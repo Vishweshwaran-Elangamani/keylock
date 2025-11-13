@@ -1,0 +1,363 @@
+/* PROMOTION DETAILS MODAL - PERFECTLY CENTERED */
+
+.modal.show {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-dialog {
+  position: static !important;
+  margin: 0 !important;
+  max-width: 900px !important;
+  width: calc(100% - 40px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.modal-content {
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: 95vh !important;
+  height: auto !important;
+  width: 100% !important;
+}
+
+.promo-modal-header {
+  background: linear-gradient(90deg, #27235C 0%, #1a1842 100%);
+  color: #ffffff;
+  border-bottom: 2px solid #1a1842;
+  padding: 14px 20px !important;
+  flex-shrink: 0;
+  border-radius: 0;
+}
+
+.promo-modal-header .modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.promo-modal-header i {
+  font-size: 22px;
+  color: #fbbf24;
+}
+
+.promo-modal-header .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+  padding: 0;
+}
+
+.promo-modal-header .btn-close:hover {
+  opacity: 1;
+}
+
+.promo-modal-body {
+  padding: 12px 16px;
+  background: #ffffff;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.promo-modal-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.promo-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.promo-modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.promo-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.promo-details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.promo-details-section {
+  margin-bottom: 0;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.promo-details-section:nth-child(odd) {
+  background: #f0f9ff;
+  border-color: #bfdbfe;
+}
+
+.promo-details-section:last-child {
+  margin-bottom: 0;
+}
+
+.promo-details-heading {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.promo-details-heading i {
+  color: #0369a1;
+  font-size: 14px;
+}
+
+.promo-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.promo-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.promo-detail-item label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.promo-detail-item span {
+  font-size: 12px;
+  color: #1e293b;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.promo-new-role-highlight {
+  color: #10b981 !important;
+  font-weight: 700 !important;
+}
+
+.promo-new-salary-highlight {
+  color: #10b981 !important;
+  font-weight: 700 !important;
+}
+
+.promo-status-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  width: fit-content;
+}
+
+.promo-status-approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.promo-status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.promo-status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.promo-increment-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  background: #dbeafe;
+  color: #0c4a6e;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.promo-justification-box {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.5;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.promo-justification-box p {
+  margin: 0;
+  word-break: break-word;
+}
+
+.promo-justification-box::-webkit-scrollbar {
+  width: 4px;
+}
+
+.promo-justification-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.promo-justification-box::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.promo-modal-footer {
+  padding: 10px 16px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn {
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  height: 36px;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover {
+  background: #cbd5e1;
+  color: #1e293b;
+}
+
+@media (max-width: 1024px) {
+  .modal-dialog {
+    max-width: 90% !important;
+    width: calc(100% - 40px) !important;
+  }
+
+  .promo-details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-dialog {
+    max-width: 95% !important;
+    width: calc(100% - 30px) !important;
+  }
+
+  .promo-modal-header .modal-title {
+    font-size: 14px;
+  }
+
+  .promo-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    max-width: 98% !important;
+    width: calc(100% - 20px) !important;
+  }
+
+  .promo-modal-header {
+    padding: 10px 12px !important;
+  }
+
+  .promo-modal-header .modal-title {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .promo-modal-header i {
+    font-size: 18px;
+  }
+
+  .promo-modal-body {
+    padding: 8px 12px;
+  }
+
+  .promo-modal-footer {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .btn {
+    font-size: 11px;
+    padding: 4px 10px;
+    height: 32px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .promo-details-section {
+    padding: 8px;
+  }
+
+  .promo-details-heading {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  .promo-detail-item label {
+    font-size: 9px;
+  }
+
+  .promo-detail-item span {
+    font-size: 11px;
+  }
+
+  .promo-justification-box {
+    max-height: 80px;
+    font-size: 11px;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal.show .modal-content {
+  animation: modalSlideIn 0.3s ease-out;
+}

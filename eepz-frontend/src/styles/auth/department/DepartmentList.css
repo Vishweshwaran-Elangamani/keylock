@@ -1,0 +1,576 @@
+/* ===================================================================
+   DEPARTMENT MANAGEMENT - COMPACT STYLES
+   All classes use '-dept' suffix to prevent CSS conflicts
+   =================================================================== */
+
+/* ========================
+   CONTAINER
+   ======================== */
+.department-management-page {
+  padding: 1.25rem;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+/* ========================
+   BREADCRUMBS
+   ======================== */
+.breadcrumb-nav-dept {
+  margin-bottom: 1.25rem;
+}
+
+.breadcrumb-dept {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-item-dept {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6c757d;
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-item-dept.clickable {
+  cursor: pointer;
+}
+
+.breadcrumb-item-dept.clickable:hover {
+  color: #97247E;
+}
+
+.breadcrumb-item-dept i {
+  font-size: 1rem;
+  color: #97247E;
+}
+
+.breadcrumb-item-dept:not(:last-child)::after {
+  content: '\F285';
+  font-family: 'bootstrap-icons';
+  margin-left: 0.5rem;
+  color: #6c757d;
+}
+
+.breadcrumb-item-dept.active {
+  color: #97247E;
+  font-weight: 600;
+}
+
+/* ========================
+   PAGE HEADER
+   ======================== */
+.page-header-dept {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.header-text-dept {
+  flex: 1;
+}
+
+.page-title-dept {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #27235c;
+  margin: 0 0 0.25rem 0;
+}
+
+.page-subtitle-dept {
+  color: #6c757d;
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+.btn-create-dept {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #97247E 0%, #E01950 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.3);
+}
+
+.btn-create-dept:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.4);
+}
+
+/* ========================
+   STATISTICS CARDS
+   ======================== */
+.stats-cards-dept {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.stat-card-dept {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.stat-card-dept:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon-dept {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.stat-total-dept .stat-icon-dept {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-active-dept .stat-icon-dept {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.stat-content-dept {
+  flex: 1;
+}
+
+.stat-value-dept {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #27235c;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label-dept {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* ========================
+   CONTROLS BAR
+   ======================== */
+.controls-bar-dept {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.search-section-dept {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-input-wrapper-dept {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrapper-dept i {
+  position: absolute;
+  left: 1rem;
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.search-input-wrapper-dept input {
+  width: 100%;
+  padding: 0.625rem 2.5rem 0.625rem 2.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  transition: all 0.3s ease;
+}
+
+.search-input-wrapper-dept input:focus {
+  outline: none;
+  border-color: #97247E;
+  box-shadow: 0 0 0 3px rgba(151, 36, 126, 0.1);
+}
+
+.clear-search-dept {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.clear-search-dept:hover {
+  color: #97247E;
+}
+
+.view-switcher-dept {
+  display: flex;
+  gap: 0.5rem;
+  background: #fff;
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.view-btn-dept {
+  padding: 0.5rem 0.875rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.125rem;
+}
+
+.view-btn-dept:hover {
+  color: #97247E;
+  background: rgba(151, 36, 126, 0.05);
+}
+
+.view-btn-dept.active {
+  background: #97247E;
+  color: #fff;
+}
+
+/* ========================
+   GRID VIEW
+   ======================== */
+.departments-grid-dept {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.department-card-item {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.department-card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: #97247E;
+}
+
+.card-header-dept {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.dept-icon-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #97247E 0%, #E01950 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.card-body-dept {
+  margin-bottom: 1rem;
+}
+
+.dept-name-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #27235c;
+  margin: 0 0 0.625rem 0;
+}
+
+.dept-description-text {
+  font-size: 0.875rem;
+  color: #6c757d;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.card-footer-dept {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dept-info-date {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  color: #6c757d;
+}
+
+.card-actions-dept {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon-dept {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9375rem;
+}
+
+.btn-edit-dept {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.btn-edit-dept:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.btn-delete-dept {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.btn-delete-dept:hover:not(:disabled) {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-delete-dept:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ========================
+   TABLE VIEW
+   ======================== */
+.table-container-dept {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.table-dept {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.table-dept thead {
+  background: #f8f9fa;
+}
+
+.table-dept th {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #27235c;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table-dept tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.2s ease;
+}
+
+.table-dept tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.table-dept td {
+  padding: 0.875rem 1rem;
+  color: #27235c;
+}
+
+.table-dept-name {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-weight: 600;
+}
+
+.table-dept-name i {
+  font-size: 1.25rem;
+  color: #97247E;
+}
+
+.description-cell {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #6c757d;
+}
+
+.table-actions-dept {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ========================
+   PAGINATION
+   ======================== */
+.pagination-dept {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.pagination-btn {
+  padding: 0.5rem 0.875rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #27235c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #97247E;
+  color: #fff;
+  border-color: #97247E;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 0.9375rem;
+  color: #27235c;
+  font-weight: 500;
+}
+
+/* ========================
+   LOADING
+   ======================== */
+.loading-container-dept {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* ========================
+   EMPTY STATE
+   ======================== */
+.empty-state-dept {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 3rem;
+  text-align: center;
+}
+
+.empty-icon-dept {
+  font-size: 4rem;
+  color: #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.empty-state-dept h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #27235c;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state-dept p {
+  color: #6c757d;
+  margin: 0;
+}
+
+/* ========================
+   RESPONSIVE DESIGN
+   ======================== */
+@media (max-width: 768px) {
+  .department-management-page {
+    padding: 1rem;
+  }
+
+  .page-header-dept {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .controls-bar-dept {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-section-dept {
+    max-width: 100%;
+  }
+
+  .departments-grid-dept {
+    grid-template-columns: 1fr;
+  }
+
+  .table-container-dept {
+    overflow-x: auto;
+  }
+
+  .table-dept {
+    min-width: 800px;
+  }
+}

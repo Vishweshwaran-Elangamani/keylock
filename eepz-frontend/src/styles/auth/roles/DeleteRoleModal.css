@@ -1,0 +1,479 @@
+/* ===================================================================
+   DELETE ROLE MODAL STYLES
+   Matches DeactivateUserModal styling pattern
+   =================================================================== */
+
+/* ========================
+   MODAL BACKDROP
+   ======================== */
+.modal-backdrop-delete-role {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  animation: fadeInDeleteRole 0.2s ease-in-out;
+}
+
+@keyframes fadeInDeleteRole {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ========================
+   MODAL WRAPPER
+   ======================== */
+.modal-wrapper-delete-role {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1055;
+  padding: 1rem;
+  overflow-y: auto;
+  animation: slideUpDeleteRole 0.3s ease-out;
+}
+
+@keyframes slideUpDeleteRole {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================
+   MODAL DIALOG
+   ======================== */
+.modal-dialog-delete-role {
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+}
+
+/* ========================
+   MODAL CONTENT
+   ======================== */
+.modal-content-delete-role {
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+/* ========================
+   MODAL HEADER
+   ======================== */
+.modal-header-delete-role {
+  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: none;
+}
+
+.modal-title-delete-role {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #FFFFFF;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.modal-title-delete-role i {
+  font-size: 1.5rem;
+}
+
+.modal-close-btn-delete-role {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.modal-close-btn-delete-role:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+.modal-close-btn-delete-role:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================
+   MODAL BODY
+   ======================== */
+.modal-body-delete-role {
+  padding: 2rem;
+}
+
+/* ========================
+   DELETE QUESTION
+   ======================== */
+.delete-question-delete-role {
+  font-size: 1.125rem;
+  color: #27235c;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.role-name-highlight-delete-role {
+  color: #97247E;
+  font-weight: 700;
+}
+
+/* ========================
+   ROLE INFO BOX
+   ======================== */
+.role-info-box-delete-role {
+  background: #f8f9fa;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.role-info-item-delete-role {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.role-info-item-delete-role:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.role-info-item-delete-role:first-child {
+  padding-top: 0;
+}
+
+.role-info-label-delete-role {
+  color: #6c757d;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.role-info-value-delete-role {
+  color: #27235c;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.role-code-badge-delete-role {
+  background: rgba(151, 36, 126, 0.1);
+  color: #97247E;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* ========================
+   WARNING BOX
+   ======================== */
+.warning-box-delete-role {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+  border: 2px solid #dc3545;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.warning-header-delete-role {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #dc3545;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.warning-header-delete-role i {
+  font-size: 1.5rem;
+  animation: pulseWarningDeleteRole 2s ease-in-out infinite;
+}
+
+@keyframes pulseWarningDeleteRole {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.warning-text-delete-role {
+  color: #721c24;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0 0 1rem 0;
+}
+
+.warning-text-delete-role strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #dc3545;
+}
+
+.warning-list-delete-role {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.warning-list-delete-role li {
+  color: #721c24;
+  font-size: 0.9375rem;
+  padding: 0.5rem 0;
+  padding-left: 1.75rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.warning-list-delete-role li::before {
+  content: '\F62A';
+  font-family: 'bootstrap-icons';
+  position: absolute;
+  left: 0;
+  color: #dc3545;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* ========================
+   INFO ALERT
+   ======================== */
+.info-alert-delete-role {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 140, 0, 0.08);
+  border: 1px solid rgba(255, 140, 0, 0.2);
+  border-radius: 10px;
+  color: #97247E;
+}
+
+.info-alert-delete-role i {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.info-alert-delete-role small {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.info-alert-delete-role strong {
+  font-weight: 700;
+}
+
+/* ========================
+   MODAL FOOTER
+   ======================== */
+.modal-footer-delete-role {
+  padding: 1.5rem 2rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* ========================
+   BUTTONS
+   ======================== */
+.btn-cancel-delete-role,
+.btn-submit-delete-role {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.12s ease;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-cancel-delete-role {
+  background: transparent;
+  color: #6c757d;
+  border: 1px solid #e5e7eb;
+}
+
+.btn-cancel-delete-role:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #6c757d;
+  color: #212529;
+}
+
+/* DANGER/DELETE BUTTON */
+.btn-submit-delete-role {
+  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-submit-delete-role:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-cancel-delete-role:disabled,
+.btn-submit-delete-role:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-cancel-delete-role i,
+.btn-submit-delete-role i {
+  font-size: 1rem;
+}
+
+/* ========================
+   SPINNER
+   ======================== */
+.spinner-delete-role {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: spinDeleteRole 0.6s linear infinite;
+}
+
+@keyframes spinDeleteRole {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================
+   RESPONSIVE DESIGN
+   ======================== */
+@media (max-width: 768px) {
+  .modal-wrapper-delete-role {
+    padding: 0.5rem;
+  }
+
+  .modal-dialog-delete-role {
+    max-width: 100%;
+  }
+
+  .modal-header-delete-role {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .modal-title-delete-role {
+    font-size: 1.125rem;
+  }
+
+  .modal-body-delete-role {
+    padding: 1.5rem;
+  }
+
+  .delete-question-delete-role {
+    font-size: 1rem;
+  }
+
+  .role-info-item-delete-role {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .modal-footer-delete-role {
+    padding: 1.25rem 1.5rem;
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancel-delete-role,
+  .btn-submit-delete-role {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-header-delete-role {
+    padding: 1rem 1.25rem;
+  }
+
+  .modal-title-delete-role {
+    font-size: 1rem;
+  }
+
+  .modal-title-delete-role i {
+    font-size: 1.25rem;
+  }
+
+  .modal-body-delete-role {
+    padding: 1.25rem;
+  }
+
+  .delete-question-delete-role {
+    font-size: 0.9375rem;
+  }
+
+  .warning-box-delete-role {
+    padding: 1.25rem;
+  }
+
+  .modal-footer-delete-role {
+    padding: 1rem 1.25rem;
+  }
+}
+
+/* ========================
+   ACCESSIBILITY
+   ======================== */
+.btn-cancel-delete-role:focus-visible,
+.btn-submit-delete-role:focus-visible,
+.modal-close-btn-delete-role:focus-visible {
+  outline: 2px solid #97247E;
+  outline-offset: 2px;
+}

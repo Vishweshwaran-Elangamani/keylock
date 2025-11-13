@@ -1,0 +1,20 @@
+/* Reuse all styles from InternalOpportunityManagement.css */
+/* Import if needed */
+@import "./InternalOpportunityManagement.css";
+
+/* Additional nomination-specific styles */
+.nomination-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-warning {
+  background-color: #fef08a;
+  color: #854d0e;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}

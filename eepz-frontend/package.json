@@ -1,0 +1,42 @@
+{
+  "name": "eepz-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.11.2",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.553.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.10.10",
+    "react-datepicker": "^8.8.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.6.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^6.20.1",
+    "react-toastify": "^11.0.5",
+    "react-tooltip": "^5.30.0",
+    "recharts": "^3.3.0",
+    "sonner": "^2.0.7",
+    "toastr": "^2.1.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-datepicker": "^6.2.0",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "vite": "^5.0.8"
+  }
+}

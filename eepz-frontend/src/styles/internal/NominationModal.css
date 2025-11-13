@@ -1,0 +1,88 @@
+/* Existing imports */
+@import "./OpportunityModal.css";
+
+/* Info section styling */
+.info-section {
+  background-color: #f0f9ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-section p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.info-section strong {
+  color: #0c4a6e;
+  font-weight: 600;
+}
+
+.details-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #e74c3c;
+  padding-bottom: 8px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #7f8c8d;
+}
+
+.detail-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.salary-old {
+  color: #95a5a6;
+}
+
+.salary-new {
+  color: #27ae60;
+}
+
+.salary-increase {
+  color: #e74c3c;
+  font-weight: 700;
+}
+
+.remarks-text {
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.modal-dialog-large {
+  max-width: 800px;
+}

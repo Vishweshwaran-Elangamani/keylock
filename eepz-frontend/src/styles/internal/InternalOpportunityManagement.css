@@ -1,0 +1,31 @@
+/* Reuse your existing UserList.css styles */
+/* This file can import or extend your existing user management styles */
+
+.opportunity-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.opportunity-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.opportunity-desc,
+.opportunity-req {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}

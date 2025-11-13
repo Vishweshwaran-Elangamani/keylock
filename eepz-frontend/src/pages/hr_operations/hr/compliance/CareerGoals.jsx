@@ -1,0 +1,762 @@
+import { useEffect, useState } from "react";
+import hrApi from "../../../../services/hr_operations/hr/hrApi";
+import {
+  Button,
+  Modal,
+  Spinner,
+  Alert,
+  OverlayTrigger,
+  Tooltip,
+  Form,
+  InputGroup,
+  Pagination,
+} from "react-bootstrap";
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as ChartTooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { FaPaperPlane, FaLightbulb, FaSearch } from "react-icons/fa";
+import "../../../../styles/hr_operations/hr/careerGoals.css";
+
+const CareerGoals = () => {
+  const [withoutGoals, setWithoutGoals] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [loadingWithoutGoals, setLoadingWithoutGoals] = useState(false);
+  const [goalSuggestions, setGoalSuggestions] = useState(null);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [adoptionStats, setAdoptionStats] = useState(null);
+  const [loadingAdoption, setLoadingAdoption] = useState(false);
+  const [goalStats, setGoalStats] = useState(null);
+  const [loadingGoalStats, setLoadingGoalStats] = useState(false);
+  const [reminderEmailModal, setReminderEmailModal] = useState(false);
+  const [reminderTargetUser, setReminderTargetUser] = useState(null);
+  const [sendingReminder, setSendingReminder] = useState(false);
+  const [reminderResult, setReminderResult] = useState(null);
+  const [alert, setAlert] = useState(null);
+
+  // Bulk Selection States
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [bulkReminderModal, setBulkReminderModal] = useState(false);
+  const [sendingBulkReminder, setSendingBulkReminder] = useState(false);
+
+  // Search & Filter States
+  const [searchTerm, setSearchTerm] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("");
+  const [daysFilter, setDaysFilter] = useState("");
+
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  // Load data on mount
+  useEffect(() => {
+    fetchWithoutGoals();
+    fetchAdoptionStats();
+    fetchGoalStats();
+  }, []);
+
+  // Apply filters and search whenever data or filters change
+  useEffect(() => {
+    applyFilters();
+  }, [withoutGoals, searchTerm, departmentFilter, daysFilter]);
+
+  // Reset selections when filters change
+  useEffect(() => {
+    setSelectedEmployees([]);
+    setSelectAll(false);
+  }, [filteredData]);
+
+  const fetchWithoutGoals = () => {
+    setLoadingWithoutGoals(true);
+    hrApi
+      .get("/Compliance/employees-without-goals")
+      .then((res) => {
+        setWithoutGoals(res.data.data.employees || []);
+      })
+      .catch(() => setWithoutGoals([]))
+      .finally(() => setLoadingWithoutGoals(false));
+  };
+
+  const fetchAdoptionStats = () => {
+    setLoadingAdoption(true);
+    hrApi
+      .get("/Compliance/goal-adoption-rate")
+      .then((res) => setAdoptionStats(res.data.data))
+      .catch(() => setAdoptionStats(null))
+      .finally(() => setLoadingAdoption(false));
+  };
+
+  const fetchGoalStats = () => {
+    setLoadingGoalStats(true);
+    hrApi
+      .get("/Compliance/goal-statistics")
+      .then((res) => setGoalStats(res.data.data))
+      .catch(() => setGoalStats(null))
+      .finally(() => setLoadingGoalStats(false));
+  };
+
+  const fetchSuggestions = (userId) => {
+    setLoadingSuggestions(true);
+    hrApi
+      .get(`/Compliance/suggest-goals/${userId}`)
+      .then((res) => setGoalSuggestions(res.data.data))
+      .catch(() => setGoalSuggestions(null))
+      .finally(() => setLoadingSuggestions(false));
+  };
+
+  const applyFilters = () => {
+    let filtered = [...withoutGoals];
+
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (emp) =>
+          (emp.employeeName?.toLowerCase() || "").includes(
+            searchTerm.toLowerCase()
+          ) ||
+          (emp.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+          (emp.employeeCompanyId?.toLowerCase() || "").includes(
+            searchTerm.toLowerCase()
+          )
+      );
+    }
+
+    if (departmentFilter) {
+      filtered = filtered.filter(
+        (emp) =>
+          emp.departmentName?.toLowerCase() === departmentFilter.toLowerCase()
+      );
+    }
+
+    if (daysFilter) {
+      filtered = filtered.filter((emp) => {
+        const days = emp.daysWithoutGoals ?? 0;
+        if (daysFilter === "0-7") return days <= 7;
+        if (daysFilter === "8-30") return days > 7 && days <= 30;
+        if (daysFilter === "30+") return days > 30;
+        return true;
+      });
+    }
+
+    setFilteredData(filtered);
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setDepartmentFilter("");
+    setDaysFilter("");
+    setCurrentPage(1);
+  };
+
+  const uniqueDepartments = [
+    ...new Set(withoutGoals.map((emp) => emp.departmentName).filter(Boolean)),
+  ];
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Checkbox Handlers
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      const allIds = currentItems.map((emp) => emp.userId ?? emp.UserId);
+      setSelectedEmployees(allIds);
+      setSelectAll(true);
+    } else {
+      setSelectedEmployees([]);
+      setSelectAll(false);
+    }
+  };
+
+  const handleSelectEmployee = (userId) => {
+    if (selectedEmployees.includes(userId)) {
+      setSelectedEmployees(selectedEmployees.filter((id) => id !== userId));
+      setSelectAll(false);
+    } else {
+      setSelectedEmployees([...selectedEmployees, userId]);
+    }
+  };
+
+  // Bulk Reminder Handlers
+  const openBulkReminderModal = () => {
+    if (selectedEmployees.length === 0) {
+      setAlert({
+        type: "warning",
+        message: "Please select at least one employee!",
+      });
+      return;
+    }
+    setBulkReminderModal(true);
+  };
+
+  const sendBulkReminders = () => {
+    setSendingBulkReminder(true);
+    hrApi
+      .post("/Compliance/send-goal-reminders", {
+        sendType: "multiple",
+        userIds: selectedEmployees,
+        includeGoalSuggestions: true,
+      })
+      .then((res) => {
+        setAlert({
+          type: "success",
+          message: `Reminders sent to ${selectedEmployees.length} employees successfully!`,
+        });
+        setBulkReminderModal(false);
+        setSelectedEmployees([]);
+        setSelectAll(false);
+      })
+      .catch(() => {
+        setAlert({ type: "danger", message: "Failed to send bulk reminders." });
+      })
+      .finally(() => setSendingBulkReminder(false));
+  };
+
+  const openSendReminder = (user) => {
+    setReminderTargetUser(user);
+    setReminderResult(null);
+    setReminderEmailModal(true);
+  };
+
+  const sendReminder = () => {
+    setSendingReminder(true);
+    hrApi
+      .post("/Compliance/send-goal-reminders", {
+        sendType: "single",
+        userId: reminderTargetUser.userId ?? reminderTargetUser.UserId,
+        includeGoalSuggestions: true,
+      })
+      .then((res) => {
+        setReminderResult(res.data.data);
+        setAlert({ type: "success", message: "Reminder sent successfully!" });
+
+        setTimeout(() => {
+          setReminderEmailModal(false);
+          setReminderResult(null);
+        }, 1000);
+      })
+      .catch(() => {
+        setAlert({ type: "danger", message: "Failed to send reminder." });
+      })
+      .finally(() => setSendingReminder(false));
+  };
+
+  const COLORS = [
+    "#3b82f6",
+    "#10b981",
+    "#f59e0b",
+    "#ef4444",
+    "#8b5cf6",
+    "#ec4899",
+    "#14b8a6",
+  ];
+
+  return (
+    <div className="cg-root">
+      <h2 className="cg-page-title">Career Goals</h2>
+
+      {alert && (
+        <Alert variant={alert.type} dismissible onClose={() => setAlert(null)}>
+          {alert.message}
+        </Alert>
+      )}
+
+      {/*  3 CAREER GOALS KPI CARDS */}
+      {loadingAdoption ? (
+        <div className="cg-loading-container">
+          <Spinner animation="border" />
+        </div>
+      ) : (
+        <div className="cg-career-kpi-row">
+          {adoptionStats && (
+            <>
+              <div className="cg-kpi-card card-purple">
+                <div className="cg-kpi-label">Total Employees</div>
+                <div className="cg-kpi-value">
+                  {adoptionStats.totalEmployees}
+                </div>
+                <span className="cg-kpi-meta meta-green">
+                  +{adoptionStats.employeesWithGoals} set goals
+                </span>
+              </div>
+
+              <div className="cg-kpi-card card-indigo">
+                <div className="cg-kpi-label">With Goals</div>
+                <div className="cg-kpi-value">
+                  {adoptionStats.employeesWithGoals}
+                </div>
+                <span className="cg-kpi-meta meta-blue">
+                  {adoptionStats.adoptionRate}% adoption
+                </span>
+              </div>
+
+              <div className="cg-kpi-card card-amber">
+                <div className="cg-kpi-label">Without Goals</div>
+                <div className="cg-kpi-value">
+                  {adoptionStats.employeesWithoutGoals}
+                </div>
+                <span className="cg-kpi-meta meta-orange">Need action</span>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Charts Section */}
+      {adoptionStats && goalStats && (
+        <div className="cg-charts-section">
+          <h4 className="cg-section-title">Goal Analytics</h4>
+
+          <div className="cg-charts-grid">
+            <div className="cg-chart-card">
+              <h5 className="cg-chart-title">Goal Types Distribution</h5>
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={adoptionStats.goalTypeDistribution}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={(entry) => `${entry.goalType}: ${entry.count}`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="count"
+                  >
+                    {adoptionStats.goalTypeDistribution.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Bar Chart */}
+            <div className="cg-chart-card">
+              <h5 className="cg-chart-title">Goal Status Overview</h5>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart
+                  data={[
+                    { name: "Completed", value: goalStats.completedGoals },
+                    { name: "In Progress", value: goalStats.inProgressGoals },
+                    { name: "Expired", value: goalStats.expiredGoals },
+                  ]}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <ChartTooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#9D247D" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TABLE WITH BULK SELECTION */}
+      <div className="cg-card-container">
+        <div className="cg-card-table-header">
+          <div className="cg-card-table-title">Employees Without Goals</div>
+
+          {selectedEmployees.length > 0 && (
+            <Button
+              variant="primary"
+              className="cg-bulk-btn"
+              onClick={openBulkReminderModal}
+            >
+              <FaPaperPlane className="me-2" />
+              Send Reminder to Selected ({selectedEmployees.length})
+            </Button>
+          )}
+        </div>
+
+        <div className="cg-filter-section">
+          <div className="cg-filter-row-single">
+            <InputGroup className="cg-search-input">
+              <InputGroup.Text>
+                <FaSearch />
+              </InputGroup.Text>
+              <Form.Control
+                type="text"
+                placeholder="Search by name, email, or employee ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </InputGroup>
+
+            <Form.Select
+              className="cg-filter-select"
+              value={departmentFilter}
+              onChange={(e) => setDepartmentFilter(e.target.value)}
+            >
+              <option value="">All Departments</option>
+              {uniqueDepartments.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </Form.Select>
+
+            <Form.Select
+              className="cg-filter-select"
+              value={daysFilter}
+              onChange={(e) => setDaysFilter(e.target.value)}
+            >
+              <option value="">All Days</option>
+              <option value="0-7">0-7 days</option>
+              <option value="8-30">8-30 days</option>
+              <option value="30+">30+ days</option>
+            </Form.Select>
+
+            <Button
+              variant="outline-secondary"
+              onClick={clearFilters}
+              className="cg-clear-btn"
+            >
+              Clear Filters
+            </Button>
+
+            <div className="cg-results-count-inline">
+              Showing {currentItems.length} of {filteredData.length} employees
+            </div>
+          </div>
+        </div>
+
+        <div className="cg-table-wrapper">
+          <table className="cg-employee-table">
+            <thead>
+              <tr>
+                <th className="col-checkbox">
+                  <Form.Check
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    label=""
+                  />
+                </th>
+                <th className="col-emp-id">EMPLOYEE ID</th>
+                <th className="col-name">EMPLOYEE NAME</th>
+                <th className="col-department">DEPARTMENT</th>
+                <th className="col-email">EMAIL</th>
+                <th className="col-days">DAYS WITHOUT GOALS</th>
+                <th className="col-action-text">RECOMMENDED ACTION</th>
+                <th className="col-action-btns">ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loadingWithoutGoals ? (
+                <tr>
+                  <td colSpan={8} className="cg-table-loading">
+                    <Spinner animation="border" size="sm" /> Loading...
+                  </td>
+                </tr>
+              ) : currentItems.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="cg-table-no-data">
+                    No employees found matching the criteria!
+                  </td>
+                </tr>
+              ) : (
+                currentItems.map((emp) => {
+                  const empId = emp.userId ?? emp.UserId;
+                  return (
+                    <tr key={empId}>
+                      <td className="col-checkbox">
+                        <Form.Check
+                          type="checkbox"
+                          checked={selectedEmployees.includes(empId)}
+                          onChange={() => handleSelectEmployee(empId)}
+                          label=""
+                        />
+                      </td>
+                      <td className="col-emp-id">
+                        <strong>
+                          {emp.employeeCompanyId ?? emp.EmployeeCompanyId}
+                        </strong>
+                      </td>
+                      <td className="col-name">
+                        {emp.employeeName ?? emp.EmployeeName}
+                      </td>
+                      <td className="col-department">
+                        {emp.departmentName ?? emp.DepartmentName}
+                      </td>
+                      <td className="col-email">{emp.email ?? emp.Email}</td>
+                      <td className="col-days">
+                        <span
+                          className={`cg-days-badge ${
+                            (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) > 30
+                              ? "badge-danger"
+                              : (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) >
+                                7
+                              ? "badge-warning"
+                              : "badge-info"
+                          }`}
+                        >
+                          {emp.daysWithoutGoals ?? emp.DaysWithoutGoals}
+                        </span>
+                      </td>
+                      <td className="col-action-text">
+                        {emp.recommendedAction ?? emp.RecommendedAction}
+                      </td>
+                      <td className="col-action-btns">
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`tooltip-send-${empId}`}>
+                              Send Reminder
+                            </Tooltip>
+                          }
+                        >
+                          <button
+                            className="cg-icon-btn cg-icon-btn-primary"
+                            onClick={() => openSendReminder(emp)}
+                          >
+                            <FaPaperPlane />
+                          </button>
+                        </OverlayTrigger>
+
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`tooltip-suggest-${empId}`}>
+                              Suggest Goals
+                            </Tooltip>
+                          }
+                        >
+                          <button
+                            className="cg-icon-btn cg-icon-btn-secondary"
+                            onClick={() => fetchSuggestions(empId)}
+                          >
+                            <FaLightbulb />
+                          </button>
+                        </OverlayTrigger>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {totalPages > 1 && (
+          <div className="cg-pagination-wrapper">
+            <Pagination>
+              <Pagination.First
+                onClick={() => paginate(1)}
+                disabled={currentPage === 1}
+              />
+              <Pagination.Prev
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+              />
+
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNum = index + 1;
+                if (
+                  pageNum === 1 ||
+                  pageNum === totalPages ||
+                  (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                ) {
+                  return (
+                    <Pagination.Item
+                      key={pageNum}
+                      active={pageNum === currentPage}
+                      onClick={() => paginate(pageNum)}
+                    >
+                      {pageNum}
+                    </Pagination.Item>
+                  );
+                } else if (
+                  pageNum === currentPage - 2 ||
+                  pageNum === currentPage + 2
+                ) {
+                  return <Pagination.Ellipsis key={pageNum} disabled />;
+                }
+                return null;
+              })}
+
+              <Pagination.Next
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              />
+              <Pagination.Last
+                onClick={() => paginate(totalPages)}
+                disabled={currentPage === totalPages}
+              />
+            </Pagination>
+          </div>
+        )}
+      </div>
+
+      {/* GOAL SUGGESTIONS MODAL */}
+      <Modal
+        show={!!goalSuggestions}
+        onHide={() => setGoalSuggestions(null)}
+        size="lg"
+        centered
+        className="cg-suggestions-modal"
+      >
+        <Modal.Header closeButton className="cg-modal-header">
+          <Modal.Title className="cg-modal-title">
+            Goal Suggestions for
+            <br />
+            <span className="cg-modal-email">{goalSuggestions?.email}</span>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="cg-modal-body">
+          {loadingSuggestions ? (
+            <div className="cg-modal-loading">
+              <Spinner animation="border" />
+            </div>
+          ) : (
+            <ul className="cg-suggestion-list">
+              {goalSuggestions &&
+                goalSuggestions.suggestions.map((g, idx) => (
+                  <li key={idx} className="cg-suggestion-item">
+                    <div className="cg-suggestion-header">
+                      <span className="cg-suggestion-title">{g.goalTitle}</span>
+                      <span className="cg-suggestion-type">({g.goalType})</span>
+                    </div>
+                    <div className="cg-suggestion-description">
+                      {g.goalDescription}
+                    </div>
+                    <div className="cg-suggestion-meta">
+                      <span className="cg-meta-priority">
+                        Priority: <strong>{g.priority}</strong>
+                      </span>
+                      <span className="cg-meta-duration">
+                        Duration: <strong>{g.estimatedDuration}</strong>
+                      </span>
+                    </div>
+                  </li>
+                ))}
+            </ul>
+          )}
+        </Modal.Body>
+      </Modal>
+
+      {/* SINGLE REMINDER MODAL */}
+      <Modal
+        show={reminderEmailModal}
+        onHide={() => {
+          setReminderEmailModal(false);
+          setReminderResult(null);
+        }}
+        centered
+        className="cg-reminder-modal"
+      >
+        <Modal.Header closeButton className="cg-reminder-modal-header">
+          <Modal.Title>Send Career Goals Reminder</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            Send goal-setting reminder to: <br />
+            <b>{reminderTargetUser?.email ?? reminderTargetUser?.Email}</b>
+          </p>
+          {reminderResult && (
+            <div className="cg-reminder-result">
+              {reminderResult.successful > 0 ? (
+                <span className="text-success">
+                  ✓ Reminder sent successfully!
+                </span>
+              ) : (
+                <span className="text-danger">✗ Failed to send reminder</span>
+              )}
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setReminderEmailModal(false);
+              setReminderResult(null);
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            variant="primary"
+            onClick={sendReminder}
+            disabled={sendingReminder}
+          >
+            {sendingReminder ? "Sending..." : "Send Reminder"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* BULK REMINDER MODAL */}
+      <Modal
+        show={bulkReminderModal}
+        onHide={() => setBulkReminderModal(false)}
+        centered
+        className="cg-reminder-modal"
+      >
+        <Modal.Header closeButton className="cg-reminder-modal-header">
+          <Modal.Title>Send Bulk Reminders</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            You are about to send career goals reminders to{" "}
+            <strong>{selectedEmployees.length}</strong> selected employee(s).
+          </p>
+          <p>
+            Each employee will receive an email reminder to set their career
+            goals.
+          </p>
+          <p className="text-muted">
+            <small>This action cannot be undone.</small>
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setBulkReminderModal(false)}
+            disabled={sendingBulkReminder}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={sendBulkReminders}
+            disabled={sendingBulkReminder}
+          >
+            {sendingBulkReminder ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <FaPaperPlane className="me-2" />
+                Send to {selectedEmployees.length} Employee(s)
+              </>
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
+};
+
+export default CareerGoals;

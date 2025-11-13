@@ -1,0 +1,673 @@
+import axios from "axios";
+
+// ==================== LnD MODULE BASE URL ====================
+const API_BASE_URL = import.meta.env.VITE_LND_API_URL + "/api";
+
+/**
+ * Get auth token from localStorage
+ */
+const getAuthToken = () => {
+  const token = localStorage.getItem("token") || "{}";
+  return token || "";
+};
+
+/**
+ * Get headers with auth token
+ */
+const getHeaders = () => ({
+  Authorization: `Bearer ${getAuthToken()}`,
+  "Content-Type": "application/json",
+});
+
+/**
+ * Get headers for multipart form data
+ */
+const getMultipartHeaders = () => ({
+  Authorization: `Bearer ${getAuthToken()}`,
+});
+
+/**
+ * Build query string from params object
+ */
+const buildQueryString = (params) => {
+  const queryParams = new URLSearchParams();
+
+  Object.keys(params).forEach((key) => {
+    if (
+      params[key] !== undefined &&
+      params[key] !== null &&
+      params[key] !== ""
+    ) {
+      queryParams.append(key, params[key]);
+    }
+  });
+
+  const queryString = queryParams.toString();
+  return queryString ? `?${queryString}` : "";
+};
+
+/**
+ * Handle API errors
+ */
+const handleError = (error) => {
+  if (error.response?.status === 401) {
+    localStorage.removeItem("authData");
+    window.location.href = "/login";
+  }
+  throw error;
+};
+
+/**
+ * L&D Service - All API calls for Learning & Development module
+ */
+export const lndService = {
+  // ==================== SKILLS ====================
+
+  /**
+   * Get current user's skills
+   * @param {number} pageNumber - Page number (default: 1)
+   * @param {string} searchTerm - Search term (optional)
+   * @returns {Promise} API response
+   */
+  getMySkills: async (pageNumber = 1, searchTerm = "") => {
+    try {
+      const query = buildQueryString({ pageNumber, searchTerm });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/skills/my-skills${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get subordinate employees' skills (Manager only)
+   * @param {number} pageNumber - Page number
+   * @param {number|null} employeeId - Filter by employee (optional)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortBy - Sort by field (default: 'employeename')
+   * @returns {Promise} API response
+   */
+  getSubordinateSkills: async (
+    pageNumber = 1,
+    employeeId = null,
+    searchTerm = "",
+    sortBy = "employeename"
+  ) => {
+    try {
+      const query = buildQueryString({
+        pageNumber,
+        employeeId,
+        searchTerm,
+        sortBy,
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/skills/subordinates${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Record a single skill for an employee (Manager only)
+   * @param {object} data - { employeeId, skillId, rating }
+   * @returns {Promise} API response
+   */
+  recordSkill: async (data) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/LnD/skills/record`,
+        data,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Record multiple skills for an employee (Manager only)
+   * @param {object} data - { employeeId, skills: [{ skillId, rating }] }
+   * @returns {Promise} API response
+   */
+  recordSkillsBulk: async (data) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/LnD/skills/record-bulk`,
+        data,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Update employee skill rating (Manager only)
+   * @param {object} data - { mapperId, rating }
+   * @returns {Promise} API response
+   */
+  updateSkillRating: async (data) => {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/LnD/skills/update-rating`,
+        data,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Delete employee skill (Manager only)
+   * @param {number} mapperId - Skill mapper ID
+   * @returns {Promise} API response
+   */
+  deleteSkill: async (mapperId) => {
+    try {
+      const response = await axios.delete(
+        `${API_BASE_URL}/LnD/skills/${mapperId}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get subordinate employees for manager with pagination and search
+   * @param {number} pageNumber - Page number (default: 1)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {number} pageSize - Items per page (default: 9)
+   * @returns {Promise} API response with paginated employees
+   */
+  getSubordinateEmployees: async (
+    pageNumber = 1,
+    searchTerm = "",
+    pageSize = 9
+  ) => {
+    try {
+      const query = buildQueryString({ pageNumber, searchTerm, pageSize });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/employees/subordinates${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get all available skills for dropdown
+   * @returns {Promise} List of all skills
+   */
+  getAllSkills: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/LnD/skills/all`, {
+        headers: getHeaders(),
+      });
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  // ==================== SME ====================
+
+  /**
+   * Check if current user is an SME
+   * @returns {Promise} API response with boolean
+   */
+  checkIfSme: async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/LnD/sme/check`, {
+        headers: getHeaders(),
+      });
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Apply to become SME
+   * @param {FormData} formData - { skillId, proofDocument (file) }
+   * @returns {Promise} API response
+   */
+  applyToBecomeSme: async (formData) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/LnD/sme/apply`,
+        formData,
+        { headers: getMultipartHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get available SMEs for a skill
+   * @param {number} skillId - Skill ID (required)
+   * @param {number} pageNumber - Page number
+   * @param {string} searchTerm - Search term (optional)
+   * @returns {Promise} API response
+   */
+  getAvailableSmes: async (skillId, pageNumber = 1, searchTerm = "") => {
+    try {
+      const query = buildQueryString({ skillId, pageNumber, searchTerm });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/sme/available${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  // ==================== ASSIGNMENTS ====================
+
+  /**
+   * Get current user's assignments (as mentee)
+   * @param {number} pageNumber - Page number
+   * @param {string} statusFilter - Status filter (optional)
+   * @param {string} searchTerm - Search term (optional)
+   * @returns {Promise} API response
+   */
+  getMyAssignments: async (
+    pageNumber = 1,
+    statusFilter = "",
+    searchTerm = "",
+    sortField = "",
+    sortOrder = ""
+  ) => {
+    try {
+      const query = buildQueryString({
+        pageNumber,
+        statusFilter,
+        searchTerm,
+        sortField,
+        sortOrder,
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/assignments/my-assignments${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get team assignments (Manager only)
+   * @param {number} pageNumber - Page number
+   * @param {string} statusFilter - Status filter (optional)
+   * @param {string} searchTerm - Search term (optional)
+   * @returns {Promise} API response
+   */
+  getTeamAssignments: async (
+    pageNumber = 1,
+    statusFilter = "",
+    searchTerm = "",
+    sortField = "",
+    sortOrder = "asc"
+  ) => {
+    try {
+      const query = buildQueryString({
+        pageNumber,
+        statusFilter,
+        searchTerm,
+        sortField,
+        sortOrder,
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/assignments/team${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get SME assignments (SME only)
+   * @param {number} pageNumber - Page number
+   * @param {string} statusFilter - Status filter (optional)
+   * @param {string} searchTerm - Search term (optional)
+   * @returns {Promise} API response
+   */
+  getSmeAssignments: async (
+    pageNumber = 1,
+    statusFilter = "",
+    searchTerm = "",
+    sortField = "",
+    sortOrder = "asc"
+  ) => {
+    try {
+      const query = buildQueryString({
+        pageNumber,
+        statusFilter,
+        searchTerm,
+        sortField,
+        sortOrder,
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/assignments/sme${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Request SME assignment for subordinate (Manager only)
+   * @param {object} data - { skillId, menteeEmployeeId, deadline }
+   * @returns {Promise} API response
+   */
+  requestSmeAssignment: async (data) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/LnD/assignments/request-sme`,
+        data,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Upload assignment completion proof (Employee only)
+   * @param {FormData} formData - { assignmentId, proofDocument (file), completionNotes }
+   * @returns {Promise} API response
+   */
+  uploadCompletionProof: async (formData) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/LnD/assignments/upload-proof`,
+        formData,
+        { headers: getMultipartHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Complete assignment with new rating (Manager only)
+   * @param {object} data - { assignmentId, newRating, notes }
+   * @returns {Promise} API response
+   */
+  completeAssignment: async (data) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/LnD/assignments/complete`,
+        data,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Download assignment completion proof
+   * @param {number} assignmentId - Assignment ID
+   * @returns {Promise} Blob response
+   */
+  downloadAssignmentProof: async (assignmentId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/assignments/${assignmentId}/download-proof`,
+        {
+          headers: getHeaders(),
+          responseType: "blob",
+        }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  // ==================== HR MANAGEMENT ====================
+
+  getAllOrganizationEmployees: async (
+    pageNumber = 1,
+    searchTerm = "",
+    pageSize = 9
+  ) => {
+    try {
+      const query = buildQueryString({ pageNumber, searchTerm, pageSize });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/hr/employees/organization${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  getAllOrganizationAssignments: async (
+    pageNumber = 1,
+    statusFilter = "",
+    searchTerm = "",
+    sortField = "",
+    sortOrder = "",
+    pageSize = 10
+  ) => {
+    try {
+      const query = buildQueryString({
+        pageNumber,
+        statusFilter,
+        searchTerm,
+        sortField,
+        sortOrder,
+        pageSize,
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/hr/assignments/organization${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  getAllActiveSmes: async (pageNumber = 1, searchTerm = "", pageSize = 10) => {
+    try {
+      const query = buildQueryString({ pageNumber, searchTerm, pageSize });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/hr/smes/all${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  getEmployeeSkillsForHR: async (
+    employeeId,
+    pageNumber = 1,
+    searchTerm = "",
+    sortBy = "skillname"
+  ) => {
+    try {
+      const query = buildQueryString({ pageNumber, searchTerm, sortBy });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/hr/skills/employee/${employeeId}${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  // ==================== APPROVALS ====================
+
+  /**
+   * Get current user's pending approvals (as approver)
+   * @param {number} pageNumber - Page number
+   * @param {string} approvalType - Approval type filter (optional)
+   * @param {string} status - Status filter (optional)
+   * @returns {Promise} API response
+   */
+  getMyApprovals: async (
+    pageNumber = 1,
+    approvalType = "",
+    status = "",
+    sortField = "",
+    sortOrder = "asc"
+  ) => {
+    try {
+      const query = buildQueryString({
+        pageNumber,
+        approvalType,
+        status,
+        sortField,
+        sortOrder,
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/approvals/my-approvals${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Process approval (approve/reject)
+   * @param {object} data - { approvalId, isApproved, notes }
+   * @returns {Promise} API response
+   */
+  processApproval: async (data) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/LnD/approvals/process`,
+        data,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get approval history
+   * @param {number} pageNumber - Page number
+   * @param {string} role - Role filter: 'all', 'requester', 'approver'
+   * @param {string} approvalType - Approval type filter (optional)
+   * @param {string} status - Status filter (optional)
+   * @returns {Promise} API response
+   */
+  getApprovalHistory: async (
+    pageNumber = 1,
+    role = "all",
+    approvalType = "",
+    status = "",
+    searchTerm = "", // ADD THIS
+    sortField = "", // ADD THIS
+    sortOrder = "" // ADD THIS
+  ) => {
+    try {
+      const query = buildQueryString({
+        pageNumber,
+        role,
+        approvalType,
+        status,
+        searchTerm, // ADD THIS
+        sortField, // ADD THIS
+        sortOrder, // ADD THIS
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/approvals/history${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Get detailed approval information
+   * @param {number} approvalId - Approval ID
+   * @returns {Promise} API response
+   */
+  getApprovalDetails: async (approvalId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/approvals/${approvalId}/details`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Download approval attachment
+   * @param {number} approvalId - Approval ID
+   * @returns {Promise} Blob response
+   */
+  downloadApprovalAttachment: async (approvalId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/approvals/${approvalId}/download`,
+        {
+          headers: getHeaders(),
+          responseType: "blob",
+        }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+};
+
+/**
+ * Helper function to trigger file download from blob
+ * @param {Blob} blob - File blob
+ * @param {string} filename - Default filename
+ */
+export const downloadFile = (blob, filename = "download") => {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+
+export default lndService;

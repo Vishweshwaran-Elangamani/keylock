@@ -1,0 +1,528 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/auth/AuthContext";
+import GoalStatusBadge from "../badges/GoalStatusBadge";
+import GoalTypeBadge from "../badges/GoalTypeBadge";
+import TaskStatusBadge from "../badges/TaskStatusBadge";
+import GoalProgress from "../forms/GoalProgress";
+import {
+  formatDate,
+  truncateText,
+  isOverdue,
+  getDaysUntilDeadline,
+} from "../../../utils/goals/goalHelpers";
+
+const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const isCreator = goal.createdByEmployeeMasterId === user.empMasterId;
+  const isAssignee = goal.assignees?.some(
+    (a) => a.employeeMasterId === user.empMasterId
+  );
+  const canAssign = isCreator && goal.goalType === "team";
+
+  // ✅ NEW: Check if user is Leadership
+  const isLeadership = user.role === "Leadership";
+  const isOrgGoal = goal.goalType === "org";
+
+  const showTaskStatus = !isCreator && isAssignee && goal.goalType === "team";
+  const overdueStatus = isOverdue(goal.endAt) && goal.status !== "completed";
+  const daysUntil = getDaysUntilDeadline(goal.endAt);
+
+  // ✅ NEW: Only show comment button if not org goal OR if leadership
+  const canShowCommentButton = onComment && (!isOrgGoal || isLeadership);
+
+  // Get user's acknowledgment status
+  const userAssignee = goal.assignees?.find(
+    (a) => a.employeeMasterId === user.empMasterId
+  );
+  const isUserAcknowledged =
+    showTaskStatus && (userAssignee?.isAcknowledged || false);
+
+  const getProgressColor = (progress) => {
+    if (progress >= 75) return "#28a745";
+    if (progress >= 50) return "#17a2b8";
+    if (progress >= 25) return "#ffc107";
+    return "#dc3545";
+  };
+
+  const handleCardClick = () => {
+    const rolePath =
+      user.role === "Employee"
+        ? "employee"
+        : user.role === "Leadership"
+        ? "Leadership"
+        : "manager";
+    navigate(`/${rolePath}/goals/${goal.goalId}`);
+  };
+
+  const currentProgress = showTaskStatus
+    ? goal.myProgress || 0
+    : goal.progressPercent || 0;
+
+  return (
+    <div
+      className="card h-100 goal-card"
+      style={{
+        cursor: "pointer",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        border: "1px solid #e0e0e0",
+        borderRadius: "12px",
+        overflow: "hidden",
+        position: "relative",
+        background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.12)";
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.borderColor = "#0d6efd";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.borderColor = "#e0e0e0";
+      }}
+    >
+      {/* Accent Bar */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "4px",
+          background: `linear-gradient(90deg, ${getProgressColor(
+            currentProgress
+          )} 0%, ${getProgressColor(currentProgress)}99 100%)`,
+          zIndex: 1,
+        }}
+      />
+
+      {/* Card Header */}
+      <div
+        style={{
+          backgroundColor: "rgba(248, 249, 250, 0.8)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid #e9ecef",
+          padding: "0.875rem 1.25rem",
+        }}
+      >
+        <div className="d-flex justify-content-between align-items-start">
+          <div className="d-flex gap-2 flex-wrap align-items-center">
+            <GoalTypeBadge type={goal.goalType} size="sm" />
+
+            {showTaskStatus ? (
+              // Show both badges for employee assignees
+              <>
+                <TaskStatusBadge
+                  progress={goal.myProgress || 0}
+                  hasPendingApproval={goal.hasPendingApproval || false}
+                  isAcknowledged={isUserAcknowledged}
+                  size="sm"
+                />
+                <GoalStatusBadge status={goal.status} size="sm" />
+              </>
+            ) : (
+              // Show only goal status for creators
+              <GoalStatusBadge status={goal.status} size="sm" />
+            )}
+
+            {goal.projectName && (
+              <span
+                className="badge"
+                style={{
+                  backgroundColor: "#e7f3ff",
+                  color: "#0056b3",
+                  fontSize: "0.7rem",
+                  fontWeight: 500,
+                  padding: "0.25rem 0.5rem",
+                  borderRadius: "4px",
+                }}
+              >
+                <i className="bi bi-folder2 me-1"></i>
+                {goal.projectName}
+              </span>
+            )}
+          </div>
+
+          {overdueStatus && (
+            <span
+              className="badge"
+              style={{
+                background: "linear-gradient(135deg, #dc3545 0%, #c82333 100%)",
+                fontSize: "0.7rem",
+                fontWeight: 600,
+                padding: "0.35rem 0.6rem",
+                borderRadius: "6px",
+                boxShadow: "0 2px 8px rgba(220, 53, 69, 0.3)",
+                animation: "pulse 2s infinite",
+              }}
+            >
+              <i className="bi bi-exclamation-triangle-fill me-1"></i>
+              Overdue
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Card Body */}
+      <div
+        className="card-body"
+        style={{ padding: "1.25rem" }}
+        onClick={handleCardClick}
+      >
+        <h6
+          className="card-title mb-2"
+          style={{
+            fontWeight: 700,
+            fontSize: "1.1rem",
+            color: "#212529",
+            lineHeight: "1.4",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            minHeight: "2.8rem",
+          }}
+        >
+          {goal.title}
+        </h6>
+
+        {goal.descriptionShort && (
+          <p
+            className="card-text mb-3"
+            style={{
+              fontSize: "0.875rem",
+              color: "#6c757d",
+              lineHeight: "1.5",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              minHeight: "2.6rem",
+            }}
+          >
+            {truncateText(goal.descriptionShort, 100)}
+          </p>
+        )}
+
+        {/* Meta Info Grid */}
+        <div
+          className="mb-3"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "0.75rem",
+            padding: "0.75rem",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "8px",
+            fontSize: "0.8rem",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <i
+              className="bi bi-person-fill"
+              style={{ fontSize: "1.1rem", color: "#0d6efd" }}
+            ></i>
+            <div>
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  color: "#6c757d",
+                  marginBottom: "2px",
+                }}
+              >
+                Creator
+              </div>
+              <div style={{ fontWeight: 600, color: "#212529" }}>
+                {truncateText(goal.createdByName || "Unknown", 15)}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <i
+              className="bi bi-calendar-check-fill"
+              style={{ fontSize: "1.1rem", color: "#dc3545" }}
+            ></i>
+            <div>
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  color: "#6c757d",
+                  marginBottom: "2px",
+                }}
+              >
+                Deadline
+              </div>
+              <div style={{ fontWeight: 600, color: "#212529" }}>
+                {formatDate(goal.endAt)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Days until deadline */}
+        {daysUntil !== null && !overdueStatus && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 0.75rem",
+              backgroundColor: daysUntil <= 7 ? "#fff3cd" : "#e7f3ff",
+              border: `1px solid ${daysUntil <= 7 ? "#ffc107" : "#0dcaf0"}`,
+              borderRadius: "6px",
+              fontSize: "0.8rem",
+              fontWeight: 500,
+              color: daysUntil <= 7 ? "#856404" : "#0c5460",
+              marginBottom: "1rem",
+            }}
+          >
+            <i
+              className={`bi ${
+                daysUntil <= 7 ? "bi-alarm-fill" : "bi-hourglass-split"
+              }`}
+            ></i>
+            <span>
+              {daysUntil === 0
+                ? "🔥 Due today!"
+                : daysUntil === 1
+                ? "⚡ Due tomorrow"
+                : `${daysUntil} days remaining`}
+            </span>
+          </div>
+        )}
+
+        {/* Progress Section */}
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "0.75rem",
+            borderRadius: "8px",
+            border: "1px solid #e9ecef",
+          }}
+        >
+          {showTaskStatus ? (
+            // Employee assignee: Show personal progress first, then overall
+            <>
+              {/* Personal Progress */}
+              <div className="mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      color: "#0dcaf0",
+                    }}
+                  >
+                    MY PROGRESS
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.9rem",
+                      fontWeight: 700,
+                      color: getProgressColor(goal.myProgress || 0),
+                    }}
+                  >
+                    {goal.myProgress || 0}%
+                  </span>
+                </div>
+                <GoalProgress
+                  progress={goal.myProgress || 0}
+                  size="sm"
+                  showLabel={false}
+                  showPercentage={false}
+                  color={getProgressColor(goal.myProgress || 0)}
+                />
+              </div>
+
+              {/* Overall Goal Progress */}
+              <div>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 500,
+                      color: "#6c757d",
+                    }}
+                  >
+                    OVERALL GOAL
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      color: getProgressColor(goal.progressPercent || 0),
+                    }}
+                  >
+                    {goal.progressPercent || 0}%
+                  </span>
+                </div>
+                <GoalProgress
+                  progress={goal.progressPercent || 0}
+                  size="xs"
+                  showLabel={false}
+                  showPercentage={false}
+                  color={getProgressColor(goal.progressPercent || 0)}
+                />
+              </div>
+            </>
+          ) : (
+            // Creator view: Show only overall progress
+            <>
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    color: "#6c757d",
+                  }}
+                >
+                  OVERALL PROGRESS
+                </span>
+                <span
+                  style={{
+                    fontSize: "0.9rem",
+                    fontWeight: 700,
+                    color: getProgressColor(currentProgress),
+                  }}
+                >
+                  {currentProgress}%
+                </span>
+              </div>
+              <GoalProgress
+                progress={currentProgress}
+                size="sm"
+                showLabel={false}
+                showPercentage={false}
+                color={getProgressColor(currentProgress)}
+              />
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Card Footer - Icon-only buttons with tooltips */}
+      {showActions && (
+        <div
+          style={{
+            backgroundColor: "rgba(248, 249, 250, 0.5)",
+            borderTop: "1px solid #e9ecef",
+            padding: "0.75rem 1.25rem",
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="d-flex justify-content-end align-items-center gap-2">
+            <button
+              type="button"
+              className="btn btn-sm btn-primary d-flex justify-content-center align-items-center"
+              onClick={handleCardClick}
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title="View Details"
+              style={{
+                fontSize: "0.9rem",
+                padding: "0.4rem 0.9rem",
+                borderRadius: "6px",
+                transition: "all 0.2s",
+                width: "36px",
+                height: "36px",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(13, 110, 253, 0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              <i className="bi bi-eye-fill" aria-hidden="true"></i>
+            </button>
+
+            {/* ✅ UPDATED: Comment Button - Hide for non-leadership on org goals */}
+            {canShowCommentButton && (
+              <button
+                className="btn btn-sm btn-outline-info d-flex justify-content-center align-items-center"
+                onClick={() => onComment(goal)}
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Add Comment"
+                style={{
+                  fontSize: "0.9rem",
+                  padding: "0.4rem 0.9rem",
+                  borderRadius: "6px",
+                  transition: "all 0.2s",
+                  width: "36px",
+                  height: "36px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#6c757d";
+                  e.currentTarget.style.color = "white";
+                  e.currentTarget.style.borderColor = "#6c757d";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = "#6c757d";
+                  e.currentTarget.style.borderColor = "#6c757d";
+                }}
+              >
+                <i className="bi bi-chat-dots-fill" aria-hidden="true"></i>
+              </button>
+            )}
+
+            {/* Assign Button */}
+            {canAssign && onAssign && (
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-info d-flex justify-content-center align-items-center"
+                onClick={() => onAssign(goal)}
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Assign to Team"
+                style={{
+                  fontSize: "0.9rem",
+                  padding: "0.4rem 0.9rem",
+                  borderRadius: "6px",
+                  transition: "all 0.2s",
+                  width: "36px",
+                  height: "36px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#0dcaf0";
+                  e.currentTarget.style.color = "white";
+                  e.currentTarget.style.borderColor = "#0dcaf0";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = "#0dcaf0";
+                  e.currentTarget.style.borderColor = "#0dcaf0";
+                }}
+              >
+                <i className="bi bi-person-plus-fill" aria-hidden="true"></i>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.7;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default GoalCard;
