@@ -1,6 +1,6 @@
 // src/services_api/feedbackApi.js
 import api from './http';
-
+ 
 // Manager Reviews
 export const managerReviewApi = {
   create: (body) => api.post('/managerreview/create', body),
@@ -15,7 +15,7 @@ export const managerReviewApi = {
   list: (page=1, size=20) => api.get('/managerreview/all', { params: { pageNumber: page, pageSize: size }}),
   byStatus: (status) => api.get(`/managerreview/status/${status}`)
 };
-
+ 
 // Mentor Feedback (Employee -> SME)
 export const mentorFeedbackApi = {
   create: (body) => api.post('/mentorfeedback/create', body),
@@ -26,7 +26,7 @@ export const mentorFeedbackApi = {
   acknowledge: (id) => api.post(`/mentorfeedback/${id}/acknowledge`),
   list: (page=1, size=20) => api.get('/mentorfeedback/all', { params: { pageNumber: page, pageSize: size }})
 };
-
+ 
 // Org Goal Feedback
 export const orgGoalFeedbackApi = {
   create: (body) => api.post('/orggoalfeedback/create', body),
@@ -36,7 +36,7 @@ export const orgGoalFeedbackApi = {
   remove: (id) => api.delete(`/orggoalfeedback/${id}`),
   list: (page=1, size=20) => api.get('/orggoalfeedback/all', { params: { pageNumber: page, pageSize: size }})
 };
-
+ 
 // Peer Feedback Queue (HR Approval)
 export const peerQueueApi = {
   create: (body) => api.post('/peerfeedbackqueue/create', body),
@@ -50,7 +50,7 @@ export const peerQueueApi = {
   approved: () => api.get('/peerfeedbackqueue/approved'),
   list: (page=1, size=20) => api.get('/peerfeedbackqueue/all', { params: { pageNumber: page, pageSize: size }})
 };
-
+ 
 // HR Forms & Responses
 export const hrFormApi = {
   createForm: (body) => api.post('/hrfeedbackform/forms/create', body),
@@ -59,7 +59,7 @@ export const hrFormApi = {
   listActive: () => api.get('/hrfeedbackform/forms/active'),
   updateForm: (id, body) => api.put(`/hrfeedbackform/forms/${id}`, body),
   removeForm: (id) => api.delete(`/hrfeedbackform/forms/${id}`),
-
+ 
   createResponse: (body) => api.post('/hrfeedbackform/responses/create', body),
   getResponse: (id) => api.get(`/hrfeedbackform/responses/${id}`),
   byForm: (formId) => api.get(`/hrfeedbackform/responses/by-form/${formId}`),
@@ -70,7 +70,47 @@ export const hrFormApi = {
     api.post(`/hrfeedbackform/responses/${id}/hr-review`, null, { params: { hrComments, reviewedByHRId }}),
   removeResponse: (id) => api.delete(`/hrfeedbackform/responses/${id}`)
 };
-
+ 
+// ============================================================================
+// SME API (NEW - Subject Matter Experts / Mentors)
+// ============================================================================
+export const smeApi = {
+  // Get all active SMEs
+  getActive: () => api.get('/sme/active'),
+ 
+  // Get SME by ID
+  getById: (smeId) => api.get(`/sme/${smeId}`),
+ 
+  // Get SMEs by skill
+  getBySkill: (skillId) => api.get(`/sme/skill/${skillId}`),
+ 
+  // Get SMEs for a specific employee (their mentors)
+  getMyMentors: (employeeId) => api.get(`/sme/mentors/${employeeId}`),
+ 
+  // Get all SMEs (with pagination)
+  list: (page=1, size=20) => api.get('/sme/all', { params: { pageNumber: page, pageSize: size }})
+};
+ 
+// ============================================================================
+// EMPLOYEE API (NEW - Employee Management)
+// ============================================================================
+export const employeeApi = {
+  // Get all employees
+  getAll: () => api.get('/employeemanagement/all'),
+ 
+  // Get employee by ID
+  getById: (employeeId) => api.get(`/employeemanagement/${employeeId}`),
+ 
+  // Get employees by department
+  getByDepartment: (departmentId) => api.get(`/employeemanagement/department/${departmentId}`),
+ 
+  // Get employees by role
+  getByRole: (roleId) => api.get(`/employeemanagement/role/${roleId}`),
+ 
+  // Search employees
+  search: (query) => api.get('/employeemanagement/search', { params: { q: query }})
+};
+ 
 // Shared date helpers (re-use index.css tokens for visuals in UI)
 export const dateHelpers = {
   daysRemaining: (iso) => {
@@ -88,3 +128,5 @@ export const dateHelpers = {
     return { status: 'On Track', color: '#24A148', icon: '✅' };
   }
 };
+ 
+ 

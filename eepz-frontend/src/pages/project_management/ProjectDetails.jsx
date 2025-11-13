@@ -1,14 +1,13 @@
 // src/pages/ProjectManagement/ProjectDetails.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   Calendar,
   Building,
   Briefcase,
   Users,
   UserCog,
-  Edit,
   Clock,
   Activity,
   CheckCircle,
@@ -19,19 +18,19 @@ import {
   Home
 } from 'lucide-react';
 import projectService from '../../services/project_management/projectService';
-
+ 
 const ProjectDetails = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
-  
+ 
   const [project, setProject] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+ 
   useEffect(() => {
     fetchProjectDetails();
   }, [projectId]);
-
+ 
   const fetchProjectDetails = async () => {
     setIsLoading(true);
     setError(null);
@@ -50,7 +49,7 @@ const ProjectDetails = () => {
       setIsLoading(false);
     }
   };
-
+ 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -59,7 +58,7 @@ const ProjectDetails = () => {
       day: 'numeric'
     });
   };
-
+ 
   const getStatusBadge = (status) => {
     const statusConfig = {
       'Active': { color: 'success', icon: CheckCircle },
@@ -76,7 +75,7 @@ const ProjectDetails = () => {
       </span>
     );
   };
-
+ 
   if (isLoading) {
     return (
       <div className="h-100 d-flex align-items-center justify-content-center">
@@ -89,12 +88,12 @@ const ProjectDetails = () => {
       </div>
     );
   }
-
+ 
   if (error || !project) {
     return (
       <div className="h-100 d-flex flex-column">
         <div className="d-flex align-items-center mb-4">
-          <button 
+          <button
             className="btn btn-link text-decoration-none p-0 me-3"
             onClick={() => navigate('/hr/dashboard/projectmgmt/list')}
           >
@@ -109,23 +108,23 @@ const ProjectDetails = () => {
       </div>
     );
   }
-
+ 
   const clientName = project.clientName || project.ClientName || 'N/A';
-
+ 
   return (
     <div className="h-100 d-flex flex-column">
       {/* Breadcrumbs */}
       <nav aria-label="breadcrumb" className="mb-3">
-        <ol 
-          className="breadcrumb mb-0 p-3 rounded" 
+        <ol
+          className="breadcrumb mb-0 p-3 rounded"
           style={{
             backgroundColor: 'rgba(151, 36, 126, 0.05)',
             fontSize: '0.875rem'
           }}
         >
           <li className="breadcrumb-item">
-            <a 
-              href="#" 
+            <a
+              href="#"
               onClick={(e) => { e.preventDefault(); navigate('/hr/dashboard/projectmgmt'); }}
               style={{
                 color: 'var(--color-primary-3)',
@@ -140,8 +139,8 @@ const ProjectDetails = () => {
             </a>
           </li>
           <li className="breadcrumb-item">
-            <a 
-              href="#" 
+            <a
+              href="#"
               onClick={(e) => { e.preventDefault(); navigate('/hr/dashboard/projectmgmt/list'); }}
               style={{
                 color: 'var(--color-primary-3)',
@@ -158,11 +157,11 @@ const ProjectDetails = () => {
           </li>
         </ol>
       </nav>
-
+ 
       {/* Page Header */}
       <div className="d-flex align-items-center justify-content-between mb-4">
         <div className="d-flex align-items-center gap-3">
-          <button 
+          <button
             className="btn btn-link text-decoration-none p-0"
             onClick={() => navigate('/hr/dashboard/projectmgmt/list')}
           >
@@ -174,7 +173,7 @@ const ProjectDetails = () => {
           </div>
         </div>
       </div>
-
+ 
       {/* Project Details Content */}
       <div className="flex-grow-1 overflow-auto">
         <div className="row g-4">
@@ -183,7 +182,7 @@ const ProjectDetails = () => {
             {/* Basic Information Card */}
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-header bg-white border-0 py-3">
-                <h5 className="mb-0 d-flex align-items-center gap-2">
+                <h5 className="mb-0 d-flex align-items-center gap-2" style={{ color: 'white', fontWeight: 600 }}>
                   <FileText size={20} className="text-primary" />
                   Basic Information
                 </h5>
@@ -201,7 +200,7 @@ const ProjectDetails = () => {
                       </div>
                     </div>
                   </div>
-
+ 
                   {/* CLIENT NAME FIELD */}
                   <div className="col-md-6">
                     <div className="d-flex align-items-start gap-3">
@@ -214,7 +213,7 @@ const ProjectDetails = () => {
                       </div>
                     </div>
                   </div>
-
+ 
                   <div className="col-md-6">
                     <div className="d-flex align-items-start gap-3">
                       <div className="bg-info-subtle rounded p-2">
@@ -226,7 +225,7 @@ const ProjectDetails = () => {
                       </div>
                     </div>
                   </div>
-
+ 
                   <div className="col-md-6">
                     <div className="d-flex align-items-start gap-3">
                       <div className="bg-success-subtle rounded p-2">
@@ -238,7 +237,7 @@ const ProjectDetails = () => {
                       </div>
                     </div>
                   </div>
-
+ 
                   <div className="col-md-6">
                     <div className="d-flex align-items-start gap-3">
                       <div className="bg-warning-subtle rounded p-2">
@@ -250,7 +249,7 @@ const ProjectDetails = () => {
                       </div>
                     </div>
                   </div>
-
+ 
                   <div className="col-md-6">
                     <div className="d-flex align-items-start gap-3">
                       <div className="bg-secondary-subtle rounded p-2">
@@ -262,7 +261,7 @@ const ProjectDetails = () => {
                       </div>
                     </div>
                   </div>
-
+ 
                   <div className="col-12">
                     <div className="d-flex align-items-start gap-3">
                       <div className="bg-info-subtle rounded p-2">
@@ -277,11 +276,11 @@ const ProjectDetails = () => {
                 </div>
               </div>
             </div>
-
+ 
             {/* Timeline Card */}
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-header bg-white border-0 py-3">
-                <h5 className="mb-0 d-flex align-items-center gap-2">
+                <h5 className="mb-0 d-flex align-items-center gap-2" style={{ color: 'white', fontWeight: 600 }}>
                   <Calendar size={20} className="text-primary" />
                   Project Timeline
                 </h5>
@@ -299,7 +298,7 @@ const ProjectDetails = () => {
                       </div>
                     </div>
                   </div>
-
+ 
                   <div className="col-md-6">
                     <div className="d-flex align-items-start gap-3">
                       <div className="bg-danger-subtle rounded p-2">
@@ -314,11 +313,11 @@ const ProjectDetails = () => {
                 </div>
               </div>
             </div>
-
+ 
             {/* Mapped Employees Card */}
             <div className="card border-0 shadow-sm">
               <div className="card-header bg-white border-0 py-3">
-                <h5 className="mb-0 d-flex align-items-center gap-2">
+                <h5 className="mb-0 d-flex align-items-center gap-2" style={{ color: 'white', fontWeight: 600 }}>
                   <Users size={20} className="text-primary" />
                   Mapped Employees ({project.mappedEmployees?.length || 0})
                 </h5>
@@ -328,13 +327,52 @@ const ProjectDetails = () => {
                   <div className="row g-3">
                     {project.mappedEmployees.map((employee) => (
                       <div key={employee.employeeMasterId} className="col-md-6">
-                        <div className="border rounded p-3 h-100">
-                          <div className="d-flex align-items-center gap-3">
-                            <div className="bg-primary-subtle rounded-circle d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px' }}>
-                              <User size={24} className="text-primary" />
+                        <div
+                          className={`border rounded p-3 h-100 position-relative ${
+                            employee.isPrimary ? 'border-primary border-2' : ''
+                          }`}
+                          style={{
+                            transition: 'all 0.2s ease-in-out'
+                          }}
+                        >
+                          {/* Primary Badge - Top Right */}
+                          {employee.isPrimary && (
+                            <div
+                              className="position-absolute top-0 end-0 mt-2 me-2"
+                              style={{ zIndex: 1 }}
+                            >
+                              <span className="badge bg-primary d-flex align-items-center gap-1">
+                                <CheckCircle size={12} />
+                                Primary
+                              </span>
                             </div>
+                          )}
+ 
+                          <div className="d-flex align-items-center gap-3">
+                            {/* Avatar with Primary Styling */}
+                            <div
+                              className={`rounded-circle d-flex align-items-center justify-content-center ${
+                                employee.isPrimary
+                                  ? 'bg-primary text-white'
+                                  : 'bg-primary-subtle'
+                              }`}
+                              style={{
+                                width: '48px',
+                                height: '48px',
+                                transition: 'all 0.2s ease-in-out'
+                              }}
+                            >
+                              <User
+                                size={24}
+                                className={employee.isPrimary ? 'text-white' : 'text-primary'}
+                              />
+                            </div>
+                           
+                            {/* Employee Info */}
                             <div className="flex-grow-1">
-                              <h6 className="mb-1">{employee.firstName} {employee.lastName}</h6>
+                              <h6 className="mb-1 fw-semibold">
+                                {employee.firstName} {employee.lastName}
+                              </h6>
                               <p className="mb-0 small text-muted d-flex align-items-center gap-2">
                                 <Briefcase size={14} />
                                 {employee.roleName}
@@ -344,7 +382,18 @@ const ProjectDetails = () => {
                                 {employee.departmentName}
                               </p>
                             </div>
-                            <span className="badge bg-secondary">ID: {employee.employeeMasterId}</span>
+ 
+                            {/* Status Badges - Right Side */}
+                            <div className="d-flex flex-column align-items-end gap-1">
+                              <span className="badge bg-secondary">
+                                ID: {employee.employeeMasterId}
+                              </span>
+                              {!employee.isPrimary && (
+                                <span className="badge bg-light text-dark border">
+                                  Secondary
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -359,13 +408,13 @@ const ProjectDetails = () => {
               </div>
             </div>
           </div>
-
+ 
           {/* Right Column - Reporting Managers */}
           <div className="col-lg-4">
             {/* Reporting Managers Card */}
             <div className="card border-0 shadow-sm sticky-top" style={{ top: '20px' }}>
               <div className="card-header bg-white border-0 py-3">
-                <h5 className="mb-0 d-flex align-items-center gap-2">
+                <h5 className="mb-0 d-flex align-items-center gap-2" style={{ color: 'white', fontWeight: 600 }}>
                   <UserCog size={20} className="text-primary" />
                   Reporting Managers
                 </h5>
@@ -393,7 +442,7 @@ const ProjectDetails = () => {
                     </div>
                   )}
                 </div>
-
+ 
                 {/* L1 Approver */}
                 <div className="mb-4">
                   <label className="text-muted small mb-2 d-block">L1 Approver (Manager)</label>
@@ -416,7 +465,7 @@ const ProjectDetails = () => {
                     </div>
                   )}
                 </div>
-
+ 
                 {/* L2 Approver */}
                 <div>
                   <label className="text-muted small mb-2 d-block">L2 Approver (Manager)</label>
@@ -447,5 +496,7 @@ const ProjectDetails = () => {
     </div>
   );
 };
-
+ 
 export default ProjectDetails;
+ 
+ 

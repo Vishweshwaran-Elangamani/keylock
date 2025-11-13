@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { X, Send, AlertCircle } from 'lucide-react';
 import slaService from '../../services/sla/slaService';
-
+ 
 const EscalationForm = ({ sla, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     reason: '',
@@ -11,7 +11,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+ 
   const reasons = [
     'SLA Deadline Breach',
     'Performance Issue',
@@ -19,15 +19,15 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
     'Urgent Support Needed',
     'Other'
   ];
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+ 
     try {
       const user = JSON.parse(localStorage.getItem('user'));
-      
+     
       const escalationData = {
         slaid: sla.slaid,
         reason: formData.reason,
@@ -36,10 +36,10 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
         escalatedToEmployeeId: sla.assignedToEmployeeId,
         submittedByEmployeeId: user.empId
       };
-
+ 
       console.log('🚀 Escalation:', escalationData);
       const response = await slaService.submitEscalation(escalationData);
-      
+     
       if (response.success) {
         alert('✅ Escalation submitted successfully!');
         onSuccess();
@@ -53,22 +53,22 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
-
+ 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
-
+ 
   // ✅ Check if form is valid
   const isValid = formData.reason && formData.description.trim().length >= 10;
-
+ 
   return (
-    <div 
-      className="modal fade show d-block" 
+    <div
+      className="modal fade show d-block"
       style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1055 }}
       onClick={onClose}
     >
-      <div 
+      <div
         className="modal-dialog modal-dialog-centered modal-sm"
         onClick={(e) => e.stopPropagation()}
       >
@@ -81,7 +81,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
             </div>
             <button type="button" className="btn-close" onClick={onClose} disabled={loading} />
           </div>
-
+ 
           {/* Body */}
           <form onSubmit={handleSubmit}>
             <div className="modal-body px-4 py-3">
@@ -90,7 +90,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   {error}
                 </div>
               )}
-
+ 
               {/* SLA Info */}
               <div className="mb-3 p-2" style={{ backgroundColor: '#f8f9fa', borderRadius: '6px', fontSize: '0.85rem' }}>
                 <small className="text-muted d-block">SLA Type</small>
@@ -99,7 +99,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   Deadline: {formatDate(sla?.deadline)}
                 </small>
               </div>
-
+ 
               {/* Reason */}
               <div className="mb-3">
                 <label className="form-label small fw-bold mb-2">Reason *</label>
@@ -117,7 +117,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   ))}
                 </select>
               </div>
-
+ 
               {/* Description */}
               <div className="mb-3">
                 <label className="form-label small fw-bold mb-2">Details *</label>
@@ -139,13 +139,13 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
                   </small>
                 </div>
               </div>
-
+ 
               {/* Info */}
               <div className="alert alert-info alert-sm py-2" style={{ fontSize: '0.75rem', borderRadius: '6px' }}>
                 <strong>ℹ️ Level 1 (L1)</strong> escalation to your manager for immediate review.
               </div>
             </div>
-
+ 
             {/* Footer */}
             <div className="modal-footer border-top px-4 py-2 gap-2">
               <button
@@ -182,5 +182,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
     </div>
   );
 };
-
+ 
 export default EscalationForm;
+ 
+ 
