@@ -1,0 +1,192 @@
+2025-11-08 11:59:06.415 +05:30 [INF] Database migration completed successfully
+2025-11-08 11:59:33.354 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-08 11:59:33.412 +05:30 [INF] HTTP GET / responded 404 in 59.5580 ms
+2025-11-08 12:26:20.732 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 7.5791 ms
+2025-11-08 12:26:20.732 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 7.5761 ms
+2025-11-08 12:26:20.953 +05:30 [INF] Getting all SLAs
+2025-11-08 12:26:21.400 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 652.7087 ms
+2025-11-08 12:26:21.413 +05:30 [INF] Getting all SLAs
+2025-11-08 12:26:21.456 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 54.0181 ms
+2025-11-08 12:26:21.482 +05:30 [INF] Getting all SLAs
+2025-11-08 12:26:21.484 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 14.2296 ms
+2025-11-08 12:26:21.494 +05:30 [INF] Getting all SLAs
+2025-11-08 12:26:21.497 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.4099 ms
+2025-11-08 12:26:26.335 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1011 ms
+2025-11-08 12:26:26.335 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0666 ms
+2025-11-08 12:26:26.353 +05:30 [INF] Getting all SLAs
+2025-11-08 12:26:26.360 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.6733 ms
+2025-11-08 12:26:26.373 +05:30 [INF] Getting all SLAs
+2025-11-08 12:26:26.377 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.4753 ms
+2025-11-08 12:26:30.867 +05:30 [INF] Getting all SLAs
+2025-11-08 12:26:30.872 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.2672 ms
+2025-11-08 12:26:30.889 +05:30 [INF] Getting all SLAs
+2025-11-08 12:26:30.893 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.6749 ms
+2025-11-08 12:27:10.909 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 10.5812 ms
+2025-11-08 12:27:10.910 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1183 ms
+2025-11-08 12:27:10.931 +05:30 [INF] Getting all SLAs
+2025-11-08 12:27:10.935 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 22.6087 ms
+2025-11-08 12:27:10.963 +05:30 [INF] Getting all SLAs
+2025-11-08 12:27:10.968 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 30.1635 ms
+2025-11-08 12:27:19.193 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0773 ms
+2025-11-08 12:27:19.193 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0494 ms
+2025-11-08 12:27:19.210 +05:30 [INF] Getting all SLAs
+2025-11-08 12:27:19.214 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.8413 ms
+2025-11-08 12:27:19.234 +05:30 [INF] Getting all SLAs
+2025-11-08 12:27:19.237 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 22.1816 ms
+2025-11-08 12:28:05.297 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1728 ms
+2025-11-08 12:28:05.297 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0297 ms
+2025-11-08 12:28:05.314 +05:30 [INF] Getting all SLAs
+2025-11-08 12:28:05.316 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.3692 ms
+2025-11-08 12:28:05.334 +05:30 [INF] Getting all SLAs
+2025-11-08 12:28:05.337 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 19.8551 ms
+2025-11-08 12:28:19.553 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0951 ms
+2025-11-08 12:28:19.554 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0516 ms
+2025-11-08 12:28:19.575 +05:30 [INF] Getting all SLAs
+2025-11-08 12:28:19.579 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 22.8049 ms
+2025-11-08 12:28:19.602 +05:30 [INF] Getting all SLAs
+2025-11-08 12:28:19.607 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 25.4633 ms
+2025-11-08 12:30:15.862 +05:30 [INF] HTTP GET /index.html responded 404 in 0.1759 ms
+2025-11-08 12:30:39.661 +05:30 [INF] Getting all SLAs
+2025-11-08 12:30:39.664 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.1385 ms
+2025-11-08 12:30:50.990 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 125.7450 ms
+2025-11-08 12:31:02.957 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2637 ms
+2025-11-08 12:31:02.958 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0614 ms
+2025-11-08 12:31:02.976 +05:30 [INF] Getting all SLAs
+2025-11-08 12:31:02.980 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.8712 ms
+2025-11-08 12:31:02.998 +05:30 [INF] Getting all SLAs
+2025-11-08 12:31:03.000 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.8694 ms
+2025-11-08 12:31:07.861 +05:30 [INF] Getting all SLAs
+2025-11-08 12:31:07.863 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 22.7774 ms
+2025-11-08 12:31:07.882 +05:30 [INF] Getting all SLAs
+2025-11-08 12:31:07.886 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.9271 ms
+2025-11-08 12:36:47.711 +05:30 [INF] HTTP OPTIONS /api/Sla/all/api/EmployeeManagement/all responded 204 in 0.0904 ms
+2025-11-08 12:36:47.711 +05:30 [INF] HTTP OPTIONS /api/Sla/all/api/EmployeeManagement/all responded 204 in 0.1211 ms
+2025-11-08 12:36:47.715 +05:30 [INF] HTTP GET /api/Sla/all/api/EmployeeManagement/all responded 404 in 0.4528 ms
+2025-11-08 12:36:47.719 +05:30 [INF] HTTP GET /api/Sla/all/api/EmployeeManagement/all responded 404 in 0.7030 ms
+2025-11-08 12:36:47.775 +05:30 [INF] HTTP GET /api/Sla/all/api/EmployeeManagement/all responded 404 in 0.6421 ms
+2025-11-08 12:36:47.779 +05:30 [INF] HTTP GET /api/Sla/all/api/EmployeeManagement/all responded 404 in 0.2599 ms
+2025-11-08 12:36:52.699 +05:30 [INF] HTTP OPTIONS /api/Sla/api/EmployeeManagement/all responded 204 in 0.1924 ms
+2025-11-08 12:36:52.701 +05:30 [INF] HTTP OPTIONS /api/Sla/api/EmployeeManagement/all responded 204 in 0.0279 ms
+2025-11-08 12:36:52.701 +05:30 [INF] HTTP GET /api/Sla/api/EmployeeManagement/all responded 404 in 0.2011 ms
+2025-11-08 12:36:52.702 +05:30 [INF] HTTP GET /api/Sla/api/EmployeeManagement/all responded 404 in 0.1830 ms
+2025-11-08 12:36:52.743 +05:30 [INF] HTTP GET /api/Sla/api/EmployeeManagement/all responded 404 in 0.2166 ms
+2025-11-08 12:36:52.744 +05:30 [INF] HTTP GET /api/Sla/api/EmployeeManagement/all responded 404 in 0.1621 ms
+2025-11-08 12:36:59.361 +05:30 [INF] HTTP OPTIONS /api/Sla/api/EmployeeManagement/all responded 204 in 0.0543 ms
+2025-11-08 12:36:59.361 +05:30 [INF] HTTP OPTIONS /api/Sla/api/EmployeeManagement/all responded 204 in 0.0204 ms
+2025-11-08 12:36:59.363 +05:30 [INF] HTTP GET /api/Sla/api/EmployeeManagement/all responded 404 in 0.3278 ms
+2025-11-08 12:36:59.365 +05:30 [INF] HTTP GET /api/Sla/api/EmployeeManagement/all responded 404 in 0.5275 ms
+2025-11-08 12:37:02.053 +05:30 [INF] HTTP GET /api/Sla/api/EmployeeManagement/all responded 404 in 0.3379 ms
+2025-11-08 12:37:02.054 +05:30 [INF] HTTP GET /api/Sla/api/EmployeeManagement/all responded 404 in 0.2314 ms
+2025-11-08 12:38:00.714 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2152 ms
+2025-11-08 12:38:00.715 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0795 ms
+2025-11-08 12:38:00.743 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:00.760 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 39.1768 ms
+2025-11-08 12:38:00.776 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:00.779 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.6932 ms
+2025-11-08 12:38:00.866 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:00.869 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.9503 ms
+2025-11-08 12:38:00.883 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:00.885 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 13.2751 ms
+2025-11-08 12:38:08.707 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0739 ms
+2025-11-08 12:38:08.723 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:08.725 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 14.5789 ms
+2025-11-08 12:38:08.746 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:08.749 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.5438 ms
+2025-11-08 12:38:08.804 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:08.806 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 13.1200 ms
+2025-11-08 12:38:08.816 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:08.818 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.5900 ms
+2025-11-08 12:38:11.722 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:11.723 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.3274 ms
+2025-11-08 12:38:11.732 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:11.734 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.1709 ms
+2025-11-08 12:38:11.779 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:11.781 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 12.0868 ms
+2025-11-08 12:38:11.791 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:11.794 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.8795 ms
+2025-11-08 12:38:17.089 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0269 ms
+2025-11-08 12:38:17.089 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2884 ms
+2025-11-08 12:38:17.101 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:17.107 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.2841 ms
+2025-11-08 12:38:17.116 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:17.118 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.2662 ms
+2025-11-08 12:38:18.877 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:18.880 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.6934 ms
+2025-11-08 12:38:18.895 +05:30 [INF] Getting all SLAs
+2025-11-08 12:38:18.897 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.0662 ms
+2025-11-08 12:39:18.706 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/api/EmployeeManagement/all responded 204 in 0.0916 ms
+2025-11-08 12:39:18.708 +05:30 [INF] HTTP GET /api/EmployeeManagement/api/EmployeeManagement/all responded 404 in 0.3019 ms
+2025-11-08 12:39:22.426 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.8606 ms
+2025-11-08 12:39:22.427 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0708 ms
+2025-11-08 12:39:22.437 +05:30 [INF] Getting all SLAs
+2025-11-08 12:39:22.439 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.1136 ms
+2025-11-08 12:39:22.449 +05:30 [INF] Getting all SLAs
+2025-11-08 12:39:22.451 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.7326 ms
+2025-11-08 12:39:23.667 +05:30 [INF] HTTP GET /api/EmployeeManagement/api/EmployeeManagement/all responded 404 in 0.2087 ms
+2025-11-08 12:39:23.668 +05:30 [INF] HTTP GET /api/EmployeeManagement/api/EmployeeManagement/all responded 404 in 0.1474 ms
+2025-11-08 12:40:31.719 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0531 ms
+2025-11-08 12:40:31.721 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0320 ms
+2025-11-08 12:40:31.739 +05:30 [INF] Getting all SLAs
+2025-11-08 12:40:31.741 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.3206 ms
+2025-11-08 12:40:31.744 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 20.1626 ms
+2025-11-08 12:40:31.798 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 9.5970 ms
+2025-11-08 12:40:31.813 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 14.1451 ms
+2025-11-08 12:40:43.200 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1599 ms
+2025-11-08 12:40:43.201 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.4690 ms
+2025-11-08 12:40:43.216 +05:30 [INF] Getting all SLAs
+2025-11-08 12:40:43.221 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 19.8843 ms
+2025-11-08 12:40:43.235 +05:30 [INF] Getting all SLAs
+2025-11-08 12:40:43.242 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 19.4981 ms
+2025-11-08 12:40:44.521 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0589 ms
+2025-11-08 12:40:44.522 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0292 ms
+2025-11-08 12:40:44.544 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 21.2812 ms
+2025-11-08 12:40:44.564 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 18.6009 ms
+2025-11-08 12:40:53.305 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0259 ms
+2025-11-08 12:40:53.318 +05:30 [INF] Getting all SLAs
+2025-11-08 12:40:53.321 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 14.4363 ms
+2025-11-08 12:41:03.265 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0538 ms
+2025-11-08 12:41:03.265 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0155 ms
+2025-11-08 12:41:03.280 +05:30 [INF] Getting all SLAs
+2025-11-08 12:41:03.284 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.3274 ms
+2025-11-08 12:41:03.302 +05:30 [INF] Getting all SLAs
+2025-11-08 12:41:03.306 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.8252 ms
+2025-11-08 12:41:04.554 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0297 ms
+2025-11-08 12:41:04.554 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0100 ms
+2025-11-08 12:41:04.569 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 13.9691 ms
+2025-11-08 12:41:04.592 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 22.3428 ms
+2025-11-08 12:41:09.555 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0333 ms
+2025-11-08 12:41:09.569 +05:30 [INF] Getting all SLAs
+2025-11-08 12:41:09.572 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.8943 ms
+2025-11-08 12:41:28.041 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1077 ms
+2025-11-08 12:41:28.061 +05:30 [INF] Getting all SLAs
+2025-11-08 12:41:28.065 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.8634 ms
+2025-11-08 13:59:18.163 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 3.3682 ms
+2025-11-08 13:59:18.163 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 3.3667 ms
+2025-11-08 13:59:18.354 +05:30 [INF] Getting all SLAs
+2025-11-08 13:59:18.420 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 248.8079 ms
+2025-11-08 13:59:18.445 +05:30 [INF] Getting all SLAs
+2025-11-08 13:59:18.448 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 27.1369 ms
+2025-11-08 14:00:36.766 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0313 ms
+2025-11-08 14:00:36.766 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0390 ms
+2025-11-08 14:00:36.789 +05:30 [INF] Getting all SLAs
+2025-11-08 14:00:36.792 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 23.4104 ms
+2025-11-08 14:00:36.804 +05:30 [INF] Getting all SLAs
+2025-11-08 14:00:36.807 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 14.2672 ms
+2025-11-08 14:58:09.526 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 15.3230 ms
+2025-11-08 14:58:09.526 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 15.3036 ms
+2025-11-08 14:58:10.154 +05:30 [INF] Getting all SLAs
+2025-11-08 14:58:10.409 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 855.9578 ms
+2025-11-08 14:58:10.462 +05:30 [INF] Getting all SLAs
+2025-11-08 14:58:10.473 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 57.1655 ms
+2025-11-08 15:14:42.379 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1516 ms
+2025-11-08 15:14:42.381 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1111 ms
+2025-11-08 15:14:42.503 +05:30 [INF] Getting all SLAs
+2025-11-08 15:14:42.580 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 191.8485 ms
+2025-11-08 15:14:42.634 +05:30 [INF] Getting all SLAs
+2025-11-08 15:14:42.647 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 60.9282 ms
+2025-11-08 15:16:50.687 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0796 ms
+2025-11-08 15:16:50.689 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0816 ms
+2025-11-08 15:16:50.748 +05:30 [INF] Getting all SLAs
+2025-11-08 15:16:50.766 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 70.6224 ms
+2025-11-08 15:16:50.828 +05:30 [INF] Getting all SLAs
+2025-11-08 15:16:50.836 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 64.9433 ms

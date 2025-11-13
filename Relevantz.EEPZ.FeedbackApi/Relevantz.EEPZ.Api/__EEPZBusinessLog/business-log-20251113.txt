@@ -1,0 +1,13 @@
+2025-11-13 00:00:57.564 +05:30 [INF] Database migration completed successfully
+2025-11-13 10:33:00.073 +05:30 [INF] Database migration completed successfully
+2025-11-13 11:50:31.906 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-13 11:50:33.682 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 1781.1921 ms
+2025-11-13 11:50:33.815 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 129.5786 ms
+2025-11-13 11:50:33.948 +05:30 [INF] HTTP GET /api/HrFeedbackForm/forms/active responded 200 in 251.0046 ms
+2025-11-13 11:50:33.982 +05:30 [INF] HTTP GET /api/HrFeedbackForm/forms/active responded 200 in 28.3338 ms
+2025-11-13 11:50:34.133 +05:30 [INF] HTTP GET /api/HrFeedbackForm/responses/by-employee/10 responded 200 in 179.3710 ms
+2025-11-13 11:50:34.165 +05:30 [INF] HTTP GET /api/HrFeedbackForm/responses/by-employee/10 responded 200 in 29.5164 ms
+2025-11-13 11:50:34.233 +05:30 [INF] HTTP GET /api/ManagerReview/target/10 responded 200 in 98.2471 ms
+2025-11-13 11:50:34.255 +05:30 [INF] HTTP GET /api/ManagerReview/target/10 responded 200 in 17.7158 ms
+2025-11-13 11:50:34.366 +05:30 [INF] HTTP GET /api/peerfeedbackqueue/all responded 200 in 128.4564 ms
+2025-11-13 11:50:34.400 +05:30 [INF] HTTP GET /api/peerfeedbackqueue/all responded 200 in 30.8062 ms

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\Relevantz.EEPZ.Api.props" />
+</Project>

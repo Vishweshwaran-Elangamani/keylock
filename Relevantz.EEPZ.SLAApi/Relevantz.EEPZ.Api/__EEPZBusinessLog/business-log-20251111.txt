@@ -1,0 +1,678 @@
+2025-11-11 12:01:52.039 +05:30 [INF] Database migration completed successfully
+2025-11-11 12:02:25.640 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-11 12:02:25.660 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 26.1728 ms
+2025-11-11 12:02:25.660 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 25.3392 ms
+2025-11-11 12:02:26.047 +05:30 [INF] Getting all SLAs
+2025-11-11 12:02:27.171 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 1482.3413 ms
+2025-11-11 12:02:27.192 +05:30 [INF] Getting all SLAs
+2025-11-11 12:02:27.357 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 187.6461 ms
+2025-11-11 12:02:29.506 +05:30 [INF] Getting all SLAs
+2025-11-11 12:02:29.517 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 37.9161 ms
+2025-11-11 12:02:29.540 +05:30 [INF] Getting all SLAs
+2025-11-11 12:02:29.546 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 27.1419 ms
+2025-11-11 12:02:42.796 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.3603 ms
+2025-11-11 12:02:42.796 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.3744 ms
+2025-11-11 12:02:42.814 +05:30 [INF] Getting all SLAs
+2025-11-11 12:02:42.829 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 30.0151 ms
+2025-11-11 12:02:42.848 +05:30 [INF] Getting all SLAs
+2025-11-11 12:02:42.851 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.9353 ms
+2025-11-11 12:02:47.059 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0622 ms
+2025-11-11 12:02:47.059 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0633 ms
+2025-11-11 12:02:47.230 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 162.7752 ms
+2025-11-11 12:02:47.251 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 20.1773 ms
+2025-11-11 12:02:59.104 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.4381 ms
+2025-11-11 12:02:59.151 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 43.8555 ms
+2025-11-11 12:02:59.157 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.3157 ms
+2025-11-11 12:02:59.288 +05:30 [INF] Creating new SLA
+2025-11-11 12:02:59.801 +05:30 [INF] SLA created successfully. SLA ID: 1
+2025-11-11 12:03:00.179 +05:30 [INF] Sending SLA reminder (4 days) to amanda.martinez@personal.com for Performance
+2025-11-11 12:03:03.488 +05:30 [INF] SLA reminder sent to amanda.martinez@personal.com
+2025-11-11 12:03:03.489 +05:30 [INF] SLA assignment email sent to amanda.martinez@personal.com
+2025-11-11 12:03:03.498 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4338.1435 ms
+2025-11-11 12:03:03.519 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:03.530 +05:30 [INF] SLA created successfully. SLA ID: 2
+2025-11-11 12:03:03.531 +05:30 [INF] Sending SLA reminder (4 days) to chris.garcia@personal.com for Performance
+2025-11-11 12:03:06.607 +05:30 [INF] SLA reminder sent to chris.garcia@personal.com
+2025-11-11 12:03:06.608 +05:30 [INF] SLA assignment email sent to chris.garcia@personal.com
+2025-11-11 12:03:06.608 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3105.1785 ms
+2025-11-11 12:03:06.611 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.1955 ms
+2025-11-11 12:03:06.631 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:06.638 +05:30 [INF] SLA created successfully. SLA ID: 3
+2025-11-11 12:03:06.640 +05:30 [INF] Sending SLA reminder (4 days) to david.anderson@personal.com for Performance
+2025-11-11 12:03:09.422 +05:30 [INF] SLA reminder sent to david.anderson@personal.com
+2025-11-11 12:03:09.422 +05:30 [INF] SLA assignment email sent to david.anderson@personal.com
+2025-11-11 12:03:09.422 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 2810.0567 ms
+2025-11-11 12:03:09.447 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:09.454 +05:30 [INF] SLA created successfully. SLA ID: 4
+2025-11-11 12:03:09.456 +05:30 [INF] Sending SLA reminder (4 days) to emily.davis@personal.com for Performance
+2025-11-11 12:03:12.195 +05:30 [INF] SLA reminder sent to emily.davis@personal.com
+2025-11-11 12:03:12.195 +05:30 [INF] SLA assignment email sent to emily.davis@personal.com
+2025-11-11 12:03:12.196 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 2768.1418 ms
+2025-11-11 12:03:13.383 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.1314 ms
+2025-11-11 12:03:13.405 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:13.412 +05:30 [INF] SLA created successfully. SLA ID: 5
+2025-11-11 12:03:13.414 +05:30 [INF] Sending SLA reminder (4 days) to jessica.taylor@personal.com for Performance
+2025-11-11 12:03:16.295 +05:30 [INF] SLA reminder sent to jessica.taylor@personal.com
+2025-11-11 12:03:16.295 +05:30 [INF] SLA assignment email sent to jessica.taylor@personal.com
+2025-11-11 12:03:16.296 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 2911.2465 ms
+2025-11-11 12:03:16.319 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:16.328 +05:30 [INF] SLA created successfully. SLA ID: 6
+2025-11-11 12:03:16.330 +05:30 [INF] Sending SLA reminder (4 days) to john.smith@personal.com for Performance
+2025-11-11 12:03:19.057 +05:30 [INF] SLA reminder sent to john.smith@personal.com
+2025-11-11 12:03:19.058 +05:30 [INF] SLA assignment email sent to john.smith@personal.com
+2025-11-11 12:03:19.059 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 2758.5741 ms
+2025-11-11 12:03:19.066 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.1402 ms
+2025-11-11 12:03:19.095 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:19.102 +05:30 [INF] SLA created successfully. SLA ID: 7
+2025-11-11 12:03:19.107 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 38.7130 ms
+2025-11-11 12:03:19.133 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:19.142 +05:30 [INF] SLA created successfully. SLA ID: 8
+2025-11-11 12:03:19.144 +05:30 [INF] Sending SLA reminder (4 days) to michael.brown@personal.com for Performance
+2025-11-11 12:03:21.940 +05:30 [INF] SLA reminder sent to michael.brown@personal.com
+2025-11-11 12:03:21.940 +05:30 [INF] SLA assignment email sent to michael.brown@personal.com
+2025-11-11 12:03:21.941 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 2830.0619 ms
+2025-11-11 12:03:21.972 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:21.985 +05:30 [INF] SLA created successfully. SLA ID: 9
+2025-11-11 12:03:21.988 +05:30 [INF] Sending SLA reminder (4 days) to robert.williams@personal.com for Performance
+2025-11-11 12:03:24.720 +05:30 [INF] SLA reminder sent to robert.williams@personal.com
+2025-11-11 12:03:24.720 +05:30 [INF] SLA assignment email sent to robert.williams@personal.com
+2025-11-11 12:03:24.721 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 2773.1236 ms
+2025-11-11 12:03:24.724 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0555 ms
+2025-11-11 12:03:24.743 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:24.751 +05:30 [INF] SLA created successfully. SLA ID: 10
+2025-11-11 12:03:24.753 +05:30 [INF] Sending SLA reminder (4 days) to sarah.johnson@personal.com for Performance
+2025-11-11 12:03:27.505 +05:30 [INF] SLA reminder sent to sarah.johnson@personal.com
+2025-11-11 12:03:27.505 +05:30 [INF] SLA assignment email sent to sarah.johnson@personal.com
+2025-11-11 12:03:27.506 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 2780.8472 ms
+2025-11-11 12:03:27.523 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:27.538 +05:30 [INF] SLA created successfully. SLA ID: 11
+2025-11-11 12:03:27.540 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 29.8945 ms
+2025-11-11 12:03:27.561 +05:30 [INF] Creating new SLA
+2025-11-11 12:03:27.569 +05:30 [INF] SLA created successfully. SLA ID: 12
+2025-11-11 12:03:27.571 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 28.3450 ms
+2025-11-11 12:03:32.023 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.7072 ms
+2025-11-11 12:03:32.052 +05:30 [INF] Getting all SLAs
+2025-11-11 12:03:32.138 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 111.1573 ms
+2025-11-11 12:03:41.462 +05:30 [INF] HTTP OPTIONS /api/Sla/11 responded 204 in 0.1421 ms
+2025-11-11 12:03:41.464 +05:30 [INF] HTTP OPTIONS /api/Sla/11 responded 204 in 0.1153 ms
+2025-11-11 12:03:41.482 +05:30 [INF] Getting SLA 11
+2025-11-11 12:03:41.561 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 1, Employee: 1, Userprofile: System
+2025-11-11 12:03:41.561 +05:30 [INF] 📝 Mapped - EmployeeName: 'System Administrator', DepartmentName: 'Human Resources'
+2025-11-11 12:03:41.563 +05:30 [INF] HTTP GET /api/Sla/11 responded 200 in 97.8583 ms
+2025-11-11 12:03:41.568 +05:30 [INF] HTTP OPTIONS /api/Sla/11/history responded 204 in 0.0463 ms
+2025-11-11 12:03:41.584 +05:30 [INF] Getting SLA 11
+2025-11-11 12:03:41.588 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 1, Employee: 1, Userprofile: System
+2025-11-11 12:03:41.588 +05:30 [INF] 📝 Mapped - EmployeeName: 'System Administrator', DepartmentName: 'Human Resources'
+2025-11-11 12:03:41.588 +05:30 [INF] HTTP GET /api/Sla/11 responded 200 in 23.0522 ms
+2025-11-11 12:03:41.594 +05:30 [INF] Getting SLA history for 11
+2025-11-11 12:03:41.663 +05:30 [INF] HTTP GET /api/Sla/11/history responded 200 in 91.8879 ms
+2025-11-11 12:03:41.668 +05:30 [INF] HTTP OPTIONS /api/Sla/11/escalations responded 204 in 0.0733 ms
+2025-11-11 12:03:41.691 +05:30 [INF] Getting SLA history for 11
+2025-11-11 12:03:41.698 +05:30 [INF] HTTP GET /api/Sla/11/history responded 200 in 31.5567 ms
+2025-11-11 12:03:41.710 +05:30 [INF] Getting escalations for SLA 11
+2025-11-11 12:03:41.808 +05:30 [INF] HTTP GET /api/Sla/11/escalations responded 200 in 137.6113 ms
+2025-11-11 12:03:41.828 +05:30 [INF] Getting escalations for SLA 11
+2025-11-11 12:03:41.832 +05:30 [INF] HTTP GET /api/Sla/11/escalations responded 200 in 20.1616 ms
+2025-11-11 12:03:45.002 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0562 ms
+2025-11-11 12:03:45.002 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0300 ms
+2025-11-11 12:03:45.040 +05:30 [INF] Getting all SLAs
+2025-11-11 12:03:45.051 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 44.7508 ms
+2025-11-11 12:03:45.090 +05:30 [INF] Getting all SLAs
+2025-11-11 12:03:45.100 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 46.4872 ms
+2025-11-11 12:04:10.720 +05:30 [INF] HTTP OPTIONS /api/Sla/10 responded 204 in 0.2350 ms
+2025-11-11 12:04:10.756 +05:30 [INF] Updating SLA 10
+2025-11-11 12:04:10.873 +05:30 [INF] SLA updated successfully. SLA ID: 10
+2025-11-11 12:04:10.874 +05:30 [INF] HTTP PUT /api/Sla/10 responded 200 in 152.2511 ms
+2025-11-11 12:04:12.604 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0441 ms
+2025-11-11 12:04:12.625 +05:30 [INF] Getting all SLAs
+2025-11-11 12:04:12.640 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 34.1500 ms
+2025-11-11 12:10:45.213 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0573 ms
+2025-11-11 12:10:45.214 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0523 ms
+2025-11-11 12:10:45.260 +05:30 [INF] Getting all SLAs
+2025-11-11 12:10:45.294 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 75.5673 ms
+2025-11-11 12:10:45.314 +05:30 [INF] Getting all SLAs
+2025-11-11 12:10:45.319 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 23.3750 ms
+2025-11-11 12:11:05.214 +05:30 [INF] HTTP OPTIONS /api/Sla/10 responded 204 in 0.0413 ms
+2025-11-11 12:11:05.231 +05:30 [INF] Updating SLA 10
+2025-11-11 12:11:05.241 +05:30 [INF] SLA updated successfully. SLA ID: 10
+2025-11-11 12:11:05.242 +05:30 [INF] HTTP PUT /api/Sla/10 responded 200 in 26.5581 ms
+2025-11-11 12:11:06.109 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0471 ms
+2025-11-11 12:11:06.126 +05:30 [INF] Getting all SLAs
+2025-11-11 12:11:06.131 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 19.7572 ms
+2025-11-11 12:12:14.620 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0405 ms
+2025-11-11 12:12:14.632 +05:30 [INF] Getting all SLAs
+2025-11-11 12:12:14.634 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.8051 ms
+2025-11-11 17:33:11.300 +05:30 [INF] Database migration completed successfully
+2025-11-11 17:54:39.156 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-11 17:54:39.172 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 24.5108 ms
+2025-11-11 17:54:39.172 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 24.5332 ms
+2025-11-11 17:54:39.779 +05:30 [INF] Getting all SLAs
+2025-11-11 17:54:41.405 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 2168.3548 ms
+2025-11-11 17:54:41.444 +05:30 [INF] Getting all SLAs
+2025-11-11 17:54:41.722 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 317.6102 ms
+2025-11-11 17:54:45.358 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.2832 ms
+2025-11-11 17:54:45.358 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0728 ms
+2025-11-11 17:54:45.564 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 196.8783 ms
+2025-11-11 17:54:45.608 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 40.2881 ms
+2025-11-11 17:54:49.441 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 42.6340 ms
+2025-11-11 17:54:49.483 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 37.5325 ms
+2025-11-11 17:55:06.522 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.1759 ms
+2025-11-11 17:55:06.560 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 34.4131 ms
+2025-11-11 17:55:06.568 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.6237 ms
+2025-11-11 17:55:06.689 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:07.323 +05:30 [INF] SLA created successfully. SLA ID: 1
+2025-11-11 17:55:07.824 +05:30 [INF] Sending SLA reminder (1 days) to amanda.martinez@personal.com for Performance Appraisal Form
+2025-11-11 17:55:11.381 +05:30 [INF] SLA reminder sent to amanda.martinez@personal.com
+2025-11-11 17:55:11.381 +05:30 [INF] SLA assignment email sent to amanda.martinez@personal.com
+2025-11-11 17:55:11.388 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4817.0219 ms
+2025-11-11 17:55:11.421 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:11.454 +05:30 [INF] SLA created successfully. SLA ID: 2
+2025-11-11 17:55:11.461 +05:30 [INF] Sending SLA reminder (1 days) to chris.garcia@personal.com for Performance Appraisal Form
+2025-11-11 17:55:14.761 +05:30 [INF] SLA reminder sent to chris.garcia@personal.com
+2025-11-11 17:55:14.761 +05:30 [INF] SLA assignment email sent to chris.garcia@personal.com
+2025-11-11 17:55:14.762 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3367.7813 ms
+2025-11-11 17:55:14.768 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0993 ms
+2025-11-11 17:55:14.793 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:14.808 +05:30 [INF] SLA created successfully. SLA ID: 3
+2025-11-11 17:55:14.813 +05:30 [INF] Sending SLA reminder (1 days) to david.anderson@personal.com for Performance Appraisal Form
+2025-11-11 17:55:18.035 +05:30 [INF] SLA reminder sent to david.anderson@personal.com
+2025-11-11 17:55:18.036 +05:30 [INF] SLA assignment email sent to david.anderson@personal.com
+2025-11-11 17:55:18.036 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3265.2967 ms
+2025-11-11 17:55:18.070 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:18.099 +05:30 [INF] SLA created successfully. SLA ID: 4
+2025-11-11 17:55:18.103 +05:30 [INF] Sending SLA reminder (1 days) to emily.davis@personal.com for Performance Appraisal Form
+2025-11-11 17:55:21.311 +05:30 [INF] SLA reminder sent to emily.davis@personal.com
+2025-11-11 17:55:21.311 +05:30 [INF] SLA assignment email sent to emily.davis@personal.com
+2025-11-11 17:55:21.312 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3268.2623 ms
+2025-11-11 17:55:21.317 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.2413 ms
+2025-11-11 17:55:21.342 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:21.362 +05:30 [INF] SLA created successfully. SLA ID: 5
+2025-11-11 17:55:21.366 +05:30 [INF] Sending SLA reminder (1 days) to jessica.taylor@personal.com for Performance Appraisal Form
+2025-11-11 17:55:24.486 +05:30 [INF] SLA reminder sent to jessica.taylor@personal.com
+2025-11-11 17:55:24.486 +05:30 [INF] SLA assignment email sent to jessica.taylor@personal.com
+2025-11-11 17:55:24.487 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3167.3316 ms
+2025-11-11 17:55:24.514 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:24.533 +05:30 [INF] SLA created successfully. SLA ID: 6
+2025-11-11 17:55:24.537 +05:30 [INF] Sending SLA reminder (1 days) to john.smith@personal.com for Performance Appraisal Form
+2025-11-11 17:55:27.659 +05:30 [INF] SLA reminder sent to john.smith@personal.com
+2025-11-11 17:55:27.659 +05:30 [INF] SLA assignment email sent to john.smith@personal.com
+2025-11-11 17:55:27.660 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3166.5051 ms
+2025-11-11 17:55:27.667 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.1220 ms
+2025-11-11 17:55:27.699 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:27.723 +05:30 [INF] SLA created successfully. SLA ID: 7
+2025-11-11 17:55:27.729 +05:30 [INF] Sending SLA reminder (1 days) to michael.brown@personal.com for Performance Appraisal Form
+2025-11-11 17:55:30.871 +05:30 [INF] SLA reminder sent to michael.brown@personal.com
+2025-11-11 17:55:30.871 +05:30 [INF] SLA assignment email sent to michael.brown@personal.com
+2025-11-11 17:55:30.872 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3201.5512 ms
+2025-11-11 17:55:30.903 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:30.930 +05:30 [INF] SLA created successfully. SLA ID: 8
+2025-11-11 17:55:30.937 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 59.0791 ms
+2025-11-11 17:55:30.967 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:30.981 +05:30 [INF] SLA created successfully. SLA ID: 9
+2025-11-11 17:55:30.984 +05:30 [INF] Sending SLA reminder (1 days) to robert.williams@personal.com for Performance Appraisal Form
+2025-11-11 17:55:34.150 +05:30 [INF] SLA reminder sent to robert.williams@personal.com
+2025-11-11 17:55:34.150 +05:30 [INF] SLA assignment email sent to robert.williams@personal.com
+2025-11-11 17:55:34.150 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3206.5244 ms
+2025-11-11 17:55:34.155 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0780 ms
+2025-11-11 17:55:34.178 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:34.198 +05:30 [INF] SLA created successfully. SLA ID: 10
+2025-11-11 17:55:34.202 +05:30 [INF] Sending SLA reminder (1 days) to sarah.johnson@personal.com for Performance Appraisal Form
+2025-11-11 17:55:37.480 +05:30 [INF] SLA reminder sent to sarah.johnson@personal.com
+2025-11-11 17:55:37.480 +05:30 [INF] SLA assignment email sent to sarah.johnson@personal.com
+2025-11-11 17:55:37.481 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3323.8804 ms
+2025-11-11 17:55:37.505 +05:30 [INF] Creating new SLA
+2025-11-11 17:55:37.531 +05:30 [INF] SLA created successfully. SLA ID: 11
+2025-11-11 17:55:37.534 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 49.1012 ms
+2025-11-11 17:55:39.579 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1153 ms
+2025-11-11 17:55:39.630 +05:30 [INF] Getting all SLAs
+2025-11-11 17:55:39.847 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 263.7763 ms
+2025-11-11 17:57:07.926 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.2390 ms
+2025-11-11 17:57:07.928 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0977 ms
+2025-11-11 17:57:07.965 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 17:57:07.969 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 17:57:08.072 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 144.0223 ms
+2025-11-11 17:57:08.106 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 17:57:08.106 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 17:57:08.114 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 38.4894 ms
+2025-11-11 17:57:18.028 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.1072 ms
+2025-11-11 17:57:18.028 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.1052 ms
+2025-11-11 17:57:18.069 +05:30 [INF] Getting SLA 1
+2025-11-11 17:57:18.151 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 9, Employee: 9, Userprofile: Amanda
+2025-11-11 17:57:18.151 +05:30 [INF] 📝 Mapped - EmployeeName: 'Amanda Martinez', DepartmentName: 'Human Resources'
+2025-11-11 17:57:18.154 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 122.1911 ms
+2025-11-11 17:57:18.161 +05:30 [INF] HTTP OPTIONS /api/Sla/1/history responded 204 in 0.0870 ms
+2025-11-11 17:57:18.182 +05:30 [INF] Getting SLA 1
+2025-11-11 17:57:18.199 +05:30 [INF] Getting SLA history for 1
+2025-11-11 17:57:18.207 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 9, Employee: 9, Userprofile: Amanda
+2025-11-11 17:57:18.207 +05:30 [INF] 📝 Mapped - EmployeeName: 'Amanda Martinez', DepartmentName: 'Human Resources'
+2025-11-11 17:57:18.208 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 50.3136 ms
+2025-11-11 17:57:18.289 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 124.1523 ms
+2025-11-11 17:57:18.296 +05:30 [INF] HTTP OPTIONS /api/Sla/1/escalations responded 204 in 0.1670 ms
+2025-11-11 17:57:18.318 +05:30 [INF] Getting SLA history for 1
+2025-11-11 17:57:18.325 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 32.6921 ms
+2025-11-11 17:57:18.333 +05:30 [INF] Getting escalations for SLA 1
+2025-11-11 17:57:18.404 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 105.9253 ms
+2025-11-11 17:57:18.424 +05:30 [INF] Getting escalations for SLA 1
+2025-11-11 17:57:18.430 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 23.4762 ms
+2025-11-11 17:59:23.639 +05:30 [INF] HTTP OPTIONS /api/Sla/escalate responded 204 in 0.1610 ms
+2025-11-11 17:59:23.688 +05:30 [INF] Submitting escalation for SLA 1
+2025-11-11 17:59:23.691 +05:30 [INF] Submitting escalation for SLA 1
+2025-11-11 17:59:23.748 +05:30 [ERR] Failed executing DbCommand (11ms) [Parameters=[@p_SLAId='?' (DbType = Int32), @p_Reason='?', @p_Description='?', @p_EscalationLevel='?', @p_EscalatedToEmployeeId='?' (DbType = Int32), @p_SubmittedByEmployeeId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+CALL sp_SubmitSLAEscalation(@p_SLAId, @p_Reason, @p_Description, @p_EscalationLevel, @p_EscalatedToEmployeeId, @p_SubmittedByEmployeeId)
+2025-11-11 17:59:23.755 +05:30 [ERR] Error calling escalation procedure
+MySqlConnector.MySqlException (0x80004005): PROCEDURE eepzdb.sp_SubmitSLAEscalation does not exist
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 1081
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 37
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 131
+   at MySqlConnector.MySqlDataReader.InitAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 487
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteNonQueryAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 309
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+   at Relevantz.EEPZ.Data.Repository.Implementations.SlaRepository.CallSubmitEscalationProcedureAsync(Int32 slaid, String reason, String description, String escalationLevel, Int32 escalatedToEmployeeId, Int32 submittedByEmployeeId) in D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Data\Repository\SlaRepository.cs:line 373
+2025-11-11 17:59:23.927 +05:30 [ERR] Error in SubmitEscalation
+MySqlConnector.MySqlException (0x80004005): PROCEDURE eepzdb.sp_SubmitSLAEscalation does not exist
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 1081
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 37
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 131
+   at MySqlConnector.MySqlDataReader.InitAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 487
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteNonQueryAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 309
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+   at Relevantz.EEPZ.Data.Repository.Implementations.SlaRepository.CallSubmitEscalationProcedureAsync(Int32 slaid, String reason, String description, String escalationLevel, Int32 escalatedToEmployeeId, Int32 submittedByEmployeeId) in D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Data\Repository\SlaRepository.cs:line 373
+   at Relevantz.EEPZ.Core.Services.Implementations.SlaService.SubmitEscalation(SubmitSlaEscalationRequest request) in D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Core\Service\SlaService.cs:line 85
+2025-11-11 17:59:23.940 +05:30 [INF] HTTP POST /api/Sla/escalate responded 400 in 297.3825 ms
+2025-11-11 17:59:56.396 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0770 ms
+2025-11-11 17:59:56.401 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0577 ms
+2025-11-11 17:59:56.427 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 17:59:56.427 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 17:59:56.434 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 35.3747 ms
+2025-11-11 17:59:56.453 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 17:59:56.453 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 17:59:56.459 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 23.2161 ms
+2025-11-11 17:59:58.246 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.1218 ms
+2025-11-11 17:59:58.246 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.0521 ms
+2025-11-11 17:59:58.275 +05:30 [INF] Getting SLA 1
+2025-11-11 17:59:58.281 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 9, Employee: 9, Userprofile: Amanda
+2025-11-11 17:59:58.282 +05:30 [INF] 📝 Mapped - EmployeeName: 'Amanda Martinez', DepartmentName: 'Human Resources'
+2025-11-11 17:59:58.282 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 33.3844 ms
+2025-11-11 17:59:58.287 +05:30 [INF] HTTP OPTIONS /api/Sla/1/history responded 204 in 0.0403 ms
+2025-11-11 17:59:58.309 +05:30 [INF] Getting SLA 1
+2025-11-11 17:59:58.316 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 9, Employee: 9, Userprofile: Amanda
+2025-11-11 17:59:58.316 +05:30 [INF] 📝 Mapped - EmployeeName: 'Amanda Martinez', DepartmentName: 'Human Resources'
+2025-11-11 17:59:58.316 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 32.0687 ms
+2025-11-11 17:59:58.318 +05:30 [INF] Getting SLA history for 1
+2025-11-11 17:59:58.324 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 34.2389 ms
+2025-11-11 17:59:58.331 +05:30 [INF] HTTP OPTIONS /api/Sla/1/escalations responded 204 in 0.0543 ms
+2025-11-11 17:59:58.353 +05:30 [INF] Getting SLA history for 1
+2025-11-11 17:59:58.358 +05:30 [INF] Getting escalations for SLA 1
+2025-11-11 17:59:58.359 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 32.7812 ms
+2025-11-11 17:59:58.364 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 29.6537 ms
+2025-11-11 17:59:58.391 +05:30 [INF] Getting escalations for SLA 1
+2025-11-11 17:59:58.399 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 33.6071 ms
+2025-11-11 18:00:42.242 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0570 ms
+2025-11-11 18:00:42.242 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0537 ms
+2025-11-11 18:00:42.264 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 18:00:42.264 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 18:00:42.269 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 25.3413 ms
+2025-11-11 18:00:42.292 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 18:00:42.292 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 18:00:42.297 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 26.0721 ms
+2025-11-11 18:02:43.883 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.1378 ms
+2025-11-11 18:02:43.884 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0398 ms
+2025-11-11 18:02:43.920 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 18:02:43.920 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 18:02:43.931 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 43.1559 ms
+2025-11-11 18:02:43.957 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 18:02:43.957 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 18:02:43.964 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 30.0194 ms
+2025-11-11 18:03:20.223 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0728 ms
+2025-11-11 18:03:20.229 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0568 ms
+2025-11-11 18:03:20.234 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0676 ms
+2025-11-11 18:03:20.242 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0805 ms
+2025-11-11 18:03:20.284 +05:30 [INF] Getting all SLAs
+2025-11-11 18:03:20.299 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 58.6039 ms
+2025-11-11 18:03:20.306 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 18:03:20.348 +05:30 [INF] Getting all SLAs
+2025-11-11 18:03:20.365 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 61.0296 ms
+2025-11-11 18:03:20.525 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 283.0540 ms
+2025-11-11 18:03:20.564 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 18:03:20.573 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 45.4457 ms
+2025-11-11 18:03:30.643 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0262 ms
+2025-11-11 18:03:30.644 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0261 ms
+2025-11-11 18:03:30.645 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0213 ms
+2025-11-11 18:03:30.646 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0149 ms
+2025-11-11 18:03:30.668 +05:30 [INF] Getting all SLAs
+2025-11-11 18:03:30.669 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 18:03:30.674 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 25.3485 ms
+2025-11-11 18:03:30.700 +05:30 [INF] Getting all SLAs
+2025-11-11 18:03:30.706 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 25.2529 ms
+2025-11-11 18:03:30.707 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 58.2758 ms
+2025-11-11 18:03:30.728 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 18:03:30.733 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 23.2530 ms
+2025-11-11 22:11:40.854 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.2273 ms
+2025-11-11 22:11:40.854 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0469 ms
+2025-11-11 22:11:40.855 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0690 ms
+2025-11-11 22:11:40.857 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1774 ms
+2025-11-11 22:11:41.199 +05:30 [INF] Getting all SLAs
+2025-11-11 22:11:41.201 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 22:11:41.269 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 408.2701 ms
+2025-11-11 22:11:41.278 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 417.6288 ms
+2025-11-11 22:11:41.310 +05:30 [INF] Getting all SLAs
+2025-11-11 22:11:41.317 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 22:11:41.323 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 51.4833 ms
+2025-11-11 22:11:41.329 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 48.1686 ms
+2025-11-11 22:12:06.102 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0573 ms
+2025-11-11 22:12:06.106 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.3913 ms
+2025-11-11 22:12:06.149 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 22:12:06.150 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 22:12:06.158 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 52.8358 ms
+2025-11-11 22:12:06.200 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 22:12:06.200 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 22:12:06.211 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 49.0706 ms
+2025-11-11 22:12:09.515 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.0532 ms
+2025-11-11 22:12:09.515 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.0280 ms
+2025-11-11 22:12:09.553 +05:30 [INF] Getting SLA 1
+2025-11-11 22:12:09.561 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 9, Employee: 9, Userprofile: Amanda
+2025-11-11 22:12:09.561 +05:30 [INF] 📝 Mapped - EmployeeName: 'Amanda Martinez', DepartmentName: 'Human Resources'
+2025-11-11 22:12:09.562 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 43.6024 ms
+2025-11-11 22:12:09.569 +05:30 [INF] HTTP OPTIONS /api/Sla/1/history responded 204 in 0.2109 ms
+2025-11-11 22:12:09.601 +05:30 [INF] Getting SLA 1
+2025-11-11 22:12:09.608 +05:30 [INF] Getting SLA history for 1
+2025-11-11 22:12:09.610 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 9, Employee: 9, Userprofile: Amanda
+2025-11-11 22:12:09.610 +05:30 [INF] 📝 Mapped - EmployeeName: 'Amanda Martinez', DepartmentName: 'Human Resources'
+2025-11-11 22:12:09.611 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 46.3719 ms
+2025-11-11 22:12:09.617 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 43.9883 ms
+2025-11-11 22:12:09.626 +05:30 [INF] HTTP OPTIONS /api/Sla/1/escalations responded 204 in 0.0557 ms
+2025-11-11 22:12:09.655 +05:30 [INF] Getting SLA history for 1
+2025-11-11 22:12:09.663 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 43.2418 ms
+2025-11-11 22:12:09.665 +05:30 [INF] Getting escalations for SLA 1
+2025-11-11 22:12:09.673 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 43.1337 ms
+2025-11-11 22:12:09.710 +05:30 [INF] Getting escalations for SLA 1
+2025-11-11 22:12:09.720 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 44.3886 ms
+2025-11-11 22:12:28.268 +05:30 [INF] HTTP OPTIONS /api/Sla/escalate responded 204 in 0.0776 ms
+2025-11-11 22:12:28.328 +05:30 [INF] Submitting escalation for SLA 1
+2025-11-11 22:12:28.329 +05:30 [INF] Submitting escalation for SLA 1
+2025-11-11 22:12:28.416 +05:30 [INF] Escalation procedure executed. SLA ID: 1
+2025-11-11 22:12:28.522 +05:30 [INF] Sending escalation acknowledgment to amanda.martinez@personal.com for Performance Appraisal Form
+2025-11-11 22:12:33.112 +05:30 [INF] Escalation acknowledgment sent to amanda.martinez@personal.com
+2025-11-11 22:12:33.112 +05:30 [INF] Escalation acknowledgment email sent to amanda.martinez@personal.com
+2025-11-11 22:12:33.133 +05:30 [INF] HTTP POST /api/Sla/escalate responded 200 in 4862.6325 ms
+2025-11-11 22:12:36.954 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.0538 ms
+2025-11-11 22:12:36.994 +05:30 [INF] Getting SLA 1
+2025-11-11 22:12:37.005 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 9, Employee: 9, Userprofile: Amanda
+2025-11-11 22:12:37.005 +05:30 [INF] 📝 Mapped - EmployeeName: 'Amanda Martinez', DepartmentName: 'Human Resources'
+2025-11-11 22:12:37.006 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 49.2620 ms
+2025-11-11 22:12:37.013 +05:30 [INF] HTTP OPTIONS /api/Sla/1/history responded 204 in 0.0662 ms
+2025-11-11 22:12:37.051 +05:30 [INF] Getting SLA history for 1
+2025-11-11 22:12:37.148 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 131.9088 ms
+2025-11-11 22:12:37.155 +05:30 [INF] HTTP OPTIONS /api/Sla/1/escalations responded 204 in 0.1524 ms
+2025-11-11 22:12:37.191 +05:30 [INF] Getting escalations for SLA 1
+2025-11-11 22:12:37.209 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 50.6243 ms
+2025-11-11 22:12:55.644 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0466 ms
+2025-11-11 22:12:55.645 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0318 ms
+2025-11-11 22:12:55.646 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0337 ms
+2025-11-11 22:12:55.647 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0310 ms
+2025-11-11 22:12:55.692 +05:30 [INF] Getting all SLAs
+2025-11-11 22:12:55.700 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 22:12:55.713 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 62.9972 ms
+2025-11-11 22:12:55.715 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 65.9688 ms
+2025-11-11 22:12:55.764 +05:30 [INF] Getting all SLAs
+2025-11-11 22:12:55.764 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 22:12:55.776 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 56.6939 ms
+2025-11-11 22:12:55.779 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 61.3119 ms
+2025-11-11 22:13:30.115 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0360 ms
+2025-11-11 22:13:30.119 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1852 ms
+2025-11-11 22:13:30.158 +05:30 [INF] Getting all SLAs
+2025-11-11 22:13:30.169 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 49.9126 ms
+2025-11-11 22:13:30.202 +05:30 [INF] Getting all SLAs
+2025-11-11 22:13:30.215 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 42.8330 ms
+2025-11-11 22:13:47.688 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0600 ms
+2025-11-11 22:13:47.691 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0463 ms
+2025-11-11 22:13:47.693 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.0773 ms
+2025-11-11 22:13:47.693 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0387 ms
+2025-11-11 22:13:47.736 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 22:13:47.740 +05:30 [INF] Getting all SLAs
+2025-11-11 22:13:47.745 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 49.7848 ms
+2025-11-11 22:13:47.757 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 56.4188 ms
+2025-11-11 22:13:47.793 +05:30 [INF] Getting escalations for manager 6
+2025-11-11 22:13:47.803 +05:30 [INF] Getting all SLAs
+2025-11-11 22:13:47.804 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 56.1762 ms
+2025-11-11 22:13:47.816 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 54.3147 ms
+2025-11-11 22:14:12.888 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.5179 ms
+2025-11-11 22:14:12.892 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0785 ms
+2025-11-11 22:14:12.952 +05:30 [INF] Getting all SLAs
+2025-11-11 22:14:12.972 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 78.0240 ms
+2025-11-11 22:14:13.018 +05:30 [INF] Getting all SLAs
+2025-11-11 22:14:13.035 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 59.8754 ms
+2025-11-11 22:16:40.361 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0881 ms
+2025-11-11 22:16:40.362 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0403 ms
+2025-11-11 22:16:40.458 +05:30 [INF] Getting all SLAs
+2025-11-11 22:16:40.469 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 102.5034 ms
+2025-11-11 22:16:40.536 +05:30 [INF] Getting all SLAs
+2025-11-11 22:16:40.544 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 71.3050 ms
+2025-11-11 22:26:50.019 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0321 ms
+2025-11-11 22:26:50.019 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0617 ms
+2025-11-11 22:26:50.048 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 22:26:50.049 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 22:26:50.077 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 55.6859 ms
+2025-11-11 22:26:50.097 +05:30 [INF] Getting SLAs for employee 9
+2025-11-11 22:26:50.097 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-11 22:26:50.101 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 22.1968 ms
+2025-11-11 22:27:08.301 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0670 ms
+2025-11-11 22:27:08.301 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0252 ms
+2025-11-11 22:27:08.333 +05:30 [INF] Getting all SLAs
+2025-11-11 22:27:08.337 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 27.8053 ms
+2025-11-11 22:27:08.354 +05:30 [INF] Getting all SLAs
+2025-11-11 22:27:08.358 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 19.8217 ms
+2025-11-11 22:27:10.780 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.1351 ms
+2025-11-11 22:27:10.782 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0314 ms
+2025-11-11 22:27:10.822 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 30.2275 ms
+2025-11-11 22:27:10.849 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 23.7736 ms
+2025-11-11 22:27:20.032 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0459 ms
+2025-11-11 22:27:20.065 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 28.9053 ms
+2025-11-11 22:27:20.072 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0415 ms
+2025-11-11 22:27:20.098 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:20.125 +05:30 [INF] SLA created successfully. SLA ID: 12
+2025-11-11 22:27:20.129 +05:30 [INF] Sending SLA reminder (2 days) to amanda.martinez@personal.com for Performance Form
+2025-11-11 22:27:24.811 +05:30 [INF] SLA reminder sent to amanda.martinez@personal.com
+2025-11-11 22:27:24.812 +05:30 [INF] SLA assignment email sent to amanda.martinez@personal.com
+2025-11-11 22:27:24.812 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4737.5680 ms
+2025-11-11 22:27:24.852 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:24.878 +05:30 [INF] SLA created successfully. SLA ID: 13
+2025-11-11 22:27:24.881 +05:30 [INF] Sending SLA reminder (2 days) to chris.garcia@personal.com for Performance Form
+2025-11-11 22:27:29.107 +05:30 [INF] SLA reminder sent to chris.garcia@personal.com
+2025-11-11 22:27:29.107 +05:30 [INF] SLA assignment email sent to chris.garcia@personal.com
+2025-11-11 22:27:29.107 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4288.3913 ms
+2025-11-11 22:27:29.115 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.2397 ms
+2025-11-11 22:27:29.142 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:29.168 +05:30 [INF] SLA created successfully. SLA ID: 14
+2025-11-11 22:27:29.172 +05:30 [INF] Sending SLA reminder (2 days) to david.anderson@personal.com for Performance Form
+2025-11-11 22:27:35.864 +05:30 [INF] SLA reminder sent to david.anderson@personal.com
+2025-11-11 22:27:35.864 +05:30 [INF] SLA assignment email sent to david.anderson@personal.com
+2025-11-11 22:27:35.865 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 6746.9371 ms
+2025-11-11 22:27:35.873 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0416 ms
+2025-11-11 22:27:35.897 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:35.921 +05:30 [INF] SLA created successfully. SLA ID: 15
+2025-11-11 22:27:35.925 +05:30 [INF] Sending SLA reminder (2 days) to emily.davis@personal.com for Performance Form
+2025-11-11 22:27:40.478 +05:30 [INF] SLA reminder sent to emily.davis@personal.com
+2025-11-11 22:27:40.478 +05:30 [INF] SLA assignment email sent to emily.davis@personal.com
+2025-11-11 22:27:40.478 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4602.7314 ms
+2025-11-11 22:27:40.506 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:40.516 +05:30 [INF] SLA created successfully. SLA ID: 16
+2025-11-11 22:27:40.520 +05:30 [INF] Sending SLA reminder (2 days) to jessica.taylor@personal.com for Performance Form
+2025-11-11 22:27:44.467 +05:30 [INF] SLA reminder sent to jessica.taylor@personal.com
+2025-11-11 22:27:44.467 +05:30 [INF] SLA assignment email sent to jessica.taylor@personal.com
+2025-11-11 22:27:44.468 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3982.9742 ms
+2025-11-11 22:27:44.475 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0400 ms
+2025-11-11 22:27:44.504 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:44.526 +05:30 [INF] SLA created successfully. SLA ID: 17
+2025-11-11 22:27:44.529 +05:30 [INF] Sending SLA reminder (2 days) to john.smith@personal.com for Performance Form
+2025-11-11 22:27:48.460 +05:30 [INF] SLA reminder sent to john.smith@personal.com
+2025-11-11 22:27:48.461 +05:30 [INF] SLA assignment email sent to john.smith@personal.com
+2025-11-11 22:27:48.461 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3982.5449 ms
+2025-11-11 22:27:48.498 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:48.509 +05:30 [INF] SLA created successfully. SLA ID: 18
+2025-11-11 22:27:48.512 +05:30 [INF] Sending SLA reminder (2 days) to michael.brown@personal.com for Performance Form
+2025-11-11 22:27:52.454 +05:30 [INF] SLA reminder sent to michael.brown@personal.com
+2025-11-11 22:27:52.454 +05:30 [INF] SLA assignment email sent to michael.brown@personal.com
+2025-11-11 22:27:52.454 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3988.6164 ms
+2025-11-11 22:27:52.460 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0393 ms
+2025-11-11 22:27:52.483 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:52.505 +05:30 [INF] SLA created successfully. SLA ID: 19
+2025-11-11 22:27:52.509 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 46.7550 ms
+2025-11-11 22:27:52.536 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:52.547 +05:30 [INF] SLA created successfully. SLA ID: 20
+2025-11-11 22:27:52.551 +05:30 [INF] Sending SLA reminder (2 days) to robert.williams@personal.com for Performance Form
+2025-11-11 22:27:56.755 +05:30 [INF] SLA reminder sent to robert.williams@personal.com
+2025-11-11 22:27:56.755 +05:30 [INF] SLA assignment email sent to robert.williams@personal.com
+2025-11-11 22:27:56.755 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4239.6939 ms
+2025-11-11 22:27:56.791 +05:30 [INF] Creating new SLA
+2025-11-11 22:27:56.811 +05:30 [INF] SLA created successfully. SLA ID: 21
+2025-11-11 22:27:56.815 +05:30 [INF] Sending SLA reminder (2 days) to sarah.johnson@personal.com for Performance Form
+2025-11-11 22:28:01.366 +05:30 [INF] SLA reminder sent to sarah.johnson@personal.com
+2025-11-11 22:28:01.366 +05:30 [INF] SLA assignment email sent to sarah.johnson@personal.com
+2025-11-11 22:28:01.366 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4604.5510 ms
+2025-11-11 22:28:01.371 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0623 ms
+2025-11-11 22:28:01.399 +05:30 [INF] Creating new SLA
+2025-11-11 22:28:01.420 +05:30 [INF] SLA created successfully. SLA ID: 22
+2025-11-11 22:28:01.424 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 46.5872 ms
+2025-11-11 22:30:34.491 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0459 ms
+2025-11-11 22:30:34.544 +05:30 [INF] Getting all SLAs
+2025-11-11 22:30:34.555 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 61.0417 ms
+2025-11-11 22:30:58.492 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0416 ms
+2025-11-11 22:30:58.494 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0426 ms
+2025-11-11 22:30:58.532 +05:30 [INF] Getting all SLAs
+2025-11-11 22:30:58.541 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 45.2190 ms
+2025-11-11 22:30:58.572 +05:30 [INF] Getting all SLAs
+2025-11-11 22:30:58.579 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 35.0890 ms
+2025-11-11 22:37:09.551 +05:30 [INF] HTTP GET /api/EmployeeManagement/managers responded 200 in 142.8629 ms
+2025-11-11 22:37:31.004 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 34.7369 ms
+2025-11-11 22:37:45.417 +05:30 [INF] HTTP GET /api/EmployeeManagement/managers responded 200 in 35.3770 ms
+2025-11-11 22:39:22.430 +05:30 [INF] Database migration completed successfully
+2025-11-11 22:39:30.510 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-11 22:39:31.517 +05:30 [INF] HTTP GET /api/EmployeeManagement/managers responded 200 in 1012.5771 ms
+2025-11-11 22:40:03.897 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 2.8729 ms
+2025-11-11 22:40:03.897 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 2.8761 ms
+2025-11-11 22:40:04.001 +05:30 [INF] Getting all SLAs
+2025-11-11 22:40:04.942 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 1041.1253 ms
+2025-11-11 22:40:04.977 +05:30 [INF] Getting all SLAs
+2025-11-11 22:40:05.003 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 57.9676 ms
+2025-11-11 22:56:11.253 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.3662 ms
+2025-11-11 22:56:11.253 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.3721 ms
+2025-11-11 22:56:11.327 +05:30 [INF] Getting all SLAs
+2025-11-11 22:56:11.716 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 457.3644 ms
+2025-11-11 22:56:11.749 +05:30 [INF] Getting all SLAs
+2025-11-11 22:56:11.755 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 33.2854 ms
+2025-11-11 22:56:13.538 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.5493 ms
+2025-11-11 22:56:13.538 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.5450 ms
+2025-11-11 22:56:13.624 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 81.3632 ms
+2025-11-11 22:56:13.663 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 35.8016 ms
+2025-11-11 22:56:20.128 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.1619 ms
+2025-11-11 22:56:20.168 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 37.0359 ms
+2025-11-11 22:56:20.177 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.9134 ms
+2025-11-11 22:56:20.305 +05:30 [INF] Creating new SLA
+2025-11-11 22:56:20.709 +05:30 [INF] SLA created successfully. SLA ID: 23
+2025-11-11 22:56:20.892 +05:30 [INF] Sending SLA reminder (18 days) to amanda.martinez@personal.com for Performance Form
+2025-11-11 22:56:24.685 +05:30 [INF] SLA reminder sent to amanda.martinez@personal.com
+2025-11-11 22:56:24.686 +05:30 [INF] SLA assignment email sent to amanda.martinez@personal.com
+2025-11-11 22:56:24.690 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4509.3442 ms
+2025-11-11 22:56:24.723 +05:30 [INF] Creating new SLA
+2025-11-11 22:56:24.740 +05:30 [INF] SLA created successfully. SLA ID: 24
+2025-11-11 22:56:24.744 +05:30 [INF] Sending SLA reminder (18 days) to chris.garcia@personal.com for Performance Form
+2025-11-11 22:56:29.496 +05:30 [INF] SLA reminder sent to chris.garcia@personal.com
+2025-11-11 22:56:29.496 +05:30 [INF] SLA assignment email sent to chris.garcia@personal.com
+2025-11-11 22:56:29.497 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4800.7330 ms
+2025-11-11 22:56:29.505 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.1637 ms
+2025-11-11 22:56:29.559 +05:30 [INF] Creating new SLA
+2025-11-11 22:56:29.578 +05:30 [INF] SLA created successfully. SLA ID: 25
+2025-11-11 22:56:29.582 +05:30 [INF] Sending SLA reminder (18 days) to david.anderson@personal.com for Performance Form
+2025-11-11 22:56:33.079 +05:30 [INF] SLA reminder sent to david.anderson@personal.com
+2025-11-11 22:56:33.080 +05:30 [INF] SLA assignment email sent to david.anderson@personal.com
+2025-11-11 22:56:33.081 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3572.6192 ms
+2025-11-11 22:56:33.143 +05:30 [INF] Creating new SLA
+2025-11-11 22:56:33.167 +05:30 [INF] SLA created successfully. SLA ID: 26
+2025-11-11 22:56:33.176 +05:30 [INF] Sending SLA reminder (18 days) to emily.davis@personal.com for Performance Form
+2025-11-11 22:56:37.179 +05:30 [INF] SLA reminder sent to emily.davis@personal.com
+2025-11-11 22:56:37.180 +05:30 [INF] SLA assignment email sent to emily.davis@personal.com
+2025-11-11 22:56:37.181 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 4084.8179 ms
+2025-11-11 22:56:37.193 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.2134 ms
+2025-11-11 22:56:37.249 +05:30 [INF] Creating new SLA
+2025-11-11 22:56:37.277 +05:30 [INF] SLA created successfully. SLA ID: 27
+2025-11-11 22:56:37.285 +05:30 [INF] Sending SLA reminder (18 days) to jessica.taylor@personal.com for Performance Form
+2025-11-11 22:56:41.067 +05:30 [INF] SLA reminder sent to jessica.taylor@personal.com
+2025-11-11 22:56:41.067 +05:30 [INF] SLA assignment email sent to jessica.taylor@personal.com
+2025-11-11 22:56:41.069 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3871.3135 ms
+2025-11-11 22:56:41.112 +05:30 [INF] Creating new SLA
+2025-11-11 22:56:41.138 +05:30 [INF] SLA created successfully. SLA ID: 28
+2025-11-11 22:56:41.143 +05:30 [INF] Sending SLA reminder (18 days) to john.smith@personal.com for Performance Form
+2025-11-11 22:56:44.753 +05:30 [INF] SLA reminder sent to john.smith@personal.com
+2025-11-11 22:56:44.753 +05:30 [INF] SLA assignment email sent to john.smith@personal.com
+2025-11-11 22:56:44.753 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 3677.0739 ms
+2025-11-11 22:56:44.759 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.0947 ms
+2025-11-11 22:56:44.797 +05:30 [INF] Creating new SLA
+2025-11-11 22:56:44.822 +05:30 [INF] SLA created successfully. SLA ID: 29
+2025-11-11 22:56:44.826 +05:30 [INF] Sending SLA reminder (18 days) to michael.brown@personal.com for Performance Form
+2025-11-11 22:57:09.537 +05:30 [INF] SLA reminder sent to michael.brown@personal.com
+2025-11-11 22:57:09.537 +05:30 [INF] SLA assignment email sent to michael.brown@personal.com
+2025-11-11 22:57:09.537 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 24775.2211 ms
+2025-11-11 22:57:10.533 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.1087 ms
+2025-11-11 22:57:10.572 +05:30 [INF] Creating new SLA
+2025-11-11 22:57:10.589 +05:30 [INF] SLA created successfully. SLA ID: 30
+2025-11-11 22:57:10.594 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 56.9478 ms
+2025-11-11 22:57:10.626 +05:30 [INF] Creating new SLA
+2025-11-11 22:57:10.639 +05:30 [INF] SLA created successfully. SLA ID: 31
+2025-11-11 22:57:10.645 +05:30 [INF] Sending SLA reminder (18 days) to robert.williams@personal.com for Performance Form
+2025-11-11 22:57:18.167 +05:30 [ERR] Failed to send SLA reminder to robert.williams@personal.com
+System.Net.Mail.SmtpException: Failure sending mail.
+ ---> System.Net.Sockets.SocketException (10053): An established connection was aborted by the software in your host machine.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Threading.Tasks.ValueTask.ValueTaskSourceAsTask.<>c.<.cctor>b__4_0(Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.TaskToAsyncResult.End(IAsyncResult asyncResult)
+   at System.Net.Sockets.TcpClient.EndConnect(IAsyncResult asyncResult)
+   at System.Net.Mail.SmtpConnection.ConnectAndHandshakeAsyncResult.InitializeConnectionCallback(IAsyncResult result)
+--- End of stack trace from previous location ---
+   at System.Net.Mail.SmtpClient.ConnectCallback(IAsyncResult result)
+   --- End of inner exception stack trace ---
+   at Relevantz.EEPZ.Core.Services.EmailService.SendSlaReminderEmailAsync(String toEmail, String employeeName, String slaType, DateTime dueDate, Int32 daysRemaining) in D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Core\Service\EmailService.cs:line 108
+2025-11-11 22:57:18.305 +05:30 [INF] SLA assignment email sent to robert.williams@personal.com
+2025-11-11 22:57:18.306 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 7703.4358 ms
+2025-11-11 22:57:20.096 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 0.3192 ms
+2025-11-11 22:57:20.151 +05:30 [INF] Creating new SLA
+2025-11-11 22:57:20.172 +05:30 [INF] SLA created successfully. SLA ID: 32
+2025-11-11 22:57:20.177 +05:30 [INF] Sending SLA reminder (18 days) to sarah.johnson@personal.com for Performance Form
+2025-11-11 22:57:20.191 +05:30 [ERR] Failed to send SLA reminder to sarah.johnson@personal.com
+System.Net.Mail.SmtpException: Failure sending mail.
+ ---> System.Net.Sockets.SocketException (11001): No such host is known.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Threading.Tasks.ValueTask.ValueTaskSourceAsTask.<>c.<.cctor>b__4_0(Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.Tasks.TaskToAsyncResult.End(IAsyncResult asyncResult)
+   at System.Net.Sockets.TcpClient.EndConnect(IAsyncResult asyncResult)
+   at System.Net.Mail.SmtpConnection.ConnectAndHandshakeAsyncResult.InitializeConnectionCallback(IAsyncResult result)
+--- End of stack trace from previous location ---
+   at System.Net.Mail.SmtpClient.ConnectCallback(IAsyncResult result)
+   --- End of inner exception stack trace ---
+   at Relevantz.EEPZ.Core.Services.EmailService.SendSlaReminderEmailAsync(String toEmail, String employeeName, String slaType, DateTime dueDate, Int32 daysRemaining) in D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Core\Service\EmailService.cs:line 108
+2025-11-11 22:57:20.193 +05:30 [INF] SLA assignment email sent to sarah.johnson@personal.com
+2025-11-11 22:57:20.194 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 94.3510 ms
+2025-11-11 22:57:20.273 +05:30 [INF] Creating new SLA
+2025-11-11 22:57:20.293 +05:30 [INF] SLA created successfully. SLA ID: 33
+2025-11-11 22:57:20.301 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 95.3225 ms
+2025-11-11 22:57:23.187 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1766 ms
+2025-11-11 22:57:23.234 +05:30 [INF] Getting all SLAs
+2025-11-11 22:57:23.256 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 64.0654 ms
+2025-11-11 23:04:24.066 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1750 ms
+2025-11-11 23:04:24.069 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1604 ms
+2025-11-11 23:04:24.125 +05:30 [INF] Getting all SLAs
+2025-11-11 23:04:24.169 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 99.5547 ms
+2025-11-11 23:04:24.198 +05:30 [INF] Getting all SLAs
+2025-11-11 23:04:24.206 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 34.1288 ms

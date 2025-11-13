@@ -1,0 +1,1421 @@
+2025-11-11 02:33:39.228 +05:30 [INF]  Starting EEPZ Backend Application
+2025-11-11 02:33:39.435 +05:30 [INF]  🚀 Application Configuration:
+2025-11-11 02:33:39.438 +05:30 [INF]     Environment: Development
+2025-11-11 02:33:39.442 +05:30 [INF]     JWT Issuer: EEPZ
+2025-11-11 02:33:39.442 +05:30 [INF]     JWT Audience: EEPZUsers
+2025-11-11 02:33:39.443 +05:30 [INF]     Database: Database=EEPZDB
+2025-11-11 02:33:39.443 +05:30 [INF]  Application started successfully
+2025-11-11 05:15:06.043 +05:30 [INF]  Starting EEPZ Backend Application
+2025-11-11 05:15:06.648 +05:30 [INF]  🚀 Application Configuration:
+2025-11-11 05:15:06.652 +05:30 [INF]     Environment: Development
+2025-11-11 05:15:06.657 +05:30 [INF]     JWT Issuer: EEPZ
+2025-11-11 05:15:06.660 +05:30 [INF]     JWT Audience: EEPZUsers
+2025-11-11 05:15:06.663 +05:30 [INF]     Database: Database=EEPZDB
+2025-11-11 05:15:06.666 +05:30 [INF]  Application started successfully
+2025-11-11 05:15:32.528 +05:30 [WRN] Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware Failed to determine the https port for redirect.
+2025-11-11 05:15:32.549 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/dashboard/summary responded 204 in 33.9998 ms
+2025-11-11 05:15:32.549 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/dashboard/summary responded 204 in 33.9931 ms
+2025-11-11 05:15:32.549 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 34.1704 ms
+2025-11-11 05:15:32.549 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 34.1442 ms
+2025-11-11 05:15:32.549 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 34.0112 ms
+2025-11-11 05:15:32.549 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 34.0121 ms
+2025-11-11 05:15:32.619 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 1.4602 ms
+2025-11-11 05:15:32.619 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 1.4954 ms
+2025-11-11 05:15:32.716 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:32.716 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:32.716 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:32.716 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:32.927 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/10/2025 10:04:02 PM', Current time (UTC): '11/10/2025 11:45:32 PM'.
+2025-11-11 05:15:32.927 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/10/2025 10:04:02 PM', Current time (UTC): '11/10/2025 11:45:32 PM'.
+2025-11-11 05:15:32.927 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/10/2025 10:04:02 PM', Current time (UTC): '11/10/2025 11:45:32 PM'.
+2025-11-11 05:15:32.927 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/10/2025 10:04:02 PM', Current time (UTC): '11/10/2025 11:45:32 PM'.
+2025-11-11 05:15:32.986 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/10/2025 22:04:02'
+2025-11-11 05:15:32.986 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/10/2025 22:04:02'
+2025-11-11 05:15:32.986 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/10/2025 22:04:02'
+2025-11-11 05:15:32.986 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/10/2025 22:04:02'
+2025-11-11 05:15:32.991 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 361.2655 ms
+2025-11-11 05:15:32.993 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 363.6425 ms
+2025-11-11 05:15:32.996 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/dashboard/summary responded 401 in 366.7536 ms
+2025-11-11 05:15:32.999 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 370.0835 ms
+2025-11-11 05:15:33.012 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:33.012 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:33.016 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:33.021 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:33.023 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/10/2025 10:04:02 PM', Current time (UTC): '11/10/2025 11:45:33 PM'.
+2025-11-11 05:15:33.026 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/10/2025 10:04:02 PM', Current time (UTC): '11/10/2025 11:45:33 PM'.
+2025-11-11 05:15:33.028 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/10/2025 10:04:02 PM', Current time (UTC): '11/10/2025 11:45:33 PM'.
+2025-11-11 05:15:33.031 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/10/2025 10:04:02 PM', Current time (UTC): '11/10/2025 11:45:33 PM'.
+2025-11-11 05:15:33.037 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/10/2025 22:04:02'
+2025-11-11 05:15:33.037 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/10/2025 22:04:02'
+2025-11-11 05:15:33.039 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/10/2025 22:04:02'
+2025-11-11 05:15:33.041 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/10/2025 22:04:02'
+2025-11-11 05:15:33.044 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 32.6860 ms
+2025-11-11 05:15:33.047 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 38.7478 ms
+2025-11-11 05:15:33.051 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/dashboard/summary responded 401 in 35.2461 ms
+2025-11-11 05:15:33.054 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 33.6192 ms
+2025-11-11 05:15:46.868 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/approvals/my responded 204 in 0.1127 ms
+2025-11-11 05:15:46.868 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/approvals/my responded 204 in 0.0571 ms
+2025-11-11 05:15:46.879 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:46.920 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:46.922 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:46.926 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:46.928 +05:30 [INF]     role: Employee
+2025-11-11 05:15:48.125 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:15:51.482 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/dashboard/summary responded 204 in 0.1047 ms
+2025-11-11 05:15:51.483 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 0.1452 ms
+2025-11-11 05:15:51.484 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 0.1016 ms
+2025-11-11 05:15:51.484 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 0.0487 ms
+2025-11-11 05:15:51.485 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/dashboard/summary responded 204 in 0.0962 ms
+2025-11-11 05:15:51.491 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 0.0705 ms
+2025-11-11 05:15:51.495 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 0.1633 ms
+2025-11-11 05:15:51.497 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 0.0780 ms
+2025-11-11 05:15:51.503 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:51.508 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:51.513 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:51.518 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:51.526 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:51.529 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:51.532 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:51.535 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:51.538 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:51.540 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:51.542 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:51.545 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:51.547 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:51.551 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:51.554 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:51.557 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:51.561 +05:30 [INF]     role: Employee
+2025-11-11 05:15:51.564 +05:30 [INF]     role: Employee
+2025-11-11 05:15:51.566 +05:30 [INF]     role: Employee
+2025-11-11 05:15:51.569 +05:30 [INF]     role: Employee
+2025-11-11 05:15:51.661 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:51.661 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:51.661 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:51.664 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: null, Status: completed, RequesterID: 9, Role: null, Page: 1
+2025-11-11 05:15:51.676 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:51.676 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:51.676 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:51.684 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: inprogress, RequesterID: 9, Role: Employee, Page: 1
+2025-11-11 05:15:51.687 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: reopened, RequesterID: 9, Role: Employee, Page: 1
+2025-11-11 05:15:51.692 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: open, RequesterID: 9, Role: Employee, Page: 1
+2025-11-11 05:15:53.774 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:54.767 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-11 05:15:54.767 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-11 05:15:55.449 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-11 05:15:55.449 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-11 05:15:55.449 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-11 05:15:55.449 +05:30 [INF]  [QueryGoalsAsync] Retrieved 1 goals
+2025-11-11 05:15:55.449 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:55.452 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 0 goals
+2025-11-11 05:15:55.455 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: null, Status: null, RequesterID: 9, Role: null, Page: 1
+2025-11-11 05:15:55.459 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 0 goals
+2025-11-11 05:15:55.462 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 1 goals
+2025-11-11 05:15:55.468 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 0 DTOs
+2025-11-11 05:15:55.471 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:15:55.477 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 0 DTOs
+2025-11-11 05:15:55.491 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:55.496 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-11 05:15:55.527 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-11 05:15:55.589 +05:30 [INF]  [QueryGoalsAsync] Retrieved 1 goals
+2025-11-11 05:15:55.597 +05:30 [INF]  [CountPendingApprovalsForUserAsync] Counting pending approvals for user 9
+2025-11-11 05:15:55.602 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:55.613 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 1 DTOs
+2025-11-11 05:15:55.619 +05:30 [INF]  [CountPendingApprovalsForUserAsync] Found 0 pending approvals
+2025-11-11 05:15:55.748 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:55.752 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 4239.0420 ms
+2025-11-11 05:15:55.752 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 4243.9415 ms
+2025-11-11 05:15:55.752 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 4233.3757 ms
+2025-11-11 05:15:55.752 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/dashboard/summary responded 200 in 4249.3939 ms
+2025-11-11 05:15:55.752 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:55.777 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:55.780 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:55.781 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:55.781 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:55.781 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:55.783 +05:30 [INF]     role: Employee
+2025-11-11 05:15:55.787 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:55.790 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:55.792 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:55.797 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:55.800 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:55.803 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:55.806 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:55.808 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:55.811 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:55.814 +05:30 [INF]     role: Employee
+2025-11-11 05:15:55.816 +05:30 [INF]     role: Employee
+2025-11-11 05:15:55.819 +05:30 [INF]     role: Employee
+2025-11-11 05:15:55.833 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: null, Status: completed, RequesterID: 9, Role: null, Page: 1
+2025-11-11 05:15:55.854 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:55.855 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:55.856 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:55.868 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:55.863 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:55.859 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-11 05:15:55.874 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: inprogress, RequesterID: 9, Role: Employee, Page: 1
+2025-11-11 05:15:55.878 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: open, RequesterID: 9, Role: Employee, Page: 1
+2025-11-11 05:15:55.882 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: reopened, RequesterID: 9, Role: Employee, Page: 1
+2025-11-11 05:15:56.013 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-11 05:15:56.013 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-11 05:15:56.015 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-11 05:15:56.016 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: null, Status: null, RequesterID: 9, Role: null, Page: 1
+2025-11-11 05:15:56.021 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 0 goals
+2025-11-11 05:15:56.024 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 0 goals
+2025-11-11 05:15:56.033 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 0 DTOs
+2025-11-11 05:15:56.036 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 0 DTOs
+2025-11-11 05:15:56.038 +05:30 [INF]  [QueryGoalsAsync] Retrieved 1 goals
+2025-11-11 05:15:56.040 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 259.7728 ms
+2025-11-11 05:15:56.040 +05:30 [INF]  [QueryGoalsAsync] Retrieved 1 goals
+2025-11-11 05:15:56.044 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 263.2040 ms
+2025-11-11 05:15:56.046 +05:30 [INF]  [CountPendingApprovalsForUserAsync] Counting pending approvals for user 9
+2025-11-11 05:15:56.054 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 1 goals
+2025-11-11 05:15:56.067 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:56.068 +05:30 [INF]  [CountPendingApprovalsForUserAsync] Found 0 pending approvals
+2025-11-11 05:15:56.073 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/dashboard/summary responded 200 in 326.0065 ms
+2025-11-11 05:15:56.076 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:56.083 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 1 DTOs
+2025-11-11 05:15:56.087 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 306.6404 ms
+2025-11-11 05:15:56.118 +05:30 [INF]  [GetPagedAsync] Retrieved 1 items
+2025-11-11 05:15:56.128 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:56.136 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:56.141 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 6
+2025-11-11 05:15:56.149 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Michael Brown, Profile: true
+2025-11-11 05:15:56.154 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:56.161 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:56.165 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:56.173 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:56.180 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:15:56.403 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:15:56.409 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 6
+2025-11-11 05:15:56.422 +05:30 [INF]  [GetUserRoleAsync] Role: Manager
+2025-11-11 05:15:56.438 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:15:56.441 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.465 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:56.469 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.489 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:56.491 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.511 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:56.514 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.536 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:56.539 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.546 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:56.586 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 9707.7815 ms
+2025-11-11 05:15:56.589 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:56.596 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:56.599 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:56.602 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:56.604 +05:30 [INF]     role: Employee
+2025-11-11 05:15:56.637 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:15:56.641 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.649 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:56.652 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:15:56.663 +05:30 [INF]  [GetPagedAsync] Retrieved 1 items
+2025-11-11 05:15:56.668 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:56.675 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:56.678 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 6
+2025-11-11 05:15:56.685 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Michael Brown, Profile: true
+2025-11-11 05:15:56.690 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:56.697 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:56.702 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:56.709 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:56.714 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:15:56.722 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:15:56.725 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 6
+2025-11-11 05:15:56.733 +05:30 [INF]  [GetUserRoleAsync] Role: Manager
+2025-11-11 05:15:56.737 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:15:56.739 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.746 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:56.749 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.756 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:56.759 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.766 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:56.770 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.777 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:56.780 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:56.786 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:56.791 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 202.5283 ms
+2025-11-11 05:15:56.846 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.4614 ms
+2025-11-11 05:15:56.847 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.0840 ms
+2025-11-11 05:15:56.859 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:56.864 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:56.866 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:56.869 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:56.871 +05:30 [INF]     role: Employee
+2025-11-11 05:15:56.918 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:15:56.937 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:57.011 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-11 05:15:57.444 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:57.453 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:57.467 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:57.470 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:15:57.498 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:15:57.505 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:15:57.531 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:15:57.540 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:15:57.602 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:15:57.610 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:15:57.652 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:57.656 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:15:57.664 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:57.667 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:15:57.674 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:57.677 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:57.685 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:57.695 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:15:57.717 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:15:57.721 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:57.729 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:57.738 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:57.748 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:57.755 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:15:57.772 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:15:57.777 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:57.788 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:57.795 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:15:57.855 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:15:57.860 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:15:57.866 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:15:57.872 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:15:57.892 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:15:57.898 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:15:57.918 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:15:57.926 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:15:57.972 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:15:58.011 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 1151.7966 ms
+2025-11-11 05:15:58.014 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:58.020 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:58.022 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:58.025 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:58.028 +05:30 [INF]     role: Employee
+2025-11-11 05:15:58.060 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:15:58.063 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.077 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.080 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.092 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.094 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:15:58.103 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:15:58.105 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:15:58.112 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:15:58.116 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:15:58.123 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:15:58.126 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:15:58.133 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.136 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:15:58.143 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.145 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:15:58.153 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.156 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:58.163 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:58.168 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:15:58.174 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:15:58.177 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:58.185 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:58.189 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.200 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.203 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:15:58.210 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:15:58.212 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.222 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.226 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:15:58.234 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:15:58.237 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:15:58.243 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:15:58.245 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:15:58.253 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:15:58.257 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:15:58.264 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:15:58.267 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:15:58.274 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:15:58.278 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 264.4073 ms
+2025-11-11 05:15:58.281 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:58.287 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:58.289 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:58.292 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:58.295 +05:30 [INF]     role: Employee
+2025-11-11 05:15:58.326 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:15:58.330 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.344 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.346 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.357 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.360 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:15:58.368 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:15:58.371 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:15:58.378 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:15:58.381 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:15:58.388 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:15:58.392 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:15:58.400 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.403 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:15:58.411 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.414 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:15:58.422 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.425 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:58.433 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:58.437 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:15:58.444 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:15:58.448 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:58.455 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:58.462 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.472 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.475 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:15:58.482 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:15:58.485 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.495 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.498 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:15:58.506 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:15:58.509 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:15:58.515 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:15:58.517 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:15:58.526 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:15:58.529 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:15:58.537 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:15:58.539 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:15:58.547 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:15:58.550 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 269.9733 ms
+2025-11-11 05:15:58.553 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:58.560 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:58.561 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/approvals/my responded 204 in 0.0927 ms
+2025-11-11 05:15:58.563 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:58.571 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:58.571 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:58.575 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:58.578 +05:30 [INF]     role: Employee
+2025-11-11 05:15:58.580 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:58.586 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:58.588 +05:30 [INF]     role: Employee
+2025-11-11 05:15:58.612 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:15:58.616 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.621 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:15:58.625 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.630 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.633 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.643 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.646 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:15:58.648 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:58.653 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:15:58.654 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:15:58.659 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:15:58.666 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:15:58.669 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:15:58.676 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:15:58.679 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:15:58.682 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-11 05:15:58.687 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.691 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:15:58.698 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.701 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:15:58.709 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:15:58.712 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:58.719 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:58.723 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:15:58.730 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:15:58.733 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:15:58.741 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:15:58.746 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.755 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.758 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:15:58.763 +05:30 [INF]  [GetPagedAsync] Retrieved 0 items
+2025-11-11 05:15:58.766 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:15:58.766 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:15:58.769 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:15:58.772 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.781 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:15:58.781 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:58.783 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:15:58.786 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.794 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:15:58.796 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:58.796 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:15:58.799 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.805 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:15:58.807 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:58.808 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:15:58.811 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.819 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:15:58.820 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:58.822 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:15:58.825 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.832 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:15:58.834 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:58.835 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:15:58.840 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 269.2348 ms
+2025-11-11 05:15:58.846 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:15:58.852 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 298.9770 ms
+2025-11-11 05:15:58.862 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:15:58.866 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:15:58.869 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:15:58.873 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:15:58.876 +05:30 [INF]     role: Employee
+2025-11-11 05:15:58.907 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:15:58.914 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.922 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:58.925 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:15:58.936 +05:30 [INF]  [GetPagedAsync] Retrieved 0 items
+2025-11-11 05:15:58.939 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:15:58.942 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.949 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:58.952 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.959 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:15:58.961 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.968 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:58.971 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.978 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:58.980 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:15:58.987 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:15:58.990 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 128.1396 ms
+2025-11-11 05:16:10.675 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.2829 ms
+2025-11-11 05:16:10.675 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.2187 ms
+2025-11-11 05:16:10.686 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:16:10.688 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:16:10.690 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:16:10.692 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:16:10.695 +05:30 [INF]     role: Employee
+2025-11-11 05:16:10.728 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:16:10.732 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:10.750 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:10.752 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:10.762 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:10.765 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:16:10.773 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:16:10.776 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:16:10.789 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:16:10.790 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:16:10.800 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:16:10.839 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:16:10.877 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:10.881 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:16:10.888 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:10.895 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:16:10.908 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:10.910 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:16:10.918 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:16:10.921 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:16:10.928 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:16:10.932 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:16:10.940 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:16:10.944 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:10.954 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:10.957 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:16:10.962 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:16:10.966 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:10.988 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:10.990 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:16:10.997 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:16:11.001 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:16:11.008 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:16:11.011 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:16:11.025 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:16:11.028 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:16:11.036 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:16:11.039 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:16:11.048 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:16:11.051 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 365.9421 ms
+2025-11-11 05:16:11.055 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:16:11.059 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:16:11.062 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:16:11.064 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:16:11.067 +05:30 [INF]     role: Employee
+2025-11-11 05:16:11.094 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:16:11.095 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.107 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.109 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.118 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.121 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:16:11.128 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:16:11.132 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:16:11.139 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:16:11.141 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:16:11.148 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:16:11.151 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:16:11.158 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.160 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:16:11.167 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.170 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:16:11.177 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.179 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:16:11.187 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:16:11.191 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:16:11.197 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:16:11.201 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:16:11.208 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:16:11.212 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.222 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.225 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:16:11.235 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:16:11.238 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.248 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.250 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:16:11.259 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:16:11.261 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:16:11.268 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:16:11.270 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:16:11.277 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:16:11.281 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:16:11.288 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:16:11.290 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:16:11.298 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:16:11.301 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 246.9168 ms
+2025-11-11 05:16:11.304 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:16:11.310 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:16:11.312 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:16:11.315 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:16:11.317 +05:30 [INF]     role: Employee
+2025-11-11 05:16:11.347 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:16:11.351 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.364 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.366 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.376 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.378 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:16:11.387 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:16:11.390 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:16:11.396 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:16:11.399 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:16:11.405 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:16:11.407 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:16:11.418 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.421 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:16:11.428 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.430 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:16:11.437 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.440 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:16:11.447 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:16:11.451 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:16:11.458 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:16:11.460 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:16:11.468 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:16:11.472 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.482 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.484 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:16:11.491 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:16:11.494 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.505 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.508 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:16:11.517 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:16:11.520 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:16:11.530 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:16:11.533 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:16:11.542 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:16:11.545 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:16:11.553 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:16:11.556 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:16:11.564 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:16:11.567 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 263.5281 ms
+2025-11-11 05:16:11.570 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:16:11.576 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:16:11.578 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:16:11.578 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/approvals/my responded 204 in 0.0796 ms
+2025-11-11 05:16:11.581 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:16:11.589 +05:30 [INF]     role: Employee
+2025-11-11 05:16:11.590 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:16:11.595 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:16:11.597 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:16:11.600 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:16:11.603 +05:30 [INF]     role: Employee
+2025-11-11 05:16:11.620 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:16:11.624 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.636 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:16:11.639 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.640 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.642 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.649 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:16:11.651 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:16:11.654 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.657 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:16:11.664 +05:30 [INF]  [GetPagedAsync] Retrieved 0 items
+2025-11-11 05:16:11.664 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:16:11.666 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:16:11.670 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:16:11.672 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.679 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:16:11.681 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:16:11.682 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:16:11.685 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.692 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:16:11.694 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:16:11.695 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:16:11.698 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.705 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.707 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:16:11.708 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:16:11.711 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.718 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.721 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:16:11.721 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:16:11.724 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.731 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:16:11.734 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:16:11.734 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:16:11.740 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 150.4726 ms
+2025-11-11 05:16:11.741 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:16:11.751 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:16:11.757 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:16:11.761 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:16:11.770 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:16:11.774 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.784 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.787 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:16:11.793 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:16:11.797 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:16:11.807 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:16:11.810 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:16:11.818 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:16:11.821 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:16:11.828 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:16:11.832 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:16:11.840 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:16:11.843 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:16:11.851 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:16:11.854 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:16:11.862 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:16:11.866 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 295.2349 ms
+2025-11-11 05:16:11.878 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:16:11.881 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:16:11.884 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:16:11.887 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:16:11.889 +05:30 [INF]     role: Employee
+2025-11-11 05:16:11.918 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:16:11.923 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.930 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:16:11.932 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:16:11.943 +05:30 [INF]  [GetPagedAsync] Retrieved 0 items
+2025-11-11 05:16:11.946 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:16:11.949 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.955 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:16:11.958 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.965 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:16:11.968 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.975 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:16:11.978 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.985 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:16:11.988 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:16:11.995 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:16:11.998 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 120.3459 ms
+2025-11-11 05:21:07.280 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.1162 ms
+2025-11-11 05:21:07.280 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.1161 ms
+2025-11-11 05:21:07.286 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:07.288 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:07.290 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:07.292 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:07.294 +05:30 [INF]     role: Employee
+2025-11-11 05:21:07.314 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:07.315 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.337 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.339 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.344 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.345 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:07.349 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:07.350 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:07.352 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:07.353 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:07.355 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:07.356 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:07.359 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.360 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:07.362 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.362 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:07.365 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.365 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:07.369 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:07.370 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:07.373 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:07.374 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:07.378 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:07.379 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.382 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.384 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:07.386 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:07.387 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.391 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.392 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:07.395 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:07.419 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:07.422 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:07.424 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:07.428 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:07.430 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:07.434 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:07.436 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:07.440 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:07.443 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 156.9072 ms
+2025-11-11 05:21:07.445 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:07.450 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:07.453 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:07.456 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:07.457 +05:30 [INF]     role: Employee
+2025-11-11 05:21:07.469 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:07.473 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.480 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.481 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.486 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.486 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:07.488 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:07.489 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:07.492 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:07.494 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:07.497 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:07.498 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:07.503 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.503 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:07.506 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.507 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:07.510 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.511 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:07.513 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:07.515 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:07.517 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:07.518 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:07.520 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:07.521 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.525 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.526 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:07.529 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:07.529 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.533 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.534 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:07.536 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:07.537 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:07.540 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:07.541 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:07.545 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:07.546 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:07.548 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:07.549 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:07.552 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:07.553 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 108.3626 ms
+2025-11-11 05:21:07.556 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:07.558 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:07.560 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:07.561 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:07.562 +05:30 [INF]     role: Employee
+2025-11-11 05:21:07.576 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:07.578 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.585 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.586 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.591 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.592 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:07.596 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:07.597 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:07.600 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:07.602 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:07.604 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:07.606 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:07.611 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.612 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:07.616 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.616 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:07.619 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.620 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:07.624 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:07.626 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:07.629 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:07.630 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:07.633 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:07.635 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.639 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.640 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:07.644 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:07.645 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.649 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.650 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:07.653 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:07.654 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:07.656 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:07.657 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:07.660 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:07.661 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:07.664 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:07.664 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:07.667 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:07.668 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 112.6964 ms
+2025-11-11 05:21:07.671 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:07.672 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:07.672 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:07.674 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:07.675 +05:30 [INF]     role: Employee
+2025-11-11 05:21:07.678 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/approvals/my responded 204 in 0.0430 ms
+2025-11-11 05:21:07.684 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:07.686 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:07.687 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:07.688 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:07.688 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:07.688 +05:30 [INF]     role: Employee
+2025-11-11 05:21:07.689 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.696 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.696 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.700 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.702 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:07.702 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:21:07.704 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.705 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:07.705 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:07.707 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:07.708 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:21:07.715 +05:30 [INF]  [GetPagedAsync] Retrieved 0 items
+2025-11-11 05:21:07.715 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:21:07.716 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.719 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:07.719 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.720 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:07.721 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:07.723 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:07.723 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:07.724 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.725 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:07.727 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:07.728 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.728 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.730 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:07.731 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:07.733 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.733 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.735 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:07.735 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:07.737 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:07.737 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 52.8069 ms
+2025-11-11 05:21:07.738 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:07.744 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:07.745 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:07.748 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:07.748 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:07.751 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:07.751 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.757 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.758 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:07.761 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:07.761 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:07.766 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:07.766 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:07.770 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:07.770 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:07.773 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:07.773 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:07.776 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:07.777 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:07.779 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:07.779 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:07.782 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:07.784 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 113.1624 ms
+2025-11-11 05:21:07.793 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:07.795 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:07.796 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:07.797 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:07.798 +05:30 [INF]     role: Employee
+2025-11-11 05:21:07.810 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:21:07.811 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.814 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:07.815 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:21:07.819 +05:30 [INF]  [GetPagedAsync] Retrieved 0 items
+2025-11-11 05:21:07.820 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:21:07.821 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.823 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:07.824 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.826 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:07.827 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.829 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:07.830 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.833 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:07.834 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:07.836 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:07.837 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 43.9508 ms
+2025-11-11 05:21:18.271 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.0697 ms
+2025-11-11 05:21:18.272 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.0753 ms
+2025-11-11 05:21:18.283 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:18.288 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:18.290 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:18.294 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:18.295 +05:30 [INF]     role: Employee
+2025-11-11 05:21:18.309 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:18.314 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:18.322 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:18.324 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:18.330 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:18.332 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:18.336 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:18.338 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:18.341 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:18.342 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:18.346 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:18.348 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:18.352 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:18.353 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:18.356 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:18.359 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:18.362 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:18.363 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:18.368 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:18.372 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:18.375 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:18.376 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:18.380 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:18.382 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:18.387 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:18.388 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:18.391 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:18.391 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:18.396 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:18.397 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:18.401 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:18.402 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:18.405 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:18.406 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:18.409 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:18.410 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:18.413 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:18.414 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:18.418 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:18.419 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 136.8980 ms
+2025-11-11 05:21:18.422 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:18.424 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:18.424 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:18.426 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:18.426 +05:30 [INF]     role: Employee
+2025-11-11 05:21:18.439 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:18.440 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:18.446 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:18.447 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:18.452 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:18.453 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:18.456 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:18.457 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:18.459 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:18.460 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:18.463 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:18.464 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:18.467 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:18.468 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:18.471 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:18.471 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:18.474 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:18.474 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:18.477 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:18.478 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:18.481 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:18.482 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:18.485 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:18.487 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:18.490 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:18.491 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:18.493 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:18.493 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:18.497 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:18.498 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:18.500 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:18.501 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:18.503 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:18.504 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:18.511 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:18.512 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:18.516 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:18.517 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:18.521 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:18.523 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 100.3939 ms
+2025-11-11 05:21:19.031 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:19.035 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:19.037 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:19.040 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:19.045 +05:30 [INF]     role: Employee
+2025-11-11 05:21:19.064 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:19.070 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:19.081 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:19.087 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:19.096 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:19.098 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:19.101 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:19.103 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:19.107 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:19.109 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:19.112 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:19.113 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:19.117 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:19.118 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:19.127 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:19.130 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:19.136 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:19.142 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:19.151 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:19.156 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:19.161 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:19.162 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:19.167 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:19.169 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:19.175 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:19.175 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:19.178 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:19.179 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:19.184 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:19.185 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:19.188 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:19.189 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:19.192 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:19.193 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:19.195 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:19.197 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:19.201 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:19.202 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:19.206 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:19.206 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 176.2678 ms
+2025-11-11 05:21:19.208 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:19.211 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:19.212 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:19.214 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:19.215 +05:30 [INF]     role: Employee
+2025-11-11 05:21:19.231 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:19.234 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:19.240 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:19.244 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:19.252 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:19.255 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:19.258 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:19.260 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:19.263 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:19.264 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:19.266 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:19.267 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:19.269 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:19.270 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:19.272 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:19.272 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:19.275 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:19.276 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:19.279 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:19.281 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:19.284 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:19.285 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:19.288 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:19.289 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:19.293 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:19.294 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:19.296 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:19.297 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:19.301 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:19.302 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:19.305 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:19.306 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:19.309 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:19.310 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:19.313 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:19.315 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:19.318 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:19.321 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:19.324 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:19.326 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 118.0126 ms
+2025-11-11 05:21:31.270 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.1696 ms
+2025-11-11 05:21:31.270 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.0544 ms
+2025-11-11 05:21:31.277 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:31.279 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:31.280 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:31.282 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:31.283 +05:30 [INF]     role: Employee
+2025-11-11 05:21:31.296 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:31.297 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:31.304 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:31.304 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:31.310 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:31.310 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:31.313 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:31.316 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:31.321 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:31.323 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:31.328 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:31.331 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:31.335 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:31.337 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:31.341 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:31.342 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:31.347 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:31.348 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:31.352 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:31.354 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:31.358 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:31.359 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:31.366 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:31.368 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:31.375 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:31.377 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:31.382 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:31.383 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:31.388 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:31.389 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:31.393 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:31.395 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:31.399 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:31.400 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:31.404 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:31.406 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:31.412 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:31.413 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:31.418 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:31.419 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 142.1811 ms
+2025-11-11 05:21:31.422 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:31.424 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:31.425 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:31.426 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:31.428 +05:30 [INF]     role: Employee
+2025-11-11 05:21:31.442 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:31.444 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:31.452 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:31.453 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:31.459 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:31.461 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:31.464 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:31.465 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:31.469 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:31.470 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:31.472 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:31.473 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:31.475 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:31.477 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:31.481 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:31.482 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:31.485 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:31.486 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:31.489 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:31.490 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:31.493 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:31.494 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:31.497 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:31.498 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:31.502 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:31.503 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:31.506 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:31.507 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:31.512 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:31.512 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:31.516 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:31.516 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:31.519 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:31.519 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:31.522 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:31.523 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:31.525 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:31.526 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:31.528 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:31.529 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 107.7235 ms
+2025-11-11 05:21:38.712 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.0660 ms
+2025-11-11 05:21:38.712 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/1 responded 204 in 0.0286 ms
+2025-11-11 05:21:38.720 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:38.724 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:38.729 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:38.733 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:38.736 +05:30 [INF]     role: Employee
+2025-11-11 05:21:38.757 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:38.759 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.767 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.768 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.776 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.779 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:38.784 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:38.785 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:38.790 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:38.793 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:38.797 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:38.798 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:38.804 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:38.805 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:38.808 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:38.809 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:38.812 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:38.813 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:38.816 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:38.818 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:38.820 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:38.821 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:38.823 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:38.824 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.828 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.829 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:38.833 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:38.834 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.839 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.840 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:38.843 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:38.843 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:38.846 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:38.846 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:38.850 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:38.852 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:38.855 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:38.855 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:38.858 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:38.858 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 138.7547 ms
+2025-11-11 05:21:38.860 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:38.863 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:38.864 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:38.866 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:38.867 +05:30 [INF]     role: Employee
+2025-11-11 05:21:38.878 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:38.879 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.884 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.886 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.890 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.893 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:38.897 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:38.899 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:38.906 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:38.908 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:38.911 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:38.912 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:38.915 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:38.916 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:38.921 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:38.921 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:38.924 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:38.925 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:38.927 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:38.928 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:38.931 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:38.933 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:38.937 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:38.937 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.941 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.942 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:38.944 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:38.945 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.949 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.951 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:38.955 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:38.955 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:38.958 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:38.959 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:38.961 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:38.962 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:38.965 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:38.966 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:38.969 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:38.971 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 111.0234 ms
+2025-11-11 05:21:38.972 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:38.975 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:38.976 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:38.977 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:38.978 +05:30 [INF]     role: Employee
+2025-11-11 05:21:38.991 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:38.993 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:38.998 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:38.999 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:39.003 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:39.004 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:39.006 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:39.007 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:39.009 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:39.010 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:39.012 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:39.014 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:39.016 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:39.017 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:39.020 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:39.021 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:39.023 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:39.024 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:39.027 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:39.028 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:39.030 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:39.031 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:39.034 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:39.036 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:39.040 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:39.041 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:39.043 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:39.044 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:39.050 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:39.052 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:39.056 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:39.058 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:39.061 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:39.062 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:39.066 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:39.067 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:39.069 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:39.070 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:39.072 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:39.073 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 101.2026 ms
+2025-11-11 05:21:39.074 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:39.077 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:39.078 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:39.078 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:39.079 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/approvals/my responded 204 in 0.0435 ms
+2025-11-11 05:21:39.079 +05:30 [INF]     role: Employee
+2025-11-11 05:21:39.083 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:39.085 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:39.086 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:39.088 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:39.088 +05:30 [INF]     role: Employee
+2025-11-11 05:21:39.094 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController User 9 requesting goal 1
+2025-11-11 05:21:39.095 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:39.101 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:39.102 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:21:39.102 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:39.104 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.108 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:39.108 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:39.108 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:21:39.109 +05:30 [INF]  [GetUserRoleAsync] Fetching role for employee 9
+2025-11-11 05:21:39.112 +05:30 [INF]  [GetUserRoleAsync] Role: Employee
+2025-11-11 05:21:39.113 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:39.113 +05:30 [INF]  [GetPagedAsync] Retrieved 0 items
+2025-11-11 05:21:39.116 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:39.116 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:21:39.118 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Fetching checklist items for goal 1
+2025-11-11 05:21:39.119 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.121 +05:30 [INF]  [GetChecklistItemsByGoalIdAsync] Found 3 items
+2025-11-11 05:21:39.122 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:39.122 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 1, user 9
+2025-11-11 05:21:39.123 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.125 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:39.126 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 2, user 9
+2025-11-11 05:21:39.126 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:39.128 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.128 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:39.129 +05:30 [INF]  [ChecklistHasProgressAsync] Checking progress for checklist 3, user 9
+2025-11-11 05:21:39.130 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:39.131 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.131 +05:30 [INF]  [ChecklistHasProgressAsync] Has progress: false
+2025-11-11 05:21:39.133 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:39.133 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:39.135 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.135 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:39.137 +05:30 [INF]  [GetAssigneesAsync] Fetching assignees for goal 1
+2025-11-11 05:21:39.137 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:39.138 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 55.0172 ms
+2025-11-11 05:21:39.139 +05:30 [INF]  [GetAssigneesAsync] Found 1 assignees
+2025-11-11 05:21:39.141 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-11 05:21:39.144 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-11 05:21:39.145 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:39.149 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:39.150 +05:30 [INF]  [IsUserAssignedToGoalAsync] Checking if user 9 is assigned to goal 1
+2025-11-11 05:21:39.153 +05:30 [INF]  [IsUserAssignedToGoalAsync] User assigned: true
+2025-11-11 05:21:39.154 +05:30 [INF]  [GetGoalByIdAsync] Fetching goal 1
+2025-11-11 05:21:39.157 +05:30 [INF]  [GetGoalByIdAsync] Successfully fetched goal 1
+2025-11-11 05:21:39.158 +05:30 [INF]  [IsGoalParticipantAsync] Checking if user 9 participates in goal 1
+2025-11-11 05:21:39.161 +05:30 [INF]  [IsGoalParticipantAsync] Is participant: true
+2025-11-11 05:21:39.162 +05:30 [INF]  [GetLatestProgressLogAsync] Fetching latest progress log for goal 1
+2025-11-11 05:21:39.164 +05:30 [INF]  [GetLatestProgressLogAsync] Latest progress log found: true
+2025-11-11 05:21:39.164 +05:30 [INF]  [CountCompletedForUserAsync] Counting completed items for goal 1, user 9
+2025-11-11 05:21:39.168 +05:30 [INF]  [CountCompletedForUserAsync] Found 0 completed items
+2025-11-11 05:21:39.169 +05:30 [INF]  [CountTotalForUserAsync] Counting total items for goal 1, user 9
+2025-11-11 05:21:39.171 +05:30 [INF]  [CountTotalForUserAsync] Found 3 total items
+2025-11-11 05:21:39.172 +05:30 [INF]  [HasPendingApprovalAsync] Checking for pending approvals on goal 1, user 9
+2025-11-11 05:21:39.174 +05:30 [INF]  [HasPendingApprovalAsync] Has pending approval: false
+2025-11-11 05:21:39.175 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/1 responded 200 in 100.5121 ms
+2025-11-11 05:21:39.179 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-11 05:21:39.180 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-11 05:21:39.181 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=7c5bfa12-691d-4ad0-864f-674acad559b5, iat=1762818342, exp=1762821942, iss=EEPZ, aud=EEPZUsers
+2025-11-11 05:21:39.183 +05:30 [INF]     empMasterId: 9
+2025-11-11 05:21:39.184 +05:30 [INF]     role: Employee
+2025-11-11 05:21:39.195 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:21:39.196 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.199 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:39.201 +05:30 [INF]  [GetPagedAsync] Fetching page 1, size 20
+2025-11-11 05:21:39.206 +05:30 [INF]  [GetPagedAsync] Retrieved 0 items
+2025-11-11 05:21:39.207 +05:30 [INF]  [GetGoalApprovalsQueryable] Creating queryable for approvals
+2025-11-11 05:21:39.208 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.210 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:39.211 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.214 +05:30 [INF]  [CountAsync] Count: 0
+2025-11-11 05:21:39.214 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.217 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:39.218 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.220 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:39.221 +05:30 [INF]  [CountAsync] Counting query results
+2025-11-11 05:21:39.223 +05:30 [INF]  [CountAsync] Count: 1
+2025-11-11 05:21:39.224 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/approvals/my responded 200 in 44.6996 ms

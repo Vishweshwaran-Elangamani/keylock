@@ -1,0 +1,339 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Relevantz.EEPZ.Data.DBContexts;
+
+namespace Relevantz.EEPZ.Data.DBContexts
+{
+    public class DbInitializer
+    {
+        /// <summary>
+        /// Seeds all system roles and admin user
+        /// </summary>
+        public static async Task InitializeAsync(EEPZDbContext context, IConfiguration configuration)
+        {
+            try
+            {
+                Console.WriteLine("Starting database initialization...");
+
+                // Seed roles first
+                await SeedRolesAsync(context);
+
+                // Seed default departments
+                await SeedDepartmentsAsync(context);
+
+                // Seed admin user
+                await SeedAdminUserAsync(context, configuration);
+
+                // Seed Resource Pool Project
+                await SeedResourcePoolProjectAsync(context);
+
+                Console.WriteLine("Database initialization completed successfully!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during database initialization: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Seeds all system roles
+        /// </summary>
+        private static async Task SeedRolesAsync(EEPZDbContext context)
+        {
+            Console.WriteLine("Seeding roles...");
+
+            var roles = new List<Role>
+            {
+                new Role
+                {
+                    RoleName = "Admin",
+                    RoleCode = "ADMIN",
+                    Description = "System Administrator with full access",
+                    IsSystemRole = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                 new Role
+                {
+                    RoleName = "Leadership",
+                    RoleCode = "LEADERSHIP",
+                    Description = "Team Leader - Oversees department heads and managers",
+                    IsSystemRole = true,
+                    CreatedAt = DateTime.UtcNow,
+                },
+                new Role
+                {
+                    RoleName = "HR",
+                    RoleCode = "HR",
+                    Description = "Human Resources - Manages employees and HR processes",
+                    IsSystemRole = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Role
+                {
+                    RoleName = "Department Head",
+                    RoleCode = "DEPT_HEAD",
+                    Description = "Department Head - Manages department operations",
+                    IsSystemRole = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Role
+                {
+                    RoleName = "Manager",
+                    RoleCode = "MANAGER",
+                    Description = "Manager - Manages team performance and operations",
+                    IsSystemRole = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Role
+                {
+                    RoleName = "Employee",
+                    RoleCode = "EMPLOYEE",
+                    Description = "Regular employee user",
+                    IsSystemRole = true,
+                    CreatedAt = DateTime.UtcNow
+                }
+            };
+
+            foreach (var role in roles)
+            {
+                var existingRole = await context.Roles
+                    .FirstOrDefaultAsync(r => r.RoleCode == role.RoleCode);
+
+                if (existingRole == null)
+                {
+                    context.Roles.Add(role);
+                    Console.WriteLine($"   Added role: {role.RoleName} ({role.RoleCode})");
+                }
+                else
+                {
+                    Console.WriteLine($"  ⏭  Role already exists: {role.RoleName}");
+                }
+            }
+
+            await context.SaveChangesAsync();
+            Console.WriteLine(" Roles seeding completed!");
+        }
+
+        /// <summary>
+        /// Seeds default departments
+        /// </summary>
+        private static async Task SeedDepartmentsAsync(EEPZDbContext context)
+        {
+            Console.WriteLine(" Seeding departments...");
+
+            var departments = new List<Department>
+            {
+                new Department
+                {
+                    DepartmentName = "Administration",
+                    BudgetAllocated = 0,
+                    CostCenter = "ADMIN001",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Department
+                {
+                    DepartmentName = "Human Resources",
+                    BudgetAllocated = 0,
+                    CostCenter = "HR001",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Department
+                {
+                    DepartmentName = "Information Technology",
+                    BudgetAllocated = 0,
+                    CostCenter = "IT001",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Department
+                {
+                    DepartmentName = "Finance",
+                    BudgetAllocated = 0,
+                    CostCenter = "FIN001",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Department
+                {
+                    DepartmentName = "Operations",
+                    BudgetAllocated = 0,
+                    CostCenter = "OPS001",
+                    CreatedAt = DateTime.UtcNow
+                }
+            };
+
+            foreach (var department in departments)
+            {
+                var existingDepartment = await context.Departments
+                    .FirstOrDefaultAsync(d => d.DepartmentName == department.DepartmentName);
+
+                if (existingDepartment == null)
+                {
+                    context.Departments.Add(department);
+                    Console.WriteLine($"   Added department: {department.DepartmentName}");
+                }
+                else
+                {
+                    Console.WriteLine($"    Department already exists: {department.DepartmentName}");
+                }
+            }
+
+            await context.SaveChangesAsync();
+            Console.WriteLine(" Departments seeding completed!");
+        }
+
+        /// <summary>
+        /// Seeds admin user with all required data
+        /// </summary>
+        private static async Task SeedAdminUserAsync(EEPZDbContext context, IConfiguration configuration)
+        {
+            Console.WriteLine(" Seeding admin user...");
+
+            try
+            {
+                // Check if admin already exists
+                var adminEmail = configuration["AdminSeedData:Email"] ?? "eepzmailservice@gmail.com";
+                var existingAdmin = await context.Userauthentications
+                    .FirstOrDefaultAsync(u => u.Email == adminEmail);
+
+                if (existingAdmin != null)
+                {
+                    Console.WriteLine("    Admin user already exists. Skipping seed.");
+                    return;
+                }
+
+                // Get Admin Role
+                var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.RoleCode == "ADMIN");
+                if (adminRole == null)
+                {
+                    throw new Exception("Admin role not found. Please ensure roles are seeded first.");
+                }
+
+                // Get Administration Department
+                var adminDepartment = await context.Departments
+                    .FirstOrDefaultAsync(d => d.DepartmentName == "Administration");
+                if (adminDepartment == null)
+                {
+                    throw new Exception("Administration department not found. Please ensure departments are seeded first.");
+                }
+
+                // Create Admin Employee
+                var adminEmployee = new Employee
+                {
+                    EmployeeCompanyId = configuration["AdminSeedData:EmployeeCompanyId"] ?? "12501",
+                    EmploymentType = Constants.EmploymentTypes.Permanent,
+                    EmploymentStatus = Constants.EmploymentStatuses.Active,
+                    JoiningDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                    ConfirmationDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                    EmployeeType = Constants.EmployeeTypes.FullTime,
+                    WorkLocation = "Head Office",
+                    NoticePeriodDays = 0,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+                context.Employees.Add(adminEmployee);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"   Created admin employee: {adminEmployee.EmployeeCompanyId}");
+
+                // Create Admin Authentication
+                var adminPassword = configuration["AdminSeedData:Password"] ?? "Admin@123456";
+                var adminAuth = new Userauthentication
+                {
+                    EmployeeId = adminEmployee.EmployeeId,
+                    Email = adminEmail,
+                    PasswordHash = PasswordHelper.HashPassword(adminPassword),
+                    Status = Constants.UserStatuses.Active,
+                    IsFirstLogin = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                context.Userauthentications.Add(adminAuth);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"   Created admin authentication: {adminEmail}");
+
+                // Create Admin Profile
+                var adminProfile = new Userprofile
+                {
+                    EmployeeId = adminEmployee.EmployeeId,
+                    FirstName = configuration["AdminSeedData:FirstName"] ?? "System",
+                    LastName = configuration["AdminSeedData:LastName"] ?? "Administrator",
+                    CallingName = "Admin",
+                    Gender = Constants.Genders.PreferNotToSay,
+                    MobileNumber = configuration["AdminSeedData:MobileNumber"] ?? "+91-0000000000"
+                };
+                context.Userprofiles.Add(adminProfile);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"   Created admin profile: {adminProfile.FirstName} {adminProfile.LastName}");
+
+                // Assign Role and Department to Admin
+                var adminEmployeeDetails = new Employeedetailsmaster
+                {
+                    EmployeeId = adminEmployee.EmployeeId,
+                    RoleId = adminRole.RoleId,
+                    DepartmentId = adminDepartment.DepartmentId
+                };
+                context.Employeedetailsmasters.Add(adminEmployeeDetails);
+                await context.SaveChangesAsync();
+                Console.WriteLine($"   Assigned role and department to admin");
+
+                Console.WriteLine("\n" + new string('=', 60));
+                Console.WriteLine(" ADMIN USER SEEDED SUCCESSFULLY!");
+                Console.WriteLine(new string('=', 60));
+                Console.WriteLine($" Email: {adminEmail}");
+                Console.WriteLine($" Password: {adminPassword}");
+                Console.WriteLine($" Name: {adminProfile.FirstName} {adminProfile.LastName}");
+                Console.WriteLine($" Role: Admin");
+                Console.WriteLine($" Department: Administration");
+                Console.WriteLine(new string('=', 60) + "\n");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error seeding admin user: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Seeds resource pool project
+        /// </summary>
+        public static async Task SeedResourcePoolProjectAsync(EEPZDbContext context)
+    {
+        await context.Database.EnsureCreatedAsync();
+ 
+        var existingProject = await context.Projects
+            .FirstOrDefaultAsync(p => p.ProjectName == "ORG.RZ.RESOURCEPOOL");
+ 
+        if (existingProject == null)
+        {
+            var resourcePoolProject = new Project
+            {
+                ProjectName = "ORG.RZ.RESOURCEPOOL",
+                ClientName = "Relevantz",
+                Description = "Resource Pool Project.",
+                BusinessUnit = "Resource Management",
+                Department = null,
+                EngagementModel = "Internal",
+                Status = "Active",
+                StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                EndDate = null,
+                ResourceOwnerId = null,
+                ResourceOwnerEmployeeId = null,
+                L1approverId = null,
+                L1approverEmployeeId = null,
+                L2approverId = null,
+                L2approverEmployeeId = null,
+                IsDeletable = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+ 
+            context.Projects.Add(resourcePoolProject);
+            await context.SaveChangesAsync();
+        }
+    }
+    }
+}

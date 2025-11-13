@@ -1,0 +1,6 @@
+@Relevantz.EEPZ.Api_HostAddress = http://localhost:5228
+
+GET {{Relevantz.EEPZ.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

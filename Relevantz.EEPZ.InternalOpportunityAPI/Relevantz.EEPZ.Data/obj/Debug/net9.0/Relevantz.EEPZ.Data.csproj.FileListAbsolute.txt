@@ -1,0 +1,17 @@
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\bin\Debug\net9.0\Relevantz.EEPZ.Data.deps.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\bin\Debug\net9.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\bin\Debug\net9.0\Relevantz.EEPZ.Data.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\bin\Debug\net9.0\Relevantz.EEPZ.Data.pdb
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\bin\Debug\net9.0\Relevantz.EEPZ.Common.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\bin\Debug\net9.0\Relevantz.EEPZ.Common.pdb
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevant.CA3B5C75.Up2Date
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevantz.EEPZ.Data.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\refint\Relevantz.EEPZ.Data.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevantz.EEPZ.Data.pdb
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Data\obj\Debug\net9.0\ref\Relevantz.EEPZ.Data.dll

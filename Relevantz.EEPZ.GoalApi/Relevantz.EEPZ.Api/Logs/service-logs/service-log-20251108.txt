@@ -1,0 +1,151 @@
+2025-11-08 15:29:20.540 +05:30 [INF]  Starting EEPZ Backend Application
+2025-11-08 15:29:20.756 +05:30 [INF]  🚀 Application Configuration:
+2025-11-08 15:29:20.759 +05:30 [INF]     Environment: Development
+2025-11-08 15:29:20.761 +05:30 [INF]     JWT Issuer: EEPZ
+2025-11-08 15:29:20.762 +05:30 [INF]     JWT Audience: EEPZUsers
+2025-11-08 15:29:20.762 +05:30 [INF]     Database: Database=EEPZDB
+2025-11-08 15:29:20.763 +05:30 [INF]  Application started successfully
+2025-11-08 15:29:27.641 +05:30 [WRN] Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware Failed to determine the https port for redirect.
+2025-11-08 15:29:27.646 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 7.5778 ms
+2025-11-08 15:29:27.646 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/dashboard/summary responded 204 in 7.5839 ms
+2025-11-08 15:29:27.646 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 7.5959 ms
+2025-11-08 15:29:27.646 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/dashboard/summary responded 204 in 7.5910 ms
+2025-11-08 15:29:27.646 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 7.5730 ms
+2025-11-08 15:29:27.646 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 7.5631 ms
+2025-11-08 15:29:27.669 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 0.1573 ms
+2025-11-08 15:29:27.669 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP OPTIONS /api/goals/query responded 204 in 0.1589 ms
+2025-11-08 15:29:27.691 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:27.691 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:27.691 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:27.691 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:27.737 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/7/2025 4:48:24 PM', Current time (UTC): '11/8/2025 9:59:27 AM'.
+2025-11-08 15:29:27.737 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/7/2025 4:48:24 PM', Current time (UTC): '11/8/2025 9:59:27 AM'.
+2025-11-08 15:29:27.737 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/7/2025 4:48:24 PM', Current time (UTC): '11/8/2025 9:59:27 AM'.
+2025-11-08 15:29:27.737 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/7/2025 4:48:24 PM', Current time (UTC): '11/8/2025 9:59:27 AM'.
+2025-11-08 15:29:27.753 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/07/2025 16:48:24'
+2025-11-08 15:29:27.753 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/07/2025 16:48:24'
+2025-11-08 15:29:27.753 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/07/2025 16:48:24'
+2025-11-08 15:29:27.753 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/07/2025 16:48:24'
+2025-11-08 15:29:27.754 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 82.1738 ms
+2025-11-08 15:29:27.754 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 82.6159 ms
+2025-11-08 15:29:27.755 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/dashboard/summary responded 401 in 83.2203 ms
+2025-11-08 15:29:27.755 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 83.8283 ms
+2025-11-08 15:29:27.760 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:27.760 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:27.761 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:27.762 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:27.763 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/7/2025 4:48:24 PM', Current time (UTC): '11/8/2025 9:59:27 AM'.
+2025-11-08 15:29:27.763 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/7/2025 4:48:24 PM', Current time (UTC): '11/8/2025 9:59:27 AM'.
+2025-11-08 15:29:27.763 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/7/2025 4:48:24 PM', Current time (UTC): '11/8/2025 9:59:27 AM'.
+2025-11-08 15:29:27.764 +05:30 [ERR]  ❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/7/2025 4:48:24 PM', Current time (UTC): '11/8/2025 9:59:27 AM'.
+2025-11-08 15:29:27.766 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/07/2025 16:48:24'
+2025-11-08 15:29:27.766 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/07/2025 16:48:24'
+2025-11-08 15:29:27.766 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/07/2025 16:48:24'
+2025-11-08 15:29:27.766 +05:30 [WRN]  ❌ JWT Challenge: invalid_token, The token expired at '11/07/2025 16:48:24'
+2025-11-08 15:29:27.767 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 8.6085 ms
+2025-11-08 15:29:27.768 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 7.6474 ms
+2025-11-08 15:29:27.769 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/dashboard/summary responded 401 in 7.2399 ms
+2025-11-08 15:29:27.770 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 401 in 7.3209 ms
+2025-11-08 15:29:32.527 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:32.527 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:32.527 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:32.527 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:32.540 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-08 15:29:32.540 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-08 15:29:32.540 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-08 15:29:32.540 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-08 15:29:32.541 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=d36e3233-ba7c-483d-84bc-fddfb55c9535, iat=1762595971, exp=1762599571, iss=EEPZ, aud=EEPZUsers
+2025-11-08 15:29:32.542 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=d36e3233-ba7c-483d-84bc-fddfb55c9535, iat=1762595971, exp=1762599571, iss=EEPZ, aud=EEPZUsers
+2025-11-08 15:29:32.543 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=d36e3233-ba7c-483d-84bc-fddfb55c9535, iat=1762595971, exp=1762599571, iss=EEPZ, aud=EEPZUsers
+2025-11-08 15:29:32.544 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=d36e3233-ba7c-483d-84bc-fddfb55c9535, iat=1762595971, exp=1762599571, iss=EEPZ, aud=EEPZUsers
+2025-11-08 15:29:32.545 +05:30 [INF]     empMasterId: 9
+2025-11-08 15:29:32.546 +05:30 [INF]     empMasterId: 9
+2025-11-08 15:29:32.547 +05:30 [INF]     empMasterId: 9
+2025-11-08 15:29:32.547 +05:30 [INF]     empMasterId: 9
+2025-11-08 15:29:32.548 +05:30 [INF]     role: Employee
+2025-11-08 15:29:32.549 +05:30 [INF]     role: Employee
+2025-11-08 15:29:32.549 +05:30 [INF]     role: Employee
+2025-11-08 15:29:32.550 +05:30 [INF]     role: Employee
+2025-11-08 15:29:32.913 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: null, Status: completed, RequesterID: 9, Role: null, Page: 1
+2025-11-08 15:29:32.916 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:32.916 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:32.916 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:32.920 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:32.920 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:32.921 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:32.922 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: open, RequesterID: 9, Role: Employee, Page: 1
+2025-11-08 15:29:32.923 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: inprogress, RequesterID: 9, Role: Employee, Page: 1
+2025-11-08 15:29:32.925 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: reopened, RequesterID: 9, Role: Employee, Page: 1
+2025-11-08 15:29:34.346 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-08 15:29:34.346 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-08 15:29:34.516 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-08 15:29:34.516 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-08 15:29:34.516 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-08 15:29:34.516 +05:30 [INF]  [QueryGoalsAsync] Retrieved 1 goals
+2025-11-08 15:29:34.517 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 0 goals
+2025-11-08 15:29:34.518 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 0 goals
+2025-11-08 15:29:34.520 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: null, Status: null, RequesterID: 9, Role: null, Page: 1
+2025-11-08 15:29:34.521 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 1 goals
+2025-11-08 15:29:34.522 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 0 DTOs
+2025-11-08 15:29:34.523 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 0 DTOs
+2025-11-08 15:29:34.527 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-08 15:29:34.529 +05:30 [WRN] Microsoft.EntityFrameworkCore.Query Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2025-11-08 15:29:34.553 +05:30 [INF]  [QueryGoalsAsync] Retrieved 1 goals
+2025-11-08 15:29:34.557 +05:30 [INF]  [CountPendingApprovalsForUserAsync] Counting pending approvals for user 9
+2025-11-08 15:29:34.557 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-08 15:29:34.560 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 1 DTOs
+2025-11-08 15:29:34.580 +05:30 [INF]  [CountPendingApprovalsForUserAsync] Found 0 pending approvals
+2025-11-08 15:29:34.590 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:34.590 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:34.591 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/dashboard/summary responded 200 in 2065.0383 ms
+2025-11-08 15:29:34.591 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 2065.0388 ms
+2025-11-08 15:29:34.591 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 2064.2164 ms
+2025-11-08 15:29:34.591 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 2064.8119 ms
+2025-11-08 15:29:34.592 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-08 15:29:34.593 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-08 15:29:34.599 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=d36e3233-ba7c-483d-84bc-fddfb55c9535, iat=1762595971, exp=1762599571, iss=EEPZ, aud=EEPZUsers
+2025-11-08 15:29:34.600 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=d36e3233-ba7c-483d-84bc-fddfb55c9535, iat=1762595971, exp=1762599571, iss=EEPZ, aud=EEPZUsers
+2025-11-08 15:29:34.600 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:34.600 +05:30 [INF]  📨 JWT Token Received (first 20 chars): eyJhbGciOiJIUzI1NiIs...
+2025-11-08 15:29:34.600 +05:30 [INF]     empMasterId: 9
+2025-11-08 15:29:34.601 +05:30 [INF]     empMasterId: 9
+2025-11-08 15:29:34.602 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-08 15:29:34.603 +05:30 [INF]  JWT Token Validated Successfully
+2025-11-08 15:29:34.603 +05:30 [INF]     role: Employee
+2025-11-08 15:29:34.604 +05:30 [INF]     role: Employee
+2025-11-08 15:29:34.604 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=d36e3233-ba7c-483d-84bc-fddfb55c9535, iat=1762595971, exp=1762599571, iss=EEPZ, aud=EEPZUsers
+2025-11-08 15:29:34.605 +05:30 [INF]     Claims: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier=9, http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress=amanda.martinez@company.com, empId=9, empMasterId=9, http://schemas.microsoft.com/ws/2008/06/identity/claims/role=Employee, jti=d36e3233-ba7c-483d-84bc-fddfb55c9535, iat=1762595971, exp=1762599571, iss=EEPZ, aud=EEPZUsers
+2025-11-08 15:29:34.608 +05:30 [INF]     empMasterId: 9
+2025-11-08 15:29:34.608 +05:30 [INF]     empMasterId: 9
+2025-11-08 15:29:34.609 +05:30 [INF]     role: Employee
+2025-11-08 15:29:34.610 +05:30 [INF]     role: Employee
+2025-11-08 15:29:34.618 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:34.618 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:34.618 +05:30 [INF] Relevantz.EEPZ.Api.Controllers.GoalsController [GoalsController.Query] Querying - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:34.619 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:34.619 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: null, Status: completed, RequesterID: 9, Role: null, Page: 1
+2025-11-08 15:29:34.620 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:34.621 +05:30 [INF]  [QueryGoalsAsync] Service - Type: self, Role: Employee, UserID: 9
+2025-11-08 15:29:34.622 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: reopened, RequesterID: 9, Role: Employee, Page: 1
+2025-11-08 15:29:34.625 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: open, RequesterID: 9, Role: Employee, Page: 1
+2025-11-08 15:29:34.626 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: self, Status: inprogress, RequesterID: 9, Role: Employee, Page: 1
+2025-11-08 15:29:34.668 +05:30 [INF]  [QueryGoalsAsync] Retrieved 1 goals
+2025-11-08 15:29:34.668 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-08 15:29:34.668 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-08 15:29:34.670 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 1 goals
+2025-11-08 15:29:34.672 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 0 goals
+2025-11-08 15:29:34.673 +05:30 [INF]  [QueryGoalsAsync] Retrieved 0 goals
+2025-11-08 15:29:34.674 +05:30 [INF]  [QueryGoalsAsync] Starting query - Type: null, Status: null, RequesterID: 9, Role: null, Page: 1
+2025-11-08 15:29:34.676 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Fetching EDM for 9
+2025-11-08 15:29:34.676 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 0 DTOs
+2025-11-08 15:29:34.677 +05:30 [INF]  [QueryGoalsAsync] Service - Repository returned 0 goals
+2025-11-08 15:29:34.680 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 79.8071 ms
+2025-11-08 15:29:34.680 +05:30 [INF]  [GetEmployeeDetailsByMasterIdAsync] Found - Employee: Amanda Martinez, Profile: true
+2025-11-08 15:29:34.680 +05:30 [INF]  [QueryGoalsAsync] Retrieved 1 goals
+2025-11-08 15:29:34.681 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 0 DTOs
+2025-11-08 15:29:34.683 +05:30 [INF]  [QueryGoalsAsync] Service - Returning 1 DTOs
+2025-11-08 15:29:34.685 +05:30 [INF]  [CountPendingApprovalsForUserAsync] Counting pending approvals for user 9
+2025-11-08 15:29:34.687 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 96.7167 ms
+2025-11-08 15:29:34.688 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/query responded 200 in 97.7872 ms
+2025-11-08 15:29:34.691 +05:30 [INF]  [CountPendingApprovalsForUserAsync] Found 0 pending approvals
+2025-11-08 15:29:34.693 +05:30 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /api/goals/dashboard/summary responded 200 in 93.2108 ms

@@ -1,0 +1,1312 @@
+2025-11-10 09:31:55.899 +05:30 [WRN] As of ""2025-11-10T04:01:52.8264558+00:00"", the heartbeat has been running for ""00:00:01.0590955"" which is longer than ""00:00:01"". This could be caused by thread pool starvation.
+2025-11-10 09:50:03.140 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 12.3500 ms
+2025-11-10 09:50:03.140 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 12.0846 ms
+2025-11-10 09:50:03.701 +05:30 [INF] Getting all SLAs
+2025-11-10 09:50:03.885 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 720.1885 ms
+2025-11-10 09:50:03.937 +05:30 [INF] Getting all SLAs
+2025-11-10 09:50:03.950 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 59.9071 ms
+2025-11-10 10:00:49.923 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 1.3207 ms
+2025-11-10 10:00:49.928 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0568 ms
+2025-11-10 10:00:50.007 +05:30 [INF] Getting all SLAs
+2025-11-10 10:00:50.077 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 143.0338 ms
+2025-11-10 10:00:50.102 +05:30 [INF] Getting all SLAs
+2025-11-10 10:00:50.109 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 27.1940 ms
+2025-11-10 10:05:38.436 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.1598 ms
+2025-11-10 10:05:38.436 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.1607 ms
+2025-11-10 10:05:38.483 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 44.7204 ms
+2025-11-10 10:05:38.495 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 10.0293 ms
+2025-11-10 10:05:42.638 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0369 ms
+2025-11-10 10:05:42.652 +05:30 [INF] Getting all SLAs
+2025-11-10 10:05:42.657 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.9139 ms
+2025-11-10 10:05:58.940 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0490 ms
+2025-11-10 10:05:58.940 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0131 ms
+2025-11-10 10:05:58.958 +05:30 [INF] Getting all SLAs
+2025-11-10 10:05:58.963 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.9659 ms
+2025-11-10 10:05:58.980 +05:30 [INF] Getting all SLAs
+2025-11-10 10:05:58.984 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.6813 ms
+2025-11-10 10:06:00.763 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0275 ms
+2025-11-10 10:06:00.764 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0135 ms
+2025-11-10 10:06:00.781 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 16.9695 ms
+2025-11-10 10:06:00.791 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 8.9916 ms
+2025-11-10 10:06:05.756 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0295 ms
+2025-11-10 10:06:05.765 +05:30 [INF] Getting all SLAs
+2025-11-10 10:06:05.768 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.3222 ms
+2025-11-10 10:07:15.644 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0242 ms
+2025-11-10 10:07:15.644 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0121 ms
+2025-11-10 10:07:15.667 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 21.3955 ms
+2025-11-10 10:07:15.676 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 8.5670 ms
+2025-11-10 10:07:24.798 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0205 ms
+2025-11-10 10:07:24.810 +05:30 [INF] Getting all SLAs
+2025-11-10 10:07:24.813 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 13.9167 ms
+2025-11-10 10:07:32.509 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0222 ms
+2025-11-10 10:07:32.519 +05:30 [INF] Getting all SLAs
+2025-11-10 10:07:32.520 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.1104 ms
+2025-11-10 10:13:34.609 +05:30 [INF] Database migration completed successfully
+2025-11-10 10:13:34.818 +05:30 [WRN] Overriding address(es) 'http://localhost:5259'. Binding to endpoints defined via IConfiguration and/or UseKestrel() instead.
+2025-11-10 10:13:34.829 +05:30 [INF] Now listening on: http://[::]:5000
+2025-11-10 10:13:34.829 +05:30 [INF] Now listening on: https://[::]:5001
+2025-11-10 10:13:34.830 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2025-11-10 10:13:34.830 +05:30 [INF] Hosting environment: Development
+2025-11-10 10:13:34.830 +05:30 [INF] Content root path: D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Api
+2025-11-10 10:18:05.801 +05:30 [INF] Application is shutting down...
+2025-11-10 10:18:18.698 +05:30 [INF] Database migration completed successfully
+2025-11-10 10:18:18.789 +05:30 [WRN] Overriding address(es) 'http://localhost:5259'. Binding to endpoints defined via IConfiguration and/or UseKestrel() instead.
+2025-11-10 10:18:18.797 +05:30 [INF] Now listening on: http://[::]:5000
+2025-11-10 10:18:18.797 +05:30 [INF] Now listening on: https://[::]:5001
+2025-11-10 10:18:18.797 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2025-11-10 10:18:18.797 +05:30 [INF] Hosting environment: Development
+2025-11-10 10:18:18.797 +05:30 [INF] Content root path: D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Api
+2025-11-10 10:19:34.782 +05:30 [INF] Application is shutting down...
+2025-11-10 10:19:43.806 +05:30 [INF] Database migration completed successfully
+2025-11-10 11:02:35.219 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-10 11:02:35.233 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 23.6784 ms
+2025-11-10 11:02:35.233 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 23.7108 ms
+2025-11-10 11:02:35.809 +05:30 [INF] Getting all SLAs
+2025-11-10 11:02:37.247 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 1969.9798 ms
+2025-11-10 11:02:37.267 +05:30 [INF] Getting all SLAs
+2025-11-10 11:02:37.438 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 194.0799 ms
+2025-11-10 11:02:54.374 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.2505 ms
+2025-11-10 11:02:54.374 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.2483 ms
+2025-11-10 11:02:54.551 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 169.1026 ms
+2025-11-10 11:02:54.585 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 31.7279 ms
+2025-11-10 11:03:14.291 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0843 ms
+2025-11-10 11:03:14.292 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.1702 ms
+2025-11-10 11:03:14.319 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 25.0800 ms
+2025-11-10 11:03:14.370 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 48.2183 ms
+2025-11-10 11:03:17.593 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1355 ms
+2025-11-10 11:03:17.620 +05:30 [INF] Getting all SLAs
+2025-11-10 11:03:17.625 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 29.5634 ms
+2025-11-10 11:03:52.349 +05:30 [INF] Getting all SLAs
+2025-11-10 11:03:52.355 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 26.3956 ms
+2025-11-10 11:04:05.059 +05:30 [INF] HTTP GET /.well-known/appspecific/com.chrome.devtools.json responded 404 in 0.3985 ms
+2025-11-10 11:04:11.786 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1062 ms
+2025-11-10 11:04:11.788 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0579 ms
+2025-11-10 11:04:11.846 +05:30 [INF] Getting all SLAs
+2025-11-10 11:04:11.870 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 81.6179 ms
+2025-11-10 11:04:11.914 +05:30 [INF] Getting all SLAs
+2025-11-10 11:04:11.918 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 45.3982 ms
+2025-11-10 11:04:13.597 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.4648 ms
+2025-11-10 11:04:13.597 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.4725 ms
+2025-11-10 11:04:13.626 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 27.5146 ms
+2025-11-10 11:04:13.646 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 18.6972 ms
+2025-11-10 11:04:55.251 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1744 ms
+2025-11-10 11:04:55.281 +05:30 [INF] Getting all SLAs
+2025-11-10 11:04:55.285 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 29.8730 ms
+2025-11-10 11:14:39.435 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1383 ms
+2025-11-10 11:14:39.435 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1410 ms
+2025-11-10 11:14:39.454 +05:30 [INF] Getting all SLAs
+2025-11-10 11:14:39.483 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 44.7345 ms
+2025-11-10 11:14:39.492 +05:30 [INF] Getting all SLAs
+2025-11-10 11:14:39.494 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.6487 ms
+2025-11-10 11:14:39.505 +05:30 [INF] Getting all SLAs
+2025-11-10 11:14:39.507 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.1387 ms
+2025-11-10 11:14:39.518 +05:30 [INF] Getting all SLAs
+2025-11-10 11:14:39.520 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.8934 ms
+2025-11-10 11:14:46.301 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2122 ms
+2025-11-10 11:14:46.302 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1717 ms
+2025-11-10 11:14:46.326 +05:30 [INF] Getting all SLAs
+2025-11-10 11:14:46.332 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 28.4897 ms
+2025-11-10 11:14:46.357 +05:30 [INF] Getting all SLAs
+2025-11-10 11:14:46.362 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 28.1126 ms
+2025-11-10 11:14:47.865 +05:30 [INF] Getting all SLAs
+2025-11-10 11:14:47.868 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 22.3909 ms
+2025-11-10 11:14:47.891 +05:30 [INF] Getting all SLAs
+2025-11-10 11:14:47.895 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 24.8612 ms
+2025-11-10 11:16:39.626 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2499 ms
+2025-11-10 11:16:39.643 +05:30 [INF] Getting all SLAs
+2025-11-10 11:16:39.647 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.5693 ms
+2025-11-10 11:16:42.004 +05:30 [INF] Getting all SLAs
+2025-11-10 11:16:42.012 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 19.0447 ms
+2025-11-10 11:16:42.025 +05:30 [INF] Getting all SLAs
+2025-11-10 11:16:42.027 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 13.2998 ms
+2025-11-10 11:17:34.797 +05:30 [INF] Database migration completed successfully
+2025-11-10 11:17:41.156 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-10 11:17:41.159 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 5.3794 ms
+2025-11-10 11:17:41.159 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 5.3767 ms
+2025-11-10 11:17:41.312 +05:30 [INF] Getting all SLAs
+2025-11-10 11:17:42.659 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 1485.8267 ms
+2025-11-10 11:17:42.696 +05:30 [INF] Getting all SLAs
+2025-11-10 11:17:42.915 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 256.4354 ms
+2025-11-10 11:17:44.483 +05:30 [INF] Getting all SLAs
+2025-11-10 11:17:44.491 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 41.9604 ms
+2025-11-10 11:17:44.508 +05:30 [INF] Getting all SLAs
+2025-11-10 11:17:44.513 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.1726 ms
+2025-11-10 11:19:56.088 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1937 ms
+2025-11-10 11:19:56.091 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0706 ms
+2025-11-10 11:19:56.119 +05:30 [INF] Getting all SLAs
+2025-11-10 11:19:56.135 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 42.1065 ms
+2025-11-10 11:19:56.160 +05:30 [INF] Getting all SLAs
+2025-11-10 11:19:56.167 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 30.1144 ms
+2025-11-10 11:21:29.132 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1500 ms
+2025-11-10 11:21:29.132 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0817 ms
+2025-11-10 11:21:29.174 +05:30 [INF] Getting all SLAs
+2025-11-10 11:21:29.181 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 41.8610 ms
+2025-11-10 11:21:29.200 +05:30 [INF] Getting all SLAs
+2025-11-10 11:21:29.203 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.8671 ms
+2025-11-10 11:21:35.519 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2436 ms
+2025-11-10 11:21:35.519 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2737 ms
+2025-11-10 11:21:35.534 +05:30 [INF] Getting all SLAs
+2025-11-10 11:21:35.538 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.0863 ms
+2025-11-10 11:21:35.554 +05:30 [INF] Getting all SLAs
+2025-11-10 11:21:35.558 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.8824 ms
+2025-11-10 11:22:12.951 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 91.3526 ms
+2025-11-10 11:22:47.159 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1685 ms
+2025-11-10 11:22:47.159 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1709 ms
+2025-11-10 11:22:47.188 +05:30 [INF] Getting all SLAs
+2025-11-10 11:22:47.191 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 26.8853 ms
+2025-11-10 11:22:47.208 +05:30 [INF] Getting all SLAs
+2025-11-10 11:22:47.211 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.0962 ms
+2025-11-10 11:23:06.625 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1613 ms
+2025-11-10 11:23:06.639 +05:30 [INF] Getting all SLAs
+2025-11-10 11:23:06.644 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.7303 ms
+2025-11-10 11:23:11.639 +05:30 [INF] Getting all SLAs
+2025-11-10 11:23:11.644 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.0986 ms
+2025-11-10 11:23:12.620 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1489 ms
+2025-11-10 11:23:12.648 +05:30 [INF] Getting all SLAs
+2025-11-10 11:23:12.650 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 23.3494 ms
+2025-11-10 11:23:16.097 +05:30 [INF] Getting all SLAs
+2025-11-10 11:23:16.100 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 23.8442 ms
+2025-11-10 11:23:16.119 +05:30 [INF] Getting all SLAs
+2025-11-10 11:23:16.122 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.7110 ms
+2025-11-10 11:23:18.427 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2933 ms
+2025-11-10 11:23:18.427 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2059 ms
+2025-11-10 11:23:18.443 +05:30 [INF] Getting all SLAs
+2025-11-10 11:23:18.447 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.0172 ms
+2025-11-10 11:23:18.463 +05:30 [INF] Getting all SLAs
+2025-11-10 11:23:18.465 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.9447 ms
+2025-11-10 11:23:32.623 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0524 ms
+2025-11-10 11:23:32.638 +05:30 [INF] Getting all SLAs
+2025-11-10 11:23:32.640 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.0472 ms
+2025-11-10 11:27:15.639 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.2545 ms
+2025-11-10 11:27:15.657 +05:30 [INF] Getting all SLAs
+2025-11-10 11:27:15.695 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 52.3335 ms
+2025-11-10 11:27:17.640 +05:30 [INF] Getting all SLAs
+2025-11-10 11:27:17.642 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.6513 ms
+2025-11-10 11:27:25.626 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.2347 ms
+2025-11-10 11:27:25.641 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 13.8523 ms
+2025-11-10 11:27:28.178 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 22.8877 ms
+2025-11-10 11:27:37.750 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0764 ms
+2025-11-10 11:27:37.751 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0330 ms
+2025-11-10 11:27:37.767 +05:30 [INF] Getting all SLAs
+2025-11-10 11:27:37.771 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 19.6917 ms
+2025-11-10 11:27:37.789 +05:30 [INF] Getting all SLAs
+2025-11-10 11:27:37.792 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.1181 ms
+2025-11-10 11:27:39.294 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0576 ms
+2025-11-10 11:27:39.294 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0276 ms
+2025-11-10 11:27:39.314 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 18.2340 ms
+2025-11-10 11:27:39.336 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 20.3867 ms
+2025-11-10 11:27:45.534 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0389 ms
+2025-11-10 11:27:45.563 +05:30 [INF] Getting all SLAs
+2025-11-10 11:27:45.568 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 31.9382 ms
+2025-11-10 11:27:55.528 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0549 ms
+2025-11-10 11:27:55.562 +05:30 [INF] Getting all SLAs
+2025-11-10 11:27:55.568 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 39.0839 ms
+2025-11-10 11:28:09.048 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1992 ms
+2025-11-10 11:28:09.049 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0507 ms
+2025-11-10 11:28:09.071 +05:30 [INF] Getting all SLAs
+2025-11-10 11:28:09.074 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.9434 ms
+2025-11-10 11:28:09.089 +05:30 [INF] Getting all SLAs
+2025-11-10 11:28:09.092 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.3774 ms
+2025-11-10 11:28:19.504 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0284 ms
+2025-11-10 11:28:19.504 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0686 ms
+2025-11-10 11:28:19.538 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 32.1707 ms
+2025-11-10 11:28:19.571 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 31.7814 ms
+2025-11-10 11:28:24.040 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0452 ms
+2025-11-10 11:28:24.059 +05:30 [INF] Getting all SLAs
+2025-11-10 11:28:24.062 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.7468 ms
+2025-11-10 11:28:50.551 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.0746 ms
+2025-11-10 11:28:50.571 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 18.7408 ms
+2025-11-10 11:28:51.651 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 10.7286 ms
+2025-11-10 11:28:51.657 +05:30 [INF] HTTP OPTIONS /api/Sla/create responded 204 in 2.7497 ms
+2025-11-10 11:28:51.768 +05:30 [INF] Creating new SLA
+2025-11-10 11:28:51.980 +05:30 [INF] SLA created successfully. SLA ID: 1
+2025-11-10 11:28:52.068 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 408.9429 ms
+2025-11-10 11:28:52.079 +05:30 [INF] Creating new SLA
+2025-11-10 11:28:52.084 +05:30 [INF] SLA created successfully. SLA ID: 2
+2025-11-10 11:28:52.086 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 14.7619 ms
+2025-11-10 11:28:52.094 +05:30 [INF] Creating new SLA
+2025-11-10 11:28:52.098 +05:30 [INF] SLA created successfully. SLA ID: 3
+2025-11-10 11:28:52.099 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 11.2571 ms
+2025-11-10 11:28:52.108 +05:30 [INF] Creating new SLA
+2025-11-10 11:28:52.113 +05:30 [INF] SLA created successfully. SLA ID: 4
+2025-11-10 11:28:52.115 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 13.1350 ms
+2025-11-10 11:28:52.125 +05:30 [INF] Creating new SLA
+2025-11-10 11:28:52.129 +05:30 [INF] SLA created successfully. SLA ID: 5
+2025-11-10 11:28:52.131 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 13.7854 ms
+2025-11-10 11:28:52.146 +05:30 [INF] Creating new SLA
+2025-11-10 11:28:52.149 +05:30 [INF] SLA created successfully. SLA ID: 6
+2025-11-10 11:28:52.150 +05:30 [INF] HTTP POST /api/Sla/create responded 200 in 15.8658 ms
+2025-11-10 11:28:56.891 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0370 ms
+2025-11-10 11:28:56.912 +05:30 [INF] Getting all SLAs
+2025-11-10 11:28:57.036 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 143.5788 ms
+2025-11-10 11:29:26.326 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.7364 ms
+2025-11-10 11:29:26.381 +05:30 [INF] Updating SLA 1
+2025-11-10 11:29:26.585 +05:30 [INF] SLA updated successfully. SLA ID: 1
+2025-11-10 11:29:26.587 +05:30 [INF] HTTP PUT /api/Sla/1 responded 200 in 258.4981 ms
+2025-11-10 11:29:28.195 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0584 ms
+2025-11-10 11:29:28.228 +05:30 [INF] Getting all SLAs
+2025-11-10 11:29:28.235 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 37.2304 ms
+2025-11-10 11:29:53.039 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0414 ms
+2025-11-10 11:29:53.040 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0088 ms
+2025-11-10 11:29:53.056 +05:30 [INF] Getting all SLAs
+2025-11-10 11:29:53.058 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.4075 ms
+2025-11-10 11:29:53.066 +05:30 [INF] Getting all SLAs
+2025-11-10 11:29:53.069 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.3864 ms
+2025-11-10 11:32:20.637 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0319 ms
+2025-11-10 11:32:20.649 +05:30 [INF] Getting all SLAs
+2025-11-10 11:32:20.651 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 12.0235 ms
+2025-11-10 11:32:42.439 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0341 ms
+2025-11-10 11:32:42.443 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1189 ms
+2025-11-10 11:32:42.455 +05:30 [INF] Getting all SLAs
+2025-11-10 11:32:42.457 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.1075 ms
+2025-11-10 11:32:42.464 +05:30 [INF] Getting all SLAs
+2025-11-10 11:32:42.466 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 7.9951 ms
+2025-11-10 11:33:22.168 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0272 ms
+2025-11-10 11:33:22.168 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0078 ms
+2025-11-10 11:33:22.175 +05:30 [INF] Getting all SLAs
+2025-11-10 11:33:22.178 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.0099 ms
+2025-11-10 11:33:22.186 +05:30 [INF] Getting all SLAs
+2025-11-10 11:33:22.189 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.9732 ms
+2025-11-10 11:34:28.370 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0209 ms
+2025-11-10 11:34:28.370 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0109 ms
+2025-11-10 11:34:28.381 +05:30 [INF] Getting all SLAs
+2025-11-10 11:34:28.384 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.2174 ms
+2025-11-10 11:34:28.394 +05:30 [INF] Getting all SLAs
+2025-11-10 11:34:28.397 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.8594 ms
+2025-11-10 11:34:48.910 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0271 ms
+2025-11-10 11:34:48.910 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0091 ms
+2025-11-10 11:34:48.924 +05:30 [INF] Getting all SLAs
+2025-11-10 11:34:48.927 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 12.9201 ms
+2025-11-10 11:34:48.936 +05:30 [INF] Getting all SLAs
+2025-11-10 11:34:48.939 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.5978 ms
+2025-11-10 11:36:11.539 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0257 ms
+2025-11-10 11:36:11.540 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0116 ms
+2025-11-10 11:36:11.557 +05:30 [INF] Getting all SLAs
+2025-11-10 11:36:11.561 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.1789 ms
+2025-11-10 11:36:11.572 +05:30 [INF] Getting all SLAs
+2025-11-10 11:36:11.575 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 12.3405 ms
+2025-11-10 11:36:14.401 +05:30 [INF] Getting all SLAs
+2025-11-10 11:36:14.408 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 24.5931 ms
+2025-11-10 11:36:14.433 +05:30 [INF] Getting all SLAs
+2025-11-10 11:36:14.437 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 26.3108 ms
+2025-11-10 11:36:19.768 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0631 ms
+2025-11-10 11:36:19.768 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0254 ms
+2025-11-10 11:36:19.787 +05:30 [INF] Getting all SLAs
+2025-11-10 11:36:19.791 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.0539 ms
+2025-11-10 11:36:19.810 +05:30 [INF] Getting all SLAs
+2025-11-10 11:36:19.814 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.5367 ms
+2025-11-10 11:40:26.662 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0473 ms
+2025-11-10 11:40:26.677 +05:30 [INF] Getting all SLAs
+2025-11-10 11:40:26.698 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 32.0194 ms
+2025-11-10 11:41:19.637 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0299 ms
+2025-11-10 11:41:19.645 +05:30 [INF] Getting all SLAs
+2025-11-10 11:41:19.647 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.0067 ms
+2025-11-10 11:41:21.649 +05:30 [INF] Getting all SLAs
+2025-11-10 11:41:21.651 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.1871 ms
+2025-11-10 11:41:23.642 +05:30 [INF] Getting all SLAs
+2025-11-10 11:41:23.647 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.8165 ms
+2025-11-10 11:41:25.616 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0174 ms
+2025-11-10 11:41:25.626 +05:30 [INF] Getting all SLAs
+2025-11-10 11:41:25.627 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.2346 ms
+2025-11-10 11:41:34.649 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0177 ms
+2025-11-10 11:41:34.666 +05:30 [INF] Getting all SLAs
+2025-11-10 11:41:34.669 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.6213 ms
+2025-11-10 11:41:42.641 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0198 ms
+2025-11-10 11:41:42.661 +05:30 [INF] Getting all SLAs
+2025-11-10 11:41:42.665 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 22.0812 ms
+2025-11-10 11:41:46.265 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.1155 ms
+2025-11-10 11:41:46.268 +05:30 [INF] HTTP OPTIONS /api/Sla/1 responded 204 in 0.0203 ms
+2025-11-10 11:41:46.286 +05:30 [INF] Getting SLA 1
+2025-11-10 11:41:46.290 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 6, Employee: 6, Userprofile: balaji
+2025-11-10 11:41:46.291 +05:30 [INF] 📝 Mapped - EmployeeName: 'balaji thanga', DepartmentName: 'Human Resources'
+2025-11-10 11:41:46.291 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 20.4853 ms
+2025-11-10 11:41:46.293 +05:30 [INF] HTTP OPTIONS /api/Sla/1/history responded 204 in 0.0115 ms
+2025-11-10 11:41:46.299 +05:30 [INF] Getting SLA 1
+2025-11-10 11:41:46.301 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 6, Employee: 6, Userprofile: balaji
+2025-11-10 11:41:46.301 +05:30 [INF] 📝 Mapped - EmployeeName: 'balaji thanga', DepartmentName: 'Human Resources'
+2025-11-10 11:41:46.301 +05:30 [INF] HTTP GET /api/Sla/1 responded 200 in 9.6247 ms
+2025-11-10 11:41:46.305 +05:30 [INF] Getting SLA history for 1
+2025-11-10 11:41:46.340 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 44.6575 ms
+2025-11-10 11:41:46.342 +05:30 [INF] HTTP OPTIONS /api/Sla/1/escalations responded 204 in 0.0114 ms
+2025-11-10 11:41:46.348 +05:30 [INF] Getting SLA history for 1
+2025-11-10 11:41:46.350 +05:30 [INF] HTTP GET /api/Sla/1/history responded 200 in 9.0753 ms
+2025-11-10 11:41:46.355 +05:30 [INF] Getting escalations for SLA 1
+2025-11-10 11:41:46.399 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 56.2657 ms
+2025-11-10 11:41:46.405 +05:30 [INF] Getting escalations for SLA 1
+2025-11-10 11:41:46.406 +05:30 [INF] HTTP GET /api/Sla/1/escalations responded 200 in 7.0460 ms
+2025-11-10 11:42:20.876 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0290 ms
+2025-11-10 11:42:20.876 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0148 ms
+2025-11-10 11:42:20.886 +05:30 [INF] Getting all SLAs
+2025-11-10 11:42:20.888 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.6402 ms
+2025-11-10 11:42:20.903 +05:30 [INF] Getting all SLAs
+2025-11-10 11:42:20.905 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.1951 ms
+2025-11-10 11:42:23.123 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.0163 ms
+2025-11-10 11:42:23.123 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.0092 ms
+2025-11-10 11:42:23.133 +05:30 [INF] Getting SLA 2
+2025-11-10 11:42:23.136 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 11:42:23.136 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 11:42:23.136 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 12.3523 ms
+2025-11-10 11:42:23.139 +05:30 [INF] HTTP OPTIONS /api/Sla/2/history responded 204 in 0.0278 ms
+2025-11-10 11:42:23.145 +05:30 [INF] Getting SLA 2
+2025-11-10 11:42:23.146 +05:30 [INF] Getting SLA history for 2
+2025-11-10 11:42:23.147 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 11:42:23.147 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 11:42:23.147 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 10.6881 ms
+2025-11-10 11:42:23.174 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 33.5393 ms
+2025-11-10 11:42:23.176 +05:30 [INF] HTTP OPTIONS /api/Sla/2/escalations responded 204 in 0.0183 ms
+2025-11-10 11:42:23.186 +05:30 [INF] Getting SLA history for 2
+2025-11-10 11:42:23.188 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 11:42:23.190 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 14.8666 ms
+2025-11-10 11:42:23.190 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 12.8810 ms
+2025-11-10 11:42:23.199 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 11:42:23.201 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 9.3753 ms
+2025-11-10 11:42:25.286 +05:30 [INF] Getting all SLAs
+2025-11-10 11:42:25.289 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 14.6635 ms
+2025-11-10 11:42:25.301 +05:30 [INF] Getting all SLAs
+2025-11-10 11:42:25.305 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 14.1880 ms
+2025-11-10 11:42:40.472 +05:30 [INF] HTTP OPTIONS /api/Sla/6 responded 204 in 0.0189 ms
+2025-11-10 11:42:40.487 +05:30 [INF] Deleting SLA 6
+2025-11-10 11:42:40.529 +05:30 [INF] SLA deleted successfully. SLA ID: 6
+2025-11-10 11:42:40.530 +05:30 [INF] HTTP DELETE /api/Sla/6 responded 200 in 56.9880 ms
+2025-11-10 11:42:42.159 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0242 ms
+2025-11-10 11:42:42.170 +05:30 [INF] Getting all SLAs
+2025-11-10 11:42:42.172 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.7070 ms
+2025-11-10 11:44:23.972 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0349 ms
+2025-11-10 11:44:23.972 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0188 ms
+2025-11-10 11:44:23.994 +05:30 [INF] Getting all SLAs
+2025-11-10 11:44:23.998 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 24.1694 ms
+2025-11-10 11:44:24.012 +05:30 [INF] Getting all SLAs
+2025-11-10 11:44:24.015 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.6356 ms
+2025-11-10 11:44:53.636 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0166 ms
+2025-11-10 11:44:53.648 +05:30 [INF] Getting all SLAs
+2025-11-10 11:44:53.650 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 12.6202 ms
+2025-11-10 11:44:58.641 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0170 ms
+2025-11-10 11:44:58.651 +05:30 [INF] Getting all SLAs
+2025-11-10 11:44:58.653 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.4785 ms
+2025-11-10 11:45:06.634 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0421 ms
+2025-11-10 11:45:06.642 +05:30 [INF] Getting all SLAs
+2025-11-10 11:45:06.645 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.0263 ms
+2025-11-10 11:45:14.659 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0179 ms
+2025-11-10 11:45:14.667 +05:30 [INF] Getting all SLAs
+2025-11-10 11:45:14.668 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 7.7504 ms
+2025-11-10 11:45:53.649 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0300 ms
+2025-11-10 11:45:53.662 +05:30 [INF] Getting all SLAs
+2025-11-10 11:45:53.665 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 12.7865 ms
+2025-11-10 11:55:28.254 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0442 ms
+2025-11-10 11:55:28.255 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0195 ms
+2025-11-10 11:55:28.275 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 11:55:28.316 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 58.5235 ms
+2025-11-10 11:55:28.324 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 7.9265 ms
+2025-11-10 11:55:28.334 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 77.5087 ms
+2025-11-10 11:55:28.342 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 11:55:28.347 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 11.9020 ms
+2025-11-10 11:55:42.485 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0365 ms
+2025-11-10 11:55:42.487 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0166 ms
+2025-11-10 11:55:42.487 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0327 ms
+2025-11-10 11:55:42.487 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0085 ms
+2025-11-10 11:55:42.516 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 11:55:42.521 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 32.4879 ms
+2025-11-10 11:55:42.522 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 33.4805 ms
+2025-11-10 11:55:42.549 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 25.1908 ms
+2025-11-10 11:55:42.549 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 11:55:42.553 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 29.1223 ms
+2025-11-10 11:56:01.587 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0227 ms
+2025-11-10 11:56:01.615 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 26.7188 ms
+2025-11-10 11:56:03.801 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0328 ms
+2025-11-10 11:56:03.832 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 28.9760 ms
+2025-11-10 11:56:05.899 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0248 ms
+2025-11-10 11:56:05.918 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 17.7236 ms
+2025-11-10 11:56:07.683 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0425 ms
+2025-11-10 11:56:07.706 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 18.8841 ms
+2025-11-10 11:56:09.183 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0273 ms
+2025-11-10 11:56:09.204 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 18.7142 ms
+2025-11-10 11:59:26.214 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0243 ms
+2025-11-10 11:59:26.214 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0952 ms
+2025-11-10 11:59:26.214 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0278 ms
+2025-11-10 11:59:26.216 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0471 ms
+2025-11-10 11:59:26.240 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 20.0214 ms
+2025-11-10 11:59:26.240 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 11:59:26.244 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 24.4458 ms
+2025-11-10 11:59:26.257 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 16.6556 ms
+2025-11-10 11:59:26.259 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 11:59:26.262 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 16.0664 ms
+2025-11-10 12:07:02.267 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0302 ms
+2025-11-10 12:07:02.267 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0106 ms
+2025-11-10 12:07:02.278 +05:30 [INF] Getting all SLAs
+2025-11-10 12:07:02.292 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 23.0496 ms
+2025-11-10 12:07:02.298 +05:30 [INF] Getting all SLAs
+2025-11-10 12:07:02.300 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 7.4303 ms
+2025-11-10 12:07:23.606 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0627 ms
+2025-11-10 12:07:23.607 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0282 ms
+2025-11-10 12:07:23.632 +05:30 [INF] Getting all SLAs
+2025-11-10 12:07:23.637 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 28.1654 ms
+2025-11-10 12:07:23.666 +05:30 [INF] Getting all SLAs
+2025-11-10 12:07:23.671 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 32.2098 ms
+2025-11-10 12:07:32.896 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0723 ms
+2025-11-10 12:07:32.896 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0142 ms
+2025-11-10 12:07:32.898 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0230 ms
+2025-11-10 12:07:32.898 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0146 ms
+2025-11-10 12:07:32.913 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:07:32.914 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 15.3067 ms
+2025-11-10 12:07:32.921 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 22.3702 ms
+2025-11-10 12:07:32.934 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 19.0597 ms
+2025-11-10 12:07:32.937 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:07:32.939 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 17.6493 ms
+2025-11-10 12:09:43.024 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0659 ms
+2025-11-10 12:09:43.026 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0348 ms
+2025-11-10 12:09:43.050 +05:30 [INF] Getting all SLAs
+2025-11-10 12:09:43.054 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 27.5310 ms
+2025-11-10 12:09:43.065 +05:30 [INF] Getting all SLAs
+2025-11-10 12:09:43.067 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.8410 ms
+2025-11-10 12:09:46.599 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0246 ms
+2025-11-10 12:09:46.601 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0658 ms
+2025-11-10 12:09:46.602 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0108 ms
+2025-11-10 12:09:46.602 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0131 ms
+2025-11-10 12:09:46.627 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:09:46.634 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 31.6149 ms
+2025-11-10 12:09:46.634 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 31.6917 ms
+2025-11-10 12:09:46.654 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:09:46.654 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 17.6171 ms
+2025-11-10 12:09:46.657 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 20.9754 ms
+2025-11-10 12:10:23.727 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0186 ms
+2025-11-10 12:10:23.727 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0087 ms
+2025-11-10 12:10:23.728 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0137 ms
+2025-11-10 12:10:23.728 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0433 ms
+2025-11-10 12:10:23.738 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 7.7771 ms
+2025-11-10 12:10:23.738 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:23.740 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 10.6298 ms
+2025-11-10 12:10:23.748 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 8.9664 ms
+2025-11-10 12:10:23.748 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:23.751 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 10.1368 ms
+2025-11-10 12:10:25.095 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0192 ms
+2025-11-10 12:10:25.095 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0192 ms
+2025-11-10 12:10:25.105 +05:30 [INF] Getting all SLAs
+2025-11-10 12:10:25.107 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.6582 ms
+2025-11-10 12:10:25.116 +05:30 [INF] Getting all SLAs
+2025-11-10 12:10:25.118 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 9.6727 ms
+2025-11-10 12:10:27.539 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:27.540 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 33.5606 ms
+2025-11-10 12:10:27.547 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 42.1334 ms
+2025-11-10 12:10:27.584 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:27.585 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 42.3754 ms
+2025-11-10 12:10:27.588 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 37.9834 ms
+2025-11-10 12:10:28.408 +05:30 [INF] Getting all SLAs
+2025-11-10 12:10:28.414 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.1265 ms
+2025-11-10 12:10:28.443 +05:30 [INF] Getting all SLAs
+2025-11-10 12:10:28.446 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 28.7582 ms
+2025-11-10 12:10:29.823 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0297 ms
+2025-11-10 12:10:29.824 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.1016 ms
+2025-11-10 12:10:29.824 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0193 ms
+2025-11-10 12:10:29.824 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0426 ms
+2025-11-10 12:10:29.855 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:29.856 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 27.1494 ms
+2025-11-10 12:10:29.861 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 33.2190 ms
+2025-11-10 12:10:29.887 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 29.3453 ms
+2025-11-10 12:10:29.889 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:29.894 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 29.5188 ms
+2025-11-10 12:10:34.468 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:34.470 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 28.7873 ms
+2025-11-10 12:10:34.472 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 30.6868 ms
+2025-11-10 12:10:34.488 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 16.1149 ms
+2025-11-10 12:10:34.495 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:34.500 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 27.0529 ms
+2025-11-10 12:10:35.594 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0479 ms
+2025-11-10 12:10:35.594 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0183 ms
+2025-11-10 12:10:35.618 +05:30 [INF] Getting all SLAs
+2025-11-10 12:10:35.623 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 24.8604 ms
+2025-11-10 12:10:35.645 +05:30 [INF] Getting all SLAs
+2025-11-10 12:10:35.651 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 26.8959 ms
+2025-11-10 12:10:37.548 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0236 ms
+2025-11-10 12:10:37.549 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0184 ms
+2025-11-10 12:10:37.549 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0140 ms
+2025-11-10 12:10:37.549 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0251 ms
+2025-11-10 12:10:37.573 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 22.1517 ms
+2025-11-10 12:10:37.573 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:37.577 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 26.5246 ms
+2025-11-10 12:10:37.592 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 17.8007 ms
+2025-11-10 12:10:37.593 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:10:37.596 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 17.5152 ms
+2025-11-10 12:10:38.600 +05:30 [INF] Getting all SLAs
+2025-11-10 12:10:38.605 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.5285 ms
+2025-11-10 12:10:38.626 +05:30 [INF] Getting all SLAs
+2025-11-10 12:10:38.632 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 25.6049 ms
+2025-11-10 12:11:10.833 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0257 ms
+2025-11-10 12:11:10.834 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.2391 ms
+2025-11-10 12:11:10.834 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0015 ms
+2025-11-10 12:11:10.834 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0058 ms
+2025-11-10 12:11:10.844 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 8.4387 ms
+2025-11-10 12:11:10.844 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:11:10.848 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 12.1232 ms
+2025-11-10 12:11:10.853 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 7.2437 ms
+2025-11-10 12:11:10.858 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:11:10.859 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 9.9699 ms
+2025-11-10 12:11:11.849 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0379 ms
+2025-11-10 12:11:11.849 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0153 ms
+2025-11-10 12:11:11.865 +05:30 [INF] Getting all SLAs
+2025-11-10 12:11:11.868 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.8479 ms
+2025-11-10 12:11:11.879 +05:30 [INF] Getting all SLAs
+2025-11-10 12:11:11.884 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 14.2951 ms
+2025-11-10 12:11:15.538 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 22.1354 ms
+2025-11-10 12:11:15.539 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:11:15.542 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 26.5186 ms
+2025-11-10 12:11:15.556 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 17.4466 ms
+2025-11-10 12:11:15.571 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:11:15.574 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 30.1204 ms
+2025-11-10 12:13:55.470 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0491 ms
+2025-11-10 12:13:55.497 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0202 ms
+2025-11-10 12:13:55.497 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.4474 ms
+2025-11-10 12:13:55.517 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0343 ms
+2025-11-10 12:13:55.522 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:13:55.531 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 58.1694 ms
+2025-11-10 12:13:55.551 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 12:13:55.563 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 29.6826 ms
+2025-11-10 12:13:55.568 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 54.9910 ms
+2025-11-10 12:13:55.608 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 38.1684 ms
+2025-11-10 12:18:51.134 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.1168 ms
+2025-11-10 12:18:51.134 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0961 ms
+2025-11-10 12:18:51.152 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:18:51.153 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:18:51.188 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 48.9480 ms
+2025-11-10 12:18:51.196 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:18:51.197 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:18:51.202 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 13.1418 ms
+2025-11-10 12:19:05.503 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0365 ms
+2025-11-10 12:19:05.503 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0102 ms
+2025-11-10 12:19:05.525 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:19:05.525 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:19:05.528 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 22.2661 ms
+2025-11-10 12:19:05.548 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:19:05.548 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:19:05.554 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 25.7986 ms
+2025-11-10 12:20:39.672 +05:30 [INF] HTTP OPTIONS /api/Sla/NaN responded 204 in 0.0543 ms
+2025-11-10 12:20:39.673 +05:30 [INF] HTTP OPTIONS /api/Sla/NaN responded 204 in 0.0173 ms
+2025-11-10 12:20:39.688 +05:30 [INF] HTTP GET /api/Sla/NaN responded 400 in 13.2625 ms
+2025-11-10 12:20:39.701 +05:30 [INF] HTTP GET /api/Sla/NaN responded 400 in 9.6689 ms
+2025-11-10 12:20:45.640 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.4861 ms
+2025-11-10 12:20:45.653 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:20:45.653 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:20:45.657 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 14.8962 ms
+2025-11-10 12:20:45.672 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:20:45.672 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:20:45.676 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 16.6745 ms
+2025-11-10 12:20:57.286 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0402 ms
+2025-11-10 12:20:57.287 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0258 ms
+2025-11-10 12:20:57.303 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:20:57.303 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:20:57.306 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 17.0617 ms
+2025-11-10 12:20:57.317 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:20:57.317 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:20:57.320 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 13.1268 ms
+2025-11-10 12:21:23.647 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0322 ms
+2025-11-10 12:21:23.675 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:21:23.676 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:21:23.678 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 28.6698 ms
+2025-11-10 12:21:26.645 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:21:26.645 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:21:26.647 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 12.5159 ms
+2025-11-10 12:22:24.636 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0181 ms
+2025-11-10 12:22:24.647 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:22:24.647 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:22:24.660 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 22.6956 ms
+2025-11-10 12:22:26.656 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:22:26.657 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:22:26.660 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 14.1316 ms
+2025-11-10 12:22:34.648 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0148 ms
+2025-11-10 12:22:34.657 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:22:34.657 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:22:34.660 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 11.4243 ms
+2025-11-10 12:22:38.117 +05:30 [INF] HTTP OPTIONS /api/Sla/4 responded 204 in 0.0241 ms
+2025-11-10 12:22:38.118 +05:30 [INF] HTTP OPTIONS /api/Sla/4 responded 204 in 0.0130 ms
+2025-11-10 12:22:38.134 +05:30 [INF] Getting SLA 4
+2025-11-10 12:22:38.138 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 4, Employee: 4, Userprofile: rajesh
+2025-11-10 12:22:38.138 +05:30 [INF] 📝 Mapped - EmployeeName: 'rajesh rey', DepartmentName: 'Human Resources'
+2025-11-10 12:22:38.138 +05:30 [INF] HTTP GET /api/Sla/4 responded 200 in 19.1635 ms
+2025-11-10 12:22:38.140 +05:30 [INF] HTTP OPTIONS /api/Sla/4/history responded 204 in 0.0236 ms
+2025-11-10 12:22:38.146 +05:30 [INF] Getting SLA 4
+2025-11-10 12:22:38.149 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 4, Employee: 4, Userprofile: rajesh
+2025-11-10 12:22:38.149 +05:30 [INF] 📝 Mapped - EmployeeName: 'rajesh rey', DepartmentName: 'Human Resources'
+2025-11-10 12:22:38.149 +05:30 [INF] HTTP GET /api/Sla/4 responded 200 in 9.6810 ms
+2025-11-10 12:22:38.149 +05:30 [INF] Getting SLA history for 4
+2025-11-10 12:22:38.156 +05:30 [INF] HTTP GET /api/Sla/4/history responded 200 in 15.1153 ms
+2025-11-10 12:22:38.158 +05:30 [INF] HTTP OPTIONS /api/Sla/4/escalations responded 204 in 0.0089 ms
+2025-11-10 12:22:38.165 +05:30 [INF] Getting SLA history for 4
+2025-11-10 12:22:38.166 +05:30 [INF] Getting escalations for SLA 4
+2025-11-10 12:22:38.166 +05:30 [INF] HTTP GET /api/Sla/4/history responded 200 in 9.2621 ms
+2025-11-10 12:22:38.168 +05:30 [INF] HTTP GET /api/Sla/4/escalations responded 200 in 8.6907 ms
+2025-11-10 12:22:38.176 +05:30 [INF] Getting escalations for SLA 4
+2025-11-10 12:22:38.178 +05:30 [INF] HTTP GET /api/Sla/4/escalations responded 200 in 9.1728 ms
+2025-11-10 12:22:40.804 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0405 ms
+2025-11-10 12:22:40.805 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.1310 ms
+2025-11-10 12:22:40.829 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:22:40.829 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:22:40.833 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 26.3290 ms
+2025-11-10 12:22:40.855 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:22:40.855 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:22:40.860 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 25.9649 ms
+2025-11-10 12:22:44.240 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:22:44.240 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:22:44.247 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 20.6921 ms
+2025-11-10 12:22:44.261 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:22:44.261 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:22:44.264 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 13.9110 ms
+2025-11-10 12:22:53.092 +05:30 [INF] HTTP OPTIONS /api/Sla/4 responded 204 in 0.7175 ms
+2025-11-10 12:22:53.092 +05:30 [INF] HTTP OPTIONS /api/Sla/4 responded 204 in 0.0246 ms
+2025-11-10 12:22:53.112 +05:30 [INF] Getting SLA 4
+2025-11-10 12:22:53.121 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 4, Employee: 4, Userprofile: rajesh
+2025-11-10 12:22:53.121 +05:30 [INF] 📝 Mapped - EmployeeName: 'rajesh rey', DepartmentName: 'Human Resources'
+2025-11-10 12:22:53.122 +05:30 [INF] HTTP GET /api/Sla/4 responded 200 in 26.1806 ms
+2025-11-10 12:22:53.125 +05:30 [INF] HTTP OPTIONS /api/Sla/4/history responded 204 in 0.0161 ms
+2025-11-10 12:22:53.140 +05:30 [INF] Getting SLA history for 4
+2025-11-10 12:22:53.145 +05:30 [INF] Getting SLA 4
+2025-11-10 12:22:53.145 +05:30 [INF] HTTP GET /api/Sla/4/history responded 200 in 19.3078 ms
+2025-11-10 12:22:53.149 +05:30 [INF] HTTP OPTIONS /api/Sla/4/escalations responded 204 in 0.0285 ms
+2025-11-10 12:22:53.149 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 4, Employee: 4, Userprofile: rajesh
+2025-11-10 12:22:53.149 +05:30 [INF] 📝 Mapped - EmployeeName: 'rajesh rey', DepartmentName: 'Human Resources'
+2025-11-10 12:22:53.149 +05:30 [INF] HTTP GET /api/Sla/4 responded 200 in 26.1030 ms
+2025-11-10 12:22:53.162 +05:30 [INF] Getting escalations for SLA 4
+2025-11-10 12:22:53.163 +05:30 [INF] Getting SLA history for 4
+2025-11-10 12:22:53.165 +05:30 [INF] HTTP GET /api/Sla/4/escalations responded 200 in 13.9364 ms
+2025-11-10 12:22:53.179 +05:30 [INF] HTTP GET /api/Sla/4/history responded 200 in 27.5208 ms
+2025-11-10 12:22:53.193 +05:30 [INF] Getting escalations for SLA 4
+2025-11-10 12:22:53.196 +05:30 [INF] HTTP GET /api/Sla/4/escalations responded 200 in 14.5430 ms
+2025-11-10 12:23:03.611 +05:30 [INF] HTTP OPTIONS /api/Sla/escalate responded 204 in 6.8300 ms
+2025-11-10 12:23:03.717 +05:30 [INF] Submitting escalation for SLA 4
+2025-11-10 12:23:03.720 +05:30 [INF] Submitting escalation for SLA 4
+2025-11-10 12:23:03.823 +05:30 [ERR] Failed executing DbCommand (31ms) [Parameters=[@p_SLAId='?' (DbType = Int32), @p_Reason='?', @p_Description='?', @p_EscalationLevel='?', @p_EscalatedToEmployeeId='?' (DbType = Int32), @p_SubmittedByEmployeeId='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+CALL sp_SubmitSLAEscalation(@p_SLAId, @p_Reason, @p_Description, @p_EscalationLevel, @p_EscalatedToEmployeeId, @p_SubmittedByEmployeeId)
+2025-11-10 12:23:03.830 +05:30 [ERR] Error calling escalation procedure
+MySqlConnector.MySqlException (0x80004005): PROCEDURE eepzdb.sp_SubmitSLAEscalation does not exist
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 1081
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 37
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 131
+   at MySqlConnector.MySqlDataReader.InitAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 487
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteNonQueryAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 309
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+   at Relevantz.EEPZ.Data.Repository.Implementations.SlaRepository.CallSubmitEscalationProcedureAsync(Int32 slaid, String reason, String description, String escalationLevel, Int32 escalatedToEmployeeId, Int32 submittedByEmployeeId) in D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Data\Repository\SlaRepository.cs:line 373
+2025-11-10 12:23:03.999 +05:30 [ERR] Error in SubmitEscalation
+MySqlConnector.MySqlException (0x80004005): PROCEDURE eepzdb.sp_SubmitSLAEscalation does not exist
+   at MySqlConnector.Core.ServerSession.ReceiveReplyAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/ServerSession.cs:line 1081
+   at MySqlConnector.Core.ResultSet.ReadResultSetHeaderAsync(IOBehavior ioBehavior) in /_/src/MySqlConnector/Core/ResultSet.cs:line 37
+   at MySqlConnector.MySqlDataReader.ActivateResultSet(CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 131
+   at MySqlConnector.MySqlDataReader.InitAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, IDictionary`2 cachedProcedures, IMySqlCommand command, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlDataReader.cs:line 487
+   at MySqlConnector.Core.CommandExecutor.ExecuteReaderAsync(CommandListPosition commandListPosition, ICommandPayloadCreator payloadCreator, CommandBehavior behavior, Activity activity, IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/Core/CommandExecutor.cs:line 56
+   at MySqlConnector.MySqlCommand.ExecuteNonQueryAsync(IOBehavior ioBehavior, CancellationToken cancellationToken) in /_/src/MySqlConnector/MySqlCommand.cs:line 309
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+   at Relevantz.EEPZ.Data.Repository.Implementations.SlaRepository.CallSubmitEscalationProcedureAsync(Int32 slaid, String reason, String description, String escalationLevel, Int32 escalatedToEmployeeId, Int32 submittedByEmployeeId) in D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Data\Repository\SlaRepository.cs:line 373
+   at Relevantz.EEPZ.Core.Services.Implementations.SlaService.SubmitEscalation(SubmitSlaEscalationRequest request) in D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Core\Service\SlaService.cs:line 85
+2025-11-10 12:23:04.016 +05:30 [INF] HTTP POST /api/Sla/escalate responded 400 in 399.9938 ms
+2025-11-10 12:30:55.423 +05:30 [INF] HTTP OPTIONS /api/Sla/4 responded 204 in 0.0395 ms
+2025-11-10 12:30:55.425 +05:30 [INF] HTTP OPTIONS /api/Sla/4 responded 204 in 0.0533 ms
+2025-11-10 12:30:55.451 +05:30 [INF] Getting SLA 4
+2025-11-10 12:30:55.479 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 4, Employee: 4, Userprofile: rajesh
+2025-11-10 12:30:55.479 +05:30 [INF] 📝 Mapped - EmployeeName: 'rajesh rey', DepartmentName: 'Human Resources'
+2025-11-10 12:30:55.479 +05:30 [INF] HTTP GET /api/Sla/4 responded 200 in 51.2892 ms
+2025-11-10 12:30:55.482 +05:30 [INF] HTTP OPTIONS /api/Sla/4/history responded 204 in 0.0211 ms
+2025-11-10 12:30:55.494 +05:30 [INF] Getting SLA 4
+2025-11-10 12:30:55.495 +05:30 [INF] Getting SLA history for 4
+2025-11-10 12:30:55.497 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 4, Employee: 4, Userprofile: rajesh
+2025-11-10 12:30:55.497 +05:30 [INF] 📝 Mapped - EmployeeName: 'rajesh rey', DepartmentName: 'Human Resources'
+2025-11-10 12:30:55.497 +05:30 [INF] HTTP GET /api/Sla/4 responded 200 in 16.7479 ms
+2025-11-10 12:30:55.523 +05:30 [INF] HTTP GET /api/Sla/4/history responded 200 in 38.6991 ms
+2025-11-10 12:30:55.525 +05:30 [INF] HTTP OPTIONS /api/Sla/4/escalations responded 204 in 0.0131 ms
+2025-11-10 12:30:55.536 +05:30 [INF] Getting SLA history for 4
+2025-11-10 12:30:55.541 +05:30 [INF] HTTP GET /api/Sla/4/history responded 200 in 17.0905 ms
+2025-11-10 12:30:55.541 +05:30 [INF] Getting escalations for SLA 4
+2025-11-10 12:30:55.544 +05:30 [INF] HTTP GET /api/Sla/4/escalations responded 200 in 18.7673 ms
+2025-11-10 12:30:55.564 +05:30 [INF] Getting escalations for SLA 4
+2025-11-10 12:30:55.570 +05:30 [INF] HTTP GET /api/Sla/4/escalations responded 200 in 25.1410 ms
+2025-11-10 12:31:06.062 +05:30 [INF] HTTP OPTIONS /api/Sla/escalate responded 204 in 0.0251 ms
+2025-11-10 12:31:06.079 +05:30 [INF] Submitting escalation for SLA 4
+2025-11-10 12:31:06.080 +05:30 [INF] Submitting escalation for SLA 4
+2025-11-10 12:31:06.139 +05:30 [INF] Escalation procedure executed. SLA ID: 4
+2025-11-10 12:31:06.219 +05:30 [INF] HTTP POST /api/Sla/escalate responded 200 in 156.1496 ms
+2025-11-10 12:31:08.377 +05:30 [INF] HTTP OPTIONS /api/Sla/4 responded 204 in 0.0338 ms
+2025-11-10 12:31:08.399 +05:30 [INF] Getting SLA 4
+2025-11-10 12:31:08.402 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 4, Employee: 4, Userprofile: rajesh
+2025-11-10 12:31:08.402 +05:30 [INF] 📝 Mapped - EmployeeName: 'rajesh rey', DepartmentName: 'Human Resources'
+2025-11-10 12:31:08.403 +05:30 [INF] HTTP GET /api/Sla/4 responded 200 in 23.8454 ms
+2025-11-10 12:31:08.407 +05:30 [INF] HTTP OPTIONS /api/Sla/4/history responded 204 in 0.0234 ms
+2025-11-10 12:31:08.428 +05:30 [INF] Getting SLA history for 4
+2025-11-10 12:31:08.492 +05:30 [INF] HTTP GET /api/Sla/4/history responded 200 in 83.3081 ms
+2025-11-10 12:31:08.495 +05:30 [INF] HTTP OPTIONS /api/Sla/4/escalations responded 204 in 0.0173 ms
+2025-11-10 12:31:08.509 +05:30 [INF] Getting escalations for SLA 4
+2025-11-10 12:31:08.517 +05:30 [INF] HTTP GET /api/Sla/4/escalations responded 200 in 20.9906 ms
+2025-11-10 12:31:22.598 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.1263 ms
+2025-11-10 12:31:22.599 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0152 ms
+2025-11-10 12:31:22.635 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:31:22.636 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:31:22.645 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 44.5150 ms
+2025-11-10 12:31:22.678 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:31:22.678 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:31:22.684 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 37.3035 ms
+2025-11-10 12:32:02.475 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/4 responded 204 in 0.0398 ms
+2025-11-10 12:32:02.485 +05:30 [INF] Getting SLAs for employee 4
+2025-11-10 12:32:02.485 +05:30 [INF] Retrieving SLAs for employee 4
+2025-11-10 12:32:02.487 +05:30 [INF] HTTP GET /api/Sla/employee/4 responded 200 in 10.7738 ms
+2025-11-10 12:37:24.054 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0790 ms
+2025-11-10 12:37:24.054 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0258 ms
+2025-11-10 12:37:24.054 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0311 ms
+2025-11-10 12:37:24.056 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0200 ms
+2025-11-10 12:37:24.082 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:37:24.082 +05:30 [INF] Getting all SLAs
+2025-11-10 12:37:24.110 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 51.0698 ms
+2025-11-10 12:37:24.116 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 60.3055 ms
+2025-11-10 12:37:24.120 +05:30 [INF] Getting all SLAs
+2025-11-10 12:37:24.124 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 13.0944 ms
+2025-11-10 12:37:24.128 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:37:24.131 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 13.0746 ms
+2025-11-10 12:37:42.213 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0355 ms
+2025-11-10 12:37:42.214 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0662 ms
+2025-11-10 12:37:42.229 +05:30 [INF] Getting all SLAs
+2025-11-10 12:37:42.230 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:37:42.233 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.2608 ms
+2025-11-10 12:37:42.236 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 20.6916 ms
+2025-11-10 12:37:42.246 +05:30 [INF] Getting all SLAs
+2025-11-10 12:37:42.249 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.3756 ms
+2025-11-10 12:37:42.249 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:37:42.252 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 14.7140 ms
+2025-11-10 12:44:08.884 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0245 ms
+2025-11-10 12:44:08.893 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0791 ms
+2025-11-10 12:44:08.894 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0314 ms
+2025-11-10 12:44:08.894 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0104 ms
+2025-11-10 12:44:08.937 +05:30 [INF] Getting all SLAs
+2025-11-10 12:44:08.937 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:44:08.960 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 64.0917 ms
+2025-11-10 12:44:08.974 +05:30 [INF] Getting all SLAs
+2025-11-10 12:44:08.977 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 88.1738 ms
+2025-11-10 12:44:08.977 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.5596 ms
+2025-11-10 12:44:08.993 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:44:09.000 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 21.9577 ms
+2025-11-10 12:44:37.760 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0383 ms
+2025-11-10 12:44:37.760 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0164 ms
+2025-11-10 12:44:37.760 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0264 ms
+2025-11-10 12:44:37.761 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0098 ms
+2025-11-10 12:44:37.779 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:44:37.779 +05:30 [INF] Getting all SLAs
+2025-11-10 12:44:37.782 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.7799 ms
+2025-11-10 12:44:37.783 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 21.9475 ms
+2025-11-10 12:44:37.798 +05:30 [INF] Getting all SLAs
+2025-11-10 12:44:37.799 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:44:37.800 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.5089 ms
+2025-11-10 12:44:37.802 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 18.2403 ms
+2025-11-10 12:46:52.674 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0340 ms
+2025-11-10 12:46:52.677 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0166 ms
+2025-11-10 12:46:52.680 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0157 ms
+2025-11-10 12:46:52.692 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:46:52.696 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 15.7036 ms
+2025-11-10 12:46:52.701 +05:30 [INF] Getting all SLAs
+2025-11-10 12:46:52.704 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 22.3027 ms
+2025-11-10 12:46:52.709 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:46:52.713 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 14.7172 ms
+2025-11-10 12:46:52.716 +05:30 [INF] Getting all SLAs
+2025-11-10 12:46:52.718 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 12.2359 ms
+2025-11-10 12:47:38.661 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0452 ms
+2025-11-10 12:47:38.662 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0158 ms
+2025-11-10 12:47:38.682 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:47:38.683 +05:30 [INF] Getting all SLAs
+2025-11-10 12:47:38.684 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 22.1773 ms
+2025-11-10 12:47:38.686 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 23.4002 ms
+2025-11-10 12:47:41.673 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:47:41.674 +05:30 [INF] Getting all SLAs
+2025-11-10 12:47:41.675 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 13.2690 ms
+2025-11-10 12:47:41.676 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.8779 ms
+2025-11-10 12:47:49.658 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0165 ms
+2025-11-10 12:47:49.659 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0092 ms
+2025-11-10 12:47:49.665 +05:30 [INF] Getting all SLAs
+2025-11-10 12:47:49.665 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:47:49.667 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 8.4046 ms
+2025-11-10 12:47:49.667 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 7.9567 ms
+2025-11-10 12:47:54.614 +05:30 [INF] Getting all SLAs
+2025-11-10 12:47:54.614 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:47:54.618 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 14.0537 ms
+2025-11-10 12:47:54.618 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 14.8509 ms
+2025-11-10 12:47:54.629 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:47:54.629 +05:30 [INF] Getting all SLAs
+2025-11-10 12:47:54.631 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 10.9393 ms
+2025-11-10 12:47:54.631 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 10.7032 ms
+2025-11-10 12:47:59.165 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0240 ms
+2025-11-10 12:47:59.166 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0117 ms
+2025-11-10 12:47:59.167 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0105 ms
+2025-11-10 12:47:59.167 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0100 ms
+2025-11-10 12:47:59.179 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:47:59.181 +05:30 [INF] Getting all SLAs
+2025-11-10 12:47:59.182 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 14.5341 ms
+2025-11-10 12:47:59.184 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.9201 ms
+2025-11-10 12:47:59.196 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:47:59.199 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 15.1979 ms
+2025-11-10 12:47:59.202 +05:30 [INF] Getting all SLAs
+2025-11-10 12:47:59.206 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.0875 ms
+2025-11-10 12:48:47.654 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0222 ms
+2025-11-10 12:48:47.655 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0495 ms
+2025-11-10 12:48:47.669 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:48:47.671 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 15.7062 ms
+2025-11-10 12:48:47.671 +05:30 [INF] Getting all SLAs
+2025-11-10 12:48:47.675 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.3403 ms
+2025-11-10 12:48:52.685 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0474 ms
+2025-11-10 12:48:52.687 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0302 ms
+2025-11-10 12:48:52.713 +05:30 [INF] Getting all SLAs
+2025-11-10 12:48:52.713 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:48:52.715 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 26.1675 ms
+2025-11-10 12:48:52.715 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 25.3156 ms
+2025-11-10 12:48:53.619 +05:30 [INF] Getting all SLAs
+2025-11-10 12:48:53.620 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:48:53.622 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 13.2649 ms
+2025-11-10 12:48:53.623 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 13.4751 ms
+2025-11-10 12:48:56.140 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:48:56.142 +05:30 [INF] Getting all SLAs
+2025-11-10 12:48:56.142 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 13.0956 ms
+2025-11-10 12:48:56.144 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 15.2370 ms
+2025-11-10 12:48:56.151 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:48:56.152 +05:30 [INF] Getting all SLAs
+2025-11-10 12:48:56.154 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 10.5596 ms
+2025-11-10 12:48:56.154 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 8.2239 ms
+2025-11-10 12:49:42.693 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0168 ms
+2025-11-10 12:49:42.695 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0136 ms
+2025-11-10 12:49:42.703 +05:30 [INF] Getting all SLAs
+2025-11-10 12:49:42.703 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:49:42.705 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 10.1545 ms
+2025-11-10 12:49:42.705 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 8.6215 ms
+2025-11-10 12:49:56.650 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0240 ms
+2025-11-10 12:49:56.651 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0092 ms
+2025-11-10 12:49:56.659 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:49:56.661 +05:30 [INF] Getting all SLAs
+2025-11-10 12:49:56.662 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 9.7894 ms
+2025-11-10 12:49:56.664 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.8900 ms
+2025-11-10 12:49:59.660 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:49:59.660 +05:30 [INF] Getting all SLAs
+2025-11-10 12:49:59.662 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 10.9460 ms
+2025-11-10 12:49:59.662 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 11.4344 ms
+2025-11-10 12:50:04.874 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0875 ms
+2025-11-10 12:50:04.874 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0240 ms
+2025-11-10 12:50:04.888 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:50:04.888 +05:30 [INF] Getting all SLAs
+2025-11-10 12:50:04.892 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 16.1465 ms
+2025-11-10 12:50:04.892 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 16.3158 ms
+2025-11-10 12:50:27.645 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0319 ms
+2025-11-10 12:50:27.646 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0238 ms
+2025-11-10 12:50:27.659 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:50:27.659 +05:30 [INF] Getting all SLAs
+2025-11-10 12:50:27.661 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 13.2060 ms
+2025-11-10 12:50:27.661 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 13.2796 ms
+2025-11-10 12:50:32.654 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0563 ms
+2025-11-10 12:50:32.654 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0564 ms
+2025-11-10 12:50:32.665 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:50:32.668 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 12.9012 ms
+2025-11-10 12:50:32.671 +05:30 [INF] Getting all SLAs
+2025-11-10 12:50:32.673 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 17.9715 ms
+2025-11-10 12:50:43.016 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0317 ms
+2025-11-10 12:50:43.016 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0107 ms
+2025-11-10 12:50:43.017 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0200 ms
+2025-11-10 12:50:43.017 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0263 ms
+2025-11-10 12:50:43.045 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:50:43.046 +05:30 [INF] Getting all SLAs
+2025-11-10 12:50:43.049 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 27.4686 ms
+2025-11-10 12:50:43.049 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 27.7742 ms
+2025-11-10 12:50:43.064 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:50:43.067 +05:30 [INF] Getting all SLAs
+2025-11-10 12:50:43.067 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 16.8511 ms
+2025-11-10 12:50:43.071 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.6921 ms
+2025-11-10 12:50:57.661 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0184 ms
+2025-11-10 12:50:57.663 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0129 ms
+2025-11-10 12:50:57.671 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:50:57.672 +05:30 [INF] Getting all SLAs
+2025-11-10 12:50:57.673 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 9.1460 ms
+2025-11-10 12:50:57.674 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 8.3945 ms
+2025-11-10 12:52:47.677 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0666 ms
+2025-11-10 12:52:47.677 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0408 ms
+2025-11-10 12:52:47.714 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:52:47.713 +05:30 [INF] Getting all SLAs
+2025-11-10 12:52:47.720 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 34.8741 ms
+2025-11-10 12:52:47.721 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 35.7534 ms
+2025-11-10 12:52:49.701 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:52:49.705 +05:30 [INF] Getting all SLAs
+2025-11-10 12:52:49.711 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 38.8472 ms
+2025-11-10 12:52:49.713 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 38.5328 ms
+2025-11-10 12:52:51.703 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:52:51.715 +05:30 [INF] Getting all SLAs
+2025-11-10 12:52:51.715 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 43.9304 ms
+2025-11-10 12:52:51.727 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 54.6276 ms
+2025-11-10 12:52:54.671 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0485 ms
+2025-11-10 12:52:54.673 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0449 ms
+2025-11-10 12:52:54.712 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:52:54.712 +05:30 [INF] Getting all SLAs
+2025-11-10 12:52:54.719 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 38.8540 ms
+2025-11-10 12:52:54.733 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 51.0575 ms
+2025-11-10 12:55:29.685 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0717 ms
+2025-11-10 12:55:29.685 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.2110 ms
+2025-11-10 12:55:29.739 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 12:55:29.741 +05:30 [INF] Getting all SLAs
+2025-11-10 12:55:29.753 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 60.3413 ms
+2025-11-10 12:55:29.755 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 61.7782 ms
+2025-11-10 13:00:04.794 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.1520 ms
+2025-11-10 13:00:04.799 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0520 ms
+2025-11-10 13:00:04.846 +05:30 [INF] Getting all SLAs
+2025-11-10 13:00:04.847 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:00:04.941 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 137.1294 ms
+2025-11-10 13:00:04.944 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 142.7781 ms
+2025-11-10 13:02:14.022 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0803 ms
+2025-11-10 13:02:14.024 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0454 ms
+2025-11-10 13:02:14.024 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0389 ms
+2025-11-10 13:02:14.024 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0162 ms
+2025-11-10 13:02:14.074 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:02:14.078 +05:30 [INF] Getting all SLAs
+2025-11-10 13:02:14.091 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 65.4900 ms
+2025-11-10 13:02:14.094 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 62.0897 ms
+2025-11-10 13:02:14.128 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:02:14.133 +05:30 [INF] Getting all SLAs
+2025-11-10 13:02:14.146 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 47.2625 ms
+2025-11-10 13:02:14.154 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 58.4381 ms
+2025-11-10 13:03:09.681 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0730 ms
+2025-11-10 13:03:09.682 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0474 ms
+2025-11-10 13:03:09.724 +05:30 [INF] Getting all SLAs
+2025-11-10 13:03:09.726 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:03:09.737 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 44.6862 ms
+2025-11-10 13:03:09.738 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 46.5219 ms
+2025-11-10 13:03:24.678 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0783 ms
+2025-11-10 13:03:24.680 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0408 ms
+2025-11-10 13:03:24.714 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:03:24.720 +05:30 [INF] Getting all SLAs
+2025-11-10 13:03:24.723 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 35.8534 ms
+2025-11-10 13:03:24.731 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 43.1867 ms
+2025-11-10 13:03:54.684 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.1212 ms
+2025-11-10 13:03:54.699 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0523 ms
+2025-11-10 13:03:54.738 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:03:54.743 +05:30 [INF] Getting all SLAs
+2025-11-10 13:03:54.750 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 57.7712 ms
+2025-11-10 13:03:54.753 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 48.0822 ms
+2025-11-10 13:04:01.756 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0329 ms
+2025-11-10 13:04:01.758 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0200 ms
+2025-11-10 13:04:01.758 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0156 ms
+2025-11-10 13:04:01.758 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0103 ms
+2025-11-10 13:04:01.775 +05:30 [INF] Getting all SLAs
+2025-11-10 13:04:01.775 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:04:01.780 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 18.6605 ms
+2025-11-10 13:04:01.781 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 20.0929 ms
+2025-11-10 13:04:01.796 +05:30 [INF] Getting all SLAs
+2025-11-10 13:04:01.797 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:04:01.801 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.1521 ms
+2025-11-10 13:04:01.801 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 18.7023 ms
+2025-11-10 13:04:39.441 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0281 ms
+2025-11-10 13:04:39.441 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0157 ms
+2025-11-10 13:04:39.460 +05:30 [INF] Getting all SLAs
+2025-11-10 13:04:39.460 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:04:39.466 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 22.5249 ms
+2025-11-10 13:04:39.466 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 22.6362 ms
+2025-11-10 13:04:43.465 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:04:43.471 +05:30 [INF] Getting all SLAs
+2025-11-10 13:04:43.473 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 33.5151 ms
+2025-11-10 13:04:43.479 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 39.4534 ms
+2025-11-10 13:04:43.493 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:04:43.498 +05:30 [INF] Getting all SLAs
+2025-11-10 13:04:43.499 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 22.6319 ms
+2025-11-10 13:04:43.506 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 24.1254 ms
+2025-11-10 13:05:33.657 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0549 ms
+2025-11-10 13:05:33.657 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0096 ms
+2025-11-10 13:05:33.675 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:05:33.679 +05:30 [INF] Getting all SLAs
+2025-11-10 13:05:33.681 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 20.4714 ms
+2025-11-10 13:05:33.685 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 19.0123 ms
+2025-11-10 13:06:40.360 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.0541 ms
+2025-11-10 13:06:40.361 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.0253 ms
+2025-11-10 13:06:40.390 +05:30 [INF] Getting SLA 2
+2025-11-10 13:06:40.420 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 13:06:40.420 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 13:06:40.422 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 58.3135 ms
+2025-11-10 13:06:40.429 +05:30 [INF] HTTP OPTIONS /api/Sla/2/history responded 204 in 0.0310 ms
+2025-11-10 13:06:40.450 +05:30 [INF] Getting SLA 2
+2025-11-10 13:06:40.455 +05:30 [INF] Getting SLA history for 2
+2025-11-10 13:06:40.456 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 13:06:40.456 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 13:06:40.456 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 30.9252 ms
+2025-11-10 13:06:40.474 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 41.7707 ms
+2025-11-10 13:06:40.479 +05:30 [INF] HTTP OPTIONS /api/Sla/2/escalations responded 204 in 0.0227 ms
+2025-11-10 13:06:40.499 +05:30 [INF] Getting SLA history for 2
+2025-11-10 13:06:40.502 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 13:06:40.504 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 27.4088 ms
+2025-11-10 13:06:40.528 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 47.3651 ms
+2025-11-10 13:06:40.550 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 13:06:40.555 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 25.0983 ms
+2025-11-10 13:07:08.068 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0674 ms
+2025-11-10 13:07:08.070 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0239 ms
+2025-11-10 13:07:08.072 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.1437 ms
+2025-11-10 13:07:08.072 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0134 ms
+2025-11-10 13:07:08.091 +05:30 [INF] Getting all SLAs
+2025-11-10 13:07:08.091 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:07:08.096 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 23.0115 ms
+2025-11-10 13:07:08.097 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 23.3327 ms
+2025-11-10 13:07:08.118 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:07:08.118 +05:30 [INF] Getting all SLAs
+2025-11-10 13:07:08.124 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 25.6653 ms
+2025-11-10 13:07:08.124 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 25.0597 ms
+2025-11-10 13:07:14.138 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.0308 ms
+2025-11-10 13:07:14.138 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.0185 ms
+2025-11-10 13:07:14.164 +05:30 [INF] Getting SLA 2
+2025-11-10 13:07:14.171 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 13:07:14.171 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 13:07:14.171 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 31.1956 ms
+2025-11-10 13:07:14.175 +05:30 [INF] HTTP OPTIONS /api/Sla/2/history responded 204 in 0.0550 ms
+2025-11-10 13:07:14.192 +05:30 [INF] Getting SLA 2
+2025-11-10 13:07:14.195 +05:30 [INF] Getting SLA history for 2
+2025-11-10 13:07:14.198 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 13:07:14.198 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 13:07:14.199 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 25.2720 ms
+2025-11-10 13:07:14.203 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 26.2783 ms
+2025-11-10 13:07:14.206 +05:30 [INF] HTTP OPTIONS /api/Sla/2/escalations responded 204 in 0.0224 ms
+2025-11-10 13:07:14.222 +05:30 [INF] Getting SLA history for 2
+2025-11-10 13:07:14.225 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 13:07:14.226 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 21.4086 ms
+2025-11-10 13:07:14.231 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 23.3550 ms
+2025-11-10 13:07:14.252 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 13:07:14.256 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 22.9024 ms
+2025-11-10 13:07:25.410 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0479 ms
+2025-11-10 13:07:25.412 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0359 ms
+2025-11-10 13:07:25.413 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0182 ms
+2025-11-10 13:07:25.413 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1160 ms
+2025-11-10 13:07:25.436 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:07:25.436 +05:30 [INF] Getting all SLAs
+2025-11-10 13:07:25.442 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 24.6761 ms
+2025-11-10 13:07:25.443 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 26.0214 ms
+2025-11-10 13:07:25.465 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:07:25.466 +05:30 [INF] Getting all SLAs
+2025-11-10 13:07:25.470 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 25.8812 ms
+2025-11-10 13:07:25.471 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 26.3585 ms
+2025-11-10 13:07:30.727 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.0270 ms
+2025-11-10 13:07:30.727 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.0178 ms
+2025-11-10 13:07:30.746 +05:30 [INF] Getting SLA 2
+2025-11-10 13:07:30.752 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 13:07:30.752 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 13:07:30.752 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 22.8689 ms
+2025-11-10 13:07:30.756 +05:30 [INF] HTTP OPTIONS /api/Sla/2/history responded 204 in 0.0760 ms
+2025-11-10 13:07:30.773 +05:30 [INF] Getting SLA 2
+2025-11-10 13:07:30.777 +05:30 [INF] Getting SLA history for 2
+2025-11-10 13:07:30.779 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 13:07:30.779 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 13:07:30.779 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 25.4828 ms
+2025-11-10 13:07:30.784 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 25.0580 ms
+2025-11-10 13:07:30.787 +05:30 [INF] HTTP OPTIONS /api/Sla/2/escalations responded 204 in 0.0249 ms
+2025-11-10 13:07:30.806 +05:30 [INF] Getting SLA history for 2
+2025-11-10 13:07:30.809 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 13:07:30.812 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 25.9684 ms
+2025-11-10 13:07:30.816 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 26.5226 ms
+2025-11-10 13:07:30.837 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 13:07:30.844 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 27.2738 ms
+2025-11-10 13:07:58.688 +05:30 [INF] HTTP OPTIONS /api/Sla/escalate responded 204 in 0.4044 ms
+2025-11-10 13:07:58.799 +05:30 [INF] Submitting escalation for SLA 2
+2025-11-10 13:07:58.799 +05:30 [INF] Submitting escalation for SLA 2
+2025-11-10 13:07:58.949 +05:30 [INF] Escalation procedure executed. SLA ID: 2
+2025-11-10 13:07:58.965 +05:30 [INF] HTTP POST /api/Sla/escalate responded 200 in 271.1725 ms
+2025-11-10 13:08:00.977 +05:30 [INF] HTTP OPTIONS /api/Sla/2 responded 204 in 0.1175 ms
+2025-11-10 13:08:01.027 +05:30 [INF] Getting SLA 2
+2025-11-10 13:08:01.037 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 5, Employee: 5, Userprofile: jeswanth
+2025-11-10 13:08:01.037 +05:30 [INF] 📝 Mapped - EmployeeName: 'jeswanth saran', DepartmentName: 'Human Resources'
+2025-11-10 13:08:01.038 +05:30 [INF] HTTP GET /api/Sla/2 responded 200 in 55.0294 ms
+2025-11-10 13:08:01.046 +05:30 [INF] HTTP OPTIONS /api/Sla/2/history responded 204 in 0.1070 ms
+2025-11-10 13:08:01.093 +05:30 [INF] Getting SLA history for 2
+2025-11-10 13:08:01.110 +05:30 [INF] HTTP GET /api/Sla/2/history responded 200 in 60.8027 ms
+2025-11-10 13:08:01.119 +05:30 [INF] HTTP OPTIONS /api/Sla/2/escalations responded 204 in 0.0773 ms
+2025-11-10 13:08:01.174 +05:30 [INF] Getting escalations for SLA 2
+2025-11-10 13:08:01.188 +05:30 [INF] HTTP GET /api/Sla/2/escalations responded 200 in 64.0906 ms
+2025-11-10 13:08:44.315 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0651 ms
+2025-11-10 13:08:44.317 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0660 ms
+2025-11-10 13:08:44.317 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0611 ms
+2025-11-10 13:08:44.320 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.3345 ms
+2025-11-10 13:08:44.372 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:08:44.374 +05:30 [INF] Getting all SLAs
+2025-11-10 13:08:44.383 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 59.2284 ms
+2025-11-10 13:08:44.387 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 56.8991 ms
+2025-11-10 13:08:44.432 +05:30 [INF] Getting escalations for manager 3
+2025-11-10 13:08:44.438 +05:30 [INF] Getting all SLAs
+2025-11-10 13:08:44.447 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 60.6264 ms
+2025-11-10 13:08:44.454 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 60.0990 ms
+2025-11-10 13:08:57.890 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0979 ms
+2025-11-10 13:08:57.901 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0702 ms
+2025-11-10 13:08:57.901 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0962 ms
+2025-11-10 13:08:57.946 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:08:57.961 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 66.4810 ms
+2025-11-10 13:08:57.966 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 58.8402 ms
+2025-11-10 13:08:58.016 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:08:58.017 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 47.0472 ms
+2025-11-10 13:08:58.028 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 60.4950 ms
+2025-11-10 13:09:08.459 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0920 ms
+2025-11-10 13:09:08.464 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0580 ms
+2025-11-10 13:09:08.464 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0261 ms
+2025-11-10 13:09:08.464 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.1562 ms
+2025-11-10 13:09:08.514 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 42.2775 ms
+2025-11-10 13:09:08.517 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:09:08.530 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 59.3459 ms
+2025-11-10 13:09:08.564 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 43.6151 ms
+2025-11-10 13:09:08.576 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:09:08.589 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 54.4340 ms
+2025-11-10 13:09:56.724 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0565 ms
+2025-11-10 13:09:56.724 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0338 ms
+2025-11-10 13:09:56.725 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0496 ms
+2025-11-10 13:09:56.728 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0606 ms
+2025-11-10 13:09:56.759 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 23.6891 ms
+2025-11-10 13:09:56.768 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:09:56.779 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 43.4579 ms
+2025-11-10 13:09:56.800 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 32.8984 ms
+2025-11-10 13:09:56.816 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:09:56.825 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 39.4160 ms
+2025-11-10 13:11:54.678 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0582 ms
+2025-11-10 13:11:54.679 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0196 ms
+2025-11-10 13:11:54.702 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:11:54.704 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 20.8003 ms
+2025-11-10 13:11:54.709 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 26.2539 ms
+2025-11-10 13:12:00.662 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0841 ms
+2025-11-10 13:12:00.663 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0326 ms
+2025-11-10 13:12:00.688 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:00.689 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 18.9168 ms
+2025-11-10 13:12:00.694 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 28.2017 ms
+2025-11-10 13:12:05.681 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0911 ms
+2025-11-10 13:12:05.684 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0559 ms
+2025-11-10 13:12:05.723 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:05.725 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 34.1499 ms
+2025-11-10 13:12:05.733 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 44.9394 ms
+2025-11-10 13:12:07.699 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 32.2040 ms
+2025-11-10 13:12:07.700 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:07.710 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 44.5592 ms
+2025-11-10 13:12:12.687 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0722 ms
+2025-11-10 13:12:12.688 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0521 ms
+2025-11-10 13:12:12.708 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:12.709 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 16.3967 ms
+2025-11-10 13:12:12.713 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 20.5930 ms
+2025-11-10 13:12:19.655 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0373 ms
+2025-11-10 13:12:19.656 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0261 ms
+2025-11-10 13:12:19.689 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:19.692 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 31.5918 ms
+2025-11-10 13:12:19.696 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 36.0947 ms
+2025-11-10 13:12:22.671 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:22.671 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 15.4144 ms
+2025-11-10 13:12:22.675 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 19.9288 ms
+2025-11-10 13:12:24.686 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0685 ms
+2025-11-10 13:12:24.689 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0721 ms
+2025-11-10 13:12:24.722 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:24.732 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 39.1994 ms
+2025-11-10 13:12:24.732 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 37.8363 ms
+2025-11-10 13:12:29.693 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0370 ms
+2025-11-10 13:12:29.696 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0301 ms
+2025-11-10 13:12:29.731 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:29.731 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 30.9742 ms
+2025-11-10 13:12:29.741 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 41.0491 ms
+2025-11-10 13:12:33.153 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 25.8477 ms
+2025-11-10 13:12:33.153 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:33.167 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 40.2113 ms
+2025-11-10 13:12:33.191 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 33.0553 ms
+2025-11-10 13:12:33.205 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:12:33.211 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 39.7509 ms
+2025-11-10 13:13:13.670 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0642 ms
+2025-11-10 13:13:13.671 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0439 ms
+2025-11-10 13:13:13.715 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:13:13.720 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 42.1911 ms
+2025-11-10 13:13:13.727 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 49.7929 ms
+2025-11-10 13:13:16.691 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:13:16.700 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 32.6544 ms
+2025-11-10 13:13:16.701 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 32.8711 ms
+2025-11-10 13:13:17.680 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:13:17.681 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 14.1406 ms
+2025-11-10 13:13:17.684 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 19.4626 ms
+2025-11-10 13:13:19.702 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0885 ms
+2025-11-10 13:13:19.703 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0514 ms
+2025-11-10 13:13:19.734 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 27.1278 ms
+2025-11-10 13:13:19.737 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:13:19.744 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 37.2748 ms
+2025-11-10 13:13:51.190 +05:30 [INF] HTTP OPTIONS /api/Sla/5 responded 204 in 0.0622 ms
+2025-11-10 13:13:51.196 +05:30 [INF] HTTP OPTIONS /api/Sla/5 responded 204 in 5.2856 ms
+2025-11-10 13:13:51.207 +05:30 [INF] Getting SLA 5
+2025-11-10 13:13:51.213 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 1, Employee: 1, Userprofile: System
+2025-11-10 13:13:51.213 +05:30 [INF] 📝 Mapped - EmployeeName: 'System Administrator', DepartmentName: 'Human Resources'
+2025-11-10 13:13:51.213 +05:30 [INF] HTTP GET /api/Sla/5 responded 200 in 21.3048 ms
+2025-11-10 13:13:51.219 +05:30 [INF] HTTP OPTIONS /api/Sla/5/history responded 204 in 0.0217 ms
+2025-11-10 13:13:51.229 +05:30 [INF] Getting SLA 5
+2025-11-10 13:13:51.235 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 1, Employee: 1, Userprofile: System
+2025-11-10 13:13:51.235 +05:30 [INF] 📝 Mapped - EmployeeName: 'System Administrator', DepartmentName: 'Human Resources'
+2025-11-10 13:13:51.235 +05:30 [INF] HTTP GET /api/Sla/5 responded 200 in 19.0534 ms
+2025-11-10 13:13:51.237 +05:30 [INF] Getting SLA history for 5
+2025-11-10 13:13:51.241 +05:30 [INF] HTTP GET /api/Sla/5/history responded 200 in 20.7315 ms
+2025-11-10 13:13:51.245 +05:30 [INF] HTTP OPTIONS /api/Sla/5/escalations responded 204 in 0.0424 ms
+2025-11-10 13:13:51.258 +05:30 [INF] Getting SLA history for 5
+2025-11-10 13:13:51.261 +05:30 [INF] Getting escalations for SLA 5
+2025-11-10 13:13:51.262 +05:30 [INF] HTTP GET /api/Sla/5/history responded 200 in 18.6761 ms
+2025-11-10 13:13:51.274 +05:30 [INF] HTTP GET /api/Sla/5/escalations responded 200 in 25.3587 ms
+2025-11-10 13:13:51.288 +05:30 [INF] Getting escalations for SLA 5
+2025-11-10 13:13:51.292 +05:30 [INF] HTTP GET /api/Sla/5/escalations responded 200 in 16.5298 ms
+2025-11-10 13:14:04.293 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0844 ms
+2025-11-10 13:14:04.298 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.1381 ms
+2025-11-10 13:14:04.301 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0517 ms
+2025-11-10 13:14:04.303 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0815 ms
+2025-11-10 13:14:04.346 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:14:04.348 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 42.6055 ms
+2025-11-10 13:14:04.358 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 53.6036 ms
+2025-11-10 13:14:04.397 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 43.9672 ms
+2025-11-10 13:14:04.405 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:14:04.422 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 59.4060 ms
+2025-11-10 13:14:09.093 +05:30 [INF] HTTP OPTIONS /api/Sla/5 responded 204 in 0.0845 ms
+2025-11-10 13:14:09.095 +05:30 [INF] HTTP OPTIONS /api/Sla/5 responded 204 in 0.0571 ms
+2025-11-10 13:14:09.150 +05:30 [INF] Getting SLA 5
+2025-11-10 13:14:09.162 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 1, Employee: 1, Userprofile: System
+2025-11-10 13:14:09.162 +05:30 [INF] 📝 Mapped - EmployeeName: 'System Administrator', DepartmentName: 'Human Resources'
+2025-11-10 13:14:09.163 +05:30 [INF] HTTP GET /api/Sla/5 responded 200 in 61.7885 ms
+2025-11-10 13:14:09.170 +05:30 [INF] HTTP OPTIONS /api/Sla/5/history responded 204 in 0.0744 ms
+2025-11-10 13:14:09.209 +05:30 [INF] Getting SLA 5
+2025-11-10 13:14:09.211 +05:30 [INF] Getting SLA history for 5
+2025-11-10 13:14:09.218 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 1, Employee: 1, Userprofile: System
+2025-11-10 13:14:09.218 +05:30 [INF] 📝 Mapped - EmployeeName: 'System Administrator', DepartmentName: 'Human Resources'
+2025-11-10 13:14:09.219 +05:30 [INF] HTTP GET /api/Sla/5 responded 200 in 52.5124 ms
+2025-11-10 13:14:09.299 +05:30 [INF] HTTP GET /api/Sla/5/history responded 200 in 123.4128 ms
+2025-11-10 13:14:09.310 +05:30 [INF] HTTP OPTIONS /api/Sla/5/escalations responded 204 in 0.0657 ms
+2025-11-10 13:14:09.361 +05:30 [INF] Getting SLA history for 5
+2025-11-10 13:14:09.372 +05:30 [INF] HTTP GET /api/Sla/5/history responded 200 in 67.5330 ms
+2025-11-10 13:14:09.377 +05:30 [INF] Getting escalations for SLA 5
+2025-11-10 13:14:09.393 +05:30 [INF] HTTP GET /api/Sla/5/escalations responded 200 in 77.4896 ms
+2025-11-10 13:14:09.450 +05:30 [INF] Getting escalations for SLA 5
+2025-11-10 13:14:09.465 +05:30 [INF] HTTP GET /api/Sla/5/escalations responded 200 in 67.5706 ms
+2025-11-10 13:14:12.489 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0419 ms
+2025-11-10 13:14:12.490 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/5/escalations responded 204 in 0.0360 ms
+2025-11-10 13:14:12.490 +05:30 [INF] HTTP OPTIONS /api/Sla/compliance/department/undefined responded 204 in 0.0361 ms
+2025-11-10 13:14:12.545 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:14:12.546 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 47.7873 ms
+2025-11-10 13:14:12.565 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 68.7730 ms
+2025-11-10 13:14:12.593 +05:30 [INF] HTTP GET /api/Sla/compliance/department/undefined responded 400 in 41.6333 ms
+2025-11-10 13:14:12.609 +05:30 [INF] Getting escalations for manager 5
+2025-11-10 13:14:12.621 +05:30 [INF] HTTP GET /api/Sla/manager/5/escalations responded 200 in 51.9342 ms
+2025-11-10 22:34:34.850 +05:30 [INF] Database migration completed successfully
+2025-11-10 22:34:41.776 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-10 22:34:41.781 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 7.4370 ms
+2025-11-10 22:34:41.781 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 7.4610 ms
+2025-11-10 22:34:41.781 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 7.4348 ms
+2025-11-10 22:34:41.781 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 7.4442 ms
+2025-11-10 22:34:42.048 +05:30 [INF] Getting all SLAs
+2025-11-10 22:34:42.052 +05:30 [INF] Getting escalations for manager 6
+2025-11-10 22:34:42.451 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 641.6533 ms
+2025-11-10 22:34:42.451 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 641.6251 ms
+2025-11-10 22:34:42.468 +05:30 [INF] Getting all SLAs
+2025-11-10 22:34:42.468 +05:30 [INF] Getting escalations for manager 6
+2025-11-10 22:34:42.512 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 60.6325 ms
+2025-11-10 22:34:42.519 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 67.2232 ms
+2025-11-10 22:34:51.348 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.1434 ms
+2025-11-10 22:34:51.348 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1470 ms
+2025-11-10 22:34:51.348 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1440 ms
+2025-11-10 22:34:51.348 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/6/escalations responded 204 in 0.1410 ms
+2025-11-10 22:34:51.370 +05:30 [INF] Getting escalations for manager 6
+2025-11-10 22:34:51.370 +05:30 [INF] Getting all SLAs
+2025-11-10 22:34:51.375 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 23.5762 ms
+2025-11-10 22:34:51.378 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 26.7649 ms
+2025-11-10 22:34:51.396 +05:30 [INF] Getting all SLAs
+2025-11-10 22:34:51.396 +05:30 [INF] Getting escalations for manager 6
+2025-11-10 22:34:51.399 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 21.1979 ms
+2025-11-10 22:34:51.400 +05:30 [INF] HTTP GET /api/Sla/manager/6/escalations responded 200 in 19.4884 ms
+2025-11-10 22:36:15.984 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.5289 ms
+2025-11-10 22:36:15.984 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.0509 ms
+2025-11-10 22:36:16.024 +05:30 [INF] Getting SLAs for employee 9
+2025-11-10 22:36:16.026 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-10 22:36:16.099 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 110.7255 ms
+2025-11-10 22:36:16.117 +05:30 [INF] Getting SLAs for employee 9
+2025-11-10 22:36:16.118 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-10 22:36:16.121 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 20.3433 ms

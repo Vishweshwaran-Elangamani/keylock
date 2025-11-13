@@ -1,0 +1,5 @@
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Core.Tests\obj\Debug\net9.0\Relevantz.EEPZ.Core.Tests.csproj.AssemblyReference.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Core.Tests\obj\Debug\net9.0\Relevantz.EEPZ.Core.Tests.GeneratedMSBuildEditorConfig.editorconfig
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Core.Tests\obj\Debug\net9.0\Relevantz.EEPZ.Core.Tests.AssemblyInfoInputs.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Core.Tests\obj\Debug\net9.0\Relevantz.EEPZ.Core.Tests.AssemblyInfo.cs
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Core.Tests\obj\Debug\net9.0\Relevantz.EEPZ.Core.Tests.csproj.CoreCompileInputs.cache

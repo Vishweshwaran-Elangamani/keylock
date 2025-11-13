@@ -1,0 +1,68 @@
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.deps.json
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevant.CA3B5C75.Up2Date
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\refint\Relevantz.EEPZ.Data.dll
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\CAPSTONE\Sprint 1 Migraration Layered Architecture\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.deps.json
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevant.CA3B5C75.Up2Date
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\refint\Relevantz.EEPZ.Data.dll
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\refint\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.deps.json
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevant.CA3B5C75.Up2Date
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.ProjManagementApi (2)\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.deps.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevant.CA3B5C75.Up2Date
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\refint\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll

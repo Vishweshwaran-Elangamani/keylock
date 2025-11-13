@@ -1,0 +1,264 @@
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.Development.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.staticwebassets.endpoints.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.exe
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.deps.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.runtimeconfig.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.OpenApi.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\MySqlConnector.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.AspNetCore.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.File.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.AssemblyReference.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\rpswa.dswa.cache.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.GeneratedMSBuildEditorConfig.editorconfig
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfoInputs.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfo.cs
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.CoreCompileInputs.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cs
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjimswa.dswa.cache.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\scopedcss\bundle\Relevantz.EEPZ.Api.styles.css
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.development.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevant.50C7F8F8.Up2Date
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\refint\Relevantz.EEPZ.Api.dll
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.genruntimeconfig.cache
+D:\New Cap Project\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\ref\Relevantz.EEPZ.Api.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.Development.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.staticwebassets.endpoints.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.exe
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.deps.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.runtimeconfig.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.OpenApi.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\MySqlConnector.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.AspNetCore.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.File.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.AssemblyReference.cache
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfoInputs.cache
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfo.cs
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.CoreCompileInputs.cache
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\scopedcss\bundle\Relevantz.EEPZ.Api.styles.css
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevant.50C7F8F8.Up2Date
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\refint\Relevantz.EEPZ.Api.dll
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.genruntimeconfig.cache
+C:\Users\jeswanth.s\Downloads\Sprint 4 updated 3\Sprint 4 updated\Relevantz.EEPZ.Api\obj\Debug\net8.0\ref\Relevantz.EEPZ.Api.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.Development.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.staticwebassets.endpoints.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.exe
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.deps.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.runtimeconfig.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.OpenApi.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\MySqlConnector.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.AspNetCore.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.File.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.AssemblyReference.cache
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rpswa.dswa.cache.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.GeneratedMSBuildEditorConfig.editorconfig
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfoInputs.cache
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfo.cs
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.CoreCompileInputs.cache
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cs
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cache
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjimswa.dswa.cache.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\scopedcss\bundle\Relevantz.EEPZ.Api.styles.css
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json.cache
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.development.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevant.50C7F8F8.Up2Date
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\refint\Relevantz.EEPZ.Api.dll
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.genruntimeconfig.cache
+D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\ref\Relevantz.EEPZ.Api.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.Development.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.staticwebassets.endpoints.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.exe
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.deps.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.runtimeconfig.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.OpenApi.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\MySqlConnector.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.AspNetCore.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.File.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.AssemblyReference.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rpswa.dswa.cache.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.GeneratedMSBuildEditorConfig.editorconfig
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfoInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfo.cs
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.CoreCompileInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cs
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjimswa.dswa.cache.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\scopedcss\bundle\Relevantz.EEPZ.Api.styles.css
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.development.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevant.50C7F8F8.Up2Date
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\refint\Relevantz.EEPZ.Api.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.genruntimeconfig.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\ref\Relevantz.EEPZ.Api.dll

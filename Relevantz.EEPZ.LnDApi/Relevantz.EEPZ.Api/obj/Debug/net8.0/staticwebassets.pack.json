@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api\\wwwroot\\uploads\\completion-proofs\\910f7cf8-85dc-4cc0-83d8-b49629526c09_Report.docx",
+      "PackagePath": "staticwebassets\\uploads\\completion-proofs\\910f7cf8-85dc-4cc0-83d8-b49629526c09_Report.docx"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.Relevantz.EEPZ.Api.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.Relevantz.EEPZ.Api.props",
+      "PackagePath": "build\\Relevantz.EEPZ.Api.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.Relevantz.EEPZ.Api.props",
+      "PackagePath": "buildMultiTargeting\\Relevantz.EEPZ.Api.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.Relevantz.EEPZ.Api.props",
+      "PackagePath": "buildTransitive\\Relevantz.EEPZ.Api.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

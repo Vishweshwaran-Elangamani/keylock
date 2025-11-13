@@ -1,0 +1,30 @@
+2025-11-12 13:55:04.183 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 8:18:19 AM', Current time (UTC): '11/12/2025 8:25:04 AM'.
+
+2025-11-12 13:55:04.183 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 8:18:19 AM', Current time (UTC): '11/12/2025 8:25:04 AM'.
+
+2025-11-12 13:55:04.183 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 8:18:19 AM', Current time (UTC): '11/12/2025 8:25:04 AM'.
+
+2025-11-12 13:55:04.183 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 8:18:19 AM', Current time (UTC): '11/12/2025 8:25:04 AM'.
+
+2025-11-12 13:55:04.206 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 8:18:19 AM', Current time (UTC): '11/12/2025 8:25:04 AM'.
+
+2025-11-12 13:55:04.207 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 8:18:19 AM', Current time (UTC): '11/12/2025 8:25:04 AM'.
+
+2025-11-12 13:55:04.207 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 8:18:19 AM', Current time (UTC): '11/12/2025 8:25:04 AM'.
+
+2025-11-12 13:55:04.209 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 8:18:19 AM', Current time (UTC): '11/12/2025 8:25:04 AM'.
+
+2025-11-12 15:45:18.876 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 9:46:55 AM', Current time (UTC): '11/12/2025 10:15:18 AM'.
+
+2025-11-12 15:45:18.881 +05:30 [ERR] 
+❌ JWT Authentication Failed: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '11/12/2025 9:46:55 AM', Current time (UTC): '11/12/2025 10:15:18 AM'.
+

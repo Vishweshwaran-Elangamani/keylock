@@ -1,0 +1,362 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Enums;
+using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Data.IRepository;
+
+namespace Relevantz.EEPZ.Data.Repository
+{
+    public class NominationRepository : INominationRepository
+    {
+        private readonly EEPZDbContext _context;
+
+        public NominationRepository(EEPZDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Nomination> CreateAsync(Nomination nomination)
+        {
+            try
+            {
+                if (nomination == null)
+                    throw new ArgumentNullException(nameof(nomination));
+
+                _context.Nominations.Add(nomination);
+                await _context.SaveChangesAsync();
+                return nomination;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CreateAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<Nomination?> GetByIdAsync(int id)
+        {
+            try
+            {
+                return await _context.Nominations
+                    .Include(n => n.Opportunity)
+                        .ThenInclude(o => o.Department)
+                    .Include(n => n.NomineeUser)
+                    .Include(n => n.NominatedByUser)
+                    .Include(n => n.ReviewedByUser)
+                    .FirstOrDefaultAsync(n => n.NominationId == id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetByIdAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<Nomination>> GetAllAsync()
+        {
+            try
+            {
+                return await _context.Nominations
+                    .Include(n => n.Opportunity)
+                        .ThenInclude(o => o.Department)
+                    .Include(n => n.NomineeUser)
+                    .Include(n => n.NominatedByUser)
+                    .OrderByDescending(n => n.SubmittedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetAllAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<Nomination>> GetByOpportunityAsync(int opportunityId)
+        {
+            try
+            {
+                return await _context.Nominations
+                    .Include(n => n.NomineeUser)
+                    .Include(n => n.NominatedByUser)
+                    .Where(n => n.OpportunityId == opportunityId)
+                    .OrderByDescending(n => n.SubmittedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetByOpportunityAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<Nomination>> GetByEmployeeAsync(int employeeUserId)
+        {
+            try
+            {
+                Console.WriteLine($"Repository: GetByEmployeeAsync - UserId: {employeeUserId}");
+
+                var nominations = await _context.Nominations
+                    .Include(n => n.Opportunity)
+                        .ThenInclude(o => o.Department)
+                    .Include(n => n.NomineeUser)
+                    .Include(n => n.NominatedByUser)
+                    .Where(n => n.NomineeUserId == employeeUserId)
+                    .OrderByDescending(n => n.SubmittedAt)
+                    .ToListAsync();
+
+                Console.WriteLine($"Repository: Found {nominations.Count} nominations");
+
+                return nominations;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetByEmployeeAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<Nomination>> GetByStatusAsync(string status)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(status))
+                    return new List<Nomination>();
+
+                return await _context.Nominations
+                    .Include(n => n.Opportunity)
+                        .ThenInclude(o => o.Department)
+                    .Include(n => n.NomineeUser)
+                    .Include(n => n.NominatedByUser)
+                    .Where(n => n.Status == status)
+                    .OrderByDescending(n => n.SubmittedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetByStatusAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<Nomination>> GetPendingManagerReviewAsync()
+        {
+            try
+            {
+                return await _context.Nominations
+                    .Include(n => n.Opportunity)
+                    .Include(n => n.NomineeUser)
+                    .Where(n => n.Status == NominationStatusConstants.PendingManagerReview)
+                    .OrderByDescending(n => n.SubmittedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetPendingManagerReviewAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<Nomination>> GetPendingDeptHeadApprovalAsync()
+        {
+            try
+            {
+                return await _context.Nominations
+                    .Include(n => n.Opportunity)
+                        .ThenInclude(o => o.Department)
+                    .Include(n => n.NomineeUser)
+                    .Include(n => n.NominatedByUser)
+                    .Where(n => n.Status == NominationStatusConstants.PendingDeptHeadApproval)
+                    .OrderByDescending(n => n.SubmittedAt)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetPendingDeptHeadApprovalAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<List<Nomination>> GetPendingDeptHeadApprovalByDeptHeadIdAsync(int deptHeadUserId)
+{
+    try
+    {
+        // Step 1: Get the Department Head's EmployeeId via user authentication
+        var deptHeadAuth = await _context.Userauthentications
+            .FirstOrDefaultAsync(u => u.UserId == deptHeadUserId);
+
+        if (deptHeadAuth == null)
+        {
+            Console.WriteLine("Department Head user authentication not found");
+            return new List<Nomination>();
+        }
+
+        var deptHeadEmployeeId = deptHeadAuth.EmployeeId;
+
+        // Step 2: Get DepartmentId for the Department Head employee
+        var deptHeadDetails = await _context.Employeedetailsmasters
+            .FirstOrDefaultAsync(ed => ed.EmployeeId == deptHeadEmployeeId);
+
+        if (deptHeadDetails == null)
+        {
+            Console.WriteLine("Department Head details not found");
+            return new List<Nomination>();
+        }
+
+        var deptHeadDepartmentId = deptHeadDetails.DepartmentId;
+
+        // Step 3: Fetch nominations for PendingDeptHeadApproval status linked to this department
+        var nominations = await _context.Nominations
+            .Include(n => n.Opportunity)
+                .ThenInclude(o => o.Department)
+            .Include(n => n.NomineeUser)
+            .Include(n => n.NominatedByUser)
+            .Where(n => 
+                n.Status == NominationStatusConstants.PendingDeptHeadApproval &&
+                n.Opportunity.DepartmentId == deptHeadDepartmentId)
+            .OrderByDescending(n => n.SubmittedAt)
+            .ToListAsync();
+
+        return nominations;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error fetching pending nominations for Dept Head {deptHeadUserId}: {ex.Message}");
+        throw;
+    }
+}
+
+
+        public async Task<List<Nomination>> GetPendingManagerReviewByManagerIdAsync(int managerId)
+        {
+            try
+            {
+                Console.WriteLine($"Repository: GetPendingManagerReviewByManagerIdAsync - ManagerId: {managerId}");
+
+                var managerUser = await _context.Userauthentications
+                    .FirstOrDefaultAsync(u => u.UserId == managerId);
+
+                if (managerUser == null)
+                {
+                    Console.WriteLine($"Manager user not found");
+                    return new List<Nomination>();
+                }
+
+                var managerEmployeeId = managerUser.EmployeeId;
+
+                if (managerEmployeeId <= 0)
+                {
+                    Console.WriteLine($"Manager has invalid EmployeeId: {managerEmployeeId}");
+                    return new List<Nomination>();
+                }
+
+                Console.WriteLine($"Manager EmployeeId: {managerEmployeeId}");
+
+                var teamEmployeeIds = await _context.Employees
+                    .Where(e => e.ReportingManagerEmployeeId == managerEmployeeId)
+                    .Select(e => e.EmployeeId)
+                    .ToListAsync();
+
+                Console.WriteLine($"Team EmployeeIds: {string.Join(", ", teamEmployeeIds)}");
+
+                if (!teamEmployeeIds.Any())
+                {
+                    Console.WriteLine($"No team members found");
+                    return new List<Nomination>();
+                }
+
+                var teamUserIds = await _context.Userauthentications
+                    .Where(u => teamEmployeeIds.Contains(u.EmployeeId))
+                    .Select(u => u.UserId)
+                    .ToListAsync();
+
+                Console.WriteLine($"Team UserIds: {string.Join(", ", teamUserIds)}");
+
+                var nominations = await _context.Nominations
+                    .Include(n => n.Opportunity)
+                        .ThenInclude(o => o.Department)
+                    .Include(n => n.NomineeUser)
+                    .Include(n => n.NominatedByUser)
+                    .Where(n => 
+                        n.Status == NominationStatusConstants.PendingManagerReview &&
+                        teamUserIds.Contains(n.NomineeUserId))
+                    .OrderByDescending(n => n.SubmittedAt)
+                    .ToListAsync();
+
+                Console.WriteLine($"Found {nominations.Count} pending nominations");
+
+                return nominations;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetPendingManagerReviewByManagerIdAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<Nomination> UpdateAsync(Nomination nomination)
+        {
+            try
+            {
+                if (nomination == null)
+                    throw new ArgumentNullException(nameof(nomination));
+
+                _context.Nominations.Update(nomination);
+                await _context.SaveChangesAsync();
+                return nomination;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UpdateAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            try
+            {
+                var nomination = await _context.Nominations.FindAsync(id);
+                if (nomination == null)
+                    return false;
+
+                _context.Nominations.Remove(nomination);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in DeleteAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId)
+        {
+            try
+            {
+                return await _context.Nominations
+                    .AnyAsync(n =>
+                        n.OpportunityId == opportunityId &&
+                        n.NomineeUserId == employeeId &&
+                        (n.Status == NominationStatusConstants.PendingManagerReview ||
+                         n.Status == NominationStatusConstants.PendingDeptHeadApproval ||
+                         n.Status == NominationStatusConstants.Approved));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ExistsDuplicateAsync: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task AddReviewMetricAsync(Nominationreviewmetric metric)
+        {
+            _context.Nominationreviewmetrics.Add(metric);
+            await _context.SaveChangesAsync();
+        }
+    }
+}

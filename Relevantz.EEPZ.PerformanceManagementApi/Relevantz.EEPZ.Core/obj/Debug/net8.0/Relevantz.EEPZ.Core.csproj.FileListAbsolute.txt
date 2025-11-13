@@ -1,0 +1,77 @@
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+C:\Users\rajesh.v\Downloads\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+D:\EEPZ - Backend\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+C:\Users\name\Downloads\Proj\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.sourcelink.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.PerformanceManagementApi 1\Relevantz.EEPZ.PerformanceManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll

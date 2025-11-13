@@ -1,0 +1,36 @@
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.deps.json
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.AssemblyReference.cache
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfoInputs.cache
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfo.cs
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.CoreCompileInputs.cache
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\refint\Relevantz.EEPZ.Common.dll
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\CAPSTONE\Sprint 1,2 Migraration Layered Architecture\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\ref\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.deps.json
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.AssemblyReference.cache
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfoInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfo.cs
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.CoreCompileInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\refint\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Integration Modules- Sprint 3 07.11.25\backend\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\ref\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.deps.json
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.AssemblyReference.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfoInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfo.cs
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.CoreCompileInputs.cache
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\refint\Relevantz.EEPZ.Common.dll
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Integration Modules- Sprint 3 07.11.25\Back End\Relevantz.EEPZ.SLAApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\ref\Relevantz.EEPZ.Common.dll
