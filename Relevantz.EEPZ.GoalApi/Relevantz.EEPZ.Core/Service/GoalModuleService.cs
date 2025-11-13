@@ -1444,6 +1444,29 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         );
                     }
 
+                    if (requesterRole == "Leadership" && (goal.GoalType?.ToLower() == "self"))
+                    {
+                        var autoApproval = new GoalApproval
+                        {
+                            GoalId = goalId,
+                            ApprovalType = "completion",
+                            RequestedBy = requesterEmployeeMasterId,
+                            RequestedOn = DateTime.UtcNow,
+                            ApprovedBy = requesterEmployeeMasterId,
+                            ApprovalStatus = "approved",
+                            ApprovedOn = DateTime.UtcNow,
+                        };
+
+                        await _repo.AddApprovalAsync(autoApproval);
+                        goal.Goalstatus = "completed";
+                        await _repo.SaveChangesAsync();
+
+                        return ApiResponseDto<int>.SuccessResponse(
+                            ResponseMessages.Codes.APPROVAL_REQUESTED_SUCCESS,
+                            autoApproval.ApprovalId
+                        );
+                    }
+
                     var managerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
                         requesterEmployeeMasterId
                     );
