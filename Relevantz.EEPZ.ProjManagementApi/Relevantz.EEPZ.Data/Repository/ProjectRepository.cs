@@ -15,32 +15,47 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _context = context;
         }
 
-        public async Task<Project?> GetProjectByIdAsync(int projectId)
-        {
-            return await _context.Projects
-                .Include(p => p.ResourceOwnerEmployee)
-                    .ThenInclude(e => e!.Employee)
-                        .ThenInclude(e => e!.Userprofile)
-                .Include(p => p.ResourceOwnerEmployee)
-                    .ThenInclude(e => e!.Role)
-                .Include(p => p.ResourceOwnerEmployee)
-                    .ThenInclude(e => e!.Department)
-                .Include(p => p.L1approverEmployee)
-                    .ThenInclude(e => e!.Employee)
-                        .ThenInclude(e => e!.Userprofile)
-                .Include(p => p.L1approverEmployee)
-                    .ThenInclude(e => e!.Role)
-                .Include(p => p.L1approverEmployee)
-                    .ThenInclude(e => e!.Department)
-                .Include(p => p.L2approverEmployee)
-                    .ThenInclude(e => e!.Employee)
-                        .ThenInclude(e => e!.Userprofile)
-                .Include(p => p.L2approverEmployee)
-                    .ThenInclude(e => e!.Role)
-                .Include(p => p.L2approverEmployee)
-                    .ThenInclude(e => e!.Department)
-                .FirstOrDefaultAsync(p => p.ProjectId == projectId);
-        }
+       public async Task<Project?> GetProjectByIdAsync(int projectId)
+{
+    return await _context.Projects
+        // ✅ Load Projectemployees junction table (contains IsPrimary)
+        .Include(p => p.Projectemployees)
+            .ThenInclude(pe => pe.Employee) // Employeedetailsmaster
+                .ThenInclude(e => e!.Employee) // Employee entity
+                    .ThenInclude(e => e!.Userprofile)
+        .Include(p => p.Projectemployees)
+            .ThenInclude(pe => pe.Employee)
+                .ThenInclude(e => e!.Role)
+        .Include(p => p.Projectemployees)
+            .ThenInclude(pe => pe.Employee)
+                .ThenInclude(e => e!.Department)
+        
+        // ... (manager includes remain the same)
+        .Include(p => p.ResourceOwnerEmployee)
+            .ThenInclude(e => e!.Employee)
+                .ThenInclude(e => e!.Userprofile)
+        .Include(p => p.ResourceOwnerEmployee)
+            .ThenInclude(e => e!.Role)
+        .Include(p => p.ResourceOwnerEmployee)
+            .ThenInclude(e => e!.Department)
+        .Include(p => p.L1approverEmployee)
+            .ThenInclude(e => e!.Employee)
+                .ThenInclude(e => e!.Userprofile)
+        .Include(p => p.L1approverEmployee)
+            .ThenInclude(e => e!.Role)
+        .Include(p => p.L1approverEmployee)
+            .ThenInclude(e => e!.Department)
+        .Include(p => p.L2approverEmployee)
+            .ThenInclude(e => e!.Employee)
+                .ThenInclude(e => e!.Userprofile)
+        .Include(p => p.L2approverEmployee)
+            .ThenInclude(e => e!.Role)
+        .Include(p => p.L2approverEmployee)
+            .ThenInclude(e => e!.Department)
+        
+        .FirstOrDefaultAsync(p => p.ProjectId == projectId);
+}
+
 
         public async Task<List<Project>> GetAllProjectsAsync()
         {
@@ -65,11 +80,120 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
 
         public async Task<Project> CreateProjectAsync(Project project)
-        {
-            _context.Projects.Add(project);
-            await _context.SaveChangesAsync();
-            return project;
+{
+    using var transaction = await _context.Database.BeginTransactionAsync();
+    
+    try
+    {
+        // ✅ Step 1: Add the project
+        _context.Projects.Add(project);
+        await _context.SaveChangesAsync();
+
+        Console.WriteLine($"✅ Project created with ID: {project.ProjectId}");
+
+        // ✅ Step 2: Collect manager EmployeeMasterIds
+        var managerMasterIds = new List<int?> 
+        { 
+            project.ResourceOwnerEmployeeId, 
+            project.L1approverEmployeeId, 
+            project.L2approverEmployeeId 
         }
+        .Where(id => id.HasValue && id.Value > 0)
+        .Select(id => id!.Value)
+        .Distinct()
+        .ToList();
+
+        Console.WriteLine($"📋 Manager Master IDs to map: {string.Join(", ", managerMasterIds)}");
+
+        if (managerMasterIds.Any())
+        {
+            // ✅ Step 3: Get FULL employee details (not just EmployeeId)
+            var managerDetails = await _context.Employeedetailsmasters
+                .Where(edm => managerMasterIds.Contains(edm.EmployeeMasterId))
+                .Select(edm => new 
+                { 
+                    edm.EmployeeMasterId, 
+                    edm.EmployeeId,
+                  
+                })
+                .ToListAsync();
+
+            Console.WriteLine($"👥 Found {managerDetails.Count} manager records in Employeedetailsmaster:");
+            foreach (var detail in managerDetails)
+            {
+                Console.WriteLine($"   - MasterId: {detail.EmployeeMasterId} → EmployeeId: {detail.EmployeeId})");
+            }
+
+            // ✅ Step 4: Filter out invalid EmployeeIds (null or 0)
+            var validManagerEmployeeIds = managerDetails
+                .Where(md => md.EmployeeId > 0) // ⚠️ CRITICAL: Filter null/0 values
+                .Select(md => md.EmployeeId)
+                .ToList();
+
+            Console.WriteLine($"✅ Valid EmployeeIds to map: {string.Join(", ", validManagerEmployeeIds)}");
+
+            // ✅ Step 5: Warn about missing mappings
+            var missingMasterIds = managerMasterIds.Except(managerDetails.Select(md => md.EmployeeMasterId)).ToList();
+            if (missingMasterIds.Any())
+            {
+                Console.WriteLine($"⚠️ WARNING: These EmployeeMasterIds were NOT found in Employeedetailsmaster: {string.Join(", ", missingMasterIds)}");
+            }
+
+            var invalidMasterIds = managerDetails.Where(md => md.EmployeeId <= 0).Select(md => md.EmployeeMasterId).ToList();
+            if (invalidMasterIds.Any())
+            {
+                Console.WriteLine($"⚠️ WARNING: These EmployeeMasterIds have invalid/null EmployeeId: {string.Join(", ", invalidMasterIds)}");
+            }
+
+            // ✅ Step 6: Check existing mappings
+            var existingMappings = await _context.Projectemployees
+                .Where(pe => pe.ProjectId == project.ProjectId && validManagerEmployeeIds.Contains(pe.EmployeeId))
+                .Select(pe => pe.EmployeeId)
+                .ToListAsync();
+
+            var newManagerEmployeeIds = validManagerEmployeeIds.Except(existingMappings).ToList();
+
+            Console.WriteLine($"➕ New managers to add to Projectemployees: {newManagerEmployeeIds.Count}");
+
+            // ✅ Step 7: Create Projectemployee records
+            if (newManagerEmployeeIds.Any())
+            {
+                var projectEmployees = newManagerEmployeeIds.Select(empId => new Projectemployee
+                {
+                    ProjectId = project.ProjectId,
+                    EmployeeId = empId,
+                    IsPrimary = false,
+                   
+                   
+                }).ToList();
+
+                await _context.Projectemployees.AddRangeAsync(projectEmployees);
+                var savedCount = await _context.SaveChangesAsync();
+                
+                Console.WriteLine($"✅ Successfully saved {savedCount} Projectemployee records");
+            }
+        }
+        else
+        {
+            Console.WriteLine("ℹ️ No managers assigned to this project");
+        }
+
+        await transaction.CommitAsync();
+        Console.WriteLine("✅ Transaction committed successfully");
+        
+        return project;
+    }
+    catch (Exception ex)
+    {
+        await transaction.RollbackAsync();
+        Console.WriteLine($"❌ Error in CreateProjectAsync: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        throw;
+    }
+
+
+    
+}
 
         public async Task<Project> UpdateProjectAsync(Project project)
         {
@@ -107,19 +231,98 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
 
         public async Task<bool> UpdateReportingManagersAsync(int projectId, int? resourceOwnerId, int? l1ApproverId, int? l2ApproverId)
+{
+    var project = await _context.Projects.FindAsync(projectId);
+    if (project == null)
+    {
+        Console.WriteLine($"❌ Project {projectId} not found");
+        return false;
+    }
+
+    Console.WriteLine($"📝 Updating managers for Project {projectId}:");
+    Console.WriteLine($"   - Resource Owner: {resourceOwnerId}");
+    Console.WriteLine($"   - L1 Approver: {l1ApproverId}");
+    Console.WriteLine($"   - L2 Approver: {l2ApproverId}");
+
+    // ✅ Update project's reporting manager fields
+    project.ResourceOwnerEmployeeId = resourceOwnerId;
+    project.L1approverEmployeeId = l1ApproverId;
+    project.L2approverEmployeeId = l2ApproverId;
+    project.UpdatedAt = DateTime.Now;
+
+    // ✅ Collect all manager EmployeeMasterIds
+    var managerMasterIds = new List<int?> { resourceOwnerId, l1ApproverId, l2ApproverId }
+        .Where(id => id.HasValue && id.Value > 0)
+        .Select(id => id!.Value)
+        .Distinct()
+        .ToList();
+
+    if (managerMasterIds.Any())
+    {
+        // ✅ Get manager details with validation
+        var managerDetails = await _context.Employeedetailsmasters
+            .Where(edm => managerMasterIds.Contains(edm.EmployeeMasterId))
+            .Include(edm => edm.Employee)
+                .ThenInclude(e => e!.Userprofile)
+            .ToListAsync();
+
+        Console.WriteLine($"👥 Found {managerDetails.Count}/{managerMasterIds.Count} managers:");
+        foreach (var detail in managerDetails)
         {
-            var project = await _context.Projects.FindAsync(projectId);
-            if (project == null)
-                return false;
-
-            project.ResourceOwnerEmployeeId = resourceOwnerId;
-            project.L1approverEmployeeId = l1ApproverId;
-            project.L2approverEmployeeId = l2ApproverId;
-            project.UpdatedAt = DateTime.Now;
-
-            await _context.SaveChangesAsync();
-            return true;
+            var name = $"{detail.Employee?.Userprofile?.FirstName} {detail.Employee?.Userprofile?.LastName}";
+            Console.WriteLine($"   - {name} (MasterId: {detail.EmployeeMasterId}, EmployeeId: {detail.EmployeeId})");
         }
+
+        // ✅ Filter valid EmployeeIds
+        var validManagerEmployeeIds = managerDetails
+            .Where(md => md.EmployeeId > 0)
+            .Select(md => md.EmployeeId)
+            .ToList();
+
+        // ✅ Warn about problems
+        var invalidManagers = managerDetails.Where(md => md.EmployeeId <= 0).ToList();
+        if (invalidManagers.Any())
+        {
+            Console.WriteLine($"⚠️ WARNING: {invalidManagers.Count} managers have invalid EmployeeId:");
+            foreach (var invalid in invalidManagers)
+            {
+                var name = $"{invalid.Employee?.Userprofile?.FirstName} {invalid.Employee?.Userprofile?.LastName}";
+                Console.WriteLine($"   - {name} (MasterId: {invalid.EmployeeMasterId}, EmployeeId: {invalid.EmployeeId})");
+            }
+        }
+
+        // ✅ Check existing mappings
+        var existingMappings = await _context.Projectemployees
+            .Where(pe => pe.ProjectId == projectId && validManagerEmployeeIds.Contains(pe.EmployeeId))
+            .Select(pe => pe.EmployeeId)
+            .ToListAsync();
+
+        var newManagerEmployeeIds = validManagerEmployeeIds.Except(existingMappings).ToList();
+
+        Console.WriteLine($"➕ Managers to add: {newManagerEmployeeIds.Count}, Already mapped: {existingMappings.Count}");
+
+        // ✅ Add new manager mappings
+        if (newManagerEmployeeIds.Any())
+        {
+            var newProjectEmployees = newManagerEmployeeIds.Select(empId => new Projectemployee
+            {
+                ProjectId = projectId,
+                EmployeeId = empId,
+                IsPrimary = false,
+                
+            }).ToList();
+
+            await _context.Projectemployees.AddRangeAsync(newProjectEmployees);
+            Console.WriteLine($"✅ Adding {newProjectEmployees.Count} new Projectemployee records");
+        }
+    }
+
+    await _context.SaveChangesAsync();
+    Console.WriteLine("✅ UpdateReportingManagersAsync completed successfully");
+    
+    return true;
+}
+
 
         public async Task<List<Projectemployee>> GetProjectEmployeesAsync(int projectId)
         {
@@ -279,5 +482,72 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return false;
             }
         }
+
+        // ==================== ✅ NEW: GET ALL EMPLOYEES WITH PRIMARY PROJECT ====================
+
+/// <summary>
+/// ✅ NEW: Get all active employees with their primary project information
+/// </summary>
+/// <returns>
+/// Dictionary where:
+/// - Key: EmployeeMasterId
+/// - Value: Tuple containing (ProjectId, ProjectName) of their primary project, or null if none
+/// </returns>
+public async Task<Dictionary<int, (int ProjectId, string ProjectName)?>> GetAllEmployeesWithPrimaryProjectAsync()
+{
+    try
+    {
+        Console.WriteLine("🔍 Fetching all employees with primary project information...");
+
+        // ✅ Query all active employees and their primary projects in one efficient query
+        var employeesWithPrimaryProjects = await _context.Employeedetailsmasters
+            .Where(edm => edm.Employee != null && edm.Employee.IsActive == true)
+            .Select(edm => new
+            {
+                EmployeeMasterId = edm.EmployeeMasterId,
+                FirstName = edm.Employee!.Userprofile!.FirstName,
+                LastName = edm.Employee.Userprofile.LastName,
+                // ✅ FIXED: Navigate through Employeedetailsmaster's Projectemployees collection
+                PrimaryProject = _context.Projectemployees
+                    .Where(pe => pe.EmployeeId == edm.EmployeeId && pe.IsPrimary)
+                    .Select(pe => new
+                    {
+                        ProjectId = pe.Project!.ProjectId,
+                        ProjectName = pe.Project.ProjectName
+                    })
+                    .FirstOrDefault()
+            })
+            .ToListAsync();
+
+        Console.WriteLine($"✅ Found {employeesWithPrimaryProjects.Count} active employees");
+
+        // ✅ Convert to dictionary for O(1) lookup performance
+        var result = employeesWithPrimaryProjects.ToDictionary(
+            emp => emp.EmployeeMasterId,
+            emp => emp.PrimaryProject != null
+                ? ((int ProjectId, string ProjectName)?)(emp.PrimaryProject.ProjectId, emp.PrimaryProject.ProjectName)
+                : null
+        );
+
+        var withPrimaryCount = result.Count(kvp => kvp.Value.HasValue);
+        var withoutPrimaryCount = result.Count(kvp => !kvp.Value.HasValue);
+
+        Console.WriteLine($"📊 Statistics:");
+        Console.WriteLine($"   - Employees with primary project: {withPrimaryCount}");
+        Console.WriteLine($"   - Employees without primary project: {withoutPrimaryCount}");
+
+        return result;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error in GetAllEmployeesWithPrimaryProjectAsync: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        throw;
+    }
+}
+
+
+
+        
     }
 }

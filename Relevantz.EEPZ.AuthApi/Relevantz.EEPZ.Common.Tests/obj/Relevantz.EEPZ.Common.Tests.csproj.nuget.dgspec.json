@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\Relevantz.EEPZ.Common.Tests.csproj": {}
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\Relevantz.EEPZ.Common.Tests.csproj": {}
   },
   "projects": {
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\Relevantz.EEPZ.Common.Tests.csproj": {
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\Relevantz.EEPZ.Common.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\Relevantz.EEPZ.Common.Tests.csproj",
+        "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\Relevantz.EEPZ.Common.Tests.csproj",
         "projectName": "Relevantz.EEPZ.Common.Tests",
-        "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\Relevantz.EEPZ.Common.Tests.csproj",
+        "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\Relevantz.EEPZ.Common.Tests.csproj",
         "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-        "outputPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\obj\\",
+        "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               }
             }
           }
@@ -109,14 +109,14 @@
         }
       }
     },
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "projectName": "Relevantz.EEPZ.Common",
-        "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-        "outputPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\obj\\",
+        "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

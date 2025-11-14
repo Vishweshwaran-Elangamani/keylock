@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {}
+    "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {}
   },
   "projects": {
-    "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
         "projectName": "Relevantz.EEPZ.Api.Tests",
-        "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
         "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -26,8 +26,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
               }
             }
           }
@@ -114,14 +114,14 @@
         }
       }
     },
-    "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
         "projectName": "Relevantz.EEPZ.Api",
-        "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
         "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\obj\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -136,8 +136,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
               }
             }
           }
@@ -249,14 +249,14 @@
         }
       }
     },
-    "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "projectName": "Relevantz.EEPZ.Common",
-        "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\obj\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -313,14 +313,14 @@
         }
       }
     },
-    "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
         "projectName": "Relevantz.EEPZ.Core",
-        "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
         "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\obj\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -335,8 +335,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
               }
             }
           }
@@ -381,14 +381,14 @@
         }
       }
     },
-    "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "projectName": "Relevantz.EEPZ.Data",
-        "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\obj\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Data\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -403,8 +403,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.GoalApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               }
             }
           }

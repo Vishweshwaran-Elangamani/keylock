@@ -15,6 +15,22 @@
           }
         }
       },
+      "Castle.Core/5.1.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Diagnostics.EventLog": "6.0.0"
+        },
+        "compile": {
+          "lib/net6.0/Castle.Core.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Castle.Core.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "coverlet.collector/6.0.0": {
         "type": "package",
         "build": {
@@ -1005,6 +1021,22 @@
           }
         }
       },
+      "Moq/4.20.70": {
+        "type": "package",
+        "dependencies": {
+          "Castle.Core": "5.1.1"
+        },
+        "compile": {
+          "lib/net6.0/Moq.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Moq.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "MySql.Data/9.5.0": {
         "type": "package",
         "dependencies": {
@@ -1840,6 +1872,30 @@
         "lib/netstandard2.0/BouncyCastle.Cryptography.dll",
         "lib/netstandard2.0/BouncyCastle.Cryptography.xml",
         "packageIcon.png"
+      ]
+    },
+    "Castle.Core/5.1.1": {
+      "sha512": "rpYtIczkzGpf+EkZgDr9CClTdemhsrwA/W5hMoPjLkRFnXzH44zDLoovXeKtmxb1ykXK9aJVODSpiJml8CTw2g==",
+      "type": "package",
+      "path": "castle.core/5.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ASL - Apache Software Foundation License.txt",
+        "CHANGELOG.md",
+        "LICENSE",
+        "castle-logo.png",
+        "castle.core.5.1.1.nupkg.sha512",
+        "castle.core.nuspec",
+        "lib/net462/Castle.Core.dll",
+        "lib/net462/Castle.Core.xml",
+        "lib/net6.0/Castle.Core.dll",
+        "lib/net6.0/Castle.Core.xml",
+        "lib/netstandard2.0/Castle.Core.dll",
+        "lib/netstandard2.0/Castle.Core.xml",
+        "lib/netstandard2.1/Castle.Core.dll",
+        "lib/netstandard2.1/Castle.Core.xml",
+        "readme.txt"
       ]
     },
     "coverlet.collector/6.0.0": {
@@ -3460,6 +3516,27 @@
         "version.txt"
       ]
     },
+    "Moq/4.20.70": {
+      "sha512": "4rNnAwdpXJBuxqrOCzCyICXHSImOTRktCgCWXWykuF1qwoIsVvEnR7PjbMk/eLOxWvhmj5Kwt+kDV3RGUYcNwg==",
+      "type": "package",
+      "path": "moq/4.20.70",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net462/Moq.dll",
+        "lib/net462/Moq.xml",
+        "lib/net6.0/Moq.dll",
+        "lib/net6.0/Moq.xml",
+        "lib/netstandard2.0/Moq.dll",
+        "lib/netstandard2.0/Moq.xml",
+        "lib/netstandard2.1/Moq.dll",
+        "lib/netstandard2.1/Moq.xml",
+        "moq.4.20.70.nupkg.sha512",
+        "moq.nuspec",
+        "readme.md"
+      ]
+    },
     "MySql.Data/9.5.0": {
       "sha512": "pbIrDv7vuvMlok6ldjliFOeb5fpGofAInUhG/8LraQBqT2a2xZTcAVjm/GyfZ9ZyjZeHJLWuMRbe0uI98sCoWg==",
       "type": "package",
@@ -4912,6 +4989,7 @@
   "projectFileDependencyGroups": {
     "net8.0": [
       "Microsoft.NET.Test.Sdk >= 17.8.0",
+      "Moq >= 4.20.70",
       "NUnit >= 3.14.0",
       "NUnit.Analyzers >= 3.9.0",
       "NUnit3TestAdapter >= 4.5.0",
@@ -4925,11 +5003,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+      "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
       "projectName": "Relevantz.EEPZ.Api.Tests",
-      "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+      "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
       "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-      "outputPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
+      "outputPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -4944,8 +5022,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
-              "projectPath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
+            "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+              "projectPath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
             }
           }
         }
@@ -4968,6 +5046,10 @@
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
             "version": "[17.8.0, )"
+          },
+          "Moq": {
+            "target": "Package",
+            "version": "[4.20.70, )"
           },
           "NUnit": {
             "target": "Package",

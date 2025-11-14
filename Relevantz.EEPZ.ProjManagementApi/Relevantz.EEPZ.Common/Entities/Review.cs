@@ -9,6 +9,9 @@ public partial class Review
 
     public int? GoalId { get; set; }
 
+    /// <summary>
+    /// Legacy free-text goal name
+    /// </summary>
     public string? GoalName { get; set; }
 
     public string Comments { get; set; } = null!;

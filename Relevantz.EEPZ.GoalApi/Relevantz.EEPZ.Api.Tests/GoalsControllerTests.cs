@@ -11,8 +11,7 @@ using Relevantz.EEPZ.Api.Controllers;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interface;
 
-
-namespace eepzbackend.Tests.Controllers
+namespace Relevantz.EEPZ.Api.Tests.Controllers
 {
     [TestFixture]
     public class GoalsControllerTests
@@ -22,14 +21,13 @@ namespace eepzbackend.Tests.Controllers
         private Mock<ILogger<GoalsController>> _mockLogger;
         private ControllerContext _controllerContext;
 
-
         [SetUp]
         public void Setup()
         {
             _mockService = new Mock<IGoalModuleService>();
             _mockLogger = new Mock<ILogger<GoalsController>>();
             _controller = new GoalsController(_mockService.Object, _mockLogger.Object);
-        
+
             var user = new ClaimsPrincipal(
                 new ClaimsIdentity(
                     new List<Claim>
@@ -41,16 +39,13 @@ namespace eepzbackend.Tests.Controllers
                 )
             );
 
-
             _controllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user },
             };
 
-
             _controller.ControllerContext = _controllerContext;
         }
-
 
         [Test]
         [Category("GoalCreation")]
@@ -71,7 +66,6 @@ namespace eepzbackend.Tests.Controllers
                 },
             };
 
-
             var responseDto = ApiResponseDto<int>.SuccessResponse("GOAL_CREATED_SUCCESS", 1);
             _mockService
                 .Setup(s =>
@@ -82,10 +76,10 @@ namespace eepzbackend.Tests.Controllers
                     )
                 )
                 .Returns(Task.FromResult(responseDto));
-                
+
             //Act
             var result = await _controller.Create(createGoalDto);
-            
+
             //Assert
             Assert.IsInstanceOf<CreatedAtActionResult>(result);
             _mockService.Verify(
@@ -93,7 +87,6 @@ namespace eepzbackend.Tests.Controllers
                 Times.Once
             );
         }
-
 
         [Test]
         [Category("GoalCreation")]
@@ -110,12 +103,11 @@ namespace eepzbackend.Tests.Controllers
                     new ChecklistItemDto { Title = "Item 1" },
                 },
             };
-            
+
             var responseDto = ApiResponseDto<int>.ErrorResponse(
                 "GOAL_CHECKLIST_INSUFFICIENT",
                 "Goals must have at least 3 checklist items"
             );
-
 
             _mockService
                 .Setup(s =>
@@ -126,14 +118,13 @@ namespace eepzbackend.Tests.Controllers
                     )
                 )
                 .Returns(Task.FromResult(responseDto));
-                
+
             //Act
             var result = await _controller.Create(createGoalDto);
-            
+
             //Assert
             Assert.IsInstanceOf<BadRequestObjectResult>(result);
         }
-
 
         [Test]
         [Category("GoalRetrieval")]
@@ -155,14 +146,13 @@ namespace eepzbackend.Tests.Controllers
                 IsOverdue = false,
             };
 
-
             _mockService
                 .Setup(s => s.GetGoalAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .Returns(Task.FromResult(goalDetail));
-                
+
             //Act
             var result = await _controller.GetById(goalId);
-            
+
             //Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
             var okResult = result as OkObjectResult;
@@ -170,7 +160,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsTrue(response.Success);
             Assert.AreEqual(goalDetail.Title, response.Data.Title);
         }
-
 
         [Test]
         [Category("GoalRetrieval")]
@@ -181,14 +170,13 @@ namespace eepzbackend.Tests.Controllers
             _mockService
                 .Setup(s => s.GetGoalAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
                 .Throws(new KeyNotFoundException("Goal not found"));
-                
+
             //Act
             var result = await _controller.GetById(goalId);
-            
+
             //Assert
             Assert.IsInstanceOf<NotFoundObjectResult>(result);
         }
-
 
         [Test]
         [Category("GoalRetrieval")]
@@ -207,7 +195,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsInstanceOf<ForbidResult>(result);
         }
 
-
         [Test]
         [Category("GoalQuery")]
         public async Task Query_WithValidFilter_ReturnsGoalList()
@@ -221,7 +208,6 @@ namespace eepzbackend.Tests.Controllers
                 PageSize = 10,
             };
 
-
             var goals = new List<GoalSummaryDto>
             {
                 new GoalSummaryDto
@@ -233,7 +219,6 @@ namespace eepzbackend.Tests.Controllers
                     GoalType = "self",
                 },
             };
-
 
             _mockService
                 .Setup(s =>
@@ -252,7 +237,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.AreEqual(1, response.Data.Count);
         }
 
-
         [Test]
         [Category("GoalUpdate")]
         public async Task Update_WithValidData_ReturnsSuccess()
@@ -265,7 +249,6 @@ namespace eepzbackend.Tests.Controllers
                 Description = "Updated Description",
                 Deadline = DateTime.Now.AddMonths(2),
             };
-
 
             var responseDto = ApiResponseDto.SuccessResponse("GOAL_UPDATED_SUCCESS");
             _mockService
@@ -289,7 +272,6 @@ namespace eepzbackend.Tests.Controllers
                 Times.Once
             );
         }
-
 
         [Test]
         [Category("GoalAssignment")]
@@ -315,19 +297,16 @@ namespace eepzbackend.Tests.Controllers
                 },
             };
 
-
             var manager = new ClaimsPrincipal(
                 new ClaimsIdentity(
                     new List<Claim> { new Claim("empMasterId", "1"), new Claim("role", "Manager") }
                 )
             );
 
-
             _controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = manager },
             };
-
 
             var responseDto = ApiResponseDto.SuccessResponse("GOAL_ASSIGNED_SUCCESS");
             _mockService
@@ -348,7 +327,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
-
         [Test]
         [Category("GoalApproval")]
         public async Task RequestApproval_WithFullProgress_ReturnsSuccess()
@@ -360,7 +338,6 @@ namespace eepzbackend.Tests.Controllers
                 ApprovalType = "completion",
                 ProofAttachmentIds = new List<int> { 1, 2 },
             };
-
 
             var responseDto = ApiResponseDto<int>.SuccessResponse("APPROVAL_REQUESTED_SUCCESS", 1);
             _mockService
@@ -381,7 +358,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
-
         [Test]
         [Category("GoalApproval")]
         public async Task DecideApproval_WithApprove_ReturnsSuccess()
@@ -390,19 +366,16 @@ namespace eepzbackend.Tests.Controllers
             var approvalId = 1;
             var decisionDto = new DecideApprovalDto { Decision = "approve" };
 
-
             var manager = new ClaimsPrincipal(
                 new ClaimsIdentity(
                     new List<Claim> { new Claim("empMasterId", "1"), new Claim("role", "Manager") }
                 )
             );
 
-
             _controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = manager },
             };
-
 
             var responseDto = ApiResponseDto.SuccessResponse("APPROVAL_DECIDED_SUCCESS");
             _mockService
@@ -423,7 +396,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
-
         [Test]
         [Category("Checklist")]
         public async Task ToggleChecklist_MarkAsComplete_ReturnsSuccess()
@@ -431,7 +403,6 @@ namespace eepzbackend.Tests.Controllers
             //Arrange
             var goalId = 1;
             var toggleDto = new ToggleChecklistDto { ChecklistId = 1, IsCompleted = true };
-
 
             var responseDto = ApiResponseDto.SuccessResponse("CHECKLIST_TOGGLED_SUCCESS");
             _mockService
@@ -451,7 +422,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
-
         [Test]
         [Category("Progress")]
         public async Task GetProgress_ReturnsProgressPercentage()
@@ -469,7 +439,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
-
         [Test]
         [Category("Comments")]
         public async Task AddComment_WithValidData_ReturnsSuccess()
@@ -477,7 +446,6 @@ namespace eepzbackend.Tests.Controllers
             //Arrange
             var goalId = 1;
             var commentDto = new CreateCommentDto { Comment = "This is a test comment" };
-
 
             var responseDto = ApiResponseDto.SuccessResponse("COMMENT_ADDED_SUCCESS");
             _mockService
@@ -498,7 +466,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
-
         [Test]
         [Category("Comments")]
         public async Task ListComments_ReturnsCommentList()
@@ -518,7 +485,6 @@ namespace eepzbackend.Tests.Controllers
                 },
             };
 
-
             _mockService
                 .Setup(s => s.ListCommentsAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(comments));
@@ -532,7 +498,6 @@ namespace eepzbackend.Tests.Controllers
             var response = okResult.Value as ApiResponseDto<List<GoalCommentDto>>;
             Assert.AreEqual(1, response.Data.Count);
         }
-
 
         [Test]
         [Category("Dashboard")]
@@ -548,7 +513,6 @@ namespace eepzbackend.Tests.Controllers
                 PendingApprovals = 3,
             };
 
-
             _mockService
                 .Setup(s => s.GetDashboardSummaryAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(summary));
@@ -563,7 +527,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.AreEqual(5, response.Data.Completed);
             Assert.AreEqual(3, response.Data.PendingApprovals);
         }
-
 
         [Test]
         [Category("Permissions")]
@@ -581,7 +544,6 @@ namespace eepzbackend.Tests.Controllers
             //Assert
             Assert.IsInstanceOf<OkObjectResult>(result);
         }
-
 
         [Test]
         [Category("Permissions")]
@@ -602,7 +564,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.IsInstanceOf<OkObjectResult>(result);
         }
 
-
         [Test]
         [Category("Projects")]
         public async Task GetUserProjects_ReturnsProjectList()
@@ -620,7 +581,6 @@ namespace eepzbackend.Tests.Controllers
                 },
             };
 
-
             _mockService
                 .Setup(s => s.GetUserProjectsAsync(It.IsAny<int>()))
                 .Returns(Task.FromResult(projects));
@@ -635,7 +595,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.AreEqual(1, response.Data.Count);
             Assert.AreEqual("Project 1", response.Data[0].ProjectName);
         }
-
 
         [Test]
         [Category("Timeline")]
@@ -656,7 +615,6 @@ namespace eepzbackend.Tests.Controllers
                 },
             };
 
-
             _mockService
                 .Setup(s => s.GetGoalTimelineAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .Returns(Task.FromResult(timeline));
@@ -672,7 +630,6 @@ namespace eepzbackend.Tests.Controllers
             Assert.AreEqual("created", response.Data[0].Type);
         }
 
-
         [Test]
         [Category("ErrorHandling")]
         public async Task Create_WithException_ReturnsInternalServerError()
@@ -684,7 +641,6 @@ namespace eepzbackend.Tests.Controllers
                 Title = "Test Goal",
                 Deadline = DateTime.Now.AddMonths(1),
             };
-
 
             _mockService
                 .Setup(s =>
@@ -704,7 +660,6 @@ namespace eepzbackend.Tests.Controllers
             var objectResult = result as ObjectResult;
             Assert.AreEqual(500, objectResult.StatusCode);
         }
-
 
         [TearDown]
         public void TearDown()

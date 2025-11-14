@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "cor+OgmfS7A=",
+  "dgSpecHash": "koTkDYebai8=",
   "success": true,
-  "projectFilePath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+  "projectFilePath": "D:\\Integration Modules- Sprint 3 07.11.25\\backend\\Relevantz.EEPZ.ProjManagementApi (2)\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jeswanth.s\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\jeswanth.s\\.nuget\\packages\\bouncycastle.cryptography\\2.6.2\\bouncycastle.cryptography.2.6.2.nupkg.sha512",

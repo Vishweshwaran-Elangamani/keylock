@@ -54,7 +54,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var project = new Project
                 {
                     ProjectName = request.ProjectName,
-                    ClientName = request.ClientName, 
+                    ClientName = request.ClientName,
                     Description = request.Description,
                     BusinessUnit = request.BusinessUnit,
                     Department = request.Department,
@@ -66,7 +66,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     L1approverEmployeeId = request.L1ApproverEmployeeId,
                     L2approverEmployeeId = request.L2ApproverEmployeeId,
                     CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
+                    UpdatedAt = DateTime.Now,
+    
+
                 };
 
                 var createdProject = await _projectRepository.CreateProjectAsync(project);
@@ -434,6 +436,39 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+        // ✅ NEW: Get all employees with their primary project information
+public async Task<ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>> GetAllEmployeesWithPrimaryProjectAsync()
+{
+    try
+    {
+        var primaryProjectsDict = await _projectRepository.GetAllEmployeesWithPrimaryProjectAsync();
+        
+        // Convert to DTO format
+        var result = primaryProjectsDict.ToDictionary(
+            kvp => kvp.Key,
+            kvp => kvp.Value.HasValue
+                ? new EmployeePrimaryProjectInfo
+                {
+                    ProjectId = kvp.Value.Value.ProjectId,
+                    ProjectName = kvp.Value.Value.ProjectName
+                }
+                : null
+        );
+
+        return ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>.SuccessResponse(
+            result,
+            "Employee primary project information retrieved successfully."
+        );
+    }
+    catch (Exception ex)
+    {
+        return ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>.ErrorResponse(
+            $"An error occurred while retrieving employee primary projects: {ex.Message}"
+        );
+    }
+}
+
+
         // Helper mapping methods
         private ProjectResponse MapToProjectResponse(Project project)
         {
@@ -494,5 +529,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 DepartmentName = employee.Department?.DepartmentName
             };
         }
+
+        
     }
 }

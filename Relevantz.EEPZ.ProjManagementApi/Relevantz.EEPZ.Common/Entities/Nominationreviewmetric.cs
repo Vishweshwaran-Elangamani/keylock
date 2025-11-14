@@ -11,8 +11,14 @@ public partial class Nominationreviewmetric
 
     public int ReviewedByUserId { get; set; }
 
+    /// <summary>
+    /// Merit score (0-100)
+    /// </summary>
     public decimal? MeritScore { get; set; }
 
+    /// <summary>
+    /// Diversity score (0-100)
+    /// </summary>
     public decimal? DiversityScore { get; set; }
 
     public bool? ConflictOfInterest { get; set; }

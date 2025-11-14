@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "Bo2lx6x3xFU=",
+  "dgSpecHash": "fcm5tchafNo=",
   "success": true,
-  "projectFilePath": "D:\\Repos\\EEPZ\\IntegratedModule V1.2\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+  "projectFilePath": "D:\\Repos\\EEPZ\\EEPZ Team C Master\\Back End\\Relevantz.EEPZ.LnDApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\bouncycastle.cryptography\\2.6.2\\bouncycastle.cryptography.2.6.2.nupkg.sha512",
+    "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\coverlet.collector\\6.0.0\\coverlet.collector.6.0.0.nupkg.sha512",
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\entityframework\\6.5.1\\entityframework.6.5.1.nupkg.sha512",
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\google.protobuf\\3.32.0\\google.protobuf.3.32.0.nupkg.sha512",
@@ -51,6 +52,7 @@
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\microsoft.testplatform.objectmodel\\17.8.0\\microsoft.testplatform.objectmodel.17.8.0.nupkg.sha512",
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\microsoft.testplatform.testhost\\17.8.0\\microsoft.testplatform.testhost.17.8.0.nupkg.sha512",
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
+    "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\moq\\4.20.70\\moq.4.20.70.nupkg.sha512",
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\mysql.data\\9.5.0\\mysql.data.9.5.0.nupkg.sha512",
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\mysql.entityframeworkcore\\9.0.9\\mysql.entityframeworkcore.9.0.9.nupkg.sha512",
     "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\mysqlconnector\\2.4.0\\mysqlconnector.2.4.0.nupkg.sha512",

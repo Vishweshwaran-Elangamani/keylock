@@ -7,6 +7,9 @@ public partial class Teamworkload
 {
     public int WorkloadId { get; set; }
 
+    /// <summary>
+    /// Reference to Teams (create if needed)
+    /// </summary>
     public int TeamId { get; set; }
 
     public int ManagerUserId { get; set; }

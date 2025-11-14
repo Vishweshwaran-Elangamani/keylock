@@ -9,6 +9,9 @@ public partial class Nominationparameter
 
     public int RewardTypeId { get; set; }
 
+    /// <summary>
+    /// E.g. &quot;Goal Commitment Rating&quot;, &quot;Key Achievements&quot;
+    /// </summary>
     public string ParameterName { get; set; } = null!;
 
     public string ParameterType { get; set; } = null!;
@@ -19,8 +22,14 @@ public partial class Nominationparameter
 
     public string? PlaceholderText { get; set; }
 
+    /// <summary>
+    /// For Number/Rating types
+    /// </summary>
     public int? MinimumValue { get; set; }
 
+    /// <summary>
+    /// For Number/Rating types
+    /// </summary>
     public int? MaximumValue { get; set; }
 
     public DateTime CreatedAt { get; set; }

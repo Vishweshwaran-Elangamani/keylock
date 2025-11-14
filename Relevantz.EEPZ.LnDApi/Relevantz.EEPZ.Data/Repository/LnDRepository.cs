@@ -59,9 +59,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var lowerSearchTerm = searchTerm.ToLower();
+
                 query = query.Where(e =>
                     e.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
                     || e.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
+                    || (e.Userprofile.FirstName + " " + e.Userprofile.LastName)
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || e.Userauthentication.Email.ToLower().Contains(lowerSearchTerm)
                     || (
                         e.Employeedetailsmasters.Any()
@@ -378,12 +382,20 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var lowerSearchTerm = searchTerm.ToLower();
+
                 query = query.Where(a =>
                     a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
                     || (
-                        a.Sme.Employee.Userprofile.FirstName
+                        (a.Sme.Employee.Userprofile.FirstName ?? "")
                         + " "
-                        + a.Sme.Employee.Userprofile.LastName
+                        + (a.Sme.Employee.Userprofile.LastName ?? "")
+                    )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (
+                        (a.MenteeEmployee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.MenteeEmployee.Userprofile.LastName ?? "")
                     )
                         .ToLower()
                         .Contains(lowerSearchTerm)
@@ -436,8 +448,18 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     a.Skill.SkillName.Contains(searchTerm)
                     || a.MenteeEmployee.Userprofile.FirstName.Contains(searchTerm)
                     || a.MenteeEmployee.Userprofile.LastName.Contains(searchTerm)
+                    || (
+                        a.MenteeEmployee.Userprofile.FirstName
+                        + " "
+                        + a.MenteeEmployee.Userprofile.LastName
+                    ).Contains(searchTerm)
                     || a.Sme.Employee.Userprofile.FirstName.Contains(searchTerm)
                     || a.Sme.Employee.Userprofile.LastName.Contains(searchTerm)
+                    || (
+                        a.Sme.Employee.Userprofile.FirstName
+                        + " "
+                        + a.Sme.Employee.Userprofile.LastName
+                    ).Contains(searchTerm)
                 );
             }
 
@@ -937,9 +959,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var lowerSearchTerm = searchTerm.ToLower();
+
                 baseQuery = baseQuery.Where(e =>
                     e.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
                     || e.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
+                    || (e.Userprofile.FirstName + " " + e.Userprofile.LastName)
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
                     || e.Userauthentication.Email.ToLower().Contains(lowerSearchTerm)
                     || (
                         e.Employeedetailsmasters.Any()
@@ -998,12 +1024,35 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var lowerSearchTerm = searchTerm.ToLower();
+
                 query = query.Where(a =>
-                    a.MenteeEmployee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-                    || a.MenteeEmployee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
-                    || a.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
-                    || a.Sme.Employee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-                    || a.Sme.Employee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
+                    (a.MenteeEmployee.Userprofile.FirstName ?? "")
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (a.MenteeEmployee.Userprofile.LastName ?? "")
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (
+                        (a.MenteeEmployee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.MenteeEmployee.Userprofile.LastName ?? "")
+                    )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (a.Sme.Employee.Userprofile.FirstName ?? "")
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (a.Sme.Employee.Userprofile.LastName ?? "")
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (
+                        (a.Sme.Employee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (a.Sme.Employee.Userprofile.LastName ?? "")
+                    )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (a.Skill.SkillName ?? "").ToLower().Contains(lowerSearchTerm)
                 );
             }
 
@@ -1035,14 +1084,25 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var lowerSearchTerm = searchTerm.ToLower();
+
                 query = query.Where(s =>
-                    s.Employee.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-                    || s.Employee.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
-                    || s.Skill.SkillName.ToLower().Contains(lowerSearchTerm)
+                    (s.Employee.Userprofile.FirstName ?? "").ToLower().Contains(lowerSearchTerm)
+                    || (s.Employee.Userprofile.LastName ?? "").ToLower().Contains(lowerSearchTerm)
+                    || (
+                        (s.Employee.Userprofile.FirstName ?? "")
+                        + " "
+                        + (s.Employee.Userprofile.LastName ?? "")
+                    )
+                        .ToLower()
+                        .Contains(lowerSearchTerm)
+                    || (s.Skill.SkillName ?? "").ToLower().Contains(lowerSearchTerm)
                     || (
                         s.Employee.Employeedetailsmasters.Any()
-                        && s.Employee.Employeedetailsmasters.First()
-                            .Department.DepartmentName.ToLower()
+                        && (
+                            s.Employee.Employeedetailsmasters.First().Department.DepartmentName
+                            ?? ""
+                        )
+                            .ToLower()
                             .Contains(lowerSearchTerm)
                     )
                 );

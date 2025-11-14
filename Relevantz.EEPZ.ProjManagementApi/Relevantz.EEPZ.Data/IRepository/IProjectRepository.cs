@@ -37,5 +37,9 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         
         // ✅ NEW: Batch update primary flags
         Task<bool> UpdateProjectEmployeePrimaryFlagsAsync(List<Projectemployee> projectEmployees);
+
+        // ✅ NEW: Get all employees with their primary project information
+Task<Dictionary<int, (int ProjectId, string ProjectName)?>> GetAllEmployeesWithPrimaryProjectAsync();
+
     }
 }

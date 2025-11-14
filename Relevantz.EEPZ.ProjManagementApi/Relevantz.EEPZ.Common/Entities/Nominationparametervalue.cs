@@ -11,11 +11,14 @@ public partial class Nominationparametervalue
 
     public int ParameterId { get; set; }
 
+    /// <summary>
+    /// Text, number, or rating value
+    /// </summary>
     public string? ParameterValue { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual Recognitionstatus Nomination { get; set; } = null!;
+    public virtual Nomination Nomination { get; set; } = null!;
 
     public virtual Nominationparameter Parameter { get; set; } = null!;
 }

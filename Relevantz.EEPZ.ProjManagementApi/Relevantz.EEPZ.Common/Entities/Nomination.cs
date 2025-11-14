@@ -31,13 +31,15 @@ public partial class Nomination
 
     public virtual Userauthentication NominatedByUser { get; set; } = null!;
 
+    public virtual ICollection<Nominationparametervalue> Nominationparametervalues { get; set; } = new List<Nominationparametervalue>();
+
     public virtual ICollection<Nominationreviewmetric> Nominationreviewmetrics { get; set; } = new List<Nominationreviewmetric>();
+
+    public virtual ICollection<Nominationvisibilitytracking> Nominationvisibilitytrackings { get; set; } = new List<Nominationvisibilitytracking>();
 
     public virtual Userauthentication NomineeUser { get; set; } = null!;
 
     public virtual Internalopportunity Opportunity { get; set; } = null!;
-
-    public virtual ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
 
     public virtual Userauthentication? ReviewedByUser { get; set; }
 }

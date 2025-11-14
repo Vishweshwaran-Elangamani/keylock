@@ -1,0 +1,11 @@
+# Ignore Logs directories everywhere
+Logs/
+
+# Ignore wwwroot directories everywhere
+wwwroot/
+
+# Ignore _EEPZ_BusinessLog directories everywhere
+_EEPZBusinessLog/
+
+# Ignore EEPZ_ServiceLog directories everywhere
+_EEPZServiceLog/

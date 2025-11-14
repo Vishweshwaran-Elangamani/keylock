@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data.DBContexts;
@@ -75,18 +77,18 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     q = q.Where(g => g.GoalType == type);
 
                 // ROLE-BASED VISIBILITY LOGIC
-                if (type == "team")
+                if (type == GOAL_TYPE.TEAM)
                 {
-                    if (requesterRole == "Leadership")
+                    if (requesterRole == USER_ROLE.LEADERSHIP)
                     {
                         Log.Information(
                             "[QueryGoalsAsync] Applying Leadership visibility - ALL team goals company-wide"
                         );
 
                         // Leadership sees ALL team goals across all departments
-                        q = q.Where(g => g.GoalType == "team");
+                        q = q.Where(g => g.GoalType == GOAL_TYPE.TEAM);
                     }
-                    else if (requesterRole == "Department Head")
+                    else if (requesterRole == USER_ROLE.DEPARTMENT_HEAD)
                     {
                         Log.Information(
                             "[QueryGoalsAsync] Applying DeptHead visibility for team goals"
@@ -108,7 +110,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                                     a.AssignedTo == requesterEmployeeMasterId
                                 )
                                 || (
-                                    g.GoalType == "team"
+                                    g.GoalType == GOAL_TYPE.TEAM
                                     && g.GoalAssignments.Any(a =>
                                         _db.Employeedetailsmasters.Where(e =>
                                                 e.DepartmentId == deptHead.DepartmentId
@@ -133,7 +135,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                             );
                         }
                     }
-                    else if (requesterRole == "Manager")
+                    else if (requesterRole == USER_ROLE.MANAGER)
                     {
                         Log.Information(
                             "[QueryGoalsAsync] Applying Manager visibility for team goals"
@@ -167,7 +169,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                             g.CreatedBy == requesterEmployeeMasterId
                             || g.GoalAssignments.Any(a => a.AssignedTo == requesterEmployeeMasterId)
                             || (
-                                g.GoalType == "team"
+                                g.GoalType == GOAL_TYPE.TEAM
                                 && g.GoalAssignments.Any(a =>
                                     subordinates.Contains(a.AssignedTo.Value)
                                 )
@@ -189,7 +191,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     q = q.Where(g =>
                         g.CreatedBy == requesterEmployeeMasterId
                         || g.GoalAssignments.Any(a => a.AssignedTo == requesterEmployeeMasterId)
-                        || g.GoalType == "org"
+                        || g.GoalType == GOAL_TYPE.ORG
                     );
                 }
 
@@ -312,7 +314,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .Projectemployees.Where(pe => pe.EmployeeId == employeeId)
                     .Include(pe => pe.Project)
                     .Select(pe => pe.Project)
-                    .Where(p => p != null && p.Status == "Active")
+                    .Where(p => p != null && p.Status == PROJECT_STATUS.ACTIVE)
                     .ToListAsync();
 
                 Log.Information(
@@ -337,7 +339,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             try
             {
                 Log.Information("[GetAllProjectsAsync] Fetching all active projects");
-                var result = await _db.Projects.Where(p => p.Status == "Active").ToListAsync();
+                var result = await _db
+                    .Projects.Where(p => p.Status == PROJECT_STATUS.ACTIVE)
+                    .ToListAsync();
                 Log.Information(
                     "[GetAllProjectsAsync] Found {Count} active projects",
                     result.Count
@@ -447,7 +451,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     }
 
                     var profile = edm.Employee.Userprofile;
-                    var role = edm.Role?.RoleName ?? "Employee";
+                    var role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE;
 
                     Log.Information(
                         "[GetAssigneesWithDetailsAsync] Adding assignee - Name: {FirstName} {LastName}, Role: {Role}",
@@ -587,7 +591,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .GoalApprovals.Where(a =>
                         a.GoalId == goalId
                         && a.RequestedBy == employeeMasterId
-                        && a.ApprovalStatus == "pending"
+                        && a.ApprovalStatus == APPROVAL_STATUS.PENDING
                         && approvalTypes.Contains(a.ApprovalType)
                     )
                     .ToListAsync();
@@ -903,7 +907,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .GoalApprovals.Where(a =>
                         a.GoalId == goalId
                         && a.ApprovalType == approvalType
-                        && a.ApprovalStatus == "pending"
+                        && a.ApprovalStatus == APPROVAL_STATUS.PENDING
                     )
                     .FirstOrDefaultAsync();
                 Log.Information(
@@ -985,7 +989,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     employeeMasterId
                 );
                 var result = await _db.GoalApprovals.CountAsync(a =>
-                    a.ApprovedBy == employeeMasterId && a.ApprovalStatus == "pending"
+                    a.ApprovedBy == employeeMasterId && a.ApprovalStatus == APPROVAL_STATUS.PENDING
                 );
                 Log.Information(
                     "[CountPendingApprovalsForUserAsync] Found {Count} pending approvals",
@@ -1028,7 +1032,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     || ga.Goal.CreatedBy == userId
                     || ga.Goal.GoalAssignments.Any(assignment => assignment.AssignedTo == userId)
                     || (
-                        ga.ApprovalStatus == "pending"
+                        ga.ApprovalStatus == APPROVAL_STATUS.PENDING
                         && CanUserApproveType(ga.ApprovalType, userRole)
                     )
                 );
@@ -1106,22 +1110,22 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             return approvalType switch
             {
-                "creation" or "selfgoalactivation" => new[]
+                APPROVAL_TYPE.CREATION or APPROVAL_TYPE.SELF_GOAL_ACTIVATION =>
+                    USER_ROLE.APPROVAL_AUTHORITIES.Contains(userRole),
+
+                APPROVAL_TYPE.COMPLETION
+                or APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
+                or APPROVAL_TYPE.CLOSURE
+                or APPROVAL_TYPE.REACTIVATION => USER_ROLE.APPROVAL_AUTHORITIES.Contains(userRole),
+
+                APPROVAL_TYPE.REOPENING => USER_ROLE.APPROVAL_AUTHORITIES.Contains(userRole),
+
+                APPROVAL_TYPE.DELEGATION => new[]
                 {
-                    "Manager",
-                    "Department Head",
-                    "Leadership",
+                    USER_ROLE.DEPARTMENT_HEAD,
+                    USER_ROLE.LEADERSHIP,
                 }.Contains(userRole),
-                "completion" or "task_acknowledgment" or "closure" or "reactivation" => new[]
-                {
-                    "Manager",
-                    "Department Head",
-                    "Leadership",
-                }.Contains(userRole),
-                "reopening" => new[] { "Manager", "Department Head", "Leadership" }.Contains(
-                    userRole
-                ),
-                "delegation" => new[] { "Department Head", "Leadership" }.Contains(userRole),
+
                 _ => false,
             };
         }
@@ -1138,8 +1142,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 var result = await _db.GoalApprovals.AnyAsync(a =>
                     a.GoalId == goalId
                     && a.RequestedBy == userId
-                    && a.ApprovalStatus == "pending"
-                    && (a.ApprovalType == "completion" || a.ApprovalType == "task_acknowledgment")
+                    && a.ApprovalStatus == APPROVAL_STATUS.PENDING
+                    && (
+                        a.ApprovalType == APPROVAL_TYPE.COMPLETION
+                        || a.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
+                    )
                 );
                 Log.Information(
                     "[HasPendingApprovalAsync] Has pending approval: {HasPending}",
@@ -1421,8 +1428,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     return true;
 
                 // DeptHead/Manager can comment on TEAM goals
-                var isDeptHeadOrManager = role == "Department Head" || role == "Manager";
-                var isTeamGoal = goal.GoalType == "team";
+                var isDeptHeadOrManager =
+                    role == USER_ROLE.DEPARTMENT_HEAD || role == USER_ROLE.MANAGER;
+                var isTeamGoal = goal.GoalType == GOAL_TYPE.TEAM;
 
                 if (isDeptHeadOrManager && isTeamGoal)
                 {
@@ -2234,7 +2242,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     ProgressPercent = (int)Math.Round(progress),
                     UpdatedOn = DateTime.UtcNow,
                     UpdatedBy = userId,
-                    Source = "auto",
+                    Source = PROGRESS_SOURCE.AUTO,
                 };
 
                 await _db.Goalprogresslogs.AddAsync(newLog);

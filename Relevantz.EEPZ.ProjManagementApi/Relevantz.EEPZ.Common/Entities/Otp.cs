@@ -13,6 +13,9 @@ public partial class Otp
 
     public string OtpType { get; set; } = null!;
 
+    /// <summary>
+    /// Expiration timestamp (typically 5-10 minutes)
+    /// </summary>
     public DateTime ExpiresAt { get; set; }
 
     public bool? IsUsed { get; set; }

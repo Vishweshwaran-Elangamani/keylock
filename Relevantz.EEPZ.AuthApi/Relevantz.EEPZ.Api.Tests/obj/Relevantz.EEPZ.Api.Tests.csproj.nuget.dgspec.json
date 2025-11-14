@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {}
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {}
   },
   "projects": {
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+        "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
         "projectName": "Relevantz.EEPZ.Api.Tests",
-        "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+        "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
         "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-        "outputPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
+        "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
-                "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
+              "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+                "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
               }
             }
           }
@@ -109,14 +109,14 @@
         }
       }
     },
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
+        "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
         "projectName": "Relevantz.EEPZ.Api",
-        "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
+        "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
         "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-        "outputPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\obj\\",
+        "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -137,8 +137,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
-                "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
+              "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+                "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
               }
             }
           }
@@ -251,14 +251,14 @@
         }
       }
     },
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "projectName": "Relevantz.EEPZ.Common",
-        "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-        "outputPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\obj\\",
+        "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -352,14 +352,14 @@
         }
       }
     },
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
         "projectName": "Relevantz.EEPZ.Core",
-        "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
         "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-        "outputPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\obj\\",
+        "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -380,8 +380,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
-                "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+              "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+                "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
               }
             }
           }
@@ -465,14 +465,14 @@
         }
       }
     },
-    "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+    "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "projectName": "Relevantz.EEPZ.Data",
-        "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-        "outputPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\obj\\",
+        "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -493,8 +493,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               }
             }
           }

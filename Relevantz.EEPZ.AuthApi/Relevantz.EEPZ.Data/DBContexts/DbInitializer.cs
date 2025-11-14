@@ -33,6 +33,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 // Seed Resource Pool Project
                 await SeedResourcePoolProjectAsync(context);
 
+                //Seed Skills table
+                await SeedSkillsAsync(context);
+
                 Console.WriteLine("Database initialization completed successfully!");
             }
             catch (Exception ex)
@@ -301,39 +304,94 @@ namespace Relevantz.EEPZ.Data.DBContexts
         /// Seeds resource pool project
         /// </summary>
         public static async Task SeedResourcePoolProjectAsync(EEPZDbContext context)
-    {
-        await context.Database.EnsureCreatedAsync();
- 
-        var existingProject = await context.Projects
-            .FirstOrDefaultAsync(p => p.ProjectName == "ORG.RZ.RESOURCEPOOL");
- 
-        if (existingProject == null)
         {
-            var resourcePoolProject = new Project
+            await context.Database.EnsureCreatedAsync();
+
+            var existingProject = await context.Projects
+                .FirstOrDefaultAsync(p => p.ProjectName == "ORG.RZ.RESOURCEPOOL");
+
+            if (existingProject == null)
             {
-                ProjectName = "ORG.RZ.RESOURCEPOOL",
-                ClientName = "Relevantz",
-                Description = "Resource Pool Project.",
-                BusinessUnit = "Resource Management",
-                Department = null,
-                EngagementModel = "Internal",
-                Status = "Active",
-                StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                EndDate = null,
-                ResourceOwnerId = null,
-                ResourceOwnerEmployeeId = null,
-                L1approverId = null,
-                L1approverEmployeeId = null,
-                L2approverId = null,
-                L2approverEmployeeId = null,
-                IsDeletable = false,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
- 
-            context.Projects.Add(resourcePoolProject);
-            await context.SaveChangesAsync();
+                var resourcePoolProject = new Project
+                {
+                    ProjectName = "ORG.RZ.RESOURCEPOOL",
+                    ClientName = "Relevantz",
+                    Description = "Resource Pool Project.",
+                    BusinessUnit = "Resource Management",
+                    Department = null,
+                    EngagementModel = "Internal",
+                    Status = "Active",
+                    StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                    EndDate = null,
+                    ResourceOwnerId = null,
+                    ResourceOwnerEmployeeId = null,
+                    L1approverId = null,
+                    L1approverEmployeeId = null,
+                    L2approverId = null,
+                    L2approverEmployeeId = null,
+                    IsDeletable = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                context.Projects.Add(resourcePoolProject);
+                await context.SaveChangesAsync();
+            }
         }
-    }
+
+        /// <summary>
+        /// Seeds default skills into MasterSkill table
+        /// </summary>
+        private static async Task SeedSkillsAsync(EEPZDbContext context)
+        {
+            Console.WriteLine("Seeding skills...");
+
+            var skills = new List<MasterSkill>
+    {
+        new MasterSkill { SkillName = "Python Programming", Description = "Advanced Python development with frameworks", Category = "Programming" },
+        new MasterSkill { SkillName = "Java Development", Description = "Enterprise Java application development", Category = "Programming" },
+        new MasterSkill { SkillName = "JavaScript/TypeScript", Description = "Modern JavaScript and TypeScript development", Category = "Programming" },
+        new MasterSkill { SkillName = "React.js", Description = "Frontend development using React framework", Category = "Frontend" },
+        new MasterSkill { SkillName = "Node.js", Description = "Backend development using Node.js", Category = "Backend" },
+        new MasterSkill { SkillName = ".NET Core", Description = "Cross-platform .NET development", Category = "Backend" },
+        new MasterSkill { SkillName = "SQL Database Design", Description = "Relational database design and optimization", Category = "Database" },
+        new MasterSkill { SkillName = "MongoDB", Description = "NoSQL database development", Category = "Database" },
+        new MasterSkill { SkillName = "AWS Cloud Architecture", Description = "Amazon Web Services cloud solutions", Category = "Cloud" },
+        new MasterSkill { SkillName = "Azure DevOps", Description = "Microsoft Azure DevOps and CI/CD", Category = "Cloud" },
+        new MasterSkill { SkillName = "Docker & Kubernetes", Description = "Container orchestration and deployment", Category = "DevOps" },
+        new MasterSkill { SkillName = "Microservices Architecture", Description = "Designing and implementing microservices", Category = "Architecture" },
+        new MasterSkill { SkillName = "System Design", Description = "Large-scale system design and architecture", Category = "Architecture" },
+        new MasterSkill { SkillName = "Agile/Scrum", Description = "Agile project management methodologies", Category = "Project Management" },
+        new MasterSkill { SkillName = "Technical Leadership", Description = "Leading engineering teams", Category = "Leadership" },
+        new MasterSkill { SkillName = "Code Review Best Practices", Description = "Effective code review techniques", Category = "Quality" },
+        new MasterSkill { SkillName = "Test-Driven Development", Description = "TDD methodology and practices", Category = "Quality" },
+        new MasterSkill { SkillName = "API Design", Description = "RESTful and GraphQL API design", Category = "Backend" },
+        new MasterSkill { SkillName = "Performance Optimization", Description = "Application performance tuning", Category = "Performance" },
+        new MasterSkill { SkillName = "Security Best Practices", Description = "Application security and OWASP", Category = "Security" },
+        new MasterSkill { SkillName = "CRM Systems", Description = "Customer Relationship Management systems", Category = "Sales" },
+        new MasterSkill { SkillName = "Sales Analytics", Description = "Data-driven sales analysis and forecasting", Category = "Sales" },
+        new MasterSkill { SkillName = "Cloud Migration", Description = "Legacy to cloud migration strategies", Category = "Cloud" },
+        new MasterSkill { SkillName = "Infrastructure as Code", Description = "Terraform and CloudFormation", Category = "DevOps" },
+        new MasterSkill { SkillName = "Git Version Control", Description = "Advanced Git workflows", Category = "Tools" }
+    };
+
+            foreach (var skill in skills)
+            {
+                var existingSkill = await context.MasterSkills
+                    .FirstOrDefaultAsync(s => s.SkillName == skill.SkillName);
+                if (existingSkill == null)
+                {
+                    context.MasterSkills.Add(skill);
+                    Console.WriteLine($" Added skill: {skill.SkillName}");
+                }
+                else
+                {
+                    Console.WriteLine($" ⏭ Skill already exists: {skill.SkillName}");
+                }
+            }
+
+            await context.SaveChangesAsync();
+            Console.WriteLine(" Skills seeding completed!");
+        }
     }
 }

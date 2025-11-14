@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interface;
 
-namespace eepzbackend.Controllers
+namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

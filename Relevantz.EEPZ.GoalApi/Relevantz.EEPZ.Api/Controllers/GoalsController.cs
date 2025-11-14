@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
+using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -32,7 +33,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         private int GetEmpMasterId()
         {
-            var claim = User.FindFirst("empMasterId")?.Value;
+            var claim = User.FindFirst(CLAIM_TYPES.EMPLOYEE_MASTER_ID)?.Value;
             if (string.IsNullOrEmpty(claim))
                 throw new UnauthorizedAccessException("Employee Master ID not found");
             return int.Parse(claim);
@@ -44,7 +45,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Create a new goal (self, team, or org based on role)
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "Employee,Manager,Department Head,Leadership")]
+        [Authorize(
+            Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
+        )]
         public async Task<IActionResult> Create([FromBody] CreateGoalDto dto)
         {
             var userId = 0;
@@ -281,7 +284,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Assign a team goal to subordinates (managers/Department Heads only)
         /// </summary>
         [HttpPost("{id:int}/assign")]
-        [Authorize(Roles = "Manager,Department Head")]
+        [Authorize(Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD}")]
         public async Task<IActionResult> Assign(int id, [FromBody] AssignGoalDto dto)
         {
             try
@@ -368,7 +371,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Approve or reject an approval request
         /// </summary>
         [HttpPut("approvals/{approvalId:int}")]
-        [Authorize(Roles = "Manager,Department Head,Leadership")]
+        [Authorize(
+            Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
+        )]
         public async Task<IActionResult> DecideApproval(
             int approvalId,
             [FromBody] DecideApprovalDto dto
@@ -407,7 +412,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Get pending approvals for current user (manager/Department Head/Leadership)
         /// </summary>
         [HttpGet("approvals/pending")]
-        [Authorize(Roles = "Manager,Department Head,Leadership")]
+        [Authorize(
+            Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
+        )]
         public async Task<IActionResult> PendingApprovals()
         {
             try
@@ -502,7 +509,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Manually update progress (managers/Department Heads/leaders only)
         /// </summary>
         [HttpPut("{id:int}/progress/manual")]
-        [Authorize(Roles = "Manager,Department Head,Leadership")]
+        [Authorize(
+            Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
+        )]
         public async Task<IActionResult> ManualProgress(
             int id,
             [FromBody] ManualProgressUpdateDto dto
@@ -575,7 +584,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Get team goal progress for manager (aggregated from subordinates)
         /// </summary>
         [HttpGet("{id:int}/progress/team")]
-        [Authorize(Roles = "Manager,Department Head,Leadership")]
+        [Authorize(
+            Roles = $"{USER_ROLE.EMPLOYEE},{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
+        )]
         public async Task<IActionResult> GetTeamProgress(int id)
         {
             try
@@ -717,7 +728,9 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Get all projects (for reference)
         /// </summary>
         [HttpGet("projects")]
-        [Authorize(Roles = "Manager,Department Head,Leadership")]
+        [Authorize(
+            Roles = $"{USER_ROLE.MANAGER},{USER_ROLE.DEPARTMENT_HEAD},{USER_ROLE.LEADERSHIP}"
+        )]
         public async Task<IActionResult> GetAllProjects()
         {
             try
@@ -1226,10 +1239,10 @@ namespace Relevantz.EEPZ.Api.Controllers
                 var isOverdue = goal.IsOverdue;
                 var hasRequiredProgress = goal.ProgressPercent >= 100;
                 var hasValidStatus =
-                    goal.Status == "open"
-                    || goal.Status == "inprogress"
-                    || goal.Status == "reopened";
-                var isNotOverdue = !isOverdue || goal.Status == "reopened";
+                    goal.Status == GOAL_STATUS.OPEN
+                    || goal.Status == GOAL_STATUS.IN_PROGRESS
+                    || goal.Status == GOAL_STATUS.REOPENED;
+                var isNotOverdue = !isOverdue || goal.Status == GOAL_STATUS.REOPENED;
 
                 bool isCreator = goal.CreatedByEmployeeMasterId == userId;
                 bool isAssignee = goal.Assignees?.Any(a => a.EmployeeMasterId == userId) ?? false;
@@ -1242,7 +1255,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     reasons.Add($"Progress must be 100% (current: {goal.ProgressPercent}%)");
                 }
 
-                if (isOverdue && goal.Status != "reopened")
+                if (isOverdue && goal.Status != GOAL_STATUS.REOPENED)
                 {
                     reasons.Add("Goal is overdue");
                 }
@@ -1257,7 +1270,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     reasons.Add("Not a participant");
                 }
 
-                var shouldRequestReopen = isOverdue && goal.Status != "reopened";
+                var shouldRequestReopen = isOverdue && goal.Status != GOAL_STATUS.REOPENED;
 
                 var result = new CanMarkCompleteDto
                 {

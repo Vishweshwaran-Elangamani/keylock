@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repository.Interface;
 using Serilog;
@@ -22,13 +23,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         // ==================== HELPER METHODS ====================
         private static bool CanCreate(string role, string goalType) =>
-            (goalType == "self") // All roles can create self goals
-            || (goalType == "team" && (role == "Manager" || role == "Department Head"))
-            || (goalType == "org" && role == "Leadership");
+            (goalType == GOAL_TYPE.SELF) // All roles can create self goals
+            || (
+                goalType == GOAL_TYPE.TEAM
+                && (role == USER_ROLE.MANAGER || role == USER_ROLE.DEPARTMENT_HEAD)
+            )
+            || (goalType == GOAL_TYPE.ORG && role == USER_ROLE.LEADERSHIP);
 
         private static string? GetCreationApprovalType(string goalType) =>
-            goalType == "self" ? "selfgoalactivation"
-            : goalType == "team" ? "creation"
+            goalType == GOAL_TYPE.SELF ? APPROVAL_TYPE.SELF_GOAL_ACTIVATION
+            : goalType == GOAL_TYPE.TEAM ? APPROVAL_TYPE.CREATION
             : null;
 
         private async Task<int?> GetApproverForUserAsync(int employeeMasterId, string approvalType)
@@ -41,11 +45,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         private async Task<string> GetEmployeeNameAsync(int? employeeMasterId)
         {
             if (!employeeMasterId.HasValue)
-                return "Unknown";
+                return PROJECT_STATUS.UNKNOWN;
 
             var edm = await _repo.GetEmployeeDetailsByMasterIdAsync(employeeMasterId.Value);
             if (edm?.Employee?.Userprofile == null)
-                return "Unknown";
+                return PROJECT_STATUS.UNKNOWN;
 
             var profile = edm.Employee.Userprofile;
             return $"{profile.FirstName} {profile.LastName}";
@@ -112,7 +116,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 // AUTO-ASSIGN self goal checklist items FIRST (before validation)
-                if (dto.GoalType == "self")
+                if (dto.GoalType == GOAL_TYPE.SELF)
                 {
                     Log.Information(
                         "[CreateGoal] Auto-assigning self goal checklist items to creator"
@@ -154,7 +158,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 // Team goal validation
-                if (dto.GoalType == "team")
+                if (dto.GoalType == GOAL_TYPE.TEAM)
                 {
                     var checklistAssignees = validChecklistItems
                         .Select(c => c.AddedForEmployeeMasterId!.Value)
@@ -234,7 +238,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 // Self goal assignment auto-correction
-                if (dto.GoalType == "self")
+                if (dto.GoalType == GOAL_TYPE.SELF)
                 {
                     if (
                         dto.AssignedToEmployeeMasterIds.Count != 1
@@ -250,7 +254,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 // Team goal assignment validation
-                if (dto.GoalType == "team" && dto.AssignedToEmployeeMasterIds.Count > 0)
+                if (dto.GoalType == GOAL_TYPE.TEAM && dto.AssignedToEmployeeMasterIds.Count > 0)
                 {
                     var subordinates = await _repo.GetSubordinateEmployeeMasterIdsAsync(
                         currentUserEmployeeMasterId
@@ -290,7 +294,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     GoalId = goalId,
                     GoalType = dto.GoalType,
-                    RequiresApproval = currentUserRole != "Leadership",
+                    RequiresApproval = currentUserRole != USER_ROLE.LEADERSHIP,
                     AssigneeCount = dto.AssignedToEmployeeMasterIds?.Count ?? 0,
                     ChecklistItemCount = validChecklistItems.Count,
                 };
@@ -324,17 +328,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             // Determine initial status
             string initialStatus;
-            if (currentUserRole == "Leadership")
+            if (currentUserRole == USER_ROLE.LEADERSHIP)
             {
-                initialStatus = "open";
+                initialStatus = GOAL_STATUS.OPEN;
             }
-            else if (dto.GoalType == "org")
+            else if (dto.GoalType == GOAL_TYPE.ORG)
             {
-                initialStatus = "open";
+                initialStatus = GOAL_STATUS.OPEN;
             }
             else
             {
-                initialStatus = "pending";
+                initialStatus = GOAL_STATUS.PENDING;
             }
 
             // Create goal
@@ -384,7 +388,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             // Create approval request if needed
-            if (currentUserRole != "Leadership" && initialStatus == "pending")
+            if (currentUserRole != USER_ROLE.LEADERSHIP && initialStatus == GOAL_STATUS.PENDING)
             {
                 var approvalType = GetCreationApprovalType(dto.GoalType);
                 if (approvalType != null)
@@ -399,7 +403,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         RequestedBy = currentUserEmployeeMasterId,
                         RequestedOn = DateTime.UtcNow,
                         ApprovedBy = approverId,
-                        ApprovalStatus = "pending",
+                        ApprovalStatus = APPROVAL_STATUS.PENDING,
                     };
                     await _repo.AddApprovalAsync(approval);
                 }
@@ -413,7 +417,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     UpdatedBy = currentUserEmployeeMasterId,
                     UpdatedOn = DateTime.UtcNow,
                     ProgressPercent = 0,
-                    Source = "auto",
+                    Source = PROGRESS_SOURCE.AUTO,
                 }
             );
 
@@ -441,7 +445,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             // Calculate OVERALL progress
             int progressPercent;
             var latestLog = await _repo.GetLatestProgressLogAsync(goalId);
-            if (latestLog != null && latestLog.Source == "manual")
+            if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
                 progressPercent = latestLog.ProgressPercent ?? 0;
             }
@@ -486,8 +490,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             // Check permissions
             bool canEdit =
                 goal.CreatedBy == currentUserEmployeeMasterId
-                && goal.Goalstatus != "completed"
-                && goal.Goalstatus != "closed";
+                && goal.Goalstatus != GOAL_STATUS.COMPLETED
+                && goal.Goalstatus != GOAL_STATUS.CLOSED;
             bool canComment = await CanCommentOnGoalAsync(
                 goalId,
                 currentUserEmployeeMasterId,
@@ -497,8 +501,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             bool isOverdue =
                 goal.Goalendat.HasValue
                 && goal.Goalendat.Value < DateTime.UtcNow
-                && goal.Goalstatus != "completed"
-                && goal.Goalstatus != "closed";
+                && goal.Goalstatus != GOAL_STATUS.COMPLETED
+                && goal.Goalstatus != GOAL_STATUS.CLOSED;
             bool canRequestReopen = (
                 isOverdue
                 && (
@@ -515,7 +519,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return new GoalDetailDto
             {
                 GoalId = goal.GoalId,
-                GoalType = goal.GoalType ?? "self",
+                GoalType = goal.GoalType ?? GOAL_TYPE.SELF,
                 ProjectId = goal.ProjectId,
                 ProjectName = projectName,
                 Title = goal.GoalTitle ?? "",
@@ -524,7 +528,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 CreatedByEmployeeMasterId = goal.CreatedBy,
                 CreatedByName = creatorName,
                 EndAt = goal.Goalendat,
-                Status = goal.Goalstatus ?? "pending",
+                Status = goal.Goalstatus ?? GOAL_STATUS.PENDING,
                 ProgressPercent = progressPercent,
                 HasPendingApproval = hasPendingApproval,
                 Checklist = goal
@@ -600,14 +604,17 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var isOverdue =
                         g.Goalendat.HasValue
                         && g.Goalendat.Value < DateTime.UtcNow
-                        && g.Goalstatus != "completed"
-                        && g.Goalstatus != "closed";
+                        && g.Goalstatus != GOAL_STATUS.COMPLETED
+                        && g.Goalstatus != GOAL_STATUS.CLOSED;
 
                     var canAssign =
-                        (currentUserRole == "Manager" || currentUserRole == "Department Head")
-                        && g.GoalType == "team"
+                        (
+                            currentUserRole == USER_ROLE.MANAGER
+                            || currentUserRole == USER_ROLE.DEPARTMENT_HEAD
+                        )
+                        && g.GoalType == GOAL_TYPE.TEAM
                         && g.CreatedBy == currentUserEmployeeMasterId
-                        && g.Goalstatus == "open";
+                        && g.Goalstatus == GOAL_STATUS.OPEN;
 
                     string? projectName = null;
                     if (g.ProjectId.HasValue)
@@ -625,7 +632,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         a.AssignedTo == currentUserEmployeeMasterId
                     );
 
-                    if (g.GoalType == "team" && !isCreator && isAssignee)
+                    if (g.GoalType == GOAL_TYPE.TEAM && !isCreator && isAssignee)
                     {
                         myProgress = await CalculatePersonalProgressAsync(
                             g.GoalId,
@@ -636,8 +643,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     // Check pending approval
                     var hasPendingApproval = g.GoalApprovals.Any(a =>
                         a.RequestedBy == currentUserEmployeeMasterId
-                        && a.ApprovalType == "task_acknowledgment"
-                        && a.ApprovalStatus == "pending"
+                        && a.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
+                        && a.ApprovalStatus == APPROVAL_STATUS.PENDING
                     );
 
                     // Check acknowledgment status
@@ -647,7 +654,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                     // Get assignees with acknowledgment status
                     var assignees = new List<AssigneeDto>();
-                    if (g.GoalType == "team")
+                    if (g.GoalType == GOAL_TYPE.TEAM)
                     {
                         assignees = await GetAssigneesWithDetailsAsync(g.GoalId);
                     }
@@ -664,8 +671,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                         ? g.GoalDescription.Substring(0, 80) + "..."
                                         : g.GoalDescription
                                 ),
-                            GoalType = g.GoalType ?? "self",
-                            Status = g.Goalstatus ?? "pending",
+                            GoalType = g.GoalType ?? GOAL_TYPE.SELF,
+                            Status = g.Goalstatus ?? GOAL_STATUS.PENDING,
                             CreatedAt = g.Goalcreatedat,
                             EndAt = g.Goalendat,
                             ProgressPercent = latestProgress?.ProgressPercent ?? 0,
@@ -737,7 +744,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 // Access control
-                if (goal.GoalType == "org" && currentUserRole != "Leadership")
+                if (goal.GoalType == GOAL_TYPE.ORG && currentUserRole != USER_ROLE.LEADERSHIP)
                 {
                     return ApiResponseDto.ErrorResponse(
                         ResponseMessages.Codes.GOAL_ACCESS_DENIED,
@@ -745,7 +752,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                if (goal.GoalType != "org" && goal.CreatedBy != currentUserEmployeeMasterId)
+                if (goal.GoalType != GOAL_TYPE.ORG && goal.CreatedBy != currentUserEmployeeMasterId)
                 {
                     return ApiResponseDto.ErrorResponse(
                         ResponseMessages.Codes.GOAL_ACCESS_DENIED,
@@ -879,9 +886,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             await _repo.UpdateGoalProgressAsync(goalId, newProgress, userId);
 
             // If progress drops below 100% and goal was completed, revert status
-            if (newProgress < 100 && goal.Goalstatus == "completed")
+            if (newProgress < 100 && goal.Goalstatus == GOAL_STATUS.COMPLETED)
             {
-                goal.Goalstatus = "inprogress";
+                goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                 await _repo.UpdateGoalAsync(goal);
             }
         }
@@ -914,7 +921,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     {
                         EmployeeMasterId = assignment.AssignedTo.Value,
                         Name = $"{profile.FirstName} {profile.LastName}".Trim(),
-                        Role = edm.Role?.RoleName ?? "Employee", // Fixed: Use Role.RoleName
+                        Role = edm.Role?.RoleName ?? USER_ROLE.EMPLOYEE, // Fixed: Use Role.RoleName
                         IsAcknowledged = assignment.IsAcknowledged ?? false,
                         AcknowledgedOn = assignment.AcknowledgedOn,
                     }
@@ -933,7 +940,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 // Check if user is a Leadership
                 var userRole = await _repo.GetUserRoleAsync(employeeMasterId);
 
-                if (userRole == "Leadership")
+                if (userRole == USER_ROLE.LEADERSHIP)
                 {
                     // Leaders see all active projects
                     var allProjects = await _repo.GetAllProjectsAsync();
@@ -943,7 +950,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             ProjectId = p.ProjectId,
                             ProjectName = p.ProjectName ?? "",
                             Description = p.Description,
-                            Status = p.Status ?? "Unknown",
+                            Status = p.Status ?? PROJECT_STATUS.UNKNOWN,
                             StartDate = p.StartDate,
                             EndDate = p.EndDate,
                         })
@@ -970,7 +977,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         ProjectId = p.ProjectId,
                         ProjectName = p.ProjectName ?? "",
                         Description = p.Description,
-                        Status = p.Status ?? "Unknown",
+                        Status = p.Status ?? PROJECT_STATUS.UNKNOWN,
                         StartDate = p.StartDate,
                         EndDate = p.EndDate,
                     })
@@ -994,7 +1001,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         ProjectId = p.ProjectId,
                         ProjectName = p.ProjectName ?? "",
                         Description = p.Description,
-                        Status = p.Status ?? "Unknown",
+                        Status = p.Status ?? PROJECT_STATUS.UNKNOWN,
                         StartDate = p.StartDate,
                         EndDate = p.EndDate,
                     })
@@ -1020,7 +1027,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ProjectId = project.ProjectId,
                 ProjectName = project.ProjectName ?? "",
                 Description = project.Description,
-                Status = project.Status ?? "Unknown",
+                Status = project.Status ?? PROJECT_STATUS.UNKNOWN,
                 StartDate = project.StartDate,
                 EndDate = project.EndDate,
                 Employees = employees,
@@ -1051,7 +1058,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponseDto.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
                 }
 
-                if (goal.GoalType != "team")
+                if (goal.GoalType != GOAL_TYPE.TEAM)
                 {
                     return ApiResponseDto.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_ACCESS_DENIED,
@@ -1059,7 +1066,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                if (!(currentUserRole == "Manager" || currentUserRole == "Department Head"))
+                if (!USER_ROLE.CanAssignGoals(currentUserRole))
                 {
                     return ApiResponseDto.ErrorResponse(
                         ResponseMessages.Codes.ASSIGNMENT_ACCESS_DENIED,
@@ -1168,11 +1175,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var approval = new GoalApproval
                 {
                     GoalId = goal.GoalId,
-                    ApprovalType = "delegation",
+                    ApprovalType = APPROVAL_TYPE.DELEGATION,
                     RequestedBy = currentUserEmployeeMasterId,
                     RequestedOn = DateTime.UtcNow,
                     ApprovedBy = approverId,
-                    ApprovalStatus = "pending",
+                    ApprovalStatus = APPROVAL_STATUS.PENDING,
                 };
                 await _repo.AddApprovalAsync(approval);
 
@@ -1248,11 +1255,16 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string webRootPath = _environment.WebRootPath;
             if (string.IsNullOrEmpty(webRootPath))
             {
-                webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
+                webRootPath = Path.Combine(_environment.ContentRootPath, FILE_STORAGE.WWWROOT);
             }
 
             // Create upload directory
-            var uploadsFolder = Path.Combine(webRootPath, "uploads", "goal-attachments");
+            var uploadsFolder = Path.Combine(
+                webRootPath,
+                FILE_STORAGE.UPLOADS,
+                FILE_STORAGE.GOAL_ATTACHMENTS
+            );
+
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -1267,7 +1279,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             // Store relative path in database
-            var relativePath = Path.Combine("uploads", "goal-attachments", uniqueFileName)
+            var relativePath = Path.Combine(
+                    FILE_STORAGE.UPLOADS,
+                    FILE_STORAGE.GOAL_ATTACHMENTS,
+                    uniqueFileName
+                )
                 .Replace("\\", "/");
 
             // Save attachment record
@@ -1314,7 +1330,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string webRootPath = _environment.WebRootPath;
             if (string.IsNullOrEmpty(webRootPath))
             {
-                webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
+                Path.Combine(_environment.ContentRootPath, FILE_STORAGE.WWWROOT);
             }
 
             // Get full file path
@@ -1419,23 +1435,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponseDto<int>.ErrorResponse(ResponseMessages.Codes.GOAL_NOT_FOUND);
                 }
 
-                if (dto.ApprovalType == "completion")
+                if (dto.ApprovalType == APPROVAL_TYPE.COMPLETION)
                 {
-                    if (requesterRole == "Leadership" && (goal.GoalType?.ToLower() == "org"))
+                    if (
+                        requesterRole == USER_ROLE.LEADERSHIP
+                        && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
+                    )
                     {
                         var autoApproval = new GoalApproval
                         {
                             GoalId = goalId,
-                            ApprovalType = "completion",
+                            ApprovalType = APPROVAL_TYPE.COMPLETION,
                             RequestedBy = requesterEmployeeMasterId,
                             RequestedOn = DateTime.UtcNow,
                             ApprovedBy = requesterEmployeeMasterId,
-                            ApprovalStatus = "approved",
+                            ApprovalStatus = APPROVAL_STATUS.APPROVED,
                             ApprovedOn = DateTime.UtcNow,
                         };
 
                         await _repo.AddApprovalAsync(autoApproval);
-                        goal.Goalstatus = "completed";
+                        goal.Goalstatus = GOAL_STATUS.COMPLETED;
                         await _repo.SaveChangesAsync();
 
                         return ApiResponseDto<int>.SuccessResponse(
@@ -1444,21 +1463,24 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         );
                     }
 
-                    if (requesterRole == "Leadership" && (goal.GoalType?.ToLower() == "self"))
+                    if (
+                        requesterRole == USER_ROLE.LEADERSHIP
+                        && (goal.GoalType?.ToLower() == GOAL_TYPE.SELF)
+                    )
                     {
                         var autoApproval = new GoalApproval
                         {
                             GoalId = goalId,
-                            ApprovalType = "completion",
+                            ApprovalType = APPROVAL_TYPE.COMPLETION,
                             RequestedBy = requesterEmployeeMasterId,
                             RequestedOn = DateTime.UtcNow,
                             ApprovedBy = requesterEmployeeMasterId,
-                            ApprovalStatus = "approved",
+                            ApprovalStatus = APPROVAL_STATUS.APPROVED,
                             ApprovedOn = DateTime.UtcNow,
                         };
 
                         await _repo.AddApprovalAsync(autoApproval);
-                        goal.Goalstatus = "completed";
+                        goal.Goalstatus = GOAL_STATUS.COMPLETED;
                         await _repo.SaveChangesAsync();
 
                         return ApiResponseDto<int>.SuccessResponse(
@@ -1481,11 +1503,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var approval = new GoalApproval
                     {
                         GoalId = goalId,
-                        ApprovalType = "completion",
+                        ApprovalType = APPROVAL_TYPE.COMPLETION,
+
                         RequestedBy = requesterEmployeeMasterId,
                         RequestedOn = DateTime.UtcNow,
                         ApprovedBy = managerId.Value,
-                        ApprovalStatus = "pending",
+                        ApprovalStatus = APPROVAL_STATUS.PENDING,
                     };
 
                     await _repo.AddApprovalAsync(approval);
@@ -1497,7 +1520,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                if (dto.ApprovalType == "closure")
+                if (dto.ApprovalType == APPROVAL_TYPE.CLOSURE)
                 {
                     if (goal.CreatedBy != requesterEmployeeMasterId)
                     {
@@ -1508,9 +1531,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }
 
                     if (
-                        new[] { "closed", "completed", "cancelled" }.Contains(
-                            goal.Goalstatus?.ToLower() ?? ""
-                        )
+                        new[]
+                        {
+                            GOAL_STATUS.CLOSED,
+                            GOAL_STATUS.COMPLETED,
+                            GOAL_STATUS.CANCELLED,
+                        }.Contains(goal.Goalstatus?.ToLower() ?? "")
                     )
                     {
                         return ApiResponseDto<int>.ErrorResponse(
@@ -1519,21 +1545,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         );
                     }
 
-                    if (requesterRole == "Leadership" && (goal.GoalType?.ToLower() == "org"))
+                    if (
+                        requesterRole == USER_ROLE.LEADERSHIP
+                        && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
+                    )
                     {
                         var autoApproval = new GoalApproval
                         {
                             GoalId = goalId,
-                            ApprovalType = "closure",
+                            ApprovalType = APPROVAL_TYPE.COMPLETION,
                             RequestedBy = requesterEmployeeMasterId,
                             RequestedOn = DateTime.UtcNow,
                             ApprovedBy = requesterEmployeeMasterId,
-                            ApprovalStatus = "approved",
+                            ApprovalStatus = APPROVAL_STATUS.APPROVED,
                             ApprovedOn = DateTime.UtcNow,
                         };
 
                         await _repo.AddApprovalAsync(autoApproval);
-                        goal.Goalstatus = "closed";
+                        goal.Goalstatus = GOAL_STATUS.CLOSED;
+
                         await _repo.SaveChangesAsync();
 
                         return ApiResponseDto<int>.SuccessResponse(
@@ -1556,11 +1586,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var approval = new GoalApproval
                     {
                         GoalId = goalId,
-                        ApprovalType = "closure",
+                        ApprovalType = APPROVAL_TYPE.CLOSURE,
                         RequestedBy = requesterEmployeeMasterId,
                         RequestedOn = DateTime.UtcNow,
                         ApprovedBy = managerId.Value,
-                        ApprovalStatus = "pending",
+                        ApprovalStatus = APPROVAL_STATUS.PENDING,
                     };
 
                     await _repo.AddApprovalAsync(approval);
@@ -1572,7 +1602,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                if (dto.ApprovalType == "reopening")
+                if (dto.ApprovalType == APPROVAL_TYPE.REOPENING)
                 {
                     if (!goal.Goalendat.HasValue || goal.Goalendat.Value >= DateTime.UtcNow)
                     {
@@ -1607,11 +1637,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var approval = new GoalApproval
                     {
                         GoalId = goalId,
-                        ApprovalType = "reopening",
+                        ApprovalType = APPROVAL_TYPE.REOPENING,
                         RequestedBy = requesterEmployeeMasterId,
                         RequestedOn = DateTime.UtcNow,
                         ApprovedBy = managerId.Value,
-                        ApprovalStatus = "pending",
+                        ApprovalStatus = APPROVAL_STATUS.PENDING,
                     };
 
                     await _repo.AddApprovalAsync(approval);
@@ -1623,7 +1653,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                if (dto.ApprovalType == "reactivation")
+                if (dto.ApprovalType == APPROVAL_TYPE.REACTIVATION)
                 {
                     if (goal.CreatedBy != requesterEmployeeMasterId)
                     {
@@ -1633,7 +1663,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         );
                     }
 
-                    if (!new[] { "closed", "completed" }.Contains(goal.Goalstatus?.ToLower() ?? ""))
+                    if (
+                        !new[] { GOAL_STATUS.CLOSED, GOAL_STATUS.COMPLETED }.Contains(
+                            goal.Goalstatus?.ToLower() ?? ""
+                        )
+                    )
                     {
                         return ApiResponseDto<int>.ErrorResponse(
                             ResponseMessages.Codes.GOAL_INVALID_STATUS,
@@ -1641,21 +1675,25 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         );
                     }
 
-                    if (requesterRole == "Leadership" && (goal.GoalType?.ToLower() == "org"))
+                    if (
+                        requesterRole == USER_ROLE.LEADERSHIP
+                        && (goal.GoalType?.ToLower() == GOAL_TYPE.ORG)
+                    )
                     {
                         var autoApproval = new GoalApproval
                         {
                             GoalId = goalId,
-                            ApprovalType = "reactivation",
+                            ApprovalType = APPROVAL_TYPE.REACTIVATION,
+
                             RequestedBy = requesterEmployeeMasterId,
                             RequestedOn = DateTime.UtcNow,
                             ApprovedBy = requesterEmployeeMasterId,
-                            ApprovalStatus = "approved",
+                            ApprovalStatus = APPROVAL_STATUS.APPROVED,
                             ApprovedOn = DateTime.UtcNow,
                         };
 
                         await _repo.AddApprovalAsync(autoApproval);
-                        goal.Goalstatus = "reopened";
+                        goal.Goalstatus = GOAL_STATUS.REOPENED;
                         await _repo.SaveChangesAsync();
 
                         return ApiResponseDto<int>.SuccessResponse(
@@ -1678,11 +1716,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var approval = new GoalApproval
                     {
                         GoalId = goalId,
-                        ApprovalType = "reactivation",
+                        ApprovalType = APPROVAL_TYPE.REACTIVATION,
                         RequestedBy = requesterEmployeeMasterId,
                         RequestedOn = DateTime.UtcNow,
                         ApprovedBy = managerId.Value,
-                        ApprovalStatus = "pending",
+                        ApprovalStatus = APPROVAL_STATUS.PENDING,
                     };
 
                     await _repo.AddApprovalAsync(approval);
@@ -1720,7 +1758,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     RequestedBy = requesterEmployeeMasterId,
                     RequestedOn = DateTime.UtcNow,
                     ApprovedBy = approverId.Value,
-                    ApprovalStatus = "pending",
+                    ApprovalStatus = APPROVAL_STATUS.PENDING,
                 };
 
                 await _repo.AddApprovalAsync(standardApproval);
@@ -1772,7 +1810,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                if (approval.ApprovalStatus != "pending")
+                if (approval.ApprovalStatus != APPROVAL_STATUS.PENDING)
                 {
                     return ApiResponseDto.ErrorResponse(
                         ResponseMessages.Codes.APPROVAL_ALREADY_DECIDED,
@@ -1780,7 +1818,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                 }
 
-                if (dto.Decision != "approved" && dto.Decision != "rejected")
+                if (
+                    dto.Decision != APPROVAL_STATUS.APPROVED
+                    && dto.Decision != APPROVAL_STATUS.REJECTED
+                )
                 {
                     return ApiResponseDto.ErrorResponse(
                         ResponseMessages.Codes.APPROVAL_INVALID_DECISION,
@@ -1793,48 +1834,51 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await _repo.UpdateApprovalAsync(approval);
 
                 if (
-                    approval.ApprovalType == "completion"
-                    || approval.ApprovalType == "task_acknowledgment"
+                    approval.ApprovalType == APPROVAL_TYPE.COMPLETION
+                    || approval.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
                 )
                 {
-                    if (dto.Decision == "rejected")
+                    if (dto.Decision == APPROVAL_STATUS.REJECTED)
                     {
                         await _repo.UnmarkProofAttachmentsAsync(approvalId);
                     }
                 }
 
-                if (dto.Decision == "approved")
+                if (dto.Decision == APPROVAL_STATUS.APPROVED)
                 {
                     switch (approval.ApprovalType)
                     {
-                        case "creation":
-                        case "selfgoalactivation":
-                            goal.Goalstatus = "open";
+                        case APPROVAL_TYPE.CREATION:
+                        case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
+
+                            goal.Goalstatus = GOAL_STATUS.OPEN;
+
                             await _repo.UpdateGoalAsync(goal);
                             break;
 
-                        case "delegation":
-                            goal.Goalstatus = "open";
+                        case APPROVAL_TYPE.DELEGATION:
+
+                            goal.Goalstatus = GOAL_STATUS.OPEN;
                             await _repo.UpdateGoalAsync(goal);
                             break;
 
-                        case "completion":
+                        case APPROVAL_TYPE.COMPLETION:
                             var requesterRole = approval.RequestedBy.HasValue
                                 ? await _repo.GetUserRoleAsync(approval.RequestedBy.Value)
                                 : null;
 
                             bool shouldCompleteGoal = false;
 
-                            if (goal.GoalType == "self")
+                            if (goal.GoalType == GOAL_TYPE.SELF)
                             {
                                 shouldCompleteGoal = true;
                             }
-                            else if (goal.GoalType == "team")
+                            else if (goal.GoalType == GOAL_TYPE.TEAM)
                             {
                                 shouldCompleteGoal =
-                                    requesterRole == "Manager"
-                                    || requesterRole == "Department Head"
-                                    || requesterRole == "Leadership";
+                                    requesterRole == USER_ROLE.MANAGER
+                                    || requesterRole == USER_ROLE.DEPARTMENT_HEAD
+                                    || requesterRole == USER_ROLE.LEADERSHIP;
 
                                 if (shouldCompleteGoal)
                                 {
@@ -1850,19 +1894,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                     }
                                 }
                             }
-                            else if (goal.GoalType == "org")
+                            else if (goal.GoalType == GOAL_TYPE.ORG)
                             {
-                                shouldCompleteGoal = requesterRole == "Leadership";
+                                shouldCompleteGoal = requesterRole == USER_ROLE.LEADERSHIP;
                             }
 
                             if (shouldCompleteGoal)
                             {
-                                goal.Goalstatus = "completed";
+                                goal.Goalstatus = GOAL_STATUS.COMPLETED;
+
                                 await _repo.UpdateGoalAsync(goal);
                             }
                             break;
 
-                        case "task_acknowledgment":
+                        case APPROVAL_TYPE.TASK_ACKNOWLEDGMENT:
+
                             if (approval.RequestedBy.HasValue)
                             {
                                 var assignment = await _repo.GetGoalAssignmentAsync(
@@ -1887,7 +1933,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             }
                             break;
 
-                        case "reopening":
+                        case APPROVAL_TYPE.REOPENING:
+
                             if (!dto.NewDeadline.HasValue)
                             {
                                 return ApiResponseDto.ErrorResponse(
@@ -1910,21 +1957,24 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                             }
 
                             goal.Goalendat = dto.NewDeadline.Value;
-                            goal.Goalstatus = "reopened";
+                            goal.Goalstatus = GOAL_STATUS.REOPENED;
+
                             goal.ReopenedBy = approval.RequestedBy;
                             goal.ReopenedOn = DateTime.UtcNow;
                             await _repo.UpdateGoalAsync(goal);
                             break;
 
-                        case "closure":
-                            goal.Goalstatus = "closed";
+                        case APPROVAL_TYPE.CLOSURE:
+
+                            goal.Goalstatus = GOAL_STATUS.CLOSED;
+
                             goal.ClosedBy = approverEmployeeMasterId;
                             goal.ClosedOn = DateTime.UtcNow;
                             await _repo.UpdateGoalAsync(goal);
                             break;
 
-                        case "reactivation":
-                            goal.Goalstatus = "open";
+                        case APPROVAL_TYPE.REACTIVATION:
+                            goal.Goalstatus = GOAL_STATUS.OPEN;
                             await _repo.UpdateGoalAsync(goal);
                             break;
 
@@ -1939,33 +1989,42 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     switch (approval.ApprovalType)
                     {
-                        case "creation":
-                        case "selfgoalactivation":
-                            goal.Goalstatus = "closed";
+                        case APPROVAL_TYPE.CREATION:
+                        case APPROVAL_TYPE.SELF_GOAL_ACTIVATION:
+
+                            goal.Goalstatus = GOAL_STATUS.CLOSED;
                             await _repo.UpdateGoalAsync(goal);
                             break;
 
-                        case "delegation":
+                        case APPROVAL_TYPE.DELEGATION:
                             break;
 
-                        case "completion":
-                        case "task_acknowledgment":
-                            if (!(goal.Goalstatus == "inprogress" || goal.Goalstatus == "open"))
+                        case APPROVAL_TYPE.COMPLETION:
+                        case APPROVAL_TYPE.TASK_ACKNOWLEDGMENT:
+
+                            if (
+                                !(
+                                    goal.Goalstatus == GOAL_STATUS.IN_PROGRESS
+                                    || goal.Goalstatus == GOAL_STATUS.OPEN
+                                )
+                            )
                             {
-                                goal.Goalstatus = "inprogress";
+                                goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                                 await _repo.UpdateGoalAsync(goal);
                             }
                             break;
 
-                        case "reopening":
+                        case APPROVAL_TYPE.REOPENING:
+
                             goal.ReopenUntil = null;
                             await _repo.UpdateGoalAsync(goal);
                             break;
 
-                        case "closure":
+                        case APPROVAL_TYPE.CLOSURE:
                             break;
 
-                        case "reactivation":
+                        case APPROVAL_TYPE.REACTIVATION:
+
                             break;
                     }
                 }
@@ -2015,7 +2074,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
 
                 // Can't close already completed/closed goals
-                if (new[] { "completed", "closed", "expired" }.Contains(goal.Goalstatus?.ToLower()))
+                if (
+                    new[]
+                    {
+                        GOAL_STATUS.COMPLETED,
+                        GOAL_STATUS.CLOSED,
+                        GOAL_STATUS.EXPIRED,
+                    }.Contains(goal.Goalstatus?.ToLower())
+                )
                     return ApiResponseDto.ErrorResponse(
                         ResponseMessages.Codes.GOAL_INVALID_STATUS,
                         "Cannot request closure for a completed or closed goal"
@@ -2024,7 +2090,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 // Check for existing pending closure request
                 var existingPending = await _repo.GetPendingApprovalByGoalAndTypeAsync(
                     goalId,
-                    "closure"
+                    APPROVAL_TYPE.CLOSURE
                 );
                 if (existingPending != null)
                     return ApiResponseDto.ErrorResponse(
@@ -2046,10 +2112,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var approval = new GoalApproval
                 {
                     GoalId = goalId,
-                    ApprovalType = "closure",
+                    ApprovalType = APPROVAL_TYPE.CLOSURE,
                     RequestedBy = currentUserEmployeeMasterId,
                     RequestedOn = DateTime.UtcNow,
-                    ApprovalStatus = "pending",
+                    ApprovalStatus = APPROVAL_STATUS.PENDING,
                     ApprovedBy = managerId,
                 };
 
@@ -2120,10 +2186,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var approval = new GoalApproval
                 {
                     GoalId = goalId,
-                    ApprovalType = "reactivation",
+                    ApprovalType = APPROVAL_TYPE.REACTIVATION,
                     RequestedBy = currentUserEmployeeMasterId,
                     RequestedOn = DateTime.UtcNow,
-                    ApprovalStatus = "pending",
+                    ApprovalStatus = APPROVAL_STATUS.PENDING,
                     ApprovedBy = managerId,
                 };
 
@@ -2172,7 +2238,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 // Get PROOF attachments specifically for THIS approval
                 List<GoalAttachmentDto>? proofAttachments = null;
-                if (a.ApprovalType == "completion" || a.ApprovalType == "task_acknowledgment")
+                if (
+                    a.ApprovalType == APPROVAL_TYPE.COMPLETION
+                    || a.ApprovalType == APPROVAL_TYPE.TASK_ACKNOWLEDGMENT
+                )
                 {
                     proofAttachments = allAttachments
                         ?.Where(att =>
@@ -2191,7 +2260,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         RequestedByEmployeeMasterId = a.RequestedBy,
                         RequestedByName = requesterName,
                         RequestedOn = a.RequestedOn,
-                        ApprovalStatus = a.ApprovalStatus ?? "pending",
+                        ApprovalStatus = a.ApprovalStatus ?? APPROVAL_STATUS.PENDING,
                         AllAttachments = allAttachments,
                         ProofAttachments = proofAttachments,
                         ReopenUntil = a.Goal?.ReopenUntil,
@@ -2238,7 +2307,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         break;
                     case "reviewing":
                         baseQuery = baseQuery.Where(ga =>
-                            ga.ApprovalStatus == "pending"
+                            ga.ApprovalStatus == APPROVAL_STATUS.PENDING
                             && ga.ApprovedBy == userId
                             && ga.RequestedBy != userId
                         );
@@ -2320,12 +2389,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
             var myPending = await _repo.CountAsync(
-                baseQuery.Where(ga => ga.ApprovalStatus == "pending" && ga.RequestedBy == userId)
+                baseQuery.Where(ga =>
+                    ga.ApprovalStatus == APPROVAL_STATUS.PENDING && ga.RequestedBy == userId
+                )
             );
 
             var toReview = await _repo.CountAsync(
                 baseQuery.Where(ga =>
-                    ga.ApprovalStatus == "pending"
+                    ga.ApprovalStatus == APPROVAL_STATUS.PENDING
                     && ga.ApprovedBy == userId
                     && ga.RequestedBy != userId
                 )
@@ -2336,7 +2407,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             );
 
             var history = await _repo.CountAsync(
-                baseQuery.Where(ga => ga.ApprovalStatus != "pending")
+                baseQuery.Where(ga => ga.ApprovalStatus != APPROVAL_STATUS.PENDING)
             );
 
             var total = await _repo.CountAsync(baseQuery);
@@ -2358,53 +2429,51 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         )
         {
             if (approval.RequestedBy == userId)
-                return "Requester";
+                return APPROVAL_USER_ROLE.REQUESTER;
 
             if (approval.ApprovedBy == userId)
-                return "Approver";
+                return APPROVAL_USER_ROLE.APPROVER;
 
             if (approval.Goal?.CreatedBy == userId)
-                return "GoalCreator";
+                return APPROVAL_USER_ROLE.GOAL_CREATOR;
 
             if (approval.Goal?.GoalAssignments?.Any(ga => ga.AssignedTo == userId) == true)
-                return "GoalAssignee";
+                return APPROVAL_USER_ROLE.GOAL_ASSIGNEE;
 
             if (
-                approval.ApprovalStatus == "pending"
+                approval.ApprovalStatus == APPROVAL_STATUS.PENDING
                 && CanUserApproveTypeInMemory(approval.ApprovalType, userRole)
             )
-                return "PotentialApprover";
+                return APPROVAL_USER_ROLE.POTENTIAL_APPROVER;
 
-            return "Observer";
+            return APPROVAL_USER_ROLE.OBSERVER;
         }
 
         private bool CanUserApproveTypeInMemory(string approvalType, string userRole)
         {
             return approvalType switch
             {
-                "creation" or "selfgoalactivation" => new[]
+                APPROVAL_TYPE.CREATION or APPROVAL_TYPE.SELF_GOAL_ACTIVATION =>
+                    USER_ROLE.APPROVAL_AUTHORITIES.Contains(userRole),
+
+                APPROVAL_TYPE.COMPLETION or APPROVAL_TYPE.TASK_ACKNOWLEDGMENT =>
+                    USER_ROLE.APPROVAL_AUTHORITIES.Contains(userRole),
+
+                APPROVAL_TYPE.REOPENING => USER_ROLE.APPROVAL_AUTHORITIES.Contains(userRole),
+
+                APPROVAL_TYPE.DELEGATION => new[]
                 {
-                    "Manager",
-                    "Department Head",
-                    "Leadership",
+                    USER_ROLE.DEPARTMENT_HEAD,
+                    USER_ROLE.LEADERSHIP,
                 }.Contains(userRole),
-                "completion" or "task_acknowledgment" => new[]
-                {
-                    "Manager",
-                    "Department Head",
-                    "Leadership",
-                }.Contains(userRole),
-                "reopening" => new[] { "Manager", "Department Head", "Leadership" }.Contains(
-                    userRole
-                ),
-                "delegation" => new[] { "Department Head", "Leadership" }.Contains(userRole),
+
                 _ => false,
             };
         }
 
         private bool CanUserMakeDecision(GoalApproval approval, int userId, string userRole)
         {
-            return approval.ApprovalStatus == "pending"
+            return approval.ApprovalStatus == APPROVAL_STATUS.PENDING
                 && approval.ApprovedBy == userId
                 && CanUserApproveTypeInMemory(approval.ApprovalType, userRole)
                 && approval.RequestedBy != userId;
@@ -2489,7 +2558,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 RequestedByEmployeeMasterId = approval.RequestedBy,
                 RequestedByName = requesterName,
                 RequestedOn = approval.RequestedOn,
-                ApprovalStatus = approval.ApprovalStatus ?? "pending",
+                ApprovalStatus = approval.ApprovalStatus ?? APPROVAL_STATUS.PENDING,
                 ReopenUntil = approval.Goal?.ReopenUntil,
 
                 // Approver information
@@ -2535,7 +2604,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 contexts.Add("You are assigned to this goal");
 
             if (
-                approval.ApprovalStatus == "pending"
+                approval.ApprovalStatus == APPROVAL_STATUS.PENDING
                 && CanUserApproveTypeInMemory(approval.ApprovalType, userRole)
                 && approval.RequestedBy != userId
             )
@@ -2589,9 +2658,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await _repo.SaveChangesAsync();
 
                 // Auto-transition from "open" to "inprogress" when user starts working
-                if (dto.IsCompleted && goal.Goalstatus == "open")
+                if (dto.IsCompleted && goal.Goalstatus == GOAL_STATUS.OPEN)
                 {
-                    goal.Goalstatus = "inprogress";
+                    goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                     await _repo.UpdateGoalAsync(goal);
 
                     Log.Information(
@@ -2614,12 +2683,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     var pendingApprovals = await _repo.GetPendingApprovalsForGoalAndUserAsync(
                         goalId,
                         currentUserEmployeeMasterId,
-                        new[] { "task_acknowledgment", "completion" }
+                        new[] { APPROVAL_TYPE.TASK_ACKNOWLEDGMENT, "completion" }
                     );
 
                     foreach (var approval in pendingApprovals)
                     {
-                        approval.ApprovalStatus = "rejected";
+                        approval.ApprovalStatus = APPROVAL_STATUS.REJECTED;
                     }
 
                     if (pendingApprovals.Any())
@@ -2634,7 +2703,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                 UpdatedBy = currentUserEmployeeMasterId,
                                 UpdatedOn = DateTime.UtcNow,
                                 ProgressPercent = percent,
-                                Source = "auto",
+                                Source = PROGRESS_SOURCE.AUTO,
                             }
                         );
                     }
@@ -2648,15 +2717,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         UpdatedBy = currentUserEmployeeMasterId,
                         UpdatedOn = DateTime.UtcNow,
                         ProgressPercent = percent,
-                        Source = "auto",
+                        Source = PROGRESS_SOURCE.AUTO,
                     }
                 );
 
                 // Keep status as "inprogress" even at 100%
                 // Status only changes to "completed" after approval
-                if (percent == 100 && goal.Goalstatus == "open")
+                if (percent == 100 && goal.Goalstatus == GOAL_STATUS.OPEN)
                 {
-                    goal.Goalstatus = "inprogress";
+                    goal.Goalstatus = GOAL_STATUS.IN_PROGRESS;
                     await _repo.UpdateGoalAsync(goal);
                 }
 
@@ -2669,7 +2738,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     IsCompleted = dto.IsCompleted,
                     NewProgress = percent,
                     UpdatedBy = currentUserEmployeeMasterId,
-                    StatusChanged = goal.Goalstatus == "inprogress" && dto.IsCompleted,
+                    StatusChanged = goal.Goalstatus == GOAL_STATUS.IN_PROGRESS && dto.IsCompleted,
                 };
 
                 return ApiResponseDto.SuccessResponse(
@@ -2703,7 +2772,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 var role = await _repo.GetUserRoleAsync(currentUserEmployeeMasterId);
-                if (!(role == "Manager" || role == "Department Head" || role == "Leadership"))
+                if (
+                    !(
+                        role == USER_ROLE.MANAGER
+                        || role == USER_ROLE.DEPARTMENT_HEAD
+                        || role == USER_ROLE.LEADERSHIP
+                    )
+                )
                 {
                     return ApiResponseDto.ErrorResponse(
                         ResponseMessages.Codes.PROGRESS_UPDATE_DENIED,
@@ -2748,7 +2823,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             var latestLog = await _repo.GetLatestProgressLogAsync(goalId);
 
-            if (latestLog != null && latestLog.Source == "manual")
+            if (latestLog != null && latestLog.Source == PROGRESS_SOURCE.MANUAL)
             {
                 return latestLog.ProgressPercent ?? 0;
             }
@@ -2769,7 +2844,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (goal == null)
                 return 0;
 
-            if (goal.GoalType != "team")
+            if (goal.GoalType != GOAL_TYPE.TEAM)
                 return await GetGoalProgressPercentAsync(goalId, managerEmployeeMasterId);
 
             var assignees = await _repo.GetAssigneesAsync(goalId);
@@ -2949,8 +3024,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 "employee" => (100, 0),
                 "manager" => (50, 50),
-                "Department Head" => (30, 70),
-                "Leadership" => (20, 80),
+                "departmenthead" => (30, 70),
+                "leadership" => (20, 80),
                 _ => (50, 50),
             };
         }
@@ -3105,18 +3180,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 1_000_000
             );
 
-            var pending = all.Where(g => g.Goalstatus == "pending").ToList();
+            var pending = all.Where(g => g.Goalstatus == GOAL_STATUS.PENDING).ToList();
             var ongoing = all.Where(g =>
-                    g.Goalstatus == "open"
-                    || g.Goalstatus == "inprogress"
-                    || g.Goalstatus == "reopened"
+                    g.Goalstatus == GOAL_STATUS.PENDING
+                    || g.Goalstatus == GOAL_STATUS.IN_PROGRESS
+                    || g.Goalstatus == GOAL_STATUS.REOPENED
                 )
                 .ToList();
             var overdue = all.Where(g =>
                     g.Goalendat.HasValue
                     && g.Goalendat.Value < DateTime.UtcNow
-                    && g.Goalstatus != "completed"
-                    && g.Goalstatus != "closed"
+                    && g.Goalstatus != GOAL_STATUS.COMPLETED
+                    && g.Goalstatus != GOAL_STATUS.CLOSED
                 )
                 .ToList();
 
@@ -3157,9 +3232,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var ongoing = goals
                 .Where(g =>
-                    g.Goalstatus == "open"
-                    || g.Goalstatus == "inprogress"
-                    || g.Goalstatus == "reopened"
+                    g.Goalstatus == GOAL_STATUS.OPEN
+                    || g.Goalstatus == GOAL_STATUS.IN_PROGRESS
+                    || g.Goalstatus == GOAL_STATUS.REOPENED
                 )
                 .ToList();
 
@@ -3172,7 +3247,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var isOverdue =
                     g.Goalendat.HasValue
                     && g.Goalendat.Value < DateTime.UtcNow
-                    && g.Goalstatus != "completed";
+                    && g.Goalstatus != GOAL_STATUS.COMPLETED;
 
                 string? projectName = null;
                 if (g.ProjectId.HasValue)
@@ -3195,8 +3270,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                                     ? g.GoalDescription.Substring(0, 80) + "..."
                                     : g.GoalDescription
                             ),
-                        GoalType = g.GoalType ?? "self",
-                        Status = g.Goalstatus ?? "pending",
+                        GoalType = g.GoalType ?? GOAL_TYPE.SELF,
+                        Status = g.Goalstatus ?? GOAL_STATUS.PENDING,
                         CreatedAt = g.Goalcreatedat,
                         EndAt = g.Goalendat,
                         ProgressPercent = latestProgress?.ProgressPercent ?? 0,
@@ -3212,7 +3287,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return result;
         }
 
-        // ==================== TIMELINE ====================
         public async Task<List<TimelineEventDto>> GetGoalTimelineAsync(
             int goalId,
             int currentUserEmployeeMasterId
@@ -3232,7 +3306,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             events.Add(
                 new TimelineEventDto
                 {
-                    Type = "creation",
+                    Type = TIMELINE_EVENT_TYPE.GOAL_CREATED,
                     Timestamp = goal.Goalcreatedat ?? DateTime.UtcNow,
                     Description = "Goal created",
                     UserId = goal.CreatedBy,
@@ -3250,7 +3324,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 events.Add(
                     new TimelineEventDto
                     {
-                        Type = "progress",
+                        Type = TIMELINE_EVENT_TYPE.PROGRESS,
                         Timestamp = p.UpdatedOn ?? DateTime.UtcNow,
                         Description = $"Progress updated to {p.ProgressPercent}%",
                         UserId = p.UpdatedBy,
@@ -3268,21 +3342,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 string requestDescription = a.ApprovalType switch
                 {
-                    "task_acknowledgment" => "Task acknowledgment requested",
-                    "completion" => "Completion approval requested",
-                    "creation" => "Creation approval requested",
-                    "delegation" => "Delegation approval requested",
-                    "selfgoalactivation" => "Self goal activation requested",
-                    "reopening" => "Reopen approval requested",
-                    "closure" => "Goal Closure requested",
-                    "reactivation" => "Goal Reactivation requested",
+                    APPROVAL_TYPE.TASK_ACKNOWLEDGMENT => "Task acknowledgment requested",
+                    APPROVAL_TYPE.COMPLETION => "Completion approval requested",
+                    APPROVAL_TYPE.CREATION => "Creation approval requested",
+                    APPROVAL_TYPE.DELEGATION => "Delegation approval requested",
+                    APPROVAL_TYPE.SELF_GOAL_ACTIVATION => "Self goal activation requested",
+                    APPROVAL_TYPE.REOPENING => "Reopen approval requested",
+                    APPROVAL_TYPE.CLOSURE => "Goal Closure requested",
+                    APPROVAL_TYPE.REACTIVATION => "Goal Reactivation requested",
                     _ => $"{a.ApprovalType} requested",
                 };
 
                 events.Add(
                     new TimelineEventDto
                     {
-                        Type = "approval",
+                        Type = TIMELINE_EVENT_TYPE.APPROVAL,
                         Timestamp = a.RequestedOn ?? DateTime.UtcNow,
                         Description = requestDescription,
                         UserId = a.RequestedBy,
@@ -3298,21 +3372,23 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     string decisionDescription = a.ApprovalType switch
                     {
-                        "task_acknowledgment" => $"Task acknowledgment {a.ApprovalStatus}",
-                        "completion" => $"Completion {a.ApprovalStatus}",
-                        "creation" => $"Creation {a.ApprovalStatus}",
-                        "delegation" => $"Delegation {a.ApprovalStatus}",
-                        "selfgoalactivation" => $"Self goal activation {a.ApprovalStatus}",
-                        "reopening" => $"Reopen request {a.ApprovalStatus}",
-                        "closure" => $"Closure request {a.ApprovalStatus}",
-                        "reactivation" => $"Reactivation request {a.ApprovalStatus}",
+                        APPROVAL_TYPE.TASK_ACKNOWLEDGMENT =>
+                            $"Task acknowledgment {a.ApprovalStatus}",
+                        APPROVAL_TYPE.COMPLETION => $"Completion {a.ApprovalStatus}",
+                        APPROVAL_TYPE.CREATION => $"Creation {a.ApprovalStatus}",
+                        APPROVAL_TYPE.DELEGATION => $"Delegation {a.ApprovalStatus}",
+                        APPROVAL_TYPE.SELF_GOAL_ACTIVATION =>
+                            $"Self goal activation {a.ApprovalStatus}",
+                        APPROVAL_TYPE.REOPENING => $"Reopen request {a.ApprovalStatus}",
+                        APPROVAL_TYPE.CLOSURE => $"Closure request {a.ApprovalStatus}",
+                        APPROVAL_TYPE.REACTIVATION => $"Reactivation request {a.ApprovalStatus}",
                         _ => $"{a.ApprovalType} {a.ApprovalStatus}",
                     };
 
                     events.Add(
                         new TimelineEventDto
                         {
-                            Type = "approval",
+                            Type = TIMELINE_EVENT_TYPE.APPROVAL,
                             Timestamp = a.ApprovedOn.Value,
                             Description = decisionDescription,
                             UserId = a.ApprovedBy,
@@ -3336,7 +3412,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 events.Add(
                     new TimelineEventDto
                     {
-                        Type = "comment",
+                        Type = TIMELINE_EVENT_TYPE.COMMENT,
                         Timestamp = c.CommentedOn ?? DateTime.UtcNow,
                         Description = "Comment added",
                         UserId = c.CommentedBy,
@@ -3355,7 +3431,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 events.Add(
                     new TimelineEventDto
                     {
-                        Type = "assignment",
+                        Type = TIMELINE_EVENT_TYPE.ASSIGNMENT,
                         Timestamp = a.AssignedOn ?? DateTime.UtcNow,
                         Description = $"Assigned to {await GetEmployeeNameAsync(a.AssignedTo)}",
                         UserId = a.AssignedBy,
@@ -3373,7 +3449,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 events.Add(
                     new TimelineEventDto
                     {
-                        Type = "attachment",
+                        Type = TIMELINE_EVENT_TYPE.ATTACHMENT,
                         Timestamp = att.AttachedOn ?? DateTime.UtcNow,
                         Description = $"Attachment added: {att.AttachmentTitle}",
                         UserId = att.AttachedBy,
@@ -3388,6 +3464,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return events.OrderByDescending(e => e.Timestamp).ToList();
         }
 
+        // ==================== TIMELINE ====================
+
         // ==================== PERMISSIONS & VALIDATION ====================
         public async Task<bool> CanMarkCompleteAsync(int goalId, int employeeMasterId)
         {
@@ -3399,7 +3477,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (!isParticipant)
                 return false;
 
-            if (goal.Goalstatus != "open" && goal.Goalstatus != "inprogress")
+            if (goal.Goalstatus != GOAL_STATUS.OPEN && goal.Goalstatus != GOAL_STATUS.IN_PROGRESS)
                 return false;
 
             var progress = await GetGoalProgressPercentAsync(goalId, employeeMasterId);
@@ -3409,7 +3487,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             if (
                 goal.Goalendat.HasValue
                 && goal.Goalendat.Value < DateTime.UtcNow
-                && goal.Goalstatus != "reopened"
+                && goal.Goalstatus != GOAL_STATUS.REOPENED
             )
             {
                 return false;
@@ -3428,11 +3506,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             var userRole = await _repo.GetUserRoleAsync(employeeMasterId);
 
             // Leadership can view ANY goal
-            if (userRole == "Leadership")
+            if (userRole == USER_ROLE.LEADERSHIP)
                 return true;
 
             // Org goals visible to everyone
-            if (goal.GoalType == "org")
+            if (goal.GoalType == GOAL_TYPE.ORG)
                 return true;
 
             // Creator can always view
@@ -3444,7 +3522,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return true;
 
             // Reporting managers can view their subordinates' self goals
-            if (goal.GoalType == "self" && goal.CreatedBy.HasValue)
+            if (goal.GoalType == GOAL_TYPE.SELF && goal.CreatedBy.HasValue)
             {
                 var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
                     goal.CreatedBy.Value
@@ -3456,7 +3534,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             // Dept Head can view team goals in their department
-            if (userRole == "Department Head" && goal.GoalType == "team")
+            if (userRole == USER_ROLE.DEPARTMENT_HEAD && goal.GoalType == GOAL_TYPE.TEAM)
             {
                 var deptHead = await _repo.GetEmployeeDetailsByMasterIdAsync(employeeMasterId);
                 if (deptHead != null)
@@ -3471,7 +3549,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
 
             // Managers can view team goals of their subordinates
-            if (goal.GoalType == "team" && goal.CreatedBy.HasValue)
+            if (goal.GoalType == GOAL_TYPE.TEAM && goal.CreatedBy.HasValue)
             {
                 var creatorManagerId = await _repo.GetReportingManagerEmployeeMasterIdAsync(
                     goal.CreatedBy.Value
@@ -3500,11 +3578,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 goalId,
                 currentUserEmployeeMasterId
             );
-            var isLeadership = currentUserRole == "Leadership";
+            var isLeadership = currentUserRole == USER_ROLE.LEADERSHIP; // CHANGED
 
             switch (goal.GoalType?.ToLower())
             {
-                case "self":
+                case GOAL_TYPE.SELF: // CHANGED from "self"
                     // Self goals: Only creator and their manager can comment
                     if (isCreator)
                         return true;
@@ -3515,17 +3593,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     );
                     return creatorManagerId == currentUserEmployeeMasterId;
 
-                case "team":
+                case GOAL_TYPE.TEAM: // CHANGED from "team"
                     // Team goals: Creator, assignees, and managers can comment
                     if (isCreator || isAssignee)
                         return true;
 
                     // Check if user is a manager/dept head/leadership
-                    if (
-                        new[] { "Manager", "Department Head", "Leadership" }.Contains(
-                            currentUserRole
-                        )
-                    )
+                    if (USER_ROLE.MANAGERIAL_ROLES.Contains(currentUserRole)) // CHANGED from new[] { "Manager", "Department Head", "Leadership" }.Contains(currentUserRole)
                     {
                         // Check if user is manager of any assignee
                         var assignees = await _repo.GetAssigneesAsync(goalId);
@@ -3544,7 +3618,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }
                     return false;
 
-                case "org":
+                case GOAL_TYPE.ORG: // CHANGED from "org"
                     // Org goals: Only creator and Leadership can comment
                     return isCreator || isLeadership;
 
