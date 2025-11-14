@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Toast } from "bootstrap";
+import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
 import AllocationsList from "../modals/AllocationsList";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import "../../../../styles/hr_operations/hr/allocationsList.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
+
 
 const DepartmentHeadBudgetView = () => {
   const [budgets, setBudgets] = useState([]);
@@ -13,6 +14,7 @@ const DepartmentHeadBudgetView = () => {
   const [selectedBudgetForAllocations, setSelectedBudgetForAllocations] =
     useState(null);
 
+
   // Get Department Head's department ID from localStorage
   const userDepartmentId = parseInt(localStorage.getItem("departmentId"));
   const userDepartmentName = localStorage.getItem("departmentName");
@@ -20,10 +22,12 @@ const DepartmentHeadBudgetView = () => {
     "lastName"
   )}`;
 
+
   useEffect(() => {
     console.log("Department Head logged in:");
     console.log("- Department ID:", userDepartmentId);
     console.log("- Department Name:", userDepartmentName);
+
 
     if (!userDepartmentId) {
       setError("Department information not found. Please log in again.");
@@ -31,8 +35,10 @@ const DepartmentHeadBudgetView = () => {
       return;
     }
 
+
     fetchBudgets();
   }, []);
+
 
   const fetchBudgets = async () => {
     setLoading(true);
@@ -42,9 +48,11 @@ const DepartmentHeadBudgetView = () => {
       const response = await budgetAllocationService.getAllDepartmentBudgets();
       console.log("All budgets:", response.data);
 
+
       // Filter to show only Department Head's department
       const departmentBudgets =
         response.data?.filter((b) => b.departmentId === userDepartmentId) || [];
+
 
       console.log(
         "Filtered budgets for department",
@@ -53,6 +61,7 @@ const DepartmentHeadBudgetView = () => {
         departmentBudgets
       );
       setBudgets(departmentBudgets);
+
 
       if (departmentBudgets.length === 0) {
         setError(
@@ -68,11 +77,14 @@ const DepartmentHeadBudgetView = () => {
     }
   };
 
+
   const handleShowAllocations = async (budget) => {
     console.log("Viewing allocations for budget:", budget.budgetId);
 
+
     try {
       setLoading(true);
+
 
       //  FETCH ALLOCATIONS FROM BACKEND
       console.log("Fetching allocations from backend...");
@@ -81,7 +93,9 @@ const DepartmentHeadBudgetView = () => {
           budget.budgetId
         );
 
+
       console.log("Backend response:", response);
+
 
       // Handle response structure - check both data and data.data
       let budgetAllocations = [];
@@ -93,12 +107,15 @@ const DepartmentHeadBudgetView = () => {
           : [];
       }
 
+
       console.log("Fetched allocations:", budgetAllocations);
+
 
       setSelectedBudgetForAllocations({
         ...budget,
         allocations: budgetAllocations,
       });
+
 
       setLoading(false);
     } catch (err) {
@@ -108,28 +125,36 @@ const DepartmentHeadBudgetView = () => {
     }
   };
 
+
   const handleBackToList = () => {
     console.log("Back to budget list");
     setSelectedBudgetForAllocations(null);
     fetchBudgets(); // Refresh data
   };
 
+
   const showToast = (title, message, type) => {
-    const toastElement = document.getElementById("budgetToast");
-    if (!toastElement) return;
-
-    const toastTitle = document.getElementById("budgetToastTitle");
-    const toastBody = document.getElementById("budgetToastBody");
-    const toastHeader = toastElement.querySelector(".toast-header");
-
-    if (toastTitle) toastTitle.textContent = title;
-    if (toastBody) toastBody.textContent = message;
-    if (toastHeader)
-      toastHeader.className = `toast-header bg-${type} text-white`;
-
-    const toast = new Toast(toastElement);
-    toast.show();
+    const fullMessage = `${title}: ${message}`;
+    
+    switch (type) {
+      case "success":
+        toast.success(fullMessage);
+        break;
+      case "danger":
+      case "error":
+        toast.error(fullMessage);
+        break;
+      case "warning":
+        toast.warning(fullMessage);
+        break;
+      case "info":
+        toast.info(fullMessage);
+        break;
+      default:
+        toast(fullMessage);
+    }
   };
+
 
   const getUtilizationColor = (percentage) => {
     if (!percentage) return "#cbd5e1";
@@ -138,6 +163,7 @@ const DepartmentHeadBudgetView = () => {
     if (percentage >= 50) return "#10b981";
     return "#3b82f6";
   };
+
 
   return (
     <div className="budget-root">
@@ -154,12 +180,14 @@ const DepartmentHeadBudgetView = () => {
         </>
       )}
 
+
       {error && (
         <div className="alert alert-danger budget-alert" role="alert">
           <i className="bi bi-exclamation-triangle-fill me-2"></i>
           {error}
         </div>
       )}
+
 
       {!selectedBudgetForAllocations ? (
         <>
@@ -232,24 +260,6 @@ const DepartmentHeadBudgetView = () => {
               </table>
             </div>
           )}
-
-          <div className="budget-toast-container">
-            <div id="budgetToast" className="toast" role="alert">
-              <div className="toast-header">
-                <strong className="me-auto" id="budgetToastTitle">
-                  Notification
-                </strong>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="toast"
-                ></button>
-              </div>
-              <div className="toast-body" id="budgetToastBody">
-                Toast message
-              </div>
-            </div>
-          </div>
         </>
       ) : (
         <AllocationsList
@@ -266,5 +276,6 @@ const DepartmentHeadBudgetView = () => {
     </div>
   );
 };
+
 
 export default DepartmentHeadBudgetView;

@@ -162,7 +162,7 @@ export default function ManagerReviewsList() {
   // ============================================================================
 
   const handleView = (id) => {
-    navigate(`/manager/view-review/${id}`);
+    navigate(`/manager/dashboard/feedback/review/`+id);
   };
 
   // ============================================================================

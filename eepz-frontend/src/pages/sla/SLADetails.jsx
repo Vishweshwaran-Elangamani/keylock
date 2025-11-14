@@ -4,8 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, FileText, Clock,
-  CheckCircle, AlertTriangle, RotateCcw, History, Loader
+  CheckCircle, AlertTriangle, RotateCcw, History, Loader, X
 } from 'lucide-react';
+import { toast } from 'sonner';
 import SLAHistoryTimeline from '../../components/sla/SLAHistoryTimeline';
 import ReopenSLAForm from '../../components/sla/ReopenSLAForm';
 import EscalationForm from '../../components/sla/EscalationForm';
@@ -22,6 +23,7 @@ const SLADetails = () => {
   const [activeTab, setActiveTab] = useState('details');
   const [showReopenForm, setShowReopenForm] = useState(false);
   const [showEscalationForm, setShowEscalationForm] = useState(false);
+  const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
   const [canReopen, setCanReopen] = useState(false);
   const [canEscalate, setCanEscalate] = useState(false);
   const [escalationBlockReason, setEscalationBlockReason] = useState(null);
@@ -34,7 +36,7 @@ const SLADetails = () => {
       const userData = JSON.parse(localStorage.getItem('user') || '{}');
       setUser(userData);
     } catch (err) {
-      console.error('❌ Error parsing user:', err);
+      console.error('Error parsing user:', err);
     }
     fetchSLADetails();
   }, [slaid]);
@@ -47,7 +49,7 @@ const SLADetails = () => {
     try {
       const userData = JSON.parse(localStorage.getItem('user') || '{}');
  
-      console.log(`🔍 Fetching SLA ${slaid}`);
+      console.log(`Fetching SLA ${slaid}`);
       const slaResponse = await slaService.getSLAById(parseInt(slaid));
      
       if (!slaResponse?.success || !slaResponse.data) {
@@ -58,19 +60,19 @@ const SLADetails = () => {
       }
  
       setSla(slaResponse.data);
-      console.log('✅ SLA loaded:', slaResponse.data);
+      console.log('SLA loaded:', slaResponse.data);
  
       // Fetch SLA history
       try {
         const historyResponse = await slaService.getSLAHistory(parseInt(slaid));
         if (historyResponse?.success && Array.isArray(historyResponse.data)) {
           setHistory(historyResponse.data);
-          console.log(`✅ ${historyResponse.data.length} history entries loaded`);
+          console.log(`${historyResponse.data.length} history entries loaded`);
         } else {
           setHistory([]);
         }
       } catch (err) {
-        console.warn('⚠️ Could not load history:', err.message);
+        console.warn('Could not load history:', err.message);
         setHistory([]);
       }
  
@@ -80,19 +82,19 @@ const SLADetails = () => {
         if (escalationsResponse?.success && Array.isArray(escalationsResponse.data)) {
           const escData = escalationsResponse.data;
           setEscalations(escData);
-          console.log(`✅ ${escData.length} escalations loaded`);
+          console.log(`${escData.length} escalations loaded`);
           updateEscalationStatus(slaResponse.data, escData, userData);
         } else {
           setEscalations([]);
           updateEscalationStatus(slaResponse.data, [], userData);
         }
       } catch (err) {
-        console.warn('⚠️ Could not load escalations:', err.message);
+        console.warn('Could not load escalations:', err.message);
         setEscalations([]);
         updateEscalationStatus(slaResponse.data, [], userData);
       }
     } catch (err) {
-      console.error('❌ Error fetching SLA details:', err);
+      console.error('Error fetching SLA details:', err);
       setError(err.message || 'Failed to fetch SLA details');
     } finally {
       setLoading(false);
@@ -121,18 +123,20 @@ const SLADetails = () => {
   // ========== ACTION HANDLERS ==========
   const handleEscalateClick = useCallback(() => {
     if (!canEscalate) {
-      alert(`❌ Cannot escalate: ${escalationBlockReason}`);
+      toast.error('Cannot escalate', {
+        description: escalationBlockReason || 'Escalation is not available',
+        duration: 4000,
+      });
       return;
     }
     setShowEscalationForm(true);
   }, [canEscalate, escalationBlockReason]);
  
   const handleCloseSLA = useCallback(async () => {
-    if (!window.confirm('Are you sure you want to close this SLA?')) return;
- 
     try {
       setRefreshing(true);
-      console.log(`✅ Closing SLA ${sla.slaid}`);
+      setShowCloseConfirmation(false);
+      console.log(`Closing SLA ${sla.slaid}`);
       const res = await slaService.closeSLA({
         slaid: sla.slaid,
         closedByEmployeeId: user.empId,
@@ -140,14 +144,23 @@ const SLADetails = () => {
       });
  
       if (res?.success) {
-        alert('✅ SLA closed successfully!');
+        toast.success('SLA closed successfully', {
+          description: 'The SLA has been marked as closed',
+          duration: 4000,
+        });
         await fetchSLADetails();
       } else {
-        alert('❌ ' + (res?.message || 'Failed to close SLA'));
+        toast.error('Failed to close SLA', {
+          description: res?.message || 'Unable to close the SLA',
+          duration: 5000,
+        });
       }
     } catch (err) {
-      console.error('❌ Error closing SLA:', err);
-      alert('Error: ' + err.message);
+      console.error('Error closing SLA:', err);
+      toast.error('Error closing SLA', {
+        description: err.message || 'An unexpected error occurred',
+        duration: 5000,
+      });
     } finally {
       setRefreshing(false);
     }
@@ -273,7 +286,7 @@ const SLADetails = () => {
  
           {sla.status !== 'Closed' && user?.roleName === 'Manager' && (
             <button
-              onClick={handleCloseSLA}
+              onClick={() => setShowCloseConfirmation(true)}
               disabled={refreshing}
               className="btn btn-success d-flex align-items-center gap-2"
               style={{
@@ -334,7 +347,7 @@ const SLADetails = () => {
                     </span>
                     {hasEscalations && (
                       <span
-                        className="badge bg-warning text-dark"
+                        className="badge bg-warning text-dark d-flex align-items-center gap-1"
                         style={{
                           padding: '0.375rem 0.75rem',
                           fontSize: '0.75rem',
@@ -342,7 +355,8 @@ const SLADetails = () => {
                           borderRadius: '6px'
                         }}
                       >
-                        ⚠️ Escalated
+                        <AlertTriangle size={12} />
+                        Escalated
                       </span>
                     )}
                   </div>
@@ -446,7 +460,7 @@ const SLADetails = () => {
                         {esc.escalationLevel}
                       </span>
                       <span
-                        className={`badge ${esc.escalationStatus === 'Resolved' ? 'bg-success' : 'bg-warning text-dark'}`}
+                        className={`badge d-flex align-items-center gap-1 ${esc.escalationStatus === 'Resolved' ? 'bg-success' : 'bg-warning text-dark'}`}
                         style={{
                           padding: '0.375rem 0.75rem',
                           fontSize: '0.75rem',
@@ -454,7 +468,17 @@ const SLADetails = () => {
                           borderRadius: '6px'
                         }}
                       >
-                        {esc.escalationStatus === 'Resolved' ? '✓ Resolved' : '⏳ Pending'}
+                        {esc.escalationStatus === 'Resolved' ? (
+                          <>
+                            <CheckCircle size={12} />
+                            Resolved
+                          </>
+                        ) : (
+                          <>
+                            <Clock size={12} />
+                            Pending
+                          </>
+                        )}
                       </span>
                     </div>
  
@@ -720,6 +744,69 @@ const SLADetails = () => {
           onSuccess={handleEscalationSuccess}
         />
       )}
+
+      {/* ========== CLOSE CONFIRMATION MODAL ========== */}
+      {showCloseConfirmation && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1055 }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content" style={{ borderRadius: '12px' }}>
+              <div className="modal-header border-0">
+                <h5 className="modal-title fw-bold d-flex align-items-center gap-2">
+                  <AlertTriangle size={20} color="#E2B93B" />
+                  Close SLA Confirmation
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowCloseConfirmation(false)}
+                  disabled={refreshing}
+                />
+              </div>
+              
+              <div className="modal-body">
+                <p className="mb-3">
+                  Are you sure you want to close this SLA?
+                </p>
+                <div className="alert alert-warning d-flex align-items-start gap-2" style={{ borderRadius: '8px' }}>
+                  <AlertTriangle size={18} className="flex-shrink-0 mt-1" />
+                  <small>
+                    This action will mark the SLA as closed. You can reopen it later if needed.
+                  </small>
+                </div>
+              </div>
+
+              <div className="modal-footer border-0">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setShowCloseConfirmation(false)}
+                  disabled={refreshing}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-success d-flex align-items-center gap-2"
+                  onClick={handleCloseSLA}
+                  disabled={refreshing}
+                >
+                  {refreshing ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm" />
+                      <span>Closing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle size={16} />
+                      <span>Close SLA</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
  
       <style>{`
         @keyframes spin {
@@ -732,5 +819,3 @@ const SLADetails = () => {
 };
  
 export default SLADetails;
- 
- 

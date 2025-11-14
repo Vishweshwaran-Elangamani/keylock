@@ -97,6 +97,7 @@ import EmployeeHome from "./pages/performancemanagement/employee/employeehome";
 import EmployeeAcknowledgment from "./pages/performancemanagement/employee/EmployeeAcknowledge";
 import ManagerAcknowledgment from "./pages/performancemanagement/manager/ManagerAcknowledgment";
 import MentorFeedbackDashboard from "./pages/FeedbackManagement/feedback/MentorFeedbackDashboard";
+import ViewManagerReview from "./pages/FeedbackManagement/manager/ViewManagerReview";
 const AppRoutes = () => {
   const { user } = useAuth();
   return (
@@ -1486,6 +1487,17 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/manager/dashboard/feedback/review/:id"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <ViewManagerReview />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
       //endregion LND EMPLOYEE
       //region PERFORMANCE Acknowledge
       <Route

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Toast } from "bootstrap";
+import { toast } from "sonner";
 import costMappingService from "../../../../services/hr_operations/hr/costMappingService";
 import CreateCostMappingModal from "../modals/CreateCostMappingModal";
 import EditCostMappingModal from "../modals/EditCostMappingModal";
 import "../../../../styles/hr_operations/hr/costMapping.css";
+
 
 const CostMapping = () => {
   const [costMappings, setCostMappings] = useState([]);
@@ -16,16 +17,20 @@ const CostMapping = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDepartment, setFilterDepartment] = useState("all");
 
+
   const userRole = localStorage.getItem("userRole");
   const isHR = userRole === "HR";
+
 
   useEffect(() => {
     fetchCostMappings();
   }, []);
 
+
   useEffect(() => {
     filterMappings();
   }, [costMappings, searchQuery, filterDepartment]);
+
 
   const fetchCostMappings = async () => {
     setLoading(true);
@@ -45,8 +50,10 @@ const CostMapping = () => {
     }
   };
 
+
   const filterMappings = () => {
     let filtered = costMappings;
+
 
     // Filter by department
     if (filterDepartment !== "all") {
@@ -54,6 +61,7 @@ const CostMapping = () => {
         (m) => m.departmentId === parseInt(filterDepartment)
       );
     }
+
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -66,23 +74,28 @@ const CostMapping = () => {
       );
     }
 
+
     setFilteredMappings(filtered);
   };
+
 
   const handleCreateClick = () => {
     setSelectedMapping(null);
     setShowCreateModal(true);
   };
 
+
   const handleEditClick = (mapping) => {
     setSelectedMapping(mapping);
     setShowEditModal(true);
   };
 
+
   const handleDeleteClick = async (mappingId) => {
     if (!window.confirm("Are you sure you want to delete this cost mapping?")) {
       return;
     }
+
 
     try {
       await costMappingService.deleteCostMapping(mappingId);
@@ -97,11 +110,13 @@ const CostMapping = () => {
     }
   };
 
+
   const handleMappingCreated = () => {
     setShowCreateModal(false);
     fetchCostMappings();
     showToast("Success", "Cost mapping created successfully", "success");
   };
+
 
   const handleMappingUpdated = () => {
     setShowEditModal(false);
@@ -110,21 +125,29 @@ const CostMapping = () => {
     showToast("Success", "Cost mapping updated successfully", "success");
   };
 
+
   const showToast = (title, message, type) => {
-    const toastElement = document.getElementById("costMappingToast");
-    if (!toastElement) return;
-
-    const toastTitle = document.getElementById("costMappingToastTitle");
-    const toastBody = document.getElementById("costMappingToastBody");
-    const toastHeader = toastElement.querySelector(".toast-header");
-
-    toastTitle.textContent = title;
-    toastBody.textContent = message;
-    toastHeader.className = `toast-header bg-${type} text-white`;
-
-    const toast = new Toast(toastElement);
-    toast.show();
+    const fullMessage = `${title}: ${message}`;
+    
+    switch (type) {
+      case "success":
+        toast.success(fullMessage);
+        break;
+      case "danger":
+      case "error":
+        toast.error(fullMessage);
+        break;
+      case "warning":
+        toast.warning(fullMessage);
+        break;
+      case "info":
+        toast.info(fullMessage);
+        break;
+      default:
+        toast(fullMessage);
+    }
   };
+
 
   const formatCurrency = (amount) => {
     if (!amount) return "₹0";
@@ -135,6 +158,7 @@ const CostMapping = () => {
     }).format(amount);
   };
 
+
   const getDepartments = () => {
     const departments = costMappings.map((m) => ({
       id: m.departmentId,
@@ -142,6 +166,7 @@ const CostMapping = () => {
     }));
     return [...new Map(departments.map((d) => [d.id, d])).values()];
   };
+
 
   return (
     <div className="cost-mapping-root">
@@ -151,6 +176,7 @@ const CostMapping = () => {
           {error}
         </div>
       )}
+
 
       <div className="cost-mapping-header">
         <div className="cost-mapping-header-left">
@@ -173,6 +199,7 @@ const CostMapping = () => {
         )}
       </div>
 
+
       <div className="cost-mapping-filters">
         <div className="cost-mapping-search-box">
           <i className="bi bi-search"></i>
@@ -193,6 +220,7 @@ const CostMapping = () => {
           )}
         </div>
 
+
         <select
           className="cost-mapping-filter-select"
           value={filterDepartment}
@@ -206,6 +234,7 @@ const CostMapping = () => {
           ))}
         </select>
       </div>
+
 
       <div className="cost-mapping-table-container">
         {loading ? (
@@ -300,6 +329,7 @@ const CostMapping = () => {
         )}
       </div>
 
+
       {showCreateModal && (
         <CreateCostMappingModal
           show={showCreateModal}
@@ -307,6 +337,7 @@ const CostMapping = () => {
           onMappingCreated={handleMappingCreated}
         />
       )}
+
 
       {showEditModal && selectedMapping && (
         <EditCostMappingModal
@@ -319,32 +350,9 @@ const CostMapping = () => {
           onMappingUpdated={handleMappingUpdated}
         />
       )}
-
-      <div className="cost-mapping-toast-container">
-        <div
-          id="costMappingToast"
-          className="toast"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
-          <div className="toast-header">
-            <strong className="me-auto" id="costMappingToastTitle">
-              Notification
-            </strong>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="toast"
-            ></button>
-          </div>
-          <div className="toast-body" id="costMappingToastBody">
-            Toast message here
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
+
 
 export default CostMapping;

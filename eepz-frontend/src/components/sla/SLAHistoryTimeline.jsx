@@ -1,8 +1,8 @@
 // src/components/sla/SLAHistoryTimeline.jsx
 import React from 'react';
-import { 
-  Clock, CheckCircle, AlertTriangle, RotateCcw, FileText, 
-  TrendingUp, XCircle, User, Calendar 
+import {
+  Clock, CheckCircle, AlertTriangle, RotateCcw, FileText,
+  TrendingUp, XCircle, User, Calendar
 } from 'lucide-react';
 
 const SLAHistoryTimeline = ({ history }) => {
@@ -51,7 +51,7 @@ const SLAHistoryTimeline = ({ history }) => {
 
   return (
     <div className="position-relative">
-      <div 
+      <div
         className="position-absolute"
         style={{
           left: '20px',
@@ -67,11 +67,11 @@ const SLAHistoryTimeline = ({ history }) => {
 
         return (
           <div key={item.historyId || index} className="d-flex gap-3 mb-4 position-relative">
-            <div 
+            <div
               className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 position-relative"
-              style={{ 
-                width: '40px', 
-                height: '40px', 
+              style={{
+                width: '40px',
+                height: '40px',
                 backgroundColor: bgColor,
                 border: `3px solid white`,
                 zIndex: 1
@@ -81,7 +81,7 @@ const SLAHistoryTimeline = ({ history }) => {
             </div>
 
             <div className="flex-grow-1">
-              <div 
+              <div
                 className="card border-0 shadow-sm"
                 style={{ borderRadius: '8px', borderLeft: `3px solid ${color}` }}
               >
@@ -116,7 +116,7 @@ const SLAHistoryTimeline = ({ history }) => {
                           <span className="text-muted">→</span>
                         )}
                         {item.changedTo && (
-                          <span 
+                          <span
                             className="badge small"
                             style={{ backgroundColor: bgColor, color, border: `1px solid ${color}30` }}
                           >

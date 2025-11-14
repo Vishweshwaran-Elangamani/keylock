@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   RefreshCw, Eye, Search, Filter, AlertTriangle, FileText, Send,
-  Download, Users, Clock, CheckCircle, TrendingUp
+  Download, Users, Clock, CheckCircle, TrendingUp, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import slaService, { escalationHelpers } from '../../services/sla/slaService';
 import ManagerEscalationModal from '../../components/sla/ManagerEscalationModal';
@@ -22,7 +22,7 @@ const ManagerSLADashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
  
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -48,7 +48,7 @@ const ManagerSLADashboard = () => {
  
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, complianceFilter, activeTab]);
+  }, [searchTerm, statusFilter, complianceFilter, activeTab, itemsPerPage]);
  
   const fetchDeptHeads = async (departmentId) => {
     try {
@@ -331,6 +331,63 @@ const ManagerSLADashboard = () => {
       default: return 'badge bg-secondary';
     }
   };
+
+  // Pagination handlers
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
  
   const stats = calculateStats();
   const totalPages = Math.ceil(filteredSlas.length / itemsPerPage);
@@ -349,14 +406,11 @@ const ManagerSLADashboard = () => {
   }
  
   return (
-    <div style={{ padding: '1.25rem 1.75rem', maxWidth: '100%', height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ padding: '1.25rem 1.75rem', maxWidth: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
      
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <h2 className="fw-bold mb-1" style={{ color: '#27235c', fontSize: '1.625rem', letterSpacing: '-0.025em' }}>
-            Manager Dashboard
-          </h2>
           <p className="mb-0" style={{ color: '#64748b', fontSize: '0.875rem' }}>
             Track and manage all assigned SLAs
           </p>
@@ -554,8 +608,8 @@ const ManagerSLADashboard = () => {
         </div>
       </div>
  
-      {/* DATA TABLE */}
-      <div style={{ flex: 1, overflow: 'auto' }}>
+      {/* DATA TABLE - FIXED (NO SCROLL) */}
+      <div style={{ flex: 1 }}>
         <div className="card border-0 shadow-sm" style={{ borderRadius: '10px' }}>
           <div className="table-responsive">
             <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.875rem' }}>
@@ -563,21 +617,21 @@ const ManagerSLADashboard = () => {
                 <tr>
                   {activeTab === 'escalations' ? (
                     <>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Employee</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Reason</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Level</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Status</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Submitted At</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', textAlign: 'center' }}>Actions</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Employee</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Reason</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Level</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Status</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Submitted At</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', textAlign: 'center', backgroundColor: '#f8fafc' }}>Actions</th>
                     </>
                   ) : (
                     <>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Employee</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>SLA's Department</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Deadline</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Status</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0' }}>Compliance</th>
-                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', textAlign: 'center' }}>Actions</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Employee</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>SLA's Department</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Deadline</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Status</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', backgroundColor: '#f8fafc' }}>Compliance</th>
+                      <th style={{ padding: '1rem', fontSize: '0.813rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '2px solid #e2e8f0', textAlign: 'center', backgroundColor: '#f8fafc' }}>Actions</th>
                     </>
                   )}
                 </tr>
@@ -708,6 +762,122 @@ const ManagerSLADashboard = () => {
               </tbody>
             </table>
           </div>
+
+          {/* PAGINATION */}
+          {filteredSlas.length > 0 && (
+            <div className="card-footer bg-white border-top" style={{ padding: '1rem 1.5rem' }}>
+              <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                {/* Left: Rows per page selector */}
+                <div className="d-flex align-items-center gap-2">
+                  <small className="text-muted" style={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                    Rows per page:
+                  </small>
+                  <select
+                    className="form-select form-select-sm"
+                    value={itemsPerPage}
+                    onChange={handleItemsPerPageChange}
+                    style={{
+                      width: '80px',
+                      borderRadius: '6px',
+                      borderColor: '#e2e8f0',
+                      fontSize: '0.875rem',
+                      padding: '0.25rem 0.5rem'
+                    }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                    <option value={20}>20</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+
+                {/* Center: Showing info */}
+                <div>
+                  <small className="text-muted" style={{ fontSize: '0.875rem' }}>
+                    Showing <strong>{startIndex + 1}</strong> to <strong>{Math.min(endIndex, filteredSlas.length)}</strong> of <strong>{filteredSlas.length}</strong> entries
+                  </small>
+                </div>
+
+                {/* Right: Pagination controls */}
+                {totalPages > 1 && (
+                  <nav aria-label="Page navigation">
+                    <ul className="pagination pagination-sm mb-0" style={{ gap: '4px' }}>
+                      {/* Previous button */}
+                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <button
+                          className="page-link d-flex align-items-center justify-content-center"
+                          onClick={handlePreviousPage}
+                          disabled={currentPage === 1}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            padding: 0,
+                            borderRadius: '6px',
+                            border: '1px solid #e2e8f0',
+                            color: currentPage === 1 ? '#cbd5e1' : '#0F62FE'
+                          }}
+                        >
+                          <ChevronLeft size={16} />
+                        </button>
+                      </li>
+
+                      {/* Page numbers */}
+                      {getPageNumbers().map((pageNum, index) => (
+                        pageNum === '...' ? (
+                          <li key={`ellipsis-${index}`} className="page-item disabled">
+                            <span className="page-link" style={{ border: 'none', background: 'transparent', color: '#64748b' }}>
+                              ...
+                            </span>
+                          </li>
+                        ) : (
+                          <li key={pageNum} className={`page-item ${currentPage === pageNum ? 'active' : ''}`}>
+                            <button
+                              className="page-link"
+                              onClick={() => handlePageChange(pageNum)}
+                              style={{
+                                width: '32px',
+                                height: '32px',
+                                padding: 0,
+                                borderRadius: '6px',
+                                border: '1px solid #e2e8f0',
+                                backgroundColor: currentPage === pageNum ? '#0F62FE' : 'transparent',
+                                color: currentPage === pageNum ? '#fff' : '#64748b',
+                                fontWeight: currentPage === pageNum ? 600 : 400,
+                                fontSize: '0.875rem'
+                              }}
+                            >
+                              {pageNum}
+                            </button>
+                          </li>
+                        )
+                      ))}
+
+                      {/* Next button */}
+                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                        <button
+                          className="page-link d-flex align-items-center justify-content-center"
+                          onClick={handleNextPage}
+                          disabled={currentPage === totalPages}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            padding: 0,
+                            borderRadius: '6px',
+                            border: '1px solid #e2e8f0',
+                            color: currentPage === totalPages ? '#cbd5e1' : '#0F62FE'
+                          }}
+                        >
+                          <ChevronRight size={16} />
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
  
@@ -740,5 +910,3 @@ const ManagerSLADashboard = () => {
 };
  
 export default ManagerSLADashboard;
- 
- 

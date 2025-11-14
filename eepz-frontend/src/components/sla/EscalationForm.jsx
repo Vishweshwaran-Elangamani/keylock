@@ -1,6 +1,7 @@
 // src/components/sla/EscalationForm.jsx
 import React, { useState } from 'react';
-import { X, Send, AlertCircle } from 'lucide-react';
+import { X, Send, AlertCircle, Info } from 'lucide-react';
+import { toast } from 'sonner';
 import slaService from '../../services/sla/slaService';
  
 const EscalationForm = ({ sla, onClose, onSuccess }) => {
@@ -32,22 +33,33 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
         slaid: sla.slaid,
         reason: formData.reason,
         description: formData.description,
-        escalationLevel: 'L1',  // ✅ Always L1
+        escalationLevel: 'L1',  // Always L1
         escalatedToEmployeeId: sla.assignedToEmployeeId,
         submittedByEmployeeId: user.empId
       };
  
-      console.log('🚀 Escalation:', escalationData);
+      console.log('Escalation Data:', escalationData);
       const response = await slaService.submitEscalation(escalationData);
      
       if (response.success) {
-        alert('✅ Escalation submitted successfully!');
+        toast.success('Escalation submitted successfully!', {
+          description: 'Your manager will review this escalation.',
+          duration: 4000,
+        });
         onSuccess();
         onClose();
       } else {
+        toast.error('Escalation Failed', {
+          description: response.message || 'Unable to submit escalation',
+          duration: 5000,
+        });
         setError(response.message);
       }
     } catch (err) {
+      toast.error('Error', {
+        description: err.message || 'Failed to submit escalation',
+        duration: 5000,
+      });
       setError(err.message || 'Failed to submit escalation');
     } finally {
       setLoading(false);
@@ -59,7 +71,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
     return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
  
-  // ✅ Check if form is valid
+  // Check if form is valid
   const isValid = formData.reason && formData.description.trim().length >= 10;
  
   return (
@@ -77,7 +89,7 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
           <div className="modal-header border-0 px-4 py-3" style={{ backgroundColor: '#FEF3C7' }}>
             <div className="d-flex align-items-center gap-2">
               <AlertCircle size={20} color="#E2B93B" />
-              <h6 className="mb-0 fw-bold">⚠️ Escalate to Manager?</h6>
+              <h6 className="mb-0 fw-bold">Escalate to Manager?</h6>
             </div>
             <button type="button" className="btn-close" onClick={onClose} disabled={loading} />
           </div>
@@ -141,8 +153,11 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
               </div>
  
               {/* Info */}
-              <div className="alert alert-info alert-sm py-2" style={{ fontSize: '0.75rem', borderRadius: '6px' }}>
-                <strong>ℹ️ Level 1 (L1)</strong> escalation to your manager for immediate review.
+              <div className="alert alert-info alert-sm py-2 d-flex align-items-center gap-2" style={{ fontSize: '0.75rem', borderRadius: '6px' }}>
+                <Info size={16} className="flex-shrink-0" />
+                <span>
+                  <strong>Level 1 (L1)</strong> escalation to your manager for immediate review.
+                </span>
               </div>
             </div>
  
@@ -184,5 +199,3 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
 };
  
 export default EscalationForm;
- 
- 

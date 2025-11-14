@@ -35,12 +35,12 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           });
  
           setEmployeeCount(uniqueEmployees.size);
-          console.log(`✅ ${uniqueEmployees.size} employees found`);
+          console.log(` ${uniqueEmployees.size} employees found`);
         } else {
           setError('Failed to load employee count');
         }
       } catch (err) {
-        console.error('❌ Error:', err);
+        console.error(' Error:', err);
         setError('Failed to load employee count');
       } finally {
         setFetchLoading(false);
@@ -108,7 +108,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
       let successCount = 0;
       let failedCount = 0;
  
-      console.log(`📤 Creating SLA for ${uniqueEmployees.size} employees...`);
+      console.log(` Creating SLA for ${uniqueEmployees.size} employees...`);
  
       // Create SLA for each employee
       for (const [empId, empData] of uniqueEmployees) {
@@ -127,7 +127,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
  
           if (response?.success) {
             successCount++;
-            console.log(`✅ SLA created for ${empData.name}`);
+            console.log(` SLA created for ${empData.name}`);
           } else {
             failedCount++;
           }
@@ -136,17 +136,17 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         }
       }
  
-      console.log(`📊 Summary: ${successCount} created, ${failedCount} failed`);
+      console.log(` Summary: ${successCount} created, ${failedCount} failed`);
  
       if (successCount > 0) {
-        alert(`✅ Success!\n\nCreated: ${successCount}\nFailed: ${failedCount}`);
+        
         onSuccess?.();
         onClose?.();
       } else {
-        setError('Failed to create SLAs');
+ 
       }
     } catch (err) {
-      console.error('❌ Error:', err);
+      console.error(' Error:', err);
       setError(err?.message || 'Error creating SLAs');
     } finally {
       setLoading(false);

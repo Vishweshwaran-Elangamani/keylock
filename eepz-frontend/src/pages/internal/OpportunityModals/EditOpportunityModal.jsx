@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
-import toastr from "toastr";
 import "../../../styles/internal/OpportunityModal.css";
-
+ 
 const EditOpportunityModal = ({
   show,
   onHide,
@@ -21,7 +21,7 @@ const EditOpportunityModal = ({
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
+ 
   useEffect(() => {
     if (opportunity) {
       setFormData({
@@ -37,7 +37,7 @@ const EditOpportunityModal = ({
       });
     }
   }, [opportunity]);
-
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -51,45 +51,45 @@ const EditOpportunityModal = ({
       }));
     }
   };
-
+ 
   const validateForm = () => {
     const newErrors = {};
-
+ 
     if (!formData.opportunityName.trim()) {
       newErrors.opportunityName = "Opportunity name is required";
     }
-
+ 
     if (!formData.departmentId) {
       newErrors.departmentId = "Department is required";
     }
-
+ 
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
     }
-
+ 
     if (!formData.requirements.trim()) {
       newErrors.requirements = "Requirements are required";
     }
-
+ 
     if (!formData.deadline) {
       newErrors.deadline = "Deadline is required";
     }
-
+ 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+ 
     if (!validateForm()) {
-      toastr.error("Please fix the form errors");
+      toast.error("Please fix the form errors");
       return;
     }
-
+ 
     try {
       setLoading(true);
-
+ 
       const payload = {
         opportunityName: formData.opportunityName.trim(),
         departmentId: parseInt(formData.departmentId),
@@ -99,29 +99,29 @@ const EditOpportunityModal = ({
         deadline: formData.deadline,
         status: formData.status,
       };
-
+ 
       const response = await internalOpportunityService.updateOpportunity(
         opportunity.opportunityId,
         payload
       );
-
+ 
       if (response.success) {
-        toastr.success("Opportunity updated successfully!");
+        toast.success("Opportunity updated successfully!");
         onOpportunityUpdated();
         onHide();
       } else {
-        toastr.error(response.message || "Failed to update opportunity");
+        toast.error(response.message || "Failed to update opportunity");
       }
     } catch (error) {
       console.error("Error:", error);
-      toastr.error(error.message || "Failed to update opportunity");
+      toast.error(error.message || "Failed to update opportunity");
     } finally {
       setLoading(false);
     }
   };
-
+ 
   if (!show) return null;
-
+ 
   return (
     <>
       <div className="modal-backdrop-custom"></div>
@@ -143,7 +143,7 @@ const EditOpportunityModal = ({
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
-
+ 
             <form onSubmit={handleSubmit}>
               <div className="modal-body-custom">
                 <div className="form-grid">
@@ -166,7 +166,7 @@ const EditOpportunityModal = ({
                       <div className="error-message">{errors.opportunityName}</div>
                     )}
                   </div>
-
+ 
                   <div className="form-group-custom">
                     <label className="form-label-custom">
                       Department <span className="required-mark">*</span>
@@ -190,7 +190,7 @@ const EditOpportunityModal = ({
                       <div className="error-message">{errors.departmentId}</div>
                     )}
                   </div>
-
+ 
                   <div className="form-group-custom">
                     <label className="form-label-custom">
                       Deadline <span className="required-mark">*</span>
@@ -208,7 +208,7 @@ const EditOpportunityModal = ({
                       <div className="error-message">{errors.deadline}</div>
                     )}
                   </div>
-
+ 
                   <div className="form-group-custom full-width">
                     <label className="form-label-custom">
                       Description <span className="required-mark">*</span>
@@ -228,7 +228,7 @@ const EditOpportunityModal = ({
                       <div className="error-message">{errors.description}</div>
                     )}
                   </div>
-
+ 
                   <div className="form-group-custom full-width">
                     <label className="form-label-custom">
                       Requirements <span className="required-mark">*</span>
@@ -248,7 +248,7 @@ const EditOpportunityModal = ({
                       <div className="error-message">{errors.requirements}</div>
                     )}
                   </div>
-
+ 
                   <div className="form-group-custom full-width">
                     <label className="form-label-custom">
                       Eligibility Criteria
@@ -263,7 +263,7 @@ const EditOpportunityModal = ({
                       maxLength={500}
                     />
                   </div>
-
+ 
                   <div className="form-group-custom">
                     <label className="form-label-custom">
                       Status <span className="required-mark">*</span>
@@ -281,7 +281,7 @@ const EditOpportunityModal = ({
                   </div>
                 </div>
               </div>
-
+ 
               <div className="modal-footer-custom">
                 <button
                   type="button"
@@ -313,5 +313,5 @@ const EditOpportunityModal = ({
     </>
   );
 };
-
+ 
 export default EditOpportunityModal;

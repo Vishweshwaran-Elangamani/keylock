@@ -6,9 +6,14 @@ import EmptyState from "../../../components/lnd/common/EmptyState";
 import BecomeSmeModal from "../../../components/lnd/modals/BecomeSmeModal";
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
+import {
+  APPROVAL_TYPE,
+  APPROVAL_STATUS,
+} from "../../../constants/lnd/lndConstants";
 
 const MySkills = () => {
   const [skills, setSkills] = useState([]);
+  const [approvals, setApprovals] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,7 +47,8 @@ const MySkills = () => {
 
   useEffect(() => {
     fetchSkills();
-  }, [currentPage, searchTerm, sortField, sortOrderAsc]);
+    fetchApprovalHistory();
+  }, [currentPage, searchTerm, sortField, sortOrderAsc, showSmeModal]);
 
   const fetchSkills = async () => {
     try {
@@ -71,6 +77,44 @@ const MySkills = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchApprovalHistory = async () => {
+    try {
+      setLoading(true);
+      const response = await lndService.getApprovalHistory(
+        1,
+        "",
+        APPROVAL_TYPE.SME_REGISTRATION,
+        APPROVAL_STATUS.PENDING,
+        "",
+        "",
+        "desc"
+      );
+      if (response.data.success) {
+        setApprovals(response.data.data.items);
+        setPagination({
+          totalCount: response.data.data.totalCount,
+          pageNumber: response.data.data.pageNumber,
+          pageSize: response.data.data.pageSize,
+          totalPages: response.data.data.totalPages,
+          hasPreviousPage: response.data.data.hasPreviousPage,
+          hasNextPage: response.data.data.hasNextPage,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch approval history:", error);
+      toast.error("Failed to load approval history");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const hasPendingSmeRequest = (skillId) => {
+    return approvals.some(
+      (approval) =>
+        approval.skillId === skillId && approval.status === "PENDING"
+    );
   };
 
   const handleSearchChange = (e) => {
@@ -275,7 +319,7 @@ const MySkills = () => {
             <div
               style={{
                 background: "#fff",
-                border: "1px solid #e5e7eb",
+                border: "2px solid #abb4c5ff",
                 borderRadius: "12px",
                 overflow: "hidden",
               }}
@@ -287,7 +331,7 @@ const MySkills = () => {
                   gridTemplateColumns: "2fr 1.5fr 1fr 1fr 1fr",
                   padding: "1rem 1.5rem",
                   background: "#f9fafb",
-                  borderBottom: "1px solid #e5e7eb",
+                  borderBottom: "2px solid #abb4c5ff",
                   fontWeight: "600",
                   fontSize: "0.875rem",
                   color: "#374151",
@@ -482,38 +526,66 @@ const MySkills = () => {
                     }}
                   >
                     {skill.canBecomeSme && !skill.isSme ? (
-                      <button
-                        onClick={() => handleBecomeSme(skill)}
-                        style={{
-                          padding: "0.5rem 1rem",
-                          background:
-                            "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: "8px",
-                          fontSize: "0.8125rem",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.375rem",
-                          transition: "all 0.2s",
-                          boxShadow: "0 2px 6px rgba(151, 36, 126, 0.25)",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = "translateY(-1px)";
-                          e.currentTarget.style.boxShadow =
-                            "0 4px 10px rgba(151, 36, 126, 0.35)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = "translateY(0)";
-                          e.currentTarget.style.boxShadow =
-                            "0 2px 6px rgba(151, 36, 126, 0.25)";
-                        }}
-                      >
-                        <Award size={14} />
-                        Apply
-                      </button>
+                      hasPendingSmeRequest(skill.skillId) ? (
+                        <button
+                          disabled
+                          style={{
+                            padding: "0.375rem 0.5rem",
+                            background: "#f59e0b",
+                            border: "none",
+                            borderRadius: "4px",
+                            color: "#fff",
+                            cursor: "not-allowed",
+                            display: "flex",
+                            alignItems: "center",
+                            fontSize: "0.75rem",
+                            fontWeight: "600",
+                            gap: "0.3rem",
+                            opacity: 0.8,
+                          }}
+                          title="SME Activation request is pending approval"
+                        >
+                          <i
+                            className="bi bi-hourglass-split"
+                            style={{ fontSize: "12px" }}
+                          ></i>
+                          Pending
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleBecomeSme(skill)}
+                          style={{
+                            padding: "0.5rem 1rem",
+                            background:
+                              "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            fontSize: "0.8125rem",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.375rem",
+                            transition: "all 0.2s",
+                            boxShadow: "0 2px 6px rgba(151, 36, 126, 0.25)",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform =
+                              "translateY(-1px)";
+                            e.currentTarget.style.boxShadow =
+                              "0 4px 10px rgba(151, 36, 126, 0.35)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.boxShadow =
+                              "0 2px 6px rgba(151, 36, 126, 0.25)";
+                          }}
+                        >
+                          <Award size={14} />
+                          Apply
+                        </button>
+                      )
                     ) : (
                       <span
                         style={{

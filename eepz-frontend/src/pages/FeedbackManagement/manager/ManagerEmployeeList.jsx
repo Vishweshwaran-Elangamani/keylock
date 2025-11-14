@@ -18,7 +18,7 @@ export default function ManagerEmployeeList() {
     setLoading(true);
     try {
       setEmployees(MOCK_EMPLOYEES);
-      console.log('✅ Employees loaded');
+      console.log(' Employees loaded');
     } catch (err) {
       setError('Failed to load employees');
     } finally {
@@ -30,10 +30,10 @@ export default function ManagerEmployeeList() {
     <div className="container-fluid py-3" style={{ maxWidth: '1200px' }}>
       <div className="d-flex justify-content-between align-items-start mb-4">
         <div>
-          <h2 className="fw-bold mb-1" style={{ color: 'var(--color-primary-1)' }}>👥 Team Members</h2>
+          <h2 className="fw-bold mb-1" style={{ color: 'var(--color-primary-1)' }}> Team Members:</h2>
           <p className="mb-0 small text-muted">Employees you manage</p>
         </div>
-        <Link to="/feedback/manager-dashboard" className="btn btn-outline-secondary">
+        <Link to="/manager/dashboard/feedback" className="btn btn-outline-secondary">
           Back to Dashboard
         </Link>
       </div>
@@ -65,7 +65,7 @@ export default function ManagerEmployeeList() {
                         <div><strong>Department:</strong> {emp.department}</div>
                       </div>
                       <Link
-                        to={`/manager/create-review`}
+                        to={`/manager/dashboard/feedback/create-review`}
                         state={{ employee: emp }}
                         className="btn btn-sm btn-primary w-100"
                       >

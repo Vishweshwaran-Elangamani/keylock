@@ -516,6 +516,7 @@ const ApprovalReviewModal = ({
                                   ? 0.85
                                   : 1,
                                 padding: "0.875rem 1rem",
+                                textAlign: "left",
                               }}
                             >
                               <div className="d-flex align-items-start gap-2">

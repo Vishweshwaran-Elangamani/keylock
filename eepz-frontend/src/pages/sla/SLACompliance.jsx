@@ -23,7 +23,7 @@ const SLACompliance = () => {
   }, []);
 
 
-  // ✅ Fetch ALL SLAs
+  //  Fetch ALL SLAs
   const fetchAllData = async () => {
     setLoading(true);
     setError(null);
@@ -31,7 +31,7 @@ const SLACompliance = () => {
       const res = await slaService.getAllSLAs();
       
       if (res?.success && Array.isArray(res.data)) {
-        console.log('✅ Loaded', res.data.length, 'SLAs from all departments');
+        console.log(' Loaded', res.data.length, 'SLAs from all departments');
         setAllSLAs(res.data);
       } else {
         setAllSLAs([]);
@@ -47,7 +47,7 @@ const SLACompliance = () => {
   };
 
 
-  // ✅ Calculate compliance data for each department (ALL SLAs)
+  //  Calculate compliance data for each department (ALL SLAs)
   const complianceData = useMemo(() => {
     if (allSLAs.length === 0) return [];
 
@@ -59,7 +59,7 @@ const SLACompliance = () => {
       const deptSLAs = allSLAs.filter(sla => sla.departmentId === deptId);
       const deptName = deptSLAs[0]?.departmentName || 'Department';
       
-      // ✅ Use getComplianceSummary (CLOSED SLAs ONLY for compliance %)
+      //  Use getComplianceSummary (CLOSED SLAs ONLY for compliance %)
       const summary = getComplianceSummary(deptSLAs);
 
       // Get date range

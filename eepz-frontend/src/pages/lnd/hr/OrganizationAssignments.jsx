@@ -268,7 +268,7 @@ const OrganizationAssignments = () => {
             <div
               style={{
                 background: "#fff",
-                border: "1px solid #e5e7eb",
+                border: "2px solid #abb4c5ff",
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
@@ -280,7 +280,7 @@ const OrganizationAssignments = () => {
                   gridTemplateColumns:
                     "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr",
                   background: "#f9fafb",
-                  borderBottom: "1px solid #e5e7eb",
+                  borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
                   color: "#374151",
                   fontSize: "0.875rem",

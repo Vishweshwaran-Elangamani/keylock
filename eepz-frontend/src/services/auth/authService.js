@@ -344,13 +344,13 @@ const authService = {
 
   saveAuthData: (userData, accessToken, refreshToken) => {
     try {
-      console.log("💾 Saving auth data...");
+      console.log(" Saving auth data...");
       console.log("User data from backend:", userData);
 
       // DECODE TOKEN TO GET CLAIMS INCLUDING empMasterId
       const tokenClaims = getClaimsFromToken(accessToken);
-      console.log("🔍 Token claims:", tokenClaims);
-      console.log("📋 empMasterId from token:", tokenClaims?.empMasterId);
+      console.log(" Token claims:", tokenClaims);
+      console.log(" empMasterId from token:", tokenClaims?.empMasterId);
 
       // MERGE USER DATA WITH TOKEN CLAIMS
       const enrichedUserData = {
@@ -358,7 +358,7 @@ const authService = {
         empMasterId: tokenClaims?.empMasterId,
       };
 
-      console.log("✅ Enriched user data:", enrichedUserData);
+      console.log(" Enriched user data:", enrichedUserData);
 
       localStorage.setItem("user", JSON.stringify(enrichedUserData));
       localStorage.setItem("accessToken", accessToken);

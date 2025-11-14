@@ -1,6 +1,6 @@
 import { useState } from "react";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
-import toastr from "toastr";
+import {toast} from "sonner";
 import "../../../styles/internal/OpportunityModal.css";
 
 const DeleteOpportunityModal = ({
@@ -20,15 +20,15 @@ const DeleteOpportunityModal = ({
       );
 
       if (response.success) {
-        toastr.success("Opportunity deleted successfully!");
+        toast.success("Opportunity deleted successfully!");
         onOpportunityDeleted();
         onHide();
       } else {
-        toastr.error(response.message || "Failed to delete opportunity");
+        toast.error(response.message || "Failed to delete opportunity");
       }
     } catch (error) {
       console.error("Error:", error);
-      toastr.error(error.message || "Failed to delete opportunity");
+      toast.error(error.message || "Failed to delete opportunity");
     } finally {
       setLoading(false);
     }

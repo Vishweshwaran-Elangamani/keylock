@@ -422,9 +422,12 @@ const Login = () => {
               {/* Header Section */}
               <div className="text-center mb-4">
                 <img
-                  src="/logo.png"
+                  src="/logodarkfull.png"
                   alt="EEPZ Logo"
                   className="logo-img mb-3"
+                  style={{
+                    width: "450px"
+                  }}
                 />
                 <h2 className="fw-bold mb-2" style={{ color: "#2d3565" }}>
                   Sign In to Your Account
@@ -624,9 +627,7 @@ const Login = () => {
                 className="text-white fw-bold mb-3"
                 style={{ fontSize: "2.5rem", lineHeight: "1.2" }}
               >
-                Welcome to the
-                <br />
-                EEPZ Portal
+                Welcome to EEPZ
               </h1>
 
               <p
@@ -640,34 +641,41 @@ const Login = () => {
                 <h3 className="fw-bold mb-3" style={{ color: "#2d3565" }}>
                   Everything You Need
                 </h3>
-                <ul style={{ listStyle: "none", padding: 0 }}>
+                <ul style={{ listStyle: "none", padding: 0, textAlign: "left" }}>
                   <li className="mb-3">
                     <i
                       className="bi bi-check-circle-fill me-2"
                       style={{ color: "#5a9fd4" }}
                     ></i>
-                    Track your performance and achievements
+                    Align your goals and achieve more, together.
                   </li>
                   <li className="mb-3">
                     <i
                       className="bi bi-check-circle-fill me-2"
                       style={{ color: "#5a9fd4" }}
                     ></i>
-                    Explore internal job opportunities
+                    Discover growth with internal career opportunities
                   </li>
                   <li className="mb-3">
                     <i
                       className="bi bi-check-circle-fill me-2"
                       style={{ color: "#5a9fd4" }}
                     ></i>
-                    Manage HR tasks efficiently
+                    Advance through transparent performance and recognition.
                   </li>
                   <li>
                     <i
                       className="bi bi-check-circle-fill me-2"
                       style={{ color: "#5a9fd4" }}
                     ></i>
-                    Stay connected with your team
+                    Connect and collaborate within your organization.
+                  </li>
+                  <li>
+                    <i
+                      className="bi bi-check-circle-fill me-2"
+                      style={{ color: "#5a9fd4" }}
+                    ></i>
+                    Align your goals, track your growth, and unlock new opportunities.
                   </li>
                 </ul>
               </div>

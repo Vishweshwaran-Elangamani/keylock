@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { 
   RefreshCw, AlertTriangle, Eye, MessageSquare, 
-  FileText, Users, Send, Clock, User, Target, Star, Zap, Briefcase
+  FileText, Users, Send, Clock, User, Target, Star, Briefcase
 } from 'lucide-react';
 import { mentorFeedbackApi, peerQueueApi } from '../../../services/feedbackmanagement/feedbackApi';
 import ResponseViewModal from '../../../components/FeedbackManagement/ResponseViewModal';
@@ -63,12 +63,6 @@ const getDaysAgo = (dateInput) => {
   }
 };
 
-const Badge = ({ text, color = '#525252' }) => (
-  <span className="badge" style={{ backgroundColor: `${color}20`, color, padding: '6px 10px', fontSize: '0.75rem' }}>
-    {text}
-  </span>
-);
-
 const RATING_LABELS = { 1: 'Poor', 2: 'Fair', 3: 'Good', 4: 'Very Good', 5: 'Excellent' };
 
 export default function ManageTeamSubmissions() {
@@ -100,7 +94,6 @@ export default function ManageTeamSubmissions() {
         
         response.data.data.forEach(emp => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
-          // Filter department employees (you can adjust this logic based on your department structure)
           if (emp.departmentId === user?.departmentId || emp.employeeId !== user?.empId) {
             deptEmps.push(emp);
           }
@@ -108,11 +101,11 @@ export default function ManageTeamSubmissions() {
         
         setEmployeeMap(map);
         setDepartmentEmployees(deptEmps);
-        console.log('✅ Employee map loaded:', Object.keys(map).length, 'employees');
-        console.log('✅ Department employees:', deptEmps.length);
+        console.log('Employee map loaded:', Object.keys(map).length, 'employees');
+        console.log('Department employees:', deptEmps.length);
       }
     } catch (err) {
-      console.error('❌ Error fetching employee data:', err.message);
+      console.error('Error fetching employee data:', err.message);
     }
   }, [user?.empId, user?.departmentId]);
 
@@ -128,10 +121,10 @@ export default function ManageTeamSubmissions() {
           map[obj.objectiveId] = obj.title || obj.objectiveName || `Objective ${obj.objectiveId}`;
         });
         setObjectives(map);
-        console.log('✅ Objectives loaded:', Object.keys(map).length);
+        console.log('Objectives loaded:', Object.keys(map).length);
       }
     } catch (err) {
-      console.error('❌ Error fetching objectives:', err.message);
+      console.error('Error fetching objectives:', err.message);
     }
   }, []);
 
@@ -166,9 +159,9 @@ export default function ManageTeamSubmissions() {
           }
         }
         setHrForms(hrData);
-        console.log('✅ HR forms loaded:', hrData.length);
+        console.log('HR forms loaded:', hrData.length);
       } catch (hrErr) {
-        console.warn('⚠️ HR feedback API error:', hrErr.message);
+        console.warn('HR feedback API error:', hrErr.message);
         setHrForms([]);
       }
 
@@ -188,9 +181,9 @@ export default function ManageTeamSubmissions() {
           }
         }
         setMentor(mentorData);
-        console.log('✅ Mentor feedback loaded:', mentorData.length);
+        console.log('Mentor feedback loaded:', mentorData.length);
       } catch (mentorErr) {
-        console.warn('⚠️ Mentor feedback API error:', mentorErr.message);
+        console.warn('Mentor feedback API error:', mentorErr.message);
         setMentor([]);
       }
 
@@ -207,15 +200,15 @@ export default function ManageTeamSubmissions() {
             createdAtFormatted: formatDate(p.createdAt)
           }));
         setPeer(peerData);
-        console.log('✅ Peer feedback loaded:', peerData.length);
+        console.log('Peer feedback loaded:', peerData.length);
       } catch (peerErr) {
-        console.warn('⚠️ Peer feedback API error:', peerErr.message);
+        console.warn('Peer feedback API error:', peerErr.message);
         setPeer([]);
       }
 
       // Goal Feedback
       try {
-        console.log('🔍 Fetching goal feedback for department...');
+        console.log('Fetching goal feedback for department...');
         
         const goalRes = await axios.get(`${API_BASE}/OrgGoalFeedback/all`, {
           params: {
@@ -239,16 +232,16 @@ export default function ManageTeamSubmissions() {
             }));
           
           setGoalFeedback(deptGoals);
-          console.log('✅ Goal feedback loaded:', deptGoals.length, 'items');
+          console.log('Goal feedback loaded:', deptGoals.length, 'items');
         } else {
           setGoalFeedback([]);
         }
       } catch (goalErr) {
-        console.error('❌ Goal feedback API error:', goalErr.message);
+        console.error('Goal feedback API error:', goalErr.message);
         setGoalFeedback([]);
       }
     } catch (err) {
-      console.error('❌ Fetch error:', err);
+      console.error('Fetch error:', err);
       setError(err?.response?.data?.message || err.message || 'Failed to fetch submissions');
     } finally {
       setLoading(false);
@@ -280,337 +273,582 @@ export default function ManageTeamSubmissions() {
     setSelectedType(null);
   };
 
-  // Tab Button Component
-  const TabBtn = ({ label, icon: Icon, active }) => (
-    <button
-      type="button"
-      className={`btn btn-sm ${active ? 'btn-primary' : 'btn-outline-primary'}`}
-      onClick={() => setTab(label)}
-      style={{ borderRadius: 'var(--radius-sm)' }}
-    >
-      <Icon size={14} className="me-1" style={{ display: 'inline' }} />
-      {label}
-    </button>
-  );
+  const getActiveData = () => {
+    switch(tab) {
+      case 'HRForms': return hrForms;
+      case 'GoalFeedback': return goalFeedback;
+      case 'Mentor': return mentor;
+      case 'Peer': return peer;
+      default: return [];
+    }
+  };
+
+  const activeData = getActiveData();
 
   return (
-    <div className="container-fluid py-3" style={{ maxWidth: '1200px' }}>
-      {/* HEADER */}
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div>
-          <div className="d-flex align-items-center gap-2 mb-1">
-            <Briefcase size={24} style={{ color: 'var(--color-primary-1)' }} />
-            <h2 className="fw-bold mb-0" style={{ color: 'var(--color-primary-1)' }}>
+    <div style={{ minHeight: '100vh', background: '#f8f9fa', padding: '2rem 1rem' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        {/* HEADER */}
+        <div className="d-flex justify-content-between align-items-center mb-4" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h2 className="fw-bold mb-1" style={{ fontSize: '1.75rem', color: '#212529' }}>
               Department Team Submissions
             </h2>
+            <p className="mb-0 text-muted" style={{ fontSize: '0.875rem' }}>
+              View all feedback from your department ({departmentEmployees.length} employees)
+            </p>
           </div>
-          <p className="mb-0 small" style={{ color: 'var(--muted)' }}>
-            View all feedback from your department ({departmentEmployees.length} employees)
-          </p>
+          <button
+            className="btn btn-outline-secondary d-flex align-items-center gap-2"
+            onClick={() => {
+              fetchEmployeeData();
+              fetchObjectives();
+              fetchData();
+            }}
+            disabled={refreshing || loading}
+            style={{ borderRadius: '8px', padding: '10px 20px', fontWeight: 600, border: '2px solid #dee2e6' }}
+          >
+            <RefreshCw size={18} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+            Refresh
+          </button>
         </div>
-        <button
-          className="btn d-flex align-items-center gap-2"
-          onClick={() => {
-            fetchEmployeeData();
-            fetchObjectives();
-            fetchData();
-          }}
-          disabled={refreshing || loading}
-          style={{ 
-            background: 'transparent', 
-            border: '1px solid var(--border)', 
-            color: 'var(--color-primary-3)', 
-            borderRadius: 'var(--radius-md)', 
-            padding: '0.5rem 0.9rem', 
-            fontWeight: '600' 
-          }}
-        >
-          <RefreshCw size={18} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
-          Refresh
-        </button>
-      </div>
 
-      {/* ERROR ALERT */}
-      {error && (
-        <div className="alert alert-danger d-flex align-items-start gap-2" style={{ borderRadius: 'var(--radius-md)' }}>
-          <AlertTriangle size={18} className="mt-1" />
-          <div>
-            <strong>Error</strong>
-            <p className="mb-0 small mt-1">{error}</p>
-          </div>
-          <button className="btn-close ms-auto" onClick={() => setError('')} />
-        </div>
-      )}
-
-      {/* TABS */}
-      <div className="card border-0 mb-3" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow)' }}>
-        <div className="card-body d-flex gap-2 flex-wrap">
-          <TabBtn label="HR Forms" icon={FileText} active={tab === 'HR Forms'} />
-          <TabBtn label="Goal Feedback" icon={Target} active={tab === 'Goal Feedback'} />
-          <TabBtn label="Mentor" icon={Send} active={tab === 'Mentor'} />
-          <TabBtn label="Peer" icon={Users} active={tab === 'Peer'} />
-          <small className="text-muted ms-auto align-self-center">
-            {loading && (
-              <>
-                <Clock size={14} className="me-1" style={{ display: 'inline' }} />
-                Loading...
-              </>
-            )}
-            {!loading && tab === 'HR Forms' && `${hrForms.length} submission(s)`}
-            {!loading && tab === 'Goal Feedback' && `${goalFeedback.length} submission(s)`}
-            {!loading && tab === 'Mentor' && `${mentor.length} submission(s)`}
-            {!loading && tab === 'Peer' && `${peer.length} submission(s)`}
-          </small>
-        </div>
-      </div>
-
-      {/* HR FORMS TAB */}
-      {tab === 'HR Forms' && (
-        <div className="card border-0" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow)' }}>
-          <div className="card-body">
-            <div className="d-flex align-items-center gap-2 mb-3">
-              <FileText size={20} style={{ color: 'var(--color-primary-1)' }} />
-              <h5 className="mb-0">HR Form Responses</h5>
+        {/* ERROR ALERT */}
+        {error && (
+          <div className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-4" role="alert" style={{ borderRadius: '8px' }}>
+            <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
+            <div className="flex-grow-1">
+              <strong>Error</strong>
+              <p className="mb-0 small mt-1">{error}</p>
             </div>
-            {hrForms.length === 0 ? (
-              <div className="alert alert-info mb-0">
-                <AlertTriangle size={16} className="me-2" style={{ display: 'inline' }} />
-                No HR form responses from department yet
-              </div>
-            ) : (
-              <div className="row g-3">
-                {hrForms.map((hr) => {
-                  const statusColor = hr.status === 'Reviewed' ? '#24A148' : hr.status === 'Submitted' ? '#0F62FE' : '#E2B93B';
-                  return (
-                    <div className="col-md-6 col-lg-4" key={hr.responseId}>
-                      <div 
-                        className="card h-100 border-0" 
-                        style={{ 
-                          border: '1px solid var(--border)', 
-                          borderLeft: `4px solid ${statusColor}`,
-                          borderRadius: 'var(--radius-lg)' 
-                        }}
-                      >
-                        <div className="card-body">
-                          <div className="d-flex justify-content-between align-items-start mb-2">
-                            <div>
-                              <h6 className="mb-1 small text-muted">{hr.submittedByName}</h6>
-                              <h6 className="mb-0">{hr.formName || 'HR Form'}</h6>
-                            </div>
-                            <Badge text={hr.status || 'Draft'} color={statusColor} />
-                          </div>
+            <button type="button" className="btn-close" onClick={() => setError('')} />
+          </div>
+        )}
 
-                          <div className="small mb-3">
-                            <div className="text-muted">
-                              <Clock size={12} className="me-1" style={{ display: 'inline' }} />
-                              <strong>Submitted:</strong> {hr.submittedAtFormatted}
-                              {hr.daysAgo !== null && <span> ({hr.daysAgo}d ago)</span>}
-                            </div>
-                          </div>
+        {/* TABS - CLEAN CARD STYLE */}
+        <div style={{ 
+          background: 'white',
+          border: '1px solid #e5e7eb',
+          borderRadius: '12px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div className="row g-3">
+            {/* HR Forms Card */}
+            <div className="col-md-6 col-lg-3">
+              <button
+                type="button"
+                onClick={() => setTab('HRForms')}
+                style={{
+                  width: '100%',
+                  background: tab === 'HRForms' ? '#97247E' : 'white',
+                  border: `2px solid ${tab === 'HRForms' ? '#97247E' : '#e5e7eb'}`,
+                  borderRadius: '10px',
+                  padding: '1.25rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  textAlign: 'left'
+                }}
+              >
+                <div className="d-flex align-items-center gap-3">
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '10px',
+                    background: tab === 'HRForms' ? 'rgba(255,255,255,0.2)' : '#97247E15',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <FileText size={24} style={{ color: tab === 'HRForms' ? 'white' : '#97247E' }} />
+                  </div>
+                  <div>
+                    <div style={{ 
+                      fontSize: '0.875rem', 
+                      fontWeight: 600,
+                      color: tab === 'HRForms' ? 'white' : '#6c757d',
+                      marginBottom: '4px'
+                    }}>
+                      HR Forms
+                    </div>
+                    <div style={{ 
+                      fontSize: '1.5rem', 
+                      fontWeight: 700,
+                      color: tab === 'HRForms' ? 'white' : '#212529'
+                    }}>
+                      {hrForms.length}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
 
-                          {hr.status === 'Reviewed' && hr.hrReviewComments && (
-                            <div className="mb-3 p-2 rounded" style={{ backgroundColor: '#f0f0f0' }}>
-                              <small className="fw-bold d-block mb-1">
-                                <MessageSquare size={12} className="me-1" style={{ display: 'inline' }} />
-                                HR Review:
-                              </small>
-                              <p className="small mb-0">{hr.hrReviewComments.substring(0, 50)}...</p>
-                            </div>
-                          )}
+            {/* Goal Feedback Card */}
+            <div className="col-md-6 col-lg-3">
+              <button
+                type="button"
+                onClick={() => setTab('GoalFeedback')}
+                style={{
+                  width: '100%',
+                  background: tab === 'GoalFeedback' ? '#97247E' : 'white',
+                  border: `2px solid ${tab === 'GoalFeedback' ? '#97247E' : '#e5e7eb'}`,
+                  borderRadius: '10px',
+                  padding: '1.25rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  textAlign: 'left'
+                }}
+              >
+                <div className="d-flex align-items-center gap-3">
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '10px',
+                    background: tab === 'GoalFeedback' ? 'rgba(255,255,255,0.2)' : '#97247E15',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Target size={24} style={{ color: tab === 'GoalFeedback' ? 'white' : '#97247E' }} />
+                  </div>
+                  <div>
+                    <div style={{ 
+                      fontSize: '0.875rem', 
+                      fontWeight: 600,
+                      color: tab === 'GoalFeedback' ? 'white' : '#6c757d',
+                      marginBottom: '4px'
+                    }}>
+                      Goal Feedback
+                    </div>
+                    <div style={{ 
+                      fontSize: '1.5rem', 
+                      fontWeight: 700,
+                      color: tab === 'GoalFeedback' ? 'white' : '#212529'
+                    }}>
+                      {goalFeedback.length}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
 
-                          <button 
-                            className="btn btn-sm btn-outline-secondary w-100" 
-                            onClick={() => handleViewResponse(hr, 'HR')}
-                            title="View details"
-                          >
-                            <Eye size={14} className="me-1" style={{ display: 'inline' }} />
-                            View
-                          </button>
+            {/* Mentor Card */}
+            <div className="col-md-6 col-lg-3">
+              <button
+                type="button"
+                onClick={() => setTab('Mentor')}
+                style={{
+                  width: '100%',
+                  background: tab === 'Mentor' ? '#97247E' : 'white',
+                  border: `2px solid ${tab === 'Mentor' ? '#97247E' : '#e5e7eb'}`,
+                  borderRadius: '10px',
+                  padding: '1.25rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  textAlign: 'left'
+                }}
+              >
+                <div className="d-flex align-items-center gap-3">
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '10px',
+                    background: tab === 'Mentor' ? 'rgba(255,255,255,0.2)' : '#97247E15',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Send size={24} style={{ color: tab === 'Mentor' ? 'white' : '#97247E' }} />
+                  </div>
+                  <div>
+                    <div style={{ 
+                      fontSize: '0.875rem', 
+                      fontWeight: 600,
+                      color: tab === 'Mentor' ? 'white' : '#6c757d',
+                      marginBottom: '4px'
+                    }}>
+                      Mentor
+                    </div>
+                    <div style={{ 
+                      fontSize: '1.5rem', 
+                      fontWeight: 700,
+                      color: tab === 'Mentor' ? 'white' : '#212529'
+                    }}>
+                      {mentor.length}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Peer Card */}
+            <div className="col-md-6 col-lg-3">
+              <button
+                type="button"
+                onClick={() => setTab('Peer')}
+                style={{
+                  width: '100%',
+                  background: tab === 'Peer' ? '#97247E' : 'white',
+                  border: `2px solid ${tab === 'Peer' ? '#97247E' : '#e5e7eb'}`,
+                  borderRadius: '10px',
+                  padding: '1.25rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  textAlign: 'left'
+                }}
+              >
+                <div className="d-flex align-items-center gap-3">
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '10px',
+                    background: tab === 'Peer' ? 'rgba(255,255,255,0.2)' : '#97247E15',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Users size={24} style={{ color: tab === 'Peer' ? 'white' : '#97247E' }} />
+                  </div>
+                  <div>
+                    <div style={{ 
+                      fontSize: '0.875rem', 
+                      fontWeight: 600,
+                      color: tab === 'Peer' ? 'white' : '#6c757d',
+                      marginBottom: '4px'
+                    }}>
+                      Peer
+                    </div>
+                    <div style={{ 
+                      fontSize: '1.5rem', 
+                      fontWeight: 700,
+                      color: tab === 'Peer' ? 'white' : '#212529'
+                    }}>
+                      {peer.length}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* CONTENT AREA */}
+        {loading ? (
+          <div className="text-center py-5">
+            <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#97247E', borderWidth: '3px' }} role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="text-muted mt-3 fw-medium">Loading submissions...</p>
+          </div>
+        ) : activeData.length === 0 ? (
+          <div style={{ 
+            background: 'white',
+            border: '1px solid #e5e7eb',
+            borderRadius: '12px',
+            padding: '3rem',
+            textAlign: 'center'
+          }}>
+            <AlertTriangle size={48} style={{ color: '#cbd5e1', marginBottom: '1rem' }} />
+            <h5 className="fw-bold mb-2" style={{ color: '#6c757d' }}>No Submissions Yet</h5>
+            <p className="text-muted mb-0">There are no submissions from your department in this category.</p>
+          </div>
+        ) : (
+          <div className="row g-3">
+            {/* HR FORMS */}
+            {tab === 'HRForms' && hrForms.map((hr) => {
+              const statusColor = hr.status === 'Reviewed' ? '#198754' : hr.status === 'Submitted' ? '#97247E' : '#ffc107';
+              return (
+                <div className="col-md-6 col-lg-4" key={hr.responseId}>
+                  <div style={{ 
+                    background: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderLeft: `4px solid ${statusColor}`,
+                    borderRadius: '10px',
+                    padding: '1.25rem',
+                    height: '100%',
+                    transition: 'box-shadow 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
+                  onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+                  >
+                    <div className="d-flex justify-content-between align-items-start mb-3">
+                      <div>
+                        <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '4px', fontWeight: 600 }}>
+                          {hr.submittedByName}
                         </div>
+                        <h6 className="mb-0 fw-bold" style={{ fontSize: '1rem', color: '#212529' }}>
+                          {hr.formName || 'HR Form'}
+                        </h6>
+                      </div>
+                      <span style={{ 
+                        display: 'inline-block',
+                        backgroundColor: `${statusColor}15`, 
+                        color: statusColor, 
+                        padding: '4px 10px', 
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        borderRadius: '6px',
+                        border: `1.5px solid ${statusColor}40`
+                      }}>
+                        {hr.status || 'Draft'}
+                      </span>
+                    </div>
+
+                    <div className="mb-3">
+                      <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.813rem' }}>
+                        <Clock size={14} />
+                        <span>{hr.submittedAtFormatted}</span>
+                        {hr.daysAgo !== null && <span>({hr.daysAgo}d ago)</span>}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
-      {/* GOAL FEEDBACK TAB */}
-      {tab === 'Goal Feedback' && (
-        <div className="card border-0" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow)' }}>
-          <div className="card-body">
-            <div className="d-flex align-items-center gap-2 mb-3">
-              <Target size={20} style={{ color: 'var(--color-primary-1)' }} />
-              <h5 className="mb-0">Goal Feedback</h5>
-            </div>
-            {goalFeedback.length === 0 ? (
-              <div className="alert alert-info mb-0">
-                <AlertTriangle size={16} className="me-2" style={{ display: 'inline' }} />
-                No goal feedback from department yet
-              </div>
-            ) : (
-              <div className="row g-3">
-                {goalFeedback.map((goal) => (
-                  <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
-                    <div 
-                      className="card h-100 border-0" 
-                      style={{ 
-                        border: '1px solid var(--border)', 
-                        borderLeft: '4px solid #0F62FE',
-                        borderRadius: 'var(--radius-lg)' 
-                      }}
+                    {hr.status === 'Reviewed' && hr.hrReviewComments && (
+                      <div className="mb-3" style={{ 
+                        background: '#f8f9fa',
+                        padding: '0.75rem',
+                        borderRadius: '6px',
+                        border: '1px solid #e9ecef'
+                      }}>
+                        <div className="d-flex align-items-center gap-1 mb-1">
+                          <MessageSquare size={12} style={{ color: '#6c757d' }} />
+                          <small style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6c757d' }}>
+                            HR Review:
+                          </small>
+                        </div>
+                        <p className="mb-0" style={{ fontSize: '0.813rem', color: '#495057' }}>
+                          {hr.hrReviewComments.substring(0, 80)}...
+                        </p>
+                      </div>
+                    )}
+
+                    <button 
+                      className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" 
+                      onClick={() => handleViewResponse(hr, 'HR')}
+                      style={{ borderRadius: '6px', padding: '8px', fontWeight: 600 }}
                     >
-                      <div className="card-body">
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <div>
-                            <h6 className="mb-1 small text-muted">{goal.submittedByName}</h6>
-                            <h6 className="mb-0 small">{goal.objectiveTitle}</h6>
-                          </div>
-                          <div className="d-flex align-items-center gap-1">
-                            <Star size={14} style={{ color: '#FFB800', fill: '#FFB800' }} />
-                            <span className="fw-bold small">{goal.rating}/5</span>
-                          </div>
-                        </div>
+                      <Eye size={16} />
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
 
-                        <Badge text={RATING_LABELS[goal.rating] || 'N/A'} color="#0F62FE" />
-
-                        <div className="small my-2">
-                          <div className="text-muted">
-                            <Clock size={12} className="me-1" style={{ display: 'inline' }} />
-                            {goal.submittedAtFormatted}
-                            {goal.daysAgo !== null && <span> ({goal.daysAgo}d ago)</span>}
-                          </div>
-                        </div>
-
-                        {goal.feedbackComments && (
-                          <p className="small mb-3" style={{ backgroundColor: '#f9f9f9', padding: '8px', borderRadius: '4px', minHeight: '40px' }}>
-                            {goal.feedbackComments.substring(0, 60)}...
-                          </p>
-                        )}
-
-                        <button 
-                          className="btn btn-sm btn-outline-secondary w-100" 
-                          onClick={() => handleViewResponse(goal, 'Goal')}
-                          title="View details"
-                        >
-                          <Eye size={14} className="me-1" style={{ display: 'inline' }} />
-                          View
-                        </button>
+            {/* GOAL FEEDBACK */}
+            {tab === 'GoalFeedback' && goalFeedback.map((goal) => (
+              <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
+                <div style={{ 
+                  background: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderLeft: '4px solid #97247E',
+                  borderRadius: '10px',
+                  padding: '1.25rem',
+                  height: '100%',
+                  transition: 'box-shadow 0.2s',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+                >
+                  <div className="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '4px', fontWeight: 600 }}>
+                        {goal.submittedByName}
                       </div>
+                      <h6 className="mb-0 fw-bold" style={{ fontSize: '0.938rem', color: '#212529' }}>
+                        {goal.objectiveTitle}
+                      </h6>
+                    </div>
+                    <div className="d-flex align-items-center gap-1">
+                      <Star size={16} style={{ color: '#ffc107', fill: '#ffc107' }} />
+                      <span style={{ fontSize: '1rem', fontWeight: 700, color: '#212529' }}>
+                        {goal.rating}/5
+                      </span>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
-      {/* MENTOR TAB */}
-      {tab === 'Mentor' && (
-        <div className="card border-0" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow)' }}>
-          <div className="card-body">
-            <div className="d-flex align-items-center gap-2 mb-3">
-              <Send size={20} style={{ color: 'var(--color-primary-1)' }} />
-              <h5 className="mb-0">Mentor Feedback</h5>
-            </div>
-            {mentor.length === 0 ? (
-              <p className="text-muted mb-0">No mentor feedback from department yet</p>
-            ) : (
-              <div className="row g-3">
-                {mentor.map((m) => (
-                  <div className="col-md-6 col-lg-4" key={m.trackingId || m.id}>
-                    <div className="card h-100 border-0" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-                      <div className="card-body">
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <div>
-                            <h6 className="mb-1 small text-muted">{m.submittedByName}</h6>
-                            <p className="mb-0 fw-bold small" style={{ fontSize: '0.95rem', color: 'var(--color-primary-1)' }}>
-                              <User size={12} className="me-1" style={{ display: 'inline' }} />
-                              {m.mentorNameFull}
-                            </p>
-                          </div>
-                          <Badge text={`${m.rating || 0} / 5`} color="#24A148" />
-                        </div>
-                        <p className="small mb-2" style={{ backgroundColor: '#f9f9f9', padding: '8px', borderRadius: '4px', minHeight: '40px' }}>
-                          {m.feedbackComments ? m.feedbackComments.substring(0, 50) + '...' : 'No comments'}
-                        </p>
-                        <small className="text-muted d-block mb-2">
-                          <Clock size={12} className="me-1" style={{ display: 'inline' }} />
-                          {m.createdAtFormatted}
-                        </small>
-                        <button 
-                          className="btn btn-sm btn-outline-secondary w-100" 
-                          onClick={() => handleViewResponse(m, 'Mentor')}
-                          title="View details"
-                        >
-                          <Eye size={14} className="me-1" style={{ display: 'inline' }} />
-                          View
-                        </button>
-                      </div>
+                  <div className="mb-3">
+                    <span style={{ 
+                      display: 'inline-block',
+                      backgroundColor: '#97247E15', 
+                      color: '#97247E', 
+                      padding: '4px 10px', 
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: '6px',
+                      border: '1.5px solid #97247E40'
+                    }}>
+                      {RATING_LABELS[goal.rating] || 'N/A'}
+                    </span>
+                  </div>
+
+                  <div className="mb-3">
+                    <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.813rem' }}>
+                      <Clock size={14} />
+                      <span>{goal.submittedAtFormatted}</span>
+                      {goal.daysAgo !== null && <span>({goal.daysAgo}d ago)</span>}
                     </div>
                   </div>
-                ))}
+
+                  {goal.feedbackComments && (
+                    <div className="mb-3" style={{ 
+                      background: '#f8f9fa',
+                      padding: '0.75rem',
+                      borderRadius: '6px',
+                      minHeight: '60px'
+                    }}>
+                      <p className="mb-0" style={{ fontSize: '0.813rem', color: '#495057' }}>
+                        {goal.feedbackComments.substring(0, 80)}...
+                      </p>
+                    </div>
+                  )}
+
+                  <button 
+                    className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" 
+                    onClick={() => handleViewResponse(goal, 'Goal')}
+                    style={{ borderRadius: '6px', padding: '8px', fontWeight: 600 }}
+                  >
+                    <Eye size={16} />
+                    View Details
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
-      )}
+            ))}
 
-      {/* PEER TAB */}
-      {tab === 'Peer' && (
-        <div className="card border-0" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow)' }}>
-          <div className="card-body">
-            <div className="d-flex align-items-center gap-2 mb-3">
-              <Users size={20} style={{ color: 'var(--color-primary-1)' }} />
-              <h5 className="mb-0">Peer Feedback</h5>
-            </div>
-            {peer.length === 0 ? (
-              <p className="text-muted mb-0">No peer feedback from department yet</p>
-            ) : (
-              <div className="row g-3">
-                {peer.map((p) => (
-                  <div className="col-md-6 col-lg-4" key={p.queueId || p.id}>
-                    <div className="card h-100 border-0" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-                      <div className="card-body">
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <div>
-                            <h6 className="mb-1 small text-muted">{p.submittedByName}</h6>
-                            <p className="mb-0 fw-bold small" style={{ fontSize: '0.95rem', color: 'var(--color-primary-1)' }}>
-                              <User size={14} className="me-1" style={{ display: 'inline' }} />
-                              {p.recipientNameFull}
-                            </p>
-                          </div>
-                        </div>
-
-                        <p className="small mb-2" style={{ backgroundColor: '#f9f9f9', padding: '8px', borderRadius: '4px', minHeight: '40px' }}>
-                          {p.feedbackContent ? p.feedbackContent.substring(0, 50) + '...' : 'No content'}
-                        </p>
-
-                        <small className="text-muted d-block mb-2">
-                          <Clock size={12} className="me-1" style={{ display: 'inline' }} />
-                          {p.createdAtFormatted}
-                        </small>
-
-                        <button 
-                          className="btn btn-sm btn-outline-secondary w-100" 
-                          onClick={() => handleViewResponse(p, 'Peer')}
-                          title="View details"
-                        >
-                          <Eye size={14} className="me-1" style={{ display: 'inline' }} />
-                          View
-                        </button>
+            {/* MENTOR */}
+            {tab === 'Mentor' && mentor.map((m) => (
+              <div className="col-md-6 col-lg-4" key={m.trackingId || m.id}>
+                <div style={{ 
+                  background: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderLeft: '4px solid #198754',
+                  borderRadius: '10px',
+                  padding: '1.25rem',
+                  height: '100%',
+                  transition: 'box-shadow 0.2s',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+                >
+                  <div className="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '4px', fontWeight: 600 }}>
+                        {m.submittedByName}
+                      </div>
+                      <div className="d-flex align-items-center gap-1">
+                        <User size={14} style={{ color: '#198754' }} />
+                        <h6 className="mb-0 fw-bold" style={{ fontSize: '0.938rem', color: '#212529' }}>
+                          {m.mentorNameFull}
+                        </h6>
                       </div>
                     </div>
+                    <span style={{ 
+                      display: 'inline-block',
+                      backgroundColor: '#19875415', 
+                      color: '#198754', 
+                      padding: '4px 10px', 
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: '6px',
+                      border: '1.5px solid #19875440'
+                    }}>
+                      {m.rating || 0}/5
+                    </span>
                   </div>
-                ))}
+
+                  <div className="mb-3">
+                    <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.813rem' }}>
+                      <Clock size={14} />
+                      <span>{m.createdAtFormatted}</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-3" style={{ 
+                    background: '#f8f9fa',
+                    padding: '0.75rem',
+                    borderRadius: '6px',
+                    minHeight: '60px'
+                  }}>
+                    <p className="mb-0" style={{ fontSize: '0.813rem', color: '#495057' }}>
+                      {m.feedbackComments ? m.feedbackComments.substring(0, 80) + '...' : 'No comments'}
+                    </p>
+                  </div>
+
+                  <button 
+                    className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" 
+                    onClick={() => handleViewResponse(m, 'Mentor')}
+                    style={{ borderRadius: '6px', padding: '8px', fontWeight: 600 }}
+                  >
+                    <Eye size={16} />
+                    View Details
+                  </button>
+                </div>
               </div>
-            )}
+            ))}
+
+            {/* PEER */}
+            {tab === 'Peer' && peer.map((p) => (
+              <div className="col-md-6 col-lg-4" key={p.queueId || p.id}>
+                <div style={{ 
+                  background: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderLeft: '4px solid #6610f2',
+                  borderRadius: '10px',
+                  padding: '1.25rem',
+                  height: '100%',
+                  transition: 'box-shadow 0.2s',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+                >
+                  <div className="mb-3">
+                    <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '4px', fontWeight: 600 }}>
+                      {p.submittedByName}
+                    </div>
+                    <div className="d-flex align-items-center gap-1">
+                      <User size={14} style={{ color: '#6610f2' }} />
+                      <h6 className="mb-0 fw-bold" style={{ fontSize: '0.938rem', color: '#212529' }}>
+                        {p.recipientNameFull}
+                      </h6>
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.813rem' }}>
+                      <Clock size={14} />
+                      <span>{p.createdAtFormatted}</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-3" style={{ 
+                    background: '#f8f9fa',
+                    padding: '0.75rem',
+                    borderRadius: '6px',
+                    minHeight: '60px'
+                  }}>
+                    <p className="mb-0" style={{ fontSize: '0.813rem', color: '#495057' }}>
+                      {p.feedbackContent ? p.feedbackContent.substring(0, 80) + '...' : 'No content'}
+                    </p>
+                  </div>
+
+                  <button 
+                    className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" 
+                    onClick={() => handleViewResponse(p, 'Peer')}
+                    style={{ borderRadius: '6px', padding: '8px', fontWeight: 600 }}
+                  >
+                    <Eye size={16} />
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <ResponseViewModal 
         show={showModal} 

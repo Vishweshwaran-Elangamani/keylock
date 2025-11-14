@@ -246,7 +246,7 @@ const PendingApprovals = () => {
             <div
               style={{
                 background: "#fff",
-                border: "1px solid #e5e7eb",
+                border: "2px solid #abb4c5ff",
                 borderRadius: "12px",
                 overflow: "hidden",
               }}
@@ -258,7 +258,7 @@ const PendingApprovals = () => {
                   gridTemplateColumns: "2fr 1.5fr 1.5fr 1.2fr 1.3fr",
                   padding: "1rem 1.5rem",
                   background: "#f9fafb",
-                  borderBottom: "1px solid #e5e7eb",
+                  borderBottom: "2px solid #abb4c5ff",
                   fontWeight: "600",
                   fontSize: "0.875rem",
                   color: "#374151",

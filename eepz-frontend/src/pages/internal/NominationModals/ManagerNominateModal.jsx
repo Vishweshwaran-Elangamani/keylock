@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import userService from "../../../services/auth/userService";
-import toastr from "toastr";
+import { toast } from "sonner";
 import "../../../styles/internal/NominationModal.css";
 
 const ManagerNominateModal = ({
@@ -26,76 +26,62 @@ const ManagerNominateModal = ({
   }, [show]);
 
   const fetchEmployees = async () => {
-
     try {
-  
       setLoadingEmployees(true);
-  
+
       // ⭐ FIX: Get userId from localStorage and validate it
-  
+
       const userIdStr = localStorage.getItem("userId");
-  
+
       console.log("🔍 Raw userId from localStorage:", userIdStr);
-  
+
       if (!userIdStr) {
-  
         console.error("❌ No userId found in localStorage");
-  
+
         toast.error("User ID not found. Please login again.");
-  
+
         setEmployees([]);
-  
+
         return;
-  
       }
-  
+
       const managerId = parseInt(userIdStr);
-  
+
       console.log("📋 Fetching employees for manager ID:", managerId);
-  
+
       if (isNaN(managerId) || managerId <= 0) {
-  
         console.error("❌ Invalid manager ID:", managerId);
-  
+
         toast.error("Invalid user ID. Please login again.");
-  
+
         setEmployees([]);
-  
+
         return;
-  
       }
-  
+
       // Call the service function
-  
+
       const response = await userService.getEmployeesByManager(managerId);
-  
+
       console.log("Employees response:", response);
-  
+
       // Handle response format
-  
+
       const employeeList = response.data || response || [];
-  
+
       setEmployees(employeeList);
-  
+
       console.log("👥 Employees loaded:", employeeList.length);
-  
     } catch (error) {
-  
       console.error("Error fetching employees:", error);
-  
+
       setEmployees([]);
-  
+
       toast.error("Failed to load employees");
-  
     } finally {
-  
       setLoadingEmployees(false);
-  
     }
-  
   };
-  
-   
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -132,7 +118,7 @@ const ManagerNominateModal = ({
     e.preventDefault();
 
     if (!validateForm()) {
-      toastr.error("Please fix the errors");
+      toast.error("Please fix the errors");
       return;
     }
 
@@ -149,15 +135,15 @@ const ManagerNominateModal = ({
       const response = await nominationService.managerNominate(payload);
 
       if (response.success) {
-        toastr.success("Team member nominated successfully!");
+        toast.success("Team member nominated successfully!");
         onNominationSubmitted();
         onHide();
       } else {
-        toastr.error(response.message || "Failed to nominate team member");
+        toast.error(response.message || "Failed to nominate team member");
       }
     } catch (error) {
       console.error("Error:", error);
-      toastr.error(error.message || "Failed to nominate team member");
+      toast.error(error.message || "Failed to nominate team member");
     } finally {
       setLoading(false);
     }
@@ -249,7 +235,9 @@ const ManagerNominateModal = ({
                       maxLength={1000}
                     />
                     {errors.justification && (
-                      <div className="error-message">{errors.justification}</div>
+                      <div className="error-message">
+                        {errors.justification}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -288,4 +276,3 @@ const ManagerNominateModal = ({
 };
 
 export default ManagerNominateModal;
-

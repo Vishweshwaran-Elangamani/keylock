@@ -5,8 +5,7 @@ import nominationService from "../../services/internal/nominationService";
 import CreatePromotionModal from "./PromotionModals/CreatePromotionModal";
 import PromotionApprovalModal from "./PromotionModals/PromotionApprovalModal";
 import PromotionDetailsModal from "./PromotionModals/PromotionDetailsModal";
-import toastr from "toastr";
-import "toastr/build/toastr.min.css";
+import {toast} from "sonner";
 import "../../styles/internal/PromotionManagement.css";
 
 const PromotionManagement = () => {
@@ -24,7 +23,7 @@ const PromotionManagement = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedPromotion, setSelectedPromotion] = useState(null);
 
-  toastr.options = {
+  toast.options = {
     closeButton: true,
     progressBar: true,
     positionClass: "toast-top-right",
@@ -74,7 +73,7 @@ const PromotionManagement = () => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-      toastr.error("Failed to load data");
+      toast.error("Failed to load data");
     } finally {
       setLoading(false);
     }

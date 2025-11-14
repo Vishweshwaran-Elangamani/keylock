@@ -13,7 +13,7 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
   // Filter SLAs
   const filteredSLAs = slas.filter(sla => {
     const matchesSearch = sla.slatype.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         sla.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
+      sla.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'All' || sla.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -22,7 +22,7 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
   const sortedSLAs = [...filteredSLAs].sort((a, b) => {
     const aValue = a[sortConfig.key];
     const bValue = b[sortConfig.key];
-    
+
     if (sortConfig.direction === 'asc') {
       return aValue > bValue ? 1 : -1;
     }
@@ -124,8 +124,8 @@ const SLATable = ({ slas, onViewDetails, onEscalate, showActions = true }) => {
                     {formatDate(sla.deadline)}
                   </td>
                   <td style={{ padding: '1rem' }}>
-                    <UrgencyIndicator 
-                      urgencyStatus={sla.urgencyStatus} 
+                    <UrgencyIndicator
+                      urgencyStatus={sla.urgencyStatus}
                       daysUntilDeadline={sla.daysUntilDeadline}
                       showLabel={false}
                     />

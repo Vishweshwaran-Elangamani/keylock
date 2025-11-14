@@ -4,7 +4,7 @@ import { TrendingUp, AlertCircle, CheckCircle, Clock, Award, Eye, Calendar } fro
 import { getComplianceRating, getComplianceSummary } from '../../utils/sla/slaCalculations';
 
 const ComplianceCard = ({ compliance, slaData, onClick, showActions = false }) => {
-  // ✅ Calculate compliance from real SLA data if provided
+  //  Calculate compliance from real SLA data if provided
   const calculatedCompliance = useMemo(() => {
     if (!slaData || slaData.length === 0) return compliance;
     
@@ -24,7 +24,7 @@ const ComplianceCard = ({ compliance, slaData, onClick, showActions = false }) =
     };
   }, [slaData, compliance]);
 
-  // ✅ Handle null/undefined compliance
+  //  Handle null/undefined compliance
   if (!calculatedCompliance) {
     return (
       <div className="card h-100 border-0 shadow-sm" style={{ borderRadius: '12px' }}>
@@ -47,7 +47,7 @@ const ComplianceCard = ({ compliance, slaData, onClick, showActions = false }) =
     });
   };
 
-  // ✅ Use calculated values
+  //  Use calculated values
   const openSlas = calculatedCompliance.openSlas || 0;
   const closedSlas = calculatedCompliance.closedSlas || 0;
   const onTimeSlas = calculatedCompliance.onTimeSlas || 0;

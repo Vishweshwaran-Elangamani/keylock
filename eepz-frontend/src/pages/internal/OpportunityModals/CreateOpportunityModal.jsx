@@ -1,6 +1,6 @@
 import { useState } from "react";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
-import toastr from "toastr";
+import {toast} from "sonner";
 import "../../../styles/internal/OpportunityModal.css";
 
 const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, departments }) => {
@@ -70,7 +70,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
     e.preventDefault();
 
     if (!validateForm()) {
-      toastr.error("Please fix the form errors");
+      toast.error("Please fix the form errors");
       return;
     }
 
@@ -98,7 +98,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
       console.log("✅ Response:", response);
 
       if (response.success || response.data) {
-        toastr.success("Opportunity created successfully!");
+        toast.success("Opportunity created successfully!");
         // Reset form
         setFormData({
           opportunityName: "",
@@ -113,7 +113,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
         onOpportunityCreated();
         onHide();
       } else {
-        toastr.error(response.message || "Failed to create opportunity");
+        toast.error(response.message || "Failed to create opportunity");
       }
     } catch (error) {
       console.error("❌ Error:", error);
@@ -126,7 +126,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
         error.message ||
         "Failed to create opportunity";
 
-      toastr.error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

@@ -5,9 +5,9 @@ import {
   Users, TrendingUp, Clock, CheckCircle, Download, AlertCircle, 
   RefreshCw, AlertTriangle, Eye, Send
 } from 'lucide-react';
+import { toast } from 'sonner';
 import ComplianceCard from '../../components/sla/ComplianceCard';
 import slaService from '../../services/sla/slaService';
-
 
 const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
@@ -27,7 +27,6 @@ const DeptHeadSLADashboard = () => {
   const [resolutionComments, setResolutionComments] = useState('');
   const [approvingEscalation, setApprovingEscalation] = useState(false);
 
-
   // ============= LIFECYCLE HOOKS =============
   useEffect(() => {
     fetchAllData();
@@ -38,7 +37,6 @@ const DeptHeadSLADashboard = () => {
     fetchComplianceData();
   }, [selectedPeriod]);
 
-
   // ============= DATA FETCHING =============
   const fetchAllData = async () => {
     setLoading(true);
@@ -46,30 +44,29 @@ const DeptHeadSLADashboard = () => {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       
-      console.log('👤 Dept Head Info:', { empId: user.empId, deptId: user.departmentId });
+      console.log('Dept Head Info:', { empId: user.empId, deptId: user.departmentId });
 
-      // ✅ Fetch L2 Escalations (Manager → Dept Head)
+      // Fetch L2 Escalations (Manager → Dept Head)
       await fetchL2Escalations(user.empId);
 
     } catch (err) {
-      console.error('❌ Error in fetchAllData:', err);
+      console.error('Error in fetchAllData:', err);
       setError('Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
   };
 
-
   const fetchL2Escalations = async (deptHeadId) => {
     try {
-      console.log('📋 Fetching L2 Escalations for Dept Head:', deptHeadId);
+      console.log('Fetching L2 Escalations for Dept Head:', deptHeadId);
       
       const response = await slaService.getManagerEscalations(deptHeadId);
       
       if (response && response.success) {
         const escalations = Array.isArray(response.data) ? response.data : [];
         
-        console.log('✅ L2 Escalations from API:', escalations.length);
+        console.log('L2 Escalations from API:', escalations.length);
         
         // Process escalations
         const processed = escalations.map(e => ({
@@ -107,33 +104,31 @@ const DeptHeadSLADashboard = () => {
         setAllL2Escalations(processed);
         filterEscalationsByPeriod(selectedPeriod, processed);
       } else {
-        console.warn('⚠️ No escalations found');
+        console.warn('No escalations found');
         setAllL2Escalations([]);
         setFilteredL2Escalations([]);
       }
     } catch (err) {
-      console.error('❌ L2 Escalations error:', err.message);
+      console.error('L2 Escalations error:', err.message);
       setAllL2Escalations([]);
       setFilteredL2Escalations([]);
     }
   };
 
-
   const filterEscalationsByPeriod = (period, escalations = allL2Escalations) => {
-    console.log(`🔍 Filtering escalations for period: ${period}`);
+    console.log(`Filtering escalations for period: ${period}`);
     
     const filtered = escalations.filter(e => e.period === period);
     
-    console.log(`✅ Filtered escalations for ${period}:`, filtered.length);
+    console.log(`Filtered escalations for ${period}:`, filtered.length);
     setFilteredL2Escalations(filtered);
   };
-
 
   const fetchComplianceData = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       
-      console.log('📊 Fetching department compliance for:', selectedPeriod);
+      console.log('Fetching department compliance for:', selectedPeriod);
       
       const response = await slaService.getDepartmentCompliance(
         user.departmentId,
@@ -142,16 +137,15 @@ const DeptHeadSLADashboard = () => {
       
       if (response && response.success && response.data) {
         setDepartmentCompliance(response.data);
-        console.log('✅ Compliance loaded:', response.data);
+        console.log('Compliance loaded:', response.data);
       } else {
         setDepartmentCompliance(null);
       }
     } catch (err) {
-      console.warn('⚠️ Compliance fetch error:', err.message);
+      console.warn('Compliance fetch error:', err.message);
       setDepartmentCompliance(null);
     }
   };
-
 
   // ============= EVENT HANDLERS =============
   const handleViewDetails = (slaid) => {
@@ -172,7 +166,10 @@ const DeptHeadSLADashboard = () => {
 
   const handleApproveEscalation = async () => {
     if (!resolutionComments.trim()) {
-      alert('Please provide approval comments');
+      toast.warning('Approval comments required', {
+        description: 'Please provide approval comments before proceeding',
+        duration: 4000,
+      });
       return;
     }
 
@@ -187,25 +184,33 @@ const DeptHeadSLADashboard = () => {
         resolutionComments: resolutionComments.trim()
       };
 
-      console.log('✅ Approving L2 escalation:', payload);
+      console.log('Approving L2 escalation:', payload);
       
       const response = await slaService.resolveEscalation(payload);
       
       if (response.success) {
-        alert('✅ Escalation approved successfully!');
+        toast.success('Escalation approved successfully', {
+          description: 'Resolution comments have been saved',
+          duration: 4000,
+        });
         handleCloseResolutionModal();
         fetchAllData();
       } else {
-        alert('❌ Failed to approve: ' + response.message);
+        toast.error('Failed to approve escalation', {
+          description: response.message || 'Unable to process approval',
+          duration: 5000,
+        });
       }
     } catch (err) {
-      console.error('❌ Error approving escalation:', err);
-      alert('Error: ' + err.message);
+      console.error('Error approving escalation:', err);
+      toast.error('Error approving escalation', {
+        description: err.message || 'An unexpected error occurred',
+        duration: 5000,
+      });
     } finally {
       setApprovingEscalation(false);
     }
   };
-
 
   // ============= HELPER FUNCTIONS =============
   const calculateStats = () => {
@@ -252,11 +257,10 @@ const DeptHeadSLADashboard = () => {
   };
 
   const getDaysLabel = (days) => {
-    if (days < 0) return `${Math.abs(days)}d Overdue 🔴`;
-    if (days === 0) return 'Due Today ⚠️';
-    return `${days}d Left ✓`;
+    if (days < 0) return `${Math.abs(days)}d Overdue`;
+    if (days === 0) return 'Due Today';
+    return `${days}d Left`;
   };
-
 
   // ============= RENDER =============
   const stats = calculateStats();
@@ -276,9 +280,7 @@ const DeptHeadSLADashboard = () => {
       {/* ============= HEADER ============= */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h2 className="fw-bold mb-1" style={{ color: 'var(--color-primary-1)' }}>
-           
-          </h2>
+          
           <p className="text-muted mb-0">Review manager escalations (L2) and department compliance</p>
         </div>
         <div className="d-flex gap-2">
@@ -408,7 +410,7 @@ const DeptHeadSLADashboard = () => {
       {activeTab === 'escalations' && (
         <div className="card border-0 shadow-sm" style={{ borderRadius: '12px' }}>
           <div className="card-body">
-            <h5 className="fw-bold mb-4">L2 Escalations - Manager → Dept Head</h5>
+            <h5 className="fw-bold mb-4">L2 Escalations - Manager to Dept Head</h5>
             
             {filteredL2Escalations.length === 0 ? (
               <div className="text-center py-5">

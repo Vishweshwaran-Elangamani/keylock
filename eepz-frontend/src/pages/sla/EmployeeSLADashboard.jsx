@@ -1,5 +1,5 @@
-// src/pages/sla/EmployeeSLADashboard.jsx - FIXED STATS CARDS
- 
+// src/pages/sla/EmployeeSLADashboard.jsx
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -7,10 +7,13 @@ import {
   RefreshCw, AlertCircle, Eye, Zap, Grid, List
 } from 'lucide-react';
 import slaService, { dateHelpers } from '../../services/sla/slaService';
- 
+
+const cardBorder = '1.5px solid #a21caf';   // Purple border from your image
+const cardRadius = '14px';                  // Rounded corners matching UI
+
 const EmployeeSLADashboard = () => {
   const navigate = useNavigate();
- 
+
   // ========== STATE ==========
   const [slas, setSlas] = useState([]);
   const [filteredSLAs, setFilteredSLAs] = useState([]);
@@ -20,7 +23,7 @@ const EmployeeSLADashboard = () => {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [viewMode, setViewMode] = useState('cards');
   const [user, setUser] = useState(null);
- 
+
   // ========== INITIALIZE ==========
   useEffect(() => {
     try {
@@ -33,29 +36,25 @@ const EmployeeSLADashboard = () => {
       setUser(userData);
       fetchSLAs(userData.empId);
     } catch (err) {
-      console.error('❌ Error parsing user:', err);
       setError('Failed to load user information');
       setLoading(false);
     }
   }, []);
- 
+
   useEffect(() => {
     filterSLAs();
   }, [selectedFilter, slas]);
- 
+
   const fetchSLAs = useCallback(async (empId) => {
     setLoading(true);
     setRefreshing(true);
     setError(null);
-   
     try {
       if (!empId) throw new Error('Employee ID not found');
-     
       const response = await slaService.getEmployeeSLAs(empId);
-     
+
       if (response?.success) {
         let slasData = [];
-       
         if (Array.isArray(response.data)) {
           slasData = response.data;
         } else if (response.data && typeof response.data === 'object') {
@@ -63,14 +62,12 @@ const EmployeeSLADashboard = () => {
         } else {
           slasData = [];
         }
-       
         const processedSLAs = slasData.map((sla, idx) => ({
           ...sla,
           daysUntilDeadline: dateHelpers.daysRemaining(sla.deadline),
           urgencyStatus: dateHelpers.getUrgencyStatus(sla.deadline),
           _key: `${sla.slaid}-${sla.employeeId || idx}`
         }));
-       
         setSlas(processedSLAs);
       } else {
         setSlas([]);
@@ -84,10 +81,9 @@ const EmployeeSLADashboard = () => {
       setRefreshing(false);
     }
   }, []);
- 
+
   const filterSLAs = useCallback(() => {
     let filtered = [...slas];
- 
     switch (selectedFilter) {
       case 'Open':
         filtered = slas.filter(sla => sla.status === 'Open');
@@ -107,20 +103,19 @@ const EmployeeSLADashboard = () => {
       default:
         filtered = slas;
     }
- 
     setFilteredSLAs(filtered);
   }, [slas, selectedFilter]);
- 
+
   const handleViewDetails = useCallback((slaid) => {
     navigate(`/employee/dashboard/sla/details/`+slaid);
   }, [navigate]);
- 
+
   const handleRefresh = useCallback(() => {
     if (user?.empId) {
       fetchSLAs(user.empId);
     }
   }, [user, fetchSLAs]);
- 
+
   const calculateStats = useCallback(() => {
     return {
       total: slas.length,
@@ -133,9 +128,9 @@ const EmployeeSLADashboard = () => {
       ).length
     };
   }, [slas]);
- 
+
   const stats = calculateStats();
- 
+
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Open':
@@ -148,12 +143,12 @@ const EmployeeSLADashboard = () => {
         return { bg: '#f1f5f9', border: '#64748b', text: '#64748b', icon: FileText };
     }
   };
- 
+
   const isOverdue = (sla) => {
     return (sla.status === 'Open' || sla.status === 'InProgress') &&
            sla.daysUntilDeadline < 0;
   };
- 
+
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '500px' }}>
@@ -166,16 +161,14 @@ const EmployeeSLADashboard = () => {
       </div>
     );
   }
- 
+
   return (
     <div style={{ padding: '1.25rem 1.75rem', maxWidth: '100%', height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-     
+
       {/* ========== HEADER ========== */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div>
-          <h2 className="fw-bold mb-1" style={{ color: '#27235c', fontSize: '1.625rem', letterSpacing: '-0.025em' }}>
-            My SLA Dashboard
-          </h2>
+         
           <p className="mb-0" style={{ color: '#64748b', fontSize: '0.875rem' }}>
             Track your SLA deadlines and compliance status
           </p>
@@ -209,10 +202,10 @@ const EmployeeSLADashboard = () => {
           Refresh
         </button>
       </div>
- 
+
       {/* ========== ERROR ALERT ========== */}
       {error && (
-        <div className="alert alert-danger alert-dismissible fade show mb-3 d-flex align-items-start" style={{ borderRadius: '8px', padding: '0.75rem 1rem', border: '1px solid #fee2e2', backgroundColor: '#fef2f2' }}>
+        <div className="alert alert-danger alert-dismissible fade show mb-3 d-flex align-items-start" style={{ borderRadius: cardRadius, padding: '0.75rem 1rem', border: '1px solid #fee2e2', backgroundColor: '#fef2f2' }}>
           <AlertCircle size={18} className="flex-shrink-0 me-2" style={{ marginTop: '2px', color: '#dc2626' }} />
           <div className="flex-grow-1">
             <strong style={{ fontSize: '0.875rem', color: '#991b1b' }}>Error:</strong>
@@ -221,7 +214,7 @@ const EmployeeSLADashboard = () => {
           <button type="button" className="btn-close" onClick={() => setError(null)} />
         </div>
       )}
- 
+
       {/* ========== STATS CARDS - VERTICAL CENTERED LAYOUT ========== */}
       <div className="row g-3 mb-3">
         {[
@@ -234,26 +227,25 @@ const EmployeeSLADashboard = () => {
           return (
             <div key={stat.label} className="col-6 col-lg-3">
               <div
-                className="card border-0 h-100"
+                className="card h-100"
                 style={{
-                  borderRadius: '10px',
+                  border: cardBorder,
+                  borderRadius: cardRadius,
                   backgroundColor: '#fff',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                  boxShadow: 'none',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   cursor: 'pointer'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.12)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px 0 rgba(163,21,175,0.13)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}
               >
                 <div
                   className="card-body d-flex flex-column align-items-center justify-content-center text-center"
-                  style={{ padding: '1.25rem 1rem' }}
+                  style={{ padding: '1.75rem 1.25rem' }}
                 >
                   {/* Icon at top */}
                   <div
@@ -268,8 +260,6 @@ const EmployeeSLADashboard = () => {
                   >
                     <Icon size={28} color={stat.iconColor} strokeWidth={2.5} />
                   </div>
-                 
-                  {/* Number */}
                   <h2
                     className="fw-bold mb-2"
                     style={{
@@ -282,13 +272,11 @@ const EmployeeSLADashboard = () => {
                   >
                     {stat.value}
                   </h2>
-                 
-                  {/* Label */}
                   <p
                     className="mb-0"
                     style={{
-                      fontSize: '0.875rem',
-                      color: '#64748b',
+                      fontSize: '0.975rem',
+                      color: '#27235c',
                       fontWeight: 600,
                       lineHeight: 1.2
                     }}
@@ -301,10 +289,10 @@ const EmployeeSLADashboard = () => {
           );
         })}
       </div>
- 
+
       {/* ========== OVERDUE ALERT ========== */}
       {stats.overdue > 0 && (
-        <div className="alert d-flex align-items-center gap-3 mb-3" style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '0.875rem 1rem' }}>
+        <div className="alert d-flex align-items-center gap-3 mb-3" style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: cardRadius, padding: '0.875rem 1rem' }}>
           <div style={{ width: '40px', height: '40px', backgroundColor: '#fee2e2', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <AlertTriangle size={22} color="#dc2626" />
           </div>
@@ -318,7 +306,7 @@ const EmployeeSLADashboard = () => {
           </div>
         </div>
       )}
- 
+
       {/* ========== FILTER + VIEW TOGGLE ========== */}
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div className="d-flex gap-2" style={{ flexWrap: 'wrap' }}>
@@ -335,14 +323,15 @@ const EmployeeSLADashboard = () => {
               className="btn d-inline-flex align-items-center gap-2"
               onClick={() => setSelectedFilter(filter.key)}
               style={{
-                backgroundColor: selectedFilter === filter.key ? '#27235c' : '#fff',
-                color: selectedFilter === filter.key ? '#fff' : '#64748b',
-                border: selectedFilter === filter.key ? 'none' : '1px solid #e2e8f0',
+                backgroundColor: selectedFilter === filter.key ? '#a21caf' : '#fff',
+                color: selectedFilter === filter.key ? '#fff' : '#7f1d1d',
+                border: selectedFilter === filter.key ? 'none' : cardBorder,
                 borderRadius: '8px',
                 padding: '6px 14px',
                 fontSize: '0.875rem',
                 fontWeight: 600,
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: 'none'
               }}
               onMouseEnter={(e) => {
                 if (selectedFilter !== filter.key) {
@@ -358,8 +347,8 @@ const EmployeeSLADashboard = () => {
               {filter.label}
               {filter.count > 0 && (
                 <span className="badge" style={{
-                  backgroundColor: selectedFilter === filter.key ? 'rgba(255,255,255,0.2)' : '#e2e8f0',
-                  color: selectedFilter === filter.key ? '#fff' : '#475569',
+                  backgroundColor: selectedFilter === filter.key ? 'rgba(255,255,255,0.2)' : '#f3e8ff',
+                  color: selectedFilter === filter.key ? '#fff' : '#a21caf',
                   padding: '2px 8px',
                   fontSize: '0.75rem',
                   borderRadius: '10px',
@@ -371,7 +360,7 @@ const EmployeeSLADashboard = () => {
             </button>
           ))}
         </div>
- 
+
         {/* VIEW TOGGLE */}
         <div className="btn-group" role="group">
           <button
@@ -392,14 +381,14 @@ const EmployeeSLADashboard = () => {
           </button>
         </div>
       </div>
- 
+
       {/* ========== CONTENT AREA - SCROLLABLE ========== */}
       <div style={{ flex: 1, overflow: 'auto' }}>
         {filteredSLAs.length === 0 ? (
-          <div className="card border-0" style={{ borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', minHeight: '300px' }}>
+          <div className="card" style={{ border: cardBorder, borderRadius: cardRadius, background: '#fff', boxShadow: 'none', minHeight: '300px' }}>
             <div className="card-body d-flex flex-column align-items-center justify-content-center text-center p-5">
               <FileText size={56} style={{ color: '#cbd5e1', opacity: 0.5 }} className="mb-3" />
-              <h5 className="fw-bold mb-2" style={{ color: '#64748b', fontSize: '1.125rem' }}>No SLAs found</h5>
+              <h5 className="fw-bold mb-2" style={{ color: '#a21caf', fontSize: '1.125rem' }}>No SLAs found</h5>
               <p className="text-muted mb-0" style={{ fontSize: '0.938rem' }}>
                 {selectedFilter === 'All' ? 'You don\'t have any SLAs assigned yet' : `No ${selectedFilter.toLowerCase()} SLAs at this time`}
               </p>
@@ -407,7 +396,7 @@ const EmployeeSLADashboard = () => {
           </div>
         ) : viewMode === 'table' ? (
           // ========== TABLE VIEW ==========
-          <div className="card border-0" style={{ borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)' }}>
+          <div className="card" style={{ border: cardBorder, borderRadius: cardRadius, background: '#fff', boxShadow: 'none' }}>
             <div className="table-responsive">
               <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.875rem' }}>
                 <thead style={{ backgroundColor: '#f8fafc' }}>
@@ -501,17 +490,22 @@ const EmployeeSLADashboard = () => {
               const isOverdueStatus = isOverdue(sla);
               const style = isOverdueStatus ? { bg: '#fee2e2', border: '#E01950', text: '#E01950', icon: AlertTriangle } : getStatusStyle(sla.status);
               const IconComponent = style.icon;
- 
+
               return (
                 <div key={sla._key} className="col-md-6 col-lg-4">
-                  <div className="card border-0 h-100" style={{ borderRadius: '10px', borderLeft: `4px solid ${style.border}`, boxShadow: '0 1px 3px rgba(0,0,0,0.08)', cursor: 'pointer', transition: 'all 0.3s ease' }}
+                  <div className="card h-100" style={{
+                    border: cardBorder,
+                    borderRadius: cardRadius,
+                    background: '#fff',
+                    boxShadow: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.12)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px 0 rgba(163,21,175,0.13)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
                     <div className="card-body" style={{ padding: '1.125rem' }}>
@@ -521,7 +515,7 @@ const EmployeeSLADashboard = () => {
                           <IconComponent size={20} color={style.text} strokeWidth={2.5} />
                         </div>
                         <div className="flex-grow-1" style={{ minWidth: 0 }}>
-                          <h6 className="mb-1 fw-bold text-truncate" style={{ fontSize: '0.938rem', color: '#0f172a' }}>
+                          <h6 className="mb-1 fw-bold text-truncate" style={{ fontSize: '0.938rem', color: '#a21caf' }}>
                             {sla.slatype || 'SLA'}
                           </h6>
                           <span className="badge" style={{ backgroundColor: style.bg, color: style.text, fontSize: '0.75rem', padding: '3px 8px', fontWeight: 600, borderRadius: '4px' }}>
@@ -529,8 +523,6 @@ const EmployeeSLADashboard = () => {
                           </span>
                         </div>
                       </div>
- 
-                      {/* Info Grid */}
                       <div className="mb-3" style={{ fontSize: '0.813rem' }}>
                         <div className="d-flex justify-content-between mb-2 pb-2" style={{ borderBottom: '1px solid #f1f5f9' }}>
                           <span style={{ color: '#64748b', fontWeight: 600 }}>Deadline</span>
@@ -564,8 +556,6 @@ const EmployeeSLADashboard = () => {
                           </div>
                         )}
                       </div>
- 
-                      {/* Action */}
                       <button
                         className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
                         onClick={() => handleViewDetails(sla.slaid)}
@@ -582,7 +572,6 @@ const EmployeeSLADashboard = () => {
           </div>
         )}
       </div>
- 
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
@@ -596,7 +585,5 @@ const EmployeeSLADashboard = () => {
     </div>
   );
 };
- 
+
 export default EmployeeSLADashboard;
- 
- 

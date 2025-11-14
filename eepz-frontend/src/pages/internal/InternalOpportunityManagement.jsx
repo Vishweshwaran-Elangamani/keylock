@@ -9,8 +9,7 @@ import EditOpportunityModal from "./OpportunityModals/EditOpportunityModal";
 import DeleteOpportunityModal from "./OpportunityModals/DeleteOpportunityModal";
 import SelfNominateModal from "./NominationModals/SelfNominateModal";
 import ManagerNominateModal from "./NominationModals/ManagerNominateModal";
-import toastr from "toastr";
-import "toastr/build/toastr.min.css";
+import {toast} from "sonner";
 import "../../styles/internal/InternalOpportunityManagement.css";
 
 const InternalOpportunityManagement = () => {
@@ -37,7 +36,7 @@ const InternalOpportunityManagement = () => {
   const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
 
-  toastr.options = {
+  toast.options = {
     closeButton: true,
     progressBar: true,
     positionClass: "toast-top-right",
@@ -68,7 +67,7 @@ const InternalOpportunityManagement = () => {
         setOpportunities(oppArray);
       } else {
         setOpportunities([]);
-        toastr.error("Failed to load opportunities");
+        toast.error("Failed to load opportunities");
       }
 
       if (departmentsResponse.success) {
@@ -77,7 +76,7 @@ const InternalOpportunityManagement = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
       setOpportunities([]);
-      toastr.error("Failed to load data. Please try again.");
+      toast.error("Failed to load data. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -152,7 +151,7 @@ const InternalOpportunityManagement = () => {
   const handleNominationSubmitted = () => {
     setShowSelfNominateModal(false);
     setShowManagerNominateModal(false);
-    toastr.success("Nomination submitted successfully!");
+    toast.success("Nomination submitted successfully!");
     fetchData();
   };
 
@@ -467,7 +466,7 @@ const InternalOpportunityManagement = () => {
                         <button
                           className="action-btn action-btn-view"
                           onClick={() =>
-                            toastr.info(
+                            toast.info(
                               `${opportunity.opportunityName} - Posted by ${opportunity.postedByName}`
                             )
                           }

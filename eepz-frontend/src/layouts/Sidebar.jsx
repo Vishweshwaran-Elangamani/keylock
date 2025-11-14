@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
-import explogo from "../assets/explogo.png";
+import icon from "../assets/icon.png";
+import logolightbarred from "../assets/logolightbarred.png";
+import logodarkbarred from "../assets/logodarkbarred.png";
 
 const Sidebar = ({ allowedRoles = [], currentRole }) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
@@ -25,11 +26,20 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
     ],
     HR: [
       { icon: "bi-speedometer2", label: "Dashboard", path: "/hr/dashboard" },
-      { icon: "bi-briefcase", label: "Operations", path: "/hr/operations" }, {
+      { icon: "bi-briefcase", label: "Internal Oppurtunities", path: "/internal/opportunities" },
+      { icon: "bi-hand-thumbs-up", label: "Nominations", path: "/internal/nominations" },
+      { icon: "bi-arrow-up-circle", label: "Promotions", path: "/internal/promotions" },
+      { icon: "bi-bar-chart-line", label: "Career Progression", path: "/hr/operations/promotions" },
+      {
         icon: "bi-book",
         label: "Learning & Development",
         path: "/hr/lnd/dashboard",
       },
+      { icon: "bi-gear", label: "Operations", path: "/hr/operations/policies" },
+      { icon: "bi-stack", label: "Project Management", path: "/hr/dashboard/projectmgmt" },
+      { icon: "bi-graph-up", label: "Performance Management", path: "/hr/dashboard/performance" },
+      { icon: "bi-file-earmark-check", label: "SLA Management", path: "/hr/dashboard/sla" },
+      { icon: "bi-chat-left-text", label: "Feedback Management", path: "/hr/dashboard/feedback" },
     ],
     Leadership: [
       {
@@ -174,21 +184,21 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         style={{
           padding: "1.5rem 1.25rem",
           borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
-          background: "rgba(219, 219, 219, 0.15)",
+          background: "rgba(255, 255, 255, 1)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: "80px",
+          minHeight: "1.5rem",
         }}
       >
         <img
           onClick={() => setSidebarExpanded(!sidebarExpanded)}
-          src={sidebarExpanded ? explogo : logo}
+          src={sidebarExpanded ? logodarkbarred : icon}
           alt="EEPZ Logo"
           style={{
             width: sidebarExpanded ? "180px" : "50px",
             height: sidebarExpanded ? "auto" : "50px",
-            maxHeight: "60px",
+            maxHeight: "40px",
             objectFit: "contain",
             cursor: "pointer",
             transition: "all 0.3s ease-in-out",

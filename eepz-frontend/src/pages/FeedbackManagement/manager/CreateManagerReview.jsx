@@ -106,7 +106,7 @@ export default function CreateManagerReview() {
       
       if (response.data?.success === true) {
         setSuccess('Review created successfully!');
-        setTimeout(() => navigate('/manager/reviews'), 1500);
+        setTimeout(() => navigate('/manager/dashboard/feedback'), 1500);
       } else {
         setError(response.data?.message || 'Failed to create review');
       }

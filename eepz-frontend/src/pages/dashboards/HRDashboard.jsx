@@ -38,6 +38,13 @@ const HRDashboard = () => {
       path: "/hr/operations/promotions",
     },
     {
+      title: "Learning and Development",
+      description: "Time For An Upgrade",
+      icon: "bi bi-book",
+      gradient: "gradient-pink",
+      path: "/hr/lnd/dashboard",
+    },
+    {
       title: "HR Operations",
       description: "Manage HR daily operations",
       icon: "bi bi-gear",
@@ -75,30 +82,30 @@ const HRDashboard = () => {
   ];
   return (
     <div className="dashboard-container">
-          <div className="management-cards-grid">
-            {cards.map((card, index) => (
-              <div
-                key={index}
-                className={`management-card ${hoveredCard === index ? "hovered" : ""
-                  }`}
-                onMouseEnter={() => setHoveredCard(index)}
-                onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => handleNavigation(card.path)}
-              >
-                <div className={`card-icon-wrapper ${card.gradient}`}>
-                  <i className={`bi ${card.icon}`}></i>
-                </div>
-                <div className="card-content">
-                  <h3 className="card-title">{card.title}</h3>
-                  <p className="card-description">{card.description}</p>
-                </div>
-                <div className="card-arrow">
-                  <i className="bi bi-arrow-right"></i>
-                </div>
-              </div>
-            ))}
+      <div className="management-cards-grid">
+        {cards.map((card, index) => (
+          <div
+            key={index}
+            className={`management-card ${hoveredCard === index ? "hovered" : ""
+              }`}
+            onMouseEnter={() => setHoveredCard(index)}
+            onMouseLeave={() => setHoveredCard(null)}
+            onClick={() => handleNavigation(card.path)}
+          >
+            <div className={`card-icon-wrapper ${card.gradient}`}>
+              <i className={`bi ${card.icon}`}></i>
+            </div>
+            <div className="card-content">
+              <h3 className="card-title">{card.title}</h3>
+              <p className="card-description">{card.description}</p>
+            </div>
+            <div className="card-arrow">
+              <i className="bi bi-arrow-right"></i>
+            </div>
           </div>
-        </div>
+        ))}
+      </div>
+    </div>
   );
 };
 export default HRDashboard;

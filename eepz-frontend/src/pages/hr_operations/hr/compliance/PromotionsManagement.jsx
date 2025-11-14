@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Toast } from "bootstrap";
+import { toast } from "sonner";
 import careerProgressionService from "../../../../services/hr_operations/hr/careerProgressionService.js";
 import CreatePromotionModal from "../modals/CreatePromotionModal.jsx";
 import FairnessCheckModal from "../modals/FairnessCheckModal.jsx";
@@ -9,16 +9,19 @@ import SubmitToLeadershipModal from "../modals/SubmitToLeadershipModal.jsx";
 import PromotionDetailsModal from "../modals/PromotionDetailsModal.jsx";
 import "../../../../styles/hr_operations/hr/promotionsManagement.css";
 
+
 const PromotionsManagement = () => {
   const [promotions, setPromotions] = useState([]);
   const [filteredPromotions, setFilteredPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+
   // View & Pagination States
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
 
   // Filter States
   const [filters, setFilters] = useState({
@@ -28,12 +31,14 @@ const PromotionsManagement = () => {
     role: "",
   });
 
+
   // Filter Options
   const [filterOptions, setFilterOptions] = useState({
     statuses: [],
     departments: [],
     roles: [],
   });
+
 
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -44,8 +49,10 @@ const PromotionsManagement = () => {
     useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
+
   const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [payrollData, setPayrollData] = useState(null);
+
 
   const currentUserId = parseInt(localStorage.getItem("userId"));
   const userRole = localStorage.getItem("userRole");
@@ -54,14 +61,17 @@ const PromotionsManagement = () => {
   const isHR = userRole === "HR";
   const isLeadership = userRole === "Leadership";
 
+
   useEffect(() => {
     fetchPromotions();
   }, []);
+
 
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
   }, [promotions, filters]);
+
 
   const fetchPromotions = async () => {
     setLoading(true);
@@ -83,6 +93,7 @@ const PromotionsManagement = () => {
     }
   };
 
+
   const generateFilterOptions = (data) => {
     const statuses = [
       ...new Set(data.map((p) => p.status).filter(Boolean)),
@@ -94,6 +105,7 @@ const PromotionsManagement = () => {
       ...new Set(data.map((p) => p.newRole).filter(Boolean)),
     ].sort();
 
+
     setFilterOptions({
       statuses,
       departments,
@@ -101,8 +113,10 @@ const PromotionsManagement = () => {
     });
   };
 
+
   const applyFilters = () => {
     let filtered = promotions;
+
 
     // Search filter
     if (filters.search.trim()) {
@@ -123,10 +137,12 @@ const PromotionsManagement = () => {
       });
     }
 
+
     // Status filter
     if (filters.status !== "all") {
       filtered = filtered.filter((p) => p.status === filters.status);
     }
+
 
     // Department filter
     if (filters.department) {
@@ -135,13 +151,16 @@ const PromotionsManagement = () => {
       );
     }
 
+
     // Role filter
     if (filters.role) {
       filtered = filtered.filter((p) => p.newRole === filters.role);
     }
 
+
     setFilteredPromotions(filtered);
   };
+
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -151,12 +170,14 @@ const PromotionsManagement = () => {
     }));
   };
 
+
   const handleSearchChange = (e) => {
     setFilters((prev) => ({
       ...prev,
       search: e.target.value,
     }));
   };
+
 
   const clearFilters = () => {
     setFilters({
@@ -167,10 +188,12 @@ const PromotionsManagement = () => {
     });
   };
 
+
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
     setCurrentPage(1);
   };
+
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -178,15 +201,18 @@ const PromotionsManagement = () => {
     }
   };
 
+
   // PAGINATION LOGIC
   const totalPages = Math.ceil(filteredPromotions.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = filteredPromotions.slice(startIndex, endIndex);
 
+
   const handleCreatePromotion = () => {
     setShowCreateModal(true);
   };
+
 
   const handlePromotionCreated = () => {
     setShowCreateModal(false);
@@ -194,15 +220,18 @@ const PromotionsManagement = () => {
     showToast("Success", "Promotion proposal created successfully", "success");
   };
 
+
   const handleViewDetails = (promotion) => {
     setSelectedPromotion(promotion);
     setShowDetailsModal(true);
   };
 
+
   const handleCheckFairness = (promotion) => {
     setSelectedPromotion(promotion);
     setShowFairnessModal(true);
   };
+
 
   const handleFairnessReviewed = () => {
     setShowFairnessModal(false);
@@ -211,10 +240,12 @@ const PromotionsManagement = () => {
     }, 300);
   };
 
+
   const handleApproveRejectClick = (promotion) => {
     setSelectedPromotion(promotion);
     setShowApproveRejectModal(true);
   };
+
 
   const handlePromotionApprovedRejected = () => {
     setShowApproveRejectModal(false);
@@ -223,10 +254,12 @@ const PromotionsManagement = () => {
     showToast("Success", "Promotion decision recorded successfully", "success");
   };
 
+
   const handleUpdatePayrollClick = (promotion) => {
     setSelectedPromotion(promotion);
     setShowPayrollModal(true);
   };
+
 
   const handlePayrollUpdated = (updatedPayroll) => {
     setPayrollData(updatedPayroll);
@@ -236,6 +269,7 @@ const PromotionsManagement = () => {
       fetchPromotions();
     }, 500);
   };
+
 
   const handleSubmitToLeadershipClick = (promotion) => {
     setSelectedPromotion(promotion);
@@ -249,6 +283,7 @@ const PromotionsManagement = () => {
     setShowSubmitLeadershipModal(true);
   };
 
+
   const handleSubmittedToLeadership = () => {
     setShowSubmitLeadershipModal(false);
     setSelectedPromotion(null);
@@ -257,22 +292,29 @@ const PromotionsManagement = () => {
     showToast("Success", "Promotion submitted to Leadership", "success");
   };
 
+
   const showToast = (title, message, type) => {
-    const toastElement = document.getElementById("promotionsToast");
-    if (!toastElement) return;
-
-    const toastTitle = document.getElementById("promotionsToastTitle");
-    const toastBody = document.getElementById("promotionsToastBody");
-    const toastHeader = toastElement.querySelector(".toast-header");
-
-    if (toastTitle) toastTitle.textContent = title;
-    if (toastBody) toastBody.textContent = message;
-    if (toastHeader)
-      toastHeader.className = `toast-header bg-${type} text-white`;
-
-    const toast = new Toast(toastElement);
-    toast.show();
+    const fullMessage = `${title}: ${message}`;
+    
+    switch (type) {
+      case "success":
+        toast.success(fullMessage);
+        break;
+      case "danger":
+      case "error":
+        toast.error(fullMessage);
+        break;
+      case "warning":
+        toast.warning(fullMessage);
+        break;
+      case "info":
+        toast.info(fullMessage);
+        break;
+      default:
+        toast(fullMessage);
+    }
   };
+
 
   const getStatusBadgeStyle = (status) => {
     const statusStyles = {
@@ -284,6 +326,7 @@ const PromotionsManagement = () => {
     return statusStyles[status] || { background: "#e5e7eb", color: "#374151" };
   };
 
+
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return "Not Set";
     return new Intl.NumberFormat("en-IN", {
@@ -293,6 +336,7 @@ const PromotionsManagement = () => {
     }).format(amount);
   };
 
+
   const formatDate = (dateString) => {
     if (!dateString) return "—";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -301,6 +345,7 @@ const PromotionsManagement = () => {
       day: "numeric",
     });
   };
+
 
   const getInitials = (name) => {
     if (!name) return "??";
@@ -312,9 +357,11 @@ const PromotionsManagement = () => {
       .slice(0, 2);
   };
 
+
   const getEmployeeDisplay = (promotion) => {
     return promotion.employeeName || promotion.employeeEmail || "Unknown";
   };
+
 
   return (
     <div className="promo-root">
@@ -324,6 +371,7 @@ const PromotionsManagement = () => {
           {error}
         </div>
       )}
+
 
       {/* FILTER BAR WITH TOGGLES */}
       <div className="promo-filters-container">
@@ -351,6 +399,7 @@ const PromotionsManagement = () => {
               </button>
             </div>
 
+
             {/* CLEAR BUTTON */}
             <button
               className="btn-clear-filters"
@@ -361,6 +410,7 @@ const PromotionsManagement = () => {
             </button>
           </div>
         </div>
+
 
         <div className="filters-grid">
           {/* SEARCH */}
@@ -378,6 +428,7 @@ const PromotionsManagement = () => {
               />
             </div>
           </div>
+
 
           {/* STATUS FILTER */}
           <div className="filter-group">
@@ -397,6 +448,7 @@ const PromotionsManagement = () => {
             </select>
           </div>
 
+
           {/* DEPARTMENT FILTER */}
           <div className="filter-group">
             <label className="filter-label">Department</label>
@@ -414,6 +466,7 @@ const PromotionsManagement = () => {
               ))}
             </select>
           </div>
+
 
           {/* NEW ROLE FILTER */}
           <div className="filter-group">
@@ -434,6 +487,7 @@ const PromotionsManagement = () => {
           </div>
         </div>
       </div>
+
 
       {/* CONTENT */}
       {loading ? (
@@ -482,6 +536,7 @@ const PromotionsManagement = () => {
               const statusStyle = getStatusBadgeStyle(promotion.status);
               const employeeDisplay = getEmployeeDisplay(promotion);
 
+
               return (
                 <div key={promotion.promotionId} className="promo-card">
                   {/* CARD HEADER */}
@@ -497,6 +552,7 @@ const PromotionsManagement = () => {
                     </div>
                   </div>
 
+
                   {/* CARD BODY */}
                   <div className="promo-card-body">
                     <div className="promo-card-row">
@@ -506,12 +562,14 @@ const PromotionsManagement = () => {
                       </span>
                     </div>
 
+
                     <div className="promo-card-row">
                       <span className="promo-card-label">New Role</span>
                       <span className="promo-card-value promo-new-role">
                         {promotion.newRole || "—"}
                       </span>
                     </div>
+
 
                     <div className="promo-card-row">
                       <span className="promo-card-label">Old Salary</span>
@@ -520,12 +578,14 @@ const PromotionsManagement = () => {
                       </span>
                     </div>
 
+
                     <div className="promo-card-row">
                       <span className="promo-card-label">New Salary</span>
                       <span className="promo-card-value promo-new-salary">
                         {formatCurrency(promotion.newSalary)}
                       </span>
                     </div>
+
 
                     <div className="promo-card-row">
                       <span className="promo-card-label">Increment</span>
@@ -540,6 +600,7 @@ const PromotionsManagement = () => {
                       </span>
                     </div>
 
+
                     <div className="promo-card-row">
                       <span className="promo-card-label">Status</span>
                       <span className="promo-status-badge" style={statusStyle}>
@@ -547,6 +608,7 @@ const PromotionsManagement = () => {
                       </span>
                     </div>
                   </div>
+
 
                   {/* CARD ACTIONS */}
                   <div className="promo-card-actions">
@@ -559,6 +621,7 @@ const PromotionsManagement = () => {
                       <i className="bi bi-eye"></i>
                       <span>View</span>
                     </button>
+
 
                     {isDeptHead && promotion.status === "Pending" && (
                       <>
@@ -582,6 +645,7 @@ const PromotionsManagement = () => {
                         </button>
                       </>
                     )}
+
 
                     {isHR && promotion.status === "Approved" && (
                       <>
@@ -615,6 +679,7 @@ const PromotionsManagement = () => {
             })}
           </div>
 
+
           {/* PAGINATION */}
           <div className="pagination-container">
             <div className="pagination-left">
@@ -631,6 +696,7 @@ const PromotionsManagement = () => {
               </select>
             </div>
 
+
             <div className="pagination-center">
               <span className="pagination-info">
                 Page {currentPage} of {totalPages} | Showing{" "}
@@ -640,6 +706,7 @@ const PromotionsManagement = () => {
               </span>
             </div>
 
+
             <div className="pagination-right">
               <button
                 className="pagination-btn"
@@ -648,6 +715,7 @@ const PromotionsManagement = () => {
               >
                 <i className="bi bi-chevron-left"></i> Prev
               </button>
+
 
               <div className="pagination-numbers">
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -667,6 +735,7 @@ const PromotionsManagement = () => {
                     </button>
                   ))}
               </div>
+
 
               <button
                 className="pagination-btn"
@@ -705,6 +774,7 @@ const PromotionsManagement = () => {
                       : 0;
                   const statusStyle = getStatusBadgeStyle(promotion.status);
                   const employeeDisplay = getEmployeeDisplay(promotion);
+
 
                   return (
                     <tr key={promotion.promotionId}>
@@ -756,6 +826,7 @@ const PromotionsManagement = () => {
                             <i className="bi bi-eye"></i>
                           </button>
 
+
                           {isDeptHead && promotion.status === "Pending" && (
                             <>
                               <button
@@ -777,6 +848,7 @@ const PromotionsManagement = () => {
                               </button>
                             </>
                           )}
+
 
                           {isHR && promotion.status === "Approved" && (
                             <>
@@ -816,6 +888,7 @@ const PromotionsManagement = () => {
             </table>
           </div>
 
+
           {/* PAGINATION */}
           <div className="pagination-container">
             <div className="pagination-left">
@@ -832,6 +905,7 @@ const PromotionsManagement = () => {
               </select>
             </div>
 
+
             <div className="pagination-center">
               <span className="pagination-info">
                 Page {currentPage} of {totalPages} | Showing{" "}
@@ -841,6 +915,7 @@ const PromotionsManagement = () => {
               </span>
             </div>
 
+
             <div className="pagination-right">
               <button
                 className="pagination-btn"
@@ -849,6 +924,7 @@ const PromotionsManagement = () => {
               >
                 <i className="bi bi-chevron-left"></i> Prev
               </button>
+
 
               <div className="pagination-numbers">
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
@@ -869,6 +945,7 @@ const PromotionsManagement = () => {
                   ))}
               </div>
 
+
               <button
                 className="pagination-btn"
                 onClick={() => goToPage(currentPage + 1)}
@@ -881,6 +958,7 @@ const PromotionsManagement = () => {
         </>
       )}
 
+
       {/* MODALS */}
       {showCreateModal && (
         <CreatePromotionModal
@@ -889,6 +967,7 @@ const PromotionsManagement = () => {
           onPromotionCreated={handlePromotionCreated}
         />
       )}
+
 
       {showFairnessModal && selectedPromotion && (
         <FairnessCheckModal
@@ -902,6 +981,7 @@ const PromotionsManagement = () => {
         />
       )}
 
+
       {showApproveRejectModal && selectedPromotion && (
         <ApproveRejectModal
           show={showApproveRejectModal}
@@ -914,6 +994,7 @@ const PromotionsManagement = () => {
         />
       )}
 
+
       {showPayrollModal && selectedPromotion && (
         <PayrollUpdateModal
           show={showPayrollModal}
@@ -925,6 +1006,7 @@ const PromotionsManagement = () => {
           onPayrollUpdated={handlePayrollUpdated}
         />
       )}
+
 
       {showSubmitLeadershipModal && selectedPromotion && (
         <SubmitToLeadershipModal
@@ -940,6 +1022,7 @@ const PromotionsManagement = () => {
         />
       )}
 
+
       {showDetailsModal && selectedPromotion && (
         <PromotionDetailsModal
           show={showDetailsModal}
@@ -951,31 +1034,6 @@ const PromotionsManagement = () => {
         />
       )}
 
-      {/* TOAST */}
-      <div className="promo-toast-container">
-        <div
-          id="promotionsToast"
-          className="toast"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
-          <div className="toast-header">
-            <strong className="me-auto" id="promotionsToastTitle">
-              Notification
-            </strong>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="toast"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div className="toast-body" id="promotionsToastBody">
-            Toast message here
-          </div>
-        </div>
-      </div>
 
       {/* BLUR BACKDROP */}
       <div
@@ -995,5 +1053,6 @@ const PromotionsManagement = () => {
     </div>
   );
 };
+
 
 export default PromotionsManagement;

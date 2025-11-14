@@ -5,6 +5,7 @@ import {
   ArrowLeft, AlertTriangle, Clock, CheckCircle, XCircle,
   User, Calendar, FileText, MessageSquare
 } from 'lucide-react';
+import { toast } from 'sonner';
 import slaService from '../../services/sla/slaService';
 import { formatDate, formatDateTime } from '../../utils/sla/dateFormatter';
 
@@ -59,13 +60,24 @@ const SLAEscalations = () => {
       });
 
       if (response.success) {
-        alert('Escalation resolved successfully!');
+        toast.success('Escalation resolved successfully', {
+          description: 'The escalation has been resolved and saved',
+          duration: 4000,
+        });
         setSelectedEscalation(null);
         setResolutionForm({ escalationStatus: 'Resolved', resolutionComments: '' });
         fetchData();
+      } else {
+        toast.error('Failed to resolve escalation', {
+          description: response.message || 'Unable to process resolution',
+          duration: 5000,
+        });
       }
     } catch (err) {
-      alert('Failed to resolve escalation: ' + err.message);
+      toast.error('Failed to resolve escalation', {
+        description: err.message || 'An unexpected error occurred',
+        duration: 5000,
+      });
     }
   };
 

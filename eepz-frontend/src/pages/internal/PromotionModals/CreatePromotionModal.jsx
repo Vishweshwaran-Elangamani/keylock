@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import promotionService from "../../../services/internal/promotionService";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
-import toastr from "toastr";
+import {toast} from "sonner";
 import "../../../styles/internal/NominationModal.css";
 
 const CreatePromotionModal = ({
@@ -135,7 +135,7 @@ const CreatePromotionModal = ({
     e.preventDefault();
 
     if (!validateForm()) {
-      toastr.error("Please fix the errors");
+      toast.error("Please fix the errors");
       return;
     }
 
@@ -160,15 +160,15 @@ const CreatePromotionModal = ({
       const response = await promotionService.createPromotion(payload);
 
       if (response.success) {
-        toastr.success("Promotion created successfully!");
+        toast.success("Promotion created successfully!");
         onPromotionCreated();
         onHide();
       } else {
-        toastr.error(response.message || "Failed to create promotion");
+        toast.error(response.message || "Failed to create promotion");
       }
     } catch (error) {
       console.error("Error:", error);
-      toastr.error(error.message || "Failed to create promotion");
+      toast.error(error.message || "Failed to create promotion");
     } finally {
       setLoading(false);
     }

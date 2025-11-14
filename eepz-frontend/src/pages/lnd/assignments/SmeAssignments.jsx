@@ -292,7 +292,7 @@ const SmeAssignments = () => {
             <div
               style={{
                 background: "#fff",
-                border: "1px solid #e5e7eb",
+                border: "2px solid #abb4c5ff",
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
@@ -305,7 +305,7 @@ const SmeAssignments = () => {
                   gridTemplateColumns:
                     "1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr",
                   background: "#f9fafb",
-                  borderBottom: "1px solid #e5e7eb",
+                  borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
                   color: "#374151",
                   fontSize: "0.875rem",

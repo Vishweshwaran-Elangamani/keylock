@@ -3,12 +3,12 @@ import React from 'react';
 import { Eye, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 
 const TeamReviewTable = ({ reviews, onViewDetails }) => {
-  // ✅ Debug logging
+  //  Debug logging
   React.useEffect(() => {
-    console.log('📋 TeamReviewTable received reviews:', reviews);
-    console.log('📋 Total reviews in table:', reviews.length);
+    console.log(' TeamReviewTable received reviews:', reviews);
+    console.log(' Total reviews in table:', reviews.length);
     if (reviews.length > 0) {
-      console.log('📋 First review:', reviews[0]);
+      console.log(' First review:', reviews[0]);
     }
   }, [reviews]);
 
@@ -26,11 +26,11 @@ const TeamReviewTable = ({ reviews, onViewDetails }) => {
 
   const calculateUrgencyStatus = (deadline, status, submittedAt) => {
     if (submittedAt || status === 'Submitted') return { text: 'Submitted', color: 'success' };
-    
+
     const now = new Date();
     const deadlineDate = new Date(deadline);
     const daysUntilDeadline = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
-    
+
     if (daysUntilDeadline < 0) return { text: 'Overdue', color: 'danger' };
     if (daysUntilDeadline <= 1) return { text: `${daysUntilDeadline} day(s) left`, color: 'warning' };
     return { text: `${daysUntilDeadline} day(s) left`, color: 'success' };
@@ -78,14 +78,14 @@ const TeamReviewTable = ({ reviews, onViewDetails }) => {
                     review.status,
                     review.submittedAt
                   );
-                  
+
                   const daysUntil = review.daysUntilDeadline;
 
                   return (
                     <tr key={review.reviewTrackingId || review.slaid}>
                       <td className="px-4">
                         <div>
-                          <strong>{review.employeeName}</strong><br/>
+                          <strong>{review.employeeName}</strong><br />
                           <small className="text-muted">{review.employeeEmail}</small>
                         </div>
                       </td>
@@ -104,7 +104,7 @@ const TeamReviewTable = ({ reviews, onViewDetails }) => {
                           </small>
                           {review.submittedAt && (
                             <>
-                              <br/>
+                              <br />
                               <small className="text-success">
                                 Submitted: {formatDate(review.submittedAt).split(',')[0]}
                               </small>

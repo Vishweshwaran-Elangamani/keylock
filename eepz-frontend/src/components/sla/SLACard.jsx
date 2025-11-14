@@ -62,8 +62,8 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
           <small className="text-muted d-block">Deadline</small>
           <strong>{new Date(sla.deadline).toLocaleDateString('en-IN')}</strong>
           <small className={`d-block mt-1 ${daysUntil < 0 ? 'text-danger' : 'text-muted'}`}>
-            {daysUntil < 0 
-              ? `🔴 ${Math.abs(daysUntil)} days overdue` 
+            {daysUntil < 0
+              ? `🔴 ${Math.abs(daysUntil)} days overdue`
               : `⏳ ${daysUntil} days remaining`}
           </small>
         </div>
@@ -81,8 +81,8 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
             <small className="text-muted d-block">Compliance Status</small>
             <Badge bg={
               sla.complianceStatus === 'OnTime' ? 'success' :
-              sla.complianceStatus === 'Breached' ? 'danger' :
-              'warning'
+                sla.complianceStatus === 'Breached' ? 'danger' :
+                  'warning'
             }>
               {sla.complianceStatus}
             </Badge>
@@ -92,8 +92,8 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
 
       {/* Card Footer */}
       <Card.Footer className="bg-light d-flex gap-2">
-        <Button 
-          variant="outline-primary" 
+        <Button
+          variant="outline-primary"
           size="sm"
           className="flex-grow-1"
           onClick={onViewDetails}
@@ -101,8 +101,8 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
           View Details
         </Button>
         {sla.status === 'Open' && (
-          <Button 
-            variant="outline-danger" 
+          <Button
+            variant="outline-danger"
             size="sm"
             className="flex-grow-1"
             onClick={onEscalate}

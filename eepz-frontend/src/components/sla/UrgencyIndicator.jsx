@@ -31,9 +31,9 @@ const UrgencyIndicator = ({ urgencyStatus, daysUntilDeadline, showLabel = true }
   const IconComponent = config.icon;
 
   return (
-    <div 
+    <div
       className="d-inline-flex align-items-center gap-2 px-3 py-2"
-      style={{ 
+      style={{
         backgroundColor: config.bgColor,
         borderRadius: '8px',
         border: `1px solid ${config.color}30`

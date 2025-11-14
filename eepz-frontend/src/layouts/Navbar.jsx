@@ -65,7 +65,7 @@ const Navbar = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "0.75rem 1.5rem",
+            padding: "1.15rem 1.5rem",
           }}
         >
           {/* Left Section */}
@@ -82,7 +82,7 @@ const Navbar = () => {
               >
                 <i
                   className="bi bi-person-circle"
-                  style={{ fontSize: "1.2rem", color: "#97247E" }}
+                  style={{ fontSize: "1.5rem", color: "#97247E" }}
                 ></i>
                 <h6
                   style={{ margin: 0, fontWeight: "bold", color: "#97247E" }}

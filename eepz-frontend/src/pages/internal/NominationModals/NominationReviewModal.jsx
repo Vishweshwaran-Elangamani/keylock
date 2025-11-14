@@ -1,6 +1,6 @@
 import { useState } from "react";
 import nominationService from "../../../services/internal/nominationService";
-import toastr from "toastr";
+import {toast} from "sonner";
 import "../../../styles/internal/NominationModal.css";
 
 const NominationReviewModal = ({
@@ -79,7 +79,7 @@ const NominationReviewModal = ({
   e.preventDefault();
 
   if (!validateForm()) {
-    toastr.error("Please fix the errors");
+    toast.error("Please fix the errors");
     return;
   }
 
@@ -118,17 +118,17 @@ const NominationReviewModal = ({
     );
 
     if (response.success) {
-      toastr.success(
+      toast.success(
         `Nomination ${formData.action.toLowerCase()} successfully!`
       );
       onReviewSubmitted();
       onHide();
     } else {
-      toastr.error(response.message || "Failed to submit review");
+      toast.error(response.message || "Failed to submit review");
     }
   } catch (error) {
     console.error("Error:", error);
-    toastr.error(error.message || "Failed to submit review");
+    toast.error(error.message || "Failed to submit review");
   } finally {
     setLoading(false);
   }

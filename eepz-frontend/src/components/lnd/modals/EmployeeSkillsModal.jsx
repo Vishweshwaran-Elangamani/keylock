@@ -9,10 +9,12 @@ import { toast } from "sonner";
 import {
   APPROVAL_TYPE,
   APPROVAL_STATUS,
+  ASSIGNMENT_STATUS,
 } from "../../../constants/lnd/lndConstants";
 
 const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
   const [skills, setSkills] = useState([]);
+  const [assignments, setAssignments] = useState([]);
   const [approvals, setApprovals] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,8 +30,9 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     fetchEmployeeSkills();
     if (!isReadOnly) {
       fetchApprovalHistory();
+      fetchTeamAssignments();
     }
-  }, [employee.employeeId]);
+  }, [employee.employeeId, showRequestSmeModal]);
 
   const fetchEmployeeSkills = async () => {
     try {
@@ -54,6 +57,36 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
     } catch (error) {
       console.error("Failed to fetch employee skills:", error);
       toast.error("Failed to load employee skills");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTeamAssignments = async () => {
+    try {
+      setLoading(true);
+      const response = await lndService.getTeamAssignments(
+        1,
+        ASSIGNMENT_STATUS.IN_PROGRESS,
+        employee.employeeName,
+        "",
+        "desc"
+      );
+
+      if (response.data.success) {
+        setAssignments(response.data.data.items);
+        setPagination({
+          totalCount: response.data.data.totalCount,
+          pageNumber: response.data.data.pageNumber,
+          pageSize: response.data.data.pageSize,
+          totalPages: response.data.data.totalPages,
+          hasPreviousPage: response.data.data.hasPreviousPage,
+          hasNextPage: response.data.data.hasNextPage,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch team assignments:", error);
+      toast.error("Failed to load team assignments");
     } finally {
       setLoading(false);
     }
@@ -97,6 +130,15 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
         approval.status === "PENDING" &&
         JSON.parse(approval.notes || "{}").MenteeEmployeeId ===
           employee.employeeId
+    );
+  };
+
+  const hasOngoingAssignments = (skillId) => {
+    return assignments.some(
+      (assignment) =>
+        assignment.skillId === skillId &&
+        assignment.status === "IN_PROGRESS" &&
+        assignment.MenteeEmployeeId != employee.employeeId
     );
   };
 
@@ -432,6 +474,31 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                                 style={{ fontSize: "12px" }}
                               ></i>
                               Pending
+                            </button>
+                          ) : hasOngoingAssignments(skill.skillId) ? (
+                            <button
+                              disabled
+                              style={{
+                                padding: "0.375rem 0.5rem",
+                                background: "#2b8302ff",
+                                border: "none",
+                                borderRadius: "4px",
+                                color: "#fff",
+                                cursor: "not-allowed",
+                                display: "flex",
+                                alignItems: "center",
+                                fontSize: "0.75rem",
+                                fontWeight: "600",
+                                gap: "0.3rem",
+                                opacity: 0.8,
+                              }}
+                              title="SME Assignment is In Progress."
+                            >
+                              <i
+                                className="bi bi-hourglass-split"
+                                style={{ fontSize: "12px" }}
+                              ></i>
+                              Assigned
                             </button>
                           ) : (
                             <button

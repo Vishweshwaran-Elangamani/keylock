@@ -6,13 +6,15 @@ import axios from 'axios';
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5333/api';
 
 const Badge = ({ text, color = '#525252' }) => (
-  <span className="badge" style={{ 
+  <span style={{ 
+    display: 'inline-block',
     backgroundColor: `${color}20`, 
     color, 
-    padding: '6px 12px', 
-    fontSize: '0.75rem', 
+    padding: '6px 14px', 
+    fontSize: '0.813rem', 
     fontWeight: '600', 
-    borderRadius: '6px' 
+    borderRadius: '6px',
+    border: `1.5px solid ${color}40`
   }}>
     {text}
   </span>
@@ -57,7 +59,7 @@ export default function ViewManagerReview() {
           setEmployeeMap(empMap);
         }
       } catch (err) {
-        console.warn('⚠️ Error fetching employee map:', err.message);
+        console.warn('Error fetching employee map:', err.message);
       }
 
       // Fetch review details
@@ -69,13 +71,13 @@ export default function ViewManagerReview() {
           managerName: empMap[reviewRes.data.data.managerEmployeeId] || `Manager ${reviewRes.data.data.managerEmployeeId}`
         };
         setReview(reviewData);
-        console.log('✅ Review loaded:', reviewData);
+        console.log('Review loaded:', reviewData);
       } else {
         setError('Review not found');
       }
     } catch (err) {
       setError(err?.response?.data?.message || err.message || 'Failed to load review');
-      console.error('❌ Error:', err);
+      console.error('Error:', err);
     } finally {
       setLoading(false);
     }
@@ -95,10 +97,10 @@ export default function ViewManagerReview() {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
         <div className="text-center">
-          <div className="spinner-border text-primary mb-3" role="status">
+          <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#0d6efd', borderWidth: '3px' }} role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
-          <p className="text-muted">Loading review details...</p>
+          <p className="text-muted mt-3 fw-medium">Loading review details...</p>
         </div>
       </div>
     );
@@ -106,37 +108,52 @@ export default function ViewManagerReview() {
 
   if (!review) {
     return (
-      <div className="container-fluid py-3" style={{ maxWidth: '900px' }}>
-        <div className="alert alert-danger d-flex align-items-center gap-2">
-          <AlertTriangle size={18} />
-          Review not found
+      <div className="container-fluid py-4" style={{ maxWidth: '900px' }}>
+        <div className="alert alert-danger d-flex align-items-center gap-3" style={{ borderRadius: '8px', border: '1px solid #dc3545' }}>
+          <AlertTriangle size={20} />
+          <span className="fw-medium">Review not found</span>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate(-1)}>
-          <ArrowLeft size={16} className="me-2" style={{ display: 'inline' }} />
+        <button 
+          className="btn btn-primary d-inline-flex align-items-center gap-2" 
+          onClick={() => navigate(-1)}
+          style={{ borderRadius: '6px', padding: '10px 20px' }}
+        >
+          <ArrowLeft size={18} />
           Go Back
         </button>
       </div>
     );
   }
 
-  const statusColor = review.status === 'Finalized' ? '#24A148' : review.status === 'Submitted' ? '#0F62FE' : '#E2B93B';
+  const statusColor = review.status === 'Finalized' ? '#198754' : review.status === 'Submitted' ? '#0d6efd' : '#ffc107';
 
   return (
-    <div className="d-flex justify-content-center py-4" style={{ minHeight: '100vh', background: '#f9f9f9' }}>
-      <div style={{ width: '100%', maxWidth: '900px', paddingLeft: '1rem', paddingRight: '1rem' }}>
-        {/* HEADER */}
-        <div className="d-flex align-items-center justify-content-between mb-4">
-          <div className="d-flex align-items-center gap-2">
+    <div style={{ minHeight: '100vh', background: '#f8f9fa', padding: '2rem 1rem' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        {/* HEADER SECTION */}
+        <div className="d-flex justify-content-between align-items-center mb-4" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+          <div className="d-flex align-items-center gap-3">
             <button
               className="btn btn-outline-secondary"
               onClick={() => navigate(-1)}
-              style={{ borderRadius: 'var(--radius-md)' }}
+              style={{ 
+                width: '40px', 
+                height: '40px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+                border: '2px solid #dee2e6'
+              }}
             >
-              <ArrowLeft size={16} />
+              <ArrowLeft size={18} />
             </button>
             <div>
-              <h2 className="fw-bold mb-0" style={{ color: 'var(--color-primary-1)' }}>Review Details</h2>
-              <p className="mb-0 small text-muted">
+              <h2 className="mb-1 fw-bold" style={{ fontSize: '1.75rem', color: '#212529' }}>
+                Review Details
+              </h2>
+              <p className="mb-0 text-muted" style={{ fontSize: '0.875rem' }}>
                 {review.targetEmployeeName} • {new Date(review.createdAt).toLocaleDateString()}
               </p>
             </div>
@@ -146,7 +163,16 @@ export default function ViewManagerReview() {
             onClick={fetchReviewData}
             disabled={loading}
             title="Refresh"
-            style={{ borderRadius: 'var(--radius-md)' }}
+            style={{ 
+              width: '40px', 
+              height: '40px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
+              border: '2px solid #dee2e6'
+            }}
           >
             <RefreshCw size={18} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
           </button>
@@ -154,200 +180,305 @@ export default function ViewManagerReview() {
 
         {/* ERROR ALERT */}
         {error && (
-          <div className="alert alert-danger d-flex align-items-start gap-2 mb-3" style={{ borderRadius: 'var(--radius-md)' }}>
+          <div className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-3" role="alert" style={{ borderRadius: '8px' }}>
             <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
             <div className="flex-grow-1">
               <strong>Error</strong>
               <p className="mb-0 small mt-1">{error}</p>
             </div>
-            <button className="btn-close" onClick={() => setError('')} />
+            <button type="button" className="btn-close" onClick={() => setError('')} />
           </div>
         )}
 
         {/* SUCCESS ALERT */}
         {success && (
-          <div className="alert alert-success d-flex align-items-center gap-2 mb-3" style={{ borderRadius: 'var(--radius-md)' }}>
+          <div className="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-3" role="alert" style={{ borderRadius: '8px' }}>
             <CheckCircle size={18} className="flex-shrink-0" />
             <div className="small flex-grow-1">{success}</div>
-            <button className="btn-close" onClick={() => setSuccess('')} />
+            <button type="button" className="btn-close" onClick={() => setSuccess('')} />
           </div>
         )}
 
-        {/* STATUS & RATING CARD */}
-        <div className="card border-0 mb-4" style={{ 
-          border: '1px solid var(--border)', 
-          borderRadius: 'var(--radius-lg)', 
-          boxShadow: 'var(--shadow)',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        {/* MAIN RATING CARD - MODAL HEADER STYLE */}
+        <div style={{ 
+          background: 'linear-gradient(135deg, #9D247D 0%, #7a1d63 100%)',
+          borderRadius: '10px',
+          padding: '2rem',
+          marginBottom: '1.5rem',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           color: 'white'
         }}>
-          <div className="card-body p-4">
-            <div className="row align-items-center">
-              <div className="col-md-6">
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <User size={20} />
-                  <small className="opacity-75">Reviewing</small>
-                </div>
-                <h4 className="fw-bold mb-0">{review.targetEmployeeName}</h4>
+          <div className="row align-items-center g-3">
+            <div className="col-md-6">
+              <div className="d-flex align-items-center gap-2 mb-2" style={{ opacity: 0.9,color:'white' }}>
+                <User size={18} />
+                <small style={{ fontSize: '0.813rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px',color:'white' }}>
+                  Reviewing Employee
+                </small>
               </div>
-              <div className="col-md-6 text-md-end mt-3 mt-md-0">
-                <div className="d-flex align-items-center justify-content-md-end gap-2 mb-2">
-                  <Star size={20} style={{ fill: 'white' }} />
-                  <small className="opacity-75">Rating</small>
-                </div>
-                <h3 className="fw-bold mb-0">
-                  {review.rating}/5
-                  <span className="ms-2" style={{ fontSize: '0.7rem', opacity: 0.8 }}>
-                    ({RATING_LABELS[review.rating]})
-                  </span>
-                </h3>
-                <div className="mt-1">
-                  {[...Array(5)].map((_, index) => (
-                    <Star 
-                      key={index}
-                      size={16} 
-                      style={{ 
-                        color: 'white', 
-                        fill: index < review.rating ? 'white' : 'transparent',
-                        marginRight: '2px'
-                      }} 
-                    />
-                  ))}
-                </div>
+              <h4 className="fw-bold mb-0" style={{ fontSize: '1.5rem',color:'white' ,textAlign:'left' }}>{review.targetEmployeeName}</h4>
+            </div>
+            <div className="col-md-6 text-md-end">
+              <div className="d-flex align-items-center justify-content-md-end gap-2 mb-2" style={{ opacity: 0.9 }}>
+                <Star size={18} style={{ fill: 'white' }} />
+                <small style={{ fontSize: '0.813rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px',color:'white' }}>
+                  Performance Rating
+                </small>
+              </div>
+              <h3 className="fw-bold mb-2" style={{ fontSize: '2rem',color:'white' }}>
+                {review.rating}/5
+                <span className="ms-2" style={{ fontSize: '0.875rem', opacity: 0.85 }}>
+                  ({RATING_LABELS[review.rating]})
+                </span>
+              </h3>
+              <div className="d-flex justify-content-md-end gap-1">
+                {[...Array(5)].map((_, index) => (
+                  <Star 
+                    key={index}
+                    size={18} 
+                    style={{ 
+                      color: 'white', 
+                      fill: index < review.rating ? 'white' : 'transparent',
+                      opacity: index < review.rating ? 1 : 0.5
+                    }} 
+                  />
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* INFO CARDS ROW */}
-        <div className="row g-3 mb-4">
-          {/* Status */}
+        {/* TWO COLUMN GRID - MODAL STYLE */}
+        <div className="row g-3 mb-3">
+          {/* LEFT COLUMN */}
           <div className="col-md-4">
-            <div className="card border-0 h-100" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow)' }}>
-              <div className="card-body">
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <CheckCircle size={16} style={{ color: 'var(--color-primary-1)' }} />
-                  <small className="text-muted fw-bold">Status</small>
+            <div style={{ 
+              background: 'white',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '1.25rem',
+              height: '100%'
+            }}>
+              <div className="d-flex align-items-center gap-2 mb-3">
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '6px',
+                  background: `${statusColor}15`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <CheckCircle size={16} style={{ color: statusColor }} />
                 </div>
-                <Badge text={review.status || 'Submitted'} color={statusColor} />
+                <small className="text-muted fw-bold" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px',textAlign:'left'  }}>
+                  Status
+                </small>
               </div>
+              <Badge text={review.status || 'Submitted'} color={statusColor} style={{textAlign:'left' }} />
             </div>
           </div>
 
-          {/* Manager */}
+          {/* MIDDLE COLUMN */}
           <div className="col-md-4">
-            <div className="card border-0 h-100" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow)' }}>
-              <div className="card-body">
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <User size={16} style={{ color: 'var(--color-primary-1)' }} />
-                  <small className="text-muted fw-bold">Reviewed By</small>
+            <div style={{ 
+              background: 'white',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '1.25rem',
+              height: '100%'
+            }}>
+              <div className="d-flex align-items-center gap-2 mb-3">
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '6px',
+                  background: '#0d6efd15',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <User size={16} style={{ color: '#0d6efd' }} />
                 </div>
-                <p className="mb-0 fw-semibold">{review.managerName}</p>
+                <small className="text-muted fw-bold" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Reviewed By
+                </small>
               </div>
+              <p className="mb-0 fw-semibold" style={{ fontSize: '0.938rem', color: '#212529',textAlign:'left'  }}>
+                {review.managerName}
+              </p>
             </div>
           </div>
 
-          {/* Created Date */}
+          {/* RIGHT COLUMN */}
           <div className="col-md-4">
-            <div className="card border-0 h-100" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow)' }}>
-              <div className="card-body">
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <Calendar size={16} style={{ color: 'var(--color-primary-1)' }} />
-                  <small className="text-muted fw-bold">Created On</small>
+            <div style={{ 
+              background: 'white',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              padding: '1.25rem',
+              height: '100%'
+            }}>
+              <div className="d-flex align-items-center gap-2 mb-3">
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '6px',
+                  background: '#0d6efd15',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Calendar size={16} style={{ color: '#0d6efd' }} />
                 </div>
-                <p className="mb-0 fw-semibold">{new Date(review.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                <small className="text-muted fw-bold" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px',textAlign:'left'  }}>
+                  Created On
+                </small>
               </div>
+              <p className="mb-0 fw-semibold" style={{ fontSize: '0.938rem', color: '#212529',textAlign:'left'  }}>
+                {new Date(review.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* REVIEW COMMENT */}
-        <div className="card border-0 mb-4" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow)' }}>
-          <div className="card-body p-4">
-            <div className="d-flex align-items-center gap-2 mb-3">
-              <div style={{ 
-                width: '40px', 
-                height: '40px', 
-                borderRadius: '8px', 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <Star size={20} style={{ color: 'white' }} />
-              </div>
-              <h5 className="fw-bold mb-0" style={{ color: 'var(--color-primary-1)' }}>Review Comment</h5>
+        {/* REVIEW COMMENT SECTION - DOCUMENT SECTION STYLE */}
+        <div style={{ 
+          background: 'white',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          padding: '1.5rem',
+          marginBottom: '1.5rem'
+        }}>
+          <div className="d-flex align-items-center gap-2 mb-3">
+            <div style={{ 
+              width: '36px', 
+              height: '36px', 
+              borderRadius: '8px', 
+              background: 'linear-gradient(135deg, #9D247D 0%, #7a1d63 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Star size={18} style={{ color: 'white' }} />
             </div>
-            <p className="mb-0" style={{ lineHeight: '1.8', color: '#333', fontSize: '1rem' }}>
-              {review.reviewComment}
-            </p>
+            <h5 className="fw-bold mb-0" style={{ fontSize: '1.125rem', color: '#212529' }}>
+              Review Comment
+            </h5>
           </div>
+          <p className="mb-0" style={{ lineHeight: '1.7', color: '#6c757d', fontSize: '0.938rem',textAlign:'left' }}>
+            {review.reviewComment}
+          </p>
         </div>
 
-        {/* PROJECT & GOAL CONTEXT */}
+        {/* PROJECT & GOAL CONTEXT - TWO COLUMN GRID */}
         {(review.projectContext || review.goalContext) && (
-          <div className="row g-3 mb-4">
+          <div className="row g-3 mb-3">
             {review.projectContext && (
               <div className="col-md-6">
-                <div className="card border-0 h-100" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow)' }}>
-                  <div className="card-body p-4">
-                    <div className="d-flex align-items-center gap-2 mb-3">
-                      <Briefcase size={18} style={{ color: '#0F62FE' }} />
-                      <h6 className="fw-bold mb-0" style={{ color: 'var(--color-primary-1)' }}>Project Context</h6>
+                <div style={{ 
+                  background: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '1.5rem',
+                  height: '100%'
+                }}>
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <div style={{ 
+                      width: '32px', 
+                      height: '32px', 
+                      borderRadius: '6px', 
+                      background: '#0d6efd15',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <Briefcase size={16} style={{ color: '#0d6efd' }} />
                     </div>
-                    <p className="mb-0" style={{ lineHeight: '1.6' }}>{review.projectContext}</p>
+                    <h6 className="fw-bold mb-0" style={{ fontSize: '1rem', color: '#212529' }}>
+                      Project Context
+                    </h6>
                   </div>
+                  <p className="mb-0" style={{ lineHeight: '1.6', color: '#6c757d', fontSize: '0.875rem' }}>
+                    {review.projectContext}
+                  </p>
                 </div>
               </div>
             )}
             {review.goalContext && (
               <div className="col-md-6">
-                <div className="card border-0 h-100" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow)' }}>
-                  <div className="card-body p-4">
-                    <div className="d-flex align-items-center gap-2 mb-3">
-                      <Target size={18} style={{ color: '#24A148' }} />
-                      <h6 className="fw-bold mb-0" style={{ color: 'var(--color-primary-1)' }}>Goal Context</h6>
+                <div style={{ 
+                  background: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '1.5rem',
+                  height: '100%'
+                }}>
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <div style={{ 
+                      width: '32px', 
+                      height: '32px', 
+                      borderRadius: '6px', 
+                      background: '#19875415',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <Target size={16} style={{ color: '#198754' }} />
                     </div>
-                    <p className="mb-0" style={{ lineHeight: '1.6' }}>{review.goalContext}</p>
+                    <h6 className="fw-bold mb-0" style={{ fontSize: '1rem', color: '#212529' }}>
+                      Goal Context
+                    </h6>
                   </div>
+                  <p className="mb-0" style={{ lineHeight: '1.6', color: '#6c757d', fontSize: '0.875rem' }}>
+                    {review.goalContext}
+                  </p>
                 </div>
               </div>
             )}
           </div>
         )}
 
-        {/* SUBMITTED DATE */}
+        {/* SUBMITTED DATE INFO */}
         {review.submittedDate && (
-          <div className="card border-0 mb-4" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', background: '#f8f9fa' }}>
-            <div className="card-body p-3">
-              <div className="d-flex align-items-center gap-2">
-                <CheckCircle size={16} style={{ color: '#24A148' }} />
-                <small className="text-muted">Submitted on</small>
-                <strong>{new Date(review.submittedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</strong>
-              </div>
+          <div style={{ 
+            background: '#f9fafb',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+            padding: '1rem 1.25rem',
+            marginBottom: '1.5rem'
+          }}>
+            <div className="d-flex align-items-center gap-2">
+              <CheckCircle size={16} style={{ color: '#198754' }} />
+              <small className="text-muted fw-medium" style={{ fontSize: '0.875rem' }}>
+                Submitted on
+              </small>
+              <strong style={{ fontSize: '0.875rem', color: '#212529' }}>
+                {new Date(review.submittedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </strong>
             </div>
           </div>
         )}
 
         {/* FINALIZED MESSAGE */}
         {review.status === 'Finalized' && (
-          <div className="alert alert-success d-flex align-items-center gap-2 mb-4" style={{ borderRadius: 'var(--radius-lg)' }}>
-            <CheckCircle size={20} />
+          <div className="alert alert-success d-flex align-items-start gap-2 mb-3" role="alert" style={{ borderRadius: '8px', border: '1px solid #198754' }}>
+            <CheckCircle size={20} className="flex-shrink-0" style={{ marginTop: '2px' }} />
             <div>
-              <strong>Review Finalized</strong>
-              <p className="mb-0 small">This review has been finalized and can no longer be modified.</p>
+              <strong style={{ fontSize: '0.938rem' }}>Review Finalized</strong>
+              <p className="mb-0 small mt-1">This review has been finalized and can no longer be modified.</p>
             </div>
           </div>
         )}
 
-        {/* BACK BUTTON */}
-        <div className="d-flex gap-2">
+        {/* MODAL FOOTER STYLE BUTTONS */}
+        <div className="d-flex justify-content-end gap-2">
           <button
-            className="btn btn-outline-secondary flex-grow-1"
+            className="btn btn-secondary d-flex align-items-center gap-2"
             onClick={() => navigate(-1)}
-            style={{ borderRadius: 'var(--radius-md)' }}
+            style={{ borderRadius: '6px', padding: '10px 20px', fontWeight: 600 }}
           >
-            <ArrowLeft size={16} className="me-2" style={{ display: 'inline' }} />
+            <ArrowLeft size={16} />
             Back to List
           </button>
         </div>

@@ -1,17 +1,16 @@
 // src/components/sla/ReopenSLAForm.jsx
 import React, { useState } from 'react';
 import { X, RotateCcw, Send, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import slaService from '../../services/sla/slaService';
-
 
 const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    extensionDays: 1,  // ✅ Fixed to 1 only
+    extensionDays: 1,  // Fixed to 1 only
     reason: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,38 +19,48 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
 
     try {
       const user = JSON.parse(localStorage.getItem('user'));
-      
+
       const reopenData = {
         slaid: sla.slaid,
-        extensionDays: 1,  // ✅ Always 1 day
+        extensionDays: 1,  // Always 1 day
         reopenReason: formData.reason,
         reopenedByEmployeeId: user.empId
       };
 
-      console.log('📤 Sending reopen payload:', reopenData);
+      console.log('Sending reopen payload:', reopenData);
 
       const response = await slaService.reopenSLA(reopenData);
-      
+
       if (response.success) {
-        alert('✅ SLA reopened successfully with 1 day extension!');
+        toast.success('SLA reopened successfully', {
+          description: 'Extended by 1 day with new deadline',
+          duration: 4000,
+        });
         onSuccess();
         onClose();
       } else {
+        toast.error('Failed to reopen SLA', {
+          description: response.message || 'Unable to process reopen request',
+          duration: 5000,
+        });
         setError(response.message || 'Failed to reopen SLA');
       }
     } catch (err) {
-      console.error('❌ Reopen error:', err);
+      console.error('Reopen error:', err);
+      toast.error('Error reopening SLA', {
+        description: err.message || 'An unexpected error occurred',
+        duration: 5000,
+      });
       setError(err.message || 'Failed to reopen SLA');
     } finally {
       setLoading(false);
     }
   };
 
-
   const calculateNewDeadline = () => {
     const originalDeadline = new Date(sla.deadline);
     const newDeadline = new Date(originalDeadline);
-    newDeadline.setDate(newDeadline.getDate() + 1);  // ✅ Always +1 day
+    newDeadline.setDate(newDeadline.getDate() + 1);  // Always +1 day
     return newDeadline.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -59,14 +68,13 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
     });
   };
 
-
   return (
-    <div 
-      className="modal fade show d-block" 
+    <div
+      className="modal fade show d-block"
       style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1055 }}
       onClick={onClose}
     >
-      <div 
+      <div
         className="modal-dialog modal-dialog-centered modal-lg"
         onClick={(e) => e.stopPropagation()}
       >
@@ -74,7 +82,7 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
           <div className="modal-header border-0 pb-0">
             <div>
               <h5 className="modal-title d-flex align-items-center gap-2 mb-1">
-                <div 
+                <div
                   className="rounded-circle d-flex align-items-center justify-content-center"
                   style={{ width: '40px', height: '40px', backgroundColor: '#AC509815' }}
                 >
@@ -86,9 +94,9 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
                 Grant 1 additional day to complete this SLA
               </p>
             </div>
-            <button 
-              type="button" 
-              className="btn-close" 
+            <button
+              type="button"
+              className="btn-close"
               onClick={onClose}
               disabled={loading}
             />

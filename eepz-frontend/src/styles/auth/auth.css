@@ -681,12 +681,31 @@
 }
 
 /* Welcome Card List Styling */
-.welcome-card ul li {
-  font-size: 0.9375rem;
-  color: #495057;
-  line-height: 1.8;
+.welcome-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
-
+ 
+/* Add this new section */
+.welcome-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ 
+.welcome-card ul li {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  line-height: 1.6;
+}
+ 
+.welcome-card ul li i {
+  margin-right: 12px;
+  flex-shrink: 0;
+}
 /* Login Right Background Animation */
 .login-right-bg {
   position: relative;

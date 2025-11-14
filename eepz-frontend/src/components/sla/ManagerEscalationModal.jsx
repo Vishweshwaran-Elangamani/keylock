@@ -28,12 +28,12 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
     fetchDepartmentHead();
   }, []);
  
-  // ✅ Check if THIS SPECIFIC SLA is already escalated
+  //  Check if THIS SPECIFIC SLA is already escalated
   const checkEscalationStatus = async () => {
     try {
-      console.log(`📊 Checking escalations for SLA ${review.slaid}`);
+      console.log(`Checking escalations for SLA ${review.slaid}`);
      
-      // ✅ Get escalations for THIS specific SLA
+      //  Get escalations for THIS specific SLA
       const response = await slaService.getSLAEscalations(review.slaid);
      
       if (response?.success && response.data && response.data.length > 0) {
@@ -45,15 +45,15 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
  
         if (pendingL2Escalation) {
           setAlreadyEscalated(true);
-          console.log('⚠️ SLA already has pending L2 escalation:', pendingL2Escalation);
+          console.log(' SLA already has pending L2 escalation:', pendingL2Escalation);
         } else {
-          console.log('✅ No pending L2 escalation found');
+          console.log(' No pending L2 escalation found');
         }
       } else {
-        console.log('✅ No escalations found for this SLA');
+        console.log(' No escalations found for this SLA');
       }
     } catch (error) {
-      console.error('❌ Error checking escalation status:', error);
+      console.error(' Error checking escalation status:', error);
     }
   };
  
@@ -62,11 +62,11 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
      
-      console.log('👤 Current Manager:', user);
-      console.log('🏢 Manager Department Name:', user.departmentName);
+      console.log(' Current Manager:', user);
+      console.log(' Manager Department Name:', user.departmentName);
  
       if (!user.departmentName) {
-        console.warn('⚠️ Manager has no department assigned');
+        console.warn(' Manager has no department assigned');
         setDeptHead(null);
         setFetchingDeptHead(false);
         return;
@@ -82,17 +82,17 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
  
         if (deptHeadInSameDepartment) {
           setDeptHead(deptHeadInSameDepartment);
-          console.log('✅ Department Head found:', deptHeadInSameDepartment);
+          console.log(' Department Head found:', deptHeadInSameDepartment);
         } else {
-          console.warn('⚠️ No department head found for department:', user.departmentName);
+          console.warn(' No department head found for department:', user.departmentName);
           setDeptHead(null);
         }
       } else {
-        console.warn('⚠️ No employees data received');
+        console.warn(' No employees data received');
         setDeptHead(null);
       }
     } catch (error) {
-      console.error('❌ Error fetching department head:', error);
+      console.error(' Error fetching department head:', error);
       setDeptHead(null);
     } finally {
       setFetchingDeptHead(false);
@@ -240,7 +240,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         description: comments.trim()
       };
  
-      console.log('🚀 Escalation Payload:', payload);
+      console.log(' Escalation Payload:', payload);
       await onEscalate(payload);
      
       toast.success('Escalation Successful!', {
@@ -253,7 +253,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
       }, 1500);
  
     } catch (err) {
-      console.error('❌ Escalation error:', err);
+      console.error(' Escalation error:', err);
       setError(err.message || 'Error escalating');
      
       toast.error('Escalation Failed', {
@@ -282,7 +282,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           >
             <div className="d-flex align-items-center gap-2">
               <AlertTriangle size={20} className="text-warning" />
-              <h6 className="mb-0 fw-bold">⚠️ Escalate to Department Head</h6>
+              <h6 className="mb-0 fw-bold"> Escalate to Department Head</h6>
             </div>
             <button
               type="button"
@@ -305,7 +305,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
                 className="mb-3 p-2"
                 style={{ backgroundColor: '#f8f9fa', borderRadius: '6px', fontSize: '0.85rem' }}
               >
-                <small className="text-muted d-block">📋 SLA #{review.slaid}</small>
+                <small className="text-muted d-block"> SLA #{review.slaid}</small>
                 <strong className="d-block">{review.employeeName}</strong>
                 <small className="text-muted">{review.slatype}</small>
               </div>
@@ -314,7 +314,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
                 className="mb-3 p-2"
                 style={{ backgroundColor: '#E8F4F8', borderRadius: '6px', fontSize: '0.85rem' }}
               >
-                <small className="text-muted d-block">👔 Escalating To</small>
+                <small className="text-muted d-block"> Escalating To</small>
                 <strong className="d-block text-primary">
                   {deptHead.firstName} {deptHead.lastName}
                 </strong>

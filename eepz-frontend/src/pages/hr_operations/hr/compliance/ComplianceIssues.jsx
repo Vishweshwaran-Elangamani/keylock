@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Modal, Button, Form, Spinner, Badge } from "react-bootstrap";
 import violationService from "../../../../services/hr_operations/hr/violationService";
-import toastr from "toastr";
-import "toastr/build/toastr.min.css";
 import "../../../../styles/hr_operations/hr/complianceIssues.css";
+
 
 const ComplianceIssues = () => {
   const [violations, setViolations] = useState([]);
@@ -15,6 +15,7 @@ const ComplianceIssues = () => {
   const [selectedViolation, setSelectedViolation] = useState(null);
   const [resolutionNotes, setResolutionNotes] = useState("");
 
+
   // Filter State
   const [filters, setFilters] = useState({
     status: "All",
@@ -22,13 +23,16 @@ const ComplianceIssues = () => {
     searchTerm: "",
   });
 
+
   useEffect(() => {
     fetchData();
   }, []);
 
+
   useEffect(() => {
     applyFilters();
   }, [filters, violations]);
+
 
   const fetchData = async () => {
     try {
@@ -41,6 +45,7 @@ const ComplianceIssues = () => {
     }
   };
 
+
   const fetchViolations = async () => {
     try {
       const response = await violationService.getAllViolations();
@@ -49,9 +54,10 @@ const ComplianceIssues = () => {
       }
     } catch (error) {
       console.error("Error fetching violations:", error);
-      toastr.error("Error loading violations");
+      toast.error("Error loading violations");
     }
   };
+
 
   const fetchStats = async () => {
     try {
@@ -64,19 +70,23 @@ const ComplianceIssues = () => {
     }
   };
 
+
   // Apply Filters
   const applyFilters = () => {
     let filtered = [...violations];
+
 
     // Filter by Status
     if (filters.status !== "All") {
       filtered = filtered.filter((v) => v.status === filters.status);
     }
 
+
     // Filter by Severity
     if (filters.severity !== "All") {
       filtered = filtered.filter((v) => v.severity === filters.severity);
     }
+
 
     // Filter by Search Term
     if (filters.searchTerm.trim() !== "") {
@@ -93,13 +103,16 @@ const ComplianceIssues = () => {
       );
     }
 
+
     setFilteredViolations(filtered);
   };
+
 
   const handleViewDetails = (violation) => {
     setSelectedViolation(violation);
     setShowDetailModal(true);
   };
+
 
   const handleResolve = (violation) => {
     setSelectedViolation(violation);
@@ -107,11 +120,13 @@ const ComplianceIssues = () => {
     setShowResolveModal(true);
   };
 
+
   const submitResolve = async () => {
     if (!resolutionNotes.trim()) {
-      toastr.warning("Please enter resolution notes");
+      toast.warning("Please enter resolution notes");
       return;
     }
+
 
     try {
       const response = await violationService.resolveViolation(
@@ -119,17 +134,19 @@ const ComplianceIssues = () => {
         { resolutionNotes }
       );
 
+
       if (response.success) {
-        toastr.success("Violation resolved successfully!");
+        toast.success("Violation resolved successfully!");
         setShowResolveModal(false);
         setSelectedViolation(null);
         setResolutionNotes("");
         fetchData();
       }
     } catch (error) {
-      toastr.error("Failed to resolve violation");
+      toast.error("Failed to resolve violation");
     }
   };
+
 
   const getSeverityBadge = (severity) => {
     const badges = {
@@ -140,6 +157,7 @@ const ComplianceIssues = () => {
     };
     return badges[severity] || "secondary";
   };
+
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -152,9 +170,11 @@ const ComplianceIssues = () => {
     return badges[status] || "secondary";
   };
 
+
   const getStatusLabel = (status) => {
     return status === "UnderReview" ? "Under Review" : status;
   };
+
 
   // Calculate stats
   const calculateStats = () => {
@@ -166,6 +186,7 @@ const ComplianceIssues = () => {
       (v) => v.status === "Resolved"
     ).length;
 
+
     return {
       totalViolations,
       activeViolations,
@@ -174,7 +195,9 @@ const ComplianceIssues = () => {
     };
   };
 
+
   const displayStats = calculateStats();
+
 
   if (loading) {
     return (
@@ -184,6 +207,7 @@ const ComplianceIssues = () => {
       </div>
     );
   }
+
 
   return (
     <div className="ci-root">
@@ -197,6 +221,7 @@ const ComplianceIssues = () => {
           View adherence to organizational rules and identify violations
         </p>
       </div>
+
 
       {/* Stats Cards */}
       <div className="ci-stats-row">
@@ -212,6 +237,7 @@ const ComplianceIssues = () => {
           </div>
         </div>
 
+
         <div className="ci-stat-card stat-active">
           <div className="ci-stat-icon">
             <i className="bi bi-hourglass-split"></i>
@@ -223,6 +249,7 @@ const ComplianceIssues = () => {
             </div>
           </div>
         </div>
+
 
         <div className="ci-stat-card stat-resolved">
           <div className="ci-stat-icon">
@@ -236,6 +263,7 @@ const ComplianceIssues = () => {
           </div>
         </div>
       </div>
+
 
       {/* Enhanced Filters Section */}
       <div className="ci-filters-container">
@@ -259,6 +287,7 @@ const ComplianceIssues = () => {
           )}
         </div>
 
+
         <div className="ci-filters-row">
           <div className="ci-filter-group ci-filter-search">
             <label className="ci-filter-label">
@@ -274,6 +303,7 @@ const ComplianceIssues = () => {
               }
             />
           </div>
+
 
           <div className="ci-filter-group">
             <label className="ci-filter-label">
@@ -295,6 +325,7 @@ const ComplianceIssues = () => {
             </select>
           </div>
 
+
           <div className="ci-filter-group">
             <label className="ci-filter-label">
               <i className="bi bi-exclamation-triangle me-2"></i>Severity
@@ -314,6 +345,7 @@ const ComplianceIssues = () => {
             </select>
           </div>
 
+
           {/* Clear Filters Button */}
           <div className="ci-filter-group">
             <label className="ci-filter-label" style={{ visibility: "hidden" }}>
@@ -331,6 +363,7 @@ const ComplianceIssues = () => {
           </div>
         </div>
 
+
         {/* Results Count */}
         <div className="ci-results-count">
           <span className="ci-results-text">
@@ -344,6 +377,7 @@ const ComplianceIssues = () => {
           )}
         </div>
       </div>
+
 
       {/* Violations List */}
       <div className="ci-violations-container">
@@ -394,6 +428,7 @@ const ComplianceIssues = () => {
                 </Badge>
               </div>
 
+
               <div className="ci-violation-details">
                 <div className="ci-detail-row">
                   <span className="ci-detail-label">Violation Type</span>
@@ -421,10 +456,12 @@ const ComplianceIssues = () => {
                 </div>
               </div>
 
+
               <div className="ci-violation-description">
                 <strong>Description</strong>
                 <p>{violation.description || "No description provided"}</p>
               </div>
+
 
               <div className="ci-violation-actions">
                 <button
@@ -434,6 +471,7 @@ const ComplianceIssues = () => {
                   <i className="bi bi-eye me-1"></i>
                   View Details
                 </button>
+
 
                 {violation.status !== "Resolved" &&
                   violation.status !== "Closed" && (
@@ -450,6 +488,7 @@ const ComplianceIssues = () => {
           ))
         )}
       </div>
+
 
       {/* Detail Modal */}
       <Modal
@@ -537,6 +576,7 @@ const ComplianceIssues = () => {
         </Modal.Body>
       </Modal>
 
+
       {/* Resolve Modal */}
       <Modal
         show={showResolveModal}
@@ -553,6 +593,7 @@ const ComplianceIssues = () => {
           <p>
             <strong>Violation Type:</strong> {selectedViolation?.violationType}
           </p>
+
 
           <Form.Group className="mt-3">
             <Form.Label>Action Taken / Resolution Notes *</Form.Label>
@@ -581,5 +622,6 @@ const ComplianceIssues = () => {
     </div>
   );
 };
+
 
 export default ComplianceIssues;
