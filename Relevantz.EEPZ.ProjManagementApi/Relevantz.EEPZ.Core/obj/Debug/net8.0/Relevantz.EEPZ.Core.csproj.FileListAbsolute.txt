@@ -74,3 +74,22 @@ D:\Capstone\Sprint 4\Back End\Back End\Relevantz.EEPZ.ProjManagementApi\Relevant
 D:\Capstone\Sprint 4\Back End\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
 D:\Capstone\Sprint 4\Back End\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
 D:\Capstone\Sprint 4\Back End\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll

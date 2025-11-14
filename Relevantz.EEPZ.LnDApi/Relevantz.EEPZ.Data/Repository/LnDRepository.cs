@@ -961,20 +961,16 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 var lowerSearchTerm = searchTerm.ToLower();
 
                 baseQuery = baseQuery.Where(e =>
-                    e.Userprofile.FirstName.ToLower().Contains(lowerSearchTerm)
-                    || e.Userprofile.LastName.ToLower().Contains(lowerSearchTerm)
-                    || (e.Userprofile.FirstName + " " + e.Userprofile.LastName)
+                    (e.Userprofile.FirstName + " " + e.Userprofile.LastName)
                         .ToLower()
                         .Contains(lowerSearchTerm)
                     || e.Userauthentication.Email.ToLower().Contains(lowerSearchTerm)
-                    || (
-                        e.Employeedetailsmasters.Any()
-                        && e.Employeedetailsmasters.First()
-                            .Department.DepartmentName.ToLower()
-                            .Contains(lowerSearchTerm)
-                    )
+                    || e.Employeedetailsmasters.Any(edm =>
+                        edm.Department.DepartmentName.ToLower().Contains(lowerSearchTerm))
                 );
             }
+
+
 
             var totalCount = await baseQuery.CountAsync();
 
