@@ -31,7 +31,14 @@ const OrganizationSkills = () => {
       );
 
       if (response.data.success) {
-        setEmployees(response.data.data.items);
+        let employees = response.data.data.items;
+
+        // Only filter out Admins if there is no search term
+        if (!searchTerm) {
+          employees = employees.filter(emp => emp.departmentName !== "Administration");
+        }
+
+        setEmployees(employees);
         setPagination({
           totalCount: response.data.data.totalCount,
           pageNumber: response.data.data.pageNumber,
@@ -48,6 +55,7 @@ const OrganizationSkills = () => {
       setLoading(false);
     }
   };
+
 
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
@@ -270,6 +278,7 @@ const OrganizationSkills = () => {
                         <p
                           style={{
                             margin: 0,
+                            paddingLeft: "2rem",
                             fontSize: "0.875rem",
                             color: "#6c757d",
                           }}
