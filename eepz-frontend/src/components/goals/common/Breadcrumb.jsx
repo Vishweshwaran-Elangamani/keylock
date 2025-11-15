@@ -11,6 +11,8 @@ const Breadcrumb = ({ items }) => {
     }
   };
 
+  const cleanLabel = (label) => label?.replace(/^\/+/, "");
+
   const getRoleBasePath = () => {
     const role = user?.role;
     if (role === "Employee") return "/employee";
@@ -36,7 +38,7 @@ const Breadcrumb = ({ items }) => {
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           // Build full path correctly
-          const fullPath = item.path ? `${basePath}${item.path}` : null;
+          const fullPath = item.path ? `${basePath}${item.path.replace(/^\/+/, "")}` : null;
 
           return (
             <li
@@ -68,7 +70,7 @@ const Breadcrumb = ({ items }) => {
                   }
                 >
                   {item.icon && <i className={`bi bi-${item.icon}`}></i>}
-                  {item.label}
+                  {cleanLabel(item.label)}
                 </button>
               ) : (
                 <span
@@ -81,7 +83,7 @@ const Breadcrumb = ({ items }) => {
                   }}
                 >
                   {item.icon && <i className={`bi bi-${item.icon}`}></i>}
-                  {item.label}
+                  {cleanLabel(item.label)}
                 </span>
               )}
             </li>

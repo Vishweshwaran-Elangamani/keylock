@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getManagerEmployeeAcknowledgments } from "../../../services/performancemanagement/hr/api";
+import { getUserIdFromToken } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
  
@@ -7,6 +8,7 @@ export default function ManagerAcknowledgment() {
   const [ackList, setAckList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+ 
  
   useEffect(() => {
     fetchAckList();
@@ -16,7 +18,13 @@ export default function ManagerAcknowledgment() {
     setLoading(true);
     setError(null);
     try {
-      const res = await getManagerEmployeeAcknowledgments();
+      const managerId = getUserIdFromToken();
+      if (!managerId) {
+        setError("Manager ID not found in token");
+        setLoading(false);
+        return;
+      }
+      const res = await getManagerEmployeeAcknowledgments(managerId);
       if (res.data.success) {
         setAckList(res.data.data);
       } else {

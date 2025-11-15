@@ -75,7 +75,7 @@ export default function MentorFeedbackDashboard() {
         empResponse.data.data.forEach(emp => {
           employeeMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
-        console.log('✅ Employee map loaded:', Object.keys(employeeMap).length);
+        console.log(' Employee map loaded:', Object.keys(employeeMap).length);
       }
      
       // THEN: Fetch mentor feedback
@@ -98,7 +98,7 @@ export default function MentorFeedbackDashboard() {
        
         setFeedbacks(enriched);
         setFilteredFeedbacks(enriched);
-        console.log('✅ Feedback loaded:', enriched.length);
+        console.log(' Feedback loaded:', enriched.length);
       } else {
         setFeedbacks([]);
         setFilteredFeedbacks([]);

@@ -9,13 +9,6 @@ const DepartmentHeadDashboard = () => {
   };
   const cards = [
     {
-      title: "Internal Opportunities",
-      description: "Review nominations for internal opportunities",
-      icon: "bi-briefcase",
-      gradient: "gradient-green",
-      path: "/internal/opportunities",
-    },
-    {
       title: "Nomination Reviews",
       description: "Approve or reject employee nominations",
       icon: "bi-clipboard-check",
@@ -67,7 +60,7 @@ const DepartmentHeadDashboard = () => {
     {
       title: "Feedback Management",
       description: "Share Feedbacks",
-      icon: "bi bi-book",
+      icon: "bi bi-chat-left-text",
       gradient: "gradient-teal",
       path: "/department-head/dashboard/feedback",
     }

@@ -200,7 +200,7 @@ const SLACompliance = () => {
 
       {/* Overall Stats Cards */}
       <div className="row g-3 mb-4">
-        <div className="col-md-2">
+        <div className="col-md-3">
           <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '12px' }}>
             <div className="card-body p-3">
               <div 
@@ -215,7 +215,7 @@ const SLACompliance = () => {
           </div>
         </div>
 
-        <div className="col-md-2">
+        <div className="col-md-3">
           <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '12px' }}>
             <div className="card-body p-3">
               <div 
@@ -230,7 +230,7 @@ const SLACompliance = () => {
           </div>
         </div>
 
-        <div className="col-md-2">
+        <div className="col-md-3">
           <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '12px' }}>
             <div className="card-body p-3">
               <div 
@@ -245,7 +245,7 @@ const SLACompliance = () => {
           </div>
         </div>
 
-        <div className="col-md-2">
+        <div className="col-md-3">
           <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '12px' }}>
             <div className="card-body p-3">
               <div 
@@ -259,9 +259,6 @@ const SLACompliance = () => {
             </div>
           </div>
         </div>
-
-        
-       
       </div>
 
       {/* View Mode Toggle & Sort */}

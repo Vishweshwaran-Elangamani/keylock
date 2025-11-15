@@ -68,7 +68,7 @@ const EmployeeDashboard = () => {
     {
       title: "Feedback Management",
       description: "Submit Feedback Forms",
-      icon: "bi bi-book",
+      icon: "bi bi-chat-left-text",
       gradient: "gradient-teal",
       path: "/employee/dashboard/feedback",
     }

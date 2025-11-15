@@ -71,19 +71,34 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         path: "/department-head/dashboard",
       },
       {
+        icon: "bi-clipboard-check",
+        label: "Nominations",
+        path: "/internal/nominations",
+      },
+      {
+        icon: "bi-pie-chart",
+        label: "Budget Utilization",
+        path: "/department-head/budget",
+      },
+      {
         icon: "bi-shield-check",
         label: "Company Policies",
         path: "/department-head/policies",
       },
       {
-        icon: "bi bi-file-earmark-check",
-        label: "SLA Management",
-        path: "/department-head/dashboard/sla",
-      },
-      {
         icon: "bi bi-file-earmark-text",
         label: "Department Compliance",
         path: "/department-head/dashboard/sla/compliance",
+      },
+      {
+        icon: "bi-graph-up",
+        label: "Performance",
+        path: "/department-head/dashboard/performance",
+      },
+      {
+        icon: "bi bi-file-earmark-check",
+        label: "SLA Management",
+        path: "/department-head/dashboard/sla",
       },
       { icon: "bi-bullseye", label: "Goals", path: "/department-head/dashboard/goals" },
       {
@@ -100,7 +115,12 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         icon: "bi-trophy",
         label: "Top Performers",
         path: "/department-head/dashboard/performance/top-performers",
-      }
+      },
+      {
+        icon: "bi-chat-left-text",
+        label: "Feedback Management",
+        path: "/department-head/dashboard/feedback",
+      },
     ],
     Manager: [
       {
@@ -109,9 +129,29 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         path: "/manager/dashboard",
       },
       {
+        icon: "bi-briefcase",
+        label: "Internal Opportiunities",
+        path: "/internal/opportunities",
+      },
+      {
+        icon: "bi-clipboard-check",
+        label: "Nominations",
+        path: "/internal/nominations",
+      },
+      {
+        icon: "bi-arrow-up-circle",
+        label: "Career Progression",
+        path: "/internal/nominations",
+      },
+      {
         icon: "bi-shield-check",
         label: "Company Policies",
         path: "/manager/policies",
+      },
+      {
+        icon: "bi-graph-up",
+        label: "Performance",
+        path: "/manager/dashboard/performance",
       },
       { icon: "bi-bullseye", label: "Goals", path: "/manager/dashboard/goals" },
       {
@@ -124,6 +164,16 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Learning & Development",
         path: "/manager/lnd/dashboard",
       },
+      {
+        icon: "bi-chat-left-text",
+        label: "Feedback Management",
+        path: "/manager/dashboard/feedback",
+      },
+      {
+        icon: "bi-file-earmark-check",
+        label: "SLA Management",
+        path: "/manager/dashboard/sla",
+      },
     ],
     Employee: [
       {
@@ -132,9 +182,37 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         path: "/employee/dashboard",
       },
       {
+        icon: "bi-briefcase",
+        label: "Internal Opportiunities",
+        path: "/internal/opportunities",
+      },
+      {
+        icon: "bi-clipboard-check",
+        label: "My Nominations",
+        path: "/internal/nominations",
+      },
+      {
         icon: "bi-shield-check",
         label: "Company Policies",
         path: "/employee/policies",
+      },
+      
+      {
+        icon: "bi-building-check",
+        label: "Employee Acknowledgement",
+        path: "/employee/dashboard/employee-acknowledgments",
+      },
+      
+      {
+        icon: "bi-graph-up",
+        label: "Performance",
+        path: "/employee/dashboard/performance",
+      },
+      
+      {
+        icon: "bi-file-earmark-check",
+        label: "SLA Compliance",
+        path: "/employee/dashboard/sla",
       },
       { icon: "bi-bullseye", label: "Goals", path: "/employee/dashboard/goals" },
       {
@@ -146,6 +224,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         icon: "bi-book",
         label: "Learning & Development",
         path: "/employee/lnd/dashboard",
+      },
+      {
+        icon: "bi-chat-left-text",
+        label: "Company Policies",
+        path: "/employee/dashboard/feedback",
       },
     ],
   };

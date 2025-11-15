@@ -39,12 +39,6 @@
   font-size: 1rem;
 }
 
-.breadcrumb-item-leadership + .breadcrumb-item-leadership::before {
-  content: "/";
-  padding: 0 0.75rem;
-  color: #6c757d;
-}
-
 .breadcrumb-item-leadership.active {
   color: #2d3565;
   font-weight: 500;

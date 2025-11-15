@@ -34,9 +34,9 @@ import ProjectDetails from "./pages/project_management/ProjectDetails";
 import ProjectList from "./pages/project_management/ProjectList";
 import ResourcePoolMapping from "./pages/project_management/ResourcePoolMapping";
 import HRSLADashboard from "./pages/sla/HRSLADashboard";
-import FeedbackHRDashboard from "./pages/FeedbackManagement/FeedbackHRDashboard";
-import CreateFeedbackForm from "./pages/FeedbackManagement/hr/CreateFeedbackForm";
-import HRFeedbackList from "./pages/FeedbackManagement/hr/HRFeedbackList";
+import FeedbackHRDashboard from "./pages/feedback_management/FeedbackHRDashboard";
+import CreateFeedbackForm from "./pages/feedback_management/hr/CreateFeedbackForm";
+import HRFeedbackList from "./pages/feedback_management/hr/HRFeedbackList";
 import SLADetails from "./pages/sla/SLADetails";
 // Internal Opportunity
 import InternalOpportunityManagement from "./pages/internal/InternalOpportunityManagement";
@@ -61,7 +61,7 @@ import EmployeeDashboard from "./pages/dashboards/EmployeeDashboard";
 import EmployeeSLADashboard from "./pages/sla/EmployeeSLADashboard";
 import UserAssignments from "./pages/performancemanagement/employee/MyAssessments";
 import EmployeePolicyView from "./pages/hr_operations/employee/EmployeePolicyView";
-import SubmitMentorFeedback from "./pages/FeedbackManagement/feedback/SubmitMentorFeedback";
+import SubmitMentorFeedback from "./pages/feedback_management/feedback/SubmitMentorFeedback";
 //LnD
 import LnDDashboard from "./pages/lnd/dashboard/LnDDashboard";
 import MySkills from "./pages/lnd/skills/MySkills";
@@ -80,33 +80,33 @@ import YourGoalsPage from "./pages/goals/YourGoalsPage";
 import ViewGoalPage from "./pages/goals/ViewGoalPage";
 import GoalApprovalsPage from "./pages/goals/GoalApprovalsPage";
 //Feedback imports
-import FeedbackEmployeeDashboard from './pages/FeedbackManagement/FeedbackEmployeeDashboard';
-import FeedbackManagerDashboard from './pages/FeedbackManagement/FeedbackManagerDashboard';
-import FeedbackDepartmentHeadDashboard from './pages/FeedbackManagement/FeedbackDepartmentHeadDashboard';
-import SubmitContextFeedback from './pages/FeedbackManagement/feedback/SubmitContextFeedback';
-import MySubmissions from './pages/FeedbackManagement/feedback/MySubmissions';
-import EmployeeAssignedForms from './pages/FeedbackManagement/feedback/EmployeeAssignedForms';
-import EmployeeFillForm from './pages/FeedbackManagement/feedback/EmployeeFillForm';
-import ViewMyPeerFeedback from './pages/FeedbackManagement/feedback/ViewMyPeerFeedback';
-import CreateManagerReview from './pages/FeedbackManagement/manager/CreateManagerReview';
-import ManagerReviewsList from './pages/FeedbackManagement/manager/ManagerReviewsList';
-import ManagerEmployeeList from './pages/FeedbackManagement/manager/ManagerEmployeeList';
-import ManagerTeamSubmissions from './pages/FeedbackManagement/manager/ManagerTeamSubmissions';
-import AllManagerReviews from './pages/FeedbackManagement/head/AllManagerReviews';
+import FeedbackEmployeeDashboard from './pages/feedback_management/FeedbackEmployeeDashboard';
+import FeedbackManagerDashboard from './pages/feedback_management/FeedbackManagerDashboard';
+import FeedbackDepartmentHeadDashboard from './pages/feedback_management/FeedbackDepartmentHeadDashboard';
+import SubmitContextFeedback from './pages/feedback_management/feedback/SubmitContextFeedback';
+import MySubmissions from './pages/feedback_management/feedback/MySubmissions';
+import EmployeeAssignedForms from './pages/feedback_management/feedback/EmployeeAssignedForms';
+import EmployeeFillForm from './pages/feedback_management/feedback/EmployeeFillForm';
+import ViewMyPeerFeedback from './pages/feedback_management/feedback/ViewMyPeerFeedback';
+import CreateManagerReview from './pages/feedback_management/manager/CreateManagerReview';
+import ManagerReviewsList from './pages/feedback_management/manager/ManagerReviewsList';
+import ManagerEmployeeList from './pages/feedback_management/manager/ManagerEmployeeList';
+import ManagerTeamSubmissions from './pages/feedback_management/manager/ManagerTeamSubmissions';
+import AllManagerReviews from './pages/feedback_management/head/AllManagerReviews';
 import EmployeeHome from "./pages/performancemanagement/employee/employeehome";
 import EmployeeAcknowledgment from "./pages/performancemanagement/employee/EmployeeAcknowledge";
 import ManagerAcknowledgment from "./pages/performancemanagement/manager/ManagerAcknowledgment";
-import MentorFeedbackDashboard from "./pages/FeedbackManagement/feedback/MentorFeedbackDashboard";
-import ViewManagerReview from "./pages/FeedbackManagement/manager/ViewManagerReview";
+import MentorFeedbackDashboard from "./pages/feedback_management/feedback/MentorFeedbackDashboard";
+import ViewManagerReview from "./pages/feedback_management/manager/ViewManagerReview";
 const AppRoutes = () => {
   const { user } = useAuth();
   return (
     <Routes>
     //region DEFAULT/FALLBACK ROUTES
-    <Route path="/" element={<Navigate to="/login" replace />} />
-    <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
     //endregion DEFAULT/FALLBACK ROUTES
-    //region PUBLIC ROUTES
+      //region PUBLIC ROUTES
       <Route
         path="/login"
         element={
@@ -426,7 +426,7 @@ const AppRoutes = () => {
       />
       //endregion HR • OPS
       //endregion HR ROUTES
-      //region Internal Opportunity
+      //region INTERNAL OPPORTUNITIES
       {/* ========== INTERNAL OPPORTUNITY ROUTES ========== */}
       {/*  INTERNAL OPPORTUNITIES - Accessible to Employee, Manager, HR with dynamic role-based UI */}
       <Route
@@ -461,8 +461,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //end Internal Opportunity
-      //region LEADERSHIP ROUTES
+      //region INTERNAL OPPORTUNITIES LEADERSHIP
       <Route
         path="/leadership/dashboard"
         element={
@@ -473,49 +472,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //region GOALS LEADERSHIP
-      {/* Leadership Goal Routes */}
-      <Route
-        path="/leadership/dashboard/goals"
-        element={
-          <ProtectedRoute allowedRoles={["Leadership"]}>
-            <DashboardLayout role="Leadership">
-              <GoalsDashboard />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/leadership/goals/your-goals"
-        element={
-          <ProtectedRoute allowedRoles={["Leadership"]}>
-            <DashboardLayout role="Leadership">
-              <YourGoalsPage />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/leadership/goals/:id"
-        element={
-          <ProtectedRoute allowedRoles={["Leadership"]}>
-            <DashboardLayout role="Leadership">
-              <ViewGoalPage />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/leadership/goals/approvals"
-        element={
-          <ProtectedRoute allowedRoles={["Leadership"]}>
-            <DashboardLayout role="Leadership">
-              <GoalApprovalsPage />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      //endregion GOALS LEADERSHIP
       <Route
         path="/leadership/promotions"
         element={
@@ -546,8 +502,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion LEADERSHIP ROUTES
-      //region DEPARTMENT HEAD ROUTES
+      //endregion INTERNAL OPPORTUNITIES LEADERSHIP
+      //region INTERNAL OPPORTUNITIES DEPARTMENT HEAD
       <Route
         path="/department-head/dashboard"
         element={
@@ -608,18 +564,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //region GOALS DEPT HEAD
-      <Route
-        path="/department-head/dashboard/goals"
-        element={
-          <ProtectedRoute allowedRoles={["Department Head"]}>
-            <DashboardLayout role="Department Head">
-              <GoalsDashboard />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      //endregion GOALS DEPT HEAD
       <Route
         path="/department-head/policies"
         element={
@@ -640,8 +584,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion DEPARTMENT HEAD ROUTES
-      //region MANAGER ROUTES
+      //endregion INTERNAL OPPORTUNITIES DEPARTMENT HEAD
+      //region INTERNAL OPPORTUNITIES MANAGER
       <Route
         path="/manager/dashboard"
         element={
@@ -712,6 +656,146 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/manager/policies"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <EmployeePolicyView />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      //endregion INTERNAL OPPORTUNITIES MANAGER
+      //region INTERNAL OPPORTUNITIES EMPLOYEE 
+      <Route
+        path="/employee/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <EmployeeDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/performance"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <EmployeeHome />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/performance/my-assessments"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              < UserAssignments />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/sla"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <EmployeeSLADashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/sla/details/:slaid"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <SLADetails />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/policies"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <EmployeePolicyView />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      //endregion INTERNAL OPPORTUNITIES EMPLOYEE
+      //region SHARED 
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout role={user?.role}>
+              <EmployeeProfile />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      //endregion SHARED
+      //region GOALS LEADERSHIP
+      {/* Leadership Goal Routes */}
+      <Route
+        path="/leadership/dashboard/goals"
+        element={
+          <ProtectedRoute allowedRoles={["Leadership"]}>
+            <DashboardLayout role="Leadership">
+              <GoalsDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/leadership/goals/your-goals"
+        element={
+          <ProtectedRoute allowedRoles={["Leadership"]}>
+            <DashboardLayout role="Leadership">
+              <YourGoalsPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/leadership/goals/:id"
+        element={
+          <ProtectedRoute allowedRoles={["Leadership"]}>
+            <DashboardLayout role="Leadership">
+              <ViewGoalPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/leadership/goals/approvals"
+        element={
+          <ProtectedRoute allowedRoles={["Leadership"]}>
+            <DashboardLayout role="Leadership">
+              <GoalApprovalsPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      //endregion GOALS LEADERSHIP
+      //region GOALS DEPT HEAD
+      <Route
+        path="/department-head/dashboard/goals"
+        element={
+          <ProtectedRoute allowedRoles={["Department Head"]}>
+            <DashboardLayout role="Department Head">
+              <GoalsDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      //endregion GOALS DEPT HEAD
       //region GOALS MANAGER
       {/* Manager Goal Routes */}
       <Route
@@ -755,68 +839,6 @@ const AppRoutes = () => {
         }
       />
       //endregion GOALS MANAGER
-      <Route
-        path="/manager/policies"
-        element={
-          <ProtectedRoute allowedRoles={["Manager"]}>
-            <DashboardLayout role="Manager">
-              <EmployeePolicyView />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      //endregion MANAGER ROUTES
-      //region EMPLOYEE ROUTES
-      <Route
-        path="/employee/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={["Employee"]}>
-            <DashboardLayout role="Employee">
-              <EmployeeDashboard />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employee/dashboard/performance"
-        element={
-          <ProtectedRoute allowedRoles={["Employee"]}>
-            <DashboardLayout role="Employee">
-              <EmployeeHome />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employee/dashboard/performance/my-assessments"
-        element={
-          <ProtectedRoute allowedRoles={["Employee"]}>
-            <DashboardLayout role="Employee">
-              < UserAssignments/>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employee/dashboard/sla"
-        element={
-          <ProtectedRoute allowedRoles={["Employee"]}>
-            <DashboardLayout role="Employee">
-              <EmployeeSLADashboard />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/employee/dashboard/sla/details/:slaid"
-        element={
-          <ProtectedRoute allowedRoles={["Employee"]}>
-            <DashboardLayout role="Employee">
-              <SLADetails />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
       //region GOALS EMPLOYEE
       {/* Employee Goal Routes */}
       <Route
@@ -860,31 +882,6 @@ const AppRoutes = () => {
         }
       />
       //endregion GOALS EMPLOYEE
-      <Route
-        path="/employee/policies"
-        element={
-          <ProtectedRoute allowedRoles={["Employee"]}>
-            <DashboardLayout role="Employee">
-              <EmployeePolicyView />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      //endregion EMPLOYEE ROUTES
-      //region SHARED ROUTES
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout role={user?.role}>
-              <EmployeeProfile />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      //endregion SHARED ROUTES
-      //region LND ROUTES
-      {/*LnD Routes*/}
       //region LND LEADERSHIP
       {/* Leadership L&D Routes */}
       <Route
@@ -1198,101 +1195,100 @@ const AppRoutes = () => {
       />
       //endregion LND EMPLOYEE
       //region LND HR
-         <Route
-          path="/hr/lnd/dashboard"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <LnDDashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr/lnd/my-skills"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <MySkills />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr/lnd/my-assignments"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <MyAssignments />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr/lnd/sme/assignments"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <SmeAssignments />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr/lnd/approvals/pending"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <PendingApprovals />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr/lnd/approvals/history"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <ApprovalHistory />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr/lnd/organization-skills"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <OrganizationSkills />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr/lnd/organization-assignments"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <OrganizationAssignments />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/hr/lnd/sme-directory"
-          element={
-            <ProtectedRoute allowedRoles={["HR"]}>
-              <DashboardLayout role="HR">
-                <SmeDirectory />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/hr/lnd/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <LnDDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/lnd/my-skills"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <MySkills />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/lnd/my-assignments"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <MyAssignments />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/lnd/sme/assignments"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <SmeAssignments />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/lnd/approvals/pending"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <PendingApprovals />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/lnd/approvals/history"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <ApprovalHistory />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/lnd/organization-skills"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <OrganizationSkills />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/lnd/organization-assignments"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <OrganizationAssignments />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/lnd/sme-directory"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <SmeDirectory />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
         //endregion LND HR
-        //endregion LND ROUTES
-    //endregion DEFAULT/FALLBACK ROUTES
-    //region FEEDBACK EMPLOYEE 
-    <Route
+      //endregion DEFAULT/FALLBACK ROUTES
+      //region FEEDBACK EMPLOYEE 
+      <Route
         path="/employee/dashboard/feedback"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
@@ -1322,7 +1318,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-<Route
+      <Route
         path="/employee/dashboard/feedback/assignedform"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
@@ -1343,7 +1339,7 @@ const AppRoutes = () => {
         }
       />
 
-<Route
+      <Route
         path="/employee/dashboard/feedback/mentor"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
@@ -1353,8 +1349,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
- 
- 
+
+
       <Route
         path="/employee/dashboard/feedback/submissions"
         element={
@@ -1369,7 +1365,7 @@ const AppRoutes = () => {
         path="/dashboard/feedback/fillform/:formId"
         element={
           <ProtectedRoute allowedRoles={["Employee", "Manager"]}>
-            <DashboardLayout role={["Manager","Employee"]}>
+            <DashboardLayout role={["Manager", "Employee"]}>
               <EmployeeFillForm />
             </DashboardLayout>
           </ProtectedRoute>
@@ -1416,7 +1412,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-       <Route
+      <Route
         path="/manager/dashboard/feedback/team-submissions"
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
@@ -1515,7 +1511,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              < EmployeeAcknowledgment/>
+              < EmployeeAcknowledgment />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1525,13 +1521,13 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              < EmployeeAcknowledgment/>
+              < EmployeeAcknowledgment />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
       //endregion PERFORMANCE ACKNOWLEDGE
-    </Routes>  
+    </Routes>
   );
 };
 export default AppRoutes;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { RefreshCw, AlertTriangle, Eye, Edit, Trash2, Star, User, X, Save, Loader } from 'lucide-react';
+import { RefreshCw, AlertTriangle, Eye, Edit, Trash2, Star, User, X, Save, Loader, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 // import { managerReviewApi } from '../../../services/feedbackmanagement/feedbackApi';
 import axios from 'axios';
@@ -22,8 +22,9 @@ const Badge = ({ text, color = '#525252' }) => (
 
 export default function ManagerReviewsList() {
   const navigate = useNavigate();
+
   const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}') || {}, []);
-  
+
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -90,7 +91,7 @@ export default function ManagerReviewsList() {
       // STEP 2: Fetch reviews for current manager
       const managerId = user?.empId || 1002;
       const res = await axios.get(`${API_BASE}/ManagerReview/manager/${managerId}`);
-      
+
       if (res.data?.success && Array.isArray(res.data.data)) {
         const enriched = enrichReviews(res.data.data, empMap);
         setReviews(enriched);
@@ -120,7 +121,7 @@ export default function ManagerReviewsList() {
     total: reviews.length,
     submitted: reviews.filter(r => r.status === 'Submitted' || r.submitted === true || r.isSubmitted === true).length,
     finalized: reviews.filter(r => r.status === 'Finalized').length,
-    avgRating: reviews.length > 0 
+    avgRating: reviews.length > 0
       ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
       : '0.0'
   }), [reviews]);
@@ -136,11 +137,11 @@ export default function ManagerReviewsList() {
     }
 
     if (!window.confirm('Are you sure you want to delete this review? This action cannot be undone.')) return;
-    
+
     try {
       console.log('🗑️ Deleting review:', id);
       const response = await axios.delete(`${API_BASE}/ManagerReview/${id}`);
-      
+
       if (response.data?.success) {
         setReviews(reviews.filter(r => r.reviewcommentId !== id));
         showToast('Review deleted successfully!', 'success');
@@ -162,7 +163,7 @@ export default function ManagerReviewsList() {
   // ============================================================================
 
   const handleView = (id) => {
-    navigate(`/manager/dashboard/feedback/review/`+id);
+    navigate(`/manager/dashboard/feedback/review/` + id);
   };
 
   // ============================================================================
@@ -171,7 +172,7 @@ export default function ManagerReviewsList() {
 
   const handleEdit = async (review) => {
     console.log('✏️ Opening edit modal for review:', review.reviewcommentId);
-    
+
     setEditingReview(review);
     setEditForm({
       targetEmployeeId: review.targetEmployeeId || '',
@@ -183,67 +184,67 @@ export default function ManagerReviewsList() {
     setShowEditModal(true);
   };
 
-  
+
 
   // ============================================================================
   // HANDLE EDIT - SAVE
   // ============================================================================
 
- const handleSaveEdit = async (e) => {
-  e.preventDefault();
-  
-  if (!editForm.targetEmployeeId || !editForm.reviewComment?.trim()) {
-    showToast('Please select employee and enter review comment', 'error');
-    return;
-  }
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
 
-  setEditLoading(true);
-  
-  try {
-    const reviewId = editingReview.reviewcommentId;
-    
-    console.log('🔄 Step 1: Calling modify...');
-    await axios.post(`${API_BASE}/ManagerReview/${reviewId}/modify`);
+    if (!editForm.targetEmployeeId || !editForm.reviewComment?.trim()) {
+      showToast('Please select employee and enter review comment', 'error');
+      return;
+    }
 
-    console.log('💾 Step 2: Fetching current review...');
-    const getCurrentReview = await axios.get(`${API_BASE}/ManagerReview/${reviewId}`);
-    const currentReview = getCurrentReview.data?.data || getCurrentReview.data;
-    
-    console.log('📝 Step 3: Updating review...');
-    const updatedReview = {
-      ...currentReview,
-      targetEmployeeId: Number(editForm.targetEmployeeId),
-      rating: Number(editForm.rating),
-      reviewComment: editForm.reviewComment,
-      projectContext: editForm.projectContext || null,
-      goalContext: editForm.goalContext || null,
-      managerEmployeeId: currentReview.managerEmployeeId,
-      status: 'Draft'
-    };
+    setEditLoading(true);
 
-    await axios.put(`${API_BASE}/ManagerReview/${reviewId}`, updatedReview);
+    try {
+      const reviewId = editingReview.reviewcommentId;
 
-    console.log('📤 Step 4: Re-submitting...');
-    await axios.post(`${API_BASE}/ManagerReview/${reviewId}/submit`);
+      console.log('🔄 Step 1: Calling modify...');
+      await axios.post(`${API_BASE}/ManagerReview/${reviewId}/modify`);
 
-    // Wait a moment for backend to process
-    await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('💾 Step 2: Fetching current review...');
+      const getCurrentReview = await axios.get(`${API_BASE}/ManagerReview/${reviewId}`);
+      const currentReview = getCurrentReview.data?.data || getCurrentReview.data;
 
-    showToast('Review updated successfully!', 'success');
-    setShowEditModal(false);
-    setEditingReview(null);
-    
-    // Force refresh with cache busting
-    await fetchReviews();
-    
-  } catch (err) {
-    console.error('❌ Update error:', err);
-    const errorMsg = err?.response?.data?.message || err.message || 'Failed to update review';
-    showToast(errorMsg, 'error');
-  } finally {
-    setEditLoading(false);
-  }
-};
+      console.log('📝 Step 3: Updating review...');
+      const updatedReview = {
+        ...currentReview,
+        targetEmployeeId: Number(editForm.targetEmployeeId),
+        rating: Number(editForm.rating),
+        reviewComment: editForm.reviewComment,
+        projectContext: editForm.projectContext || null,
+        goalContext: editForm.goalContext || null,
+        managerEmployeeId: currentReview.managerEmployeeId,
+        status: 'Draft'
+      };
+
+      await axios.put(`${API_BASE}/ManagerReview/${reviewId}`, updatedReview);
+
+      console.log('📤 Step 4: Re-submitting...');
+      await axios.post(`${API_BASE}/ManagerReview/${reviewId}/submit`);
+
+      // Wait a moment for backend to process
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      showToast('Review updated successfully!', 'success');
+      setShowEditModal(false);
+      setEditingReview(null);
+
+      // Force refresh with cache busting
+      await fetchReviews();
+
+    } catch (err) {
+      console.error('❌ Update error:', err);
+      const errorMsg = err?.response?.data?.message || err.message || 'Failed to update review';
+      showToast(errorMsg, 'error');
+    } finally {
+      setEditLoading(false);
+    }
+  };
 
   // ============================================================================
   // HANDLE EDIT - CLOSE MODAL
@@ -266,14 +267,24 @@ export default function ManagerReviewsList() {
   }, [editForm.targetEmployeeId, employees]);
 
   return (
+
     <div className="container-fluid py-3" style={{ maxWidth: '1200px' }}>
+      <div className="d-flex align-items-start mb-4">
+        <button
+          className="btn btn-outline-secondary me-2"
+          onClick={() => navigate(-1)}
+          style={{ borderRadius: 'var(--radius-md)' }}
+        >
+          <ArrowLeft size={16} />
+        </button>
+      </div>
       {/* TOAST NOTIFICATION */}
       {toast.show && (
-        <div 
+        <div
           className={`alert ${toast.type === 'success' ? 'alert-success' : 'alert-danger'} alert-dismissible fade show position-fixed`}
-          style={{ 
-            top: '20px', 
-            right: '20px', 
+          style={{
+            top: '20px',
+            right: '20px',
             zIndex: 9999,
             minWidth: '300px',
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
@@ -281,9 +292,9 @@ export default function ManagerReviewsList() {
           role="alert"
         >
           {toast.message}
-          <button 
-            type="button" 
-            className="btn-close" 
+          <button
+            type="button"
+            className="btn-close"
             onClick={() => setToast({ show: false, message: '', type: '' })}
           ></button>
         </div>
@@ -292,23 +303,23 @@ export default function ManagerReviewsList() {
       {/* EDIT MODAL */}
       {showEditModal && (
         <>
-          <div 
-            className="modal-backdrop fade show" 
+          <div
+            className="modal-backdrop fade show"
             style={{ zIndex: 1040 }}
             onClick={handleCloseEditModal}
           ></div>
-          <div 
-            className="modal fade show d-block" 
-            tabIndex="-1" 
+          <div
+            className="modal fade show d-block"
+            tabIndex="-1"
             style={{ zIndex: 1050 }}
           >
             <div className="modal-dialog modal-dialog-centered modal-lg">
               <div className="modal-content" style={{ borderRadius: 'var(--radius-lg)' }}>
                 <div className="modal-header" style={{ borderBottom: '2px solid var(--border)' }}>
                   <h5 className="modal-title fw-bold">Edit Review</h5>
-                  <button 
-                    type="button" 
-                    className="btn-close" 
+                  <button
+                    type="button"
+                    className="btn-close"
                     onClick={handleCloseEditModal}
                   ></button>
                 </div>
@@ -418,16 +429,16 @@ export default function ManagerReviewsList() {
                   </form>
                 </div>
                 <div className="modal-footer" style={{ borderTop: '2px solid var(--border)' }}>
-                  <button 
-                    type="button" 
-                    className="btn btn-outline-secondary" 
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
                     onClick={handleCloseEditModal}
                   >
                     Cancel
                   </button>
-                  <button 
-                    type="button" 
-                    className="btn btn-primary" 
+                  <button
+                    type="button"
+                    className="btn btn-primary"
                     onClick={handleSaveEdit}
                     disabled={editLoading}
                   >
@@ -460,8 +471,8 @@ export default function ManagerReviewsList() {
           <p className="mb-0 small text-muted">Create and manage your employee reviews</p>
         </div>
         <div className="d-flex gap-2">
-          <Link 
-            to="/manager/create-review" 
+          <Link
+            to="/manager/create-review"
             className="btn btn-primary d-flex align-items-center gap-2"
             style={{ borderRadius: 'var(--radius-md)', padding: '0.5rem 0.9rem', fontWeight: '600' }}
           >
@@ -472,13 +483,13 @@ export default function ManagerReviewsList() {
             className="btn d-flex align-items-center gap-2"
             onClick={fetchReviews}
             disabled={loading}
-            style={{ 
-              background: 'transparent', 
-              border: '1px solid var(--border)', 
-              color: 'var(--color-primary-3)', 
-              borderRadius: 'var(--radius-md)', 
-              padding: '0.5rem 0.9rem', 
-              fontWeight: '600' 
+            style={{
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              color: 'var(--color-primary-3)',
+              borderRadius: 'var(--radius-md)',
+              padding: '0.5rem 0.9rem',
+              fontWeight: '600'
             }}
           >
             <RefreshCw size={18} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} />
@@ -574,15 +585,15 @@ export default function ManagerReviewsList() {
                     <th style={{ color: 'var(--color-primary-1)', fontWeight: '600', textAlign: 'center' }}>Actions</th>
                   </tr>
                 </thead>
-              
+
                 <tbody>
                   {reviews.map(review => {
                     const isSubmitted = review.status === 'Submitted' || review.submitted === true || review.isSubmitted === true;
                     const isFinalized = review.status === 'Finalized';
-                    
+
                     let statusColor = '#24A148';
                     let statusText = 'Submitted';
-                    
+
                     if (isFinalized) {
                       statusColor = '#0F62FE';
                       statusText = 'Finalized';
@@ -613,14 +624,14 @@ export default function ManagerReviewsList() {
                         </td>
                         <td>
                           <div className="d-flex gap-1 justify-content-center">
-                            <button 
-                              className="btn btn-sm btn-outline-secondary" 
+                            <button
+                              className="btn btn-sm btn-outline-secondary"
                               onClick={() => handleView(review.reviewcommentId)}
                               title="View"
                             >
                               <Eye size={14} />
                             </button>
-                           
+
                           </div>
                         </td>
                       </tr>

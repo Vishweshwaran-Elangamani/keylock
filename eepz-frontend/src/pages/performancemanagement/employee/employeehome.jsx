@@ -150,32 +150,6 @@ export default function EmployeeHome() {
           gap: "16px"
 
         }}>
-          <div>
-            <h1 style={{
-
-              fontSize: "32px",
-
-              fontWeight: "700",
-
-              marginBottom: "8px"
-
-            }}>
-
-              Welcome, Employee! 👋
-            </h1>
-            <p style={{
-
-              fontSize: "18px",
-
-              opacity: 0.9,
-
-              margin: 0
-
-            }}>
-
-              Employee ID: {employeeId}
-            </p>
-          </div>
           {/* <button
  
             onClick={handleLogout}
