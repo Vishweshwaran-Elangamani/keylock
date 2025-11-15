@@ -13,12 +13,9 @@ public partial class Nominationvisibilitytracking
 
     public DateTime ViewedAt { get; set; }
 
-    /// <summary>
-    /// E.g. &quot;Opened&quot;, &quot;Downloaded&quot;, &quot;Approved&quot;
-    /// </summary>
     public string? ActionTaken { get; set; }
 
-    public virtual Nomination Nomination { get; set; } = null!;
+    public virtual Recognitionstatus Nomination { get; set; } = null!;
 
     public virtual Employee ViewedByEmployee { get; set; } = null!;
 }

@@ -83,6 +83,10 @@ public partial class Employee
 
     public virtual ICollection<Meetingmom> Meetingmoms { get; set; } = new List<Meetingmom>();
 
+    public virtual ICollection<Meetingparticipant> Meetingparticipants { get; set; } = new List<Meetingparticipant>();
+
+    public virtual ICollection<Meeting> Meetings { get; set; } = new List<Meeting>();
+
     public virtual ICollection<Mentorfeedback> Mentorfeedbacks { get; set; } = new List<Mentorfeedback>();
 
     public virtual ICollection<Mentorfeedbacktracking> MentorfeedbacktrackingMenteeEmployees { get; set; } = new List<Mentorfeedbacktracking>();
@@ -90,6 +94,14 @@ public partial class Employee
     public virtual ICollection<Mentorfeedbacktracking> MentorfeedbacktrackingMentorEmployees { get; set; } = new List<Mentorfeedbacktracking>();
 
     public virtual ICollection<Mentorfeedbacktracking> MentorfeedbacktrackingSubmittedByEmployees { get; set; } = new List<Mentorfeedbacktracking>();
+
+    public virtual ICollection<Momactionitem> Momactionitems { get; set; } = new List<Momactionitem>();
+
+    public virtual ICollection<Mom> Moms { get; set; } = new List<Mom>();
+
+    public virtual ICollection<Momsharing> MomsharingSharedByEmployees { get; set; } = new List<Momsharing>();
+
+    public virtual ICollection<Momsharing> MomsharingSharedWithEmployees { get; set; } = new List<Momsharing>();
 
     public virtual ICollection<Nominationvisibilitytracking> Nominationvisibilitytrackings { get; set; } = new List<Nominationvisibilitytracking>();
 

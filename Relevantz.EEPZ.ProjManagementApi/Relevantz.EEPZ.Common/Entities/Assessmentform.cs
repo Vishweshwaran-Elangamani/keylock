@@ -7,9 +7,6 @@ public partial class Assessmentform
 {
     public int FormId { get; set; }
 
-    /// <summary>
-    /// Self Assessment, etc
-    /// </summary>
     public string? Name { get; set; }
 
     public string? Type { get; set; }

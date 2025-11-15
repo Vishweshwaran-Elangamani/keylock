@@ -19,9 +19,6 @@ public partial class Goal
 
     public DateTime? Goalendat { get; set; }
 
-    /// <summary>
-    /// FK to EmployeeDetailsMaster(EmployeeMasterId)
-    /// </summary>
     public int? CreatedBy { get; set; }
 
     public string? Goalstatus { get; set; }
@@ -32,24 +29,17 @@ public partial class Goal
 
     public DateTime? ReopenUntil { get; set; }
 
-    /// <summary>
-    /// FK to EmployeeDetailsMaster who closed the goal
-    /// </summary>
     public int? ClosedBy { get; set; }
 
-    /// <summary>
-    /// Timestamp when goal was closed
-    /// </summary>
     public DateTime? ClosedOn { get; set; }
 
-    /// <summary>
-    /// Reason for premature closure
-    /// </summary>
     public string? ClosureReason { get; set; }
 
     public virtual Employeedetailsmaster? ClosedByNavigation { get; set; }
 
     public virtual Employeedetailsmaster? CreatedByNavigation { get; set; }
+
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
     public virtual ICollection<GoalApproval> GoalApprovals { get; set; } = new List<GoalApproval>();
 
@@ -63,7 +53,11 @@ public partial class Goal
 
     public virtual ICollection<Goalprogresslog> Goalprogresslogs { get; set; } = new List<Goalprogresslog>();
 
+    public virtual ICollection<Managerreviewcomment> Managerreviewcomments { get; set; } = new List<Managerreviewcomment>();
+
     public virtual Project? Project { get; set; }
+
+    public virtual ICollection<Projectgoalfeedback> Projectgoalfeedbacks { get; set; } = new List<Projectgoalfeedback>();
 
     public virtual Employeedetailsmaster? ReopenedByNavigation { get; set; }
 

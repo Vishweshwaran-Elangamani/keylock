@@ -9,9 +9,6 @@ public partial class Rewardtype
 
     public string RewardCategory { get; set; } = null!;
 
-    /// <summary>
-    /// E.g. &quot;Employee of the Year&quot;, &quot;Senior Engineer&quot;
-    /// </summary>
     public string RewardName { get; set; } = null!;
 
     public string? Description { get; set; }
@@ -25,4 +22,6 @@ public partial class Rewardtype
     public virtual Userauthentication? CreatedByNavigation { get; set; }
 
     public virtual ICollection<Nominationparameter> Nominationparameters { get; set; } = new List<Nominationparameter>();
+
+    public virtual ICollection<Recognitiondetail> Recognitiondetails { get; set; } = new List<Recognitiondetail>();
 }

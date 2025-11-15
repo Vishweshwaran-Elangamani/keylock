@@ -17,6 +17,8 @@ public partial class Selfassessment
 
     public virtual ICollection<Assessmentdetail> Assessmentdetails { get; set; } = new List<Assessmentdetail>();
 
+    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
+
     public virtual Userauthentication Employee { get; set; } = null!;
 
     public virtual Assessmentform Form { get; set; } = null!;

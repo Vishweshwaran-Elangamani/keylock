@@ -11,9 +11,6 @@ public partial class Department
 
     public decimal? BudgetAllocated { get; set; }
 
-    /// <summary>
-    /// Cost center code for financial tracking
-    /// </summary>
     public string? CostCenter { get; set; }
 
     public DateTime CreatedAt { get; set; }
@@ -35,6 +32,8 @@ public partial class Department
     public virtual ICollection<Payroll> Payrolls { get; set; } = new List<Payroll>();
 
     public virtual ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
+
+    public virtual ICollection<Recognitiondetail> Recognitiondetails { get; set; } = new List<Recognitiondetail>();
 
     public virtual ICollection<Risk> Risks { get; set; } = new List<Risk>();
 
