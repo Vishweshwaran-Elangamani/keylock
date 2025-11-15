@@ -46,6 +46,18 @@ D:\Balaji\Updated\Backend\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.AuthApi\Relevant
 D:\Balaji\Updated\Backend\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\refint\Relevantz.EEPZ.Common.dll
 D:\Balaji\Updated\Backend\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.pdb
 D:\Balaji\Updated\Backend\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\ref\Relevantz.EEPZ.Common.dll
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.deps.json
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.AssemblyReference.cache
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfoInputs.cache
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfo.cs
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.CoreCompileInputs.cache
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\refint\Relevantz.EEPZ.Common.dll
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Team D\Relevantz.EEPZ.AuthApi 1\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\ref\Relevantz.EEPZ.Common.dll
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.deps.json
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb

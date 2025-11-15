@@ -11,8 +11,14 @@ public partial class Meetingmom
 
     public DateOnly MeetingDate { get; set; }
 
+    /// <summary>
+    /// Minutes / notes
+    /// </summary>
     public string Notes { get; set; } = null!;
 
+    /// <summary>
+    /// Legacy creator id
+    /// </summary>
     public int? CreatedBy { get; set; }
 
     public int? EmployeeId { get; set; }

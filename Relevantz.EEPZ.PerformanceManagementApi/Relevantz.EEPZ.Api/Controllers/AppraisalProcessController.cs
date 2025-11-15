@@ -326,7 +326,7 @@ namespace PerformanceManagement.Controllers
                     where ua.Status == "Active"
                         && emp.EmploymentStatus == "Active"
                         && emp.IsActive == true
-                        && (r == null || (r.RoleCode != "HR" && r.RoleCode != "ADMIN"))
+                        && (r == null || (r.RoleCode != "HR" && r.RoleCode != "ADMIN" && r.RoleCode != "DEPT_HEAD" && r.RoleCode != "LEADERSHIP"))
                     select new
                     {
                         UserId = ua.UserId,

@@ -3412,11 +3412,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Integration Modules- Sprint 3 07.11.25\\backend\\Relevantz.EEPZ.ProjManagementApi (2)\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core.Tests\\Relevantz.EEPZ.Core.Tests.csproj",
+      "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core.Tests\\Relevantz.EEPZ.Core.Tests.csproj",
       "projectName": "Relevantz.EEPZ.Core.Tests",
-      "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\backend\\Relevantz.EEPZ.ProjManagementApi (2)\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core.Tests\\Relevantz.EEPZ.Core.Tests.csproj",
+      "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core.Tests\\Relevantz.EEPZ.Core.Tests.csproj",
       "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-      "outputPath": "D:\\Integration Modules- Sprint 3 07.11.25\\backend\\Relevantz.EEPZ.ProjManagementApi (2)\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core.Tests\\obj\\",
+      "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3437,8 +3437,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\Integration Modules- Sprint 3 07.11.25\\backend\\Relevantz.EEPZ.ProjManagementApi (2)\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
-              "projectPath": "D:\\Integration Modules- Sprint 3 07.11.25\\backend\\Relevantz.EEPZ.ProjManagementApi (2)\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
+            "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+              "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
             }
           }
         }

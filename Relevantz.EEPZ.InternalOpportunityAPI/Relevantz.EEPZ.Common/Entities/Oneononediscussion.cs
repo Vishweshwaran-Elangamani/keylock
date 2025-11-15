@@ -11,6 +11,9 @@ public partial class Oneononediscussion
 
     public int ParticipantEmployeeId { get; set; }
 
+    /// <summary>
+    /// Teams/Zoom/etc URL
+    /// </summary>
     public string MeetingLink { get; set; } = null!;
 
     public string? Agenda { get; set; }
@@ -25,6 +28,9 @@ public partial class Oneononediscussion
 
     public string? RecordingLink { get; set; }
 
+    /// <summary>
+    /// Post-meeting notes / MOM
+    /// </summary>
     public string? Notes { get; set; }
 
     public int CreatedBy { get; set; }

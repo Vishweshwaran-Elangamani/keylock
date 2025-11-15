@@ -33,6 +33,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
 
         // Role and Department
         public string? RoleName { get; set; }
+        public int? DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
     }
 }

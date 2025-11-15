@@ -23,14 +23,6 @@ public partial class Budgetallocation
 
     public DateTime AllocatedAt { get; set; }
 
-    public int? BudgetId { get; set; }
-
-    public decimal? UtilizedAmount { get; set; }
-
-    public decimal? UtilizationPercentage { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
     public virtual Userauthentication AllocatedByUser { get; set; } = null!;
 
     public virtual Department Department { get; set; } = null!;

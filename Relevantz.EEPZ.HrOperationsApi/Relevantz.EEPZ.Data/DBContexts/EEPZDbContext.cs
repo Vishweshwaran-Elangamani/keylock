@@ -45,8 +45,6 @@ public partial class EEPZDbContext : DbContext
 
     public virtual DbSet<Departmentheadapproval> Departmentheadapprovals { get; set; }
 
-    public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; }
-
     public virtual DbSet<Employee> Employees { get; set; }
 
     public virtual DbSet<Employeedetailsmaster> Employeedetailsmasters { get; set; }
@@ -105,23 +103,11 @@ public partial class EEPZDbContext : DbContext
 
     public virtual DbSet<MasterSkill> MasterSkills { get; set; }
 
-    public virtual DbSet<Meeting> Meetings { get; set; }
-
     public virtual DbSet<Meetingmom> Meetingmoms { get; set; }
-
-    public virtual DbSet<Meetingparticipant> Meetingparticipants { get; set; }
 
     public virtual DbSet<Mentorfeedback> Mentorfeedbacks { get; set; }
 
     public virtual DbSet<Mentorfeedbacktracking> Mentorfeedbacktrackings { get; set; }
-
-    public virtual DbSet<Mom> Moms { get; set; }
-
-    public virtual DbSet<Momactionitem> Momactionitems { get; set; }
-
-    public virtual DbSet<Momdiscussionpoint> Momdiscussionpoints { get; set; }
-
-    public virtual DbSet<Momsharing> Momsharings { get; set; }
 
     public virtual DbSet<Nomination> Nominations { get; set; }
 
@@ -203,7 +189,7 @@ public partial class EEPZDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;database=EEPZDB;uid=root;pwd=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.41-mysql"));
+        => optionsBuilder.UseMySql("server=localhost;database=eepzdb;uid=root;pwd=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.43-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -409,13 +395,15 @@ public partial class EEPZDbContext : DbContext
         {
             entity.HasKey(e => e.AllocationId).HasName("PRIMARY");
 
-            entity.ToTable("budgetallocations");
+            entity.ToTable("budgetallocations", tb => tb.HasComment("HR sub-allocations from department budgets"));
 
             entity.HasIndex(e => e.AllocatedByUserId, "AllocatedByUserId");
 
             entity.HasIndex(e => e.EmployeeUserId, "EmployeeUserId");
 
             entity.HasIndex(e => e.AllocationType, "idx_allocation_type");
+
+            entity.HasIndex(e => e.BudgetId, "idx_budget");
 
             entity.HasIndex(e => e.DepartmentId, "idx_department");
 
@@ -426,6 +414,9 @@ public partial class EEPZDbContext : DbContext
             entity.Property(e => e.Amount).HasPrecision(15, 2);
             entity.Property(e => e.GoalStatus).HasMaxLength(100);
             entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.Period)
+                .HasMaxLength(10)
+                .HasComment("Q1, Q2, Q3, Q4");
             entity.Property(e => e.UpdatedAt)
                 .ValueGeneratedOnAddOrUpdate()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -442,6 +433,10 @@ public partial class EEPZDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("budgetallocations_ibfk_3");
 
+            entity.HasOne(d => d.Budget).WithMany(p => p.Budgetallocations)
+                .HasForeignKey(d => d.BudgetId)
+                .HasConstraintName("budgetallocations_ibfk_4");
+
             entity.HasOne(d => d.Department).WithMany(p => p.Budgetallocations)
                 .HasForeignKey(d => d.DepartmentId)
                 .HasConstraintName("budgetallocations_ibfk_1");
@@ -456,7 +451,7 @@ public partial class EEPZDbContext : DbContext
         {
             entity.HasKey(e => e.PeriodAllocationId).HasName("PRIMARY");
 
-            entity.ToTable("budgetperiodallocations");
+            entity.ToTable("budgetperiodallocations", tb => tb.HasComment("Leadership period-based budget allocations (e.g., 10L in Q1, 20L in Q2)"));
 
             entity.HasIndex(e => e.AllocatedByUserId, "idx_allocated_by");
 
@@ -654,18 +649,6 @@ public partial class EEPZDbContext : DbContext
             entity.HasOne(d => d.Project).WithMany(p => p.Departmentheadapprovals)
                 .HasForeignKey(d => d.ProjectId)
                 .HasConstraintName("departmentheadapprovals_ibfk_2");
-        });
-
-        modelBuilder.Entity<Efmigrationshistory>(entity =>
-        {
-            entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
-
-            entity
-                .ToTable("__efmigrationshistory")
-                .UseCollation("utf8mb4_0900_ai_ci");
-
-            entity.Property(e => e.MigrationId).HasMaxLength(150);
-            entity.Property(e => e.ProductVersion).HasMaxLength(32);
         });
 
         modelBuilder.Entity<Employee>(entity =>
@@ -1788,50 +1771,6 @@ public partial class EEPZDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(500);
         });
 
-        modelBuilder.Entity<Meeting>(entity =>
-        {
-            entity.HasKey(e => e.MeetingId).HasName("PRIMARY");
-
-            entity.ToTable("meetings");
-
-            entity.HasIndex(e => e.MeetingDate, "idx_meeting_date");
-
-            entity.HasIndex(e => e.MeetingType, "idx_meeting_type");
-
-            entity.HasIndex(e => e.ScheduledByEmployeeId, "idx_scheduled_by");
-
-            entity.HasIndex(e => e.Status, "idx_status");
-
-            entity.Property(e => e.Agenda)
-                .HasComment("Meeting agenda/discussion topics")
-                .HasColumnType("text");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.MeetingDate)
-                .HasComment("Scheduled date and time")
-                .HasColumnType("datetime");
-            entity.Property(e => e.MeetingLink)
-                .HasMaxLength(500)
-                .HasComment("Teams/Zoom/Google Meet link");
-            entity.Property(e => e.MeetingTitle)
-                .HasMaxLength(200)
-                .HasComment("Title/Subject of the meeting");
-            entity.Property(e => e.MeetingType).HasColumnType("enum('One-on-One','Team Meeting','Presentation','Other')");
-            entity.Property(e => e.ScheduledByEmployeeId).HasComment("Manager/Employee who scheduled the meeting");
-            entity.Property(e => e.Status)
-                .HasDefaultValueSql("'Scheduled'")
-                .HasColumnType("enum('Scheduled','Completed','Cancelled')");
-            entity.Property(e => e.UpdatedAt)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasColumnType("datetime");
-
-            entity.HasOne(d => d.ScheduledByEmployee).WithMany(p => p.Meetings)
-                .HasForeignKey(d => d.ScheduledByEmployeeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("meetings_ibfk_1");
-        });
-
         modelBuilder.Entity<Meetingmom>(entity =>
         {
             entity.HasKey(e => e.Momid).HasName("PRIMARY");
@@ -1853,53 +1792,6 @@ public partial class EEPZDbContext : DbContext
                 .HasForeignKey(d => d.EmployeeId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("meetingmom_ibfk_1");
-        });
-
-        modelBuilder.Entity<Meetingparticipant>(entity =>
-        {
-            entity.HasKey(e => e.ParticipantId).HasName("PRIMARY");
-
-            entity.ToTable("meetingparticipants");
-
-            entity.HasIndex(e => e.EmployeeId, "idx_employee");
-
-            entity.HasIndex(e => e.MeetingId, "idx_meeting");
-
-            entity.HasIndex(e => e.Rsvpstatus, "idx_rsvp_status");
-
-            entity.HasIndex(e => new { e.MeetingId, e.EmployeeId }, "unique_meeting_participant").IsUnique();
-
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.InvitedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasComment("When invitation was sent")
-                .HasColumnType("datetime");
-            entity.Property(e => e.Rsvpcomments)
-                .HasComment("Optional comments from employee (e.g., reason for decline)")
-                .HasColumnType("text")
-                .HasColumnName("RSVPComments");
-            entity.Property(e => e.RsvpresponseDate)
-                .HasComment("When employee responded to invitation")
-                .HasColumnType("datetime")
-                .HasColumnName("RSVPResponseDate");
-            entity.Property(e => e.Rsvpstatus)
-                .HasDefaultValueSql("'Pending'")
-                .HasComment("Employee response to meeting invitation")
-                .HasColumnType("enum('Pending','Accepted','Declined','Tentative')")
-                .HasColumnName("RSVPStatus");
-            entity.Property(e => e.UpdatedAt)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasColumnType("datetime");
-
-            entity.HasOne(d => d.Employee).WithMany(p => p.Meetingparticipants)
-                .HasForeignKey(d => d.EmployeeId)
-                .HasConstraintName("meetingparticipants_ibfk_2");
-
-            entity.HasOne(d => d.Meeting).WithMany(p => p.Meetingparticipants)
-                .HasForeignKey(d => d.MeetingId)
-                .HasConstraintName("meetingparticipants_ibfk_1");
         });
 
         modelBuilder.Entity<Mentorfeedback>(entity =>
@@ -1993,160 +1885,6 @@ public partial class EEPZDbContext : DbContext
             entity.HasOne(d => d.SubmittedByEmployee).WithMany(p => p.MentorfeedbacktrackingSubmittedByEmployees)
                 .HasForeignKey(d => d.SubmittedByEmployeeId)
                 .HasConstraintName("FK_MentorFeedback_SubmittedBy");
-        });
-
-        modelBuilder.Entity<Mom>(entity =>
-        {
-            entity.HasKey(e => e.Momid).HasName("PRIMARY");
-
-            entity.ToTable("mom");
-
-            entity.HasIndex(e => e.MeetingDate, "idx_meeting_date");
-
-            entity.HasIndex(e => e.MeetingId, "idx_meeting_id");
-
-            entity.HasIndex(e => e.MeetingType, "idx_meeting_type");
-
-            entity.HasIndex(e => e.SubmittedByEmployeeId, "idx_submitted_by");
-
-            entity.HasIndex(e => e.SubmittedByRole, "idx_submitted_role");
-
-            entity.Property(e => e.Momid).HasColumnName("MOMId");
-            entity.Property(e => e.Attendees)
-                .HasComment("Comma-separated list or JSON array of attendee names")
-                .HasColumnType("text");
-            entity.Property(e => e.CommentsObservations)
-                .HasComment("General comments and observations from the meeting")
-                .HasColumnType("text");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.IsEditable)
-                .IsRequired()
-                .HasDefaultValueSql("'1'")
-                .HasComment("Managers can edit their own MOMs (US077)");
-            entity.Property(e => e.MeetingDate).HasColumnType("datetime");
-            entity.Property(e => e.MeetingId).HasComment("NULL if instant MOM without pre-scheduled meeting");
-            entity.Property(e => e.MeetingLink)
-                .HasMaxLength(500)
-                .HasComment("Teams/Zoom/Google Meet link");
-            entity.Property(e => e.MeetingTitle).HasMaxLength(200);
-            entity.Property(e => e.MeetingType).HasColumnType("enum('One-on-One','Team Meeting','Presentation','Other')");
-            entity.Property(e => e.SubmittedByRole)
-                .HasComment("Role of the person submitting MOM")
-                .HasColumnType("enum('Employee','Manager','HR')");
-            entity.Property(e => e.UpdatedAt)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasColumnType("datetime");
-
-            entity.HasOne(d => d.Meeting).WithMany(p => p.Moms)
-                .HasForeignKey(d => d.MeetingId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("mom_ibfk_1");
-
-            entity.HasOne(d => d.SubmittedByEmployee).WithMany(p => p.Moms)
-                .HasForeignKey(d => d.SubmittedByEmployeeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("mom_ibfk_2");
-        });
-
-        modelBuilder.Entity<Momactionitem>(entity =>
-        {
-            entity.HasKey(e => e.ActionItemId).HasName("PRIMARY");
-
-            entity.ToTable("momactionitems");
-
-            entity.HasIndex(e => new { e.AssignedToEmployeeId, e.Status }, "idx_assigned_status");
-
-            entity.HasIndex(e => e.AssignedToEmployeeId, "idx_assigned_to");
-
-            entity.HasIndex(e => e.DueDate, "idx_due_date");
-
-            entity.HasIndex(e => e.Momid, "idx_mom");
-
-            entity.HasIndex(e => e.Status, "idx_status");
-
-            entity.Property(e => e.AssignedToEmployeeId).HasComment("Employee responsible for the task");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.DueDate).HasComment("Deadline for completion");
-            entity.Property(e => e.Momid).HasColumnName("MOMId");
-            entity.Property(e => e.Status)
-                .HasDefaultValueSql("'Pending'")
-                .HasColumnType("enum('Pending','Completed')");
-            entity.Property(e => e.TaskDescription)
-                .HasMaxLength(500)
-                .HasComment("Description of the action item/task");
-            entity.Property(e => e.UpdatedAt)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasColumnType("datetime");
-
-            entity.HasOne(d => d.AssignedToEmployee).WithMany(p => p.Momactionitems)
-                .HasForeignKey(d => d.AssignedToEmployeeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("momactionitems_ibfk_2");
-
-            entity.HasOne(d => d.Mom).WithMany(p => p.Momactionitems)
-                .HasForeignKey(d => d.Momid)
-                .HasConstraintName("momactionitems_ibfk_1");
-        });
-
-        modelBuilder.Entity<Momdiscussionpoint>(entity =>
-        {
-            entity.HasKey(e => e.PointId).HasName("PRIMARY");
-
-            entity.ToTable("momdiscussionpoints");
-
-            entity.HasIndex(e => e.Momid, "idx_mom");
-
-            entity.HasIndex(e => e.PointOrder, "idx_point_order");
-
-            entity.Property(e => e.Momid).HasColumnName("MOMId");
-            entity.Property(e => e.PointOrder)
-                .HasDefaultValueSql("'1'")
-                .HasComment("Display order of discussion points");
-            entity.Property(e => e.PointText)
-                .HasComment("The discussion point content")
-                .HasColumnType("text");
-
-            entity.HasOne(d => d.Mom).WithMany(p => p.Momdiscussionpoints)
-                .HasForeignKey(d => d.Momid)
-                .HasConstraintName("momdiscussionpoints_ibfk_1");
-        });
-
-        modelBuilder.Entity<Momsharing>(entity =>
-        {
-            entity.HasKey(e => e.SharingId).HasName("PRIMARY");
-
-            entity.ToTable("momsharing");
-
-            entity.HasIndex(e => e.Momid, "idx_mom");
-
-            entity.HasIndex(e => e.SharedByEmployeeId, "idx_shared_by");
-
-            entity.HasIndex(e => e.SharedWithEmployeeId, "idx_shared_with");
-
-            entity.HasIndex(e => new { e.SharedWithEmployeeId, e.SharedAt }, "idx_shared_with_date");
-
-            entity.Property(e => e.Momid).HasColumnName("MOMId");
-            entity.Property(e => e.SharedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("datetime");
-            entity.Property(e => e.SharedByEmployeeId).HasComment("Employee who shared the MOM");
-            entity.Property(e => e.SharedWithEmployeeId).HasComment("Employee who received the shared MOM");
-
-            entity.HasOne(d => d.Mom).WithMany(p => p.Momsharings)
-                .HasForeignKey(d => d.Momid)
-                .HasConstraintName("momsharing_ibfk_1");
-
-            entity.HasOne(d => d.SharedByEmployee).WithMany(p => p.MomsharingSharedByEmployees)
-                .HasForeignKey(d => d.SharedByEmployeeId)
-                .HasConstraintName("momsharing_ibfk_2");
-
-            entity.HasOne(d => d.SharedWithEmployee).WithMany(p => p.MomsharingSharedWithEmployees)
-                .HasForeignKey(d => d.SharedWithEmployeeId)
-                .HasConstraintName("momsharing_ibfk_3");
         });
 
         modelBuilder.Entity<Nomination>(entity =>

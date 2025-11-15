@@ -3182,9 +3182,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var pending = all.Where(g => g.Goalstatus == GOAL_STATUS.PENDING).ToList();
             var ongoing = all.Where(g =>
-                    g.Goalstatus == GOAL_STATUS.PENDING
-                    || g.Goalstatus == GOAL_STATUS.IN_PROGRESS
-                    || g.Goalstatus == GOAL_STATUS.REOPENED
+                g.Goalstatus == GOAL_STATUS.IN_PROGRESS
                 )
                 .ToList();
             var overdue = all.Where(g =>

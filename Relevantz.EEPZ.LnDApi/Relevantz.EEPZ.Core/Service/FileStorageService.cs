@@ -2,7 +2,6 @@ using Relevantz.EEPZ.Core.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 
-
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class FileStorageService : IFileStorageService

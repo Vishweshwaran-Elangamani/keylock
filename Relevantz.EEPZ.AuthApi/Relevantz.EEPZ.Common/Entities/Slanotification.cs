@@ -24,8 +24,4 @@ public partial class Slanotification
     public DateTime? ReadAt { get; set; }
 
     public string Channel { get; set; } = null!;
-
-    public virtual Employee Employee { get; set; } = null!;
-
-    public virtual Sla Sla { get; set; } = null!;
 }

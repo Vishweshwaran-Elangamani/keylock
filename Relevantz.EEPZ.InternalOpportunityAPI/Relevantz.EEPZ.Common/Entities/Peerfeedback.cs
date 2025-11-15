@@ -9,6 +9,9 @@ public partial class Peerfeedback
 
     public int? PeerEmployeeId { get; set; }
 
+    /// <summary>
+    /// Legacy free-text name
+    /// </summary>
     public string? PeerName { get; set; }
 
     public string Comments { get; set; } = null!;

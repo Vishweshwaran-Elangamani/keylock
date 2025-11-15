@@ -25,21 +25,21 @@ public partial class Lndassignment
 
     public int CreatedByEmployeeId { get; set; }
 
-    public DateOnly? CreatedOn { get; set; }
+    public DateTime? CreatedOn { get; set; }
 
     public int? UpdatedByEmployeeId { get; set; }
 
-    public DateOnly? UpdatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
 
     public virtual Employee CreatedByEmployee { get; set; } = null!;
 
-    public virtual ICollection<Lndapproval> Lndapprovals { get; set; } = new List<Lndapproval>();
+    public virtual ICollection<Lndcomment> Lndcomments { get; set; } = new List<Lndcomment>();
 
     public virtual Employee MenteeEmployee { get; set; } = null!;
 
-    public virtual MasterSkill Skill { get; set; } = null!;
+    public virtual Skillmaster Skill { get; set; } = null!;
 
-    public virtual Lndsme Sme { get; set; } = null!;
+    public virtual Sme Sme { get; set; } = null!;
 
     public virtual Employee? UpdatedByEmployee { get; set; }
 }

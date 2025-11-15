@@ -1,38 +1,48 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
+ 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
+ 
   <ItemGroup>
-    <!-- Downgraded to .NET 8 compatible versions -->
+    <!-- ASP.NET Core and OpenAPI -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+ 
+    <!-- EF Core provider for MySQL -->
+ 
+    <!-- EF Core design-time package (required for dotnet ef commands) -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+ 
+    <!-- Authentication and JWT -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-    
-    <!-- FIX: Use 8.0.1 to avoid version downgrade conflict -->
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
-
-    <!-- Serilog packages are already compatible -->
+ 
+    <!-- Logging with Serilog -->
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
-
-    <!-- AutoMapper is fine for .NET 8 -->
+ 
+    <!-- AutoMapper -->
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
   </ItemGroup>
-
+ 
   <ItemGroup>
+    <!-- Project references -->
     <ProjectReference Include="..\Relevantz.EEPZ.Common\Relevantz.EEPZ.Common.csproj" />
     <ProjectReference Include="..\Relevantz.EEPZ.Data\Relevantz.EEPZ.Data.csproj" />
     <ProjectReference Include="..\Relevantz.EEPZ.Core\Relevantz.EEPZ.Core.csproj" />
   </ItemGroup>
-
+ 
 </Project>
+ 
+ 

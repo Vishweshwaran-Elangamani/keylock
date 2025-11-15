@@ -9,7 +9,7 @@ public partial class Lndapproval
 
     public string ApprovalType { get; set; } = null!;
 
-    public int? AssignmentId { get; set; }
+    public int RelatedId { get; set; }
 
     public int? SkillId { get; set; }
 
@@ -21,19 +21,29 @@ public partial class Lndapproval
 
     public string Status { get; set; } = null!;
 
-    public string? Notes { get; set; }
+    public string? Reason { get; set; }
 
-    public DateOnly? RequestedOn { get; set; }
+    public DateTime? ApprovedOn { get; set; }
 
-    public DateOnly? UpdatedOn { get; set; }
+    public DateTime? RejectedOn { get; set; }
+
+    public int CreatedByEmployeeId { get; set; }
+
+    public DateTime? CreatedOn { get; set; }
+
+    public int? UpdatedByEmployeeId { get; set; }
+
+    public DateTime? UpdatedOn { get; set; }
 
     public virtual Employee? ApproverEmployee { get; set; }
 
-    public virtual Lndassignment? Assignment { get; set; }
-
     public virtual Lndattachment? Attachment { get; set; }
+
+    public virtual Employee CreatedByEmployee { get; set; } = null!;
 
     public virtual Employee RequesterEmployee { get; set; } = null!;
 
-    public virtual MasterSkill? Skill { get; set; }
+    public virtual Skillmaster? Skill { get; set; }
+
+    public virtual Employee? UpdatedByEmployee { get; set; }
 }

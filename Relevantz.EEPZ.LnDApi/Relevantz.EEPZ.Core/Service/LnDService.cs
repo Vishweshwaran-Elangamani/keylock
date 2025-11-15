@@ -5,7 +5,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
 
-namespace eepzbackend.Services.Implementations
+namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class LnDService : ILnDService
     {
@@ -595,7 +595,7 @@ namespace eepzbackend.Services.Implementations
                     FileName = request.ProofDocument.FileName,
                     FilePath = filePath,
                     FileSize = request.ProofDocument.Length,
-                    AttachmentType = LnDConstants.AttachmentType.SME_PROOF,
+                    AttachmentType = LnDConstants.ATTACHMENT_TYPE.SME_PROOF,
                     CreatedByEmployeeId = employeeId,
                     CreatedOn = DateOnly.FromDateTime(DateTime.Now),
                 };
@@ -605,12 +605,12 @@ namespace eepzbackend.Services.Implementations
 
                 var approval = new Lndapproval
                 {
-                    ApprovalType = LnDConstants.ApprovalType.SME_REGISTRATION,
+                    ApprovalType = LnDConstants.APPROVAL_TYPE.SME_REGISTRATION,
                     SkillId = request.SkillId,
                     AttachmentId = attachment.AttachmentId,
                     RequesterEmployeeId = employeeId,
                     ApproverEmployeeId = skillMapping.Employee.ReportingManagerEmployeeId,
-                    Status = LnDConstants.ApprovalStatus.PENDING,
+                    Status = LnDConstants.APPROVAL_STATUS.PENDING,
                     RequestedOn = DateOnly.FromDateTime(DateTime.Now),
                 };
 
@@ -736,11 +736,11 @@ namespace eepzbackend.Services.Implementations
 
                 var approval = new Lndapproval
                 {
-                    ApprovalType = LnDConstants.ApprovalType.SME_REQUEST,
+                    ApprovalType = LnDConstants.APPROVAL_TYPE.SME_REQUEST,
                     SkillId = request.SkillId,
                     RequesterEmployeeId = managerId,
                     ApproverEmployeeId = request.MentorEmployeeId,
-                    Status = LnDConstants.ApprovalStatus.PENDING,
+                    Status = LnDConstants.APPROVAL_STATUS.PENDING,
                     Notes = System.Text.Json.JsonSerializer.Serialize(
                         new
                         {
@@ -992,7 +992,7 @@ namespace eepzbackend.Services.Implementations
                         Message = "Assignment not found",
                     };
 
-                if (assignment.Status != LnDConstants.AssignmentStatus.IN_PROGRESS)
+                if (assignment.Status != LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS)
                     return new ApiResponse<bool>
                     {
                         Success = false,
@@ -1009,7 +1009,7 @@ namespace eepzbackend.Services.Implementations
                     FileName = request.ProofDocument.FileName,
                     FilePath = filePath,
                     FileSize = request.ProofDocument.Length,
-                    AttachmentType = LnDConstants.AttachmentType.COMPLETION_PROOF,
+                    AttachmentType = LnDConstants.ATTACHMENT_TYPE.COMPLETION_PROOF,
                     CreatedByEmployeeId = employeeId,
                     CreatedOn = DateOnly.FromDateTime(DateTime.Now),
                 };
@@ -1019,19 +1019,19 @@ namespace eepzbackend.Services.Implementations
 
                 assignment.ProofFilePath = filePath;
                 assignment.CompletionNotes = request.CompletionNotes;
-                assignment.Status = LnDConstants.AssignmentStatus.PENDING_SME_ACKNOWLEDGEMENT;
+                assignment.Status = LnDConstants.ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT;
                 assignment.UpdatedByEmployeeId = employeeId;
                 assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
 
                 var approval = new Lndapproval
                 {
-                    ApprovalType = LnDConstants.ApprovalType.ASSIGNMENT_ACKNOWLEDGEMENT,
+                    ApprovalType = LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT,
                     AssignmentId = assignment.AssignmentId,
                     SkillId = assignment.SkillId,
                     AttachmentId = attachment.AttachmentId,
                     RequesterEmployeeId = employeeId,
                     ApproverEmployeeId = assignment.Sme.EmployeeId,
-                    Status = LnDConstants.ApprovalStatus.PENDING,
+                    Status = LnDConstants.APPROVAL_STATUS.PENDING,
                     RequestedOn = DateOnly.FromDateTime(DateTime.Now),
                 };
 
@@ -1083,7 +1083,7 @@ namespace eepzbackend.Services.Implementations
 
                 if (
                     assignment.Status
-                    != LnDConstants.AssignmentStatus.PENDING_MANAGER_ACKNOWLEDGEMENT
+                    != LnDConstants.ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT
                 )
                     return new ApiResponse<bool>
                     {
@@ -1091,7 +1091,7 @@ namespace eepzbackend.Services.Implementations
                         Message = "Assignment is not awaiting manager acknowledgement",
                     };
 
-                assignment.Status = LnDConstants.AssignmentStatus.COMPLETED;
+                assignment.Status = LnDConstants.ASSIGNMENT_STATUS.COMPLETED;
                 assignment.CompletionRating = request.NewRating;
                 assignment.CompletionNotes = request.Notes;
                 assignment.UpdatedByEmployeeId = managerId;
@@ -1112,12 +1112,12 @@ namespace eepzbackend.Services.Implementations
 
                 var approval = await _repository.GetPendingAssignmentApprovalAsync(
                     request.AssignmentId,
-                    LnDConstants.ApprovalType.ASSIGNMENT_COMPLETION
+                    LnDConstants.APPROVAL_TYPE.ASSIGNMENT_COMPLETION
                 );
 
                 if (approval != null)
                 {
-                    approval.Status = LnDConstants.ApprovalStatus.APPROVED;
+                    approval.Status = LnDConstants.APPROVAL_STATUS.APPROVED;
                     approval.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
                     await _repository.UpdateApprovalAsync(approval);
                 }
@@ -1232,7 +1232,7 @@ namespace eepzbackend.Services.Implementations
                         Message = "Approval request not found",
                     };
 
-                if (approval.Status != LnDConstants.ApprovalStatus.PENDING)
+                if (approval.Status != LnDConstants.APPROVAL_STATUS.PENDING)
                     return new ApiResponse<bool>
                     {
                         Success = false,
@@ -1240,8 +1240,8 @@ namespace eepzbackend.Services.Implementations
                     };
 
                 approval.Status = request.IsApproved
-                    ? LnDConstants.ApprovalStatus.APPROVED
-                    : LnDConstants.ApprovalStatus.REJECTED;
+                    ? LnDConstants.APPROVAL_STATUS.APPROVED
+                    : LnDConstants.APPROVAL_STATUS.REJECTED;
                 approval.Notes = request.Notes;
                 approval.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
 
@@ -1249,15 +1249,15 @@ namespace eepzbackend.Services.Implementations
                 {
                     switch (approval.ApprovalType)
                     {
-                        case LnDConstants.ApprovalType.SME_REGISTRATION:
+                        case LnDConstants.APPROVAL_TYPE.SME_REGISTRATION:
                             await HandleSmeRegistrationApproval(approval);
                             break;
 
-                        case LnDConstants.ApprovalType.SME_REQUEST:
+                        case LnDConstants.APPROVAL_TYPE.SME_REQUEST:
                             await HandleSmeRequestApproval(approval);
                             break;
 
-                        case LnDConstants.ApprovalType.ASSIGNMENT_ACKNOWLEDGEMENT:
+                        case LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT:
                             await HandleAssignmentAcknowledgement(approval);
                             break;
                     }
@@ -1266,7 +1266,7 @@ namespace eepzbackend.Services.Implementations
                 {
                     if (
                         approval.ApprovalType
-                        == LnDConstants.ApprovalType.ASSIGNMENT_ACKNOWLEDGEMENT
+                        == LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT
                     )
                     {
                         var assignment = await _repository.GetAssignmentByIdAsync(
@@ -1274,7 +1274,7 @@ namespace eepzbackend.Services.Implementations
                         );
                         if (assignment != null)
                         {
-                            assignment.Status = LnDConstants.AssignmentStatus.IN_PROGRESS;
+                            assignment.Status = LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS;
                             await _repository.UpdateAssignmentAsync(assignment);
                         }
                     }
@@ -1334,7 +1334,7 @@ namespace eepzbackend.Services.Implementations
                 SmeId = sme.SmeId,
                 SkillId = int.Parse(assignmentDetails["SkillId"].ToString()),
                 Deadline = DateTime.Parse(assignmentDetails["Deadline"].ToString()),
-                Status = LnDConstants.AssignmentStatus.IN_PROGRESS,
+                Status = LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS,
                 CreatedByEmployeeId = int.Parse(assignmentDetails["ManagerId"].ToString()),
                 CreatedOn = DateOnly.FromDateTime(DateTime.Now),
             };
@@ -1351,22 +1351,22 @@ namespace eepzbackend.Services.Implementations
 
             if (assignment != null)
             {
-                assignment.Status = LnDConstants.AssignmentStatus.ACKNOWLEDGED;
+                assignment.Status = LnDConstants.ASSIGNMENT_STATUS.ACKNOWLEDGED;
 
                 var managerApproval = new Lndapproval
                 {
-                    ApprovalType = LnDConstants.ApprovalType.ASSIGNMENT_COMPLETION,
+                    ApprovalType = LnDConstants.APPROVAL_TYPE.ASSIGNMENT_COMPLETION,
                     AssignmentId = assignment.AssignmentId,
                     SkillId = assignment.SkillId,
                     AttachmentId = approval.AttachmentId,
                     RequesterEmployeeId = approval.ApproverEmployeeId.Value,
                     ApproverEmployeeId = assignment.MenteeEmployee.ReportingManagerEmployeeId,
-                    Status = LnDConstants.ApprovalStatus.PENDING,
+                    Status = LnDConstants.APPROVAL_STATUS.PENDING,
                     RequestedOn = DateOnly.FromDateTime(DateTime.Now),
                 };
 
                 await _repository.AddApprovalAsync(managerApproval);
-                assignment.Status = LnDConstants.AssignmentStatus.PENDING_MANAGER_ACKNOWLEDGEMENT;
+                assignment.Status = LnDConstants.ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT;
                 await _repository.UpdateAssignmentAsync(assignment);
             }
         }

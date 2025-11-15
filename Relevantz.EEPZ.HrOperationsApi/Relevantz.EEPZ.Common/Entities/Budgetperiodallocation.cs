@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Relevantz.EEPZ.Common.Entities;
 
+/// <summary>
+/// Leadership period-based budget allocations (e.g., 10L in Q1, 20L in Q2)
+/// </summary>
 public partial class Budgetperiodallocation
 {
     public int PeriodAllocationId { get; set; }

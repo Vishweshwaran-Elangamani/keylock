@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Relevantz.EEPZ.Data;
 using Relevantz.EEPZ.Core.Services.Interface;
-using eepzbackend.Services.Implementations;
 using Serilog;
 using System.Text;
 using Relevantz.EEPZ.Common.Entities;

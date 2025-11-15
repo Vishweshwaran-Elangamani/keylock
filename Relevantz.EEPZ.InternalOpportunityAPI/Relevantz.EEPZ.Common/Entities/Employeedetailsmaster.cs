@@ -15,8 +15,6 @@ public partial class Employeedetailsmaster
 
     public virtual Department Department { get; set; } = null!;
 
-    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
-
     public virtual Employee Employee { get; set; } = null!;
 
     public virtual ICollection<GoalApproval> GoalApprovalApprovedByNavigations { get; set; } = new List<GoalApproval>();
@@ -64,8 +62,6 @@ public partial class Employeedetailsmaster
     public virtual ICollection<Project> ProjectResourceOwnerEmployees { get; set; } = new List<Project>();
 
     public virtual ICollection<Projectemployee> Projectemployees { get; set; } = new List<Projectemployee>();
-
-    public virtual ICollection<Projectgoalfeedback> Projectgoalfeedbacks { get; set; } = new List<Projectgoalfeedback>();
 
     public virtual Role Role { get; set; } = null!;
 }

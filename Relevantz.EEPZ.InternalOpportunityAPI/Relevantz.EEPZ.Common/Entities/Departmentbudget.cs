@@ -27,7 +27,5 @@ public partial class Departmentbudget
 
     public DateTime? UpdatedAt { get; set; }
 
-    public virtual ICollection<Budgetperiodallocation> Budgetperiodallocations { get; set; } = new List<Budgetperiodallocation>();
-
     public virtual Department Department { get; set; } = null!;
 }

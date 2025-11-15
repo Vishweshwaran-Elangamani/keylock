@@ -772,7 +772,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             try
             {
-                Console.WriteLine($" Controller: UpdateUtilization called for allocation {request.AllocationId}");
+                Console.WriteLine($"📊 Controller: UpdateUtilization called for allocation {request.AllocationId}");
 
                 if (request.AllocationId <= 0)
                 {
@@ -784,15 +784,24 @@ namespace Relevantz.EEPZ.Api.Controllers
                     });
                 }
 
+                // Get the allocation first
                 var allocation = await _context.Budgetallocations
                     .FirstOrDefaultAsync(a => a.AllocationId == request.AllocationId);
 
                 if (allocation == null)
                 {
+                    Console.WriteLine($"❌ Allocation not found: {request.AllocationId}");
+                    
+                    // DEBUG: Check what allocations exist
+                    var existingAllocations = await _context.Budgetallocations
+                        .Select(a => a.AllocationId)
+                        .ToListAsync();
+                    Console.WriteLine($"📋 Existing AllocationIds: {string.Join(", ", existingAllocations)}");
+                    
                     return NotFound(new
                     {
                         success = false,
-                        message = "Budget allocation not found",
+                        message = $"Budget allocation with ID {request.AllocationId} not found",
                         data = (object)null
                     });
                 }
@@ -820,12 +829,16 @@ namespace Relevantz.EEPZ.Api.Controllers
                 // Update allocation
                 allocation.UtilizedAmount = request.UtilizedAmount;
                 allocation.UtilizationPercentage = request.UtilizationPercentage;
-                allocation.UpdatedAt = DateTime.Now;
+                
+                if (!string.IsNullOrEmpty(request.Notes))
+                    allocation.Notes = request.Notes;
+                    
+                allocation.UpdatedAt = DateTime.UtcNow;
 
                 _context.Budgetallocations.Update(allocation);
                 await _context.SaveChangesAsync();
 
-                Console.WriteLine($" Allocation utilization updated successfully");
+                Console.WriteLine($"✅ Allocation {allocation.AllocationId} utilization updated successfully");
 
                 // Update parent department budget totals
                 await UpdateDepartmentBudgetTotals(allocation.DepartmentId);
@@ -846,7 +859,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error in UpdateUtilization: {ex.Message}");
+                Console.WriteLine($"❌ Controller Error: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return StatusCode(500, new
                 {
@@ -856,59 +869,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-        [HttpGet("by-budget/{budgetId}")]
-public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
-{
-    try
-    {
-        Console.WriteLine($" Fetching allocations for budget: {budgetId}");
-        
-        //  TEMPORARY FIX - Get department from budget, then filter by department
-        var budget = await _context.Departmentbudgets
-            .FirstOrDefaultAsync(b => b.BudgetId == budgetId);
-        
-        if (budget == null)
-        {
-            return NotFound(new
-            {
-                success = false,
-                message = "Budget not found",
-                data = (object)null
-            });
-        }
-        
-        // Filter allocations by department instead of budgetId (temporary)
-        var allocations = await _context.Budgetallocations
-            .Where(a => a.DepartmentId == budget.DepartmentId)
-            .OrderByDescending(a => a.AllocatedAt)
-            .ToListAsync();
-        
-        Console.WriteLine($" Found {allocations.Count} allocations for department {budget.DepartmentId}");
-        
-        return Ok(new
-        {
-            success = true,
-            message = $"Retrieved {allocations.Count} allocations",
-            data = allocations
-        });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($" Error: {ex.Message}");
-        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-        return StatusCode(500, new
-        {
-            success = false,
-            message = ex.Message,
-            data = (object)null
-        });
-    }
-}
 
-
-
-        // ========== HELPER: UPDATE DEPARTMENT BUDGET TOTALS ==========
-
+        // Helper method
         private async Task UpdateDepartmentBudgetTotals(int departmentId)
         {
             try
@@ -918,7 +880,6 @@ public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
 
                 if (budget != null)
                 {
-                    // Calculate total utilized from all allocations
                     var totalUtilized = await _context.Budgetallocations
                         .Where(a => a.DepartmentId == departmentId)
                         .SumAsync(a => a.UtilizedAmount ?? 0);
@@ -927,19 +888,74 @@ public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
                     budget.UtilizationPercentage = budget.AllocatedAmount > 0
                         ? (totalUtilized / budget.AllocatedAmount.Value) * 100
                         : 0;
-                    budget.UpdatedAt = DateTime.Now;
+                    budget.UpdatedAt = DateTime.UtcNow;
 
                     _context.Departmentbudgets.Update(budget);
                     await _context.SaveChangesAsync();
 
-                    Console.WriteLine($" Department budget totals updated: Utilized={totalUtilized}, Percentage={budget.UtilizationPercentage}%");
+                    Console.WriteLine($"✅ Department budget totals updated");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($" Error updating department budget totals: {ex.Message}");
+                Console.WriteLine($"❌ Error updating department budget totals: {ex.Message}");
             }
         }
+        [HttpGet("by-budget/{budgetId}")]
+public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
+{
+    try {
+        Console.WriteLine($"📊 Getting allocations for budget: {budgetId}");
+
+        // ✅ FIX: Use AsNoTracking and don't include circular references
+        var allocations = await _context.Budgetallocations
+            .AsNoTracking()  // ✅ Important: Prevents tracking and circular refs
+            .Where(a => a.BudgetId == budgetId)
+            .Select(a => new
+            {
+                a.AllocationId,
+                a.BudgetId,
+                a.DepartmentId,
+                DepartmentName = a.Department != null ? a.Department.DepartmentName : "Unknown",
+                a.EmployeeUserId,
+                EmployeeEmail = a.EmployeeUser != null ? a.EmployeeUser.Email : null,
+                a.AllocationType,
+                a.Amount,
+                a.GoalStatus,
+                a.Notes,
+                a.AllocatedByUserId,
+                AllocatedByEmail = a.AllocatedByUser != null ? a.AllocatedByUser.Email : "Unknown",
+                a.AllocatedAt,
+                a.UtilizedAmount,
+                a.UtilizationPercentage,
+                a.UpdatedAt,
+                a.Period,  // ✅ NEW: Include period info
+                a.PeriodYear  // ✅ NEW: Include period year
+            })
+            .ToListAsync();
+
+        Console.WriteLine($"✅ Found {allocations.Count} allocations for budget {budgetId}");
+
+        return Ok(new
+        {
+            success = true,
+            message = $"Retrieved {allocations.Count} allocations",
+            data = allocations
+        });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error getting allocations: {ex.Message}");
+        return StatusCode(500, new
+        {
+            success = false,
+            message = "An error occurred while fetching allocations",
+            data = (object)null
+        });
+    }
+}
+
+
     }
 }
 

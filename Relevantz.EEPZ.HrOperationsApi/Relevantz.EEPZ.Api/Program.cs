@@ -118,10 +118,12 @@ builder.Services.AddScoped<INominationManagementService, NominationManagementSer
 builder.Services.AddScoped<IPayrollManagementRepository, PayrollManagementRepository>();
 builder.Services.AddScoped<IPayrollManagementService, PayrollManagementService>();
 builder.Services.AddScoped<ICareerProgressionRepository, CareerProgressionRepository>();
+builder.Services.AddScoped<IBudgetPeriodAllocationRepository, BudgetPeriodAllocationRepository>();
+builder.Services.AddScoped<IPeriodAllocationService, PeriodAllocationService>();
 builder.Services.AddScoped<ICareerProgressionService, CareerProgressionService>();
 builder.Services.AddScoped<IFundAllocationRepository, FundAllocationRepository>();
 builder.Services.AddScoped<IFundAllocationService, FundAllocationService>();
-
+builder.Services.AddScoped<ISlaEscalationRepository, SlaEscalationRepository>();
 // ---------- CORS ----------
 builder.Services.AddCors(options =>
 {

@@ -1,0 +1,51 @@
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.deps.json
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevant.CA3B5C75.Up2Date
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\refint\Relevantz.EEPZ.Data.dll
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\CAPSTONE\Sprint 1,2,3,4 Migraration Layered Architecture\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.deps.json
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevant.CA3B5C75.Up2Date
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\refint\Relevantz.EEPZ.Data.dll
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.deps.json
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevant.CA3B5C75.Up2Date
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\refint\Relevantz.EEPZ.Data.dll
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.MOM&MeetingApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll

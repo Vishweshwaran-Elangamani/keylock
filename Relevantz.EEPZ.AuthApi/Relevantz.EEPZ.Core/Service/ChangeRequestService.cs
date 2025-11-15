@@ -9,6 +9,7 @@ using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
+
 namespace Relevantz.EEPZ.Core.Service
 {
     public class ChangeRequestService : IChangeRequestService
@@ -17,6 +18,7 @@ namespace Relevantz.EEPZ.Core.Service
         private readonly IUserAuthenticationRepository _userAuthRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IEmailService _emailService;
+
 
         public ChangeRequestService(
             IChangeRequestRepository changeRequestRepository,
@@ -30,6 +32,7 @@ namespace Relevantz.EEPZ.Core.Service
             _emailService = emailService;
         }
 
+
         public async Task<ApiResponseDto<ChangeRequestResponseDto>> SubmitChangeRequestAsync(int userId, ChangeRequestDto request)
         {
             try
@@ -40,7 +43,7 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
-                // Check if user already has a pending request
+                // Check if user already has a pending request - ADDED
                 var existingRequests = await _changeRequestRepository.GetByEmployeeIdAsync(user.EmployeeId);
                 var hasPendingRequest = existingRequests.Any(r => r.Status == Constants.RequestStatuses.Pending);
 
@@ -49,14 +52,32 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse("You already have a pending change request. Please wait for admin approval or cancel the existing request.");
                 }
 
-                // Email change logic only
+                string? currentValue = null;
+                string? newValue = null;
+
+                if (request.ChangeType == Constants.ChangeTypes.Email)
+                {
+                    currentValue = user.Email;
+                    newValue = request.NewEmail;
+                }
+                else if (request.ChangeType == Constants.ChangeTypes.EmployeeCompanyId)
+                {
+                    currentValue = user.Employee.EmployeeCompanyId;
+                    newValue = request.NewEmployeeCompanyId;
+                }
+                else
+                {
+                    newValue = request.NewValue;
+                }
+
                 var changeRequest = new Changerequest
                 {
                     EmployeeId = user.EmployeeId,
-                    ChangeType = "Email",
+                    ChangeType = request.ChangeType,
+                    NewEmployeeCompanyId = request.NewEmployeeCompanyId,
                     NewEmail = request.NewEmail,
-                    CurrentValue = user.Email,
-                    NewValue = request.NewEmail,
+                    CurrentValue = currentValue,
+                    NewValue = newValue,
                     Reason = request.Reason,
                     Status = Constants.RequestStatuses.Pending,
                     RequestedByUserId = userId,
@@ -67,74 +88,95 @@ namespace Relevantz.EEPZ.Core.Service
 
                 // Send notification email
                 var firstName = user.Employee?.Userprofile?.FirstName ?? "User";
-                await _emailService.SendChangeRequestNotificationAsync(user.Email, firstName, "Email", request.NewEmail);
+                await _emailService.SendChangeRequestNotificationAsync(user.Email, firstName, request.ChangeType, newValue ?? string.Empty);
 
                 var response = MapToChangeRequestResponse(changeRequest);
-                EEPZBusinessLog.Information($"Email change request submitted by UserId: {userId}");
+                EEPZBusinessLog.Information($"Change request submitted by UserId: {userId}");
 
                 return ApiResponseDto<ChangeRequestResponseDto>.SuccessResponse(response, Constants.Messages.ChangeRequestSubmitted);
             }
             catch (Exception ex)
             {
-                EEPZBusinessLog.Error($"Error submitting email change request for UserId: {userId}", ex);
+                EEPZBusinessLog.Error($"Error submitting change request for UserId: {userId}", ex);
                 return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse("An error occurred while submitting change request");
             }
         }
 
-        // UPDATED METHOD SIGNATURE - Uses single DTO
-        public async Task<ApiResponseDto<ChangeRequestResponseDto>> ProcessChangeRequestAsync(ChangeRequestDto request, int adminUserId)
+
+
+        public async Task<ApiResponseDto<ChangeRequestResponseDto>> ProcessChangeRequestAsync(ProcessChangeRequestDto request, int adminUserId)
         {
             try
             {
-                // Use RequestId from DTO
-                var changeRequest = await _changeRequestRepository.GetByIdAsync(request.RequestId.Value);
+                var changeRequest = await _changeRequestRepository.GetByIdAsync(request.RequestId);
                 if (changeRequest == null)
                 {
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse("Change request not found");
                 }
+
 
                 if (changeRequest.Status != Constants.RequestStatuses.Pending)
                 {
                     return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse("Change request already processed");
                 }
 
-                // Use Status and AdminRemarks from DTO
+
                 changeRequest.Status = request.Status;
                 changeRequest.ApprovedByUserId = adminUserId;
                 changeRequest.AdminRemarks = request.AdminRemarks;
                 changeRequest.ProcessedAt = DateTime.UtcNow;
 
-                // If approved, apply email change only
-                if (request.Status == Constants.RequestStatuses.Approved && !string.IsNullOrEmpty(changeRequest.NewEmail))
+
+                // If approved, apply the changes
+                if (request.Status == Constants.RequestStatuses.Approved)
                 {
-                    var user = await _userAuthRepository.GetByEmployeeIdAsync(changeRequest.EmployeeId);
-                    if (user != null)
+                    if (changeRequest.ChangeType == Constants.ChangeTypes.Email && !string.IsNullOrEmpty(changeRequest.NewEmail))
                     {
-                        user.Email = changeRequest.NewEmail;
-                        await _userAuthRepository.UpdateAsync(user);
+                        var user = await _userAuthRepository.GetByEmployeeIdAsync(changeRequest.EmployeeId);
+                        if (user != null)
+                        {
+                            user.Email = changeRequest.NewEmail;
+                            await _userAuthRepository.UpdateAsync(user);
+                        }
+                    }
+                    else if (changeRequest.ChangeType == Constants.ChangeTypes.EmployeeCompanyId && !string.IsNullOrEmpty(changeRequest.NewEmployeeCompanyId))
+                    {
+                        var employee = await _employeeRepository.GetByIdAsync(changeRequest.EmployeeId);
+                        if (employee != null)
+                        {
+                            employee.EmployeeCompanyId = changeRequest.NewEmployeeCompanyId;
+                            await _employeeRepository.UpdateAsync(employee);
+                        }
                     }
                 }
 
+
                 await _changeRequestRepository.UpdateAsync(changeRequest);
 
+
                 var response = MapToChangeRequestResponse(changeRequest);
-                EEPZBusinessLog.Information($"Email change request processed: RequestId {request.RequestId}, Status: {request.Status}");
+                EEPZBusinessLog.Information($"Change request processed: RequestId {request.RequestId}, Status: {request.Status}");
+
 
                 return ApiResponseDto<ChangeRequestResponseDto>.SuccessResponse(response, Constants.Messages.ChangeRequestProcessed);
             }
             catch (Exception ex)
             {
-                EEPZBusinessLog.Error($"Error processing email change request: RequestId {request.RequestId}", ex);
+                EEPZBusinessLog.Error($"Error processing change request: RequestId {request.RequestId}", ex);
                 return ApiResponseDto<ChangeRequestResponseDto>.FailureResponse("An error occurred while processing change request");
             }
         }
+
 
         public async Task<ApiResponseDto<List<ChangeRequestResponseDto>>> GetPendingRequestsAsync()
         {
             try
             {
                 var requests = await _changeRequestRepository.GetPendingRequestsAsync();
+
+                // Filter to show only Pending status (exclude Cancelled)
                 var pendingOnly = requests.Where(r => r.Status == Constants.RequestStatuses.Pending).ToList();
+
                 var responses = pendingOnly.Select(MapToChangeRequestResponse).ToList();
                 return ApiResponseDto<List<ChangeRequestResponseDto>>.SuccessResponse(responses, "Pending requests retrieved successfully");
             }
@@ -144,6 +186,8 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<ChangeRequestResponseDto>>.FailureResponse("An error occurred while retrieving pending requests");
             }
         }
+
+
 
         public async Task<ApiResponseDto<List<ChangeRequestResponseDto>>> GetUserChangeRequestsAsync(int userId)
         {
@@ -155,6 +199,7 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<List<ChangeRequestResponseDto>>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
+
                 var requests = await _changeRequestRepository.GetByEmployeeIdAsync(user.EmployeeId);
                 var responses = requests.Select(MapToChangeRequestResponse).ToList();
                 return ApiResponseDto<List<ChangeRequestResponseDto>>.SuccessResponse(responses, "User change requests retrieved successfully");
@@ -165,6 +210,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<ChangeRequestResponseDto>>.FailureResponse("An error occurred while retrieving user change requests");
             }
         }
+
 
         public async Task<ApiResponseDto<List<ChangeRequestResponseDto>>> GetAllChangeRequestsAsync()
         {
@@ -181,6 +227,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<ApiResponseDto<bool>> CancelChangeRequestAsync(int userId, int requestId)
         {
             try
@@ -192,19 +239,23 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<bool>.FailureResponse("Change request not found");
                 }
 
+
                 if (changeRequest.RequestedByUserId != userId)
                 {
                     return ApiResponseDto<bool>.FailureResponse("You are not authorized to cancel this request");
                 }
+
 
                 if (changeRequest.Status != Constants.RequestStatuses.Pending)
                 {
                     return ApiResponseDto<bool>.FailureResponse("Only pending requests can be cancelled");
                 }
 
+
                 changeRequest.Status = Constants.RequestStatuses.Cancelled;
                 changeRequest.ProcessedAt = DateTime.UtcNow;
                 await _changeRequestRepository.UpdateAsync(changeRequest);
+
 
                 EEPZBusinessLog.Information($"Change request cancelled: RequestId {requestId}, UserId: {userId}");
                 return ApiResponseDto<bool>.SuccessResponse(true, "Change request cancelled successfully");
@@ -216,6 +267,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
+
         public async Task<ApiResponseDto<ChangeRequestResponseDto?>> HasPendingRequestAsync(int userId)
         {
             try
@@ -226,14 +278,17 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<ChangeRequestResponseDto?>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
+
                 var requests = await _changeRequestRepository.GetByEmployeeIdAsync(user.EmployeeId);
                 var pendingRequest = requests.FirstOrDefault(r => r.Status == Constants.RequestStatuses.Pending);
+
 
                 if (pendingRequest != null)
                 {
                     var response = MapToChangeRequestResponse(pendingRequest);
                     return ApiResponseDto<ChangeRequestResponseDto?>.SuccessResponse(response, "Pending request found");
                 }
+
 
                 return ApiResponseDto<ChangeRequestResponseDto?>.SuccessResponse(null, "No pending request found");
             }
@@ -243,6 +298,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<ChangeRequestResponseDto?>.FailureResponse("An error occurred while checking pending request");
             }
         }
+
 
         private ChangeRequestResponseDto MapToChangeRequestResponse(Changerequest changeRequest)
         {

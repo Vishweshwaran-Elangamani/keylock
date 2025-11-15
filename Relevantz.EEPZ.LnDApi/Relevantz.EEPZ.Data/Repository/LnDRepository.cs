@@ -52,7 +52,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(e => e.Employeedetailsmasters)
                 .ThenInclude(ed => ed.Department)
                 .Where(e =>
-                    e.ReportingManagerEmployeeId == managerId && e.EmploymentStatus == "Active"
+                    e.ReportingManagerEmployeeId == managerId && e.EmploymentStatus == LnDConstants.EMPLOYMENT_STATUS.ACTIVE
                 );
 
             // Apply search filter if provided
@@ -137,9 +137,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             query = sortBy?.ToLower() switch
             {
-                "skillname" => query.OrderBy(m => m.Skill.SkillName),
-                "rating" => query.OrderByDescending(m => m.Rating),
-                "createdon" => query.OrderByDescending(m => m.CreatedOn),
+                LnDConstants.SORT_FIELDS.SKILL_NAME => query.OrderBy(m => m.Skill.SkillName),
+                LnDConstants.SORT_FIELDS.RATING => query.OrderByDescending(m => m.Rating),
+                LnDConstants.SORT_FIELDS.CREATED_ON => query.OrderByDescending(m => m.CreatedOn),
                 _ => query.OrderBy(m => m.Employee.Userprofile.FirstName),
             };
 
@@ -293,7 +293,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 {
                     Sme = s,
                     InProgressCount = _context.Lndassignments.Count(a =>
-                        a.SmeId == s.SmeId && a.Status == LnDConstants.AssignmentStatus.IN_PROGRESS
+                        a.SmeId == s.SmeId && a.Status == LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS
                     ),
                 })
                 .ToListAsync();
@@ -466,11 +466,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             // Apply sorting
             if (!string.IsNullOrWhiteSpace(sortField))
             {
-                var isAscending = sortOrder?.ToLower() != "desc";
+                var isAscending = sortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
 
                 query = sortField.ToLower() switch
                 {
-                    "menteename" => isAscending
+                    LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
                         ? query
                             .OrderBy(a => a.MenteeEmployee.Userprofile.FirstName)
                             .ThenBy(a => a.MenteeEmployee.Userprofile.LastName)
@@ -478,11 +478,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                             .OrderByDescending(a => a.MenteeEmployee.Userprofile.FirstName)
                             .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
 
-                    "skillname" => isAscending
+                    LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
                         ? query.OrderBy(a => a.Skill.SkillName)
                         : query.OrderByDescending(a => a.Skill.SkillName),
 
-                    "smename" => isAscending
+                    LnDConstants.SORT_FIELDS.SME_NAME => isAscending
                         ? query
                             .OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
                             .ThenBy(a => a.Sme.Employee.Userprofile.LastName)
@@ -490,19 +490,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                             .OrderByDescending(a => a.Sme.Employee.Userprofile.FirstName)
                             .ThenByDescending(a => a.Sme.Employee.Userprofile.LastName),
 
-                    "status" => isAscending
+                    LnDConstants.SORT_FIELDS.STATUS => isAscending
                         ? query.OrderBy(a => a.Status)
                         : query.OrderByDescending(a => a.Status),
 
-                    "createdon" => isAscending
+                    LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
                         ? query.OrderBy(a => a.CreatedOn)
                         : query.OrderByDescending(a => a.CreatedOn),
 
-                    "deadline" => isAscending
+                    LnDConstants.SORT_FIELDS.DEADLINE => isAscending
                         ? query.OrderBy(a => a.Deadline)
                         : query.OrderByDescending(a => a.Deadline),
 
-                    "completionrating" => isAscending
+                    LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
                         ? query.OrderBy(a => a.CompletionRating ?? 0)
                         : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
@@ -560,11 +560,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             // Apply sorting
             if (!string.IsNullOrWhiteSpace(sortField))
             {
-                var isAscending = sortOrder?.ToLower() != "desc";
+                var isAscending = sortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
 
                 query = sortField.ToLower() switch
                 {
-                    "menteename" => isAscending
+                    LnDConstants.SORT_FIELDS.MENTEE_NAME => isAscending
                         ? query
                             .OrderBy(a => a.MenteeEmployee.Userprofile.FirstName)
                             .ThenBy(a => a.MenteeEmployee.Userprofile.LastName)
@@ -572,23 +572,23 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                             .OrderByDescending(a => a.MenteeEmployee.Userprofile.FirstName)
                             .ThenByDescending(a => a.MenteeEmployee.Userprofile.LastName),
 
-                    "skillname" => isAscending
-                        ? query.OrderBy(a => a.Skill.SkillName)
-                        : query.OrderByDescending(a => a.Skill.SkillName),
+                    LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
+                          ? query.OrderBy(a => a.Skill.SkillName)
+                          : query.OrderByDescending(a => a.Skill.SkillName),
 
-                    "status" => isAscending
-                        ? query.OrderBy(a => a.Status)
-                        : query.OrderByDescending(a => a.Status),
+                    LnDConstants.SORT_FIELDS.STATUS => isAscending
+                            ? query.OrderBy(a => a.Status)
+                            : query.OrderByDescending(a => a.Status),
 
-                    "createdon" => isAscending
+                    LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
                         ? query.OrderBy(a => a.CreatedOn)
                         : query.OrderByDescending(a => a.CreatedOn),
 
-                    "deadline" => isAscending
+                    LnDConstants.SORT_FIELDS.DEADLINE => isAscending
                         ? query.OrderBy(a => a.Deadline)
                         : query.OrderByDescending(a => a.Deadline),
 
-                    "completionrating" => isAscending
+                    LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
                         ? query.OrderBy(a => a.CompletionRating ?? 0)
                         : query.OrderByDescending(a => a.CompletionRating ?? 0),
 
@@ -611,7 +611,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         public async Task<int> GetSmeInProgressAssignmentCountAsync(int smeId)
         {
             return await _context.Lndassignments.CountAsync(a =>
-                a.SmeId == smeId && a.Status == LnDConstants.AssignmentStatus.IN_PROGRESS
+                a.SmeId == smeId && a.Status == LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS
             );
         }
 
@@ -621,30 +621,30 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             string? sortOrder
         )
         {
-            var isAscending = string.IsNullOrEmpty(sortOrder) || sortOrder.ToLower() == "asc";
+            var isAscending = string.IsNullOrEmpty(sortOrder) || sortOrder.ToLower() == LnDConstants.SORT_ORDER.ASC;
 
             return sortField?.ToLower() switch
             {
-                "skillname" => isAscending
+                LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
                     ? query.OrderBy(a => a.Skill.SkillName)
                     : query.OrderByDescending(a => a.Skill.SkillName),
-                "smename" => isAscending
+                LnDConstants.SORT_FIELDS.SME_NAME => isAscending
                     ? query
                         .OrderBy(a => a.Sme.Employee.Userprofile.FirstName)
                         .ThenBy(a => a.Sme.Employee.Userprofile.LastName)
                     : query
                         .OrderByDescending(a => a.Sme.Employee.Userprofile.FirstName)
                         .ThenByDescending(a => a.Sme.Employee.Userprofile.LastName),
-                "status" => isAscending
+                LnDConstants.SORT_FIELDS.STATUS => isAscending
                     ? query.OrderBy(a => a.Status)
                     : query.OrderByDescending(a => a.Status),
-                "createdon" => isAscending
+                LnDConstants.SORT_FIELDS.CREATED_ON => isAscending
                     ? query.OrderBy(a => a.CreatedOn)
                     : query.OrderByDescending(a => a.CreatedOn),
-                "deadline" => isAscending
+                LnDConstants.SORT_FIELDS.DEADLINE => isAscending
                     ? query.OrderBy(a => a.Deadline)
                     : query.OrderByDescending(a => a.Deadline),
-                "completionrating" => isAscending
+                LnDConstants.SORT_FIELDS.COMPLETION_RATING => isAscending
                     ? query.OrderBy(a => a.CompletionRating ?? 0)
                     : query.OrderByDescending(a => a.CompletionRating ?? 0),
                 _ => query.OrderByDescending(a => a.CreatedOn),
@@ -675,8 +675,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             return await _context.Lndapprovals.FirstOrDefaultAsync(a =>
                 a.RequesterEmployeeId == employeeId
                 && a.SkillId == skillId
-                && a.ApprovalType == LnDConstants.ApprovalType.SME_REGISTRATION
-                && a.Status == LnDConstants.ApprovalStatus.PENDING
+                && a.ApprovalType == LnDConstants.APPROVAL_TYPE.SME_REGISTRATION
+                && a.Status == LnDConstants.APPROVAL_STATUS.PENDING
             );
         }
 
@@ -725,15 +725,15 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             // Apply sorting
             if (!string.IsNullOrWhiteSpace(sortField))
             {
-                var isAscending = sortOrder?.ToLower() != "desc";
+                var isAscending = sortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
 
                 query = sortField.ToLower() switch
                 {
-                    "approvaltype" => isAscending
+                    LnDConstants.SORT_FIELDS.APPROVAL_TYPE => isAscending
                         ? query.OrderBy(a => a.ApprovalType)
                         : query.OrderByDescending(a => a.ApprovalType),
 
-                    "requestername" => isAscending
+                    LnDConstants.SORT_FIELDS.REQUESTER_NAME => isAscending
                         ? query
                             .OrderBy(a => a.RequesterEmployee.Userprofile.FirstName)
                             .ThenBy(a => a.RequesterEmployee.Userprofile.LastName)
@@ -741,7 +741,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                             .OrderByDescending(a => a.RequesterEmployee.Userprofile.FirstName)
                             .ThenByDescending(a => a.RequesterEmployee.Userprofile.LastName),
 
-                    "approvername" => isAscending
+                    LnDConstants.SORT_FIELDS.APPROVER_NAME => isAscending
                         ? query
                             .OrderBy(a => a.ApproverEmployee.Userprofile.FirstName)
                             .ThenBy(a => a.ApproverEmployee.Userprofile.LastName)
@@ -749,11 +749,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                             .OrderByDescending(a => a.ApproverEmployee.Userprofile.FirstName)
                             .ThenByDescending(a => a.ApproverEmployee.Userprofile.LastName),
 
-                    "requestedon" => isAscending
+                    LnDConstants.SORT_FIELDS.REQUESTED_ON => isAscending
                         ? query.OrderBy(a => a.RequestedOn)
                         : query.OrderByDescending(a => a.RequestedOn),
 
-                    "status" => isAscending
+                    LnDConstants.SORT_FIELDS.STATUS => isAscending
                         ? query.OrderBy(a => a.Status)
                         : query.OrderByDescending(a => a.Status),
 
@@ -794,13 +794,13 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(a => a.Attachment)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(role) && role.ToLower() != "all")
+            if (!string.IsNullOrEmpty(role) && role.ToLower() != LnDConstants.ROLE_FILTERS.ALL)
             {
-                if (role.ToLower() == "requester")
+                if (role.ToLower() == LnDConstants.ROLE_FILTERS.REQUESTER)
                 {
                     query = query.Where(a => a.RequesterEmployeeId == employeeId);
                 }
-                else if (role.ToLower() == "approver")
+                else if (role.ToLower() == LnDConstants.ROLE_FILTERS.APPROVER)
                 {
                     query = query.Where(a => a.ApproverEmployeeId == employeeId);
                 }
@@ -866,7 +866,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         {
             return await _context.Lndapprovals.FirstOrDefaultAsync(a =>
                 a.AssignmentId == assignmentId
-                && a.Status == LnDConstants.ApprovalStatus.PENDING
+                && a.Status == LnDConstants.APPROVAL_STATUS.PENDING
                 && a.ApprovalType == approvalType
             );
         }
@@ -881,20 +881,20 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             return sortField?.ToLower() switch
             {
-                "approvaltype" => isAscending
+                LnDConstants.SORT_FIELDS.APPROVAL_TYPE => isAscending
                     ? query.OrderBy(a => a.ApprovalType)
                     : query.OrderByDescending(a => a.ApprovalType),
-                "skillname" => isAscending
+                LnDConstants.SORT_FIELDS.SKILL_NAME => isAscending
                     ? query.OrderBy(a => a.Skill != null ? a.Skill.SkillName : "")
                     : query.OrderByDescending(a => a.Skill != null ? a.Skill.SkillName : ""),
-                "requestername" => isAscending
+                LnDConstants.SORT_FIELDS.REQUESTER_NAME => isAscending
                     ? query
                         .OrderBy(a => a.RequesterEmployee.Userprofile.FirstName)
                         .ThenBy(a => a.RequesterEmployee.Userprofile.LastName)
                     : query
                         .OrderByDescending(a => a.RequesterEmployee.Userprofile.FirstName)
                         .ThenByDescending(a => a.RequesterEmployee.Userprofile.LastName),
-                "approvername" => isAscending
+                LnDConstants.SORT_FIELDS.APPROVER_NAME => isAscending
                     ? query
                         .OrderBy(a =>
                             a.ApproverEmployee != null
@@ -917,10 +917,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                                 ? a.ApproverEmployee.Userprofile.LastName
                                 : ""
                         ),
-                "status" => isAscending
+                LnDConstants.SORT_FIELDS.STATUS => isAscending
                     ? query.OrderBy(a => a.Status)
                     : query.OrderByDescending(a => a.Status),
-                "requestedon" => isAscending
+                LnDConstants.SORT_FIELDS.REQUESTED_ON => isAscending
                     ? query.OrderBy(a => a.RequestedOn)
                     : query.OrderByDescending(a => a.RequestedOn),
                 _ => query.OrderByDescending(a => a.UpdatedOn ?? a.RequestedOn),
@@ -929,7 +929,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #endregion
 
-        #region Attachment Management
+        #region Attachment Management 
 
         public async Task<Lndattachment> AddAttachmentAsync(Lndattachment attachment)
         {
@@ -1144,8 +1144,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             {
                 query = sortBy.ToLower() switch
                 {
-                    "skillname" => query.OrderBy(m => m.Skill.SkillName),
-                    "rating" => query.OrderByDescending(m => m.Rating),
+                    LnDConstants.SORT_FIELDS.SKILL_NAME => query.OrderBy(m => m.Skill.SkillName),
+                    LnDConstants.SORT_FIELDS.RATING => query.OrderByDescending(m => m.Rating),
                     _ => query.OrderBy(m => m.Skill.SkillName),
                 };
             }

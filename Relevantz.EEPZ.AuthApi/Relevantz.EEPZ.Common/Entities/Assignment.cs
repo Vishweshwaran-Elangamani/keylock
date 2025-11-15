@@ -15,8 +15,6 @@ public partial class Assignment
 
     public DateTime? AssignedAt { get; set; }
 
-    public DateTime? Deadline { get; set; }
-
     public string? Action { get; set; }
 
     public virtual Userauthentication AssignedByNavigation { get; set; } = null!;

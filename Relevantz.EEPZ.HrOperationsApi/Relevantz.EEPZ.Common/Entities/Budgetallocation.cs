@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Relevantz.EEPZ.Common.Entities;
 
+/// <summary>
+/// HR sub-allocations from department budgets
+/// </summary>
 public partial class Budgetallocation
 {
     public int AllocationId { get; set; }
@@ -31,7 +34,16 @@ public partial class Budgetallocation
 
     public DateTime? UpdatedAt { get; set; }
 
+    /// <summary>
+    /// Q1, Q2, Q3, Q4
+    /// </summary>
+    public string? Period { get; set; }
+
+    public int? PeriodYear { get; set; }
+
     public virtual Userauthentication AllocatedByUser { get; set; } = null!;
+
+    public virtual Departmentbudget? Budget { get; set; }
 
     public virtual Department Department { get; set; } = null!;
 

@@ -7,6 +7,9 @@ public partial class Employee
 {
     public int EmployeeId { get; set; }
 
+    /// <summary>
+    /// Company-assigned employee ID (e.g., EMP001)
+    /// </summary>
     public string EmployeeCompanyId { get; set; } = null!;
 
     public string EmploymentType { get; set; } = null!;
@@ -15,10 +18,19 @@ public partial class Employee
 
     public DateOnly JoiningDate { get; set; }
 
+    /// <summary>
+    /// Date of confirmation after probation
+    /// </summary>
     public DateOnly? ConfirmationDate { get; set; }
 
+    /// <summary>
+    /// Last working day
+    /// </summary>
     public DateOnly? ExitDate { get; set; }
 
+    /// <summary>
+    /// Self-referencing FK to Employee
+    /// </summary>
     public int? ReportingManagerEmployeeId { get; set; }
 
     public string? WorkLocation { get; set; }
@@ -43,21 +55,25 @@ public partial class Employee
 
     public virtual ICollection<Employeedetailsmaster> Employeedetailsmasters { get; set; } = new List<Employeedetailsmaster>();
 
-    public virtual ICollection<Feedback> FeedbackRecipientEmployees { get; set; } = new List<Feedback>();
+    public virtual ICollection<Employeeskillmapper> EmployeeskillmapperCreatedByEmployees { get; set; } = new List<Employeeskillmapper>();
 
-    public virtual ICollection<Feedback> FeedbackRelatedMentors { get; set; } = new List<Feedback>();
+    public virtual ICollection<Employeeskillmapper> EmployeeskillmapperEmployees { get; set; } = new List<Employeeskillmapper>();
 
-    public virtual ICollection<Feedback> FeedbackSubmittedByEmployees { get; set; } = new List<Feedback>();
+    public virtual ICollection<Employeeskillmapper> EmployeeskillmapperUpdatedByEmployees { get; set; } = new List<Employeeskillmapper>();
 
-    public virtual ICollection<Feedbackedithistory> Feedbackedithistories { get; set; } = new List<Feedbackedithistory>();
+    public virtual ICollection<Feedback> FeedbackEmployees { get; set; } = new List<Feedback>();
 
-    public virtual ICollection<Hrfeedbackformresponse> Hrfeedbackformresponses { get; set; } = new List<Hrfeedbackformresponse>();
+    public virtual ICollection<Feedback> FeedbackManagerEmployees { get; set; } = new List<Feedback>();
 
     public virtual ICollection<Employee> InverseReportingManagerEmployee { get; set; } = new List<Employee>();
 
     public virtual ICollection<Lndapproval> LndapprovalApproverEmployees { get; set; } = new List<Lndapproval>();
 
+    public virtual ICollection<Lndapproval> LndapprovalCreatedByEmployees { get; set; } = new List<Lndapproval>();
+
     public virtual ICollection<Lndapproval> LndapprovalRequesterEmployees { get; set; } = new List<Lndapproval>();
+
+    public virtual ICollection<Lndapproval> LndapprovalUpdatedByEmployees { get; set; } = new List<Lndapproval>();
 
     public virtual ICollection<Lndassignment> LndassignmentCreatedByEmployees { get; set; } = new List<Lndassignment>();
 
@@ -67,57 +83,11 @@ public partial class Employee
 
     public virtual ICollection<Lndattachment> Lndattachments { get; set; } = new List<Lndattachment>();
 
-    public virtual ICollection<Lndemployeeskillmapper> LndemployeeskillmapperCreatedByEmployees { get; set; } = new List<Lndemployeeskillmapper>();
-
-    public virtual ICollection<Lndemployeeskillmapper> LndemployeeskillmapperEmployees { get; set; } = new List<Lndemployeeskillmapper>();
-
-    public virtual ICollection<Lndemployeeskillmapper> LndemployeeskillmapperUpdatedByEmployees { get; set; } = new List<Lndemployeeskillmapper>();
-
-    public virtual ICollection<Lndsme> LndsmeApprovedByEmployees { get; set; } = new List<Lndsme>();
-
-    public virtual ICollection<Lndsme> LndsmeEmployees { get; set; } = new List<Lndsme>();
-
-    public virtual ICollection<Managerreviewcomment> ManagerreviewcommentManagerEmployees { get; set; } = new List<Managerreviewcomment>();
-
-    public virtual ICollection<Managerreviewcomment> ManagerreviewcommentTargetEmployees { get; set; } = new List<Managerreviewcomment>();
+    public virtual ICollection<Lndcomment> Lndcomments { get; set; } = new List<Lndcomment>();
 
     public virtual ICollection<Meetingmom> Meetingmoms { get; set; } = new List<Meetingmom>();
 
-    public virtual ICollection<Meetingparticipant> Meetingparticipants { get; set; } = new List<Meetingparticipant>();
-
-    public virtual ICollection<Meeting> Meetings { get; set; } = new List<Meeting>();
-
     public virtual ICollection<Mentorfeedback> Mentorfeedbacks { get; set; } = new List<Mentorfeedback>();
-
-    public virtual ICollection<Mentorfeedbacktracking> MentorfeedbacktrackingMenteeEmployees { get; set; } = new List<Mentorfeedbacktracking>();
-
-    public virtual ICollection<Mentorfeedbacktracking> MentorfeedbacktrackingMentorEmployees { get; set; } = new List<Mentorfeedbacktracking>();
-
-    public virtual ICollection<Mentorfeedbacktracking> MentorfeedbacktrackingSubmittedByEmployees { get; set; } = new List<Mentorfeedbacktracking>();
-
-    public virtual ICollection<Momactionitem> Momactionitems { get; set; } = new List<Momactionitem>();
-
-    public virtual ICollection<Mom> Moms { get; set; } = new List<Mom>();
-
-    public virtual ICollection<Momsharing> MomsharingSharedByEmployees { get; set; } = new List<Momsharing>();
-
-    public virtual ICollection<Momsharing> MomsharingSharedWithEmployees { get; set; } = new List<Momsharing>();
-
-    public virtual ICollection<Nominationvisibilitytracking> Nominationvisibilitytrackings { get; set; } = new List<Nominationvisibilitytracking>();
-
-    public virtual ICollection<Organizationgoalfeedback> OrganizationgoalfeedbackManagerEmployees { get; set; } = new List<Organizationgoalfeedback>();
-
-    public virtual ICollection<Organizationgoalfeedback> OrganizationgoalfeedbackSubmittedByEmployees { get; set; } = new List<Organizationgoalfeedback>();
-
-    public virtual ICollection<Peerfeedbackqueue> PeerfeedbackqueueRecipientEmployees { get; set; } = new List<Peerfeedbackqueue>();
-
-    public virtual ICollection<Peerfeedbackqueue> PeerfeedbackqueueSubmittedByEmployees { get; set; } = new List<Peerfeedbackqueue>();
-
-    public virtual ICollection<Recognitionstatus> RecognitionstatusNominatedByEmployees { get; set; } = new List<Recognitionstatus>();
-
-    public virtual ICollection<Recognitionstatus> RecognitionstatusNomineeEmployees { get; set; } = new List<Recognitionstatus>();
-
-    public virtual ICollection<Recognitionstatus> RecognitionstatusReviewedByEmployees { get; set; } = new List<Recognitionstatus>();
 
     public virtual Employee? ReportingManagerEmployee { get; set; }
 
@@ -144,6 +114,14 @@ public partial class Employee
     public virtual ICollection<Slareviewtracking> SlareviewtrackingEmployees { get; set; } = new List<Slareviewtracking>();
 
     public virtual ICollection<Slareviewtracking> SlareviewtrackingReviewers { get; set; } = new List<Slareviewtracking>();
+
+    public virtual ICollection<Sme> SmeApprovedByEmployees { get; set; } = new List<Sme>();
+
+    public virtual ICollection<Sme> SmeCreatedByEmployees { get; set; } = new List<Sme>();
+
+    public virtual Sme? SmeEmployee { get; set; }
+
+    public virtual ICollection<Sme> SmeUpdatedByEmployees { get; set; } = new List<Sme>();
 
     public virtual Userauthentication? Userauthentication { get; set; }
 

@@ -37,7 +37,5 @@ public partial class Nomination
 
     public virtual Internalopportunity Opportunity { get; set; } = null!;
 
-    public virtual ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
-
     public virtual Userauthentication? ReviewedByUser { get; set; }
 }

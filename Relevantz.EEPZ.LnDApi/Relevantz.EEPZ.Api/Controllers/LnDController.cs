@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interface;
+using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Api.Controllers
+
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -21,7 +23,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         private int GetCurrentEmployeeId()
         {
             // Check which claim name your JWT uses for employee ID
-            var employeeIdClaim = User.FindFirst("empId")?.Value;
+            var employeeIdClaim = User.FindFirst(LnDConstants.CLAIM_TYPES.EMPLOYEE_ID)?.Value;
 
             if (string.IsNullOrEmpty(employeeIdClaim))
             {
@@ -69,7 +71,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetSubordinateSkills(
             [FromQuery] int? employeeId,
             [FromQuery] string? searchTerm,
-            [FromQuery] string? sortBy = "employeename",
+            [FromQuery] string? sortBy = LnDConstants.DEFAULTS.SORT_BY_EMPLOYEE_NAME,
             [FromQuery] int pageNumber = 1
         )
         {
@@ -176,7 +178,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         #region HR Management
 
         [HttpGet("hr/employees/organization")]
-        [Authorize(Roles = "HR")]
+        [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> GetAllOrganizationEmployees(
             [FromQuery] string? searchTerm,
             [FromQuery] int pageNumber = 1,
@@ -193,7 +195,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         [HttpGet("hr/assignments/organization")]
-        [Authorize(Roles = "HR")]
+        [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> GetAllOrganizationAssignments(
             [FromQuery] string? statusFilter,
             [FromQuery] string? searchTerm,
@@ -216,7 +218,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         [HttpGet("hr/smes/all")]
-        [Authorize(Roles = "HR")]
+        [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> GetAllActiveSmes(
             [FromQuery] string? searchTerm,
             [FromQuery] int pageNumber = 1,
@@ -229,12 +231,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         [HttpGet("hr/skills/employee/{employeeId}")]
-        [Authorize(Roles = "HR")]
+        [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> GetEmployeeSkillsById(
             int employeeId,
             [FromQuery] int pageNumber = 1,
             [FromQuery] string? searchTerm = "",
-            [FromQuery] string? sortBy = "skillname"
+            [FromQuery] string? sortBy = LnDConstants.DEFAULTS.SORT_BY_SKILL_NAME
         )
         {
             var result = await _lndService.GetEmployeeSkillsById(

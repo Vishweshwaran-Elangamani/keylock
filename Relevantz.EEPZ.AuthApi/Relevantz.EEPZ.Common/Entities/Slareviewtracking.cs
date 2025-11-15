@@ -36,12 +36,4 @@ public partial class Slareviewtracking
     public ulong? IsManagerSelfReview { get; set; }
 
     public int? ManagerReviewerId { get; set; }
-
-    public virtual Employee Employee { get; set; } = null!;
-
-    public virtual Assessmentform? Form { get; set; }
-
-    public virtual Employee Reviewer { get; set; } = null!;
-
-    public virtual Sla Sla { get; set; } = null!;
 }
