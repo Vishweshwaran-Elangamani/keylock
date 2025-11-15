@@ -71,6 +71,14 @@ const EmployeeDashboard = () => {
       icon: "bi bi-chat-left-text",
       gradient: "gradient-teal",
       path: "/employee/dashboard/feedback",
+    },
+
+    {
+      title: "Meeting & MOM Management",
+      description: "Manage Meetings & MOMs",
+      icon: "bi bi-book",
+      gradient: "gradient-pink",
+      path: "/employee/dashboard/meetmom",
     }
   ];
   return (

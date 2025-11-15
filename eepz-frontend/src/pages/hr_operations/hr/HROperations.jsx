@@ -4,6 +4,7 @@ import PolicyManagement from "./compliance/PolicyManagement";
 import CareerGoals from "./compliance/CareerGoals";
 import ComplianceIssues from "./compliance/ComplianceIssues";
 import BudgetAllocationBreakdown from "./compliance/BudgetAllocationBreakdown";
+import PeriodAllocationManagement from "./compliance/PeriodAllocationManagement"; // ✅ NEW
 import WorkloadDistribution from "./compliance/WorkloadDistribution";
 import PromotionsManagement from "./compliance/PromotionsManagement";
 import "../../../styles/hr_operations/hr/hrOperations.css";
@@ -21,6 +22,7 @@ const HROperations = () => {
     if (path.includes("/career-goals")) return "career-goals";
     if (path.includes("/compliance")) return "compliance";
     if (path.includes("/budget-allocation")) return "budget";
+    if (path.includes("/period-allocations")) return "period-allocations"; // ✅ NEW
     if (path.includes("/workload")) return "workload";
     if (path.includes("/promotions")) return "promotions";
     return "policies";
@@ -49,6 +51,12 @@ const HROperations = () => {
       label: "Budget",
       path: "/hr/operations/budget-allocation",
     },
+    // ✅ NEW: Period Allocations Tab
+    {
+      key: "period-allocations",
+      label: "Period Allocations",
+      path: "/hr/operations/period-allocations",
+    },
     { key: "workload", label: "Workload", path: "/hr/operations/workload" },
     {
       key: "promotions",
@@ -69,7 +77,6 @@ const HROperations = () => {
   return (
     <div className="hr-operations-container">
       <div className="toggle-buttons">
-        
         <button
           className={`toggle-btn-main ${
             activeSection === "hr-operations" ? "active" : ""
@@ -118,6 +125,11 @@ const HROperations = () => {
               <Route
                 path="budget-allocation"
                 element={<BudgetAllocationBreakdown />}
+              />
+              {/* ✅ NEW: Period Allocations Route */}
+              <Route
+                path="period-allocations"
+                element={<PeriodAllocationManagement />}
               />
               <Route path="workload" element={<WorkloadDistribution />} />
               <Route path="promotions" element={<PromotionsManagement />} />

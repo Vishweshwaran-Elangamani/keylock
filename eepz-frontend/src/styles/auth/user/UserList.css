@@ -27,6 +27,13 @@
   color: #97247E;
 }
 
+.breadcrumb-item:not(:last-child)::after {
+  content: '\F285';
+  font-family: 'bootstrap-icons';
+  margin-left: 0.5rem;
+  color: #6c757d;
+}
+
 .breadcrumb-item.active {
   color: #97247E;
   font-weight: 600;

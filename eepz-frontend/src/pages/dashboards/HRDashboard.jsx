@@ -78,6 +78,13 @@ const HRDashboard = () => {
       icon: "bi bi-chat-left-text",
       gradient: "gradient-teal",
       path: "/hr/dashboard/feedback",
+    },
+    {
+      title: "Meeting & MOM Management",
+      description: "Manage Meetings & MOMs",
+      icon: "bi bi-book",
+      gradient: "gradient-pink",
+      path: "/hr/dasboard/meetmom",
     }
   ];
   return (

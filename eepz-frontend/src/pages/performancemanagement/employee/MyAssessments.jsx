@@ -1,9 +1,23 @@
+/**
+ * MyAssessments Component (formerly UserAssignments)
+ * 
+ * Employee Assessment Management Dashboard
+ * Features:
+ * - Real-time deadline timers for all pending assessments
+ * - Tab-based view (Pending/Completed)
+ * - Advanced search and filtering
+ * - Modal-based assessment submission/viewing
+ * - Professional form layout with company branding
+ * 
+ * @component
+ */
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import api from "../../../services/performancemanagement/hr/api";
 import logoImage from "../../../assets/explogodark.png";
-import "../../../styles/performancemanagement/hr/MyAssessments.css";
+import "../../../styles/performancemanagement/employee/MyAssessments.css";
 
 // Utility function to get days and hours left
 function getTimeLeft(deadline) {
@@ -16,8 +30,7 @@ function getTimeLeft(deadline) {
   return { days, hours, expired: ms === 0 };
 }
 
-
-function UserAssignments() {
+function MyAssessments() {
   const navigate = useNavigate();
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,6 +48,10 @@ function UserAssignments() {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
+
+  // ========================
+  // EFFECTS
+  // ========================
 
   useEffect(() => {
     if (!userId) {
@@ -74,12 +91,17 @@ function UserAssignments() {
     return () => clearInterval(interval);
   }, [assignments]);
 
+  // ========================
+  // API FUNCTIONS
+  // ========================
+
   const fetchAssignments = async () => {
     setLoading(true);
     try {
       const { data } = await api.get(`/AppraisalProcess/employee/${userId}`);
       if (data.success) {
         setAssignments(data.data || []);
+        toast.success("Assessments loaded successfully");
       } else {
         toast.error(data.message || "Failed to fetch assignments.");
       }
@@ -185,6 +207,10 @@ function UserAssignments() {
     }
   };
 
+  // ========================
+  // FILTER & DATA PROCESSING
+  // ========================
+
   const pendingAssignments = assignments.filter((a) => !a.isCompleted);
   const completedAssignments = assignments.filter((a) => a.isCompleted);
 
@@ -209,9 +235,13 @@ function UserAssignments() {
   const filteredPending = filterAssignments(pendingAssignments);
   const filteredCompleted = filterAssignments(completedAssignments);
 
+  // ========================
+  // RENDER FUNCTIONS
+  // ========================
+
   const renderTable = (data) => (
-    <div className="table-container">
-      <table className="table">
+    <div className="aep-table-container">
+      <table className="aep-table">
         <thead>
           <tr>
             <th>Form Name</th>
@@ -226,24 +256,39 @@ function UserAssignments() {
             return (
               <tr key={assignment.assignmentId}>
                 <td>
-                  <strong>{assignment.formName}</strong>
+                  <div className="aep-form-name">
+                    <i className="bi bi-file-earmark-text"></i>
+                    <strong>{assignment.formName}</strong>
+                  </div>
                 </td>
                 <td>
-                  <span className="badge">{assignment.formType}</span>
+                  <span className="aep-badge">{assignment.formType}</span>
                 </td>
-                <td>{new Date(assignment.deadline || new Date()).toLocaleDateString()}</td>
                 <td>
-                  <span className={assignment.isCompleted ? "badge-success" : "badge-pending"}>
+                  <div className="aep-date-cell">
+                    <i className="bi bi-calendar-event"></i>
+                    {new Date(assignment.deadline || new Date()).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric', 
+                      year: 'numeric' 
+                    })}
+                  </div>
+                </td>
+                <td>
+                  <span className={assignment.isCompleted ? "aep-badge-success" : "aep-badge-pending"}>
+                    <i className={`bi ${assignment.isCompleted ? 'bi-check-circle-fill' : 'bi-clock-fill'}`}></i>
                     {assignment.isCompleted ? "Completed" : "Pending"}
                   </span>
                 </td>
                 <td>
                   {!assignment.isCompleted ? (
-                    <button className="btn btn-submit" onClick={() => openSubmitModal(assignment)}>
+                    <button className="aep-btn aep-btn-submit" onClick={() => openSubmitModal(assignment)}>
+                      <i className="bi bi-pencil-square"></i>
                       Submit
                     </button>
                   ) : (
-                    <button className="btn btn-view" onClick={() => openViewModal(assignment)}>
+                    <button className="aep-btn aep-btn-view" onClick={() => openViewModal(assignment)}>
+                      <i className="bi bi-eye-fill"></i>
                       View
                     </button>
                   )}
@@ -256,59 +301,68 @@ function UserAssignments() {
     </div>
   );
 
+  // ========================
+  // MAIN RENDER - LOADING STATE
+  // ========================
+
   if (loading) {
     return (
-      <div className="my-assessments-container">
+      <div className="aep-container">
         <Toaster position="top-right" richColors />
-        <div style={{ textAlign: "center", padding: "60px" }}>
+        <div className="aep-loading-state">
           <div className="spinner-border"></div>
-          <p style={{ marginTop: "16px", color: "var(--text-light)" }}>
-            Loading assessments...
-          </p>
+          <p>Loading assessments...</p>
         </div>
       </div>
     );
   }
 
+  // ========================
+  // MAIN RENDER - PAGE CONTENT
+  // ========================
+
   return (
-    <div className="my-assessments-container">
+    <div className="aep-container">
       <Toaster position="top-right" richColors />
 
-     
-
       {/* Header Section */}
-      <div className="header-section">
-        <div className="header-content">
-          <h2>
-            <i className="bi bi-file-earmark-check"></i>
-            My Performance Assessments
-          </h2>
-          <p>View and complete your assigned performance evaluations</p>
+      <div className="aep-header-section">
+        <div className="aep-header-content">
+          <div className="aep-header-icon">
+            <i className="bi bi-clipboard-check"></i>
+          </div>
+          <div className="aep-header-text">
+            <h2 className="aep-header-title">My Performance Assessments</h2>
+            <p className="aep-header-description">View and complete your assigned performance evaluations</p>
+          </div>
         </div>
         {showModal && currentAssignment && timers[currentAssignment.assignmentId] && (
-          <div className="timer-container">
-            <div className="timer-label">Time Remaining</div>
-            <div className="timer-display">
+          <div className="aep-timer-container">
+            <div className="aep-timer-label">Time Remaining</div>
+            <div className="aep-timer-display">
               {timers[currentAssignment.assignmentId].days > 0
                 ? `${timers[currentAssignment.assignmentId].days} days`
                 : "Expired"}
             </div>
-            <div className="timer-subtext">
+            <div className="aep-timer-subtext">
               Deadline: {new Date(currentAssignment.deadline).toLocaleDateString()}
             </div>
           </div>
         )}
       </div>
 
-       {/* TIMER BARS - ALWAYS VISIBLE FOR ALL PENDING FORMS */}
+      {/* TIMER BARS - ALWAYS VISIBLE FOR ALL PENDING FORMS */}
       {visibleTimers.length > 0 && (
-        <div className="timer-bars-container">
+        <div className="aep-timer-bars-container">
           {visibleTimers.map((timer) => (
-            <div key={timer.id} className={`timer-bar ${timer.isExpired ? 'expired' : ''}`}>
-              <div className="timer-bar-content">
-                <span className="timer-bar-label"> {timer.formName}</span>
-                <span className="timer-bar-time">
-                  ⏱ {timer.days > 0 ? `${timer.days} days left` : "Expired"}
+            <div key={timer.id} className={`aep-timer-bar ${timer.isExpired ? 'expired' : ''}`}>
+              <div className="aep-timer-bar-content">
+                <span className="aep-timer-bar-icon">
+                  <i className="bi bi-alarm"></i>
+                </span>
+                <span className="aep-timer-bar-label">{timer.formName}</span>
+                <span className="aep-timer-bar-time">
+                  {timer.days > 0 ? `${timer.days} days left` : "Expired"}
                 </span>
               </div>
             </div>
@@ -317,22 +371,23 @@ function UserAssignments() {
       )}
 
       {/* Search & Filter */}
-      <div className="search-filter-container">
-        <div className="search-box">
+      <div className="aep-search-filter-container">
+        <div className="aep-search-box">
           <i className="bi bi-search"></i>
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search by form name or type..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <select
-          className="filter-select"
+          className="aep-filter-select"
           value={formTypeFilter}
           onChange={(e) => setFormTypeFilter(e.target.value)}
         >
-          {formTypes.map((type) => (
+          <option value="">All Form Types</option>
+          {formTypes.filter(t => t !== "All").map((type) => (
             <option key={type} value={type}>
               {type}
             </option>
@@ -340,38 +395,77 @@ function UserAssignments() {
         </select>
         <input
           type="date"
-          className="filter-select"
+          className="aep-filter-select"
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value)}
+          placeholder="Filter by deadline"
         />
       </div>
 
+      {/* Statistics Cards */}
+      <div className="aep-stats-grid">
+        <div className="aep-stat-card aep-stat-pending">
+          <div className="aep-stat-icon">
+            <i className="bi bi-hourglass-split"></i>
+          </div>
+          <div className="aep-stat-content">
+            <h3 className="aep-stat-value">{pendingAssignments.length}</h3>
+            <p className="aep-stat-label">Pending</p>
+          </div>
+        </div>
+        <div className="aep-stat-card aep-stat-completed">
+          <div className="aep-stat-icon">
+            <i className="bi bi-check-circle-fill"></i>
+          </div>
+          <div className="aep-stat-content">
+            <h3 className="aep-stat-value">{completedAssignments.length}</h3>
+            <p className="aep-stat-label">Completed</p>
+          </div>
+        </div>
+        <div className="aep-stat-card aep-stat-total">
+          <div className="aep-stat-icon">
+            <i className="bi bi-list-check"></i>
+          </div>
+          <div className="aep-stat-content">
+            <h3 className="aep-stat-value">{assignments.length}</h3>
+            <p className="aep-stat-label">Total</p>
+          </div>
+        </div>
+      </div>
+
       {/* Tab Navigation */}
-      <div className="tab-container">
+      <div className="aep-tab-container">
         <button
-          className={`tab-button ${activeTab === "pending" ? "active" : ""}`}
+          className={`aep-tab-button ${activeTab === "pending" ? "active" : ""}`}
           onClick={() => setActiveTab("pending")}
         >
-          Pending Assessments ({filteredPending.length})
+          <i className="bi bi-hourglass-split"></i>
+          Pending Assessments
+          <span className="aep-tab-badge">{filteredPending.length}</span>
         </button>
         <button
-          className={`tab-button ${activeTab === "completed" ? "active" : ""}`}
+          className={`aep-tab-button ${activeTab === "completed" ? "active" : ""}`}
           onClick={() => setActiveTab("completed")}
         >
-          Completed Assessments ({filteredCompleted.length})
+          <i className="bi bi-check-circle-fill"></i>
+          Completed Assessments
+          <span className="aep-tab-badge">{filteredCompleted.length}</span>
         </button>
       </div>
 
       {/* Content */}
-      <div className="card">
+      <div className="aep-card">
         {activeTab === "pending" && (
           <>
             {filteredPending.length > 0 ? (
               renderTable(filteredPending)
             ) : (
-              <div className="empty-state">
-                <h3 className="empty-title">No Pending Assessments</h3>
-                <p className="empty-text">
+              <div className="aep-empty-state">
+                <div className="aep-empty-icon">
+                  <i className="bi bi-inbox"></i>
+                </div>
+                <h3 className="aep-empty-title">No Pending Assessments</h3>
+                <p className="aep-empty-text">
                   {assignments.length === 0
                     ? "You don't have any assessments assigned yet."
                     : "All assessments have been completed or filtered out!"}
@@ -386,9 +480,12 @@ function UserAssignments() {
             {filteredCompleted.length > 0 ? (
               renderTable(filteredCompleted)
             ) : (
-              <div className="empty-state">
-                <h3 className="empty-title">No Completed Assessments</h3>
-                <p className="empty-text">
+              <div className="aep-empty-state">
+                <div className="aep-empty-icon">
+                  <i className="bi bi-clipboard-check"></i>
+                </div>
+                <h3 className="aep-empty-title">No Completed Assessments</h3>
+                <p className="aep-empty-text">
                   Complete your pending assessments to see them here.
                 </p>
               </div>
@@ -397,7 +494,7 @@ function UserAssignments() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modal - KEEPING ORIGINAL FORMAT */}
       {showModal && currentAssignment && (
         <div
           className="modal-overlay"
@@ -470,7 +567,7 @@ function UserAssignments() {
                                     e.target.value
                                   )
                                 }
-                                className="form-select"
+                                className="ma-form-select"
                                 disabled={submitting}
                               >
                                 <option value="">-</option>
@@ -535,4 +632,4 @@ function UserAssignments() {
   );
 }
 
-export default UserAssignments;
+export default MyAssessments;

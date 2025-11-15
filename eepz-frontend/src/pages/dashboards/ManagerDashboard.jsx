@@ -71,6 +71,13 @@ const ManagerDashboard = () => {
       gradient: "gradient-teal",
       path: "/manager/dashboard/sla",
     },
+    {
+     title: "Meeting & MOM Management",
+     description: "Manage Meetings & MOMs",
+     icon: "bi bi-book",
+     gradient: "gradient-pink",
+     path: "/manager/dashboard/meetmom",
+   }
   ];
   return (
     <div className="dashboard-container">

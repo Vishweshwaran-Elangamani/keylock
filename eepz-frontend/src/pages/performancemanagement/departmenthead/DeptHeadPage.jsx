@@ -1,747 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import {
-//   getDeptHeadSubmittedRatings,
-//   approveDeptHeadEmployee,
-//   getApprovedEmployees
-// } from "../../../services/performancemanagement/hr/api";
-// import { toast, ToastContainer } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-
-// const THEME = {
-//   primary: "#27235C",
-//   secondary: "#AC5098",
-//   accent: "#3B4B8C",
-//   background: "#F8F9FA",
-//   card: "#FFFFFF",
-//   text: "#2C3E50",
-//   textLight: "#6C757D",
-//   border: "#E0E0E0",
-//   success: "#10B981",
-//   warning: "#F59E0B",
-//   danger: "#EF4444"
-// };
-
-// export default function DeptHeadPage() {
-//   const [data, setData] = useState([]);
-//   const [approvedEmployees, setApprovedEmployees] = useState([]);
-//   const [expandedEmployeeIds, setExpandedEmployeeIds] = useState(new Set());
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [totalPages, setTotalPages] = useState(1);
-//   const [approvingEmployeeId, setApprovingEmployeeId] = useState(null);
-//   const pageSize = 5;
-
-//   useEffect(() => {
-//     fetchDeptHeadRatings();
-//     fetchApprovedEmployees();
-//   }, [currentPage]);
-
-//   const fetchDeptHeadRatings = async () => {
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       const res = await getDeptHeadSubmittedRatings();
-//       if (res.data.success) {
-//         setData(res.data.data);
-//       } else {
-//         setError("Failed to load data");
-//       }
-//     } catch (err) {
-//       console.error("Error fetching data:", err);
-//       setError(err.response?.data?.message || "Error fetching data");
-//       toast.error("Failed to load submitted ratings");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const fetchApprovedEmployees = async () => {
-//     try {
-//       const res = await getApprovedEmployees(currentPage, pageSize);
-//       if (res.data.success) {
-//         setApprovedEmployees(res.data.data);
-//         setTotalPages(res.data.totalPages);
-//       }
-//     } catch (err) {
-//       console.error("Error fetching approved employees:", err);
-//     }
-//   };
-
-//   const handleApprove = async (employee) => {
-//     setApprovingEmployeeId(employee.employeeId);
-//     try {
-//       const res = await approveDeptHeadEmployee({
-//         employeeId: employee.employeeId,
-//         projectId: employee.projectId,
-//         assessmentId: employee.assessmentId
-//       });
-
-//       if (res.data.success) {
-//         toast.success("Employee approved successfully!");
-//         setData(prevData =>
-//           prevData.filter(emp => emp.assessmentId !== employee.assessmentId)
-//         );
-//         await fetchApprovedEmployees();
-//       }
-//     } catch (err) {
-//       console.error("Error approving employee:", err);
-//       const errorMsg = err.response?.data?.message || "Failed to approve employee";
-//       toast.error(errorMsg);
-//     } finally {
-//       setApprovingEmployeeId(null);
-//     }
-//   };
-
-//   const toggleDetails = (uniqueKey) => {
-//     setExpandedEmployeeIds((prev) => {
-//       const newSet = new Set(prev);
-//       if (newSet.has(uniqueKey)) {
-//         newSet.delete(uniqueKey);
-//       } else {
-//         newSet.add(uniqueKey);
-//       }
-//       return newSet;
-//     });
-//   };
-
-//   const getAvgRating = (competencies, key) => {
-//     if (!competencies || competencies.length === 0) return "-";
-//     const vals = competencies
-//       .filter(c => c[key] != null && c[key] !== -1)
-//       .map(c => c[key]);
-//     if (vals.length === 0) return "-";
-//     const total = vals.reduce((a, b) => a + b, 0);
-//     return (total / vals.length).toFixed(2);
-//   };
-
-//   const getAvgChecklistProgress = (checklists) => {
-//     if (!checklists || checklists.length === 0) return 0;
-//     let totalProgress = 0;
-//     let count = 0;
-
-//     checklists.forEach(cl => {
-//       if (cl.progresses && cl.progresses.length) {
-//         cl.progresses.forEach(p => {
-//           count++;
-//           totalProgress += p.isCompleted ? 100 : 0;
-//         });
-//       }
-//     });
-
-//     if (count === 0) return 0;
-//     return Math.round(totalProgress / count);
-//   };
-
-//   return (
-//     <div style={styles.container}>
-//       <ToastContainer position="top-right" autoClose={3000} />
-
-//       <div style={styles.header}>
-//         <h2 style={styles.title}>Department Head Dashboard</h2>
-//         <p style={styles.subtitle}>Submitted Ratings & Goals Overview</p>
-//       </div>
-
-//       {loading && (
-//         <div style={styles.loadingCard}>
-//           <div style={styles.spinner}></div>
-//           <p>Loading data...</p>
-//         </div>
-//       )}
-
-//       {error && (
-//         <div style={styles.errorCard}>
-//           <p>{error}</p>
-//         </div>
-//       )}
-
-//       {!loading && !error && (
-//         <>
-//           {/* Pending Approvals Section */}
-//           <div style={styles.tableCard}>
-//             <div style={styles.sectionHeader}>
-//               <h3 style={styles.sectionTitle}>📋 Pending Approvals</h3>
-//               <span style={styles.badge}>{data.length} Employees</span>
-//             </div>
-
-//             {data.length === 0 ? (
-//               <div style={styles.emptyState}>
-//                 <div style={styles.emptyIcon}>✓</div>
-//                 <p style={styles.emptyText}>No pending approvals</p>
-//                 <p style={styles.emptySubtext}>All submitted assessments have been reviewed</p>
-//               </div>
-//             ) : (
-//               <table style={styles.table}>
-//                 <thead>
-//                   <tr>
-//                     <th style={styles.th}>Employee Name</th>
-//                     <th style={styles.th}>Project</th>
-//                     <th style={styles.th}>Avg Emp Rating</th>
-//                     <th style={styles.th}>Avg L1 Rating</th>
-//                     <th style={styles.th}>Avg L2 Rating</th>
-//                     <th style={styles.th}>Actions</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {data.map((emp) => {
-//                     // Key combining employeeId, projectId, and assessmentId for uniqueness
-//                     const uniqueKey = `${emp.employeeId}-${emp.projectId}-${emp.assessmentId}`;
-
-//                     return (
-//                       <React.Fragment key={uniqueKey}>
-//                         <tr style={styles.tr}>
-//                           <td style={styles.td}>{emp.employeeName}</td>
-//                           <td style={styles.td}>{emp.projectName}</td>
-//                           <td style={styles.td}>
-//                             <span style={styles.ratingBadge}>
-//                               {getAvgRating(emp.competencies, "employeeRating")}
-//                             </span>
-//                           </td>
-//                           <td style={styles.td}>
-//                             <span style={styles.ratingBadge}>
-//                               {getAvgRating(emp.competencies, "l1Rating")}
-//                             </span>
-//                           </td>
-//                           <td style={styles.td}>
-//                             <span style={styles.ratingBadge}>
-//                               {getAvgRating(emp.competencies, "l2Rating")}
-//                             </span>
-//                           </td>
-//                           <td style={styles.td}>
-//                             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-//                               <button
-//                                 onClick={() => toggleDetails(uniqueKey)}
-//                                 style={styles.viewButton}
-//                               >
-//                                 {expandedEmployeeIds.has(uniqueKey) ? "Hide Details" : "View Details"}
-//                               </button>
-//                               <button
-//                                 onClick={() => handleApprove(emp)}
-//                                 style={{
-//                                   ...styles.approveButton,
-//                                   opacity: approvingEmployeeId === emp.employeeId ? 0.6 : 1,
-//                                   cursor: approvingEmployeeId === emp.employeeId ? "not-allowed" : "pointer"
-//                                 }}
-//                                 disabled={approvingEmployeeId === emp.employeeId}
-//                               >
-//                                 {approvingEmployeeId === emp.employeeId ? "Approving..." : "Approve"}
-//                               </button>
-//                             </div>
-//                           </td>
-//                         </tr>
-
-//                         {expandedEmployeeIds.has(uniqueKey) && (
-//                           <tr key={`${uniqueKey}-expanded`}>
-//                             <td colSpan={6} style={styles.expandedCell}>
-//                               <div style={styles.section}>
-//                                 <h4 style={styles.sectionSubtitle}>📊 Competencies</h4>
-//                                 <div style={styles.tableWrapper}>
-//                                   <table style={styles.innerTable}>
-//                                     <thead>
-//                                       <tr>
-//                                         <th style={styles.innerTh}>Competency</th>
-//                                         <th style={styles.innerTh}>Emp Rating</th>
-//                                         <th style={styles.innerTh}>Emp Comments</th>
-//                                         <th style={styles.innerTh}>L1 Reviewer</th>
-//                                         <th style={styles.innerTh}>L1 Rating</th>
-//                                         <th style={styles.innerTh}>L1 Comments</th>
-//                                         <th style={styles.innerTh}>L2 Reviewer</th>
-//                                         <th style={styles.innerTh}>L2 Rating</th>
-//                                         <th style={styles.innerTh}>L2 Comments</th>
-//                                         <th style={styles.innerTh}>Status</th>
-//                                       </tr>
-//                                     </thead>
-//                                     <tbody>
-//                                       {emp.competencies && emp.competencies.length > 0 ? (
-//                                         emp.competencies.map((c, idx) => (
-//                                           <tr key={`${uniqueKey}-comp-${idx}`} style={styles.innerTr}>
-//                                             <td style={styles.innerTd}>{c.competencyName}</td>
-//                                             <td style={styles.innerTd}>
-//                                               <strong style={{ color: THEME.secondary }}>
-//                                                 {c.employeeRating || "-"}
-//                                               </strong>
-//                                             </td>
-//                                             <td style={styles.innerTd}>{c.employeeComments || "-"}</td>
-//                                             <td style={styles.innerTd}>{c.l1ReviewerName || "No L1"}</td>
-//                                             <td style={styles.innerTd}>
-//                                               <strong style={{ color: THEME.accent }}>
-//                                                 {c.l1Rating || "-"}
-//                                               </strong>
-//                                             </td>
-//                                             <td style={styles.innerTd}>{c.l1Comments || "-"}</td>
-//                                             <td style={styles.innerTd}>{c.l2ReviewerName || "No L2"}</td>
-//                                             <td style={styles.innerTd}>
-//                                               <strong style={{ color: THEME.accent }}>
-//                                                 {c.l2Rating || "-"}
-//                                               </strong>
-//                                             </td>
-//                                             <td style={styles.innerTd}>{c.l2Comments || "-"}</td>
-//                                             <td style={styles.innerTd}>
-//                                               <span style={getStatusBadgeStyle(c.status)}>
-//                                                 {c.status}
-//                                               </span>
-//                                             </td>
-//                                           </tr>
-//                                         ))
-//                                       ) : (
-//                                         <tr>
-//                                           <td colSpan={10} style={{ ...styles.innerTd, textAlign: "center" }}>
-//                                             No competencies found
-//                                           </td>
-//                                         </tr>
-//                                       )}
-//                                     </tbody>
-//                                   </table>
-//                                 </div>
-//                               </div>
-
-//                               <div style={styles.section}>
-//                                 <h4 style={styles.sectionSubtitle}>🎯 Goals</h4>
-//                                 {emp.goals && emp.goals.length === 0 ? (
-//                                   <p style={styles.noData}>No goals assigned.</p>
-//                                 ) : (
-//                                   emp.goals.map((goal) => {
-//                                     const avgProgress = getAvgChecklistProgress(goal.goalChecklists);
-
-//                                     return (
-//                                       <div key={`${uniqueKey}-goal-${goal.goalId}`} style={styles.goalCard}>
-//                                         <div style={styles.goalHeader}>
-//                                           <div>
-//                                             <h5 style={styles.goalTitle}>{goal.goalTitle}</h5>
-//                                             <p style={styles.goalDescription}>{goal.goalDescription}</p>
-//                                           </div>
-//                                           <span style={getGoalStatusBadge(goal.goalstatus)}>
-//                                             {goal.goalstatus}
-//                                           </span>
-//                                         </div>
-
-//                                         <div style={styles.progressContainer}>
-//                                           <div style={styles.progressLabel}>
-//                                             <span>Progress</span>
-//                                             <span style={{ fontWeight: "700" }}>{avgProgress}%</span>
-//                                           </div>
-//                                           <div style={styles.progressBarBg}>
-//                                             <div style={{
-//                                               ...styles.progressBarFill,
-//                                               width: `${avgProgress}%`
-//                                             }} />
-//                                           </div>
-//                                         </div>
-//                                       </div>
-//                                     );
-//                                   })
-//                                 )}
-//                               </div>
-//                             </td>
-//                           </tr>
-//                         )}
-//                       </React.Fragment>
-//                     );
-//                   })}
-//                 </tbody>
-//               </table>
-//             )}
-//           </div>
-
-//           <div style={styles.approvedSection}>
-//             <div style={styles.sectionHeader}>
-//               <h3 style={styles.approvedTitle}>✅ Approved Employees</h3>
-//               <span style={styles.badge}>{approvedEmployees.length} on this page</span>
-//             </div>
-
-//             <div style={styles.approvedTableCard}>
-//               <table style={styles.table}>
-//                 <thead>
-//                   <tr>
-//                     <th style={styles.th}>Employee Name</th>
-//                     <th style={styles.th}>Project Name</th>
-//                     <th style={styles.th}>Approved At</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {approvedEmployees.length === 0 ? (
-//                     <tr>
-//                       <td colSpan={3} style={{ ...styles.td, textAlign: "center", padding: "32px" }}>
-//                         <div style={styles.emptyIcon}>📋</div>
-//                         <p style={styles.emptyText}>No approved employees yet</p>
-//                       </td>
-//                     </tr>
-//                   ) : (
-//                     approvedEmployees.map((emp) => (
-//                       <tr key={emp.approvalId} style={styles.tr}>
-//                         <td style={styles.td}>{emp.employeeName}</td>
-//                         <td style={styles.td}>{emp.projectName}</td>
-//                         <td style={styles.td}>
-//                           {new Date(emp.approvedAt).toLocaleString('en-US', {
-//                             year: 'numeric',
-//                             month: 'short',
-//                             day: 'numeric',
-//                             hour: '2-digit',
-//                             minute: '2-digit'
-//                           })}
-//                         </td>
-//                       </tr>
-//                     ))
-//                   )}
-//                 </tbody>
-//               </table>
-
-//               {totalPages > 1 && (
-//                 <div style={styles.pagination}>
-//                   <button
-//                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-//                     disabled={currentPage === 1}
-//                     style={{
-//                       ...styles.paginationButton,
-//                       opacity: currentPage === 1 ? 0.5 : 1
-//                     }}
-//                   >
-//                     ← Previous
-//                   </button>
-//                   <span style={styles.paginationInfo}>
-//                     Page {currentPage} of {totalPages}
-//                   </span>
-//                   <button
-//                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-//                     disabled={currentPage === totalPages}
-//                     style={{
-//                       ...styles.paginationButton,
-//                       opacity: currentPage === totalPages ? 0.5 : 1
-//                     }}
-//                   >
-//                     Next →
-//                   </button>
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// }
-
-// // Helper functions here (retain previous ones)
-// function getStatusBadgeStyle(status) {
-//   let bg = "#E0E0E0";
-//   let color = "#6C757D";
-
-//   if (status === "Completed" || status === "Approved") {
-//     bg = "#10B98120";
-//     color = "#10B981";
-//   } else if (status === "Pending") {
-//     bg = "#F59E0B20";
-//     color = "#F59E0B";
-//   }
-
-//   return {
-//     padding: "4px 12px",
-//     borderRadius: "6px",
-//     fontSize: "12px",
-//     fontWeight: "600",
-//     backgroundColor: bg,
-//     color: color
-//   };
-// }
-
-// function getGoalStatusBadge(status) {
-//   const isCompleted = status && status.toLowerCase() === "completed";
-//   return {
-//     padding: "6px 14px",
-//     borderRadius: "8px",
-//     fontSize: "13px",
-//     fontWeight: "700",
-//     backgroundColor: isCompleted ? "#10B98120" : "#F59E0B20",
-//     color: isCompleted ? "#10B981" : "#F59E0B"
-//   };
-// }
-
-// const styles = {
-//   container: {
-//     padding: "32px",
-//     maxWidth: "1600px",
-//     margin: "0 auto",
-//     backgroundColor: THEME.background,
-//     minHeight: "100vh",
-//     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
-//   },
-//   header: {
-//     marginBottom: "32px",
-//     textAlign: "center"
-//   },
-//   title: {
-//     fontSize: "32px",
-//     fontWeight: "700",
-//     color: THEME.primary,
-//     margin: 0
-//   },
-//   subtitle: {
-//     fontSize: "16px",
-//     color: THEME.textLight,
-//     marginTop: "8px"
-//   },
-//   loadingCard: {
-//     backgroundColor: THEME.card,
-//     padding: "48px",
-//     borderRadius: "12px",
-//     textAlign: "center",
-//     boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
-//   },
-//   spinner: {
-//     width: "40px",
-//     height: "40px",
-//     border: `4px solid ${THEME.border}`,
-//     borderTop: `4px solid ${THEME.primary}`,
-//     borderRadius: "50%",
-//     animation: "spin 1s linear infinite",
-//     margin: "0 auto 16px"
-//   },
-//   errorCard: {
-//     backgroundColor: "#FEE2E2",
-//     color: THEME.danger,
-//     padding: "20px",
-//     borderRadius: "12px",
-//     border: `2px solid ${THEME.danger}`
-//   },
-//   tableCard: {
-//     backgroundColor: THEME.card,
-//     borderRadius: "12px",
-//     boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-//     overflow: "hidden",
-//     marginBottom: "32px"
-//   },
-//   sectionHeader: {
-//     display: "flex",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//     padding: "20px 24px",
-//     borderBottom: `2px solid ${THEME.border}`
-//   },
-//   sectionTitle: {
-//     fontSize: "20px",
-//     fontWeight: "700",
-//     color: THEME.primary,
-//     margin: 0
-//   },
-//   badge: {
-//     padding: "6px 14px",
-//     backgroundColor: `${THEME.primary}15`,
-//     color: THEME.primary,
-//     borderRadius: "20px",
-//     fontSize: "13px",
-//     fontWeight: "600"
-//   },
-//   emptyState: {
-//     padding: "60px 20px",
-//     textAlign: "center"
-//   },
-//   emptyIcon: {
-//     fontSize: "64px",
-//     marginBottom: "16px"
-//   },
-//   emptyText: {
-//     fontSize: "18px",
-//     fontWeight: "600",
-//     color: THEME.text,
-//     marginBottom: "8px"
-//   },
-//   emptySubtext: {
-//     fontSize: "14px",
-//     color: THEME.textLight
-//   },
-//   table: {
-//     width: "100%",
-//     borderCollapse: "collapse"
-//   },
-//   th: {
-//     padding: "16px",
-//     textAlign: "left",
-//     backgroundColor: `${THEME.primary}08`,
-//     fontWeight: "700",
-//     fontSize: "14px",
-//     color: THEME.text,
-//     borderBottom: `3px solid ${THEME.primary}`,
-//     textTransform: "uppercase",
-//     letterSpacing: "0.5px"
-//   },
-//   tr: {
-//     borderBottom: `1px solid ${THEME.border}`,
-//     transition: "background 0.2s"
-//   },
-//   td: {
-//     padding: "16px",
-//     fontSize: "14px",
-//     color: THEME.text
-//   },
-//   ratingBadge: {
-//     padding: "6px 12px",
-//     backgroundColor: `${THEME.secondary}20`,
-//     color: THEME.secondary,
-//     borderRadius: "8px",
-//     fontWeight: "700",
-//     fontSize: "14px"
-//   },
-//   viewButton: {
-//     padding: "8px 16px",
-//     backgroundColor: THEME.primary,
-//     color: "#fff",
-//     border: "none",
-//     borderRadius: "8px",
-//     cursor: "pointer",
-//     fontWeight: "600",
-//     fontSize: "13px",
-//     transition: "all 0.2s"
-//   },
-//   approveButton: {
-//     padding: "8px 16px",
-//     backgroundColor: THEME.success,
-//     color: "#fff",
-//     border: "none",
-//     borderRadius: "8px",
-//     cursor: "pointer",
-//     fontWeight: "600",
-//     fontSize: "13px",
-//     transition: "all 0.2s"
-//   },
-//   expandedCell: {
-//     padding: "24px",
-//     backgroundColor: "#F9FAFB"
-//   },
-//   section: {
-//     marginBottom: "32px"
-//   },
-//   sectionSubtitle: {
-//     fontSize: "18px",
-//     fontWeight: "700",
-//     color: THEME.primary,
-//     marginBottom: "16px"
-//   },
-//   tableWrapper: {
-//     overflowX: "auto",
-//     borderRadius: "8px",
-//     border: `1px solid ${THEME.border}`,
-//     backgroundColor: "#fff"
-//   },
-//   innerTable: {
-//     width: "100%",
-//     borderCollapse: "collapse",
-//     minWidth: "1200px"
-//   },
-//   innerTh: {
-//     padding: "12px",
-//     textAlign: "left",
-//     backgroundColor: `${THEME.primary}10`,
-//     fontWeight: "600",
-//     fontSize: "13px",
-//     color: THEME.text,
-//     borderBottom: `2px solid ${THEME.border}`,
-//     whiteSpace: "nowrap"
-//   },
-//   innerTr: {
-//     borderBottom: `1px solid ${THEME.border}`
-//   },
-//   innerTd: {
-//     padding: "12px",
-//     fontSize: "13px",
-//     color: THEME.text,
-//     maxWidth: "200px",
-//     overflow: "hidden",
-//     textOverflow: "ellipsis"
-//   },
-//   noData: {
-//     color: THEME.textLight,
-//     fontSize: "14px",
-//     fontStyle: "italic",
-//     padding: "20px"
-//   },
-//   goalCard: {
-//     backgroundColor: "#fff",
-//     border: `2px solid ${THEME.border}`,
-//     borderRadius: "12px",
-//     padding: "20px",
-//     marginBottom: "16px"
-//   },
-//   goalHeader: {
-//     display: "flex",
-//     justifyContent: "space-between",
-//     alignItems: "flex-start",
-//     marginBottom: "16px"
-//   },
-//   goalTitle: {
-//     fontSize: "16px",
-//     fontWeight: "700",
-//     color: THEME.text,
-//     margin: 0
-//   },
-//   goalDescription: {
-//     fontSize: "14px",
-//     color: THEME.textLight,
-//     marginTop: "4px"
-//   },
-//   progressContainer: {
-//     marginTop: "16px"
-//   },
-//   progressLabel: {
-//     display: "flex",
-//     justifyContent: "space-between",
-//     marginBottom: "8px",
-//     fontSize: "14px",
-//     fontWeight: "600"
-//   },
-//   progressBarBg: {
-//     backgroundColor: THEME.border,
-//     borderRadius: "8px",
-//     height: "20px",
-//     overflow: "hidden"
-//   },
-//   progressBarFill: {
-//     height: "100%",
-//     backgroundColor: THEME.success,
-//     transition: "width 0.5s",
-//     borderRadius: "8px"
-//   },
-//   approvedSection: {
-//     marginTop: "48px"
-//   },
-//   approvedTitle: {
-//     fontSize: "20px",
-//     fontWeight: "700",
-//     color: THEME.success,
-//     margin: 0
-//   },
-//   approvedTableCard: {
-//     backgroundColor: THEME.card,
-//     borderRadius: "12px",
-//     boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-//     overflow: "hidden"
-//   },
-//   pagination: {
-//     display: "flex",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     gap: "16px",
-//     padding: "20px",
-//     borderTop: `1px solid ${THEME.border}`
-//   },
-//   paginationButton: {
-//     padding: "10px 20px",
-//     backgroundColor: THEME.primary,
-//     color: "#fff",
-//     border: "none",
-//     borderRadius: "8px",
-//     fontWeight: "600",
-//     fontSize: "14px",
-//     transition: "all 0.2s",
-//     cursor: "pointer"
-//   },
-//   paginationInfo: {
-//     fontSize: "14px",
-//     fontWeight: "600",
-//     color: THEME.text
-//   }
-// };
-
-
 /**
  * DeptHeadPage Component
  * 
@@ -1194,19 +450,19 @@ export default function DeptHeadPage() {
 
     return (
       <>
-        <div className="dhp-modal-backdrop"></div>
-        <div className="dhp-modal-wrapper">
-          <div className="dhp-modal-dialog">
+        <div className="dp-modal-backdrop"></div>
+        <div className="dp-modal-wrapper">
+          <div className="dp-modal-dialog">
             
             {/* Modal Header */}
-            <div className="dhp-modal-header dhp-modal-header-success">
-              <h5 className="dhp-modal-title">
+            <div className="dp-modal-header dp-modal-header-success">
+              <h5 className="dp-modal-title">
                 <i className="bi bi-check-circle-fill"></i>
                 Approve Employee Assessment
               </h5>
               <button
                 type="button"
-                className="dhp-modal-close-btn"
+                className="dp-modal-close-btn"
                 onClick={handleModalClose}
                 disabled={approvingEmployeeId}
                 aria-label="Close"
@@ -1216,60 +472,60 @@ export default function DeptHeadPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="dhp-modal-body">
+            <div className="dp-modal-body">
               
               {/* Employee Details Box */}
-              <div className="dhp-details-box">
-                <h6 className="dhp-details-title">
+              <div className="dp-details-box">
+                <h6 className="dp-details-title">
                   <i className="bi bi-person-badge me-2"></i>
                   Employee Information
                 </h6>
 
-                <div className="dhp-details-grid">
+                <div className="dp-details-grid">
                   
-                  <div className="dhp-detail-row">
-                    <div className="dhp-detail-label">Employee Name:</div>
-                    <div className="dhp-detail-value">
+                  <div className="dp-detail-row">
+                    <div className="dp-detail-label">Employee Name:</div>
+                    <div className="dp-detail-value">
                       <strong>{selectedEmployee.employeeName}</strong>
                     </div>
                   </div>
 
-                  <div className="dhp-detail-row">
-                    <div className="dhp-detail-label">Project:</div>
-                    <div className="dhp-detail-value">{selectedEmployee.projectName}</div>
+                  <div className="dp-detail-row">
+                    <div className="dp-detail-label">Project:</div>
+                    <div className="dp-detail-value">{selectedEmployee.projectName}</div>
                   </div>
 
-                  <div className="dhp-detail-row">
-                    <div className="dhp-detail-label">Avg Employee Rating:</div>
-                    <div className="dhp-detail-value">
-                      <span className="dhp-rating-badge emp-rating">
+                  <div className="dp-detail-row">
+                    <div className="dp-detail-label">Avg Employee Rating:</div>
+                    <div className="dp-detail-value">
+                      <span className="dp-rating-badge emp-rating">
                         {getAvgRating(selectedEmployee.competencies, "employeeRating")}
                       </span>
                     </div>
                   </div>
 
-                  <div className="dhp-detail-row">
-                    <div className="dhp-detail-label">Avg L1 Rating:</div>
-                    <div className="dhp-detail-value">
-                      <span className="dhp-rating-badge l1-rating">
+                  <div className="dp-detail-row">
+                    <div className="dp-detail-label">Avg L1 Rating:</div>
+                    <div className="dp-detail-value">
+                      <span className="dp-rating-badge l1-rating">
                         {getAvgRating(selectedEmployee.competencies, "l1Rating")}
                       </span>
                     </div>
                   </div>
 
-                  <div className="dhp-detail-row">
-                    <div className="dhp-detail-label">Avg L2 Rating:</div>
-                    <div className="dhp-detail-value">
-                      <span className="dhp-rating-badge l2-rating">
+                  <div className="dp-detail-row">
+                    <div className="dp-detail-label">Avg L2 Rating:</div>
+                    <div className="dp-detail-value">
+                      <span className="dp-rating-badge l2-rating">
                         {getAvgRating(selectedEmployee.competencies, "l2Rating")}
                       </span>
                     </div>
                   </div>
 
-                  <div className="dhp-detail-row">
-                    <div className="dhp-detail-label">Goals Assigned:</div>
-                    <div className="dhp-detail-value">
-                      <span className="dhp-goals-badge">
+                  <div className="dp-detail-row">
+                    <div className="dp-detail-label">Goals Assigned:</div>
+                    <div className="dp-detail-value">
+                      <span className="dp-goals-badge">
                         <i className="bi bi-bullseye"></i>
                         {selectedEmployee.goals?.length || 0} Goals
                       </span>
@@ -1279,7 +535,7 @@ export default function DeptHeadPage() {
               </div>
 
               {/* Info Alert */}
-              <div className="dhp-info-alert">
+              <div className="dp-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <div>
                   <strong>Note:</strong> Approving this assessment will finalize the performance review process.
@@ -1289,10 +545,10 @@ export default function DeptHeadPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="dhp-modal-footer">
+            <div className="dp-modal-footer">
               <button
                 type="button"
-                className="dhp-btn-cancel"
+                className="dp-btn-cancel"
                 onClick={handleModalClose}
                 disabled={approvingEmployeeId}
               >
@@ -1301,13 +557,13 @@ export default function DeptHeadPage() {
               </button>
               <button
                 type="button"
-                className="dhp-btn-submit dhp-btn-success"
+                className="dp-btn-submit dp-btn-success"
                 onClick={handleApproveSubmit}
                 disabled={approvingEmployeeId}
               >
                 {approvingEmployeeId ? (
                   <>
-                    <span className="dhp-spinner"></span>
+                    <span className="dp-spinner"></span>
                     Approving...
                   </>
                 ) : (
@@ -1332,19 +588,19 @@ export default function DeptHeadPage() {
 
     return (
       <>
-        <div className="dhp-modal-backdrop"></div>
-        <div className="dhp-modal-wrapper dhp-modal-large">
-          <div className="dhp-modal-dialog">
+        <div className="dp-modal-backdrop"></div>
+        <div className="dp-modal-wrapper dp-modal-large">
+          <div className="dp-modal-dialog">
             
             {/* Modal Header */}
-            <div className="dhp-modal-header dhp-modal-header-primary">
-              <h5 className="dhp-modal-title">
+            <div className="dp-modal-header dp-modal-header-primary">
+              <h5 className="dp-modal-title">
                 <i className="bi bi-file-text-fill"></i>
                 Employee Assessment Details
               </h5>
               <button
                 type="button"
-                className="dhp-modal-close-btn"
+                className="dp-modal-close-btn"
                 onClick={handleModalClose}
                 aria-label="Close"
               >
@@ -1353,15 +609,15 @@ export default function DeptHeadPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="dhp-modal-body">
+            <div className="dp-modal-body">
               {renderEmployeeDetails(selectedEmployee)}
             </div>
 
             {/* Modal Footer */}
-            <div className="dhp-modal-footer">
+            <div className="dp-modal-footer">
               <button
                 type="button"
-                className="dhp-btn-cancel"
+                className="dp-btn-cancel"
                 onClick={handleModalClose}
               >
                 <i className="bi bi-x-circle"></i>
@@ -1381,13 +637,13 @@ export default function DeptHeadPage() {
     return (
       <>
         {/* Competencies Section */}
-        <div className="dhp-detail-section">
-          <h4 className="dhp-detail-section-title">
+        <div className="dp-detail-section">
+          <h4 className="dp-detail-section-title">
             <i className="bi bi-graph-up"></i>
             Competencies
           </h4>
-          <div className="dhp-inner-table-wrapper">
-            <table className="dhp-inner-table">
+          <div className="dp-inner-table-wrapper">
+            <table className="dp-inner-table">
               <thead>
                 <tr>
                   <th>Competency</th>
@@ -1428,7 +684,7 @@ export default function DeptHeadPage() {
                       </td>
                       <td>{c.l2Comments || "-"}</td>
                       <td>
-                        <span className={`dhp-status-badge status-${c.status?.toLowerCase()}`}>
+                        <span className={`dp-status-badge status-${c.status?.toLowerCase()}`}>
                           {c.status}
                         </span>
                       </td>
@@ -1436,7 +692,7 @@ export default function DeptHeadPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={10} className="dhp-no-data">
+                    <td colSpan={10} className="dp-no-data">
                       No competencies found
                     </td>
                   </tr>
@@ -1447,37 +703,37 @@ export default function DeptHeadPage() {
         </div>
 
         {/* Goals Section */}
-        <div className="dhp-detail-section">
-          <h4 className="dhp-detail-section-title">
+        <div className="dp-detail-section">
+          <h4 className="dp-detail-section-title">
             <i className="bi bi-bullseye"></i>
             Goals
           </h4>
           {emp.goals && emp.goals.length === 0 ? (
-            <p className="dhp-no-data">No goals assigned.</p>
+            <p className="dp-no-data">No goals assigned.</p>
           ) : (
             emp.goals?.map((goal) => {
               const avgProgress = getAvgChecklistProgress(goal.goalChecklists);
 
               return (
-                <div key={goal.goalId} className="dhp-goal-card">
-                  <div className="dhp-goal-header">
+                <div key={goal.goalId} className="dp-goal-card">
+                  <div className="dp-goal-header">
                     <div>
-                      <h5 className="dhp-goal-title">{goal.goalTitle}</h5>
-                      <p className="dhp-goal-description">{goal.goalDescription}</p>
+                      <h5 className="dp-goal-title">{goal.goalTitle}</h5>
+                      <p className="dp-goal-description">{goal.goalDescription}</p>
                     </div>
-                    <span className={`dhp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
+                    <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
                       {goal.goalstatus}
                     </span>
                   </div>
 
-                  <div className="dhp-progress-container">
-                    <div className="dhp-progress-label">
+                  <div className="dp-progress-container">
+                    <div className="dp-progress-label">
                       <span>Progress</span>
-                      <span className="dhp-progress-value">{avgProgress}%</span>
+                      <span className="dp-progress-value">{avgProgress}%</span>
                     </div>
-                    <div className="dhp-progress-bar-bg">
+                    <div className="dp-progress-bar-bg">
                       <div 
-                        className="dhp-progress-bar-fill" 
+                        className="dp-progress-bar-fill" 
                         style={{ width: `${avgProgress}%` }}
                       />
                     </div>
@@ -1497,7 +753,7 @@ export default function DeptHeadPage() {
 
   if (loading) {
     return (
-      <div className="dhp-loading-container">
+      <div className="dp-loading-container">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -1510,39 +766,39 @@ export default function DeptHeadPage() {
   // ========================
 
   return (
-    <div className="dhp-page">
+    <div className="dp-page">
       
       {/* Breadcrumb Navigation */}
-      <nav className="dhp-breadcrumb-nav" aria-label="breadcrumb">
-        <ol className="dhp-breadcrumb">
-          <li className="dhp-breadcrumb-item">
+      <nav className="dp-breadcrumb-nav" aria-label="breadcrumb">
+        <ol className="dp-breadcrumb">
+          <li className="dp-breadcrumb-item">
             <i className="bi bi-house-door"></i>
             <span>Dashboard</span>
           </li>
-          <li className="dhp-breadcrumb-item active" aria-current="page">
+          <li className="dp-breadcrumb-item active" aria-current="page">
             Department Head Dashboard
           </li>
         </ol>
       </nav>
 
       {/* Page Header */}
-      <div className="dhp-page-header">
-        <div className="dhp-header-content">
-          <div className="dhp-header-text">
-            <h2 className="dhp-page-title">Department Head Dashboard</h2>
-            <p className="dhp-page-description">
+      <div className="dp-page-header">
+        <div className="dp-header-content">
+          <div className="dp-header-text">
+            <h2 className="dp-page-title">Department Head Dashboard</h2>
+            <p className="dp-page-description">
               Review and approve employee performance assessments and track completed reviews
             </p>
           </div>
         </div>
-        <div className="dhp-header-actions">
+        <div className="dp-header-actions">
           {lastUpdated && (
-            <span className="dhp-last-updated-text">
+            <span className="dp-last-updated-text">
               <i className="bi bi-clock-history"></i>
               Last updated: {formatTime(lastUpdated)}
             </span>
           )}
-          <button className="dhp-btn-refresh" onClick={() => fetchData()}>
+          <button className="dp-btn-refresh" onClick={() => fetchData()}>
             <i className="bi bi-arrow-clockwise"></i>
             Refresh
           </button>
@@ -1550,9 +806,9 @@ export default function DeptHeadPage() {
       </div>
 
       {/* Tabs (Pending vs Approved) */}
-      <div className="dhp-tabs">
+      <div className="dp-tabs">
         <button
-          className={`dhp-tab-btn ${activeTab === "pending" ? "active" : ""}`}
+          className={`dp-tab-btn ${activeTab === "pending" ? "active" : ""}`}
           onClick={() => setActiveTab("pending")}
         >
           <i className="bi bi-hourglass-split me-2"></i>
@@ -1564,7 +820,7 @@ export default function DeptHeadPage() {
           )}
         </button>
         <button
-          className={`dhp-tab-btn ${activeTab === "approved" ? "active" : ""}`}
+          className={`dp-tab-btn ${activeTab === "approved" ? "active" : ""}`}
           onClick={() => setActiveTab("approved")}
         >
           <i className="bi bi-check-circle me-2"></i>
@@ -1573,16 +829,16 @@ export default function DeptHeadPage() {
       </div>
 
       {/* Filters Section */}
-      <div className="dhp-filters-card">
-        <div className="dhp-filters-content">
-          <div className="dhp-filters-left">
+      <div className="dp-filters-card">
+        <div className="dp-filters-content">
+          <div className="dp-filters-left">
             
             {/* Search Box */}
-            <div className="dhp-search-box">
-              <i className="bi bi-search dhp-search-icon"></i>
+            <div className="dp-search-box">
+              <i className="bi bi-search dp-search-icon"></i>
               <input
                 type="text"
-                className="dhp-search-input"
+                className="dp-search-input"
                 placeholder="Search employee or project..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -1591,7 +847,7 @@ export default function DeptHeadPage() {
 
             {/* Project Filter */}
             <select
-              className="dhp-filter-select"
+              className="dp-filter-select"
               value={filterProject}
               onChange={(e) => setFilterProject(e.target.value)}
             >
@@ -1604,7 +860,7 @@ export default function DeptHeadPage() {
             {/* Date Filter */}
             <input
               type="date"
-              className="dhp-filter-date"
+              className="dp-filter-date"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
             />
@@ -1613,37 +869,37 @@ export default function DeptHeadPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="dhp-stats-grid">
+      <div className="dp-stats-grid">
         
         {/* Total Pending */}
-        <div className="dhp-stat-card">
-          <div className="dhp-stat-icon dhp-stat-icon-warning">
+        <div className="dp-stat-card">
+          <div className="dp-stat-icon dp-stat-icon-warning">
             <i className="bi bi-hourglass-split"></i>
           </div>
-          <div className="dhp-stat-content">
-            <h3 className="dhp-stat-value">{pendingRequests.length}</h3>
-            <p className="dhp-stat-label">Pending Approvals</p>
+          <div className="dp-stat-content">
+            <h3 className="dp-stat-value">{pendingRequests.length}</h3>
+            <p className="dp-stat-label">Pending Approvals</p>
           </div>
         </div>
 
         {/* Total Approved */}
-        <div className="dhp-stat-card">
-          <div className="dhp-stat-icon dhp-stat-icon-success">
+        <div className="dp-stat-card">
+          <div className="dp-stat-icon dp-stat-icon-success">
             <i className="bi bi-check-circle-fill"></i>
           </div>
-          <div className="dhp-stat-content">
-            <h3 className="dhp-stat-value">{approvedRequests.length}</h3>
-            <p className="dhp-stat-label">Approved Employees</p>
+          <div className="dp-stat-content">
+            <h3 className="dp-stat-value">{approvedRequests.length}</h3>
+            <p className="dp-stat-label">Approved Employees</p>
           </div>
         </div>
 
         {/* Avg L2 Rating (Pending) */}
-        <div className="dhp-stat-card">
-          <div className="dhp-stat-icon dhp-stat-icon-primary">
+        <div className="dp-stat-card">
+          <div className="dp-stat-icon dp-stat-icon-primary">
             <i className="bi bi-star-fill"></i>
           </div>
-          <div className="dhp-stat-content">
-            <h3 className="dhp-stat-value">
+          <div className="dp-stat-content">
+            <h3 className="dp-stat-value">
               {(() => {
                 let total = 0;
                 let count = 0;
@@ -1657,28 +913,28 @@ export default function DeptHeadPage() {
                 return count > 0 ? (total / count).toFixed(1) : "0";
               })()}
             </h3>
-            <p className="dhp-stat-label">Avg L2 Rating</p>
+            <p className="dp-stat-label">Avg L2 Rating</p>
           </div>
         </div>
 
         {/* Total Goals */}
-        <div className="dhp-stat-card">
-          <div className="dhp-stat-icon dhp-stat-icon-danger">
+        <div className="dp-stat-card">
+          <div className="dp-stat-icon dp-stat-icon-danger">
             <i className="bi bi-bullseye"></i>
           </div>
-          <div className="dhp-stat-content">
-            <h3 className="dhp-stat-value">
+          <div className="dp-stat-content">
+            <h3 className="dp-stat-value">
               {pendingRequests.reduce((sum, emp) => sum + (emp.goals?.length || 0), 0)}
             </h3>
-            <p className="dhp-stat-label">Total Goals</p>
+            <p className="dp-stat-label">Total Goals</p>
           </div>
         </div>
       </div>
 
       {/* Data Table */}
-      <div className="dhp-table-card">
-        <div className="dhp-table-wrapper">
-          <table className="dhp-table">
+      <div className="dp-table-card">
+        <div className="dp-table-wrapper">
+          <table className="dp-table">
             <thead>
               <tr>
                 <th>Employee</th>
@@ -1694,7 +950,7 @@ export default function DeptHeadPage() {
             <tbody>
               {getPaginatedData().length === 0 ? (
                 <tr>
-                  <td colSpan={activeTab === "approved" ? "8" : "7"} className="dhp-empty-state">
+                  <td colSpan={activeTab === "approved" ? "8" : "7"} className="dp-empty-state">
                     <i className="bi bi-inbox"></i>
                     <p>No {activeTab === "pending" ? "pending approvals" : "approved employees"} found</p>
                   </td>
@@ -1705,11 +961,11 @@ export default function DeptHeadPage() {
                     <tr>
                       {/* Employee Info */}
                       <td>
-                        <div className="dhp-user-info">
-                          <div className="dhp-user-avatar">{getInitials(emp.employeeName)}</div>
+                        <div className="dp-user-info">
+                          <div className="dp-user-avatar">{getInitials(emp.employeeName)}</div>
                           <div>
-                            <span className="dhp-user-name">{emp.employeeName}</span>
-                            <small className="dhp-user-id">@{emp.employeeCompanyId}</small>
+                            <span className="dp-user-name">{emp.employeeName}</span>
+                            <small className="dp-user-id">@{emp.employeeCompanyId}</small>
                           </div>
                         </div>
                       </td>
@@ -1719,28 +975,28 @@ export default function DeptHeadPage() {
                       
                       {/* Avg Emp Rating */}
                       <td>
-                        <span className="dhp-rating-badge emp-rating">
+                        <span className="dp-rating-badge emp-rating">
                           {getAvgRating(emp.competencies, "employeeRating")}
                         </span>
                       </td>
                       
                       {/* Avg L1 Rating */}
                       <td>
-                        <span className="dhp-rating-badge l1-rating">
+                        <span className="dp-rating-badge l1-rating">
                           {getAvgRating(emp.competencies, "l1Rating")}
                         </span>
                       </td>
                       
                       {/* Avg L2 Rating */}
                       <td>
-                        <span className="dhp-rating-badge l2-rating">
+                        <span className="dp-rating-badge l2-rating">
                           {getAvgRating(emp.competencies, "l2Rating")}
                         </span>
                       </td>
                       
                       {/* Goals */}
                       <td>
-                        <span className="dhp-goals-badge">
+                        <span className="dp-goals-badge">
                           <i className="bi bi-bullseye"></i>
                           {emp.goals?.length || 0}
                         </span>
@@ -1753,18 +1009,18 @@ export default function DeptHeadPage() {
                       
                       {/* Actions */}
                       <td>
-                        <div className="dhp-action-buttons">
+                        <div className="dp-action-buttons">
                           {activeTab === "pending" ? (
                             <>
                               <button
-                                className="dhp-action-btn dhp-action-btn-view"
+                                className="dp-action-btn dp-action-btn-view"
                                 onClick={() => handleViewDetails(emp)}
                                 title="View Details"
                               >
                                 <i className="bi bi-eye"></i>
                               </button>
                               <button
-                                className="dhp-action-btn dhp-action-btn-approve"
+                                className="dp-action-btn dp-action-btn-approve"
                                 onClick={() => handleApproveClick(emp)}
                                 title="Approve"
                               >
@@ -1773,7 +1029,7 @@ export default function DeptHeadPage() {
                             </>
                           ) : (
                             <button
-                              className="dhp-action-btn dhp-action-btn-view"
+                              className="dp-action-btn dp-action-btn-view"
                               onClick={() => handleViewDetails(emp)}
                               title="View Details"
                             >
@@ -1792,13 +1048,13 @@ export default function DeptHeadPage() {
 
         {/* Pagination */}
         {filteredData.length > 0 && (
-          <div className="dhp-pagination-container">
+          <div className="dp-pagination-container">
             
             {/* Rows Per Page Selector */}
-            <div className="dhp-pagination-info">
-              <span className="dhp-pagination-label">Show</span>
+            <div className="dp-pagination-info">
+              <span className="dp-pagination-label">Show</span>
               <select
-                className="dhp-pagination-select"
+                className="dp-pagination-select"
                 value={rowsPerPage}
                 onChange={(e) => {
                   setRowsPerPage(Number(e.target.value));
@@ -1809,22 +1065,22 @@ export default function DeptHeadPage() {
                 <option value="25">25</option>
                 <option value="50">50</option>
               </select>
-              <span className="dhp-pagination-label">entries</span>
+              <span className="dp-pagination-label">entries</span>
             </div>
 
             {/* Pagination Status */}
-            <div className="dhp-pagination-status">
+            <div className="dp-pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredData.length)} of{" "}
               {filteredData.length} entries
             </div>
 
             {/* Pagination Navigation */}
-            <nav className="dhp-pagination-nav">
-              <ul className="dhp-pagination">
-                <li className={`dhp-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+            <nav className="dp-pagination-nav">
+              <ul className="dp-pagination">
+                <li className={`dp-page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
-                    className="dhp-page-link"
+                    className="dp-page-link"
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                   >
@@ -1835,12 +1091,12 @@ export default function DeptHeadPage() {
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`dhp-page-item ${
+                    className={`dp-page-item ${
                       page === currentPage ? "active" : ""
                     } ${typeof page !== "number" ? "disabled" : ""}`}
                   >
                     <button
-                      className="dhp-page-link"
+                      className="dp-page-link"
                       onClick={() => typeof page === "number" && setCurrentPage(page)}
                       disabled={typeof page !== "number"}
                     >
@@ -1849,9 +1105,9 @@ export default function DeptHeadPage() {
                   </li>
                 ))}
 
-                <li className={`dhp-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <li className={`dp-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                   <button
-                    className="dhp-page-link"
+                    className="dp-page-link"
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                   >

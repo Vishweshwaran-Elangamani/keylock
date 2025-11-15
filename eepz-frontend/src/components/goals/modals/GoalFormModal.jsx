@@ -560,19 +560,24 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-          <div className="modal-content">
+          <div className="modal-content" >
             <div className="modal-header">
               <h5 className="modal-title">
-                {isEdit ? "✏️ Edit Goal" : "➕ Create New Goal"}
+                {isEdit ? "Edit Goal" : "Create New Goal"}
               </h5>
               <button type="button" className="btn-close" onClick={onClose} />
             </div>
 
             <div
-              className="modal-body"
-              ref={modalBodyRef}
-              style={{ maxHeight: "70vh", overflowY: "auto" }}
-            >
+  className="modal-body"
+  ref={modalBodyRef}
+  style={{
+    maxHeight: "70vh",
+    overflowY: "auto",
+    msOverflowStyle: "none",   // IE and Edge
+    scrollbarWidth: "none"     // Firefox
+  }}
+>
               {alert && (
                 <Alert
                   type={alert.type}

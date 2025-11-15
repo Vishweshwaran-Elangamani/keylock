@@ -1,3 +1,17 @@
+/**
+ * Login Component
+ * 
+ * Handles user authentication and login flow.
+ * Features:
+ * - Email and password validation
+ * - Two-factor authentication support
+ * - First-time login handling
+ * - Remember me functionality
+ * - Toast notifications using Sonner
+ * - Responsive design with welcome card
+ * 
+ * @component
+ */
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,28 +21,56 @@ import { toast } from "sonner";
 import "../../../styles/auth/auth.css";
 
 const Login = () => {
-  // Form state management
+  // ========================
+  // STATE MANAGEMENT
+  // ========================
+
+  /**
+   * Form data state - stores email, password, and remember me checkbox
+   */
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
   
-  // UI state management
+  /**
+   * Show password state - controls password visibility
+   */
   const [showPassword, setShowPassword] = useState(false);
+
+  /**
+   * Error state - stores general error messages
+   */
   const [error, setError] = useState("");
+
+  /**
+   * Loading state - tracks form submission status
+   */
   const [loading, setLoading] = useState(false);
   
-  // Validation state management
+  /**
+   * Errors state - stores field-specific validation errors
+   */
   const [errors, setErrors] = useState({});
+
+  /**
+   * Touched state - tracks which fields have been interacted with
+   */
   const [touched, setTouched] = useState({
     email: false,
     password: false,
   });
 
-  // Hooks
+  // ========================
+  // HOOKS
+  // ========================
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // ========================
+  // VALIDATION FUNCTIONS
+  // ========================
 
   /**
    * Validates email format using regex pattern
@@ -38,53 +80,6 @@ const Login = () => {
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  };
-
-  /**
-   * Handles input changes and updates form state
-   * Also triggers validation for touched fields
-   * @param {Event} e - Input change event
-   */
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-
-    // Update form data
-    setFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-
-    // Clear field-specific error
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-
-    // Clear general error message
-    if (error) {
-      setError("");
-    }
-
-    // Validate field if it has been touched
-    if (touched[name]) {
-      validateField(name, newValue);
-    }
-  };
-
-  /**
-   * Handles field blur event to mark field as touched
-   * @param {Event} e - Blur event
-   */
-  const handleBlur = (e) => {
-    const { name } = e.target;
-    setTouched((prev) => ({
-      ...prev,
-      [name]: true,
-    }));
-    validateField(name, formData[name]);
   };
 
   /**
@@ -153,6 +148,57 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // ========================
+  // EVENT HANDLERS
+  // ========================
+
+  /**
+   * Handles input changes and updates form state
+   * Also triggers validation for touched fields
+   * @param {Event} e - Input change event
+   */
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+
+    // Update form data
+    setFormData((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+
+    // Clear field-specific error
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+
+    // Clear general error message
+    if (error) {
+      setError("");
+    }
+
+    // Validate field if it has been touched
+    if (touched[name]) {
+      validateField(name, newValue);
+    }
+  };
+
+  /**
+   * Handles field blur event to mark field as touched
+   * @param {Event} e - Blur event
+   */
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+    validateField(name, formData[name]);
+  };
+
   /**
    * Security function to prevent password paste
    * @param {Event} e - Paste event
@@ -183,6 +229,10 @@ const Login = () => {
     return false;
   };
 
+  // ========================
+  // ROUTING LOGIC
+  // ========================
+
   /**
    * Determines the dashboard route based on user role
    * @param {string} roleName - User's role name
@@ -207,6 +257,10 @@ const Login = () => {
 
     return route;
   };
+
+  // ========================
+  // FORM SUBMISSION
+  // ========================
 
   /**
    * Handles form submission
@@ -412,22 +466,26 @@ const Login = () => {
     }
   };
 
+  // ========================
+  // RENDER LOGIC
+  // ========================
   return (
-    <div className="auth-page">
+    <div className="eepz-login-page">
       <div className="container-fluid h-100 g-0">
         <div className="row g-0 h-100">
-          {/* Left Side - Login Form */}
+          
+          {/* ======================== */}
+          {/* LEFT SIDE - LOGIN FORM */}
+          {/* ======================== */}
           <div className="col-lg-6 d-flex align-items-center justify-content-center bg-white p-4">
-            <div className="login-form-container">
+            <div className="eepz-login-form-container">
+              
               {/* Header Section */}
               <div className="text-center mb-4">
                 <img
-                  src="/logodarkfull.png"
+                  src="/logo.png"
                   alt="EEPZ Logo"
-                  className="logo-img mb-3"
-                  style={{
-                    width: "450px"
-                  }}
+                  className="eepz-logo-img mb-3"
                 />
                 <h2 className="fw-bold mb-2" style={{ color: "#2d3565" }}>
                   Sign In to Your Account
@@ -437,9 +495,9 @@ const Login = () => {
                 </p>
               </div>
 
-              {/* Error Alert - Keeping existing error display for compatibility */}
+              {/* Error Alert */}
               {error && (
-                <div className="alert alert-danger d-flex align-items-start mb-4 animate-slide-in">
+                <div className="alert alert-danger d-flex align-items-start mb-4 eepz-animate-slide-in">
                   <i
                     className="bi bi-exclamation-triangle-fill me-2 mt-1"
                     style={{ fontSize: "1.25rem" }}
@@ -453,42 +511,34 @@ const Login = () => {
 
               {/* Login Form */}
               <form onSubmit={handleSubmit} noValidate autoComplete="off">
+                
                 {/* Email Field */}
                 <div className="mb-4">
                   <label htmlFor="email" className="form-label fw-semibold">
                     <i className="bi bi-envelope me-2"></i>
                     Email Address
                   </label>
-                  <div className="email-input-wrapper">
-                    <input
-                      type="email"
-                      className={`form-control form-control-lg ${
-                        errors.email ? "is-invalid" : ""
-                      } ${
-                        touched.email && !errors.email && formData.email
-                          ? "is-valid"
-                          : ""
-                      }`}
-                      id="email"
-                      name="email"
-                      placeholder="your.email@eepz.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      autoComplete="username"
-                      disabled={loading}
-                    />
-                    {/* Email validation icon */}
-                    {touched.email && formData.email && (
-                      <div className="email-validation-icon">
-                        {!errors.email ? (
-                          <i className="bi bi-check-circle-fill text-success"></i>
-                        ) : (
-                          <i className="bi bi-x-circle-fill text-danger"></i>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <div className="eepz-email-input-wrapper">
+  <input
+    type="email"
+    className={`form-control form-control-lg ${
+      errors.email ? "is-invalid" : ""
+    } ${
+      touched.email && !errors.email && formData.email
+        ? "is-valid"
+        : ""
+    }`}
+    id="email"
+    name="email"
+    placeholder="your.email@eepz.com"
+    value={formData.email}
+    onChange={handleChange}
+    onBlur={handleBlur}
+    autoComplete="username"
+    disabled={loading}
+  />
+</div>
+
                   {/* Email error message */}
                   {errors.email && touched.email && (
                     <div className="invalid-feedback d-block">
@@ -504,7 +554,7 @@ const Login = () => {
                     <i className="bi bi-lock me-2"></i>
                     Password
                   </label>
-                  <div className="password-input-wrapper">
+                  <div className="eepz-password-input-wrapper">
                     <input
                       type={showPassword ? "text" : "password"}
                       className={`form-control form-control-lg ${
@@ -524,7 +574,7 @@ const Login = () => {
                     />
                     {/* Password visibility toggle button */}
                     <button
-                      className="password-toggle-btn"
+                      className="eepz-password-toggle-btn"
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex="-1"
@@ -551,7 +601,7 @@ const Login = () => {
                   <div className="form-check">
                     <input
                       type="checkbox"
-                      className="form-check-input"
+                      className="form-check-input eepz-form-check-input"
                       id="rememberMe"
                       name="rememberMe"
                       checked={formData.rememberMe}
@@ -564,7 +614,7 @@ const Login = () => {
                   </div>
                   <a
                     href="/reset-password"
-                    className="text-decoration-none fw-semibold"
+                    className="text-decoration-none fw-semibold eepz-forgot-link"
                     style={{ color: "#5a9fd4" }}
                     onClick={(e) => {
                       e.preventDefault();
@@ -578,7 +628,7 @@ const Login = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="btn btn-primary btn-lg w-100"
+                  className="btn btn-primary btn-lg w-100 eepz-submit-btn"
                   disabled={loading}
                   style={{
                     background: loading
@@ -615,10 +665,12 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Right Side - Welcome Card */}
-          <div className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center login-right-bg">
-            <div className="info-card-wrapper">
-              <div className="info-badge mb-4">
+          {/* ======================== */}
+          {/* RIGHT SIDE - WELCOME CARD */}
+          {/* ======================== */}
+          <div className="col-lg-6 d-none d-lg-flex align-items-center justify-content-center eepz-login-right-bg">
+            <div className="eepz-info-card-wrapper">
+              <div className="eepz-info-badge mb-4">
                 <i className="bi bi-shield-lock me-2"></i>
                 Secure Access
               </div>
@@ -627,7 +679,9 @@ const Login = () => {
                 className="text-white fw-bold mb-3"
                 style={{ fontSize: "2.5rem", lineHeight: "1.2" }}
               >
-                Welcome to EEPZ
+                Welcome to the
+                <br />
+                EEPZ Portal
               </h1>
 
               <p
@@ -637,17 +691,17 @@ const Login = () => {
                 Employee Engagement Platform
               </p>
 
-              <div className="welcome-card">
+              <div className="eepz-welcome-card">
                 <h3 className="fw-bold mb-3" style={{ color: "#2d3565" }}>
                   Everything You Need
                 </h3>
-                <ul style={{ listStyle: "none", padding: 0, textAlign: "left" }}>
+                <ul className="eepz-welcome-list">
                   <li className="mb-3">
                     <i
                       className="bi bi-check-circle-fill me-2"
                       style={{ color: "#5a9fd4" }}
                     ></i>
-                    Align your goals and achieve more, together.
+                    Align your goals and achieve more, together
                   </li>
                   <li className="mb-3">
                     <i
@@ -661,28 +715,21 @@ const Login = () => {
                       className="bi bi-check-circle-fill me-2"
                       style={{ color: "#5a9fd4" }}
                     ></i>
-                    Advance through transparent performance and recognition.
+                    Advance through transparent performance and recognition
                   </li>
                   <li>
                     <i
                       className="bi bi-check-circle-fill me-2"
                       style={{ color: "#5a9fd4" }}
                     ></i>
-                    Connect and collaborate within your organization.
-                  </li>
-                  <li>
-                    <i
-                      className="bi bi-check-circle-fill me-2"
-                      style={{ color: "#5a9fd4" }}
-                    ></i>
-                    Align your goals, track your growth, and unlock new opportunities.
+                    Connect and collaborate within your organization
                   </li>
                 </ul>
               </div>
 
               <p className="text-white-50 text-center mt-5 small">
                 <i className="bi bi-lightbulb me-2"></i>
-                Stay connected, stay informed, and grow within the organization
+                Align your goals, track your growth, and unlock new opportunities
               </p>
             </div>
           </div>

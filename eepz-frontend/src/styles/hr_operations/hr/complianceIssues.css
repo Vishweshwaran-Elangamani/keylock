@@ -56,7 +56,7 @@
 /* STATS CARDS */
 .ci-stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-bottom: 32px;
 }
@@ -141,6 +141,12 @@
   color: #ffffff;
 }
 
+/* NEW: SLA Escalations Stat Card */
+.stat-escalations .ci-stat-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #ffffff;
+}
+
 .ci-stat-content {
   flex: 1;
 }
@@ -160,6 +166,36 @@
   color: #1e293b;
   line-height: 1;
   transition: all 0.3s ease;
+}
+
+/* NEW: TABS STYLING */
+.ci-tabs {
+  margin-bottom: 24px;
+}
+
+.ci-tabs .nav-link {
+  font-weight: 500;
+  color: #64748b;
+  padding: 12px 20px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.ci-tabs .nav-link:hover {
+  color: #2563eb;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.ci-tabs .nav-link.active {
+  color: #3b82f6;
+  border-bottom: 2px solid #3b82f6;
+  background: transparent;
+}
+
+.ci-tabs .nav-link i {
+  font-size: 16px;
 }
 
 /* REDUCED FILTERS SECTION WITH STYLED CLEAR BUTTON */
@@ -314,14 +350,14 @@
 /* COMPACT VIOLATIONS SECTION */
 .ci-violations-container {
   display: grid;
-  gap: 16px; /*  Reduced from 20px to 16px */
+  gap: 16px;
 }
 
 /* Compact Violation Card */
 .ci-violation-card {
   background: #ffffff;
   border-radius: 12px;
-  padding: 16px 20px; 
+  padding: 16px 20px;
   box-shadow: 0 2px 8px rgba(44, 39, 98, 0.08);
   border: 2px solid #e2e8f0;
   transition: all 0.3s ease;
@@ -337,18 +373,20 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px; 
-  padding-bottom: 12px; 
+  margin-bottom: 12px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #e2e8f0;
 }
 
 .ci-employee-name {
-  font-size: 16px; 
+  font-size: 16px;
   font-weight: 700;
   color: #1e293b;
   margin: 0 0 6px 0;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .ci-employee-id {
@@ -358,9 +396,9 @@
 }
 
 .ci-status-badge {
-  font-size: 12px; 
+  font-size: 12px;
   font-weight: 600;
-  padding: 4px 12px; 
+  padding: 4px 12px;
   border-radius: 20px;
 }
 
@@ -368,18 +406,18 @@
 .ci-violation-details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px; 
-  margin-bottom: 12px; 
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .ci-detail-row {
   display: flex;
   flex-direction: column;
-  gap: 3px; /
+  gap: 3px;
 }
 
 .ci-detail-label {
-  font-size: 11px; 
+  font-size: 11px;
   font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
@@ -387,21 +425,27 @@
 }
 
 .ci-detail-value {
-  font-size: 13px; 
+  font-size: 13px;
   color: #1e293b;
   font-weight: 500;
 }
 
+/* NEW: Highlight danger text for escalations */
+.ci-highlight-danger {
+  color: #dc3545;
+  font-weight: 600;
+}
+
 /* Compact Description */
 .ci-violation-description {
-  margin-bottom: 12px; 
-  padding: 12px; 
+  margin-bottom: 12px;
+  padding: 12px;
   background: #f8f9fc;
   border-radius: 8px;
 }
 
 .ci-violation-description strong {
-  font-size: 11px; 
+  font-size: 11px;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -410,28 +454,29 @@
 }
 
 .ci-violation-description p {
-  font-size: 13px; 
+  font-size: 13px;
   color: #334155;
   margin: 0;
-  line-height: 1.5; 
+  line-height: 1.5;
 }
 
-/*  Compact Actions */
+/* Compact Actions */
 .ci-violation-actions {
   display: flex;
-  gap: 10px; 
+  gap: 10px;
 }
 
 .ci-btn {
   padding: 7px 14px;
   border-radius: 6px;
-  font-size: 13px; 
+  font-size: 13px;
   font-weight: 500;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
+  gap: 4px;
 }
 
 .ci-btn-view {
@@ -526,7 +571,7 @@
 /* Responsive */
 @media (max-width: 1200px) {
   .ci-stats-row {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -587,5 +632,10 @@
   .ci-results-count {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .ci-tabs .nav-link {
+    font-size: 13px;
+    padding: 10px 14px;
   }
 }

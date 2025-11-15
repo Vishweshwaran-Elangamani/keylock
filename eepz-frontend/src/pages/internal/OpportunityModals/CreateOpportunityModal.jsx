@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import "../../../styles/internal/OpportunityModal.css";
 
 const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, departments }) => {
@@ -15,6 +15,25 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // ✅ Calculate min and max dates (no blocking, just calendar restrictions)
+  const { minDate, maxDate } = useMemo(() => {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    
+    // Min date: today
+    const min = today.toISOString().split("T")[0];
+    
+    // Max date: April 30th of current year (or next year if we're past April)
+    const currentMonth = today.getMonth();
+    const aprilDeadlineYear = currentMonth >= 3 ? currentYear + 1 : currentYear;
+    const max = `${aprilDeadlineYear}-04-30`;
+
+    return {
+      minDate: min,
+      maxDate: max,
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,8 +76,16 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
       const deadlineDate = new Date(formData.deadline);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      
+      // Check if deadline is in the past
       if (deadlineDate < today) {
         newErrors.deadline = "Deadline cannot be in the past";
+      }
+      
+      // Check if deadline is after April 30th
+      const maxDeadline = new Date(maxDate);
+      if (deadlineDate > maxDeadline) {
+        newErrors.deadline = `Deadline cannot be after April 30th, ${maxDeadline.getFullYear()}`;
       }
     }
 
@@ -77,29 +104,22 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
     try {
       setLoading(true);
 
-      // ⭐ Format for C# DateOnly - plain "YYYY-MM-DD" format
       const payload = {
         opportunityName: formData.opportunityName.trim(),
         departmentId: parseInt(formData.departmentId),
         description: formData.description.trim(),
         requirements: formData.requirements.trim(),
         eligibilityCriteria: formData.eligibilityCriteria.trim() || "",
-        deadline: formData.deadline, // MUST be "YYYY-MM-DD" format
+        deadline: formData.deadline,
         status: formData.status,
       };
 
-      // DETAILED LOGGING FOR DEBUGGING
       console.log("📤 Full payload:", JSON.stringify(payload, null, 2));
-      console.log("📅 Deadline:", payload.deadline);
-      console.log("🏢 DepartmentId:", payload.departmentId);
 
       const response = await internalOpportunityService.createOpportunity(payload);
 
-      console.log("✅ Response:", response);
-
       if (response.success || response.data) {
         toast.success("Opportunity created successfully!");
-        // Reset form
         setFormData({
           opportunityName: "",
           departmentId: "",
@@ -117,8 +137,6 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
       }
     } catch (error) {
       console.error("❌ Error:", error);
-      console.error("❌ Response:", error.response?.data);
-      console.error("❌ Status:", error.response?.status);
 
       const errorMessage =
         error.response?.data?.message ||
@@ -183,8 +201,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     <input
                       type="text"
                       name="opportunityName"
-                      className={`form-input-custom ${errors.opportunityName ? "is-invalid" : ""
-                        }`}
+                      className={`form-input-custom ${errors.opportunityName ? "is-invalid" : ""}`}
                       placeholder="e.g., Senior Java Developer - Project Phoenix"
                       value={formData.opportunityName}
                       onChange={handleChange}
@@ -202,8 +219,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     </label>
                     <select
                       name="departmentId"
-                      className={`form-select-custom ${errors.departmentId ? "is-invalid" : ""
-                        }`}
+                      className={`form-select-custom ${errors.departmentId ? "is-invalid" : ""}`}
                       value={formData.departmentId}
                       onChange={handleChange}
                     >
@@ -219,7 +235,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     )}
                   </div>
 
-                  {/* Deadline */}
+                  {/* Deadline - ONLY CALENDAR RESTRICTION */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
                       Application Deadline <span className="required-mark">*</span>
@@ -227,15 +243,18 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     <input
                       type="date"
                       name="deadline"
-                      className={`form-input-custom ${errors.deadline ? "is-invalid" : ""
-                        }`}
+                      className={`form-input-custom ${errors.deadline ? "is-invalid" : ""}`}
                       value={formData.deadline}
                       onChange={handleChange}
-                      min={new Date().toISOString().split("T")[0]}
+                      min={minDate}
+                      max={maxDate}
                     />
                     {errors.deadline && (
                       <div className="error-message">{errors.deadline}</div>
                     )}
+                    <small className="form-text-helper">
+                      Select a date between {new Date(minDate).toLocaleDateString()} and {new Date(maxDate).toLocaleDateString()}
+                    </small>
                   </div>
 
                   {/* Description */}
@@ -245,8 +264,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     </label>
                     <textarea
                       name="description"
-                      className={`form-textarea-custom ${errors.description ? "is-invalid" : ""
-                        }`}
+                      className={`form-textarea-custom ${errors.description ? "is-invalid" : ""}`}
                       placeholder="Provide detailed description of the opportunity..."
                       value={formData.description}
                       onChange={handleChange}
@@ -265,8 +283,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     </label>
                     <textarea
                       name="requirements"
-                      className={`form-textarea-custom ${errors.requirements ? "is-invalid" : ""
-                        }`}
+                      className={`form-textarea-custom ${errors.requirements ? "is-invalid" : ""}`}
                       placeholder="List required skills and qualifications..."
                       value={formData.requirements}
                       onChange={handleChange}

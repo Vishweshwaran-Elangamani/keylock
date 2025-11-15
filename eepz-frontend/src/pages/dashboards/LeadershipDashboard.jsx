@@ -42,7 +42,8 @@ const LeadershipDashboard = () => {
       icon: "bi bi-book",
       gradient: "gradient-pink",
       path: "/leadership/lnd/dashboard",
-    },
+    }
+
   ];
   return (
     <div className="dashboard-container">
