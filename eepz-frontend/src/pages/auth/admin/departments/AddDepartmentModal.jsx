@@ -61,7 +61,7 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error("Please fix the form errors");
+      toast.error("Enter Valid Details!");
       return;
     }
 

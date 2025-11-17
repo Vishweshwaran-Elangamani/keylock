@@ -16,7 +16,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import api from "../../../services/performancemanagement/hr/api";
-import logoImage from "../../../assets/explogodark.png";
+import logoImage from "../../../assets/logodarkfull.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
 
 // Utility function to get days and hours left

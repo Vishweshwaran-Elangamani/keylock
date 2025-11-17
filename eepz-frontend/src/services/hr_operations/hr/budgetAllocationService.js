@@ -189,6 +189,34 @@ const budgetAllocationService = {
       );
     }
   },
+  // Add to existing budgetAllocationService.js after line 180
+
+  // ========== HR: CREATE SUB-ALLOCATION FROM PERIOD ==========
+  createFundAllocationFromPeriod: async (allocationData) => {
+    try {
+      console.log("📊 Creating fund allocation from period:", allocationData);
+      const response = await hrApi.post("/FundAllocation/create", {
+        budgetId: allocationData.budgetId,
+        departmentId: allocationData.departmentId,
+        allocationType: allocationData.allocationType,
+        amount: allocationData.amount,
+        goalStatus: allocationData.goalStatus || "Approved",
+        notes: allocationData.notes || "",
+        allocatedByUserId: allocationData.allocatedByUserId,
+        period: allocationData.period,  // ✅ NEW
+        periodYear: allocationData.periodYear,  // ✅ NEW
+      });
+      console.log("✅ Fund allocation created:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error creating fund allocation:", error);
+      throw (
+        error.response?.data || {
+          message: "Failed to create fund allocation",
+        }
+      );
+    }
+  },
 
   // HR/DEPTHEAD: Update Utilized Amount
   updateUtilizedAmount: async (budgetData) => {
@@ -228,6 +256,26 @@ getBudgetAllocationsByBudget: async (budgetId) => {
     );
   }
 },
+
+// Add this method to budgetAllocationService.js
+
+  // ========== GET FUND ALLOCATIONS BY DEPARTMENT ==========
+  getFundAllocationsByDepartment: async (departmentId) => {
+    try {
+      console.log("📊 Fetching fund allocations for department:", departmentId);
+      const response = await hrApi.get(`/FundAllocation/by-department/${departmentId}`);
+      console.log("✅ Fund allocations by department:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ Error fetching fund allocations by department:", error);
+      throw (
+        error.response?.data || {
+          message: "Failed to fetch fund allocations by department",
+        }
+      );
+    }
+  },
+
 
 
   // GET: Budget Allocations by Type

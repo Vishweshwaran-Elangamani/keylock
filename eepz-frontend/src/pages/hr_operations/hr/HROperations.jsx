@@ -46,15 +46,11 @@ const HROperations = () => {
       label: "Compliance",
       path: "/hr/operations/compliance",
     },
-    {
-      key: "budget",
-      label: "Budget",
-      path: "/hr/operations/budget-allocation",
-    },
+    
     // ✅ NEW: Period Allocations Tab
     {
       key: "period-allocations",
-      label: "Period Allocations",
+      label: "Budget Allocations",
       path: "/hr/operations/period-allocations",
     },
     { key: "workload", label: "Workload", path: "/hr/operations/workload" },

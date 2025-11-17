@@ -252,7 +252,7 @@ const EditUserModal = ({
 
     // Validate form before submission
     if (!validateForm()) {
-      toast.error("Please fix the form errors");
+      toast.error("Enter Valid Details!");
       return;
     }
 

@@ -12,19 +12,13 @@
  * 
  * @component
  */
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
 import "../../../styles/auth/auth.css";
-
 const Login = () => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-
   /**
    * Form data state - stores email, password, and remember me checkbox
    */
@@ -33,27 +27,22 @@ const Login = () => {
     password: "",
     rememberMe: false,
   });
-  
   /**
    * Show password state - controls password visibility
    */
   const [showPassword, setShowPassword] = useState(false);
-
   /**
    * Error state - stores general error messages
    */
   const [error, setError] = useState("");
-
   /**
    * Loading state - tracks form submission status
    */
   const [loading, setLoading] = useState(false);
-  
   /**
    * Errors state - stores field-specific validation errors
    */
   const [errors, setErrors] = useState({});
-
   /**
    * Touched state - tracks which fields have been interacted with
    */
@@ -61,17 +50,8 @@ const Login = () => {
     email: false,
     password: false,
   });
-
-  // ========================
-  // HOOKS
-  // ========================
   const navigate = useNavigate();
   const { login } = useAuth();
-
-  // ========================
-  // VALIDATION FUNCTIONS
-  // ========================
-
   /**
    * Validates email format using regex pattern
    * @param {string} email - Email address to validate
@@ -81,7 +61,6 @@ const Login = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-
   /**
    * Validates individual form field
    * @param {string} name - Field name to validate
@@ -90,8 +69,6 @@ const Login = () => {
    */
   const validateField = (name, value) => {
     const newErrors = { ...errors };
-
-    // Email validation
     if (name === "email") {
       if (!value.trim()) {
         newErrors.email = "Email is required";
@@ -101,8 +78,6 @@ const Login = () => {
         delete newErrors.email;
       }
     }
-
-    // Password validation
     if (name === "password") {
       if (!value) {
         newErrors.password = "Password is required";
@@ -114,26 +89,20 @@ const Login = () => {
         delete newErrors.password;
       }
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   /**
    * Validates entire form before submission
    * @returns {boolean} - Returns true if form is valid
    */
   const validateForm = () => {
     const newErrors = {};
-
-    // Email validation
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!validateEmail(formData.email.trim())) {
       newErrors.email = "Please enter a valid email address";
     }
-
-    // Password validation
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
@@ -141,17 +110,10 @@ const Login = () => {
     } else if (formData.password.length > 50) {
       newErrors.password = "Password must not exceed 50 characters";
     }
-
     setErrors(newErrors);
     setTouched({ email: true, password: true });
-
     return Object.keys(newErrors).length === 0;
   };
-
-  // ========================
-  // EVENT HANDLERS
-  // ========================
-
   /**
    * Handles input changes and updates form state
    * Also triggers validation for touched fields
@@ -160,32 +122,23 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
-
-    // Update form data
     setFormData((prev) => ({
       ...prev,
       [name]: newValue,
     }));
-
-    // Clear field-specific error
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
     }
-
-    // Clear general error message
     if (error) {
       setError("");
     }
-
-    // Validate field if it has been touched
     if (touched[name]) {
       validateField(name, newValue);
     }
   };
-
   /**
    * Handles field blur event to mark field as touched
    * @param {Event} e - Blur event
@@ -198,7 +151,6 @@ const Login = () => {
     }));
     validateField(name, formData[name]);
   };
-
   /**
    * Security function to prevent password paste
    * @param {Event} e - Paste event
@@ -208,7 +160,6 @@ const Login = () => {
     toast.warning("Password pasting is disabled for security");
     return false;
   };
-
   /**
    * Security function to prevent password copy
    * @param {Event} e - Copy event
@@ -218,7 +169,6 @@ const Login = () => {
     toast.warning("Password copying is disabled for security");
     return false;
   };
-
   /**
    * Security function to prevent password cut
    * @param {Event} e - Cut event
@@ -228,11 +178,6 @@ const Login = () => {
     toast.warning("Password cutting is disabled for security");
     return false;
   };
-
-  // ========================
-  // ROUTING LOGIC
-  // ========================
-
   /**
    * Determines the dashboard route based on user role
    * @param {string} roleName - User's role name
@@ -240,9 +185,7 @@ const Login = () => {
    */
   const getDashboardRoute = (roleName) => {
     console.log("Role received:", roleName);
-
     const normalizedRole = roleName?.toUpperCase().replace(/\s+/g, "");
-
     const routes = {
       ADMIN: "/admin/dashboard",
       HR: "/hr/dashboard",
@@ -251,17 +194,10 @@ const Login = () => {
       MANAGER: "/manager/dashboard",
       EMPLOYEE: "/employee/dashboard",
     };
-
     const route = routes[normalizedRole] || "/employee/dashboard";
     console.log("Navigating to:", route);
-
     return route;
   };
-
-  // ========================
-  // FORM SUBMISSION
-  // ========================
-
   /**
    * Handles form submission
    * @param {Event} e - Form submit event
@@ -272,39 +208,27 @@ const Login = () => {
       e.preventDefault();
       e.stopPropagation();
     }
-
     setError("");
-
-    // Validate form before submission
     if (!validateForm()) {
-      toast.error("Please fix the form errors before submitting");
+      toast.error("Enter Valid Details!");
       return false;
     }
-
-    // Show loading toast and perform login
     toast.loading("Signing in...");
     performLogin();
     return false;
   };
-
   /**
    * Performs the login API call and handles authentication flow
    */
   const performLogin = async () => {
     setLoading(true);
-
     try {
       console.log("Login attempt:", formData.email);
-
-      // Call login service
       const response = await authService.login(
         formData.email,
         formData.password
       );
-
       console.log("Full Backend Response:", response);
-
-      // Check if response is successful
       if (!response.success || !response.data) {
         const errorMessage =
           response.message ||
@@ -315,32 +239,22 @@ const Login = () => {
         setLoading(false);
         return;
       }
-
       const data = response.data;
-
-      // Handle two-factor authentication requirement
       if (data.requiresTwoFactor) {
         toast.dismiss();
         toast.info("Two-factor authentication required");
-
-        // Store temporary user data
         localStorage.setItem(
           "tempUser",
           JSON.stringify({
             email: formData.email,
           })
         );
-
         navigate("/verify-code", { replace: false });
         return;
       }
-
-      // Handle first-time login password reset requirement
       if (data.requiresPasswordReset) {
         toast.dismiss();
         toast.info("Password reset required for first login");
-
-        // Store temporary user data
         localStorage.setItem(
           "tempUser",
           JSON.stringify({
@@ -349,7 +263,6 @@ const Login = () => {
             requiresPasswordReset: true,
           })
         );
-
         navigate("/verify-first-login", {
           state: {
             email: formData.email,
@@ -359,10 +272,7 @@ const Login = () => {
         });
         return;
       }
-
       const user = data.user;
-
-      // Validate user object exists
       if (!user) {
         console.error("User object not found in response");
         const errorMsg =
@@ -373,11 +283,7 @@ const Login = () => {
         setLoading(false);
         return;
       }
-
-      // Get token claims for additional user data
       const tokenClaims = authService.getClaims();
-
-      // Prepare user data object
       const userData = {
         userId: user.userId,
         email: user.email,
@@ -397,37 +303,24 @@ const Login = () => {
         departmentId: user.departmentId,
         departmentName: user.departmentName,
       };
-
       console.log("User Data to save:", userData);
-
-      // Perform login in auth context
       login(userData, data.accessToken);
-
-      // Dismiss loading toast and show success
       toast.dismiss();
       toast.success(`Welcome back, ${userData.name}!`);
-
-      // Navigate to appropriate dashboard
       const dashboardRoute = getDashboardRoute(user.roleName);
       console.log("Final navigation to:", dashboardRoute);
-
       navigate(dashboardRoute, { replace: true });
     } catch (err) {
       console.error("Login Error:", err);
       console.error("Error Status:", err.response?.status);
       console.error("Error Data:", err.response?.data);
       console.error("Error Message:", err.message);
-
       let errorMessage = "Unable to sign in. Please try again.";
-
-      // Handle different error responses
       if (err.response) {
         const status = err.response.status;
         const data = err.response.data;
-
         console.log("Status Code:", status);
         console.log("Response Data:", data);
-
         if (status === 400) {
           errorMessage =
             data?.message || "Invalid request. Please check your input.";
@@ -454,38 +347,32 @@ const Login = () => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-
       console.log("Final Error Message:", errorMessage);
       setError(errorMessage);
-      
-      // Dismiss loading toast and show error
       toast.dismiss();
       toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
-  // ========================
-  // RENDER LOGIC
-  // ========================
   return (
     <div className="eepz-login-page">
       <div className="container-fluid h-100 g-0">
         <div className="row g-0 h-100">
-          
           {/* ======================== */}
           {/* LEFT SIDE - LOGIN FORM */}
           {/* ======================== */}
           <div className="col-lg-6 d-flex align-items-center justify-content-center bg-white p-4">
             <div className="eepz-login-form-container">
-              
               {/* Header Section */}
               <div className="text-center mb-4">
                 <img
-                  src="/logo.png"
+                  src="/logodarkfull.png"
                   alt="EEPZ Logo"
-                  className="eepz-logo-img mb-3"
+                  className="eepz-logo-img"
+                  style={{
+                    width:"450px"
+                  }}
                 />
                 <h2 className="fw-bold mb-2" style={{ color: "#2d3565" }}>
                   Sign In to Your Account
@@ -494,7 +381,6 @@ const Login = () => {
                   Welcome back! Please enter your credentials
                 </p>
               </div>
-
               {/* Error Alert */}
               {error && (
                 <div className="alert alert-danger d-flex align-items-start mb-4 eepz-animate-slide-in">
@@ -508,10 +394,8 @@ const Login = () => {
                   </div>
                 </div>
               )}
-
               {/* Login Form */}
               <form onSubmit={handleSubmit} noValidate autoComplete="off">
-                
                 {/* Email Field */}
                 <div className="mb-4">
                   <label htmlFor="email" className="form-label fw-semibold">
@@ -519,26 +403,23 @@ const Login = () => {
                     Email Address
                   </label>
                   <div className="eepz-email-input-wrapper">
-  <input
-    type="email"
-    className={`form-control form-control-lg ${
-      errors.email ? "is-invalid" : ""
-    } ${
-      touched.email && !errors.email && formData.email
-        ? "is-valid"
-        : ""
-    }`}
-    id="email"
-    name="email"
-    placeholder="your.email@eepz.com"
-    value={formData.email}
-    onChange={handleChange}
-    onBlur={handleBlur}
-    autoComplete="username"
-    disabled={loading}
-  />
-</div>
-
+                    <input
+                      type="email"
+                      className={`form-control form-control-lg ${errors.email ? "is-invalid" : ""
+                        } ${touched.email && !errors.email && formData.email
+                          ? "is-valid"
+                          : ""
+                        }`}
+                      id="email"
+                      name="email"
+                      placeholder="your.email@eepz.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      autoComplete="username"
+                      disabled={loading}
+                    />
+                  </div>
                   {/* Email error message */}
                   {errors.email && touched.email && (
                     <div className="invalid-feedback d-block">
@@ -547,7 +428,6 @@ const Login = () => {
                     </div>
                   )}
                 </div>
-
                 {/* Password Field */}
                 <div className="mb-4">
                   <label htmlFor="password" className="form-label fw-semibold">
@@ -557,9 +437,8 @@ const Login = () => {
                   <div className="eepz-password-input-wrapper">
                     <input
                       type={showPassword ? "text" : "password"}
-                      className={`form-control form-control-lg ${
-                        errors.password ? "is-invalid" : ""
-                      }`}
+                      className={`form-control form-control-lg ${errors.password ? "is-invalid" : ""
+                        }`}
                       id="password"
                       name="password"
                       placeholder="Enter your password"
@@ -581,9 +460,8 @@ const Login = () => {
                       title={showPassword ? "Hide password" : "Show password"}
                     >
                       <i
-                        className={`bi ${
-                          showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
-                        }`}
+                        className={`bi ${showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
+                          }`}
                       ></i>
                     </button>
                   </div>
@@ -595,7 +473,6 @@ const Login = () => {
                     </div>
                   )}
                 </div>
-
                 {/* Remember Me & Forgot Password Row */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <div className="form-check">
@@ -624,7 +501,6 @@ const Login = () => {
                     Forgot Password?
                   </a>
                 </div>
-
                 {/* Submit Button */}
                 <button
                   type="submit"
@@ -651,7 +527,6 @@ const Login = () => {
                   )}
                 </button>
               </form>
-
               {/* Security Note */}
               <div
                 className="text-center mt-4 pt-4"
@@ -664,7 +539,6 @@ const Login = () => {
               </div>
             </div>
           </div>
-
           {/* ======================== */}
           {/* RIGHT SIDE - WELCOME CARD */}
           {/* ======================== */}
@@ -674,7 +548,6 @@ const Login = () => {
                 <i className="bi bi-shield-lock me-2"></i>
                 Secure Access
               </div>
-
               <h1
                 className="text-white fw-bold mb-3"
                 style={{ fontSize: "2.5rem", lineHeight: "1.2" }}
@@ -683,14 +556,12 @@ const Login = () => {
                 <br />
                 EEPZ Portal
               </h1>
-
               <p
                 className="text-white-50 mb-5"
                 style={{ fontSize: "1.125rem", lineHeight: "1.8" }}
               >
                 Employee Engagement Platform
               </p>
-
               <div className="eepz-welcome-card">
                 <h3 className="fw-bold mb-3" style={{ color: "#2d3565" }}>
                   Everything You Need
@@ -726,7 +597,6 @@ const Login = () => {
                   </li>
                 </ul>
               </div>
-
               <p className="text-white-50 text-center mt-5 small">
                 <i className="bi bi-lightbulb me-2"></i>
                 Align your goals, track your growth, and unlock new opportunities
@@ -738,5 +608,4 @@ const Login = () => {
     </div>
   );
 };
-
 export default Login;

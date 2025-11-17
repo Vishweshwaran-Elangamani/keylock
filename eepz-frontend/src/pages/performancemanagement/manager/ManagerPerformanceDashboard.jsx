@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/hr/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import logoImage from "../../../assets/explogodark.png";
+import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
 
 export default function ManagerDashboard() {
