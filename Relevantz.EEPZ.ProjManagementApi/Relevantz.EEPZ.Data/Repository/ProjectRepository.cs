@@ -178,8 +178,16 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             Console.WriteLine("ℹ️ No managers assigned to this project");
         }
 
-        await transaction.CommitAsync();
-        Console.WriteLine("✅ Transaction committed successfully");
+        // ✅ NEW: Update manager reporting hierarchy
+await UpdateManagerHierarchyAsync(
+    project.ResourceOwnerEmployeeId,
+    project.L1approverEmployeeId,
+    project.L2approverEmployeeId
+);
+
+await transaction.CommitAsync();
+Console.WriteLine("✅ Transaction committed successfully");
+
         
         return project;
     }
@@ -317,8 +325,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
     }
 
-    await _context.SaveChangesAsync();
-    Console.WriteLine("✅ UpdateReportingManagersAsync completed successfully");
+// ✅ NEW: Update manager reporting hierarchy
+await UpdateManagerHierarchyAsync(resourceOwnerId, l1ApproverId, l2ApproverId);
+
+await _context.SaveChangesAsync();
+Console.WriteLine("✅ UpdateReportingManagersAsync completed successfully");
     
     return true;
 }
@@ -545,6 +556,87 @@ public async Task<Dictionary<int, (int ProjectId, string ProjectName)?>> GetAllE
         throw;
     }
 }
+
+/// <summary>
+/// ⚙️ Updates the reporting manager hierarchy for project managers
+/// L1 Approver reports to L2 Approver, L2 Approver reports to Resource Owner
+/// </summary>
+private async Task UpdateManagerHierarchyAsync(int? resourceOwnerId, int? l1ApproverId, int? l2ApproverId)
+{
+    try
+    {
+        Console.WriteLine("🔄 Updating manager reporting hierarchy...");
+
+        // ✅ Step 1: Get the actual EmployeeIds from EmployeeMasterIds
+        var resourceOwnerEmployeeId = resourceOwnerId.HasValue 
+            ? await GetEmployeeIdByMasterIdAsync(resourceOwnerId.Value) 
+            : null;
+        var l1ApproverEmployeeId = l1ApproverId.HasValue 
+            ? await GetEmployeeIdByMasterIdAsync(l1ApproverId.Value) 
+            : null;
+        var l2ApproverEmployeeId = l2ApproverId.HasValue 
+            ? await GetEmployeeIdByMasterIdAsync(l2ApproverId.Value) 
+            : null;
+
+        Console.WriteLine($"   - Resource Owner EmployeeId: {resourceOwnerEmployeeId}");
+        Console.WriteLine($"   - L1 Approver EmployeeId: {l1ApproverEmployeeId}");
+        Console.WriteLine($"   - L2 Approver EmployeeId: {l2ApproverEmployeeId}");
+
+        // ✅ Step 2: Update L1 Approver's reporting manager
+        if (l1ApproverEmployeeId.HasValue && l1ApproverEmployeeId.Value > 0)
+        {
+            var l1Employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.EmployeeId == l1ApproverEmployeeId.Value);
+
+            if (l1Employee != null)
+            {
+                var newReportingManagerId = l2ApproverEmployeeId ?? resourceOwnerEmployeeId;
+                
+                if (l1Employee.ReportingManagerEmployeeId != newReportingManagerId)
+                {
+                    l1Employee.ReportingManagerEmployeeId = newReportingManagerId;
+                    l1Employee.UpdatedAt = DateTime.UtcNow;
+                    Console.WriteLine($"✅ Updated L1 Approver's ReportingManagerEmployeeId: {newReportingManagerId}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"⚠️ WARNING: L1 Approver Employee not found (EmployeeId: {l1ApproverEmployeeId})");
+            }
+        }
+
+        // ✅ Step 3: Update L2 Approver's reporting manager
+        if (l2ApproverEmployeeId.HasValue && l2ApproverEmployeeId.Value > 0)
+        {
+            var l2Employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.EmployeeId == l2ApproverEmployeeId.Value);
+
+            if (l2Employee != null)
+            {
+                if (l2Employee.ReportingManagerEmployeeId != resourceOwnerEmployeeId)
+                {
+                    l2Employee.ReportingManagerEmployeeId = resourceOwnerEmployeeId;
+                    l2Employee.UpdatedAt = DateTime.UtcNow;
+                    Console.WriteLine($"✅ Updated L2 Approver's ReportingManagerEmployeeId: {resourceOwnerEmployeeId}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"⚠️ WARNING: L2 Approver Employee not found (EmployeeId: {l2ApproverEmployeeId})");
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        Console.WriteLine("✅ Manager hierarchy updated successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error updating manager hierarchy: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        throw;
+    }
+}
+
 
 
 
