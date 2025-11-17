@@ -674,11 +674,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+      "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
       "projectName": "Relevantz.EEPZ.Common",
-      "projectPath": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+      "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
       "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-      "outputPath": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\obj\\",
+      "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

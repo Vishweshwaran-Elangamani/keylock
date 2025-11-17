@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "eoiUfagFnC0=",
+  "dgSpecHash": "Ep1Ufbyu+48=",
   "success": true,
-  "projectFilePath": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+  "projectFilePath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jeswanth.s\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\jeswanth.s\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

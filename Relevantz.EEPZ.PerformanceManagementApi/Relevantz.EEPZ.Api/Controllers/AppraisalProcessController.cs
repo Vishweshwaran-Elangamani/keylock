@@ -133,7 +133,7 @@ namespace PerformanceManagement.Controllers
                 if (form.Type == "Self")
                 {
                     var today = DateTime.UtcNow.Date;
-                    var reminderDays = 45;
+                    var reminderDays = 30;
                     var reminderDate = today.AddDays(reminderDays);
                     var targetMonth = reminderDate.Month;
 
@@ -309,7 +309,7 @@ namespace PerformanceManagement.Controllers
             try
             {
                 var today = DateTime.UtcNow.Date;
-                var reminderDays = 45;
+                var reminderDays = 30;
                 var reminderDate = today.AddDays(reminderDays);
                 var targetMonth = reminderDate.Month;
                 var currentYear = today.Year;
