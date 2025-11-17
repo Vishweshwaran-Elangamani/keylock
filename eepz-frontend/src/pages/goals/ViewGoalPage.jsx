@@ -208,8 +208,6 @@ const ViewGoalPage = () => {
         />
       )}
 
-
-      {/* ✅ FIXED: Pass unified callback - removed separate callbacks */}
       <GoalDetailsHeader
         goal={goal}
         onEdit={handleEdit}
@@ -235,8 +233,6 @@ const ViewGoalPage = () => {
         </button>
       </div>
 
-
-      {/* UPDATED: Tabs - hide for Leadership monitoring */}
       <ul className="nav nav-tabs mb-4">
         <li className="nav-item">
           <button
@@ -248,7 +244,6 @@ const ViewGoalPage = () => {
             Details
           </button>
         </li>
-        {/* Hide comments tab for Leadership monitoring */}
         {shouldShowCommentsAndTimeline && (
           <li className="nav-item">
             <button
@@ -261,7 +256,6 @@ const ViewGoalPage = () => {
             </button>
           </li>
         )}
-        {/* Hide timeline tab for Leadership monitoring */}
         {shouldShowCommentsAndTimeline && (
           <li className="nav-item">
             <button
@@ -288,8 +282,6 @@ const ViewGoalPage = () => {
           />
         )}
 
-
-        {/* Hide comments for Leadership monitoring */}
         {activeTab === "comments" && shouldShowCommentsAndTimeline && (
           <GoalComments
             goalId={id}
@@ -299,8 +291,6 @@ const ViewGoalPage = () => {
           />
         )}
 
-
-        {/* Hide timeline for Leadership monitoring */}
         {activeTab === "timeline" && shouldShowCommentsAndTimeline && (
           <GoalTimeline goalId={id} />
         )}

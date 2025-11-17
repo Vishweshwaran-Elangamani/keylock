@@ -371,7 +371,7 @@ const Login = () => {
                   alt="EEPZ Logo"
                   className="eepz-logo-img"
                   style={{
-                    width:"450px"
+                    width: "450px"
                   }}
                 />
                 <h2 className="fw-bold mb-2" style={{ color: "#2d3565" }}>
@@ -550,18 +550,10 @@ const Login = () => {
               </div>
               <h1
                 className="text-white fw-bold mb-3"
-                style={{ fontSize: "2.5rem", lineHeight: "1.2" }}
+                style={{ fontSize: "2.5rem", lineHeight: "1.2"}}
               >
-                Welcome to the
-                <br />
-                EEPZ Portal
+                Welcome to the EEPZ
               </h1>
-              <p
-                className="text-white-50 mb-5"
-                style={{ fontSize: "1.125rem", lineHeight: "1.8" }}
-              >
-                Employee Engagement Platform
-              </p>
               <div className="eepz-welcome-card">
                 <h3 className="fw-bold mb-3" style={{ color: "#2d3565" }}>
                   Everything You Need

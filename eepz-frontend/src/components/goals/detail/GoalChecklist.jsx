@@ -125,7 +125,7 @@ const GoalChecklist = ({
         status: "pending",
       });
 
-      const hasPending = response.data?.items?.length > 0 || false;
+      const hasPending = response.data?.summary?.myPending > 0 || false;
       setHasPendingApproval(hasPending);
     } catch (error) {
       console.error("Failed to check pending approvals:", error);
