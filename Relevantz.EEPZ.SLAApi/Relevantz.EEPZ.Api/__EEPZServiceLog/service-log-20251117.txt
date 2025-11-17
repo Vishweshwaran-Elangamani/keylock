@@ -325,3 +325,48 @@
 2025-11-17 12:31:59.070 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/3/escalations responded 204 in 0.0402 ms
 2025-11-17 12:31:59.091 +05:30 [INF] Getting escalations for manager 3
 2025-11-17 12:31:59.099 +05:30 [INF] HTTP GET /api/Sla/manager/3/escalations responded 200 in 26.8245 ms
+2025-11-17 12:56:25.648 +05:30 [INF] Database migration completed successfully
+2025-11-17 14:38:51.708 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-17 14:38:51.741 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 55.0809 ms
+2025-11-17 14:38:51.741 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 55.1683 ms
+2025-11-17 14:38:53.082 +05:30 [INF] Getting all SLAs
+2025-11-17 14:38:57.703 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 5892.9611 ms
+2025-11-17 14:38:57.778 +05:30 [INF] Getting all SLAs
+2025-11-17 14:38:58.109 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 401.2094 ms
+2025-11-17 14:39:29.341 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.4969 ms
+2025-11-17 14:39:29.341 +05:30 [INF] HTTP OPTIONS /api/EmployeeManagement/all responded 204 in 0.9254 ms
+2025-11-17 14:39:29.638 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 289.0174 ms
+2025-11-17 14:39:29.721 +05:30 [INF] HTTP GET /api/EmployeeManagement/all responded 200 in 70.7216 ms
+2025-11-17 14:41:18.716 +05:30 [INF] HTTP OPTIONS /api/Sla/5 responded 204 in 1.2718 ms
+2025-11-17 14:41:18.716 +05:30 [INF] HTTP OPTIONS /api/Sla/5 responded 204 in 0.1061 ms
+2025-11-17 14:41:18.875 +05:30 [INF] Getting SLA 5
+2025-11-17 14:41:19.286 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 3, Employee: 3, Userprofile: Dev
+2025-11-17 14:41:19.286 +05:30 [INF] 📝 Mapped - EmployeeName: 'Dev Sai Kiran', DepartmentName: 'Human Resources'
+2025-11-17 14:41:19.296 +05:30 [INF] HTTP GET /api/Sla/5 responded 200 in 569.6152 ms
+2025-11-17 14:41:19.305 +05:30 [INF] HTTP OPTIONS /api/Sla/5/history responded 204 in 0.2078 ms
+2025-11-17 14:41:19.354 +05:30 [INF] Getting SLA 5
+2025-11-17 14:41:19.381 +05:30 [INF] 🔍 SLA from repo - EmployeeId: 3, Employee: 3, Userprofile: Dev
+2025-11-17 14:41:19.381 +05:30 [INF] Getting SLA history for 5
+2025-11-17 14:41:19.382 +05:30 [INF] 📝 Mapped - EmployeeName: 'Dev Sai Kiran', DepartmentName: 'Human Resources'
+2025-11-17 14:41:19.383 +05:30 [INF] HTTP GET /api/Sla/5 responded 200 in 82.7021 ms
+2025-11-17 14:41:19.617 +05:30 [INF] HTTP GET /api/Sla/5/history responded 200 in 303.2759 ms
+2025-11-17 14:41:19.627 +05:30 [INF] HTTP OPTIONS /api/Sla/5/escalations responded 204 in 0.4393 ms
+2025-11-17 14:41:19.673 +05:30 [INF] Getting SLA history for 5
+2025-11-17 14:41:19.688 +05:30 [INF] HTTP GET /api/Sla/5/history responded 200 in 66.2792 ms
+2025-11-17 14:41:19.699 +05:30 [INF] Getting escalations for SLA 5
+2025-11-17 14:41:19.889 +05:30 [INF] HTTP GET /api/Sla/5/escalations responded 200 in 256.2475 ms
+2025-11-17 14:41:19.944 +05:30 [INF] Getting escalations for SLA 5
+2025-11-17 14:41:19.960 +05:30 [INF] HTTP GET /api/Sla/5/escalations responded 200 in 65.1611 ms
+2025-11-17 14:42:22.392 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1641 ms
+2025-11-17 14:42:22.392 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.3648 ms
+2025-11-17 14:42:22.443 +05:30 [INF] Getting all SLAs
+2025-11-17 14:42:22.467 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 69.2554 ms
+2025-11-17 14:42:22.523 +05:30 [INF] Getting all SLAs
+2025-11-17 14:42:22.545 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 70.6859 ms
+2025-11-17 14:43:05.663 +05:30 [INF] HTTP OPTIONS /api/Sla/7 responded 204 in 1.4171 ms
+2025-11-17 14:43:05.877 +05:30 [INF] Updating SLA 7
+2025-11-17 14:43:06.725 +05:30 [INF] SLA updated successfully. SLA ID: 7
+2025-11-17 14:43:06.728 +05:30 [INF] HTTP PUT /api/Sla/7 responded 200 in 1056.2336 ms
+2025-11-17 14:43:06.737 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.1298 ms
+2025-11-17 14:43:06.798 +05:30 [INF] Getting all SLAs
+2025-11-17 14:43:06.816 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 73.1519 ms

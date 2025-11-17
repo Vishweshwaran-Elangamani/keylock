@@ -1,3 +1,5 @@
+
+ 
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.DTOs.Request;
@@ -16,15 +18,15 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         // Projects with L1: visible only after at least one L1 (Approver) review exists.
         Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedFormsAsync(
             int reviewerUserId, int page, int pageSize);
-
+ 
             // Add after SaveApproverReviewAsync (around line 23):
-
+ 
 Task SubmitApproverReviewsAsync(int approverId, int assessmentId, List<ReviewItemDto> items);
  
 // Add after SaveReviewerReviewAsync (around line 28):
-
+ 
 Task SubmitReviewerReviewsAsync(int reviewerUserId, int assessmentId, List<ReviewItemDto> items);
-
+ 
  
  
         // L1 — submit ratings & comments (per-detail records in AssessmentReview)
@@ -51,4 +53,5 @@ Task SubmitReviewerReviewsAsync(int reviewerUserId, int assessmentId, List<Revie
    
     }
 }
+ 
  

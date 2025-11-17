@@ -623,49 +623,29 @@ VALUES
 
 // =========================================================
 
-public async Task SubmitApproverReviewsAsync(
-
-    int approverId,
-
-    int assessmentId,
-
-    List<ReviewItemDto> items)
-
-{
-
-    foreach (var item in items)
-
+  public async Task SubmitApproverReviewsAsync(
+        int approverId,
+        int assessmentId,
+        List<ReviewItemDto> items)
     {
-
-        var entry = new Assessmentreview
-
+        foreach (var item in items)
         {
+            var entry = new Assessmentreview
+            {
+                DetailId = item.DetailId,
+                ReviewerId = approverId,
+                ReviewerRole = "Approver",
+                Rating = item.Rating,
+                Comments = item.Comments,
+                ReviewedAt = DateTime.Now,
+                ReviewStatus = "Pending"  // ✅ FIXED: Set to Pending for L1
+            };
 
-            DetailId = item.DetailId,
-
-            ReviewerId = approverId,
-
-            ReviewerRole = "Approver",
-
-            Rating = item.Rating,
-
-            Comments = item.Comments,
-
-            ReviewedAt = DateTime.Now,
-
-            ReviewStatus = "Approved"  // ✅ Set status to "Completed" for L1
-
-        };
-
-         _ctx.Entry(entry).Property(e => e.ReviewStatus).IsModified = true;
-
-        _ctx.Assessmentreviews.Add(entry);
-
+            _ctx.Assessmentreviews.Add(entry);
+        }
+    
+        await _ctx.SaveChangesAsync();
     }
- 
-    await _ctx.SaveChangesAsync();
-
-}
  
 // =========================================================
 
@@ -673,53 +653,90 @@ public async Task SubmitApproverReviewsAsync(
 
 // =========================================================
 
+// =========================================================
+// L2 (Reviewer) — SUBMIT REVIEW RATINGS (CLEAN APPROACH)
+// =========================================================
 public async Task SubmitReviewerReviewsAsync(
-
     int reviewerUserId,
-
     int assessmentId,
-
     List<ReviewItemDto> items)
-
 {
+    var detailIds = items.Select(i => i.DetailId).ToList();
+    var conn = _ctx.Database.GetDbConnection();
+    
+    if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
-    // ✅ CRITICAL FIX: Only insert rating records, DO NOT auto-approve
+    // ✅ Strategy: Update existing L2 records, don't delete and recreate
+    const string updateExistingSql = @"
+UPDATE AssessmentReview
+SET rating = @rating, 
+    comments = @comments, 
+    reviewed_at = NOW(),
+    review_status = NULL
+WHERE reviewer_role = 'Reviewer'
+  AND reviewer_id = @reviewerUserId
+  AND detail_id = @detailId
+  AND rating > 0;";  // Only update rating records
 
-    foreach (var item in items)
+    // ✅ Insert only if no record exists for this detail
+    const string insertNewSql = @"
+INSERT INTO AssessmentReview 
+  (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
+VALUES 
+  (@detailId, @reviewerUserId, 'Reviewer', @rating, @comments, NOW(), NULL)
+WHERE NOT EXISTS (
+  SELECT 1 FROM AssessmentReview ar
+  WHERE ar.detail_id = @detailId
+    AND ar.reviewer_id = @reviewerUserId
+    AND ar.reviewer_role = 'Reviewer'
+    AND ar.rating > 0
+);";
 
+    using var tx = await conn.BeginTransactionAsync();
+
+    try
     {
-
-        var entry = new Assessmentreview
-
+        foreach (var item in items)
         {
+            // Try to update existing record
+            var updateCount = await conn.ExecuteAsync(updateExistingSql,
+                new
+                {
+                    rating = item.Rating,
+                    comments = item.Comments,
+                    reviewerUserId,
+                    detailId = item.DetailId
+                }, tx);
 
-            DetailId = item.DetailId,
+            // If no existing record, insert new one
+            if (updateCount == 0)
+            {
+                await conn.ExecuteAsync(@"
+INSERT INTO AssessmentReview 
+  (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
+VALUES 
+  (@detailId, @reviewerUserId, 'Reviewer', @rating, @comments, NOW(), NULL);",
+                    new
+                    {
+                        detailId = item.DetailId,
+                        reviewerUserId,
+                        rating = item.Rating,
+                        comments = item.Comments
+                    }, tx);
+            }
+        }
 
-            ReviewerId = reviewerUserId,
-
-            ReviewerRole = "Reviewer",
-
-            Rating = item.Rating,
-
-            Comments = item.Comments,
-
-            ReviewedAt = DateTime.Now,
-
-            ReviewStatus = "Approved" // ✅ Leave status as NULL until decision is made
-
-        };
-
-        _ctx.Assessmentreviews.Add(entry);
-
+        await tx.CommitAsync();
     }
- 
-    await _ctx.SaveChangesAsync();
-
-    // ✅ REMOVED: Do NOT call SetReviewerDecisionAsync here!
-
-    // Decision should ONLY be set when L2 clicks "Approve/Reject" button
-
+    catch
+    {
+        await tx.RollbackAsync();
+        throw;
+    }
 }
+
+
+
 
  
     
@@ -730,197 +747,165 @@ public async Task SubmitReviewerReviewsAsync(
 
   // =========================================================
 
-  public async Task<bool> SetReviewerDecisionAsync(
-
-      int reviewerUserId,
-
-      int assessmentId,
-
-      string decision,
-
-      string? reviewerComment)
-
-  {
-
+public async Task<bool> SetReviewerDecisionAsync(
+    int reviewerUserId,
+    int assessmentId,
+    string decision,
+    string? reviewerComment)
+{
     decision = (decision ?? "").Trim();
-
     var approved = string.Equals(decision, "Approved", StringComparison.OrdinalIgnoreCase);
-
     var rejected = string.Equals(decision, "Rejected", StringComparison.OrdinalIgnoreCase);
-
+    
     if (!approved && !rejected) return false;
 
     const string scopeSql = @"
-
 WITH l2 AS (
-
   SELECT e.EmployeeId AS L2EmployeeId
-
   FROM UserAuthentication ua
-
   JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-
   WHERE ua.UserId = @reviewerUserId
-
 )
-
 SELECT COUNT(*)
-
 FROM SelfAssessment sa
-
 JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-
 JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-
 JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-
 JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
-
 JOIN Project p ON p.ProjectId = pe.ProjectId
-
 JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
-
 WHERE sa.assessment_id = @assessmentId
-
   AND sa.status = 'Submitted'
-
   AND (
-
        p.L1ApproverEmployeeId IS NULL
-
        OR EXISTS (
-
            SELECT 1
-
            FROM AssessmentReview ar
-
            JOIN AssessmentDetail ad2 ON ad2.detail_id = ar.detail_id
-
            WHERE ar.reviewer_role = 'Approver'
-
              AND ad2.assessment_id = sa.assessment_id
-
        )
-
   );";
 
     const string detailsSql = @"SELECT detail_id FROM AssessmentDetail WHERE assessment_id=@aid;";
 
-    // ✅ FIXED: Only update rating records (rating > 0), not decision records
-
-    const string updatePerCompetencySql = @"
-
+    // ✅ Update rating records with decision
+    const string updateRatingsSql = @"
 UPDATE AssessmentReview
-
 SET review_status = @decision, reviewed_at = NOW()
-
 WHERE reviewer_role = 'Reviewer'
-
-  AND reviewer_id   = @reviewerUserId
-
-  AND detail_id     IN @detailIds
-
+  AND reviewer_id = @reviewerUserId
+  AND detail_id IN @detailIds
   AND rating > 0;";
 
-    const string insertDecisionNoteSql = @"
+    // ✅ For REJECTION: Insert one decision note (rating = -1) OR UPDATE if exists
+    const string updateOrInsertDecisionNoteSql = @"
+UPDATE AssessmentReview
+SET rating = -1, 
+    comments = @note, 
+    review_status = @decision,
+    reviewed_at = NOW()
+WHERE reviewer_role = 'Reviewer'
+  AND reviewer_id = @reviewerUserId
+  AND detail_id = @firstDetailId
+  AND rating = -1
+LIMIT 1;
 
+-- If not updated, insert new
 INSERT INTO AssessmentReview
-
   (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
-
-VALUES
-
-  (@firstDetailId, @reviewerUserId, 'Reviewer', -1, @note, NOW(), @decision);";
+SELECT @firstDetailId, @reviewerUserId, 'Reviewer', -1, @note, NOW(), @decision
+WHERE NOT EXISTS (
+  SELECT 1 FROM AssessmentReview
+  WHERE detail_id = @firstDetailId
+    AND reviewer_id = @reviewerUserId
+    AND reviewer_role = 'Reviewer'
+    AND rating = -1
+);";
 
     var conn = _ctx.Database.GetDbConnection();
-
     if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
     var inScope = await conn.ExecuteScalarAsync<int>(scopeSql, new { reviewerUserId, assessmentId });
-
     if (inScope <= 0) return false;
 
     using var tx = await conn.BeginTransactionAsync();
 
-    var detailIds = (await conn.QueryAsync<int>(detailsSql, new { aid = assessmentId }, tx)).ToArray();
-
-    if (detailIds.Length == 0) { await tx.RollbackAsync(); return false; }
-
-    var finalDecision = approved ? "Approved" : "Rejected";
-
-    // ✅ Update only rating records (rating > 0) with decision status
-
-    await conn.ExecuteAsync(updatePerCompetencySql,
-
-        new { decision = finalDecision, reviewerUserId, detailIds }, tx);
-
-    // ✅ Insert ONE decision record with rating = -1
-
-    var note = reviewerComment ?? (approved ? "Reviewer Approved" : "Reviewer Rejected");
-
-    await conn.ExecuteAsync(insertDecisionNoteSql,
-
-        new
-        {
-
-          firstDetailId = detailIds[0],
-
-          reviewerUserId,
-
-          note,
-
-          decision = finalDecision
-
-        }, tx);
-
-    await tx.CommitAsync();
-
     try
-
     {
-
-      var assessment = await _ctx.Selfassessments
-
-          .FirstOrDefaultAsync(a => a.AssessmentId == assessmentId);
-
-      if (assessment != null)
-
-      {
-
-        var tracker = await _ctx.Formprogresstrackers
-
-            .Include(t => t.Assignment)
-
-            .FirstOrDefaultAsync(t => t.Assignment.EmployeeId == assessment.EmployeeId
-&& t.Assignment.FormId == assessment.FormId);
-
-        if (tracker != null)
-
-        {
-
-          tracker.ManagerCompleted = true;
-
-          tracker.LastUpdated = DateTime.UtcNow;
-
-          await _ctx.SaveChangesAsync();
-
+        var detailIds = (await conn.QueryAsync<int>(detailsSql, new { aid = assessmentId }, tx)).ToArray();
+        if (detailIds.Length == 0) 
+        { 
+            await tx.RollbackAsync(); 
+            return false; 
         }
 
-      }
+        var finalDecision = approved ? "Approved" : "Rejected";
 
+        // ✅ Update rating records
+        await conn.ExecuteAsync(updateRatingsSql,
+            new { decision = finalDecision, reviewerUserId, detailIds }, tx);
+
+        // ✅ For REJECTION: Update or insert decision note
+        if (rejected)
+        {
+            var note = reviewerComment ?? "Reviewer Rejected";
+            await conn.ExecuteAsync(updateOrInsertDecisionNoteSql,
+                new
+                {
+                    firstDetailId = detailIds[0],
+                    reviewerUserId,
+                    note,
+                    decision = finalDecision
+                }, tx);
+        }
+        // ✅ For APPROVAL: Delete any existing -1 decision records (cleanup)
+        else
+        {
+            await conn.ExecuteAsync(@"
+DELETE FROM AssessmentReview
+WHERE reviewer_role = 'Reviewer'
+  AND reviewer_id = @reviewerUserId
+  AND detail_id IN @detailIds
+  AND rating = -1;",
+                new { reviewerUserId, detailIds }, tx);
+        }
+
+        await tx.CommitAsync();
+    }
+    catch
+    {
+        await tx.RollbackAsync();
+        throw;
     }
 
-    catch
-
+    try
     {
-
-      // Log if needed
-
+        var assessment = await _ctx.Selfassessments
+            .FirstOrDefaultAsync(a => a.AssessmentId == assessmentId);
+        if (assessment != null)
+        {
+            var tracker = await _ctx.Formprogresstrackers
+                .Include(t => t.Assignment)
+                .FirstOrDefaultAsync(t => t.Assignment.EmployeeId == assessment.EmployeeId
+                                       && t.Assignment.FormId == assessment.FormId);
+            if (tracker != null)
+            {
+                tracker.ManagerCompleted = true;
+                tracker.LastUpdated = DateTime.UtcNow;
+                await _ctx.SaveChangesAsync();
+            }
+        }
+    }
+    catch
+    {
+        // Log if needed
     }
 
     return true;
+}
 
-  }
+
 
  
 
