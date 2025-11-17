@@ -341,7 +341,22 @@
  * - Add Competency button on left
  * 
  * @component
+ *//**
+ * FormCreate Component
+ * 
+ * Create/Edit performance evaluation forms with competencies.
+ * Features:
+ * - Create new forms or edit existing ones
+ * - Add/Remove/Reorder competencies
+ * - Form type selection (Self/Manager/HR Summary)
+ * - Delivery/Enablement classification
+ * - Real-time validation
+ * - Toast notifications using Sonner
+ * - Professional UI with fixed headers and scrollable content
+ * 
+ * @component
  */
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/hr/api";
@@ -553,9 +568,8 @@ function FormCreate() {
         data.message || (isEditMode ? "Form updated successfully!" : "Form created successfully!")
       );
       setTimeout(() => {
-  navigate("/hr/dashboard/performance/formslist");
-}, 500);
-
+        navigate("/hr/dashboard/performance/formslist");
+      }, 500);
 
     } catch (error) {
       toast.dismiss();
@@ -575,7 +589,7 @@ function FormCreate() {
 
   if (loading) {
     return (
-      <div className="fc-loading-container">
+      <div className="hrfcper-loading-container">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -585,8 +599,8 @@ function FormCreate() {
 
   if (!user || !user.userId) {
     return (
-      <div className="fc-error-container">
-        <div className="fc-error-icon">
+      <div className="hrfcper-error-container">
+        <div className="hrfcper-error-icon">
           <i className="bi bi-exclamation-triangle"></i>
         </div>
         <h4>Authentication Required</h4>
@@ -600,26 +614,26 @@ function FormCreate() {
   // ========================
 
   return (
-    <div className="fc-page">
+    <div className="hrfcper-page">
       {/* Top Bar */}
-      <div className="fc-top-bar">
-        <nav className="fc-breadcrumb-nav" aria-label="breadcrumb">
-          <ol className="fc-breadcrumb">
-            <li className="fc-breadcrumb-item" onClick={() => navigate("/dashboard")}>
+      <div className="hrfcper-top-bar">
+        <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
+          <ol className="hrfcper-breadcrumb">
+            <li className="hrfcper-breadcrumb-item" onClick={() => navigate("/dashboard")}>
               <i className="bi bi-house-door"></i>
               <span>Dashboard</span>
             </li>
-            <li className="fc-breadcrumb-item" onClick={() => navigate("/performance/forms")}>
+            <li className="hrfcper-breadcrumb-item" onClick={() => navigate("/performance/forms")}>
               <span>Forms</span>
             </li>
-            <li className="fc-breadcrumb-item active" aria-current="page">
-              Create Form
+            <li className="hrfcper-breadcrumb-item active" aria-current="page">
+              {isEditMode ? "Edit Form" : "Create Form"}
             </li>
           </ol>
         </nav>
         <button
           type="button"
-          className="fc-btn-back"
+          className="hrfcper-btn-back"
           onClick={() => navigate("/performance/forms")}
           disabled={busy}
         >
@@ -629,36 +643,39 @@ function FormCreate() {
       </div>
 
       {/* Page Header */}
-      <div className="fc-page-header">
-        <h2 className="fc-page-title">
+      <div className="hrfcper-page-header">
+        <h2 className="hrfcper-page-title">
           <i className="bi bi-file-earmark-plus"></i>
-          Create New Form
+          {isEditMode ? "Edit Form" : "Create New Form"}
         </h2>
-        <p className="fc-page-description">
-          Design a new performance evaluation form with competencies
+        <p className="hrfcper-page-description">
+          {isEditMode 
+            ? "Update the performance evaluation form details and competencies"
+            : "Design a new performance evaluation form with competencies"
+          }
         </p>
       </div>
 
       {/* FORM CONTAINER */}
-      <form onSubmit={onSubmit} className="fc-form-container">
+      <form onSubmit={onSubmit} className="hrfcper-form-container">
         {/* LEFT COLUMN - details and actions */}
-        <div className="fc-left-column">
+        <div className="hrfcper-left-column">
           {/* General Details */}
-          <div className="fc-section fc-general-details">
-            <div className="fc-section-header">
+          <div className="hrfcper-section hrfcper-general-details">
+            <div className="hrfcper-section-header">
               <i className="bi bi-info-circle"></i>
-              <h3 className="fc-section-title">General Details</h3>
+              <h3 className="hrfcper-section-title">General Details</h3>
             </div>
-            <div className="fc-section-body">
+            <div className="hrfcper-section-body">
               {/* Form Name */}
-              <div className="fc-form-group fc-full-width">
-                <label className="fc-label">
-                  Form Name <span className="fc-required">*</span>
+              <div className="hrfcper-form-group hrfcper-full-width">
+                <label className="hrfcper-label">
+                  Form Name <span className="hrfcper-required">*</span>
                 </label>
-                <div className="fc-error-wrapper">
+                <div className="hrfcper-error-wrapper">
                   <input
                     type="text"
-                    className={`fc-input ${validationErrors.name ? "fc-input-error" : ""}`}
+                    className={`hrfcper-input ${validationErrors.name ? "hrfcper-input-error" : ""}`}
                     placeholder="Enter form name (e.g., Annual Performance Review 2024)"
                     value={model.name}
                     onChange={(e) => {
@@ -668,7 +685,7 @@ function FormCreate() {
                     disabled={busy}
                   />
                   {validationErrors.name && (
-                    <span className="fc-error-text">
+                    <span className="hrfcper-error-text">
                       <i className="bi bi-exclamation-circle"></i>
                       {validationErrors.name}
                     </span>
@@ -676,14 +693,14 @@ function FormCreate() {
                 </div>
               </div>
               {/* Form Type & Category */}
-              <div className="fc-form-row-two">
-                <div className="fc-form-group">
-                  <label className="fc-label">
-                    Form Type <span className="fc-required">*</span>
+              <div className="hrfcper-form-row-two">
+                <div className="hrfcper-form-group">
+                  <label className="hrfcper-label">
+                    Form Type <span className="hrfcper-required">*</span>
                   </label>
-                  <div className="fc-error-wrapper">
+                  <div className="hrfcper-error-wrapper">
                     <select
-                      className={`fc-select ${validationErrors.type ? "fc-input-error" : ""}`}
+                      className={`hrfcper-select ${validationErrors.type ? "hrfcper-input-error" : ""}`}
                       value={model.type}
                       onChange={(e) => {
                         setModel({ ...model, type: e.target.value });
@@ -697,21 +714,21 @@ function FormCreate() {
                       <option value="HR Summary">HR Summary</option>
                     </select>
                     {validationErrors.type && (
-                      <span className="fc-error-text">
+                      <span className="hrfcper-error-text">
                         <i className="bi bi-exclamation-circle"></i>
                         {validationErrors.type}
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="fc-form-group">
-                  <label className="fc-label">
-                    Category <span className="fc-required">*</span>
+                <div className="hrfcper-form-group">
+                  <label className="hrfcper-label">
+                    Category <span className="hrfcper-required">*</span>
                   </label>
-                  <div className="fc-error-wrapper">
+                  <div className="hrfcper-error-wrapper">
                     <select
-                      className={`fc-select ${
-                        validationErrors.deliveryEnablement ? "fc-input-error" : ""
+                      className={`hrfcper-select ${
+                        validationErrors.deliveryEnablement ? "hrfcper-input-error" : ""
                       }`}
                       value={model.deliveryEnablement}
                       onChange={(e) => {
@@ -725,7 +742,7 @@ function FormCreate() {
                       <option value="Enablement">Enablement</option>
                     </select>
                     {validationErrors.deliveryEnablement && (
-                      <span className="fc-error-text">
+                      <span className="hrfcper-error-text">
                         <i className="bi bi-exclamation-circle"></i>
                         {validationErrors.deliveryEnablement}
                       </span>
@@ -736,19 +753,19 @@ function FormCreate() {
             </div>
           </div>
           {/* Action Buttons */}
-          <div className="fc-form-actions">
+          <div className="hrfcper-form-actions">
             <button
               type="button"
-              className="fc-btn-cancel"
-              onClick={() => navigate("/performance/forms")}
+              className="hrfcper-btn-cancel"
+              onClick={() => navigate("/hr/dashboard/performance/formslist")}
               disabled={busy}
             >
               Cancel
             </button>
-            <button type="submit" className="fc-btn-submit" disabled={busy}>
+            <button type="submit" className="hrfcper-btn-submit" disabled={busy}>
               {busy ? (
                 <>
-                  <span className="fc-spinner"></span>
+                  <span className="hrfcper-spinner"></span>
                   {isEditMode ? "Updating..." : "Creating..."}
                 </>
               ) : (
@@ -760,16 +777,16 @@ function FormCreate() {
           </div>
         </div>
         {/* RIGHT COLUMN - Competencies with fixed header and scrollable cards */}
-        <div className="fc-section fc-competencies-section">
-          <div className="fc-section-header">
-            <div className="fc-section-header-left">
+        <div className="hrfcper-section hrfcper-competencies-section">
+          <div className="hrfcper-section-header">
+            <div className="hrfcper-section-header-left">
               <i className="bi bi-list-check"></i>
-              <h3 className="fc-section-title">Competencies</h3>
-              <span className="fc-count-badge">{model.competencies.length} Competencies</span>
+              <h3 className="hrfcper-section-title">Competencies</h3>
+              <span className="hrfcper-count-badge">{model.competencies.length} Competencies</span>
             </div>
             <button
               type="button"
-              className="fc-btn-add-comp"
+              className="hrfcper-btn-add-comp"
               onClick={addCompetency}
               disabled={busy}
             >
@@ -777,24 +794,24 @@ function FormCreate() {
               Add Competency
             </button>
           </div>
-          <div className="fc-section-body">
+          <div className="hrfcper-section-body">
             {validationErrors.competencies && (
-              <div className="fc-alert-warning">
+              <div className="hrfcper-alert-warning">
                 <i className="bi bi-exclamation-triangle"></i>
                 <span>At least one competency is required</span>
               </div>
             )}
             {model.competencies.map((comp, index) => (
-              <div key={index} className="fc-comp-card">
-                <div className="fc-comp-header">
-                  <div className="fc-comp-left">
-                    <span className="fc-comp-number">#{comp.displayOrder}</span>
-                    <span className="fc-comp-label">{comp.name || "Sample"}</span>
+              <div key={index} className="hrfcper-comp-card">
+                <div className="hrfcper-comp-header">
+                  <div className="hrfcper-comp-left">
+                    <span className="hrfcper-comp-number">#{comp.displayOrder}</span>
+                    <span className="hrfcper-comp-label">{comp.name || "Untitled Competency"}</span>
                   </div>
-                  <div className="fc-comp-actions">
+                  <div className="hrfcper-comp-actions">
                     <button
                       type="button"
-                      className="fc-btn-icon fc-btn-up"
+                      className="hrfcper-btn-icon hrfcper-btn-up"
                       onClick={() => moveCompUp(index)}
                       disabled={index === 0 || busy}
                       title="Move Up"
@@ -803,7 +820,7 @@ function FormCreate() {
                     </button>
                     <button
                       type="button"
-                      className="fc-btn-icon fc-btn-down"
+                      className="hrfcper-btn-icon hrfcper-btn-down"
                       onClick={() => moveCompDown(index)}
                       disabled={index === model.competencies.length - 1 || busy}
                       title="Move Down"
@@ -812,7 +829,7 @@ function FormCreate() {
                     </button>
                     <button
                       type="button"
-                      className="fc-btn-icon fc-btn-delete"
+                      className="hrfcper-btn-icon hrfcper-btn-delete"
                       onClick={() => removeComp(index)}
                       disabled={busy}
                       title="Delete"
@@ -821,18 +838,18 @@ function FormCreate() {
                     </button>
                   </div>
                 </div>
-                <div className="fc-comp-body">
-                  <div className="fc-form-group fc-full-width">
-                    <label className="fc-label">
-                      Competency Name <span className="fc-required">*</span>
+                <div className="hrfcper-comp-body">
+                  <div className="hrfcper-form-group hrfcper-full-width">
+                    <label className="hrfcper-label">
+                      Competency Name <span className="hrfcper-required">*</span>
                     </label>
-                    <div className="fc-error-wrapper">
+                    <div className="hrfcper-error-wrapper">
                       <input
                         type="text"
-                        className={`fc-input ${
-                          validationErrors[`comp_${index}_name`] ? "fc-input-error" : ""
+                        className={`hrfcper-input ${
+                          validationErrors[`comp_${index}_name`] ? "hrfcper-input-error" : ""
                         }`}
-                        placeholder="Sample"
+                        placeholder="e.g., Communication Skills, Technical Expertise"
                         value={comp.name}
                         onChange={(e) => {
                           updateComp(index, "name", e.target.value);
@@ -844,17 +861,17 @@ function FormCreate() {
                         disabled={busy}
                       />
                       {validationErrors[`comp_${index}_name`] && (
-                        <span className="fc-error-text">
+                        <span className="hrfcper-error-text">
                           <i className="bi bi-exclamation-circle"></i>
                           {validationErrors[`comp_${index}_name`]}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="fc-form-group fc-full-width">
-                    <label className="fc-label">Description (Optional)</label>
+                  <div className="hrfcper-form-group hrfcper-full-width">
+                    <label className="hrfcper-label">Description (Optional)</label>
                     <textarea
-                      className="fc-textarea"
+                      className="hrfcper-textarea"
                       placeholder="Enter competency description..."
                       rows="2"
                       value={comp.description || ""}

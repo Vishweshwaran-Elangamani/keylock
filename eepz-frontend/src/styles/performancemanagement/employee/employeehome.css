@@ -49,11 +49,11 @@
   border-style: solid;
 }
 
-@keyframes spinner-border {
+/* @keyframes spinner-border {
   to {
     transform: rotate(360deg);
   }
-}
+} */
 
 .ehp-loading-text {
   margin-top: 16px;

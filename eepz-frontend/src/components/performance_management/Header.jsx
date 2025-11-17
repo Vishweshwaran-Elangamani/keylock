@@ -1,400 +1,400 @@
 
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
-import { Search, Bell, User, KeyRound, LogOut } from 'lucide-react';
+// import { Search, Bell, User, KeyRound, LogOut } from 'lucide-react';
 
-const formatDate = (date, locale = navigator.language || 'en-IN') => {
+// const formatDate = (date, locale = navigator.language || 'en-IN') => {
 
-  return new Intl.DateTimeFormat(locale, {
+//   return new Intl.DateTimeFormat(locale, {
 
-    weekday: 'long',
+//     weekday: 'long',
 
-    month: 'long',
+//     month: 'long',
 
-    day: 'numeric',
+//     day: 'numeric',
 
-    year: 'numeric'
+//     year: 'numeric'
 
-  }).format(date);
+//   }).format(date);
 
-};
+// };
 
-const Header = () => {
+// const Header = () => {
 
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+//   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-  const today = new Date();
+//   const today = new Date();
 
-  const formattedDate = formatDate(today);
+//   const formattedDate = formatDate(today);
 
-  // Get user from localStorage (temporary solution)
+//   // Get user from localStorage (temporary solution)
 
-  const getUserFromStorage = () => {
+//   const getUserFromStorage = () => {
 
-    const storedUser = localStorage.getItem('user');
+//     const storedUser = localStorage.getItem('user');
 
-    if (storedUser) {
+//     if (storedUser) {
 
-      try {
+//       try {
 
-        return JSON.parse(storedUser);
+//         return JSON.parse(storedUser);
 
-      } catch (error) {
+//       } catch (error) {
 
-        return { name: 'User', email: 'user@example.com', empId: 'EMP-000' };
+//         return { name: 'User', email: 'user@example.com', empId: 'EMP-000' };
 
-      }
+//       }
 
-    }
+//     }
 
-    return { name: 'User', email: 'user@example.com', empId: 'EMP-000' };
+//     return { name: 'User', email: 'user@example.com', empId: 'EMP-000' };
 
-  };
+//   };
 
-  const user = getUserFromStorage();
+//   const user = getUserFromStorage();
 
-  const getInitials = (name) => {
+//   const getInitials = (name) => {
 
-    if (!name) return 'U';
+//     if (!name) return 'U';
 
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+//     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
 
-  };
+//   };
 
-  const handleLogout = () => {
+//   const handleLogout = () => {
 
-    if (window.confirm('Are you sure you want to logout?')) {
+//     if (window.confirm('Are you sure you want to logout?')) {
 
-      localStorage.removeItem('user');
+//       localStorage.removeItem('user');
 
-      localStorage.removeItem('token');
+//       localStorage.removeItem('token');
 
-      navigate('/login');
+//       navigate('/login');
 
-    }
+//     }
 
-  };
+//   };
 
-  const handleChangePassword = () => {
+//   const handleChangePassword = () => {
 
-    localStorage.setItem('tempUser', JSON.stringify(user));
+//     localStorage.setItem('tempUser', JSON.stringify(user));
 
-    navigate('/change-password', { state: { user, fromSettings: true } });
+//     navigate('/change-password', { state: { user, fromSettings: true } });
 
-    setShowProfileMenu(false);
+//     setShowProfileMenu(false);
 
-  };
+//   };
 
-  const handleProfile = () => {
+//   const handleProfile = () => {
 
-    navigate('/profile');
+//     navigate('/profile');
 
-    setShowProfileMenu(false);
+//     setShowProfileMenu(false);
 
-  };
+//   };
 
-  return (
-<header
+//   return (
+// <header
 
-      className="bg-white border-bottom"
+//       className="bg-white border-bottom"
 
-      style={{
+//       style={{
 
-        position: 'sticky',
+//         position: 'sticky',
 
-        top: 0,
+//         top: 0,
 
-        zIndex: 1000,
+//         zIndex: 1000,
 
-        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+//         boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
 
-      }}
->
-<div className="d-flex align-items-center justify-content-between px-4 py-3">
+//       }}
+// >
+// <div className="d-flex align-items-center justify-content-between px-4 py-3">
 
-        {/* Left Section - Welcome */}
-<div className="d-flex align-items-center gap-3">
-<div>
-<div className="d-flex align-items-center gap-2">
-<i className="bi bi-person-circle" style={{ fontSize: '1.2rem', color: '#97247E' }}></i>
-<h6 className="mb-0 fw-bold" style={{ color: 'var(--color-primary-1)' }}>
+//         {/* Left Section - Welcome */}
+// <div className="d-flex align-items-center gap-3">
+// <div>
+// <div className="d-flex align-items-center gap-2">
+// <i className="bi bi-person-circle" style={{ fontSize: '1.2rem', color: '#97247E' }}></i>
+// <h6 className="mb-0 fw-bold" style={{ color: 'var(--color-primary-1)' }}>
 
-                Welcome, {user?.name || 'User'}
-</h6>
-</div>
-<small className="text-muted">{formattedDate}</small>
-</div>
-</div>
+//                 Welcome, {user?.name || 'User'}
+// </h6>
+// </div>
+// <small className="text-muted">{formattedDate}</small>
+// </div>
+// </div>
 
-        {/* Right Section - Search, Notifications, Profile */}
-<div className="d-flex align-items-center gap-3">
+//         {/* Right Section - Search, Notifications, Profile */}
+// <div className="d-flex align-items-center gap-3">
 
-          {/* Search Bar */}
-<div className="input-group" style={{ width: '300px' }}>
-<span className="input-group-text bg-white border-end-0">
-<Search size={18} className="text-muted" />
-</span>
-<input
+//           {/* Search Bar */}
+// <div className="input-group" style={{ width: '300px' }}>
+// <span className="input-group-text bg-white border-end-0">
+// <Search size={18} className="text-muted" />
+// </span>
+// <input
 
-              type="text"
+//               type="text"
 
-              className="form-control border-start-0"
+//               className="form-control border-start-0"
 
-              placeholder="Search..."
+//               placeholder="Search..."
 
-              aria-label="Search"
+//               aria-label="Search"
 
-              style={{ fontSize: '0.875rem' }}
+//               style={{ fontSize: '0.875rem' }}
 
-            />
-</div>
+//             />
+// </div>
 
-          {/* Notification Bell */}
-<div className="position-relative">
-<button
+//           {/* Notification Bell */}
+// <div className="position-relative">
+// <button
 
-              className="btn btn-link text-dark p-0 position-relative"
+//               className="btn btn-link text-dark p-0 position-relative"
 
-              style={{ textDecoration: 'none' }}
->
-<Bell size={24} />
-<span
+//               style={{ textDecoration: 'none' }}
+// >
+// <Bell size={24} />
+// <span
 
-                className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+//                 className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
 
-                style={{ fontSize: '0.65rem', padding: '0.25rem 0.4rem' }}
->
+//                 style={{ fontSize: '0.65rem', padding: '0.25rem 0.4rem' }}
+// >
 
-                3
-</span>
-</button>
-</div>
+//                 3
+// </span>
+// </button>
+// </div>
 
-          {/* User Profile Dropdown */}
-<div className="dropdown">
-<button
+//           {/* User Profile Dropdown */}
+// <div className="dropdown">
+// <button
 
-              className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold"
+//               className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold"
 
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
+//               onClick={() => setShowProfileMenu(!showProfileMenu)}
 
-              style={{
+//               style={{
 
-                width: '40px',
+//                 width: '40px',
 
-                height: '40px',
+//                 height: '40px',
 
-                cursor: 'pointer',
+//                 cursor: 'pointer',
 
-                background: 'linear-gradient(135deg, #AC5098 0%, #97247E 100%)',
+//                 background: 'linear-gradient(135deg, #AC5098 0%, #97247E 100%)',
 
-                border: 'none',
+//                 border: 'none',
 
-                boxShadow: '0 2px 8px rgba(151, 36, 126, 0.3)',
+//                 boxShadow: '0 2px 8px rgba(151, 36, 126, 0.3)',
 
-                fontSize: '0.875rem',
+//                 fontSize: '0.875rem',
 
-                letterSpacing: '0.5px'
+//                 letterSpacing: '0.5px'
 
-              }}
+//               }}
 
-              data-bs-toggle="dropdown"
+//               data-bs-toggle="dropdown"
 
-              aria-expanded={showProfileMenu}
->
+//               aria-expanded={showProfileMenu}
+// >
 
-              {getInitials(user?.name || 'User')}
-</button>
+//               {getInitials(user?.name || 'User')}
+// </button>
 
-            {/* Profile Dropdown Menu */}
-<div
+//             {/* Profile Dropdown Menu */}
+// <div
 
-              className={`dropdown-menu dropdown-menu-end ${showProfileMenu ? 'show' : ''}`}
+//               className={`dropdown-menu dropdown-menu-end ${showProfileMenu ? 'show' : ''}`}
 
-              style={{
+//               style={{
 
-                minWidth: '320px',
+//                 minWidth: '320px',
 
-                borderRadius: '12px',
+//                 borderRadius: '12px',
 
-                border: '1px solid #e5e7eb',
+//                 border: '1px solid #e5e7eb',
 
-                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
+//                 boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
 
-                padding: 0,
+//                 padding: 0,
 
-                marginTop: '10px'
+//                 marginTop: '10px'
 
-              }}
->
+//               }}
+// >
 
-              {/* Profile Header */}
-<div className="p-4 text-center border-bottom">
-<div
+//               {/* Profile Header */}
+// <div className="p-4 text-center border-bottom">
+// <div
 
-                  className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold mx-auto mb-3"
+//                   className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold mx-auto mb-3"
 
-                  style={{
+//                   style={{
 
-                    width: '72px',
+//                     width: '72px',
 
-                    height: '72px',
+//                     height: '72px',
 
-                    background: 'linear-gradient(135deg, #AC5098 0%, #97247E 100%)',
+//                     background: 'linear-gradient(135deg, #AC5098 0%, #97247E 100%)',
 
-                    border: '4px solid #e5e7eb',
+//                     border: '4px solid #e5e7eb',
 
-                    fontSize: '1.5rem',
+//                     fontSize: '1.5rem',
 
-                    boxShadow: '0 4px 12px rgba(151, 36, 126, 0.3)'
+//                     boxShadow: '0 4px 12px rgba(151, 36, 126, 0.3)'
 
-                  }}
->
+//                   }}
+// >
 
-                  {getInitials(user?.name || 'User')}
-</div>
-<h5 className="fw-bold mb-1" style={{ fontSize: '18px', color: 'var(--color-primary-1)' }}>
+//                   {getInitials(user?.name || 'User')}
+// </div>
+// <h5 className="fw-bold mb-1" style={{ fontSize: '18px', color: 'var(--color-primary-1)' }}>
 
-                  {user?.name || 'User'}
-</h5>
-<p className="text-muted mb-2" style={{ fontSize: '14px' }}>
+//                   {user?.name || 'User'}
+// </h5>
+// <p className="text-muted mb-2" style={{ fontSize: '14px' }}>
 
-                  {user?.email || 'user@example.com'}
-</p>
-<p
+//                   {user?.email || 'user@example.com'}
+// </p>
+// <p
 
-                  className="fw-bold mb-0"
+//                   className="fw-bold mb-0"
 
-                  style={{
+//                   style={{
 
-                    fontSize: '14px',
+//                     fontSize: '14px',
 
-                    letterSpacing: '0.5px',
+//                     letterSpacing: '0.5px',
 
-                    color: '#97247E'
+//                     color: '#97247E'
 
-                  }}
->
+//                   }}
+// >
 
-                  {user?.empId || 'EMP-000'}
-</p>
-</div>
+//                   {user?.empId || 'EMP-000'}
+// </p>
+// </div>
 
-              {/* Profile Actions */}
-<div className="p-3">
-<button
+//               {/* Profile Actions */}
+// <div className="p-3">
+// <button
 
-                  className="btn w-100 mb-2 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+//                   className="btn w-100 mb-2 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
 
-                  onClick={handleProfile}
+//                   onClick={handleProfile}
 
-                  style={{
+//                   style={{
 
-                    backgroundColor: '#3f4d8f',
+//                     backgroundColor: '#3f4d8f',
 
-                    color: 'white',
+//                     color: 'white',
 
-                    border: 'none',
+//                     border: 'none',
 
-                    borderRadius: '8px',
+//                     borderRadius: '8px',
 
-                    fontSize: '14px',
+//                     fontSize: '14px',
 
-                    transition: 'all 0.2s ease'
+//                     transition: 'all 0.2s ease'
 
-                  }}
->
-<User size={16} />
+//                   }}
+// >
+// <User size={16} />
 
-                  Profile
-</button>
-<button
+//                   Profile
+// </button>
+// <button
 
-                  className="btn w-100 mb-2 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+//                   className="btn w-100 mb-2 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
 
-                  onClick={handleChangePassword}
+//                   onClick={handleChangePassword}
 
-                  style={{
+//                   style={{
 
-                    backgroundColor: '#3f4d8f',
+//                     backgroundColor: '#3f4d8f',
 
-                    color: 'white',
+//                     color: 'white',
 
-                    border: 'none',
+//                     border: 'none',
 
-                    borderRadius: '8px',
+//                     borderRadius: '8px',
 
-                    fontSize: '14px',
+//                     fontSize: '14px',
 
-                    transition: 'all 0.2s ease'
+//                     transition: 'all 0.2s ease'
 
-                  }}
->
-<KeyRound size={16} />
+//                   }}
+// >
+// <KeyRound size={16} />
 
-                  Change Password
-</button>
-<button
+//                   Change Password
+// </button>
+// <button
 
-                  className="btn btn-outline-danger w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
+//                   className="btn btn-outline-danger w-100 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
 
-                  onClick={handleLogout}
+//                   onClick={handleLogout}
 
-                  style={{
+//                   style={{
 
-                    borderRadius: '8px',
+//                     borderRadius: '8px',
 
-                    fontSize: '14px',
+//                     fontSize: '14px',
 
-                    transition: 'all 0.2s ease'
+//                     transition: 'all 0.2s ease'
 
-                  }}
->
-<LogOut size={16} />
+//                   }}
+// >
+// <LogOut size={16} />
 
-                  Logout
-</button>
-</div>
-</div>
-</div>
-</div>
-</div>
+//                   Logout
+// </button>
+// </div>
+// </div>
+// </div>
+// </div>
+// </div>
 
-      {/* Backdrop for closing dropdown */}
+//       {/* Backdrop for closing dropdown */}
 
-      {showProfileMenu && (
-<div
+//       {showProfileMenu && (
+// <div
 
-          style={{
+//           style={{
 
-            position: 'fixed',
+//             position: 'fixed',
 
-            top: 0,
+//             top: 0,
 
-            left: 0,
+//             left: 0,
 
-            right: 0,
+//             right: 0,
 
-            bottom: 0,
+//             bottom: 0,
 
-            zIndex: 999
+//             zIndex: 999
 
-          }}
+//           }}
 
-          onClick={() => setShowProfileMenu(false)}
+//           onClick={() => setShowProfileMenu(false)}
 
-        />
+//         />
 
-      )}
-</header>
+//       )}
+// </header>
 
-  );
+//   );
 
-};
+// };
 
-export default Header;
+// export default Header;
  

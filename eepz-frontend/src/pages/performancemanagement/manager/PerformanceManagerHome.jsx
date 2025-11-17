@@ -51,15 +51,15 @@ export default function PerformanceManagerHome() {
   ];
 
   return (
-    <div className="manager-home-container">
-      <h1 className="manager-main-title">
+    <div className="managerperfromancehome-container">
+      <h1 className="managerperfromancehome-main-title">
         EEPZ Performance Management - Manager
       </h1>
-      <div className="management-cards-grid">
+      <div className="managerperfromancehome-cards-grid">
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`management-card-admin ${hoveredCard === index ? "hovered" : ""}`}
+            className={`managerperfromancehome-card-admin ${hoveredCard === index ? "hovered" : ""}`}
             onMouseEnter={() => setHoveredCard(index)}
             onMouseLeave={() => setHoveredCard(null)}
             onClick={() => navigate(card.path)}
@@ -69,7 +69,7 @@ export default function PerformanceManagerHome() {
             tabIndex={0}
           >
             <div
-              className="card-icon-wrapper-admin"
+              className="managerperfromancehome-card-icon"
               style={{
                 background: card.bg,
                 color: card.color,
@@ -77,11 +77,11 @@ export default function PerformanceManagerHome() {
             >
               <i className={`bi ${card.icon}`}></i>
             </div>
-            <div className="card-content-admin">
-              <h3 className="card-title-admin">{card.title}</h3>
-              <p className="card-description-admin">{card.description}</p>
+            <div className="managerperfromancehome-card-content">
+              <h3 className="managerperfromancehome-card-title">{card.title}</h3>
+              <p className="managerperfromancehome-card-description">{card.description}</p>
             </div>
-            <div className="card-arrow-admin">
+            <div className="managerperfromancehome-card-arrow">
               <i className="bi bi-arrow-right"></i>
             </div>
           </div>

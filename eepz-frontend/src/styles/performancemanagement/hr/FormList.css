@@ -1,740 +1,934 @@
 /* ============================================================
-   FORMS PAGE CONTAINER - Main Layout
+   HR FORMS LIST PAGE - Main Layout
+   CLASS PREFIX: hrformlist- (HR Form List Performance)
    ============================================================ */
-.forms-page-container {
-  height: calc(100vh - 60px);
-  background: #F0F2F5;
-  font-family: 'Segoe UI', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+   .hrformlist-page-container {
+    height: calc(100vh - 60px);
+    background: #F0F2F5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* ============================================================
+     MAIN CONTENT AREA - Two Column Layout
+     ============================================================ */
+  .hrformlist-main-area {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    overflow: hidden;
+    min-height: 0;
+  }
+  
+  /* ============================================================
+     FORMS SECTION - Left Panel (Large)
+     ============================================================ */
+  .hrformlist-forms-section {
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    flex: 1;
+    overflow: hidden;
+    border: 1px solid #E5E7EB;
+  }
+  
+  /* ============================================================
+     SECTION HEADER - Search & Filter Row
+     ============================================================ */
+  .hrformlist-section-header {
+    padding: 16px 20px;
+    border-bottom: 2px solid #E5E7EB;
+    background: #FAFBFC;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .hrformlist-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 200px;
+  }
+  
+  .hrformlist-header-left h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #27235C;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .hrformlist-header-left h3 i {
+    font-size: 18px;
+    color: #AC5098;
+  }
+  
+  .hrformlist-count-badge {
+    display: inline-block;
+    font-size: 12px;
+    padding: 6px 12px;
+    background: #27235C;
+    color: #FFFFFF;
+    border-radius: 20px;
+    font-weight: 700;
+  }
+  
+  .hrformlist-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    max-width: 500px;
+  }
+  
+  .hrformlist-search-box {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+  
+  .hrformlist-search-icon {
+    position: absolute;
+    left: 12px;
+    color: #9CA3AF;
+    font-size: 14px;
+    pointer-events: none;
+  }
+  
+  .hrformlist-search-box input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #374151;
+    background: #FFFFFF;
+    transition: all 0.3s ease;
+  }
+  
+  .hrformlist-search-box input:focus {
+    outline: none;
+    border-color: #AC5098;
+    box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
+  }
+  
+  .hrformlist-search-box input::placeholder {
+    color: #D1D5DB;
+  }
+  
+  .hrformlist-header-right select {
+    padding: 10px 12px;
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+  }
+  
+  .hrformlist-header-right select:focus {
+    outline: none;
+    border-color: #AC5098;
+    box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
+  }
+  
+  /* ============================================================
+     TABLE SECTION
+     ============================================================ */
+  .hrformlist-table-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  .hrformlist-table-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .hrformlist-table-scroll::-webkit-scrollbar-track {
+    background: #F1F5F9;
+  }
+  
+  .hrformlist-table-scroll::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+  }
+  
+  .hrformlist-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+  
+  .hrformlist-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFFFF;
+  }
+  
+  .hrformlist-table thead {
+    background: #F9FAFB;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .hrformlist-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 800;
+    color: #6B7280;
+    border-bottom: 2px solid #E5E7EB;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .hrformlist-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #374151;
+    text-align: left;
+  }
+  
+  .hrformlist-table tr {
+    background: #FFFFFF;
+    border-bottom: 1px solid #F3F4F6;
+    transition: all 0.2s ease;
+  }
+  
+  .hrformlist-table tr:hover {
+    background: #F9FAFB;
+  }
+  
+  .hrformlist-table tr.hrformlist-selected {
+    background: #FDF4FF;
+    border-left: 4px solid #AC5098;
+  }
+  
+  /* ============================================================
+     TABLE ELEMENTS - Type Pills & Buttons
+     ============================================================ */
+  .hrformlist-type-pill {
+    display: inline-block;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #AC5098, #97247E);
+    color: #FFFFFF;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  
+  .hrformlist-table td button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px; /* Reduced from 6px */
+    padding: 6px 10px; /* Reduced from 8px 14px */
+    background: #FFFFFF;
+    color: #27235C;
+    border: 2px solid #27235C;
+    border-radius: 8px;
+    font-size: 11px; /* Reduced from 12px */
+    font-weight: 700;
+    cursor: pointer;
+    margin-right: 4px; /* Reduced from 6px */
+    transition: all 0.2s ease;
+  }
+  
+  .hrformlist-table td.hrformlist-actions-cell {
+    display: flex;
+    gap: 6px; /* Reduced from 8px */
+    align-items: center;
+    white-space: nowrap;
+  }
+  
+  /* ← ADD THIS NEW WRAPPER RULE */
+  .hrformlist-table td {
+    white-space: nowrap; /* Prevents buttons from wrapping to new line */
+  }
+  
+  
+  .hrformlist-table td button:hover {
+    background: #F3F4F6;
+  }
+  
+  .hrformlist-table td button.hrformlist-active {
+    background: linear-gradient(135deg, #AC5098, #97247E);
+    color: #FFFFFF;
+    border-color: #AC5098;
+  }
+  
+  .hrformlist-table td button i {
+    font-size: 13px;
+  }
+  
+  /* ============================================================
+     USERS PANEL - Right Panel (Sidebar)
+     ============================================================ */
+  .hrformlist-users-panel {
+    width: 400px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1px solid #E5E7EB;
+  }
+  
+  /* ============================================================
+     USERS PANEL HEADER
+     ============================================================ */
+  .hrformlist-users-panel-header {
+    padding: 16px 20px;
+    border-bottom: 2px solid #E5E7EB;
+    background: linear-gradient(135deg, #AC5098, #97247E);
+    color: #FFFFFF;
+  }
+  
+  .hrformlist-users-panel-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .hrformlist-users-panel-header h3 i {
+    font-size: 18px;
+  }
+  
+  /* ============================================================
+     USER SEARCH & SELECT ALL
+     ============================================================ */
+  .hrformlist-user-search-container {
+    padding: 12px 16px;
+    border-bottom: 2px solid #E5E7EB;
+    background: #FAFBFC;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .hrformlist-user-search-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #374151;
+    background: #FFFFFF;
+    transition: all 0.3s ease;
+  }
+  
+  .hrformlist-user-search-input:focus {
+    outline: none;
+    border-color: #AC5098;
+    box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
+  }
+  
+  .hrformlist-user-search-input::placeholder {
+    color: #D1D5DB;
+  }
+  
+  .hrformlist-btn-select-all {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: #10B981;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  
+  .hrformlist-btn-select-all:hover {
+    background: #059669;
+    transform: translateY(-1px);
+  }
+  
+  .hrformlist-btn-select-all i {
+    font-size: 14px;
+  }
+  
+  /* ============================================================
+     USERS PANEL BODY - User List
+     ============================================================ */
+  .hrformlist-users-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px;
+    background: #FAFBFC;
+  }
+  
+  .hrformlist-users-panel-body::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .hrformlist-users-panel-body::-webkit-scrollbar-track {
+    background: #F1F5F9;
+  }
+  
+  .hrformlist-users-panel-body::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 3px;
+  }
+  
+  .hrformlist-users-panel-body::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+  
+  .hrformlist-selected-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1F2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    background: #ECFDF5;
+    border-radius: 8px;
+    border: 2px solid #A7F3D0;
+  }
+  
+  .hrformlist-selected-count i {
+    color: #059669;
+    font-size: 14px;
+  }
+  
+  .hrformlist-empty-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  
+  .hrformlist-empty-box i {
+    font-size: 56px;
+    color: #D1D5DB;
+    margin-bottom: 16px;
+  }
+  
+  .hrformlist-empty-box p {
+    margin: 0;
+    color: #9CA3AF;
+    font-size: 14px;
+  }
+  
+  /* ============================================================
+     USER CARD - Individual User Item
+     ============================================================ */
+  .hrformlist-user-card {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    border: 2px solid #E5E7EB;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background: #FFFFFF;
+    transition: all 0.2s ease;
+  }
+  
+  .hrformlist-user-card:hover {
+    border-color: #AC5098;
+    background: #FDF4FF;
+  }
+  
+  .hrformlist-user-card input[type="checkbox"] {
+    margin-right: 10px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: #AC5098;
+  }
+  
+  .hrformlist-user-card.hrformlist-selected {
+    background: #FDF4FF;
+    border-color: #AC5098;
+  }
+  
+  .hrformlist-user-card.hrformlist-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #F9FAFB;
+  }
+  
+  .hrformlist-user-card.hrformlist-disabled:hover {
+    border-color: #E5E7EB;
+    background: #F9FAFB;
+  }
+  
+  .hrformlist-user-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .hrformlist-user-info strong {
+    font-size: 13px;
+    font-weight: 600;
+    color: #27235C;
+  }
+  
+  .hrformlist-assigned-tag {
+    font-size: 10px;
+    padding: 3px 8px;
+    background: #D1FAE5;
+    color: #059669;
+    border-radius: 8px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  
+  .hrformlist-assigned-tag i {
+    font-size: 10px;
+  }
+  
+  /* ============================================================
+     USERS PANEL FOOTER - Action Buttons
+     ============================================================ */
+  .hrformlist-users-panel-footer {
+    padding: 12px 16px;
+    border-top: 2px solid #E5E7EB;
+    background: #FFFFFF;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .hrformlist-users-panel-footer button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #27235C;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .hrformlist-users-panel-footer button:hover:not(:disabled) {
+    background: #1A1842;
+    transform: translateY(-1px);
+  }
+  
+  .hrformlist-users-panel-footer button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .hrformlist-users-panel-footer button i {
+    font-size: 14px;
+  }
+  
+  /* ============================================================
+     MODALS - OVERLAY & BASE STYLES
+     ============================================================ */
+  .hrformlist-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  }
+  
+  .hrformlist-view-modal,
+  .hrformlist-deadline-modal {
+    background: #FFFFFF;
+    border-radius: 16px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* ============================================================
+     ENHANCED VIEW MODAL - LARGER & MORE PROFESSIONAL
+     ============================================================ */
+ /* ============================================================
+   ENHANCED VIEW MODAL - COMPACT HEADER & FIXED FOOTER
+   ============================================================ */
+
+.hrformlist-view-modal-large {
+  max-width: 900px !important;
+  width: 95% !important;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  max-height: 90vh;
+  overflow: hidden; /* Prevent entire modal from scrolling */
 }
 
 /* ============================================================
-   MAIN CONTENT AREA - Two Column Layout
+   COMPACT HEADER - REDUCED VERTICAL SPACE
    ============================================================ */
-.main-area {
-  flex: 1;
-  padding: 20px;
-  display: flex;
-  gap: 20px;
-  overflow: hidden;
-  min-height: 0;
-}
 
-/* ============================================================
-   FORMS SECTION - Left Panel (Large)
-   ============================================================ */
-.forms-section {
-  background: #FFFFFF;
-  display: flex;
-  flex-direction: column;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  flex: 1;
-  overflow: hidden;
-  border: 1px solid #E5E7EB;
-}
-
-/* ============================================================
-   SECTION HEADER - Search & Filter Row
-   ============================================================ */
-.section-header {
-  padding: 16px 20px;
+.hrformlist-view-modal-header {
+  padding: 16px 28px; /* Reduced from 24px to 16px */
   border-bottom: 2px solid #E5E7EB;
-  background: #FAFBFC;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+  flex-shrink: 0; /* Prevent header from shrinking */
 }
 
-.header-left {
+.hrformlist-modal-title-section {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-width: 200px;
+  gap: 12px; /* Reduced from 16px */
 }
 
-.header-left h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: #27235C;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.header-left h3 i {
-  font-size: 18px;
+.hrformlist-modal-title-section i {
+  font-size: 28px; /* Reduced from 32px */
   color: #AC5098;
 }
 
-.count-badge {
-  display: inline-block;
-  font-size: 12px;
-  padding: 6px 12px;
-  background: #27235C;
-  color: #FFFFFF;
-  border-radius: 20px;
+.hrformlist-modal-title-section div h3 {
+  margin: 0;
+  font-size: 20px; /* Reduced from 22px */
   font-weight: 700;
+  color: #27235C;
+  line-height: 1.2;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-  max-width: 500px;
+.hrformlist-modal-subtitle {
+  margin: 2px 0 0 0; /* Reduced from 4px */
+  font-size: 12px; /* Reduced from 13px */
+  color: #6B7280;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
-.search-box {
-  position: relative;
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  color: #9CA3AF;
-  font-size: 14px;
-  pointer-events: none;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 10px 12px 10px 36px;
-  border: 2px solid #E5E7EB;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #374151;
-  background: #FFFFFF;
-  transition: all 0.3s ease;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: #AC5098;
-  box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
-}
-
-.search-box input::placeholder {
-  color: #D1D5DB;
-}
-
-.header-right select {
-  padding: 10px 12px;
-  border: 2px solid #E5E7EB;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-  background: #FFFFFF;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 140px;
-}
-
-.header-right select:focus {
-  outline: none;
-  border-color: #AC5098;
-  box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
-}
+/* X button removed - no close-btn styles needed in header */
 
 /* ============================================================
-   TABLE SECTION
+   SCROLLABLE BODY - FILLS AVAILABLE SPACE
    ============================================================ */
-.table-scroll {
-  flex: 1;
+
+.hrformlist-view-modal-body {
+  padding: 20px 28px; /* Reduced from 24px */
   overflow-y: auto;
   overflow-x: hidden;
+  flex: 1; /* Takes remaining space */
+  min-height: 0; /* Important for flex scrolling */
 }
 
-.table-scroll::-webkit-scrollbar {
+.hrformlist-view-modal-body::-webkit-scrollbar {
   width: 8px;
 }
 
-.table-scroll::-webkit-scrollbar-track {
+.hrformlist-view-modal-body::-webkit-scrollbar-track {
   background: #F1F5F9;
 }
 
-.table-scroll::-webkit-scrollbar-thumb {
+.hrformlist-view-modal-body::-webkit-scrollbar-thumb {
   background: #CBD5E1;
   border-radius: 4px;
 }
 
-.table-scroll::-webkit-scrollbar-thumb:hover {
+.hrformlist-view-modal-body::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #FFFFFF;
+/* ============================================================
+   INFO SECTION - CARD GRID LAYOUT (Same as before)
+   ============================================================ */
+
+.hrformlist-info-section {
+  margin-bottom: 28px; /* Reduced from 32px */
 }
 
-thead {
-  background: #F9FAFB;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-th {
-  padding: 14px 16px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 800;
-  color: #6B7280;
+.hrformlist-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #27235C;
+  margin: 0 0 16px 0; /* Reduced from 20px */
+  padding-bottom: 10px; /* Reduced from 12px */
   border-bottom: 2px solid #E5E7EB;
+}
+
+.hrformlist-section-heading i {
+  color: #AC5098;
+  font-size: 18px;
+}
+
+.hrformlist-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.hrformlist-info-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #F9FAFB;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.hrformlist-info-card:hover {
+  border-color: #AC5098;
+  background: #FDF4FF;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(172, 80, 152, 0.15);
+}
+
+.hrformlist-info-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #AC5098, #97247E);
+  border-radius: 10px;
+  color: #FFFFFF;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.hrformlist-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.hrformlist-info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6B7280;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-td {
-  padding: 14px 16px;
-  font-size: 13px;
-  color: #374151;
-}
-th, td {
-  text-align: left;
+.hrformlist-info-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #27235C;
 }
 
-
-tr {
-  background: #FFFFFF;
-  border-bottom: 1px solid #F3F4F6;
-  transition: all 0.2s ease;
+.hrformlist-info-value-highlight {
+  font-size: 24px;
+  font-weight: 700;
+  color: #AC5098;
 }
 
-tr:hover {
-  background: #F9FAFB;
-}
-
-tr.selected {
-  background: #FDF4FF;
-  border-left: 4px solid #AC5098;
-}
-
-/* ============================================================
-   TABLE ELEMENTS - Type Pills & Buttons
-   ============================================================ */
-.type-pill {
+.hrformlist-type-badge-modal {
   display: inline-block;
   padding: 6px 14px;
   background: linear-gradient(135deg, #AC5098, #97247E);
   color: #FFFFFF;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
-td button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+/* ============================================================
+   COMPETENCIES TABLE - PROFESSIONAL DESIGN (Same as before)
+   ============================================================ */
+
+.hrformlist-competencies-section-modal {
+  margin-bottom: 20px; /* Reduced from 24px */
+}
+
+.hrformlist-table-container {
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  overflow: hidden;
   background: #FFFFFF;
-  color: #27235C;
-  border: 2px solid #27235C;
-  border-radius: 8px;
+}
+
+.hrformlist-competencies-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.hrformlist-competencies-table thead {
+  background: linear-gradient(135deg, #27235C, #1A1842);
+}
+
+.hrformlist-competencies-table thead th {
+  padding: 16px 20px;
+  text-align: left;
   font-size: 12px;
   font-weight: 700;
-  cursor: pointer;
-  margin-right: 6px;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 3px solid #AC5098;
+}
+
+.hrformlist-table-order {
+  width: 80px;
+  text-align: center !important;
+}
+
+.hrformlist-table-name {
+  width: 35%;
+}
+
+.hrformlist-table-description {
+  width: auto;
+}
+
+.hrformlist-competencies-table tbody tr {
+  border-bottom: 1px solid #E5E7EB;
   transition: all 0.2s ease;
 }
 
-td button:hover {
-  background: #F3F4F6;
+.hrformlist-competencies-table tbody tr:hover {
+  background: #F9FAFB;
 }
 
-td button.active {
+.hrformlist-competencies-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.hrformlist-competencies-table tbody td {
+  padding: 18px 20px;
+  font-size: 14px;
+  color: #374151;
+  vertical-align: top;
+  text-align: left; 
+}
+
+.hrformlist-order-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   background: linear-gradient(135deg, #AC5098, #97247E);
   color: #FFFFFF;
-  border-color: #AC5098;
-}
-
-td button i {
-  font-size: 13px;
-}
-
-/* ============================================================
-   USERS PANEL - Right Panel (Sidebar)
-   ============================================================ */
-.users-panel {
-  width: 400px;
-  background: #FFFFFF;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 1px solid #E5E7EB;
-}
-
-/* ============================================================
-   USERS PANEL HEADER
-   ============================================================ */
-.users-panel-header {
-  padding: 16px 20px;
-  border-bottom: 2px solid #E5E7EB;
-  background: linear-gradient(135deg, #AC5098, #97247E);
-  color: #FFFFFF;
-}
-
-.users-panel-header h3 {
-  margin: 0;
-  font-size: 15px;
   font-weight: 700;
+  font-size: 14px;
+}
+
+.hrformlist-comp-name-cell {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
-.users-panel-header h3 i {
+.hrformlist-comp-name-cell i {
+  color: #AC5098;
   font-size: 18px;
 }
 
-/* ============================================================
-   USER SEARCH & SELECT ALL
-   ============================================================ */
-.user-search-container {
-  padding: 12px 16px;
-  border-bottom: 2px solid #E5E7EB;
-  background: #FAFBFC;
-  display: flex;
-  gap: 10px;
-  align-items: center;
+.hrformlist-comp-name-cell strong {
+  color: #27235C;
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.user-search-input {
-  flex: 1;
-  padding: 10px 12px;
-  border: 2px solid #E5E7EB;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #374151;
-  background: #FFFFFF;
-  transition: all 0.3s ease;
-}
-
-.user-search-input:focus {
-  outline: none;
-  border-color: #AC5098;
-  box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
-}
-
-.user-search-input::placeholder {
-  color: #D1D5DB;
-}
-
-.btn-select-all {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
-  background: #10B981;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.btn-select-all:hover {
-  background: #059669;
-  transform: translateY(-1px);
-}
-
-.btn-select-all i {
-  font-size: 14px;
-}
-
-/* ============================================================
-   USERS PANEL BODY - User List
-   ============================================================ */
-.users-panel-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 14px 16px;
-  background: #FAFBFC;
-}
-
-.users-panel-body::-webkit-scrollbar {
-  width: 6px;
-}
-
-.users-panel-body::-webkit-scrollbar-track {
-  background: #F1F5F9;
-}
-
-.users-panel-body::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 3px;
-}
-
-.users-panel-body::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
-}
-
-.selected-count {
-  font-size: 12px;
-  font-weight: 700;
-  color: #1F2937;
+.hrformlist-no-description {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
-  padding: 10px 12px;
-  background: #ECFDF5;
-  border-radius: 8px;
-  border: 2px solid #A7F3D0;
+  color: #9CA3AF;
+  font-style: italic;
+  font-size: 13px;
 }
 
-.selected-count i {
-  color: #059669;
-  font-size: 14px;
+.hrformlist-no-description i {
+  font-size: 16px;
 }
 
-.empty-box {
+/* ============================================================
+   NO COMPETENCIES MESSAGE
+   ============================================================ */
+
+.hrformlist-no-competencies {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
+  background: #F9FAFB;
+  border: 2px dashed #D1D5DB;
+  border-radius: 12px;
   text-align: center;
 }
 
-.empty-box i {
+.hrformlist-no-competencies i {
   font-size: 56px;
   color: #D1D5DB;
   margin-bottom: 16px;
 }
 
-.empty-box p {
+.hrformlist-no-competencies p {
   margin: 0;
-  color: #9CA3AF;
-  font-size: 14px;
+  color: #6B7280;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 /* ============================================================
-   USER CARD - Individual User Item
+   FIXED FOOTER - ALWAYS VISIBLE
    ============================================================ */
-.user-card {
-  display: flex;
-  align-items: flex-start;
-  padding: 12px;
-  border: 2px solid #E5E7EB;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  background: #FFFFFF;
-  transition: all 0.2s ease;
-}
 
-.user-card:hover {
-  border-color: #AC5098;
-  background: #FDF4FF;
-}
-
-.user-card input[type="checkbox"] {
-  margin-right: 10px;
-  margin-top: 2px;
-  cursor: pointer;
-  accent-color: #AC5098;
-}
-
-.user-card.selected {
-  background: #FDF4FF;
-  border-color: #AC5098;
-}
-
-.user-card.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #F9FAFB;
-}
-
-.user-card.disabled:hover {
-  border-color: #E5E7EB;
-  background: #F9FAFB;
-}
-
-.user-info {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.user-info strong {
-  font-size: 13px;
-  font-weight: 600;
-  color: #27235C;
-}
-
-.assigned-tag {
-  font-size: 10px;
-  padding: 3px 8px;
-  background: #D1FAE5;
-  color: #059669;
-  border-radius: 8px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.assigned-tag i {
-  font-size: 10px;
-}
-
-/* ============================================================
-   USERS PANEL FOOTER - Action Buttons
-   ============================================================ */
-.users-panel-footer {
-  padding: 12px 16px;
+.hrformlist-view-modal-footer {
+  padding: 16px 28px; /* Reduced from 20px */
   border-top: 2px solid #E5E7EB;
-  background: #FFFFFF;
-  display: flex;
-  gap: 10px;
-}
-
-.users-panel-footer button {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #27235C;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.users-panel-footer button:hover:not(:disabled) {
-  background: #1A1842;
-  transform: translateY(-1px);
-}
-
-.users-panel-footer button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.users-panel-footer button i {
-  font-size: 14px;
-}
-
-/* ============================================================
-   MODALS - View & Deadline
-   ============================================================ */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.65);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
-}
-
-.view-modal,
-.deadline-modal {
-  background: #FFFFFF;
-  border-radius: 16px;
-  max-width: 600px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.view-modal-header,
-.deadline-modal {
-  padding: 24px 28px;
-}
-
-.view-modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #E5E7EB;
-  padding-bottom: 16px;
-}
-
-.view-modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #27235C;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.view-modal-header h3 i {
-  color: #AC5098;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #9CA3AF;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.close-btn:hover {
-  color: #27235C;
-}
-
-.view-modal-body {
-  padding: 20px 0;
-}
-
-.detail-row {
-  display: flex;
-  padding: 12px 0;
-  border-bottom: 1px solid #E5E7EB;
-}
-
-.detail-row:last-child {
-  border-bottom: none;
-}
-
-.detail-label {
-  font-weight: 700;
-  color: #27235C;
-  min-width: 150px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.detail-label i {
-  color: #AC5098;
-}
-
-.detail-value,
-.type-badge {
-  flex: 1;
-  color: #6B7280;
-  font-size: 14px;
-}
-
-.type-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  background: linear-gradient(135deg, #AC5098, #97247E);
-  color: #FFFFFF;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.view-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding-top: 20px;
-  border-top: 2px solid #E5E7EB;
-}
-
-.btn-close-modal {
-  padding: 12px 20px;
-  background: #E5E7EB;
-  color: #27235C;
-  border: none;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-close-modal:hover {
-  background: #D1D5DB;
-}
-
-.deadline-modal h3 {
-  margin: 0 0 10px 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #27235C;
-  text-align: center;
-}
-
-.deadline-modal p {
-  margin: 0 0 20px 0;
-  color: #6B7280;
-  text-align: center;
-  font-size: 14px;
-}
-
-.input-group {
-  margin-bottom: 24px;
-}
-
-.input-group label {
-  display: block;
-  font-weight: 700;
-  color: #27235C;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.input-group label i {
-  color: #AC5098;
-}
-
-.input-group input[type="number"] {
-  width: 100%;
-  padding: 12px 14px;
-  border: 2px solid #E5E7EB;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #27235C;
-  transition: all 0.2s ease;
-}
-
-.input-group input[type="number"]:focus {
-  outline: none;
-  border-color: #AC5098;
-  box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
-}
-
-.modal-buttons {
-  display: flex;
   gap: 12px;
-  justify-content: flex-end;
+  background: #FFFFFF;
+  flex-shrink: 0; /* Prevent footer from shrinking */
+  position: sticky; /* Make it stick to bottom */
+  bottom: 0;
+  z-index: 10;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow for depth */
 }
 
-.btn-cancel-modal,
-.btn-confirm-modal {
+.hrformlist-btn-edit-form {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #FFFFFF;
   border: none;
   border-radius: 8px;
   font-weight: 700;
@@ -743,84 +937,95 @@ td button i {
   transition: all 0.2s ease;
 }
 
-.btn-cancel-modal {
-  background: #E5E7EB;
-  color: #27235C;
+.hrformlist-btn-edit-form:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
 }
 
-.btn-cancel-modal:hover {
+.hrformlist-btn-edit-form i {
+  font-size: 16px;
+}
+
+.hrformlist-btn-close-modal {
+  padding: 12px 20px;
+  background: #E5E7EB;
+  color: #27235C;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.hrformlist-btn-close-modal:hover {
   background: #D1D5DB;
 }
 
-.btn-confirm-modal {
-  background: linear-gradient(135deg, #AC5098, #97247E);
-  color: #FFFFFF;
-}
-
-.btn-confirm-modal:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(172, 80, 152, 0.3);
+.hrformlist-btn-close-modal i {
+  font-size: 16px;
 }
 
 /* ============================================================
-   RESPONSIVE DESIGN
+   RESPONSIVE DESIGN FOR COMPACT MODAL
    ============================================================ */
-@media (max-width: 1200px) {
-  .users-panel {
-    width: 350px;
-  }
-
-  .header-right {
-    max-width: 400px;
-  }
-}
-
-@media (max-width: 1024px) {
-  .main-area {
-    flex-direction: column;
-  }
-
-  .users-panel {
-    width: 100%;
-    height: 350px;
-  }
-
-  .users-panel-body {
-    max-height: 250px;
-  }
-}
 
 @media (max-width: 768px) {
-  .section-header {
+  .hrformlist-view-modal-large {
+    max-width: 95% !important;
+    width: 95% !important;
+  }
+
+  .hrformlist-view-modal-header {
+    padding: 12px 20px; /* Even more compact on mobile */
+  }
+
+  .hrformlist-modal-title-section i {
+    font-size: 24px;
+  }
+
+  .hrformlist-modal-title-section div h3 {
+    font-size: 18px;
+  }
+
+  .hrformlist-modal-subtitle {
+    font-size: 11px;
+  }
+
+  .hrformlist-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hrformlist-table-order {
+    width: 60px;
+  }
+
+  .hrformlist-table-name {
+    width: 40%;
+  }
+
+  .hrformlist-competencies-table thead th,
+  .hrformlist-competencies-table tbody td {
+    padding: 12px 14px;
+    font-size: 12px;
+  }
+
+  .hrformlist-comp-name-cell {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 6px;
   }
 
-  .header-right {
-    width: 100%;
-    max-width: 100%;
+  .hrformlist-view-modal-footer {
+    flex-direction: column-reverse;
+    padding: 12px 20px;
   }
 
-  .users-panel {
-    height: 400px;
-  }
-
-  td button {
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  td button:last-child {
-    margin-right: 0;
-  }
-
-  .modal-buttons {
-    flex-direction: column;
-  }
-
-  .btn-cancel-modal,
-  .btn-confirm-modal {
+  .hrformlist-btn-edit-form,
+  .hrformlist-btn-close-modal {
     width: 100%;
     justify-content: center;
   }

@@ -869,67 +869,32 @@ export default function DeptHeadPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="dp-stats-grid">
-        
-        {/* Total Pending */}
-        <div className="dp-stat-card">
-          <div className="dp-stat-icon dp-stat-icon-warning">
-            <i className="bi bi-hourglass-split"></i>
-          </div>
-          <div className="dp-stat-content">
-            <h3 className="dp-stat-value">{pendingRequests.length}</h3>
-            <p className="dp-stat-label">Pending Approvals</p>
-          </div>
-        </div>
+{/* Statistics Cards - ONLY 2 CARDS */}
+<div className="dp-stats-grid">
+  
+  {/* Total Pending */}
+  <div className="dp-stat-card">
+    <div className="dp-stat-icon dp-stat-icon-warning">
+      <i className="bi bi-hourglass-split"></i>
+    </div>
+    <div className="dp-stat-content">
+      <h3 className="dp-stat-value">{pendingRequests.length}</h3>
+      <p className="dp-stat-label">Pending Approvals</p>
+    </div>
+  </div>
 
-        {/* Total Approved */}
-        <div className="dp-stat-card">
-          <div className="dp-stat-icon dp-stat-icon-success">
-            <i className="bi bi-check-circle-fill"></i>
-          </div>
-          <div className="dp-stat-content">
-            <h3 className="dp-stat-value">{approvedRequests.length}</h3>
-            <p className="dp-stat-label">Approved Employees</p>
-          </div>
-        </div>
+  {/* Total Approved */}
+  <div className="dp-stat-card">
+    <div className="dp-stat-icon dp-stat-icon-success">
+      <i className="bi bi-check-circle-fill"></i>
+    </div>
+    <div className="dp-stat-content">
+      <h3 className="dp-stat-value">{approvedRequests.length}</h3>
+      <p className="dp-stat-label">Approved Employees</p>
+    </div>
+  </div>
+</div>
 
-        {/* Avg L2 Rating (Pending) */}
-        <div className="dp-stat-card">
-          <div className="dp-stat-icon dp-stat-icon-primary">
-            <i className="bi bi-star-fill"></i>
-          </div>
-          <div className="dp-stat-content">
-            <h3 className="dp-stat-value">
-              {(() => {
-                let total = 0;
-                let count = 0;
-                pendingRequests.forEach(emp => {
-                  const avg = getAvgRating(emp.competencies, "l2Rating");
-                  if (avg !== "-") {
-                    total += parseFloat(avg);
-                    count++;
-                  }
-                });
-                return count > 0 ? (total / count).toFixed(1) : "0";
-              })()}
-            </h3>
-            <p className="dp-stat-label">Avg L2 Rating</p>
-          </div>
-        </div>
-
-        {/* Total Goals */}
-        <div className="dp-stat-card">
-          <div className="dp-stat-icon dp-stat-icon-danger">
-            <i className="bi bi-bullseye"></i>
-          </div>
-          <div className="dp-stat-content">
-            <h3 className="dp-stat-value">
-              {pendingRequests.reduce((sum, emp) => sum + (emp.goals?.length || 0), 0)}
-            </h3>
-            <p className="dp-stat-label">Total Goals</p>
-          </div>
-        </div>
-      </div>
 
       {/* Data Table */}
       <div className="dp-table-card">

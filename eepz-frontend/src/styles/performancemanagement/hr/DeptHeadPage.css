@@ -1167,8 +1167,16 @@
   min-height: 400px;
 }
 
-
-
+.dp-spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3rem;
+  border-color: #97247E;
+  border-right-color: transparent;
+  animation: spinner-border 0.75s linear infinite;
+  border-radius: 50%;
+  border-style: solid;
+}
 
 
 @keyframes spinner-border {

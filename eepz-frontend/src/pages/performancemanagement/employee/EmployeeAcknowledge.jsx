@@ -304,15 +304,15 @@ const styles = {
     textAlign: "center",
     boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
   },
-  spinner: {
-    width: "40px",
-    height: "40px",
-    border: `4px solid ${THEME.border}`,
-    borderTop: `4px solid ${THEME.primary}`,
-    borderRadius: "50%",
-    animation: "spin 1s linear infinite",
-    margin: "0 auto 16px"
-  },
+  // spinner: {
+  //   width: "40px",
+  //   height: "40px",
+  //   border: `4px solid ${THEME.border}`,
+  //   borderTop: `4px solid ${THEME.primary}`,
+  //   borderRadius: "50%",
+  //   animation: "spin 1s linear infinite",
+  //   margin: "0 auto 16px"
+  // },
   errorCard: {
     backgroundColor: "#FEE2E2",
     color: THEME.danger,

@@ -16,7 +16,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import api from "../../../services/performancemanagement/hr/api";
-import logoImage from "../../../assets/logodarkfull.png";
+import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
 
 // Utility function to get days and hours left
@@ -240,8 +240,8 @@ function MyAssessments() {
   // ========================
 
   const renderTable = (data) => (
-    <div className="aep-table-container">
-      <table className="aep-table">
+    <div className="empassper-table-container">
+      <table className="empassper-table">
         <thead>
           <tr>
             <th>Form Name</th>
@@ -256,16 +256,16 @@ function MyAssessments() {
             return (
               <tr key={assignment.assignmentId}>
                 <td>
-                  <div className="aep-form-name">
+                  <div className="empassper-form-name">
                     <i className="bi bi-file-earmark-text"></i>
                     <strong>{assignment.formName}</strong>
                   </div>
                 </td>
                 <td>
-                  <span className="aep-badge">{assignment.formType}</span>
+                  <span className="empassper-badge">{assignment.formType}</span>
                 </td>
                 <td>
-                  <div className="aep-date-cell">
+                  <div className="empassper-date-cell">
                     <i className="bi bi-calendar-event"></i>
                     {new Date(assignment.deadline || new Date()).toLocaleDateString('en-US', { 
                       month: 'short', 
@@ -275,19 +275,19 @@ function MyAssessments() {
                   </div>
                 </td>
                 <td>
-                  <span className={assignment.isCompleted ? "aep-badge-success" : "aep-badge-pending"}>
+                  <span className={assignment.isCompleted ? "empassper-badge-success" : "empassper-badge-pending"}>
                     <i className={`bi ${assignment.isCompleted ? 'bi-check-circle-fill' : 'bi-clock-fill'}`}></i>
                     {assignment.isCompleted ? "Completed" : "Pending"}
                   </span>
                 </td>
                 <td>
                   {!assignment.isCompleted ? (
-                    <button className="aep-btn aep-btn-submit" onClick={() => openSubmitModal(assignment)}>
+                    <button className="empassper-btn empassper-btn-submit" onClick={() => openSubmitModal(assignment)}>
                       <i className="bi bi-pencil-square"></i>
                       Submit
                     </button>
                   ) : (
-                    <button className="aep-btn aep-btn-view" onClick={() => openViewModal(assignment)}>
+                    <button className="empassper-btn empassper-btn-view" onClick={() => openViewModal(assignment)}>
                       <i className="bi bi-eye-fill"></i>
                       View
                     </button>
@@ -307,9 +307,9 @@ function MyAssessments() {
 
   if (loading) {
     return (
-      <div className="aep-container">
+      <div className="empassper-container">
         <Toaster position="top-right" richColors />
-        <div className="aep-loading-state">
+        <div className="empassper-loading-state">
           <div className="spinner-border"></div>
           <p>Loading assessments...</p>
         </div>
@@ -322,29 +322,29 @@ function MyAssessments() {
   // ========================
 
   return (
-    <div className="aep-container">
+    <div className="empassper-container">
       <Toaster position="top-right" richColors />
 
       {/* Header Section */}
-      <div className="aep-header-section">
-        <div className="aep-header-content">
-          <div className="aep-header-icon">
+      <div className="empassper-header-section">
+        <div className="empassper-header-content">
+          <div className="empassper-header-icon">
             <i className="bi bi-clipboard-check"></i>
           </div>
-          <div className="aep-header-text">
-            <h2 className="aep-header-title">My Performance Assessments</h2>
-            <p className="aep-header-description">View and complete your assigned performance evaluations</p>
+          <div className="empassper-header-text">
+            <h2 className="empassper-header-title">My Performance Assessments</h2>
+            <p className="empassper-header-description">View and complete your assigned performance evaluations</p>
           </div>
         </div>
         {showModal && currentAssignment && timers[currentAssignment.assignmentId] && (
-          <div className="aep-timer-container">
-            <div className="aep-timer-label">Time Remaining</div>
-            <div className="aep-timer-display">
+          <div className="empassper-timer-container">
+            <div className="empassper-timer-label">Time Remaining</div>
+            <div className="empassper-timer-display">
               {timers[currentAssignment.assignmentId].days > 0
                 ? `${timers[currentAssignment.assignmentId].days} days`
                 : "Expired"}
             </div>
-            <div className="aep-timer-subtext">
+            <div className="empassper-timer-subtext">
               Deadline: {new Date(currentAssignment.deadline).toLocaleDateString()}
             </div>
           </div>
@@ -353,15 +353,15 @@ function MyAssessments() {
 
       {/* TIMER BARS - ALWAYS VISIBLE FOR ALL PENDING FORMS */}
       {visibleTimers.length > 0 && (
-        <div className="aep-timer-bars-container">
+        <div className="empassper-timer-bars-container">
           {visibleTimers.map((timer) => (
-            <div key={timer.id} className={`aep-timer-bar ${timer.isExpired ? 'expired' : ''}`}>
-              <div className="aep-timer-bar-content">
-                <span className="aep-timer-bar-icon">
+            <div key={timer.id} className={`empassper-timer-bar ${timer.isExpired ? 'expired' : ''}`}>
+              <div className="empassper-timer-bar-content">
+                <span className="empassper-timer-bar-icon">
                   <i className="bi bi-alarm"></i>
                 </span>
-                <span className="aep-timer-bar-label">{timer.formName}</span>
-                <span className="aep-timer-bar-time">
+                <span className="empassper-timer-bar-label">{timer.formName}</span>
+                <span className="empassper-timer-bar-time">
                   {timer.days > 0 ? `${timer.days} days left` : "Expired"}
                 </span>
               </div>
@@ -371,8 +371,8 @@ function MyAssessments() {
       )}
 
       {/* Search & Filter */}
-      <div className="aep-search-filter-container">
-        <div className="aep-search-box">
+      <div className="empassper-search-filter-container">
+        <div className="empassper-search-box">
           <i className="bi bi-search"></i>
           <input
             type="text"
@@ -382,7 +382,7 @@ function MyAssessments() {
           />
         </div>
         <select
-          className="aep-filter-select"
+          className="empassper-filter-select"
           value={formTypeFilter}
           onChange={(e) => setFormTypeFilter(e.target.value)}
         >
@@ -395,7 +395,7 @@ function MyAssessments() {
         </select>
         <input
           type="date"
-          className="aep-filter-select"
+          className="empassper-filter-select"
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value)}
           placeholder="Filter by deadline"
@@ -403,69 +403,69 @@ function MyAssessments() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="aep-stats-grid">
-        <div className="aep-stat-card aep-stat-pending">
-          <div className="aep-stat-icon">
+      <div className="empassper-stats-grid">
+        <div className="empassper-stat-card empassper-stat-pending">
+          <div className="empassper-stat-icon">
             <i className="bi bi-hourglass-split"></i>
           </div>
-          <div className="aep-stat-content">
-            <h3 className="aep-stat-value">{pendingAssignments.length}</h3>
-            <p className="aep-stat-label">Pending</p>
+          <div className="empassper-stat-content">
+            <h3 className="empassper-stat-value">{pendingAssignments.length}</h3>
+            <p className="empassper-stat-label">Pending</p>
           </div>
         </div>
-        <div className="aep-stat-card aep-stat-completed">
-          <div className="aep-stat-icon">
+        <div className="empassper-stat-card empassper-stat-completed">
+          <div className="empassper-stat-icon">
             <i className="bi bi-check-circle-fill"></i>
           </div>
-          <div className="aep-stat-content">
-            <h3 className="aep-stat-value">{completedAssignments.length}</h3>
-            <p className="aep-stat-label">Completed</p>
+          <div className="empassper-stat-content">
+            <h3 className="empassper-stat-value">{completedAssignments.length}</h3>
+            <p className="empassper-stat-label">Completed</p>
           </div>
         </div>
-        <div className="aep-stat-card aep-stat-total">
-          <div className="aep-stat-icon">
+        <div className="empassper-stat-card empassper-stat-total">
+          <div className="empassper-stat-icon">
             <i className="bi bi-list-check"></i>
           </div>
-          <div className="aep-stat-content">
-            <h3 className="aep-stat-value">{assignments.length}</h3>
-            <p className="aep-stat-label">Total</p>
+          <div className="empassper-stat-content">
+            <h3 className="empassper-stat-value">{assignments.length}</h3>
+            <p className="empassper-stat-label">Total</p>
           </div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="aep-tab-container">
+      <div className="empassper-tab-container">
         <button
-          className={`aep-tab-button ${activeTab === "pending" ? "active" : ""}`}
+          className={`empassper-tab-button ${activeTab === "pending" ? "active" : ""}`}
           onClick={() => setActiveTab("pending")}
         >
           <i className="bi bi-hourglass-split"></i>
           Pending Assessments
-          <span className="aep-tab-badge">{filteredPending.length}</span>
+          <span className="empassper-tab-badge">{filteredPending.length}</span>
         </button>
         <button
-          className={`aep-tab-button ${activeTab === "completed" ? "active" : ""}`}
+          className={`empassper-tab-button ${activeTab === "completed" ? "active" : ""}`}
           onClick={() => setActiveTab("completed")}
         >
           <i className="bi bi-check-circle-fill"></i>
           Completed Assessments
-          <span className="aep-tab-badge">{filteredCompleted.length}</span>
+          <span className="empassper-tab-badge">{filteredCompleted.length}</span>
         </button>
       </div>
 
       {/* Content */}
-      <div className="aep-card">
+      <div className="empassper-card">
         {activeTab === "pending" && (
           <>
             {filteredPending.length > 0 ? (
               renderTable(filteredPending)
             ) : (
-              <div className="aep-empty-state">
-                <div className="aep-empty-icon">
+              <div className="empassper-empty-state">
+                <div className="empassper-empty-icon">
                   <i className="bi bi-inbox"></i>
                 </div>
-                <h3 className="aep-empty-title">No Pending Assessments</h3>
-                <p className="aep-empty-text">
+                <h3 className="empassper-empty-title">No Pending Assessments</h3>
+                <p className="empassper-empty-text">
                   {assignments.length === 0
                     ? "You don't have any assessments assigned yet."
                     : "All assessments have been completed or filtered out!"}
@@ -480,12 +480,12 @@ function MyAssessments() {
             {filteredCompleted.length > 0 ? (
               renderTable(filteredCompleted)
             ) : (
-              <div className="aep-empty-state">
-                <div className="aep-empty-icon">
+              <div className="empassper-empty-state">
+                <div className="empassper-empty-icon">
                   <i className="bi bi-clipboard-check"></i>
                 </div>
-                <h3 className="aep-empty-title">No Completed Assessments</h3>
-                <p className="aep-empty-text">
+                <h3 className="empassper-empty-title">No Completed Assessments</h3>
+                <p className="empassper-empty-text">
                   Complete your pending assessments to see them here.
                 </p>
               </div>
@@ -567,7 +567,7 @@ function MyAssessments() {
                                     e.target.value
                                   )
                                 }
-                                className="ma-form-select"
+                                className="form-select"
                                 disabled={submitting}
                               >
                                 <option value="">-</option>

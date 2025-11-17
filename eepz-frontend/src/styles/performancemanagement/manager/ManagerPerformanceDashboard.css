@@ -58,11 +58,11 @@
   border-style: solid;
 }
 
-@keyframes spinner-border {
+/* @keyframes spinner-border {
   to {
     transform: rotate(360deg);
   }
-}
+} */
 
 .manevap-loading-state p {
   margin-top: 16px;

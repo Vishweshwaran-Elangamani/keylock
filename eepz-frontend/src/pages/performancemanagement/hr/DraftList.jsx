@@ -377,9 +377,9 @@ const styles = {
     textAlign: "center",
     padding: "48px",
   },
-  spinner: {
-    color: "#27235C",
-  },
+  // spinner: {
+  //   color: "#27235C",
+  // },
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: "12px",
