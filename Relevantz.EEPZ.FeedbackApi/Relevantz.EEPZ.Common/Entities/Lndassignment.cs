@@ -33,8 +33,6 @@ public partial class Lndassignment
 
     public virtual Employee CreatedByEmployee { get; set; } = null!;
 
-    public virtual ICollection<Lndapproval> Lndapprovals { get; set; } = new List<Lndapproval>();
-
     public virtual Employee MenteeEmployee { get; set; } = null!;
 
     public virtual MasterSkill Skill { get; set; } = null!;

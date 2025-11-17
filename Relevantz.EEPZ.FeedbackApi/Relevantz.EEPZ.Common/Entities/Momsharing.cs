@@ -9,14 +9,8 @@ public partial class Momsharing
 
     public int Momid { get; set; }
 
-    /// <summary>
-    /// Employee who shared the MOM
-    /// </summary>
     public int SharedByEmployeeId { get; set; }
 
-    /// <summary>
-    /// Employee who received the shared MOM
-    /// </summary>
     public int SharedWithEmployeeId { get; set; }
 
     public DateTime SharedAt { get; set; }

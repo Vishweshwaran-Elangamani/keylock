@@ -2,7 +2,6 @@ using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;  // ✅ ADD THIS for EmailService
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,8 +12,8 @@ using System.Threading.Tasks;
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     /// <summary>
-    /// Service implementation for OrganizationGoalFeedback business logic
-    /// Handles organization-wide goal feedback
+    /// Service for Organization Goal Feedback
+    /// Works with Feedback table filtered by Goal.GoalType
     /// </summary>
     public class OrgGoalFeedbackService : IOrgGoalFeedbackService
     {
@@ -30,31 +29,30 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // ============================================================================
-        // CREATE OPERATIONS
+        // CREATE
         // ============================================================================
 
         public async Task<OrgGoalFeedbackResponseDto> CreateOrgGoalFeedbackAsync(CreateOrgGoalFeedbackRequestDto dto)
         {
             try
             {
-                // Validate inputs
-                if (dto.OrganizationObjectiveId <= 0)
-                    throw new ArgumentException("OrganizationObjectiveId must be valid");
+                if (dto.GoalId <= 0)
+                    throw new ArgumentException("GoalId must be valid");
                 if (dto.SubmittedByEmployeeId <= 0)
                     throw new ArgumentException("SubmittedByEmployeeId must be valid");
                 if (dto.Rating < 1 || dto.Rating > 5)
                     throw new ArgumentException("Rating must be between 1 and 5");
 
-                var feedback = new Organizationgoalfeedback
+                var feedback = new Feedback
                 {
-                    OrganizationObjectiveId = dto.OrganizationObjectiveId,
+                    RelatedGoalId = dto.GoalId, // ✅ Use RelatedGoalId
                     SubmittedByEmployeeId = dto.SubmittedByEmployeeId,
-                    ManagerEmployeeId = dto.ManagerEmployeeId,
+                    RecipientEmployeeId = dto.RecipientEmployeeId, // Manager or assigned recipient
                     Rating = dto.Rating,
-                    FeedbackComments = dto.FeedbackComments,
-                    FeedbackFrom = dto.FeedbackFrom,
+                    Comments = dto.FeedbackComments,
                     IsAnonymous = dto.IsAnonymous,
-                    Status = "Submitted"
+                    Status = "Submitted",
+                    FeedbackType = "Organization Goal"
                 };
 
                 var feedbackId = await _orgGoalFeedbackRepo.CreateOrgGoalFeedbackAsync(feedback);
@@ -70,7 +68,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // ============================================================================
-        // READ OPERATIONS
+        // READ
         // ============================================================================
 
         public async Task<OrgGoalFeedbackResponseDto> GetOrgGoalFeedbackByIdAsync(int feedbackId)
@@ -90,11 +88,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        public async Task<List<OrgGoalFeedbackResponseDto>> GetFeedbackByOrgGoalAsync(int organizationObjectiveId)
+        public async Task<List<OrgGoalFeedbackResponseDto>> GetFeedbackByOrgGoalAsync(int goalId)
         {
             try
             {
-                var feedbacks = await _orgGoalFeedbackRepo.GetFeedbackByOrgObjectiveAsync(organizationObjectiveId);
+                var feedbacks = await _orgGoalFeedbackRepo.GetFeedbackByOrgGoalAsync(goalId);
                 return feedbacks.Select(f => MapToResponseDto(f)).ToList();
             }
             catch (Exception ex)
@@ -114,20 +112,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             catch (Exception ex)
             {
                 _logger.LogError($"Error getting feedback by submitter: {ex.Message}");
-                throw;
-            }
-        }
-
-        public async Task<List<OrgGoalFeedbackResponseDto>> GetFeedbackBySourceAsync(string feedbackFrom)
-        {
-            try
-            {
-                var feedbacks = await _orgGoalFeedbackRepo.GetFeedbackBySourceAsync(feedbackFrom);
-                return feedbacks.Select(f => MapToResponseDto(f)).ToList();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by source: {ex.Message}");
                 throw;
             }
         }
@@ -175,7 +159,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // ============================================================================
-        // UPDATE OPERATIONS
+        // UPDATE
         // ============================================================================
 
         public async Task<OrgGoalFeedbackResponseDto> UpdateOrgGoalFeedbackAsync(int feedbackId, UpdateOrgGoalFeedbackRequestDto dto)
@@ -186,7 +170,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (feedback == null)
                     throw new KeyNotFoundException($"Org goal feedback {feedbackId} not found");
 
-                // Can only edit Submitted status
                 if (feedback.Status != "Submitted")
                     throw new InvalidOperationException($"Cannot edit feedback in {feedback.Status} status");
 
@@ -198,7 +181,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
 
                 if (!string.IsNullOrEmpty(dto.FeedbackComments))
-                    feedback.FeedbackComments = dto.FeedbackComments;
+                    feedback.Comments = dto.FeedbackComments;
 
                 await _orgGoalFeedbackRepo.UpdateOrgGoalFeedbackAsync(feedback);
                 _logger.LogInformation($"Org goal feedback updated: {feedbackId}");
@@ -230,7 +213,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // ============================================================================
-        // DELETE OPERATIONS
+        // DELETE
         // ============================================================================
 
         public async Task<bool> DeleteOrgGoalFeedbackAsync(int feedbackId)
@@ -251,7 +234,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // ============================================================================
-        // VALIDATION OPERATIONS
+        // VALIDATION
         // ============================================================================
 
         public async Task<bool> OrgGoalFeedbackExistsAsync(int feedbackId)
@@ -268,34 +251,35 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // ============================================================================
-        // PRIVATE HELPER METHODS
+        // MAPPING
         // ============================================================================
 
-        private OrgGoalFeedbackResponseDto MapToResponseDto(Organizationgoalfeedback feedback)
+        private OrgGoalFeedbackResponseDto MapToResponseDto(Feedback feedback)
         {
             return new OrgGoalFeedbackResponseDto
             {
-                OrgGoalFeedbackId = feedback.OrgGoalFeedbackId,
-                OrganizationObjectiveId = feedback.OrganizationObjectiveId,
-                OrganizationGoalName = feedback.OrganizationObjective != null 
-                    ? feedback.OrganizationObjective.Description 
-                    : "Unknown",
-                SubmittedByEmployeeId = feedback.SubmittedByEmployeeId,
-                SubmitterName = feedback.SubmittedByEmployee != null 
-                    ? $"{feedback.SubmittedByEmployee.EmployeeId}" 
-                    : "Anonymous",
-                ManagerEmployeeId = feedback.ManagerEmployeeId,
-                ManagerName = feedback.ManagerEmployee != null 
-                    ? $"{feedback.ManagerEmployee.EmployeeId}" 
-                    : "Unknown",
-                Rating = feedback.Rating,
-                FeedbackComments = feedback.FeedbackComments,
-                FeedbackFrom = feedback.FeedbackFrom,
+                OrgGoalFeedbackId = feedback.FeedbackId,
+                GoalId = feedback.RelatedGoalId ?? 0,
+                OrganizationGoalName = feedback.RelatedGoal?.GoalTitle ?? "Unknown",
+                SubmittedByEmployeeId = feedback.SubmittedByEmployeeId ?? 0,
+                SubmitterName = feedback.IsAnonymous 
+                    ? "Anonymous" 
+                    : $"{feedback.SubmittedByEmployee?.EmployeeId}",
+                RecipientEmployeeId = feedback.RecipientEmployeeId,
+                RecipientName = $"{feedback.RecipientEmployee?.EmployeeId}",
+                Rating = feedback.Rating ?? 0,
+                FeedbackComments = feedback.Comments,
                 IsAnonymous = feedback.IsAnonymous,
                 Status = feedback.Status,
-                CreatedAt = feedback.CreatedAt,
-                
+                CreatedAt = feedback.CreatedAt
             };
+        }
+
+
+
+        public Task<OrgGoalFeedbackResponseDto> CreateOrgGoalFeedbackAsync(CreateGoalFeedbackRequestDto dto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

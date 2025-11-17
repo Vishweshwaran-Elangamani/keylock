@@ -7,16 +7,10 @@ public partial class Meeting
 {
     public int MeetingId { get; set; }
 
-    /// <summary>
-    /// Title/Subject of the meeting
-    /// </summary>
     public string MeetingTitle { get; set; } = null!;
 
     public string MeetingType { get; set; } = null!;
 
-    /// <summary>
-    /// Scheduled date and time
-    /// </summary>
     public DateTime MeetingDate { get; set; }
 
     /// <summary>
@@ -24,13 +18,10 @@ public partial class Meeting
     /// </summary>
     public string? MeetingLink { get; set; }
 
-    /// <summary>
-    /// Meeting agenda/discussion topics
-    /// </summary>
     public string? Agenda { get; set; }
 
     /// <summary>
-    /// Manager/Employee who scheduled the meeting
+    /// Manager who scheduled
     /// </summary>
     public int ScheduledByEmployeeId { get; set; }
 

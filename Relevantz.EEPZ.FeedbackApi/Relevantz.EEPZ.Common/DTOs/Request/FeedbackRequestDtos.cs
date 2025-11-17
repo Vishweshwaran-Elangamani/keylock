@@ -149,32 +149,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
     /// <summary>
     /// Request DTO for Organization Goal Feedback (US047, US049)
-    /// </summary>
-    public class CreateOrgGoalFeedbackRequestDto
-    {
-        [Required]
-        public int OrganizationObjectiveId { get; set; }
+    /// </summary>`
 
-        [Required]
-        public int SubmittedByEmployeeId { get; set; }
-        // Who submitted
-
-        public int? ManagerEmployeeId { get; set; }
-        // Manager if applicable
-
-        [Required]
-        [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
-        public int Rating { get; set; }
-
-        [MaxLength(2000)]
-        public string FeedbackComments { get; set; }
-
-        [Required]
-        public string FeedbackFrom { get; set; }
-        // Values: Employee, Manager, DeptHead, HR
-
-        public bool IsAnonymous { get; set; } = false;
-    }
 
     /// <summary>
     /// Request DTO for Peer Feedback (US033, US075)
@@ -304,10 +280,76 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int Rating { get; set; }
     }
 
+     public class CreateGoalFeedbackRequestDto
+    {
+        [Required]
+        public int GoalId { get; set; }  // ✅ Changed from OrganizationObjectiveId
 
+        [Required]
+        public int SubmittedByEmployeeId { get; set; }
 
+        public int? ManagerEmployeeId { get; set; }
 
+        [Required]
+        [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
+        public int Rating { get; set; }
 
+        [MaxLength(2000)]
+        public string FeedbackComments { get; set; }
 
+        [Required]
+        public string FeedbackFrom { get; set; }
+        // Values: Employee, Manager, DeptHead, HR
 
+        public bool IsAnonymous { get; set; } = false;
+    }
+
+    public class UpdateGoalFeedbackRequestDto
+    {
+        [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
+        public int? Rating { get; set; }
+
+        [MaxLength(2000)]
+        public string FeedbackComments { get; set; }
+        
+        public string Status { get; set; }
+    }
+
+    // ============================================================================
+// ORGANIZATION GOAL FEEDBACK REQUEST DTOs
+// ============================================================================
+
+/// <summary>
+/// Request DTO for creating organization goal feedback
+/// Uses Feedback table with RelatedGoalId filtered by Goal.GoalType
+/// </summary>
+public class CreateOrgGoalFeedbackRequestDto
+{
+    [Required(ErrorMessage = "GoalId is required")]
+    public int GoalId { get; set; }
+
+    [Required(ErrorMessage = "SubmittedByEmployeeId is required")]
+    public int SubmittedByEmployeeId { get; set; }
+
+    [Required(ErrorMessage = "RecipientEmployeeId is required")]
+    public int RecipientEmployeeId { get; set; }
+    // Manager, Department Head, or HR who receives the feedback
+
+    [Required(ErrorMessage = "Rating is required")]
+    [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
+    public int Rating { get; set; }
+
+    [MaxLength(2000, ErrorMessage = "Comments cannot exceed 2000 characters")]
+    public string FeedbackComments { get; set; }
+
+    public bool IsAnonymous { get; set; } = false;
 }
+
+
+
+    
+}
+
+
+
+

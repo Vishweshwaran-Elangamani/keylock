@@ -11,29 +11,7 @@ public partial class Meetingparticipant
 
     public int EmployeeId { get; set; }
 
-    /// <summary>
-    /// Employee response to meeting invitation
-    /// </summary>
-    public string Rsvpstatus { get; set; } = null!;
-
-    /// <summary>
-    /// When employee responded to invitation
-    /// </summary>
-    public DateTime? RsvpresponseDate { get; set; }
-
-    /// <summary>
-    /// Optional comments from employee (e.g., reason for decline)
-    /// </summary>
-    public string? Rsvpcomments { get; set; }
-
-    /// <summary>
-    /// When invitation was sent
-    /// </summary>
-    public DateTime InvitedAt { get; set; }
-
     public DateTime CreatedAt { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
 
     public virtual Employee Employee { get; set; } = null!;
 

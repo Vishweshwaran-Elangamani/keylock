@@ -8,7 +8,7 @@ public partial class Mom
     public int Momid { get; set; }
 
     /// <summary>
-    /// NULL if instant MOM without pre-scheduled meeting
+    /// NULL if instant MOM without scheduled meeting
     /// </summary>
     public int? MeetingId { get; set; }
 
@@ -19,29 +19,23 @@ public partial class Mom
     public DateTime MeetingDate { get; set; }
 
     /// <summary>
-    /// Teams/Zoom/Google Meet link
+    /// Required: Teams/Zoom/Google Meet link
     /// </summary>
     public string? MeetingLink { get; set; }
 
     /// <summary>
-    /// Comma-separated list or JSON array of attendee names
+    /// Comma-separated or JSON list of attendee names
     /// </summary>
     public string Attendees { get; set; } = null!;
 
-    /// <summary>
-    /// General comments and observations from the meeting
-    /// </summary>
     public string? CommentsObservations { get; set; }
 
     public int SubmittedByEmployeeId { get; set; }
 
-    /// <summary>
-    /// Role of the person submitting MOM
-    /// </summary>
     public string SubmittedByRole { get; set; } = null!;
 
     /// <summary>
-    /// Managers can edit their own MOMs (US077)
+    /// Managers can edit their own MOMs
     /// </summary>
     public bool? IsEditable { get; set; }
 

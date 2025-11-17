@@ -900,11 +900,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+      "projectUniqueName": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
       "projectName": "Relevantz.EEPZ.Core",
-      "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+      "projectPath": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
       "packagesPath": "C:\\Users\\jeswanth.s\\.nuget\\packages\\",
-      "outputPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\obj\\",
+      "outputPath": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -925,11 +925,11 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-              "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+            "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+              "projectPath": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
             },
-            "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
-              "projectPath": "D:\\EEPZ\\EEPZ Integrated\\Back End\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+            "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+              "projectPath": "D:\\Balaji\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI 2\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
             }
           }
         }

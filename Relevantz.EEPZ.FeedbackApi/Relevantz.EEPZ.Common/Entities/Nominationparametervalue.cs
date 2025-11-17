@@ -15,7 +15,7 @@ public partial class Nominationparametervalue
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual Recognitionstatus Nomination { get; set; } = null!;
+    public virtual Nomination Nomination { get; set; } = null!;
 
     public virtual Nominationparameter Parameter { get; set; } = null!;
 }

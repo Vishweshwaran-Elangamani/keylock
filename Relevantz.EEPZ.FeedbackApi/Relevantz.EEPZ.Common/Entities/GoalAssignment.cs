@@ -15,7 +15,7 @@ public partial class GoalAssignment
 
     public DateTime? AssignedOn { get; set; }
 
-    public bool? IsAcknowledged { get; set; }
+    public sbyte? IsAcknowledged { get; set; }
 
     public DateTime? AcknowledgedOn { get; set; }
 

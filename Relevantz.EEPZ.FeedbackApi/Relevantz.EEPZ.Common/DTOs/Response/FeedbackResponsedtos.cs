@@ -126,22 +126,51 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
     // ORGANIZATION GOAL FEEDBACK DTOs
     // ============================================================================
 
-    public class OrgGoalFeedbackResponseDto
-    {
-        public int OrgGoalFeedbackId { get; set; }
-        public int OrganizationObjectiveId { get; set; }
-        public string OrganizationGoalName { get; set; }
-        public int SubmittedByEmployeeId { get; set; }
-        public string SubmitterName { get; set; }
-        public int? ManagerEmployeeId { get; set; }
-        public string ManagerName { get; set; }
-        public int Rating { get; set; }
-        public string FeedbackComments { get; set; }
-        public string FeedbackFrom { get; set; }
-        public bool IsAnonymous { get; set; }
-        public string Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
+
+
+// ============================================================================
+// ORGANIZATION GOAL FEEDBACK RESPONSE DTOs
+// ============================================================================
+
+/// <summary>
+/// Response DTO for organization goal feedback
+/// Maps from Feedback table where RelatedGoal.GoalType = "Organization"
+/// </summary>
+public class OrgGoalFeedbackResponseDto
+{
+    public int OrgGoalFeedbackId { get; set; }
+    
+    public int GoalId { get; set; }
+    
+    public string OrganizationGoalName { get; set; }
+    
+    public string GoalDescription { get; set; }
+    
+    public string GoalType { get; set; }  // Should be "Organization"
+    
+    public int SubmittedByEmployeeId { get; set; }
+    
+    public string SubmitterName { get; set; }
+    
+    public int RecipientEmployeeId { get; set; }
+    
+    public string RecipientName { get; set; }
+    
+    public int Rating { get; set; }
+    
+    public string FeedbackComments { get; set; }
+    
+    public bool IsAnonymous { get; set; }
+    
+    public string Status { get; set; }
+    
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime? UpdatedAt { get; set; }
+    
+    public DateTime? SubmittedAt { get; set; }
+}
+
 
     // ============================================================================
     // PEER FEEDBACK QUEUE DTOs
@@ -341,6 +370,11 @@ public class HrFeedbackFormResponseDto
     public int TotalResponsesCount { get; set; }
     public int SubmittedResponsesCount { get; set; }
 }
+
+
+
+
+
 
 
 

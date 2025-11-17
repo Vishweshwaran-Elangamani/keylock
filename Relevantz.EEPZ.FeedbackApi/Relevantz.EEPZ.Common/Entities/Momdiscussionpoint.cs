@@ -9,14 +9,8 @@ public partial class Momdiscussionpoint
 
     public int Momid { get; set; }
 
-    /// <summary>
-    /// The discussion point content
-    /// </summary>
     public string PointText { get; set; } = null!;
 
-    /// <summary>
-    /// Display order of discussion points
-    /// </summary>
     public int PointOrder { get; set; }
 
     public virtual Mom Mom { get; set; } = null!;

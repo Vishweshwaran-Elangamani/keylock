@@ -37,11 +37,7 @@ public partial class Userauthentication
 
     public virtual ICollection<Budgetallocation> BudgetallocationEmployeeUsers { get; set; } = new List<Budgetallocation>();
 
-    public virtual ICollection<Budgetperiodallocation> Budgetperiodallocations { get; set; } = new List<Budgetperiodallocation>();
-
     public virtual ICollection<Bulkoperationlog> Bulkoperationlogs { get; set; } = new List<Bulkoperationlog>();
-
-    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
 
     public virtual Employee Employee { get; set; } = null!;
 
@@ -68,10 +64,6 @@ public partial class Userauthentication
     public virtual ICollection<Nomination> NominationReviewedByUsers { get; set; } = new List<Nomination>();
 
     public virtual ICollection<Nominationreviewmetric> Nominationreviewmetrics { get; set; } = new List<Nominationreviewmetric>();
-
-    public virtual ICollection<Organizationalpolicy> OrganizationalpolicyCreatedByUsers { get; set; } = new List<Organizationalpolicy>();
-
-    public virtual ICollection<Organizationalpolicy> OrganizationalpolicyPublishedByNavigations { get; set; } = new List<Organizationalpolicy>();
 
     public virtual ICollection<Organizationwideobjective> Organizationwideobjectives { get; set; } = new List<Organizationwideobjective>();
 

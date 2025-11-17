@@ -11,7 +11,7 @@ public partial class Projectemployee
 
     public DateTime? AssignedAt { get; set; }
 
-    public bool IsPrimary { get; set; }
+    public sbyte IsPrimary { get; set; }
 
     public virtual Employeedetailsmaster Employee { get; set; } = null!;
 

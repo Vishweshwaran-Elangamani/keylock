@@ -15,6 +15,7 @@ namespace eepzbackend.Controllers
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<OrgwideobjectivesController> _logger;
+        private const string ORG_GOAL_TYPE = "org"; // ✅ Filter for org-level goals
 
         public OrgwideobjectivesController(EEPZDbContext context, ILogger<OrgwideobjectivesController> logger)
         {
@@ -23,7 +24,8 @@ namespace eepzbackend.Controllers
         }
 
         /// <summary>
-        /// Get all organization-wide objectives
+        /// Get all organization-wide objectives from Goals table
+        /// Filters by GoalType = "Organization"
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponse<List<OrgObjectiveDto>>), StatusCodes.Status200OK)]
@@ -31,15 +33,57 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                _logger.LogInformation("Retrieving all organization-wide objectives");
+                _logger.LogInformation("Retrieving all organization-wide objectives from Goals table");
 
-                var objectives = await _context.Organizationwideobjectives
-                    .OrderBy(o => o.Title)
-                    .Select(o => new OrgObjectiveDto
+                // ✅ Fetch from Goals table where GoalType = "Organization"
+                var objectives = await _context.Goals
+                    .Where(g => g.GoalType == ORG_GOAL_TYPE && 
+                               (g.Goalstatus == "open" || g.Goalstatus == "inprogress")) // Only active goals
+                    .OrderBy(g => g.GoalTitle)
+                    .Select(g => new OrgObjectiveDto
                     {
-                        ObjectiveId = o.ObjectiveId,
-                        Title = o.Title,
-                        Description = o.Description
+                        ObjectiveId = g.GoalId,
+                        Title = g.GoalTitle,
+                        Description = g.GoalDescription,
+                        GoalStatus = g.Goalstatus,
+                        CreatedAt = g.Goalcreatedat,
+                        EndDate = g.Goalendat
+                    })
+                    .ToListAsync();
+
+                return Ok(ApiResponse<List<OrgObjectiveDto>>.SuccessResponse(
+                    objectives, 
+                    $"Retrieved {objectives.Count} organization objectives successfully."));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving organization objectives from Goals table");
+                return StatusCode(500, ApiResponse<List<OrgObjectiveDto>>.ErrorResponse($"Error: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Get all organization objectives (including all statuses) for dropdown
+        /// </summary>
+        [HttpGet("all")]
+        [ProducesResponseType(typeof(ApiResponse<List<OrgObjectiveDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllObjectivesForDropdown()
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving all organization objectives for dropdown");
+
+                var objectives = await _context.Goals
+                    .Where(g => g.GoalType == ORG_GOAL_TYPE)
+                    .OrderByDescending(g => g.Goalcreatedat) // Most recent first
+                    .Select(g => new OrgObjectiveDto
+                    {
+                        ObjectiveId = g.GoalId,
+                        Title = g.GoalTitle,
+                        Description = g.GoalDescription,
+                        GoalStatus = g.Goalstatus,
+                        CreatedAt = g.Goalcreatedat,
+                        EndDate = g.Goalendat
                     })
                     .ToListAsync();
 
@@ -49,13 +93,13 @@ namespace eepzbackend.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving objectives");
+                _logger.LogError(ex, "Error retrieving objectives for dropdown");
                 return StatusCode(500, ApiResponse<List<OrgObjectiveDto>>.ErrorResponse($"Error: {ex.Message}"));
             }
         }
 
         /// <summary>
-        /// Get objective by ID
+        /// Get objective by ID from Goals table
         /// </summary>
         [HttpGet("{objectiveId}")]
         [ProducesResponseType(typeof(ApiResponse<OrgObjectiveDto>), StatusCodes.Status200OK)]
@@ -64,29 +108,116 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                _logger.LogInformation("Retrieving objective with ID: {ObjectiveId}", objectiveId);
+                _logger.LogInformation("Retrieving organization objective with ID: {ObjectiveId}", objectiveId);
 
-                var objective = await _context.Organizationwideobjectives
-                    .FirstOrDefaultAsync(o => o.ObjectiveId == objectiveId);
+                // ✅ Fetch from Goals table
+                var objective = await _context.Goals
+                    .Where(g => g.GoalId == objectiveId && g.GoalType == ORG_GOAL_TYPE)
+                    .FirstOrDefaultAsync();
 
                 if (objective == null)
                 {
-                    return NotFound(ApiResponse<OrgObjectiveDto>.ErrorResponse("Objective not found."));
+                    return NotFound(ApiResponse<OrgObjectiveDto>.ErrorResponse(
+                        $"Organization objective with ID {objectiveId} not found."));
                 }
 
                 var response = new OrgObjectiveDto
                 {
-                    ObjectiveId = objective.ObjectiveId,
-                    Title = objective.Title,
-                    Description = objective.Description
+                    ObjectiveId = objective.GoalId,
+                    Title = objective.GoalTitle,
+                    Description = objective.GoalDescription,
+                    GoalStatus = objective.Goalstatus,
+                    CreatedAt = objective.Goalcreatedat,
+                    EndDate = objective.Goalendat
                 };
 
-                return Ok(ApiResponse<OrgObjectiveDto>.SuccessResponse(response, "Objective retrieved successfully."));
+                return Ok(ApiResponse<OrgObjectiveDto>.SuccessResponse(
+                    response, 
+                    "Objective retrieved successfully."));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving objective");
+                _logger.LogError(ex, "Error retrieving objective by ID");
                 return StatusCode(500, ApiResponse<OrgObjectiveDto>.ErrorResponse($"Error: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Get active organization objectives (for feedback submission dropdown)
+        /// </summary>
+        [HttpGet("active")]
+        [ProducesResponseType(typeof(ApiResponse<List<OrgObjectiveDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetActiveObjectives()
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving active organization objectives");
+
+                var objectives = await _context.Goals
+                    .Where(g => g.GoalType == ORG_GOAL_TYPE && 
+                               (g.Goalstatus == "open" || g.Goalstatus == "inprogress"))
+                    .OrderBy(g => g.GoalTitle)
+                    .Select(g => new OrgObjectiveDto
+                    {
+                        ObjectiveId = g.GoalId,
+                        Title = g.GoalTitle,
+                        Description = g.GoalDescription,
+                        GoalStatus = g.Goalstatus
+                    })
+                    .ToListAsync();
+
+                return Ok(ApiResponse<List<OrgObjectiveDto>>.SuccessResponse(
+                    objectives, 
+                    $"Retrieved {objectives.Count} active objectives."));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving active objectives");
+                return StatusCode(500, ApiResponse<List<OrgObjectiveDto>>.ErrorResponse($"Error: {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Get organization objectives by status
+        /// </summary>
+        [HttpGet("status/{status}")]
+        [ProducesResponseType(typeof(ApiResponse<List<OrgObjectiveDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetObjectivesByStatus(string status)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving objectives with status: {Status}", status);
+
+                // Validate status
+                var validStatuses = new[] { "pending", "open", "inprogress", "completed", "closed", "expired", "reopened" };
+                if (!validStatuses.Contains(status.ToLower()))
+                {
+                    return BadRequest(ApiResponse<List<OrgObjectiveDto>>.ErrorResponse(
+                        $"Invalid status. Valid values: {string.Join(", ", validStatuses)}"));
+                }
+
+                var objectives = await _context.Goals
+                    .Where(g => g.GoalType == ORG_GOAL_TYPE.ToLower() && g.Goalstatus == status.ToLower())
+                    .OrderBy(g => g.GoalTitle)
+                    .Select(g => new OrgObjectiveDto
+                    {
+                        ObjectiveId = g.GoalId,
+                        Title = g.GoalTitle,
+                        Description = g.GoalDescription,
+                        GoalStatus = g.Goalstatus,
+                        CreatedAt = g.Goalcreatedat,
+                        EndDate = g.Goalendat
+                    })
+                    .ToListAsync();
+
+                return Ok(ApiResponse<List<OrgObjectiveDto>>.SuccessResponse(
+                    objectives, 
+                    $"Retrieved {objectives.Count} {status} objectives."));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving objectives by status");
+                return StatusCode(500, ApiResponse<List<OrgObjectiveDto>>.ErrorResponse($"Error: {ex.Message}"));
             }
         }
     }
@@ -94,18 +225,27 @@ namespace eepzbackend.Controllers
     #region DTOs
 
     /// <summary>
-    /// Organization-Wide Objective DTO
+    /// Organization-Wide Objective DTO (mapped from Goals table)
     /// </summary>
     public class OrgObjectiveDto
     {
         [JsonPropertyName("objectiveId")]
-        public int ObjectiveId { get; set; }
+        public int ObjectiveId { get; set; }  // Maps to goal_id
 
         [JsonPropertyName("title")]
-        public string Title { get; set; }
+        public string Title { get; set; }  // Maps to goal_title
 
         [JsonPropertyName("description")]
-        public string Description { get; set; }
+        public string Description { get; set; }  // Maps to goal_description
+
+        [JsonPropertyName("goalStatus")]
+        public string GoalStatus { get; set; }  // Maps to goalstatus
+
+        [JsonPropertyName("createdAt")]
+        public DateTime? CreatedAt { get; set; }  // Maps to goalcreatedat
+
+        [JsonPropertyName("endDate")]
+        public DateTime? EndDate { get; set; }  // Maps to goalendat
     }
 
     /// <summary>

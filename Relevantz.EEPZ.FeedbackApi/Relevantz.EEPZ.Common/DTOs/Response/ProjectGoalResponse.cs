@@ -170,4 +170,24 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         [JsonPropertyName("departmentName")]
         public string DepartmentName { get; set; }
     }
+
+
+     public class GoalFeedbackResponseDto
+    {
+        public int FeedbackId { get; set; }  // ✅ Changed from OrgGoalFeedbackId
+        public int GoalId { get; set; }  // ✅ Changed from OrganizationObjectiveId
+        public string GoalTitle { get; set; }  // ✅ Changed from OrganizationGoalName
+        public string GoalType { get; set; }  // ✅ Added to identify goal type
+        public int SubmittedByEmployeeId { get; set; }
+        public string SubmitterName { get; set; }
+        public int? ManagerEmployeeId { get; set; }
+        public string ManagerName { get; set; }
+        public int Rating { get; set; }
+        public string FeedbackComments { get; set; }
+        public string FeedbackFrom { get; set; }
+        public bool IsAnonymous { get; set; }
+        public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
 }
+

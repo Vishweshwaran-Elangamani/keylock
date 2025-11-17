@@ -29,8 +29,6 @@ public partial class Lndapproval
 
     public virtual Employee? ApproverEmployee { get; set; }
 
-    public virtual Lndassignment? Assignment { get; set; }
-
     public virtual Lndattachment? Attachment { get; set; }
 
     public virtual Employee RequesterEmployee { get; set; } = null!;

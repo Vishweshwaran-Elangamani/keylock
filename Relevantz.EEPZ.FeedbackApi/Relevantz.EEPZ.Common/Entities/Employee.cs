@@ -41,7 +41,7 @@ public partial class Employee
 
     public virtual ICollection<Changerequest> Changerequests { get; set; } = new List<Changerequest>();
 
-    public virtual ICollection<Employeedetailsmaster> Employeedetailsmasters { get; set; } = new List<Employeedetailsmaster>();
+    public virtual Employeedetailsmaster? Employeedetailsmaster { get; set; }
 
     public virtual ICollection<Feedback> FeedbackRecipientEmployees { get; set; } = new List<Feedback>();
 
@@ -80,8 +80,6 @@ public partial class Employee
     public virtual ICollection<Managerreviewcomment> ManagerreviewcommentManagerEmployees { get; set; } = new List<Managerreviewcomment>();
 
     public virtual ICollection<Managerreviewcomment> ManagerreviewcommentTargetEmployees { get; set; } = new List<Managerreviewcomment>();
-
-    public virtual ICollection<Meetingmom> Meetingmoms { get; set; } = new List<Meetingmom>();
 
     public virtual ICollection<Meetingparticipant> Meetingparticipants { get; set; } = new List<Meetingparticipant>();
 

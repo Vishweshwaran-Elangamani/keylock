@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.EntityFrameworkCore;
-
+using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.DTOs.Response;
+using System.Text.Json.Serialization;
+using Relevantz.EEPZ.Data.DBContexts;
 
 namespace EepzBackend.Controllers
 {
@@ -15,12 +12,12 @@ namespace EepzBackend.Controllers
     public class SmeController : ControllerBase
     {
         private readonly EEPZDbContext _context;
- 
+
         public SmeController(EEPZDbContext context)
         {
             _context = context;
         }
- 
+
         // GET: api/sme/active
         [HttpGet("active")]
         public async Task<IActionResult> GetActiveSmes()
@@ -42,7 +39,7 @@ namespace EepzBackend.Controllers
                         approvedOn = s.ApprovedOn
                     })
                     .ToListAsync();
- 
+
                 return Ok(new { success = true, data = smes });
             }
             catch (Exception ex)
@@ -52,3 +49,4 @@ namespace EepzBackend.Controllers
         }
     }
 }
+

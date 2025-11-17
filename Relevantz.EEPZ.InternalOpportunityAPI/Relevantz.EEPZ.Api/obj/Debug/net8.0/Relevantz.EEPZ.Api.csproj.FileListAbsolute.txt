@@ -262,267 +262,135 @@ D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.I
 D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Balaji\Updated\Backend\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.Development.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.staticwebassets.endpoints.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.exe
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.deps.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.runtimeconfig.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.pdb
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Humanizer.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.Workspaces.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Design.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.OpenApi.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Mono.TextTemplating.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\MySqlConnector.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.AspNetCore.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Console.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.File.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.CodeDom.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.AttributedModel.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Convention.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Hosting.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Runtime.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.TypedParts.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.AssemblyReference.cache
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rpswa.dswa.cache.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.GeneratedMSBuildEditorConfig.editorconfig
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfoInputs.cache
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfo.cs
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.CoreCompileInputs.cache
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cs
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cache
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjimswa.dswa.cache.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\scopedcss\bundle\Relevantz.EEPZ.Api.styles.css
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json.cache
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.development.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevant.50C7F8F8.Up2Date
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\refint\Relevantz.EEPZ.Api.dll
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.pdb
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.genruntimeconfig.cache
-D:\Team D\Relevantz.EEPZ.InternalOpportunityAPI 1\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\ref\Relevantz.EEPZ.Api.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.Development.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.staticwebassets.endpoints.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.exe
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.deps.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.runtimeconfig.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.pdb
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Humanizer.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.Workspaces.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Design.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.OpenApi.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Mono.TextTemplating.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\MySqlConnector.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.AspNetCore.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Console.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.File.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.CodeDom.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.AttributedModel.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Convention.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Hosting.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Runtime.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.TypedParts.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.AssemblyReference.cache
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rpswa.dswa.cache.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.GeneratedMSBuildEditorConfig.editorconfig
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfoInputs.cache
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfo.cs
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.CoreCompileInputs.cache
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cs
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cache
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjimswa.dswa.cache.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\scopedcss\bundle\Relevantz.EEPZ.Api.styles.css
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json.cache
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.development.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevant.50C7F8F8.Up2Date
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\refint\Relevantz.EEPZ.Api.dll
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.pdb
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.genruntimeconfig.cache
-D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\ref\Relevantz.EEPZ.Api.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.Development.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\appsettings.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.staticwebassets.endpoints.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.exe
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.deps.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.runtimeconfig.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Humanizer.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.CodeAnalysis.Workspaces.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Design.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Microsoft.OpenApi.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Mono.TextTemplating.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\MySqlConnector.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.AspNetCore.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Serilog.Sinks.File.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.CodeDom.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.AttributedModel.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Convention.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Hosting.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.Runtime.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.Composition.TypedParts.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\fr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\it\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ja\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ko\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pl\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\pt-BR\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\ru\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.AssemblyReference.cache
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rpswa.dswa.cache.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.GeneratedMSBuildEditorConfig.editorconfig
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfoInputs.cache
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.AssemblyInfo.cs
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.csproj.CoreCompileInputs.cache
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cs
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.MvcApplicationPartsAssemblyInfo.cache
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjimswa.dswa.cache.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\scopedcss\bundle\Relevantz.EEPZ.Api.styles.css
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.json.cache
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.development.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevant.50C7F8F8.Up2Date
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\refint\Relevantz.EEPZ.Api.dll
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.pdb
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\Relevantz.EEPZ.Api.genruntimeconfig.cache
+D:\Balaji\Backend\Relevantz.EEPZ.InternalOpportunityAPI 2\Relevantz.EEPZ.InternalOpportunityAPI\Relevantz.EEPZ.Api\obj\Debug\net8.0\ref\Relevantz.EEPZ.Api.dll

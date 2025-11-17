@@ -1,7 +1,6 @@
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,13 +11,14 @@ using System.Threading.Tasks;
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     /// <summary>
-    /// Repository implementation for OrganizationGoalFeedback entity
-    /// Handles organization-wide goal feedback management
+    /// Repository for Organization Goal Feedback
+    /// Filters Feedback table by Goal.GoalType = "Organization"
     /// </summary>
     public class OrgGoalFeedbackRepository : IOrgGoalFeedbackRepository
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<OrgGoalFeedbackRepository> _logger;
+        private const string ORG_GOAL_TYPE = "Organization"; // ✅ Define your org goal type
 
         public OrgGoalFeedbackRepository(EEPZDbContext context, ILogger<OrgGoalFeedbackRepository> logger)
         {
@@ -30,18 +30,27 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         // CREATE OPERATIONS
         // ============================================================================
 
-        public async Task<int> CreateOrgGoalFeedbackAsync(Organizationgoalfeedback feedback)
+        public async Task<int> CreateOrgGoalFeedbackAsync(Feedback feedback)
         {
             try
             {
+                // Validate that the goal is an organization-level goal
+                var goal = await _context.Goals
+                    .Where(g => g.GoalId == feedback.RelatedGoalId && g.GoalType == ORG_GOAL_TYPE)
+                    .FirstOrDefaultAsync();
+
+                if (goal == null)
+                    throw new InvalidOperationException($"Goal {feedback.RelatedGoalId} is not an organization-level goal");
+
                 feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = "Submitted"; // Default status
+                feedback.Status = "Submitted";
+                feedback.FeedbackType = "Organization Goal"; // ✅ Set feedback type
                 
-                _context.Organizationgoalfeedbacks.Add(feedback);
+                _context.Feedbacks.Add(feedback);
                 await _context.SaveChangesAsync();
                 
-                _logger.LogInformation($"Organization goal feedback created: {feedback.OrgGoalFeedbackId}");
-                return feedback.OrgGoalFeedbackId;
+                _logger.LogInformation($"Organization goal feedback created: {feedback.FeedbackId}");
+                return feedback.FeedbackId;
             }
             catch (Exception ex)
             {
@@ -54,15 +63,18 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         // READ OPERATIONS
         // ============================================================================
 
-        public async Task<Organizationgoalfeedback> GetOrgGoalFeedbackByIdAsync(int feedbackId)
+        public async Task<Feedback> GetOrgGoalFeedbackByIdAsync(int feedbackId)
         {
             try
             {
-                return await _context.Organizationgoalfeedbacks
-                    .Include(f => f.OrganizationObjective)
+                return await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
                     .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.ManagerEmployee)
-                    .FirstOrDefaultAsync(f => f.OrgGoalFeedbackId == feedbackId);
+                    .Include(f => f.RecipientEmployee)
+                    .Where(f => f.FeedbackId == feedbackId 
+                        && f.RelatedGoal != null 
+                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
+                    .FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {
@@ -71,31 +83,37 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<Organizationgoalfeedback>> GetFeedbackByOrgObjectiveAsync(int organizationObjectiveId)
+        public async Task<List<Feedback>> GetFeedbackByOrgGoalAsync(int goalId)
         {
             try
             {
-                return await _context.Organizationgoalfeedbacks
-                    .Where(f => f.OrganizationObjectiveId == organizationObjectiveId && f.Status != "Archived")
+                return await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
                     .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.ManagerEmployee)
+                    .Include(f => f.RecipientEmployee)
+                    .Where(f => f.RelatedGoalId == goalId 
+                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE
+                        && f.Status != "Archived")
                     .OrderByDescending(f => f.CreatedAt)
                     .ToListAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting feedback by org objective: {ex.Message}");
+                _logger.LogError($"Error getting feedback by org goal: {ex.Message}");
                 throw;
             }
         }
 
-        public async Task<List<Organizationgoalfeedback>> GetFeedbackBySubmitterAsync(int employeeId)
+        public async Task<List<Feedback>> GetFeedbackBySubmitterAsync(int employeeId)
         {
             try
             {
-                return await _context.Organizationgoalfeedbacks
-                    .Where(f => f.SubmittedByEmployeeId == employeeId)
-                    .Include(f => f.OrganizationObjective)
+                return await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
+                    .Include(f => f.RecipientEmployee)
+                    .Where(f => f.SubmittedByEmployeeId == employeeId 
+                        && f.RelatedGoal != null
+                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .OrderByDescending(f => f.CreatedAt)
                     .ToListAsync();
             }
@@ -106,32 +124,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<Organizationgoalfeedback>> GetFeedbackBySourceAsync(string feedbackFrom)
+        public async Task<List<Feedback>> GetAllOrgGoalFeedbackAsync(int pageNumber = 1, int pageSize = 20)
         {
             try
             {
-                return await _context.Organizationgoalfeedbacks
-                    .Where(f => f.FeedbackFrom == feedbackFrom)
-                    .Include(f => f.OrganizationObjective)
+                return await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
                     .Include(f => f.SubmittedByEmployee)
-                    .OrderByDescending(f => f.CreatedAt)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error getting feedback by source: {ex.Message}");
-                throw;
-            }
-        }
-
-        public async Task<List<Organizationgoalfeedback>> GetAllOrgGoalFeedbackAsync(int pageNumber = 1, int pageSize = 20)
-        {
-            try
-            {
-                return await _context.Organizationgoalfeedbacks
-                    .Include(f => f.OrganizationObjective)
-                    .Include(f => f.SubmittedByEmployee)
-                    .Include(f => f.ManagerEmployee)
+                    .Include(f => f.RecipientEmployee)
+                    .Where(f => f.RelatedGoal != null && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .OrderByDescending(f => f.CreatedAt)
                     .Skip((pageNumber - 1) * pageSize)
                     .Take(pageSize)
@@ -144,14 +145,17 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<Organizationgoalfeedback>> GetFeedbackByStatusAsync(string status)
+        public async Task<List<Feedback>> GetFeedbackByStatusAsync(string status)
         {
             try
             {
-                return await _context.Organizationgoalfeedbacks
-                    .Where(f => f.Status == status)
-                    .Include(f => f.OrganizationObjective)
+                return await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
                     .Include(f => f.SubmittedByEmployee)
+                    .Include(f => f.RecipientEmployee)
+                    .Where(f => f.Status == status 
+                        && f.RelatedGoal != null
+                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .OrderByDescending(f => f.CreatedAt)
                     .ToListAsync();
             }
@@ -162,13 +166,17 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<Organizationgoalfeedback>> GetAnonymousOrgGoalFeedbackAsync()
+        public async Task<List<Feedback>> GetAnonymousOrgGoalFeedbackAsync()
         {
             try
             {
-                return await _context.Organizationgoalfeedbacks
-                    .Where(f => f.IsAnonymous && f.Status != "Archived")
-                    .Include(f => f.OrganizationObjective)
+                return await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
+                    .Include(f => f.RecipientEmployee)
+                    .Where(f => f.IsAnonymous 
+                        && f.Status != "Archived"
+                        && f.RelatedGoal != null
+                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
                     .OrderByDescending(f => f.CreatedAt)
                     .ToListAsync();
             }
@@ -183,14 +191,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         // UPDATE OPERATIONS
         // ============================================================================
 
-        public async Task<bool> UpdateOrgGoalFeedbackAsync(Organizationgoalfeedback feedback)
+        public async Task<bool> UpdateOrgGoalFeedbackAsync(Feedback feedback)
         {
             try
             {
-                _context.Organizationgoalfeedbacks.Update(feedback);
+                _context.Feedbacks.Update(feedback);
+                feedback.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
                 
-                _logger.LogInformation($"Organization goal feedback updated: {feedback.OrgGoalFeedbackId}");
+                _logger.LogInformation($"Organization goal feedback updated: {feedback.FeedbackId}");
                 return true;
             }
             catch (Exception ex)
@@ -204,14 +213,20 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             try
             {
-                var feedback = await _context.Organizationgoalfeedbacks.FindAsync(feedbackId);
+                var feedback = await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
+                    .Where(f => f.FeedbackId == feedbackId 
+                        && f.RelatedGoal != null
+                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
+                    .FirstOrDefaultAsync();
+
                 if (feedback == null)
                     return false;
 
-                // Status transitions: Submitted → Reviewed → Archived
                 feedback.Status = newStatus;
+                feedback.UpdatedAt = DateTime.UtcNow;
 
-                _context.Organizationgoalfeedbacks.Update(feedback);
+                _context.Feedbacks.Update(feedback);
                 await _context.SaveChangesAsync();
                 
                 _logger.LogInformation($"Org goal feedback status updated: {feedbackId} → {newStatus}");
@@ -232,15 +247,20 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             try
             {
-                var feedback = await _context.Organizationgoalfeedbacks.FindAsync(feedbackId);
+                var feedback = await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
+                    .Where(f => f.FeedbackId == feedbackId 
+                        && f.RelatedGoal != null
+                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE)
+                    .FirstOrDefaultAsync();
+
                 if (feedback == null)
                     return false;
 
-                // Only allow deletion if Submitted status
                 if (feedback.Status != "Submitted")
-                    throw new InvalidOperationException($"Cannot delete feedback in {feedback.Status} status. Only Submitted feedback can be deleted.");
+                    throw new InvalidOperationException($"Cannot delete feedback in {feedback.Status} status");
 
-                _context.Organizationgoalfeedbacks.Remove(feedback);
+                _context.Feedbacks.Remove(feedback);
                 await _context.SaveChangesAsync();
                 
                 _logger.LogInformation($"Organization goal feedback deleted: {feedbackId}");
@@ -254,14 +274,18 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
 
         // ============================================================================
-        // EXISTENCE CHECKS
+        // VALIDATION
         // ============================================================================
 
         public async Task<bool> OrgGoalFeedbackExistsAsync(int feedbackId)
         {
             try
             {
-                return await _context.Organizationgoalfeedbacks.AnyAsync(f => f.OrgGoalFeedbackId == feedbackId);
+                return await _context.Feedbacks
+                    .Include(f => f.RelatedGoal)
+                    .AnyAsync(f => f.FeedbackId == feedbackId 
+                        && f.RelatedGoal != null
+                        && f.RelatedGoal.GoalType == ORG_GOAL_TYPE);
             }
             catch (Exception ex)
             {

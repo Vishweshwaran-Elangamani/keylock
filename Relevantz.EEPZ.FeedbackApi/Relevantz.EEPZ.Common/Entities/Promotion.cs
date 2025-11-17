@@ -35,8 +35,6 @@ public partial class Promotion
 
     public DateTime? ApprovedAt { get; set; }
 
-    public DateTime? UpdatedAt { get; set; }
-
     public virtual Userauthentication? ApprovedByUser { get; set; }
 
     public virtual Department Department { get; set; } = null!;
