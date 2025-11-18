@@ -43,8 +43,9 @@ const AdminDashboard = () => {
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`management-card ${hoveredCard === index ? "hovered" : ""
-              }`}
+            className={`management-card ${
+              hoveredCard === index ? "hovered" : ""
+            }`}
             onMouseEnter={() => setHoveredCard(index)}
             onMouseLeave={() => setHoveredCard(null)}
             onClick={() => handleNavigation(card.path)}

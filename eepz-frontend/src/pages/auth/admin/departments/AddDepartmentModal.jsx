@@ -1,6 +1,6 @@
 import { useState } from "react";
 import departmentService from "../../../../services/auth/departmentService";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import "../../../../styles/auth/department/AddDepartmentModal.css";
 
 const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
@@ -77,7 +77,6 @@ const AddDepartmentModal = ({ show, onClose, onSuccess }) => {
       const response = await departmentService.createDepartment(payload);
 
       if (response.success) {
-
         onSuccess();
       } else {
         toast.error(response.message || "Failed to create department");

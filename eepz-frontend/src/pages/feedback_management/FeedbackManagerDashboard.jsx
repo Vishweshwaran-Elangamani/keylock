@@ -1,63 +1,90 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from "react";
 import {
-  RefreshCw, AlertTriangle, FileText, Plus, Clock,
-  Send, Search, Eye, Star, Users, Target, Briefcase, MessageSquare
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { peerQueueApi } from '../../services/feedbackmanagement/feedbackApi';
- 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5333/api';
- 
+  RefreshCw,
+  AlertTriangle,
+  FileText,
+  Plus,
+  Clock,
+  Send,
+  Search,
+  Eye,
+  Star,
+  Users,
+  Target,
+  Briefcase,
+  MessageSquare,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { peerQueueApi } from "../../services/feedbackmanagement/feedbackApi";
+
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
   <div
     className="card border-0 h-100"
     style={{
-      borderRadius: '10px',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-      transition: 'all 0.3s ease'
+      borderRadius: "10px",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+      transition: "all 0.3s ease",
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.transform = 'translateY(-2px)';
-      e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.12)';
+      e.currentTarget.style.transform = "translateY(-2px)";
+      e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.12)";
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.transform = 'translateY(0)';
-      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.08)';
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
     }}
   >
-    <div className="card-body d-flex flex-column align-items-center justify-content-center text-center" style={{ padding: '1.25rem 1rem' }}>
+    <div
+      className="card-body d-flex flex-column align-items-center justify-content-center text-center"
+      style={{ padding: "1.25rem 1rem" }}
+    >
       <div
         style={{
-          width: '56px',
-          height: '56px',
+          width: "56px",
+          height: "56px",
           backgroundColor: bgColor,
-          borderRadius: '12px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '0.875rem'
+          borderRadius: "12px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "0.875rem",
         }}
       >
         <Icon size={28} color={iconColor} strokeWidth={2.5} />
       </div>
-      <h2 className="fw-bold mb-2" style={{ fontSize: '2rem', color: '#0f172a', lineHeight: 1 }}>
+      <h2
+        className="fw-bold mb-2"
+        style={{ fontSize: "2rem", color: "#0f172a", lineHeight: 1 }}
+      >
         {value}
       </h2>
-      <p className="mb-0" style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: 600 }}>
+      <p
+        className="mb-0"
+        style={{ fontSize: "0.875rem", color: "#64748b", fontWeight: 600 }}
+      >
         {label}
       </p>
     </div>
   </div>
 );
- 
+
 export default function FeedbackManagerDashboard() {
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [user] = useState(() => JSON.parse(localStorage.getItem('user') || '{}') || { empId: 1002, firstName: 'Manager', lastName: 'User' });
- 
+  const [activeTab, setActiveTab] = useState("overview");
+  const [user] = useState(
+    () =>
+      JSON.parse(localStorage.getItem("user") || "{}") || {
+        empId: 1002,
+        firstName: "Manager",
+        lastName: "User",
+      }
+  );
+
   const [myReviews, setMyReviews] = useState([]);
   const [draftReviews, setDraftReviews] = useState([]);
   const [targetReviews, setTargetReviews] = useState([]);
@@ -65,151 +92,217 @@ export default function FeedbackManagerDashboard() {
   const [submittedForms, setSubmittedForms] = useState([]);
   const [activeHrForms, setActiveHrForms] = useState([]);
   const [employeeMap, setEmployeeMap] = useState({});
- 
+
   const enrichReviews = (reviews, empMap) => {
-    return reviews.map(review => ({
+    return reviews.map((review) => ({
       ...review,
-      targetEmployeeName: empMap[review.targetEmployeeId] || review.targetEmployeeName || `Employee ${review.targetEmployeeId}`,
-      managerName: empMap[review.managerEmployeeId] || `Manager ${review.managerEmployeeId}`
+      targetEmployeeName:
+        empMap[review.targetEmployeeId] ||
+        review.targetEmployeeName ||
+        `Employee ${review.targetEmployeeId}`,
+      managerName:
+        empMap[review.managerEmployeeId] ||
+        `Manager ${review.managerEmployeeId}`,
     }));
   };
- 
+
   const fetchDashboardData = async () => {
     setLoading(true);
-    setError('');
-   
+    setError("");
+
     try {
       const managerId = user?.empId || 1002;
- 
+
       let empMap = {};
       try {
         const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
         if (empRes.data?.success && Array.isArray(empRes.data.data)) {
-          empRes.data.data.forEach(emp => {
+          empRes.data.data.forEach((emp) => {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
           });
           setEmployeeMap(empMap);
         }
       } catch (err) {
-        console.warn('Error fetching employee map:', err.message);
+        console.warn("Error fetching employee map:", err.message);
       }
- 
+
       try {
-        const myRes = await axios.get(`${API_BASE}/ManagerReview/manager/${managerId}`);
+        const myRes = await axios.get(
+          `${API_BASE}/ManagerReview/manager/${managerId}`
+        );
         if (myRes.data?.success && Array.isArray(myRes.data.data)) {
           const enriched = enrichReviews(myRes.data.data, empMap);
           setMyReviews(enriched);
         }
       } catch (err) {
-        console.warn('Error fetching my reviews:', err.message);
+        console.warn("Error fetching my reviews:", err.message);
       }
- 
+
       try {
-        const draftRes = await axios.get(`${API_BASE}/ManagerReview/status/Draft`);
+        const draftRes = await axios.get(
+          `${API_BASE}/ManagerReview/status/Draft`
+        );
         if (draftRes.data?.success && Array.isArray(draftRes.data.data)) {
-          const myDrafts = draftRes.data.data.filter(r => r.managerEmployeeId === managerId);
+          const myDrafts = draftRes.data.data.filter(
+            (r) => r.managerEmployeeId === managerId
+          );
           const enriched = enrichReviews(myDrafts, empMap);
           setDraftReviews(enriched);
         }
       } catch (err) {
-        console.warn('Error fetching drafts:', err.message);
+        console.warn("Error fetching drafts:", err.message);
       }
- 
+
       try {
-        const targetRes = await axios.get(`${API_BASE}/ManagerReview/target/${managerId}`);
+        const targetRes = await axios.get(
+          `${API_BASE}/ManagerReview/target/${managerId}`
+        );
         if (targetRes.data?.success && Array.isArray(targetRes.data.data)) {
           const enriched = enrichReviews(targetRes.data.data, empMap);
           setTargetReviews(enriched);
         }
       } catch (err) {
-        console.warn('Error fetching reviews about me:', err.message);
+        console.warn("Error fetching reviews about me:", err.message);
       }
- 
+
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
         if (Array.isArray(peerRes.data?.data)) {
           const myFeedback = peerRes.data.data
-            .filter(p => p.recipientEmployeeId === managerId)
-            .map(p => ({
+            .filter((p) => p.recipientEmployeeId === managerId)
+            .map((p) => ({
               ...p,
-              submittedByName: empMap[p.submittedByEmployeeId] || `Employee ${p.submittedByEmployeeId}`
+              submittedByName:
+                empMap[p.submittedByEmployeeId] ||
+                `Employee ${p.submittedByEmployeeId}`,
             }));
           setMyPeerFeedback(myFeedback);
         }
       } catch (err) {
-        console.warn('Error fetching peer feedback:', err.message);
+        console.warn("Error fetching peer feedback:", err.message);
       }
- 
+
       try {
-        const activeRes = await axios.get(`${API_BASE}/HrFeedbackForm/forms/active`);
+        const activeRes = await axios.get(
+          `${API_BASE}/HrFeedbackForm/forms/active`
+        );
         if (activeRes.data?.success) {
           setActiveHrForms(activeRes.data.data || []);
         }
       } catch (err) {
-        console.warn('Error fetching active forms:', err.message);
+        console.warn("Error fetching active forms:", err.message);
       }
- 
+
       try {
-        const submittedRes = await axios.get(`${API_BASE}/HrFeedbackForm/responses/by-employee/${managerId}`);
+        const submittedRes = await axios.get(
+          `${API_BASE}/HrFeedbackForm/responses/by-employee/${managerId}`
+        );
         if (submittedRes.data?.success) {
           setSubmittedForms(submittedRes.data.data || []);
         }
       } catch (err) {
-        console.warn('Error fetching submitted forms:', err.message);
+        console.warn("Error fetching submitted forms:", err.message);
       }
- 
     } catch (err) {
-      console.error('Error:', err);
-      setError('Failed to load dashboard');
+      console.error("Error:", err);
+      setError("Failed to load dashboard");
     } finally {
       setLoading(false);
     }
   };
- 
+
   useEffect(() => {
     fetchDashboardData();
   }, [user?.empId]);
- 
+
   const refresh = async () => {
     setRefreshing(true);
     await fetchDashboardData();
     setRefreshing(false);
   };
- 
+
   const stats = useMemo(() => {
-    const submittedFormIds = new Set(submittedForms.map(f => f.formId));
-    const pendingForms = activeHrForms.filter(f => !submittedFormIds.has(f.formId)).length;
- 
+    const submittedFormIds = new Set(submittedForms.map((f) => f.formId));
+    const pendingForms = activeHrForms.filter(
+      (f) => !submittedFormIds.has(f.formId)
+    ).length;
+
     return [
-      { label: 'My Reviews', value: myReviews.length, Icon: Star, bgColor: '#dbeafe', iconColor: '#0F62FE' },
-      { label: 'Draft Reviews', value: draftReviews.length, Icon: Clock, bgColor: '#fef3c7', iconColor: '#E2B93B' },
-      { label: 'Pending Forms', value: pendingForms, Icon: FileText, bgColor: '#fee2e2', iconColor: '#E01950' },
-      { label: 'Peer Feedback', value: myPeerFeedback.length, Icon: Users, bgColor: '#f8f0ff', iconColor: '#9D4EDD' }
+      {
+        label: "My Reviews",
+        value: myReviews.length,
+        Icon: Star,
+        bgColor: "#dbeafe",
+        iconColor: "#0F62FE",
+      },
+      {
+        label: "Draft Reviews",
+        value: draftReviews.length,
+        Icon: Clock,
+        bgColor: "#fef3c7",
+        iconColor: "#E2B93B",
+      },
+      {
+        label: "Pending Forms",
+        value: pendingForms,
+        Icon: FileText,
+        bgColor: "#fee2e2",
+        iconColor: "#E01950",
+      },
+      {
+        label: "Peer Feedback",
+        value: myPeerFeedback.length,
+        Icon: Users,
+        bgColor: "#f8f0ff",
+        iconColor: "#9D4EDD",
+      },
     ];
   }, [myReviews, draftReviews, activeHrForms, submittedForms, myPeerFeedback]);
- 
+
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-        <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "60vh" }}
+      >
+        <div
+          className="spinner-border text-primary"
+          style={{ width: "3rem", height: "3rem" }}
+        >
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
     );
   }
- 
+
   return (
-    <div style={{ padding: '1.25rem 1.75rem', maxWidth: '100%', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-     
+    <div
+      style={{
+        padding: "1.25rem 1.75rem",
+        maxWidth: "100%",
+        minHeight: "100vh",
+        backgroundColor: "#f8f9fa",
+      }}
+    >
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-start mb-3">
         <div>
           <div className="d-flex align-items-center gap-2 mb-1">
-            <h2 className="fw-bold mb-0" style={{ color: '#27235c', fontSize: '1.625rem', letterSpacing: '-0.025em' }}>
+            <h2
+              className="fw-bold mb-0"
+              style={{
+                color: "#27235c",
+                fontSize: "1.625rem",
+                letterSpacing: "-0.025em",
+              }}
+            >
               Manager Dashboard
             </h2>
           </div>
-          <p className="mb-0" style={{ color: '#64748b', fontSize: '0.875rem' }}>
+          <p
+            className="mb-0"
+            style={{ color: "#64748b", fontSize: "0.875rem" }}
+          >
             Welcome back, {user?.firstName} {user?.lastName}
           </p>
         </div>
@@ -218,31 +311,53 @@ export default function FeedbackManagerDashboard() {
           onClick={refresh}
           disabled={refreshing}
           style={{
-            backgroundColor: 'transparent',
-            border: '1.5px solid #0F62FE',
-            color: '#0F62FE',
-            borderRadius: '8px',
-            padding: '8px 16px',
-            fontSize: '0.875rem',
-            fontWeight: 600
+            backgroundColor: "transparent",
+            border: "1.5px solid #0F62FE",
+            color: "#0F62FE",
+            borderRadius: "8px",
+            padding: "8px 16px",
+            fontSize: "0.875rem",
+            fontWeight: 600,
           }}
         >
-          <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+          <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
           Refresh
         </button>
       </div>
- 
+
       {/* ERROR ALERT */}
       {error && (
-        <div className="alert alert-danger d-flex align-items-start gap-2 mb-3" style={{ borderRadius: '8px', border: 'none', backgroundColor: '#fee2e2', padding: '0.75rem 1rem' }}>
-          <AlertTriangle size={16} className="flex-shrink-0" style={{ marginTop: '2px', color: '#dc2626' }} />
+        <div
+          className="alert alert-danger d-flex align-items-start gap-2 mb-3"
+          style={{
+            borderRadius: "8px",
+            border: "none",
+            backgroundColor: "#fee2e2",
+            padding: "0.75rem 1rem",
+          }}
+        >
+          <AlertTriangle
+            size={16}
+            className="flex-shrink-0"
+            style={{ marginTop: "2px", color: "#dc2626" }}
+          />
           <div className="flex-grow-1">
-            <p className="mb-0" style={{ fontSize: '0.875rem', color: '#991b1b' }}>{error}</p>
+            <p
+              className="mb-0"
+              style={{ fontSize: "0.875rem", color: "#991b1b" }}
+            >
+              {error}
+            </p>
           </div>
-          <button type="button" className="btn-close" style={{ fontSize: '0.75rem' }} onClick={() => setError('')} />
+          <button
+            type="button"
+            className="btn-close"
+            style={{ fontSize: "0.75rem" }}
+            onClick={() => setError("")}
+          />
         </div>
       )}
- 
+
       {/* STATS CARDS */}
       <div className="row g-3 mb-3">
         {stats.map((s, idx) => (
@@ -251,39 +366,63 @@ export default function FeedbackManagerDashboard() {
           </div>
         ))}
       </div>
- 
+
       {/* TABS */}
-      <div style={{ backgroundColor: '#27235c', borderRadius: '10px 10px 0 0', padding: '0 1rem', marginBottom: 0 }}>
+      <div
+        style={{
+          backgroundColor: "#27235c",
+          borderRadius: "10px 10px 0 0",
+          padding: "0 1rem",
+          marginBottom: 0,
+        }}
+      >
         <ul className="nav nav-tabs border-0 m-0" role="tablist">
           {[
-            { key: 'overview', label: 'Quick Actions', icon: Briefcase },
-            { key: 'manager-actions', label: 'My Reviews', icon: Star, count: myReviews.length },
-            { key: 'peer-feedback', label: 'Peer Feedback', icon: Users, count: myPeerFeedback.length },
+            { key: "overview", label: "Quick Actions", icon: Briefcase },
+            {
+              key: "manager-actions",
+              label: "My Reviews",
+              icon: Star,
+              count: myReviews.length,
+            },
+            {
+              key: "peer-feedback",
+              label: "Peer Feedback",
+              icon: Users,
+              count: myPeerFeedback.length,
+            },
           ].map(({ key, label, icon: Icon, count }) => (
             <li key={key} className="nav-item">
               <button
-                className={`nav-link border-0 d-flex align-items-center gap-2 ${activeTab === key ? 'active' : ''}`}
+                className={`nav-link border-0 d-flex align-items-center gap-2 ${
+                  activeTab === key ? "active" : ""
+                }`}
                 onClick={() => setActiveTab(key)}
                 style={{
-                  color: activeTab === key ? '#fff' : 'rgba(255,255,255,0.7)',
-                  backgroundColor: activeTab === key ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  borderBottom: activeTab === key ? '3px solid #fff' : '3px solid transparent',
-                  padding: '1rem 1.25rem',
+                  color: activeTab === key ? "#fff" : "rgba(255,255,255,0.7)",
+                  backgroundColor:
+                    activeTab === key ? "rgba(255,255,255,0.1)" : "transparent",
+                  borderBottom:
+                    activeTab === key
+                      ? "3px solid #fff"
+                      : "3px solid transparent",
+                  padding: "1rem 1.25rem",
                   fontWeight: 600,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
                   if (activeTab !== key) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
-                    e.currentTarget.style.color = '#fff';
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(255,255,255,0.05)";
+                    e.currentTarget.style.color = "#fff";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (activeTab !== key) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.7)";
                   }
                 }}
               >
@@ -294,12 +433,18 @@ export default function FeedbackManagerDashboard() {
           ))}
         </ul>
       </div>
- 
+
       {/* CONTENT AREA */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '0 0 10px 10px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', padding: '1.5rem' }}>
-       
+      <div
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: "0 0 10px 10px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+          padding: "1.5rem",
+        }}
+      >
         {/* OVERVIEW TAB - QUICK ACTIONS */}
-        {activeTab === 'overview' && (
+        {activeTab === "overview" && (
           <div className="row g-3">
             {/* Manager Functions */}
             <div className="col-md-6 col-lg-3">
@@ -307,472 +452,622 @@ export default function FeedbackManagerDashboard() {
                 to="/manager/dashboard/feedback/create-review"
                 className="action-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '1.25rem 1rem',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  minHeight: '100px'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "1.25rem 1rem",
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  minHeight: "100px",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#0f62fe';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 98, 254, 0.15)';
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.borderColor = "#0f62fe";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(15, 98, 254, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#fff';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = "#fff";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div
                   className="mb-2"
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#dbeafe',
-                    borderRadius: '8px'
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#dbeafe",
+                    borderRadius: "8px",
                   }}
                 >
-                  <Plus size={20} style={{ color: '#0f62fe' }} />
+                  <Plus size={20} style={{ color: "#0f62fe" }} />
                 </div>
-                <span style={{ fontSize: '0.813rem', fontWeight: 600, color: '#0f172a', textAlign: 'center' }}>
+                <span
+                  style={{
+                    fontSize: "0.813rem",
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textAlign: "center",
+                  }}
+                >
                   Create Review
                 </span>
               </Link>
             </div>
- 
+
             <div className="col-md-6 col-lg-3">
               <Link
                 to="/manager/dashboard/feedback/all-review"
                 className="action-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '1.25rem 1rem',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  minHeight: '100px'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "1.25rem 1rem",
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  minHeight: "100px",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#0f62fe';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 98, 254, 0.15)';
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.borderColor = "#0f62fe";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(15, 98, 254, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#fff';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = "#fff";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div
                   className="mb-2"
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#dbeafe',
-                    borderRadius: '8px'
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#dbeafe",
+                    borderRadius: "8px",
                   }}
                 >
-                  <Eye size={20} style={{ color: '#0f62fe' }} />
+                  <Eye size={20} style={{ color: "#0f62fe" }} />
                 </div>
-                <span style={{ fontSize: '0.813rem', fontWeight: 600, color: '#0f172a', textAlign: 'center' }}>
+                <span
+                  style={{
+                    fontSize: "0.813rem",
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textAlign: "center",
+                  }}
+                >
                   All Reviews
                 </span>
               </Link>
             </div>
- 
+
             <div className="col-md-6 col-lg-3">
               <Link
                 to="/manager/dashboard/feedback/team"
                 className="action-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '1.25rem 1rem',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  minHeight: '100px'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "1.25rem 1rem",
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  minHeight: "100px",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#0f62fe';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 98, 254, 0.15)';
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.borderColor = "#0f62fe";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(15, 98, 254, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#fff';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = "#fff";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div
                   className="mb-2"
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#dbeafe',
-                    borderRadius: '8px'
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#dbeafe",
+                    borderRadius: "8px",
                   }}
                 >
-                  <Users size={20} style={{ color: '#0f62fe' }} />
+                  <Users size={20} style={{ color: "#0f62fe" }} />
                 </div>
-                <span style={{ fontSize: '0.813rem', fontWeight: 600, color: '#0f172a', textAlign: 'center' }}>
+                <span
+                  style={{
+                    fontSize: "0.813rem",
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textAlign: "center",
+                  }}
+                >
                   Team Members
                 </span>
               </Link>
             </div>
- 
+
             <div className="col-md-6 col-lg-3">
               <Link
                 to="/manager/dashboard/feedback/team-submissions"
                 className="action-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '1.25rem 1rem',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  minHeight: '100px'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "1.25rem 1rem",
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  minHeight: "100px",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#0f62fe';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(15, 98, 254, 0.15)';
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.borderColor = "#0f62fe";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(15, 98, 254, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#fff';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = "#fff";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div
                   className="mb-2"
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#dbeafe',
-                    borderRadius: '8px'
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#dbeafe",
+                    borderRadius: "8px",
                   }}
                 >
-                  <FileText size={20} style={{ color: '#0f62fe' }} />
+                  <FileText size={20} style={{ color: "#0f62fe" }} />
                 </div>
-                <span style={{ fontSize: '0.813rem', fontWeight: 600, color: '#0f172a', textAlign: 'center' }}>
+                <span
+                  style={{
+                    fontSize: "0.813rem",
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textAlign: "center",
+                  }}
+                >
                   Team Submissions
                 </span>
               </Link>
             </div>
- 
+
             {/* Employee-like actions */}
             <div className="col-md-6 col-lg-3">
               <Link
                 to="/manager/dashboard/feedback/submit-mentor"
                 className="action-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '1.25rem 1rem',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  minHeight: '100px'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "1.25rem 1rem",
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  minHeight: "100px",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#64748b';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(100, 116, 139, 0.15)';
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.borderColor = "#64748b";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(100, 116, 139, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#fff';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = "#fff";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div
                   className="mb-2"
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#f1f5f9',
-                    borderRadius: '8px'
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#f1f5f9",
+                    borderRadius: "8px",
                   }}
                 >
-                  <Send size={20} style={{ color: '#64748b' }} />
+                  <Send size={20} style={{ color: "#64748b" }} />
                 </div>
-                <span style={{ fontSize: '0.813rem', fontWeight: 600, color: '#0f172a', textAlign: 'center' }}>
+                <span
+                  style={{
+                    fontSize: "0.813rem",
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textAlign: "center",
+                  }}
+                >
                   Mentor Feedback
                 </span>
               </Link>
             </div>
- 
+
             <div className="col-md-6 col-lg-3">
               <Link
                 to="/manager/dashboard/feedback/contextfeedback"
                 className="action-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '1.25rem 1rem',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  minHeight: '100px'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "1.25rem 1rem",
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  minHeight: "100px",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#64748b';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(100, 116, 139, 0.15)';
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.borderColor = "#64748b";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(100, 116, 139, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#fff';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = "#fff";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div
                   className="mb-2"
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#f1f5f9',
-                    borderRadius: '8px'
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#f1f5f9",
+                    borderRadius: "8px",
                   }}
                 >
-                  <MessageSquare size={20} style={{ color: '#64748b' }} />
+                  <MessageSquare size={20} style={{ color: "#64748b" }} />
                 </div>
-                <span style={{ fontSize: '0.813rem', fontWeight: 600, color: '#0f172a', textAlign: 'center' }}>
+                <span
+                  style={{
+                    fontSize: "0.813rem",
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textAlign: "center",
+                  }}
+                >
                   Context Feedback
                 </span>
               </Link>
             </div>
- 
+
             <div className="col-md-6 col-lg-3">
               <Link
                 to="/manager/dashboard/feedback/assignedform"
                 className="action-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '1.25rem 1rem',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  minHeight: '100px'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "1.25rem 1rem",
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  minHeight: "100px",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#64748b';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(100, 116, 139, 0.15)';
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.borderColor = "#64748b";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(100, 116, 139, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#fff';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = "#fff";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div
                   className="mb-2"
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#f1f5f9',
-                    borderRadius: '8px'
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#f1f5f9",
+                    borderRadius: "8px",
                   }}
                 >
-                  <Target size={20} style={{ color: '#64748b' }} />
+                  <Target size={20} style={{ color: "#64748b" }} />
                 </div>
-                <span style={{ fontSize: '0.813rem', fontWeight: 600, color: '#0f172a', textAlign: 'center' }}>
+                <span
+                  style={{
+                    fontSize: "0.813rem",
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textAlign: "center",
+                  }}
+                >
                   Assigned Forms
                 </span>
               </Link>
             </div>
- 
+
             <div className="col-md-6 col-lg-3">
               <Link
                 to="/manager/dashboard/feedback/submissions"
                 className="action-card"
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '1.25rem 1rem',
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  minHeight: '100px'
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "1.25rem 1rem",
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  minHeight: "100px",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#64748b';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(100, 116, 139, 0.15)';
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.borderColor = "#64748b";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(100, 116, 139, 0.15)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#fff';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.backgroundColor = "#fff";
+                  e.currentTarget.style.borderColor = "#e2e8f0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <div
                   className="mb-2"
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#f1f5f9',
-                    borderRadius: '8px'
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#f1f5f9",
+                    borderRadius: "8px",
                   }}
                 >
-                  <Search size={20} style={{ color: '#64748b' }} />
+                  <Search size={20} style={{ color: "#64748b" }} />
                 </div>
-                <span style={{ fontSize: '0.813rem', fontWeight: 600, color: '#0f172a', textAlign: 'center' }}>
+                <span
+                  style={{
+                    fontSize: "0.813rem",
+                    fontWeight: 600,
+                    color: "#0f172a",
+                    textAlign: "center",
+                  }}
+                >
                   My Submissions
                 </span>
               </Link>
             </div>
           </div>
         )}
- 
+
         {/* MANAGER ACTIONS TAB */}
-        {activeTab === 'manager-actions' && (
+        {activeTab === "manager-actions" && (
           <div>
-            <h5 className="fw-bold mb-4" style={{ color: '#0f172a', fontSize: '1.125rem' }}>
+            <h5
+              className="fw-bold mb-4"
+              style={{ color: "#0f172a", fontSize: "1.125rem" }}
+            >
               My Reviews ({myReviews.length})
             </h5>
-           
+
             {myReviews.length === 0 ? (
               <div className="text-center py-5">
-                <FileText size={56} style={{ color: '#cbd5e1', opacity: 0.5 }} className="mb-3" />
-                <h6 className="fw-bold mb-2" style={{ color: '#64748b', fontSize: '1.125rem' }}>
+                <FileText
+                  size={56}
+                  style={{ color: "#cbd5e1", opacity: 0.5 }}
+                  className="mb-3"
+                />
+                <h6
+                  className="fw-bold mb-2"
+                  style={{ color: "#64748b", fontSize: "1.125rem" }}
+                >
                   No reviews created yet
                 </h6>
-                <p className="text-muted mb-3" style={{ fontSize: '0.875rem' }}>
+                <p className="text-muted mb-3" style={{ fontSize: "0.875rem" }}>
                   Start creating reviews for your team members
                 </p>
-                <Link to="/manager/create-review" className="btn btn-primary" style={{ borderRadius: '8px', padding: '0.625rem 1.25rem' }}>
-                  <Plus size={16} className="me-2" style={{ display: 'inline' }} />
+                <Link
+                  to="/manager/create-review"
+                  className="btn btn-primary"
+                  style={{ borderRadius: "8px", padding: "0.625rem 1.25rem" }}
+                >
+                  <Plus
+                    size={16}
+                    className="me-2"
+                    style={{ display: "inline" }}
+                  />
                   Create First Review
                 </Link>
               </div>
             ) : (
               <div className="table-responsive">
-                <table className="table table-hover mb-0" style={{ fontSize: '0.875rem' }}>
-                  <thead style={{ backgroundColor: '#f8fafc' }}>
+                <table
+                  className="table table-hover mb-0"
+                  style={{ fontSize: "0.875rem" }}
+                >
+                  <thead style={{ backgroundColor: "#f8fafc" }}>
                     <tr>
-                      <th style={{ padding: '0.875rem', color: '#64748b', fontWeight: 600 }}>Employee</th>
-                      <th style={{ padding: '0.875rem', color: '#64748b', fontWeight: 600 }}>Rating</th>
-                      <th style={{ padding: '0.875rem', color: '#64748b', fontWeight: 600 }}>Status</th>
-                      <th style={{ padding: '0.875rem', color: '#64748b', fontWeight: 600 }}>Date</th>
-                      <th style={{ padding: '0.875rem', color: '#64748b', fontWeight: 600 }}>Actions</th>
+                      <th
+                        style={{
+                          padding: "0.875rem",
+                          color: "#64748b",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Employee
+                      </th>
+                      <th
+                        style={{
+                          padding: "0.875rem",
+                          color: "#64748b",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Rating
+                      </th>
+                      <th
+                        style={{
+                          padding: "0.875rem",
+                          color: "#64748b",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Status
+                      </th>
+                      <th
+                        style={{
+                          padding: "0.875rem",
+                          color: "#64748b",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Date
+                      </th>
+                      <th
+                        style={{
+                          padding: "0.875rem",
+                          color: "#64748b",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {myReviews.map(review => (
+                    {myReviews.map((review) => (
                       <tr key={review.reviewcommentId}>
-                        <td style={{ padding: '0.875rem', fontWeight: 600, color: '#0f172a' }}>{review.targetEmployeeName}</td>
-                        <td style={{ padding: '0.875rem' }}>
+                        <td
+                          style={{
+                            padding: "0.875rem",
+                            fontWeight: 600,
+                            color: "#0f172a",
+                          }}
+                        >
+                          {review.targetEmployeeName}
+                        </td>
+                        <td style={{ padding: "0.875rem" }}>
                           <div className="d-flex align-items-center gap-1">
-                            <Star size={14} style={{ color: '#FFB800', fill: '#FFB800' }} />
+                            <Star
+                              size={14}
+                              style={{ color: "#FFB800", fill: "#FFB800" }}
+                            />
                             <span>{review.rating || 0}/5</span>
                           </div>
                         </td>
-                        <td style={{ padding: '0.875rem' }}>
+                        <td style={{ padding: "0.875rem" }}>
                           <span
                             className="badge"
                             style={{
-                              backgroundColor: review.status === 'Approved' ? '#dcfce7' : '#fef3c7',
-                              color: review.status === 'Approved' ? '#24A148' : '#E2B93B',
-                              padding: '4px 10px',
-                              fontSize: '0.75rem',
-                              borderRadius: '6px',
-                              fontWeight: 600
+                              backgroundColor:
+                                review.status === "Approved"
+                                  ? "#dcfce7"
+                                  : "#fef3c7",
+                              color:
+                                review.status === "Approved"
+                                  ? "#24A148"
+                                  : "#E2B93B",
+                              padding: "4px 10px",
+                              fontSize: "0.75rem",
+                              borderRadius: "6px",
+                              fontWeight: 600,
                             }}
                           >
-                            {review.status || 'Draft'}
+                            {review.status || "Draft"}
                           </span>
                         </td>
-                        <td style={{ padding: '0.875rem', color: '#64748b' }}>
+                        <td style={{ padding: "0.875rem", color: "#64748b" }}>
                           {new Date(review.createdAt).toLocaleDateString()}
                         </td>
-                        <td style={{ padding: '0.875rem' }}>
+                        <td style={{ padding: "0.875rem" }}>
                           <Link
                             to={`/manager/view-review/${review.reviewcommentId}`}
                             className="btn btn-sm btn-outline-secondary"
-                            style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '4px 12px' }}
+                            style={{
+                              fontSize: "0.813rem",
+                              borderRadius: "6px",
+                              padding: "4px 12px",
+                            }}
                           >
-                            <Eye size={14} className="me-1" style={{ display: 'inline' }} />
+                            <Eye
+                              size={14}
+                              className="me-1"
+                              style={{ display: "inline" }}
+                            />
                             View
                           </Link>
                         </td>
@@ -784,48 +1079,95 @@ export default function FeedbackManagerDashboard() {
             )}
           </div>
         )}
- 
+
         {/* PEER FEEDBACK TAB */}
-        {activeTab === 'peer-feedback' && (
+        {activeTab === "peer-feedback" && (
           <div>
-            <h5 className="fw-bold mb-4" style={{ color: '#0f172a', fontSize: '1.125rem' }}>
+            <h5
+              className="fw-bold mb-4"
+              style={{ color: "#0f172a", fontSize: "1.125rem" }}
+            >
               All Peer Feedback ({myPeerFeedback.length})
             </h5>
-           
+
             {myPeerFeedback.length === 0 ? (
               <div className="text-center py-5">
-                <Users size={56} style={{ color: '#cbd5e1', opacity: 0.5 }} className="mb-3" />
-                <h6 className="fw-bold mb-2" style={{ color: '#64748b', fontSize: '1.125rem' }}>
+                <Users
+                  size={56}
+                  style={{ color: "#cbd5e1", opacity: 0.5 }}
+                  className="mb-3"
+                />
+                <h6
+                  className="fw-bold mb-2"
+                  style={{ color: "#64748b", fontSize: "1.125rem" }}
+                >
                   No peer feedback yet
                 </h6>
-                <p className="text-muted mb-0" style={{ fontSize: '0.875rem' }}>
+                <p className="text-muted mb-0" style={{ fontSize: "0.875rem" }}>
                   You haven't received any peer feedback yet
                 </p>
               </div>
             ) : (
               <div className="row g-3">
-                {myPeerFeedback.map(feedback => (
-                  <div className="col-12" key={feedback.peerQueueId || feedback.contextFeedbackId}>
-                    <div className="card border-0" style={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                      <div className="card-body" style={{ padding: '1rem' }}>
+                {myPeerFeedback.map((feedback) => (
+                  <div
+                    className="col-12"
+                    key={feedback.peerQueueId || feedback.contextFeedbackId}
+                  >
+                    <div
+                      className="card border-0"
+                      style={{
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <div className="card-body" style={{ padding: "1rem" }}>
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <div>
-                            <h6 className="fw-bold mb-1" style={{ fontSize: '0.875rem', color: '#0f172a' }}>
+                            <h6
+                              className="fw-bold mb-1"
+                              style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                            >
                               {feedback.submittedByName}
                             </h6>
-                            <small style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                            <small
+                              style={{ fontSize: "0.75rem", color: "#64748b" }}
+                            >
                               {feedback.submittedDate
-                                ? new Date(feedback.submittedDate).toLocaleDateString()
-                                : new Date(feedback.createdAt).toLocaleDateString()
-                              }
+                                ? new Date(
+                                    feedback.submittedDate
+                                  ).toLocaleDateString()
+                                : new Date(
+                                    feedback.createdAt
+                                  ).toLocaleDateString()}
                             </small>
                           </div>
-                          <span className="badge" style={{ backgroundColor: '#f8f0ff', color: '#9d4edd', padding: '4px 10px', fontSize: '0.75rem', borderRadius: '6px', fontWeight: 600 }}>
+                          <span
+                            className="badge"
+                            style={{
+                              backgroundColor: "#f8f0ff",
+                              color: "#9d4edd",
+                              padding: "4px 10px",
+                              fontSize: "0.75rem",
+                              borderRadius: "6px",
+                              fontWeight: 600,
+                            }}
+                          >
                             Peer Feedback
                           </span>
                         </div>
-                        <p className="mb-0" style={{ lineHeight: '1.6', color: '#475569', fontSize: '0.875rem' }}>
-                          {feedback.comment || feedback.feedbackComment || feedback.feedbackContent || 'No comment provided'}
+                        <p
+                          className="mb-0"
+                          style={{
+                            lineHeight: "1.6",
+                            color: "#475569",
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          {feedback.comment ||
+                            feedback.feedbackComment ||
+                            feedback.feedbackContent ||
+                            "No comment provided"}
                         </p>
                       </div>
                     </div>
@@ -836,7 +1178,7 @@ export default function FeedbackManagerDashboard() {
           </div>
         )}
       </div>
- 
+
       <style>{`
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -844,5 +1186,3 @@ export default function FeedbackManagerDashboard() {
     </div>
   );
 }
- 
- 

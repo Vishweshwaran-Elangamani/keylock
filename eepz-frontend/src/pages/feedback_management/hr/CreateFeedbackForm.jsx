@@ -1,14 +1,26 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { CheckCircle, Send, AlertTriangle, ArrowLeft, Loader, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useMemo, useState, useEffect } from "react";
+import {
+  CheckCircle,
+  Send,
+  AlertTriangle,
+  ArrowLeft,
+  Loader,
+  Calendar,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5333/api';
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function CreateFeedbackForm() {
   const navigate = useNavigate();
   const user = useMemo(
-    () => JSON.parse(localStorage.getItem('user') || '{}') || { empId: 1001, firstName: 'Alice', lastName: 'HR' },
+    () =>
+      JSON.parse(localStorage.getItem("user") || "{}") || {
+        empId: 1001,
+        firstName: "Alice",
+        lastName: "HR",
+      },
     []
   );
 
@@ -17,27 +29,27 @@ export default function CreateFeedbackForm() {
   // ============================================================================
 
   const [form, setForm] = useState({
-    formName: '',
-    formDescription: '',
-    formType: 'PerformanceReview',
-    deadline: ''
+    formName: "",
+    formDescription: "",
+    formType: "PerformanceReview",
+    deadline: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // ============================================================================
   // FORM TYPES
   // ============================================================================
 
   const FORM_TYPES = [
-    { value: 'PerformanceReview', label: '📊 Performance Review' },
-    { value: 'GeneralFeedback', label: '📝 General Feedback' },
-    { value: 'BiasReview', label: '⚖️ Bias Review' },
-    { value: 'ProfessionalismReview', label: '👔 Professionalism Review' },
-    { value: 'SurveyForm', label: '📋 Survey' },
-    { value: 'EvaluationForm', label: '✅ Evaluation' }
+    { value: "PerformanceReview", label: " Performance Review" },
+    { value: "GeneralFeedback", label: " General Feedback" },
+    { value: "BiasReview", label: " Bias Review" },
+    { value: "ProfessionalismReview", label: " Professionalism Review" },
+    { value: "SurveyForm", label: " Survey" },
+    { value: "EvaluationForm", label: " Evaluation" },
   ];
 
   // ============================================================================
@@ -46,80 +58,82 @@ export default function CreateFeedbackForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     // Validation
     if (!form.formName?.trim()) {
-      setError('Form name is required');
+      setError("Form name is required");
       return;
     }
     if (!form.formDescription?.trim()) {
-      setError('Form description is required');
+      setError("Form description is required");
       return;
     }
     if (!form.formType) {
-      setError('Form type is required');
+      setError("Form type is required");
       return;
     }
     if (!form.deadline) {
-      setError('Deadline is required');
+      setError("Deadline is required");
       return;
     }
 
     setLoading(true);
 
     try {
-      // ✅ SIMPLIFIED: No distribution step needed
+      //  SIMPLIFIED: No distribution step needed
       const createPayload = {
         formName: form.formName.trim(),
         formDescription: form.formDescription.trim(),
         formType: form.formType,
         createdByHRId: Number(user?.empId),
-        deadline: new Date(form.deadline).toISOString()
+        deadline: new Date(form.deadline).toISOString(),
       };
 
-      console.log('📤 Creating form:', JSON.stringify(createPayload, null, 2));
+      console.log(" Creating form:", JSON.stringify(createPayload, null, 2));
 
       const response = await axios.post(
         `${API_BASE}/HrFeedbackForm/forms/create`,
         createPayload,
         {
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      console.log('✅ Form created:', response.data);
+      console.log(" Form created:", response.data);
 
       if (response.data?.success || response.status === 200) {
         setSuccess(
-          `✅ Form created successfully!\n\n` +
-          `Form: ${form.formName}\n` +
-          `Type: ${FORM_TYPES.find(t => t.value === form.formType)?.label}\n` +
-          `Visible to: All Employees`
+          ` Form created successfully!\n\n` +
+            `Form: ${form.formName}\n` +
+            `Type: ${
+              FORM_TYPES.find((t) => t.value === form.formType)?.label
+            }\n` +
+            `Visible to: All Employees`
         );
 
         // Reset form
         setTimeout(() => {
           setForm({
-            formName: '',
-            formDescription: '',
-            formType: 'PerformanceReview',
-            deadline: ''
+            formName: "",
+            formDescription: "",
+            formType: "PerformanceReview",
+            deadline: "",
           });
-          navigate('/hr/dashboard/feedback');
+          navigate("/hr/dashboard/feedback");
         }, 2500);
       } else {
-        setError(response.data?.message || 'Failed to create form');
+        setError(response.data?.message || "Failed to create form");
       }
     } catch (err) {
-      console.error('❌ Error:', err);
+      console.error(" Error:", err);
       setError(
-        err?.response?.data?.message || 
-        err?.message || 
-        'Failed to create form. Please try again.'
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to create form. Please try again."
       );
     } finally {
       setLoading(false);
@@ -131,11 +145,11 @@ export default function CreateFeedbackForm() {
   // ============================================================================
 
   return (
-    <div className="container-fluid py-4" style={{ maxWidth: '900px' }}>
+    <div className="container-fluid py-4" style={{ maxWidth: "900px" }}>
       {/* HEADER */}
       <div className="d-flex align-items-center mb-4">
-        <button 
-          className="btn btn-outline-secondary me-2" 
+        <button
+          className="btn btn-outline-secondary me-2"
           onClick={() => navigate(-1)}
           type="button"
           disabled={loading}
@@ -143,24 +157,34 @@ export default function CreateFeedbackForm() {
           <ArrowLeft size={18} />
         </button>
         <div>
-          <h2 className="fw-bold mb-1" style={{ color: 'var(--color-primary-1)' }}>
-            📋 Create Feedback Form
+          <h2
+            className="fw-bold mb-1"
+            style={{ color: "var(--color-primary-1)" }}
+          >
+            Create Feedback Form
           </h2>
           <p className="small text-muted mb-0">
-            ✅ Forms are automatically visible to all employees
+            Forms are automatically visible to all employees
           </p>
         </div>
       </div>
 
       {/* ERROR ALERT */}
       {error && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          <AlertTriangle size={18} className="me-2" style={{ display: 'inline' }} />
+        <div
+          className="alert alert-danger alert-dismissible fade show"
+          role="alert"
+        >
+          <AlertTriangle
+            size={18}
+            className="me-2"
+            style={{ display: "inline" }}
+          />
           <strong>Error:</strong> {error}
-          <button 
-            type="button" 
-            className="btn-close" 
-            onClick={() => setError('')}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setError("")}
             aria-label="Close"
           />
         </div>
@@ -168,15 +192,31 @@ export default function CreateFeedbackForm() {
 
       {/* SUCCESS ALERT */}
       {success && (
-        <div className="alert alert-success alert-dismissible fade show" role="alert">
-          <CheckCircle size={18} className="me-2" style={{ display: 'inline' }} />
+        <div
+          className="alert alert-success alert-dismissible fade show"
+          role="alert"
+        >
+          <CheckCircle
+            size={18}
+            className="me-2"
+            style={{ display: "inline" }}
+          />
           <strong>Success!</strong>
-          <p className="mb-0 small mt-1" style={{ whiteSpace: 'pre-wrap' }}>{success}</p>
+          <p className="mb-0 small mt-1" style={{ whiteSpace: "pre-wrap" }}>
+            {success}
+          </p>
         </div>
       )}
 
       {/* FORM CARD */}
-      <div className="card border-0" style={{ border: '1px solid var(--border)', boxShadow: 'var(--shadow)', borderRadius: 'var(--radius-lg)' }}>
+      <div
+        className="card border-0"
+        style={{
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow)",
+          borderRadius: "var(--radius-lg)",
+        }}
+      >
         <div className="card-body p-4">
           <form onSubmit={handleSubmit}>
             {/* FORM NAME */}
@@ -192,9 +232,11 @@ export default function CreateFeedbackForm() {
                 onChange={(e) => setForm({ ...form, formName: e.target.value })}
                 placeholder="e.g., Q4 Performance Review"
                 disabled={loading}
-                style={{ borderRadius: 'var(--radius-md)' }}
+                style={{ borderRadius: "var(--radius-md)" }}
               />
-              <small className="text-muted">Give your form a clear, descriptive name</small>
+              <small className="text-muted">
+                Give your form a clear, descriptive name
+              </small>
             </div>
 
             {/* FORM DESCRIPTION */}
@@ -207,13 +249,16 @@ export default function CreateFeedbackForm() {
                 className="form-control"
                 rows={4}
                 value={form.formDescription}
-                onChange={(e) => setForm({ ...form, formDescription: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, formDescription: e.target.value })
+                }
                 placeholder="Describe the purpose and goals of this form..."
                 disabled={loading}
-                style={{ borderRadius: 'var(--radius-md)', resize: 'vertical' }}
+                style={{ borderRadius: "var(--radius-md)", resize: "vertical" }}
               />
               <small className="text-muted">
-                Employees will see this description ({form.formDescription.length}/500 characters)
+                Employees will see this description (
+                {form.formDescription.length}/500 characters)
               </small>
             </div>
 
@@ -228,16 +273,18 @@ export default function CreateFeedbackForm() {
                 value={form.formType}
                 onChange={(e) => setForm({ ...form, formType: e.target.value })}
                 disabled={loading}
-                style={{ borderRadius: 'var(--radius-md)' }}
+                style={{ borderRadius: "var(--radius-md)" }}
               >
                 <option value="">-- Select Form Type --</option>
-                {FORM_TYPES.map(type => (
+                {FORM_TYPES.map((type) => (
                   <option key={type.value} value={type.value}>
                     {type.label}
                   </option>
                 ))}
               </select>
-              <small className="text-muted">Choose what type of feedback this form collects</small>
+              <small className="text-muted">
+                Choose what type of feedback this form collects
+              </small>
             </div>
 
             {/* DEADLINE */}
@@ -246,7 +293,13 @@ export default function CreateFeedbackForm() {
                 Response Deadline <span className="text-danger">*</span>
               </label>
               <div className="input-group">
-                <span className="input-group-text" style={{ backgroundColor: '#f9f9f9', borderRadius: 'var(--radius-md) 0 0 var(--radius-md)' }}>
+                <span
+                  className="input-group-text"
+                  style={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: "var(--radius-md) 0 0 var(--radius-md)",
+                  }}
+                >
                   <Calendar size={16} />
                 </span>
                 <input
@@ -254,22 +307,33 @@ export default function CreateFeedbackForm() {
                   type="datetime-local"
                   className="form-control form-control-lg"
                   value={form.deadline}
-                  onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, deadline: e.target.value })
+                  }
                   disabled={loading}
-                  style={{ borderRadius: '0 var(--radius-md) var(--radius-md) 0' }}
+                  style={{
+                    borderRadius: "0 var(--radius-md) var(--radius-md) 0",
+                  }}
                 />
               </div>
-              <small className="text-muted">When employees need to complete this form by</small>
+              <small className="text-muted">
+                When employees need to complete this form by
+              </small>
             </div>
 
             {/* INFO BOX */}
-            <div className="alert alert-info mb-4" style={{ borderRadius: 'var(--radius-md)' }}>
+            <div
+              className="alert alert-info mb-4"
+              style={{ borderRadius: "var(--radius-md)" }}
+            >
               <div className="d-flex align-items-start gap-2">
                 <div>
                   <strong>👥 Visibility:</strong>
                   <p className="mb-0 small mt-1">
-                    This form will be <strong>automatically visible to all employees</strong> once created. 
-                    All employees will see this form in their assigned forms list.
+                    This form will be{" "}
+                    <strong>automatically visible to all employees</strong> once
+                    created. All employees will see this form in their assigned
+                    forms list.
                   </p>
                 </div>
               </div>
@@ -284,12 +348,20 @@ export default function CreateFeedbackForm() {
               >
                 {loading ? (
                   <>
-                    <Loader size={18} className="me-2 spinner-border spinner-border-sm" style={{ display: 'inline' }} />
+                    <Loader
+                      size={18}
+                      className="me-2 spinner-border spinner-border-sm"
+                      style={{ display: "inline" }}
+                    />
                     Creating Form...
                   </>
                 ) : (
                   <>
-                    <Send size={18} className="me-1" style={{ display: 'inline' }} />
+                    <Send
+                      size={18}
+                      className="me-1"
+                      style={{ display: "inline" }}
+                    />
                     Create Form
                   </>
                 )}
@@ -300,11 +372,16 @@ export default function CreateFeedbackForm() {
       </div>
 
       {/* FOOTER INFO */}
-      <div className="alert alert-light mt-4" style={{ border: '1px solid var(--border)' }}>
+      <div
+        className="alert alert-light mt-4"
+        style={{ border: "1px solid var(--border)" }}
+      >
         <strong>ℹ️ How it works:</strong>
         <ul className="mb-0 mt-2 ps-3">
           <li>Create the form with name, description, type, and deadline</li>
-          <li>Form is automatically set to <strong>Active</strong> status</li>
+          <li>
+            Form is automatically set to <strong>Active</strong> status
+          </li>
           <li>All employees automatically see the form in their dashboard</li>
           <li>Employees can fill it out before the deadline</li>
         </ul>

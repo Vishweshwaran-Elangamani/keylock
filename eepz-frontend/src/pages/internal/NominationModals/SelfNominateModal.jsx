@@ -1,6 +1,6 @@
 import { useState } from "react";
 import nominationService from "../../../services/internal/nominationService";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import "../../../styles/internal/NominationModal.css";
 
 const SelfNominateModal = ({

@@ -71,7 +71,8 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
         periodYear: period.periodYear,
       };
 
-      const response = await budgetAllocationService.createFundAllocationFromPeriod(payload);
+      const response =
+        await budgetAllocationService.createFundAllocationFromPeriod(payload);
 
       if (response.success) {
         toast.success("Sub-allocation created successfully!");
@@ -89,13 +90,25 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
   };
 
   return (
-    <Modal show={true} onHide={onClose} centered size="lg" backdrop="static" className="period-modal">
+    <Modal
+      show={true}
+      onHide={onClose}
+      centered
+      size="lg"
+      backdrop="static"
+      className="period-modal"
+    >
       <div className="modal-header-gradient">
         <Modal.Title className="modal-title-custom">
           <i className="bi bi-plus-circle me-2"></i>
           Sub-Allocate from {period.period} {period.periodYear}
         </Modal.Title>
-        <button type="button" className="btn-close btn-close-white" onClick={onClose} disabled={loading}></button>
+        <button
+          type="button"
+          className="btn-close btn-close-white"
+          onClick={onClose}
+          disabled={loading}
+        ></button>
       </div>
 
       <Modal.Body className="modal-body-custom">
@@ -107,35 +120,49 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
           <div className="budget-info-grid">
             <div className="budget-info-item">
               <span className="info-label">Period</span>
-              <span className="info-value">{period.period} {period.periodYear}</span>
+              <span className="info-value">
+                {period.period} {period.periodYear}
+              </span>
             </div>
             <div className="budget-info-item">
               <span className="info-label">Period Allocation</span>
-              <span className="info-value">{formatCurrency(period.allocatedAmount)}</span>
+              <span className="info-value">
+                {formatCurrency(period.allocatedAmount)}
+              </span>
             </div>
             <div className="budget-info-item">
               <span className="info-label">Already Sub-Allocated</span>
               <span className="info-value allocated">
-                {formatCurrency(period.allocatedAmount - period.remainingAmount)}
+                {formatCurrency(
+                  period.allocatedAmount - period.remainingAmount
+                )}
               </span>
             </div>
             <div className="budget-info-item highlight">
               <span className="info-label">Available for Sub-Allocation</span>
-              <span className="info-value available">{formatCurrency(period.remainingAmount)}</span>
+              <span className="info-value available">
+                {formatCurrency(period.remainingAmount)}
+              </span>
             </div>
           </div>
 
           <div className="progress-section mt-3">
             <div className="d-flex justify-content-between align-items-center mb-2">
               <small className="text-muted">Sub-Allocation Progress</small>
-              <small className="text-muted">{period.subAllocationCount || 0} sub-allocations</small>
+              <small className="text-muted">
+                {period.subAllocationCount || 0} sub-allocations
+              </small>
             </div>
             <div className="progress" style={{ height: "8px" }}>
               <div
                 className="progress-bar bg-primary"
                 role="progressbar"
                 style={{
-                  width: `${((period.allocatedAmount - period.remainingAmount) / period.allocatedAmount) * 100}%`,
+                  width: `${
+                    ((period.allocatedAmount - period.remainingAmount) /
+                      period.allocatedAmount) *
+                    100
+                  }%`,
                 }}
               ></div>
             </div>
@@ -161,7 +188,9 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
                 </option>
               ))}
             </select>
-            <small className="text-muted">Select the purpose of this allocation</small>
+            <small className="text-muted">
+              Select the purpose of this allocation
+            </small>
           </div>
 
           <div className="mb-3">
@@ -173,7 +202,9 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
               name="amount"
               value={formData.amount}
               onChange={handleChange}
-              className={`form-control form-control-custom ${errors.amount ? 'is-invalid' : ''}`}
+              className={`form-control form-control-custom ${
+                errors.amount ? "is-invalid" : ""
+              }`}
               placeholder="Enter amount"
               step="0.01"
               min="0"
@@ -185,7 +216,10 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
             )}
             {formData.amount && !errors.amount && (
               <small className="text-success">
-                ✓ {formatCurrency(parseFloat(formData.amount))} • Remaining: {formatCurrency(period.remainingAmount - parseFloat(formData.amount))}
+                ✓ {formatCurrency(parseFloat(formData.amount))} • Remaining:{" "}
+                {formatCurrency(
+                  period.remainingAmount - parseFloat(formData.amount)
+                )}
               </small>
             )}
           </div>
@@ -207,17 +241,30 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
             <div>
               <strong>Sub-Allocation from Period</strong>
               <p className="mb-0">
-                This will create a fund allocation linked to <strong>{period.period} {period.periodYear}</strong>. 
-                The department head can then update utilization for this allocation.
+                This will create a fund allocation linked to{" "}
+                <strong>
+                  {period.period} {period.periodYear}
+                </strong>
+                . The department head can then update utilization for this
+                allocation.
               </p>
             </div>
           </div>
 
           <div className="modal-actions-custom">
-            <button type="button" className="btn btn-secondary-custom" onClick={onClose} disabled={loading}>
+            <button
+              type="button"
+              className="btn btn-secondary-custom"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary-gradient" disabled={loading}>
+            <button
+              type="submit"
+              className="btn btn-primary-gradient"
+              disabled={loading}
+            >
               {loading ? (
                 <>
                   <span className="spinner-border spinner-border-sm me-2"></span>

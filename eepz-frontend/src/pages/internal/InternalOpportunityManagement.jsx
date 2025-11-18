@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
@@ -9,7 +7,7 @@ import EditOpportunityModal from "./OpportunityModals/EditOpportunityModal";
 import DeleteOpportunityModal from "./OpportunityModals/DeleteOpportunityModal";
 import SelfNominateModal from "./NominationModals/SelfNominateModal";
 import ManagerNominateModal from "./NominationModals/ManagerNominateModal";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import "../../styles/internal/InternalOpportunityManagement.css";
 
 const InternalOpportunityManagement = () => {
@@ -33,7 +31,8 @@ const InternalOpportunityManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
-  const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
+  const [showManagerNominateModal, setShowManagerNominateModal] =
+    useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
 
   toast.options = {
@@ -214,7 +213,7 @@ const InternalOpportunityManagement = () => {
     });
   };
 
-  // ✅ ROLE-BASED UI RENDERING
+  //  ROLE-BASED UI RENDERING
   const isHR = user?.role === "HR";
   const isEmployee = user?.role === "Employee";
   const isManager = user?.role === "Manager";
@@ -289,7 +288,7 @@ const InternalOpportunityManagement = () => {
           </div>
 
           <div className="filters-actions">
-            {/* ✅ ONLY HR CAN CREATE */}
+            {/*  ONLY HR CAN CREATE */}
             {isHR && (
               <button className="btn-add" onClick={handleCreateOpportunity}>
                 <i className="bi bi-plus-circle"></i>
@@ -407,7 +406,7 @@ const InternalOpportunityManagement = () => {
                     </td>
                     <td>
                       <div className="action-buttons">
-                        {/* ✅ HR: Edit & Delete */}
+                        {/*  HR: Edit & Delete */}
                         {isHR && (
                           <>
                             <button
@@ -429,7 +428,7 @@ const InternalOpportunityManagement = () => {
                           </>
                         )}
 
-                        {/* ✅ EMPLOYEE: Self Nominate */}
+                        {/*  EMPLOYEE: Self Nominate */}
                         {isEmployee && (
                           <button
                             className="action-btn action-btn-nominate"
@@ -440,7 +439,7 @@ const InternalOpportunityManagement = () => {
                           </button>
                         )}
 
-                        {/* ✅ MANAGER: Self Nominate & Nominate Team Members */}
+                        {/*  MANAGER: Self Nominate & Nominate Team Members */}
                         {isManager && (
                           <>
                             <button
@@ -452,9 +451,7 @@ const InternalOpportunityManagement = () => {
                             </button>
                             <button
                               className="action-btn action-btn-nominate-team"
-                              onClick={() =>
-                                handleManagerNominate(opportunity)
-                              }
+                              onClick={() => handleManagerNominate(opportunity)}
                               title="Nominate Team Member"
                             >
                               <i className="bi bi-person-plus"></i>
@@ -505,7 +502,10 @@ const InternalOpportunityManagement = () => {
 
             <div className="pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
-              {Math.min(currentPage * rowsPerPage, filteredOpportunities.length)}{" "}
+              {Math.min(
+                currentPage * rowsPerPage,
+                filteredOpportunities.length
+              )}{" "}
               of {filteredOpportunities.length} entries
             </div>
 
@@ -565,7 +565,7 @@ const InternalOpportunityManagement = () => {
         )}
       </div>
 
-      {/* ✅ MODALS */}
+      {/*  MODALS */}
       {isHR && showCreateModal && (
         <CreateOpportunityModal
           show={showCreateModal}
@@ -594,14 +594,16 @@ const InternalOpportunityManagement = () => {
         />
       )}
 
-      {(isEmployee || isManager) && showSelfNominateModal && selectedOpportunity && (
-        <SelfNominateModal
-          show={showSelfNominateModal}
-          onHide={() => setShowSelfNominateModal(false)}
-          opportunity={selectedOpportunity}
-          onNominationSubmitted={handleNominationSubmitted}
-        />
-      )}
+      {(isEmployee || isManager) &&
+        showSelfNominateModal &&
+        selectedOpportunity && (
+          <SelfNominateModal
+            show={showSelfNominateModal}
+            onHide={() => setShowSelfNominateModal(false)}
+            opportunity={selectedOpportunity}
+            onNominationSubmitted={handleNominationSubmitted}
+          />
+        )}
 
       {isManager && showManagerNominateModal && selectedOpportunity && (
         <ManagerNominateModal

@@ -1,29 +1,32 @@
-// src/components/SLA/SLACard.jsx
-import React from 'react';
-import { Card, Badge, Button } from 'react-bootstrap';
-import { FaExclamationTriangle, FaClock, FaCheckCircle } from 'react-icons/fa';
+import React from "react";
+import { Card, Badge, Button } from "react-bootstrap";
+import { FaExclamationTriangle, FaClock, FaCheckCircle } from "react-icons/fa";
 import {
   calculateDaysUntilDeadline,
   calculateUrgencyStatus,
-  getStatusBadge
-} from '@/utils/slaCalculations';
-import './SLACard.css';
+  getStatusBadge,
+} from "@/utils/slaCalculations";
+import "./SLACard.css";
 
 const SLACard = ({ sla, onViewDetails, onEscalate }) => {
   const daysUntil = calculateDaysUntilDeadline(sla.deadline);
-  const urgency = calculateUrgencyStatus(sla.deadline, sla.status, sla.complianceStatus);
+  const urgency = calculateUrgencyStatus(
+    sla.deadline,
+    sla.status,
+    sla.complianceStatus
+  );
   const statusBadge = getStatusBadge(sla.status);
 
   const getUrgencyBadge = () => {
     switch (urgency) {
-      case 'Overdue':
-        return { bg: 'danger', icon: <FaExclamationTriangle /> };
-      case 'Due Soon':
-        return { bg: 'warning', icon: <FaClock /> };
-      case 'Upcoming':
-        return { bg: 'info', icon: <FaClock /> };
+      case "Overdue":
+        return { bg: "danger", icon: <FaExclamationTriangle /> };
+      case "Due Soon":
+        return { bg: "warning", icon: <FaClock /> };
+      case "Upcoming":
+        return { bg: "info", icon: <FaClock /> };
       default:
-        return { bg: 'success', icon: <FaCheckCircle /> };
+        return { bg: "success", icon: <FaCheckCircle /> };
     }
   };
 
@@ -45,9 +48,11 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
         {/* Employee Info */}
         <div className="mb-3">
           <small className="text-muted d-block">Assigned to</small>
-          <strong>{sla.assignedToName || 'Unassigned'}</strong>
+          <strong>{sla.assignedToName || "Unassigned"}</strong>
           {sla.assignedToName && (
-            <small className="text-muted d-block">{sla.assignedToEmployeeId}</small>
+            <small className="text-muted d-block">
+              {sla.assignedToEmployeeId}
+            </small>
           )}
         </div>
 
@@ -60,11 +65,15 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
         {/* Deadline */}
         <div className="mb-3">
           <small className="text-muted d-block">Deadline</small>
-          <strong>{new Date(sla.deadline).toLocaleDateString('en-IN')}</strong>
-          <small className={`d-block mt-1 ${daysUntil < 0 ? 'text-danger' : 'text-muted'}`}>
+          <strong>{new Date(sla.deadline).toLocaleDateString("en-IN")}</strong>
+          <small
+            className={`d-block mt-1 ${
+              daysUntil < 0 ? "text-danger" : "text-muted"
+            }`}
+          >
             {daysUntil < 0
-              ? `🔴 ${Math.abs(daysUntil)} days overdue`
-              : `⏳ ${daysUntil} days remaining`}
+              ? ` ${Math.abs(daysUntil)} days overdue`
+              : ` ${daysUntil} days remaining`}
           </small>
         </div>
 
@@ -76,14 +85,18 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
         </div>
 
         {/* Status Info */}
-        {sla.status === 'Closed' && (
+        {sla.status === "Closed" && (
           <div className="mb-3">
             <small className="text-muted d-block">Compliance Status</small>
-            <Badge bg={
-              sla.complianceStatus === 'OnTime' ? 'success' :
-                sla.complianceStatus === 'Breached' ? 'danger' :
-                  'warning'
-            }>
+            <Badge
+              bg={
+                sla.complianceStatus === "OnTime"
+                  ? "success"
+                  : sla.complianceStatus === "Breached"
+                  ? "danger"
+                  : "warning"
+              }
+            >
               {sla.complianceStatus}
             </Badge>
           </div>
@@ -100,7 +113,7 @@ const SLACard = ({ sla, onViewDetails, onEscalate }) => {
         >
           View Details
         </Button>
-        {sla.status === 'Open' && (
+        {sla.status === "Open" && (
           <Button
             variant="outline-danger"
             size="sm"

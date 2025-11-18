@@ -1,6 +1,6 @@
 /**
  * ChangePassword Component
- * 
+ *
  * A form for changing or setting a user's password.
  * Features:
  * - Password strength indicator and validation
@@ -9,7 +9,7 @@
  * - Error handling and user feedback
  * - Toast notifications using Sonner for success/error feedback
  * - Responsive layout for first-time login vs regular password change
- * 
+ *
  * @component
  */
 
@@ -137,7 +137,7 @@ const ChangePassword = () => {
   /**
    * Evaluates password strength based on multiple criteria
    * Returns: "weak", "medium", or "strong"
-   * 
+   *
    * @param {string} password - Password to evaluate
    * @returns {string} Strength level
    */
@@ -159,7 +159,7 @@ const ChangePassword = () => {
   /**
    * Validates password against requirements
    * Updates validations state with requirement status
-   * 
+   *
    * @param {string} password - Password to validate
    * @returns {Object} Validation results
    */
@@ -178,7 +178,7 @@ const ChangePassword = () => {
   /**
    * Validates password for form submission
    * Returns error message if validation fails
-   * 
+   *
    * @param {string} password - Password to validate
    * @returns {string} Error message or empty string
    */
@@ -212,7 +212,7 @@ const ChangePassword = () => {
    * Handles input field changes
    * Updates form data and password validation
    * Clears errors when user starts typing
-   * 
+   *
    * @param {Event} e - Input change event
    */
   const handleChange = (e) => {
@@ -237,7 +237,7 @@ const ChangePassword = () => {
    * Handles form submission
    * Validates all fields and makes API call
    * Shows Sonner toast notifications for user feedback
-   * 
+   *
    * @param {Event} e - Form submit event
    */
   const handleSubmit = async (e) => {
@@ -350,7 +350,7 @@ const ChangePassword = () => {
 
   /**
    * Gets color for password strength indicator
-   * 
+   *
    * @returns {string} CSS color value
    */
   const getStrengthColor = () => {
@@ -368,7 +368,7 @@ const ChangePassword = () => {
 
   /**
    * Gets width for password strength indicator
-   * 
+   *
    * @returns {string} CSS width value
    */
   const getStrengthWidth = () => {
@@ -386,7 +386,7 @@ const ChangePassword = () => {
 
   /**
    * Checks if all password requirements are met
-   * 
+   *
    * @returns {boolean} True if all requirements passed
    */
   const allValidationsPassed = Object.values(validations).every((v) => v);

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import userService from "../../../../services/auth/userService";
 import roleService from "../../../../services/auth/roleService";
@@ -63,7 +62,8 @@ const UserList = () => {
         toast.success("Users loaded!");
       }
       if (rolesResponse.success) setRoles(rolesResponse.data || []);
-      if (departmentsResponse.success) setDepartments(departmentsResponse.data || []);
+      if (departmentsResponse.success)
+        setDepartments(departmentsResponse.data || []);
       toast.dismiss();
     } catch (error) {
       toast.dismiss();
@@ -206,7 +206,8 @@ const UserList = () => {
           <div className="header-text">
             <h2 className="page-title">User Management</h2>
             <p className="page-description">
-              Manage all users in one place. Control access, assign roles, and monitor activity.
+              Manage all users in one place. Control access, assign roles, and
+              monitor activity.
             </p>
           </div>
         </div>

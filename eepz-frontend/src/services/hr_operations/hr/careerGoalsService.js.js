@@ -1,8 +1,6 @@
 import hrApi from "../../hrApi";
 
 const careerGoalsService = {
-  
-  
   // Get career goals overview/statistics for dashboard
   getOverview: async () => {
     try {
@@ -12,7 +10,9 @@ const careerGoalsService = {
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error fetching goals overview:", error);
-      throw error.response?.data || { message: "Failed to fetch goals overview" };
+      throw (
+        error.response?.data || { message: "Failed to fetch goals overview" }
+      );
     }
   },
 
@@ -25,7 +25,9 @@ const careerGoalsService = {
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error fetching goal statistics:", error);
-      throw error.response?.data || { message: "Failed to fetch goal statistics" };
+      throw (
+        error.response?.data || { message: "Failed to fetch goal statistics" }
+      );
     }
   },
 
@@ -38,7 +40,11 @@ const careerGoalsService = {
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error fetching goal adoption rate:", error);
-      throw error.response?.data || { message: "Failed to fetch goal adoption rate" };
+      throw (
+        error.response?.data || {
+          message: "Failed to fetch goal adoption rate",
+        }
+      );
     }
   },
 
@@ -52,8 +58,15 @@ const careerGoalsService = {
       console.log(" Frontend: Employees without goals received", response.data);
       return response.data;
     } catch (error) {
-      console.error(" Frontend: Error fetching employees without goals:", error);
-      throw error.response?.data || { message: "Failed to fetch employees without goals" };
+      console.error(
+        " Frontend: Error fetching employees without goals:",
+        error
+      );
+      throw (
+        error.response?.data || {
+          message: "Failed to fetch employees without goals",
+        }
+      );
     }
   },
 
@@ -66,7 +79,9 @@ const careerGoalsService = {
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error fetching employee goals:", error);
-      throw error.response?.data || { message: "Failed to fetch employee goals" };
+      throw (
+        error.response?.data || { message: "Failed to fetch employee goals" }
+      );
     }
   },
 
@@ -79,7 +94,9 @@ const careerGoalsService = {
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error fetching goal suggestions:", error);
-      throw error.response?.data || { message: "Failed to fetch goal suggestions" };
+      throw (
+        error.response?.data || { message: "Failed to fetch goal suggestions" }
+      );
     }
   },
 
@@ -154,12 +171,17 @@ const careerGoalsService = {
   updateGoalProgress: async (goalId, progressData) => {
     try {
       console.log(" Frontend: Updating goal progress for ID:", goalId);
-      const response = await hrApi.put(`/Compliance/goal/${goalId}/progress`, progressData);
+      const response = await hrApi.put(
+        `/Compliance/goal/${goalId}/progress`,
+        progressData
+      );
       console.log(" Frontend: Progress updated", response.data);
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error updating progress:", error);
-      throw error.response?.data || { message: "Failed to update goal progress" };
+      throw (
+        error.response?.data || { message: "Failed to update goal progress" }
+      );
     }
   },
 
@@ -174,7 +196,9 @@ const careerGoalsService = {
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error fetching pending approvals:", error);
-      throw error.response?.data || { message: "Failed to fetch pending approvals" };
+      throw (
+        error.response?.data || { message: "Failed to fetch pending approvals" }
+      );
     }
   },
 
@@ -182,7 +206,10 @@ const careerGoalsService = {
   approveGoal: async (goalId, approvalData) => {
     try {
       console.log(" Frontend: Approving goal ID:", goalId);
-      const response = await hrApi.post(`/Compliance/goal/${goalId}/approve`, approvalData);
+      const response = await hrApi.post(
+        `/Compliance/goal/${goalId}/approve`,
+        approvalData
+      );
       console.log(" Frontend: Goal approved", response.data);
       return response.data;
     } catch (error) {
@@ -195,7 +222,10 @@ const careerGoalsService = {
   rejectGoal: async (goalId, rejectionData) => {
     try {
       console.log(" Frontend: Rejecting goal ID:", goalId);
-      const response = await hrApi.post(`/Compliance/goal/${goalId}/reject`, rejectionData);
+      const response = await hrApi.post(
+        `/Compliance/goal/${goalId}/reject`,
+        rejectionData
+      );
       console.log(" Frontend: Goal rejected", response.data);
       return response.data;
     } catch (error) {
@@ -213,7 +243,9 @@ const careerGoalsService = {
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error fetching goal approvals:", error);
-      throw error.response?.data || { message: "Failed to fetch goal approvals" };
+      throw (
+        error.response?.data || { message: "Failed to fetch goal approvals" }
+      );
     }
   },
 
@@ -223,7 +255,10 @@ const careerGoalsService = {
   addComment: async (goalId, commentData) => {
     try {
       console.log(" Frontend: Adding comment to goal ID:", goalId);
-      const response = await hrApi.post(`/Compliance/goal/${goalId}/comment`, commentData);
+      const response = await hrApi.post(
+        `/Compliance/goal/${goalId}/comment`,
+        commentData
+      );
       console.log(" Frontend: Comment added", response.data);
       return response.data;
     } catch (error) {
@@ -241,7 +276,9 @@ const careerGoalsService = {
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error fetching goal comments:", error);
-      throw error.response?.data || { message: "Failed to fetch goal comments" };
+      throw (
+        error.response?.data || { message: "Failed to fetch goal comments" }
+      );
     }
   },
 
@@ -251,20 +288,31 @@ const careerGoalsService = {
   sendGoalReminders: async (reminderData) => {
     try {
       console.log(" Frontend: Sending goal reminders", reminderData);
-      const response = await hrApi.post("/Compliance/send-goal-reminders", reminderData);
+      const response = await hrApi.post(
+        "/Compliance/send-goal-reminders",
+        reminderData
+      );
       console.log(" Frontend: Reminders sent", response.data);
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error sending goal reminders:", error);
-      throw error.response?.data || { message: "Failed to send goal reminders" };
+      throw (
+        error.response?.data || { message: "Failed to send goal reminders" }
+      );
     }
   },
 
   // Send goal approval notification
   sendApprovalNotification: async (goalId, notificationData) => {
     try {
-      console.log(" Frontend: Sending approval notification for goal ID:", goalId);
-      const response = await hrApi.post(`/Compliance/goal/${goalId}/notify-approval`, notificationData);
+      console.log(
+        " Frontend: Sending approval notification for goal ID:",
+        goalId
+      );
+      const response = await hrApi.post(
+        `/Compliance/goal/${goalId}/notify-approval`,
+        notificationData
+      );
       console.log(" Frontend: Notification sent", response.data);
       return response.data;
     } catch (error) {
@@ -279,7 +327,9 @@ const careerGoalsService = {
   bulkApproveGoals: async (goalIds) => {
     try {
       console.log(" Frontend: Bulk approving goals:", goalIds);
-      const response = await hrApi.post("/Compliance/goals/bulk-approve", { goalIds });
+      const response = await hrApi.post("/Compliance/goals/bulk-approve", {
+        goalIds,
+      });
       console.log(" Frontend: Goals bulk approved", response.data);
       return response.data;
     } catch (error) {
@@ -292,7 +342,9 @@ const careerGoalsService = {
   bulkDeleteGoals: async (goalIds) => {
     try {
       console.log(" Frontend: Bulk deleting goals:", goalIds);
-      const response = await hrApi.post("/Compliance/goals/bulk-delete", { goalIds });
+      const response = await hrApi.post("/Compliance/goals/bulk-delete", {
+        goalIds,
+      });
       console.log(" Frontend: Goals bulk deleted", response.data);
       return response.data;
     } catch (error) {
@@ -307,7 +359,9 @@ const careerGoalsService = {
   exportGoalsToCSV: async (filters = {}) => {
     try {
       console.log(" Frontend: Exporting goals to CSV with filters:", filters);
-      const response = await hrApi.get("/Compliance/goals/export/csv", { params: filters });
+      const response = await hrApi.get("/Compliance/goals/export/csv", {
+        params: filters,
+      });
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error exporting goals:", error);
@@ -319,14 +373,16 @@ const careerGoalsService = {
   exportGoalsToPDF: async (filters = {}) => {
     try {
       console.log(" Frontend: Exporting goals to PDF with filters:", filters);
-      const response = await hrApi.get("/Compliance/goals/export/pdf", { 
+      const response = await hrApi.get("/Compliance/goals/export/pdf", {
         params: filters,
-        responseType: 'blob'
+        responseType: "blob",
       });
       return response.data;
     } catch (error) {
       console.error(" Frontend: Error exporting goals to PDF:", error);
-      throw error.response?.data || { message: "Failed to export goals to PDF" };
+      throw (
+        error.response?.data || { message: "Failed to export goals to PDF" }
+      );
     }
   },
 };

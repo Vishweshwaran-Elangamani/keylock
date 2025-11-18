@@ -1,12 +1,12 @@
 /**
  * EmployeeHome Component
- * 
+ *
  * Employee Dashboard Home Page - Minimal Version
  * Features:
  * - Nomination celebration card (if nominated)
  * - Single "My Assessments" action card
  * - Smooth animations and modern design
- * 
+ *
  * @component
  */
 
@@ -93,7 +93,8 @@ export default function EmployeeHome() {
         <div className="ehp-nomination-content">
           <h3 className="ehp-nomination-title">Congratulations!</h3>
           <p className="ehp-nomination-text">
-            You have been nominated for: <strong>{nominations.map(n => n.roleType).join(", ")}</strong>
+            You have been nominated for:{" "}
+            <strong>{nominations.map((n) => n.roleType).join(", ")}</strong>
           </p>
           <p className="ehp-nomination-subtext">
             Your hard work and dedication have been recognized!
@@ -132,7 +133,7 @@ export default function EmployeeHome() {
 
         {/* My Assessments Card - Single Centered Card */}
         <div className="ehp-assessment-section">
-          <div 
+          <div
             className="ehp-assessment-card"
             onClick={handleNavigateToAssessments}
           >
@@ -142,7 +143,8 @@ export default function EmployeeHome() {
             <div className="ehp-assessment-content">
               <h3 className="ehp-assessment-title">My Assessments</h3>
               <p className="ehp-assessment-description">
-                Complete your performance assessments and track your progress across all assigned evaluations
+                Complete your performance assessments and track your progress
+                across all assigned evaluations
               </p>
               <div className="ehp-assessment-link">
                 View Details

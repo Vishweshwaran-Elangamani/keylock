@@ -70,7 +70,7 @@ const FormatStatusKey = (status) => {
     // Backend values -> Frontend PascalCase keys
     pending: "Pending",
     open: "Open",
-    inprogress: "InProgress", 
+    inprogress: "InProgress",
     completed: "Completed",
     closed: "Closed",
     reopened: "Reopened",

@@ -1,6 +1,6 @@
 /**
  * EditDepartmentModal Component
- * 
+ *
  * A modal component for editing existing departments in the system.
  * Features:
  * - Form validation for department name, code, description, and manager
@@ -9,7 +9,7 @@
  * - Toast notifications using Sonner for success/error feedback
  * - Loading state during API operations
  * - Two-column layout for form fields
- * 
+ *
  * @param {boolean} show - Controls modal visibility
  * @param {Object} department - Department object containing current department details
  * @param {function} onClose - Callback to close the modal
@@ -78,18 +78,18 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
    * Handles input field changes
    * Updates form data and clears field-specific errors
    * Provides immediate feedback by removing errors when user starts correcting
-   * 
+   *
    * @param {Event} e - Input change event
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Update form data with new value
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    
+
     // Clear error for this specific field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
@@ -106,12 +106,12 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
   /**
    * Validates all form fields before submission
    * Applies comprehensive validation rules for each field
-   * 
+   *
    * Validation Rules:
    * - Department Name: Required, minimum 3 characters
    * - Department Code: Required, minimum 2 characters
    * - Description: Required, minimum 10 characters
-   * 
+   *
    * @returns {boolean} - True if form is valid, false otherwise
    */
   const validateForm = () => {
@@ -121,14 +121,16 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
     if (!formData.departmentName.trim()) {
       newErrors.departmentName = "Department name is required";
     } else if (formData.departmentName.trim().length < 3) {
-      newErrors.departmentName = "Department name must be at least 3 characters";
+      newErrors.departmentName =
+        "Department name must be at least 3 characters";
     }
 
     // -------- Department Code Validation --------
     if (!formData.departmentCode.trim()) {
       newErrors.departmentCode = "Department code is required";
     } else if (formData.departmentCode.trim().length < 2) {
-      newErrors.departmentCode = "Department code must be at least 2 characters";
+      newErrors.departmentCode =
+        "Department code must be at least 2 characters";
     }
 
     // -------- Description Validation --------
@@ -140,7 +142,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
 
     // Update errors state with all validation errors
     setErrors(newErrors);
-    
+
     // Return true if no errors found, false otherwise
     return Object.keys(newErrors).length === 0;
   };
@@ -153,7 +155,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
    * Handles form submission
    * Validates form, formats payload, and calls API to update department
    * Shows Sonner toast notifications for user feedback
-   * 
+   *
    * @param {Event} e - Form submit event
    */
   const handleSubmit = async (e) => {
@@ -168,7 +170,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
     try {
       // Set loading state to disable form and show loading indicator
       setLoading(true);
-      
+
       // Show loading toast
       toast.loading("Updating department...");
 
@@ -192,16 +194,15 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
       if (response.success) {
         toast.dismiss();
         toast.success("Department updated successfully");
-        
+
         // Trigger success callback to refresh department list
         onSuccess();
-        
+
         // CRITICAL: Delay closing the modal to allow toast to render
         // Without this delay, modal unmounts before toast displays
         setTimeout(() => {
           onClose();
         }, 500); // 500ms delay
-        
       } else {
         // -------- Handle Failure Response --------
         toast.dismiss();
@@ -230,12 +231,11 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-custom"></div>
-      
+
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-custom">
         <div className="modal-dialog-custom">
           <div className="modal-content-custom">
-            
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -261,18 +261,14 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
             {/* ======================== */}
             <form onSubmit={handleSubmit}>
               <div className="modal-body-custom">
-                
                 {/* -------- 2-Column Horizontal Grid -------- */}
                 <div className="form-grid">
-                  
                   {/* -------- LEFT COLUMN -------- */}
                   <div className="form-column-custom">
-
                     {/* Department Name */}
                     <div className="form-group-custom">
                       <label className="form-label-custom">
-                        Department Name{" "}
-                        <span className="required-mark">*</span>
+                        Department Name <span className="required-mark">*</span>
                       </label>
                       <input
                         type="text"
@@ -297,8 +293,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                     {/* Department Code */}
                     <div className="form-group-custom">
                       <label className="form-label-custom">
-                        Department Code{" "}
-                        <span className="required-mark">*</span>
+                        Department Code <span className="required-mark">*</span>
                       </label>
                       <input
                         type="text"
@@ -323,12 +318,10 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
 
                   {/* -------- RIGHT COLUMN -------- */}
                   <div className="form-column-custom">
-                    
                     {/* Description */}
                     <div className="form-group-custom form-group-full-height">
                       <label className="form-label-custom">
-                        Description{" "}
-                        <span className="required-mark">*</span>
+                        Description <span className="required-mark">*</span>
                       </label>
                       <textarea
                         className={`form-textarea-custom form-textarea-full-height ${
@@ -354,9 +347,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                     <div className="form-group-custom">
                       <label className="form-label-custom">
                         Manager User ID{" "}
-                        <span className="optional-text">
-                          (Optional)
-                        </span>
+                        <span className="optional-text">(Optional)</span>
                       </label>
                       <input
                         type="number"
@@ -406,14 +397,10 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
                   <i className="bi bi-x-circle"></i>
                   Cancel
                 </button>
-                
+
                 {/* Submit Button - Updates department */}
                 {/* Disabled during loading to prevent duplicate requests */}
-                <button
-                  type="submit"
-                  className="btn-submit"
-                  disabled={loading}
-                >
+                <button type="submit" className="btn-submit" disabled={loading}>
                   {loading ? (
                     // Show loading state with spinner and text
                     <>

@@ -1,6 +1,6 @@
 /**
  * DepartmentList Component
- * 
+ *
  * Main component for department management in the admin dashboard.
  * Features:
  * - View departments in Grid or Table layout
@@ -9,7 +9,7 @@
  * - Statistics dashboard showing department counts
  * - Pagination for table view
  * - Toast notifications using Sonner for user feedback
- * 
+ *
  * @component
  */
 
@@ -92,7 +92,7 @@ const DepartmentList = () => {
   const fetchDepartments = async () => {
     try {
       setLoading(true);
-      
+
       // Show loading toast
       toast.loading("Loading departments...");
 
@@ -103,7 +103,9 @@ const DepartmentList = () => {
       if (response.success) {
         setDepartments(response.data || []);
         toast.dismiss();
-        toast.success(`Loaded ${response.data?.length || 0} departments successfully`);
+        toast.success(
+          `Loaded ${response.data?.length || 0} departments successfully`
+        );
       } else {
         // -------- Handle Failure Response --------
         toast.dismiss();
@@ -126,7 +128,7 @@ const DepartmentList = () => {
   /**
    * Handles delete button click
    * Opens delete confirmation modal
-   * 
+   *
    * @param {Object} dept - Department object to be deleted
    */
   const handleDelete = (dept) => {
@@ -154,11 +156,11 @@ const DepartmentList = () => {
       if (response.success) {
         toast.dismiss();
         toast.success("Department deleted successfully");
-        
+
         // Close modal and reset selected department
         setShowDeleteModal(false);
         setSelectedDepartment(null);
-        
+
         // Refresh departments list
         fetchDepartments();
       } else {
@@ -181,7 +183,7 @@ const DepartmentList = () => {
   /**
    * Handles edit button click
    * Opens edit modal with selected department data
-   * 
+   *
    * @param {Object} department - Department object to be edited
    */
   const handleEdit = (department) => {
@@ -197,7 +199,7 @@ const DepartmentList = () => {
    * Filters departments based on search term
    * Searches across: departmentName and description
    * Returns filtered array of departments
-   * 
+   *
    * @returns {Array} Filtered departments array
    */
   const filteredDepartments = departments.filter(
@@ -216,7 +218,10 @@ const DepartmentList = () => {
    */
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredDepartments.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredDepartments.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredDepartments.length / itemsPerPage);
 
   // ========================
@@ -225,7 +230,7 @@ const DepartmentList = () => {
 
   /**
    * Formats ISO date string to readable format
-   * 
+   *
    * @param {string} date - ISO date string
    * @returns {string} Formatted date string (e.g., "12 Jan 2024")
    */
@@ -242,7 +247,7 @@ const DepartmentList = () => {
   /**
    * Returns appropriate Bootstrap icon class for department
    * Maps department names to specific icons
-   * 
+   *
    * @param {string} name - Name of the department
    * @returns {string} Bootstrap icon class name
    */
@@ -269,7 +274,7 @@ const DepartmentList = () => {
   /**
    * Calculates statistics for department data
    * Returns count of total departments
-   * 
+   *
    * @returns {Object} Statistics object with department count
    */
   const getDepartmentStats = () => {
@@ -302,7 +307,6 @@ const DepartmentList = () => {
 
   return (
     <div className="department-management-page">
-      
       {/* ======================== */}
       {/* BREADCRUMB NAVIGATION */}
       {/* ======================== */}
@@ -347,7 +351,6 @@ const DepartmentList = () => {
       {/* STATISTICS CARDS */}
       {/* ======================== */}
       <div className="stats-cards-dept">
-        
         {/* Total Departments Card */}
         <div className="stat-card-dept stat-total-dept">
           <div className="stat-icon-dept">
@@ -375,7 +378,6 @@ const DepartmentList = () => {
       {/* CONTROLS BAR */}
       {/* ======================== */}
       <div className="controls-bar-dept">
-        
         {/* -------- Search Section -------- */}
         <div className="search-section-dept">
           <div className="search-input-wrapper-dept">
@@ -421,7 +423,7 @@ const DepartmentList = () => {
       {/* ======================== */}
       {/* CONTENT VIEWS */}
       {/* ======================== */}
-      
+
       {/* -------- Empty State -------- */}
       {/* Shown when no departments match the search/filter criteria */}
       {filteredDepartments.length === 0 ? (
@@ -441,7 +443,6 @@ const DepartmentList = () => {
             <div className="departments-grid-dept">
               {filteredDepartments.map((dept) => (
                 <div key={dept.departmentId} className="department-card-item">
-                  
                   {/* -------- Card Header -------- */}
                   <div className="card-header-dept">
                     {/* Department Icon Badge */}
@@ -523,15 +524,15 @@ const DepartmentList = () => {
                             <span>{dept.departmentName}</span>
                           </div>
                         </td>
-                        
+
                         {/* Description */}
                         <td className="description-cell">
                           {dept.description || "N/A"}
                         </td>
-                        
+
                         {/* Created Date */}
                         <td>{formatDate(dept.createdAt)}</td>
-                        
+
                         {/* Action Buttons */}
                         <td>
                           <div className="table-actions-dept">
@@ -601,7 +602,7 @@ const DepartmentList = () => {
       {/* ======================== */}
       {/* MODALS */}
       {/* ======================== */}
-      
+
       {/* -------- Add Department Modal -------- */}
       {showAddModal && (
         <AddDepartmentModal

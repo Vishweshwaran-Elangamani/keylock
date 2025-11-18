@@ -1,40 +1,40 @@
-import { useState, useEffect } from 'react';
-import meetingService from '../../services/meeting/meetingService';
-import apii from '../../../src/services/meeting/index';
-import toastr from 'toastr';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  Video, 
-  FileText, 
-  Bell, 
-  Send, 
+import { useState, useEffect } from "react";
+import meetingService from "../../services/meeting/meetingService";
+import apii from "../../../src/services/meeting/index";
+import toastr from "toastr";
+import { useNavigate } from "react-router-dom";
+import {
+  Calendar,
+  Clock,
+  Users,
+  Video,
+  FileText,
+  Bell,
+  Send,
   Search,
   Check,
   X,
   Plus,
-  ArrowLeft
-} from 'lucide-react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+  ArrowLeft,
+} from "lucide-react";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const ScheduleMeeting = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    meetingType: 'One-on-One',
-    meetingTitle: '',
+    meetingType: "One-on-One",
+    meetingTitle: "",
     participantEmployeeIds: [],
-    meetingDate: '',
-    meetingTime: '',
-    duration: '1',
-    meetingLink: '',
-    agenda: '',
+    meetingDate: "",
+    meetingTime: "",
+    duration: "1",
+    meetingLink: "",
+    agenda: "",
     sendCalendarInvite: true,
-    reminder: 1
+    reminder: 1,
   });
   const [employeeOptions, setEmployeeOptions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -42,61 +42,72 @@ const ScheduleMeeting = () => {
   }, []);
 
   useEffect(() => {
-    if (formData.meetingType === 'One-on-One' && employeeOptions.length > 0) {
-      setFormData(prev => ({
+    if (formData.meetingType === "One-on-One" && employeeOptions.length > 0) {
+      setFormData((prev) => ({
         ...prev,
-        participantEmployeeIds: [employeeOptions[0].employeeId]
+        participantEmployeeIds: [employeeOptions[0].employeeId],
       }));
-    } else if (formData.meetingType !== 'One-on-One') {
-      setFormData(prev => ({
+    } else if (formData.meetingType !== "One-on-One") {
+      setFormData((prev) => ({
         ...prev,
-        participantEmployeeIds: []
+        participantEmployeeIds: [],
       }));
     }
   }, [employeeOptions, formData.meetingType]);
 
   const fetchEmployees = async () => {
     try {
-      const response = await apii.get('/EmployeeManagement/all');
+      const response = await apii.get("/EmployeeManagement/all");
       if (response.data.success) {
         setEmployeeOptions(response.data.data);
       } else {
-        toastr.error('Failed to fetch employees');
+        toastr.error("Failed to fetch employees");
       }
     } catch (error) {
-      toastr.error('Error fetching employee list');
+      toastr.error("Error fetching employee list");
       console.error(error);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === 'checkbox') {
-      setFormData(prev => ({ ...prev, [name]: checked }));
+    if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleOneOnOneChange = (e) => {
-    setFormData(prev => ({ ...prev, participantEmployeeIds: [parseInt(e.target.value)] }));
+    setFormData((prev) => ({
+      ...prev,
+      participantEmployeeIds: [parseInt(e.target.value)],
+    }));
   };
 
   const handleCheckboxChange = (empId) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const isSelected = prev.participantEmployeeIds.includes(empId);
       if (isSelected) {
-        return { ...prev, participantEmployeeIds: prev.participantEmployeeIds.filter(id => id !== empId) };
+        return {
+          ...prev,
+          participantEmployeeIds: prev.participantEmployeeIds.filter(
+            (id) => id !== empId
+          ),
+        };
       } else {
-        return { ...prev, participantEmployeeIds: [...prev.participantEmployeeIds, empId] };
+        return {
+          ...prev,
+          participantEmployeeIds: [...prev.participantEmployeeIds, empId],
+        };
       }
     });
   };
 
   const generateTeamsLink = () => {
-    const link = 'https://teams.microsoft.com/meeting-xyz-' + Date.now();
-    setFormData(prev => ({ ...prev, meetingLink: link }));
-    toastr.success('Teams link generated');
+    const link = "https://teams.microsoft.com/meeting-xyz-" + Date.now();
+    setFormData((prev) => ({ ...prev, meetingLink: link }));
+    toastr.success("Teams link generated");
   };
 
   const handleSubmit = async (e) => {
@@ -107,7 +118,9 @@ const ScheduleMeeting = () => {
       !formData.meetingTime ||
       formData.participantEmployeeIds.length === 0
     ) {
-      toastr.error('Please fill all required fields and select at least one participant.');
+      toastr.error(
+        "Please fill all required fields and select at least one participant."
+      );
       return;
     }
     try {
@@ -121,39 +134,45 @@ const ScheduleMeeting = () => {
         participantEmployeeIds: formData.participantEmployeeIds,
       };
       await meetingService.scheduleMeeting(payload);
-      toastr.success('Meeting scheduled successfully!');
-      navigate('/manager/dashboard/meetmom');
+      toastr.success("Meeting scheduled successfully!");
+      navigate("/manager/dashboard/meetmom");
     } catch (err) {
-      toastr.error('Failed to schedule meeting');
+      toastr.error("Failed to schedule meeting");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredEmployees = employeeOptions.filter(emp => {
+  const filteredEmployees = employeeOptions.filter((emp) => {
     const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
     return fullName.includes(searchTerm.toLowerCase());
   });
 
   return (
-    <div className="container-fluid px-4 py-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <div
+      className="container-fluid px-4 py-4"
+      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
+    >
       <div className="row justify-content-center">
         <div className="col-lg-8 col-xl-7">
           {/* Header */}
           <div className="d-flex align-items-center gap-3 mb-4">
-            <button 
+            <button
               className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
               onClick={() => navigate(-1)}
-              style={{ width: '40px', height: '40px' }}
+              style={{ width: "40px", height: "40px" }}
             >
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h2 className="fw-bold mb-1" style={{ color: '#1e293b', fontSize: '1.75rem' }}>
+              <h2
+                className="fw-bold mb-1"
+                style={{ color: "#1e293b", fontSize: "1.75rem" }}
+              >
                 Schedule Meeting
               </h2>
-              <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>
+              <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
                 Create and schedule a new meeting with your team
               </p>
             </div>
@@ -169,10 +188,10 @@ const ScheduleMeeting = () => {
                     <Users size={18} />
                     Meeting Type
                   </label>
-                  <select 
-                    name="meetingType" 
-                    value={formData.meetingType} 
-                    onChange={handleInputChange} 
+                  <select
+                    name="meetingType"
+                    value={formData.meetingType}
+                    onChange={handleInputChange}
                     className="form-select"
                   >
                     <option value="One-on-One">One-on-One</option>
@@ -204,7 +223,8 @@ const ScheduleMeeting = () => {
                 <div className="mb-4">
                   <label className="form-label fw-semibold d-flex align-items-center gap-2">
                     <Users size={18} />
-                    Select Participant{formData.meetingType !== 'One-on-One' ? 's' : ''}
+                    Select Participant
+                    {formData.meetingType !== "One-on-One" ? "s" : ""}
                     <span className="text-danger">*</span>
                   </label>
 
@@ -219,19 +239,19 @@ const ScheduleMeeting = () => {
                       placeholder="Search employees..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ boxShadow: 'none' }}
+                      style={{ boxShadow: "none" }}
                     />
                   </div>
 
-                  {formData.meetingType === 'One-on-One' ? (
+                  {formData.meetingType === "One-on-One" ? (
                     <select
-                      value={formData.participantEmployeeIds[0] || ''}
+                      value={formData.participantEmployeeIds[0] || ""}
                       onChange={handleOneOnOneChange}
                       required
                       className="form-select"
                     >
                       <option value="">Select an employee</option>
-                      {filteredEmployees.map(emp => (
+                      {filteredEmployees.map((emp) => (
                         <option key={emp.employeeId} value={emp.employeeId}>
                           {emp.firstName} {emp.lastName} - {emp.roleName}
                         </option>
@@ -239,14 +259,17 @@ const ScheduleMeeting = () => {
                     </select>
                   ) : (
                     <>
-                      <div 
-                        className="border rounded" 
-                        style={{ maxHeight: '300px', overflowY: 'auto' }}
+                      <div
+                        className="border rounded"
+                        style={{ maxHeight: "300px", overflowY: "auto" }}
                       >
                         <table className="table table-hover mb-0">
-                          <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+                          <thead
+                            className="table-light"
+                            style={{ position: "sticky", top: 0, zIndex: 1 }}
+                          >
                             <tr>
-                              <th style={{ width: '60px' }}>Select</th>
+                              <th style={{ width: "60px" }}>Select</th>
                               <th>Name</th>
                               <th>Role</th>
                             </tr>
@@ -254,29 +277,40 @@ const ScheduleMeeting = () => {
                           <tbody>
                             {filteredEmployees.length === 0 ? (
                               <tr>
-                                <td colSpan="3" className="text-center py-4 text-muted">
+                                <td
+                                  colSpan="3"
+                                  className="text-center py-4 text-muted"
+                                >
                                   No employees found
                                 </td>
                               </tr>
                             ) : (
-                              filteredEmployees.map(emp => (
-                                <tr 
+                              filteredEmployees.map((emp) => (
+                                <tr
                                   key={emp.employeeId}
-                                  onClick={() => handleCheckboxChange(emp.employeeId)}
-                                  style={{ cursor: 'pointer' }}
+                                  onClick={() =>
+                                    handleCheckboxChange(emp.employeeId)
+                                  }
+                                  style={{ cursor: "pointer" }}
                                 >
                                   <td>
                                     <div className="form-check">
                                       <input
                                         className="form-check-input"
                                         type="checkbox"
-                                        checked={formData.participantEmployeeIds.includes(emp.employeeId)}
-                                        onChange={() => handleCheckboxChange(emp.employeeId)}
+                                        checked={formData.participantEmployeeIds.includes(
+                                          emp.employeeId
+                                        )}
+                                        onChange={() =>
+                                          handleCheckboxChange(emp.employeeId)
+                                        }
                                         onClick={(e) => e.stopPropagation()}
                                       />
                                     </div>
                                   </td>
-                                  <td>{emp.firstName} {emp.lastName}</td>
+                                  <td>
+                                    {emp.firstName} {emp.lastName}
+                                  </td>
                                   <td>
                                     <span className="badge bg-light text-dark border">
                                       {emp.roleName}
@@ -291,7 +325,14 @@ const ScheduleMeeting = () => {
                       <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2">
                         <Check size={18} />
                         <span>
-                          <strong>{formData.participantEmployeeIds.length}</strong> participant{formData.participantEmployeeIds.length !== 1 ? 's' : ''} selected
+                          <strong>
+                            {formData.participantEmployeeIds.length}
+                          </strong>{" "}
+                          participant
+                          {formData.participantEmployeeIds.length !== 1
+                            ? "s"
+                            : ""}{" "}
+                          selected
                         </span>
                       </div>
                     </>
@@ -338,10 +379,10 @@ const ScheduleMeeting = () => {
                     <Clock size={18} />
                     Duration
                   </label>
-                  <select 
-                    name="duration" 
-                    value={formData.duration} 
-                    onChange={handleInputChange} 
+                  <select
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleInputChange}
                     className="form-select"
                   >
                     <option value="0.5">30 minutes</option>
@@ -367,9 +408,9 @@ const ScheduleMeeting = () => {
                       className="form-control"
                       placeholder="Enter meeting link or generate one..."
                     />
-                    <button 
-                      type="button" 
-                      onClick={generateTeamsLink} 
+                    <button
+                      type="button"
+                      onClick={generateTeamsLink}
                       className="btn btn-outline-primary d-flex align-items-center gap-2"
                     >
                       <Plus size={18} />
@@ -398,7 +439,7 @@ const ScheduleMeeting = () => {
                 <div className="card bg-light border-0 mb-4">
                   <div className="card-body">
                     <h6 className="fw-semibold mb-3">Additional Options</h6>
-                    
+
                     {/* Send Calendar Invite */}
                     <div className="form-check mb-3">
                       <input
@@ -409,7 +450,10 @@ const ScheduleMeeting = () => {
                         checked={formData.sendCalendarInvite}
                         onChange={handleInputChange}
                       />
-                      <label className="form-check-label d-flex align-items-center gap-2" htmlFor="sendCalendarInvite">
+                      <label
+                        className="form-check-label d-flex align-items-center gap-2"
+                        htmlFor="sendCalendarInvite"
+                      >
                         <Send size={18} />
                         Send calendar invite to participants
                       </label>
@@ -421,10 +465,10 @@ const ScheduleMeeting = () => {
                         <Bell size={18} />
                         Reminder
                       </label>
-                      <select 
-                        name="reminder" 
-                        value={formData.reminder} 
-                        onChange={handleInputChange} 
+                      <select
+                        name="reminder"
+                        value={formData.reminder}
+                        onChange={handleInputChange}
                         className="form-select"
                       >
                         <option value="0">None</option>
@@ -438,23 +482,27 @@ const ScheduleMeeting = () => {
 
                 {/* Action Buttons */}
                 <div className="d-flex gap-3 justify-content-end">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="btn btn-light px-4 d-flex align-items-center gap-2"
                     onClick={() => navigate(-1)}
                   >
                     <X size={18} />
                     Cancel
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn btn-success px-4 d-flex align-items-center gap-2"
                     disabled={loading}
-                    style={{ fontWeight: '500' }}
+                    style={{ fontWeight: "500" }}
                   >
                     {loading ? (
                       <>
-                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
                         Scheduling...
                       </>
                     ) : (
@@ -476,11 +524,22 @@ const ScheduleMeeting = () => {
                 <FileText size={18} />
                 Quick Tips
               </h6>
-              <ul className="mb-0 ps-3" style={{ fontSize: '0.9rem', color: '#64748b' }}>
-                <li className="mb-2">Choose a clear and descriptive meeting title</li>
-                <li className="mb-2">Select all required participants before scheduling</li>
-                <li className="mb-2">Add a detailed agenda to help participants prepare</li>
-                <li className="mb-2">Generate a Teams link for virtual meetings</li>
+              <ul
+                className="mb-0 ps-3"
+                style={{ fontSize: "0.9rem", color: "#64748b" }}
+              >
+                <li className="mb-2">
+                  Choose a clear and descriptive meeting title
+                </li>
+                <li className="mb-2">
+                  Select all required participants before scheduling
+                </li>
+                <li className="mb-2">
+                  Add a detailed agenda to help participants prepare
+                </li>
+                <li className="mb-2">
+                  Generate a Teams link for virtual meetings
+                </li>
                 <li>Enable reminders to ensure everyone is notified</li>
               </ul>
             </div>

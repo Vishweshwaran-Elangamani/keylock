@@ -1,68 +1,85 @@
-// src/hooks/useFeedbackService.js
-import { useCallback, useState } from 'react';
-import { managerReviewApi, mentorFeedbackApi, peerQueueApi, hrFormApi, orgGoalFeedbackApi } from '../services/feedbackApi';
+import { useCallback, useState } from "react";
+import {
+  managerReviewApi,
+  mentorFeedbackApi,
+  peerQueueApi,
+  hrFormApi,
+  orgGoalFeedbackApi,
+} from "../services/feedbackApi";
 
 export default function useFeedbackService() {
   const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState(null);
+  const [error, setError] = useState(null);
 
   // Loads
   const loadEmployee = useCallback(async (empId, opts = {}) => {
-    setError(null); setLoading(true);
+    setError(null);
+    setLoading(true);
     try {
       const [reviews, mentor, activeForms] = await Promise.all([
         managerReviewApi.getForTarget(empId),
         mentorFeedbackApi.myFeedback(empId),
-        hrFormApi.listActive()
+        hrFormApi.listActive(),
       ]);
       return {
         reviews: reviews.data?.data || [],
         mentor: mentor.data?.data || [],
-        forms: activeForms.data?.data || []
+        forms: activeForms.data?.data || [],
       };
     } catch (e) {
-      setError(e?.response?.data?.message || e.message || 'Load failed');
+      setError(e?.response?.data?.message || e.message || "Load failed");
       return { reviews: [], mentor: [], forms: [] };
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const loadManager = useCallback(async (managerId) => {
-    setError(null); setLoading(true);
+    setError(null);
+    setLoading(true);
     try {
       const res = await managerReviewApi.getByManager(managerId);
       return { myReviews: res.data?.data || [] };
     } catch (e) {
-      setError(e?.response?.data?.message || e.message || 'Load failed');
+      setError(e?.response?.data?.message || e.message || "Load failed");
       return { myReviews: [] };
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const loadHR = useCallback(async () => {
-    setError(null); setLoading(true);
+    setError(null);
+    setLoading(true);
     try {
       const [pendingPeer, pendingForms] = await Promise.all([
         peerQueueApi.pending(),
-        hrFormApi.pendingReview()
+        hrFormApi.pendingReview(),
       ]);
       return {
         pendingPeer: pendingPeer.data?.data || [],
-        pendingForms: pendingForms.data?.data || []
+        pendingForms: pendingForms.data?.data || [],
       };
     } catch (e) {
-      setError(e?.response?.data?.message || e.message || 'Load failed');
+      setError(e?.response?.data?.message || e.message || "Load failed");
       return { pendingPeer: [], pendingForms: [] };
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const loadSME = useCallback(async (mentorId) => {
-    setError(null); setLoading(true);
+    setError(null);
+    setLoading(true);
     try {
       const res = await mentorFeedbackApi.aboutMe(mentorId);
       return { aboutMe: res.data?.data || [] };
     } catch (e) {
-      setError(e?.response?.data?.message || e.message || 'Load failed');
+      setError(e?.response?.data?.message || e.message || "Load failed");
       return { aboutMe: [] };
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   // Actions
@@ -88,5 +105,14 @@ export default function useFeedbackService() {
     submitFormResponse: (id) => hrFormApi.submitResponse(id),
   };
 
-  return { loading, error, setError, loadEmployee, loadManager, loadHR, loadSME, actions };
+  return {
+    loading,
+    error,
+    setError,
+    loadEmployee,
+    loadManager,
+    loadHR,
+    loadSME,
+    actions,
+  };
 }

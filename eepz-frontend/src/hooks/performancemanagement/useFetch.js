@@ -3,7 +3,7 @@ import api from "../services/api";
 
 /**
  * useFetch — reusable data-fetching hook for GET endpoints.
- * 
+ *
  * Example:
  * const { data, loading, error, refetch } = useFetch("/FormManagement/all");
  */

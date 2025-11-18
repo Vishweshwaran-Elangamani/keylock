@@ -14,7 +14,7 @@ import "../../../styles/auth/common/EmployeeProfile.css";
 const EmployeeProfile = () => {
   // Get current user from auth context
   const { user } = useAuth();
-  
+
   // State management
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -96,7 +96,7 @@ const EmployeeProfile = () => {
     try {
       setLoading(true);
       toast.loading("Loading your profile...");
-      
+
       const response = await EmployeeProfileService.getMyProfile();
 
       if (response.success) {
@@ -306,12 +306,11 @@ const EmployeeProfile = () => {
         // Required field validation
         if (!value || !value.trim()) {
           error = "First name is required";
-        } 
+        }
         // Length validation
         else if (value.trim().length < 2) {
           error = "First name must be at least 2 characters";
-        } 
-        else if (value.trim().length > 50) {
+        } else if (value.trim().length > 50) {
           error = "First name cannot exceed 50 characters";
         }
         // Character validation - only letters
@@ -333,7 +332,8 @@ const EmployeeProfile = () => {
           }
           // Character validation
           else if (!/^[a-zA-Z\s'-]*$/.test(value.trim())) {
-            error = "Middle name can only contain letters, spaces, hyphens, and apostrophes";
+            error =
+              "Middle name can only contain letters, spaces, hyphens, and apostrophes";
           }
           // Check for consecutive spaces
           else if (/\s{2,}/.test(value)) {
@@ -341,7 +341,8 @@ const EmployeeProfile = () => {
           }
           // Check for consecutive special chars
           else if (/[-']{2,}/.test(value)) {
-            error = "Middle name cannot contain consecutive hyphens or apostrophes";
+            error =
+              "Middle name cannot contain consecutive hyphens or apostrophes";
           }
         }
         break;
@@ -350,12 +351,11 @@ const EmployeeProfile = () => {
         // Required field validation
         if (!value || !value.trim()) {
           error = "Last name is required";
-        } 
+        }
         // Length validation
         else if (value.trim().length < 2) {
           error = "Last name must be at least 2 characters";
-        } 
-        else if (value.trim().length > 50) {
+        } else if (value.trim().length > 50) {
           error = "Last name cannot exceed 50 characters";
         }
         // Character validation - only letters
@@ -377,7 +377,8 @@ const EmployeeProfile = () => {
           }
           // Character validation
           else if (!/^[a-zA-Z\s'-]*$/.test(value.trim())) {
-            error = "Calling name can only contain letters, spaces, hyphens, and apostrophes";
+            error =
+              "Calling name can only contain letters, spaces, hyphens, and apostrophes";
           }
           // Check for consecutive spaces
           else if (/\s{2,}/.test(value)) {
@@ -385,7 +386,8 @@ const EmployeeProfile = () => {
           }
           // Check for consecutive special chars
           else if (/[-']{2,}/.test(value)) {
-            error = "Calling name cannot contain consecutive hyphens or apostrophes";
+            error =
+              "Calling name cannot contain consecutive hyphens or apostrophes";
           }
         }
         break;
@@ -501,7 +503,7 @@ const EmployeeProfile = () => {
         if (value) {
           const birthDate = new Date(value);
           const today = new Date();
-          
+
           // Validate date is not in future
           if (birthDate > today) {
             error = "Date of birth cannot be in the future";
@@ -523,7 +525,7 @@ const EmployeeProfile = () => {
             } else if (actualAge > 65) {
               error = "Age cannot exceed 65 years for employment";
             }
-            
+
             // Check if date is too old (before 1900)
             if (birthDate.getFullYear() < 1900) {
               error = "Please enter a valid date of birth";
@@ -593,7 +595,8 @@ const EmployeeProfile = () => {
         }
         // Character validation - alphanumeric with spaces and common chars
         else if (!/^[a-zA-Z0-9\s,.-]+$/.test(value.trim())) {
-          error = "Street can only contain letters, numbers, spaces, commas, dots, and hyphens";
+          error =
+            "Street can only contain letters, numbers, spaces, commas, dots, and hyphens";
         }
         // Check for consecutive spaces
         else if (/\s{2,}/.test(value)) {
@@ -608,7 +611,8 @@ const EmployeeProfile = () => {
         }
         // Character validation
         else if (!/^[a-zA-Z0-9\s,.-]+$/.test(value.trim())) {
-          error = "Landmark can only contain letters, numbers, spaces, commas, dots, and hyphens";
+          error =
+            "Landmark can only contain letters, numbers, spaces, commas, dots, and hyphens";
         }
         // Check for consecutive spaces
         else if (/\s{2,}/.test(value)) {
@@ -625,7 +629,8 @@ const EmployeeProfile = () => {
         }
         // Character validation
         else if (!/^[a-zA-Z0-9\s,.-]+$/.test(value.trim())) {
-          error = "Area can only contain letters, numbers, spaces, commas, dots, and hyphens";
+          error =
+            "Area can only contain letters, numbers, spaces, commas, dots, and hyphens";
         }
         // Check for consecutive spaces
         else if (/\s{2,}/.test(value)) {
@@ -701,7 +706,7 @@ const EmployeeProfile = () => {
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -824,7 +829,9 @@ const EmployeeProfile = () => {
     // Validate required fields
     requiredFields.forEach((field) => {
       if (!formData[field] || !formData[field].toString().trim()) {
-        newErrors[field] = `${field.replace(/([A-Z])/g, " $1").trim()} is required`;
+        newErrors[field] = `${field
+          .replace(/([A-Z])/g, " $1")
+          .trim()} is required`;
       }
     });
 
@@ -867,12 +874,14 @@ const EmployeeProfile = () => {
     }
 
     setErrors(newErrors);
-    
+
     // Show toast with error count if validation fails
     const errorCount = Object.keys(newErrors).length;
     if (errorCount > 0) {
       toast.error(
-        `Please fix ${errorCount} validation error${errorCount > 1 ? "s" : ""} before submitting`
+        `Please fix ${errorCount} validation error${
+          errorCount > 1 ? "s" : ""
+        } before submitting`
       );
     }
 
@@ -902,7 +911,9 @@ const EmployeeProfile = () => {
     // Validate form
     if (!validateForm()) {
       // Scroll to first error
-      const firstErrorField = document.querySelector(".form-control-modern.error");
+      const firstErrorField = document.querySelector(
+        ".form-control-modern.error"
+      );
       if (firstErrorField) {
         firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
         firstErrorField.focus();

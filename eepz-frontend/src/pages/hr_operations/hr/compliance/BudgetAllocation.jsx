@@ -7,13 +7,11 @@ import ViewBudgetDetailsModal from "../modals/ViewBudgetDetailsModal";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
-
 const BudgetAllocation = () => {
   const [budgets, setBudgets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -21,12 +19,10 @@ const BudgetAllocation = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
 
-
   // View & Pagination States
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
 
   // Filter States
   const [filters, setFilters] = useState({
@@ -35,34 +31,28 @@ const BudgetAllocation = () => {
     department: "",
   });
 
-
   // Filter Options
   const [filterOptions, setFilterOptions] = useState({
     years: [],
     departments: [],
   });
 
-
   const currentUserId = parseInt(localStorage.getItem("userId"));
   const userRole = localStorage.getItem("userRole");
   const isLeadership = userRole === "Leadership";
-
 
   useEffect(() => {
     console.log(" Current User Role:", userRole);
   }, [userRole]);
 
-
   useEffect(() => {
     fetchBudgets();
   }, []);
-
 
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
   }, [budgets, filters]);
-
 
   const fetchBudgets = async () => {
     setLoading(true);
@@ -84,11 +74,13 @@ const BudgetAllocation = () => {
     }
   };
 
-
   const generateFilterOptions = (data) => {
-    const years = [...new Set(data.map((b) => b.fiscalYear))].sort((a, b) => b - a);
-    const departments = [...new Set(data.map((b) => b.departmentName).filter(Boolean))].sort();
-
+    const years = [...new Set(data.map((b) => b.fiscalYear))].sort(
+      (a, b) => b - a
+    );
+    const departments = [
+      ...new Set(data.map((b) => b.departmentName).filter(Boolean)),
+    ].sort();
 
     setFilterOptions({
       years,
@@ -96,10 +88,8 @@ const BudgetAllocation = () => {
     });
   };
 
-
   const applyFilters = () => {
     let filtered = budgets;
-
 
     // Search filter
     if (filters.search.trim()) {
@@ -110,22 +100,22 @@ const BudgetAllocation = () => {
       });
     }
 
-
     // Year filter
     if (filters.year !== "all") {
-      filtered = filtered.filter((b) => b.fiscalYear === parseInt(filters.year));
+      filtered = filtered.filter(
+        (b) => b.fiscalYear === parseInt(filters.year)
+      );
     }
-
 
     // Department filter
     if (filters.department) {
-      filtered = filtered.filter((b) => b.departmentName === filters.department);
+      filtered = filtered.filter(
+        (b) => b.departmentName === filters.department
+      );
     }
-
 
     setFilteredBudgets(filtered);
   };
-
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -135,14 +125,12 @@ const BudgetAllocation = () => {
     }));
   };
 
-
   const handleSearchChange = (e) => {
     setFilters((prev) => ({
       ...prev,
       search: e.target.value,
     }));
   };
-
 
   const clearFilters = () => {
     setFilters({
@@ -152,12 +140,10 @@ const BudgetAllocation = () => {
     });
   };
 
-
   const handleItemsPerPageChange = (e) => {
     setItemsPerPage(parseInt(e.target.value));
     setCurrentPage(1);
   };
-
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -165,18 +151,15 @@ const BudgetAllocation = () => {
     }
   };
 
-
   // PAGINATION LOGIC
   const totalPages = Math.ceil(filteredBudgets.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentPageData = filteredBudgets.slice(startIndex, endIndex);
 
-
   const handleCreateBudget = () => {
     setShowCreateModal(true);
   };
-
 
   const handleBudgetCreated = () => {
     setShowCreateModal(false);
@@ -184,12 +167,10 @@ const BudgetAllocation = () => {
     showToast("Success", "Department budget created successfully", "success");
   };
 
-
   const handleEditClick = (budget) => {
     setSelectedBudget(budget);
     setShowEditModal(true);
   };
-
 
   const handleBudgetUpdated = () => {
     setShowEditModal(false);
@@ -198,12 +179,12 @@ const BudgetAllocation = () => {
     showToast("Success", "Department budget updated successfully", "success");
   };
 
-
   const handleDeleteClick = async (budgetId) => {
-    if (!window.confirm("Are you sure you want to delete this department budget?")) {
+    if (
+      !window.confirm("Are you sure you want to delete this department budget?")
+    ) {
       return;
     }
-
 
     try {
       console.log(" Deleting budget:", budgetId);
@@ -216,16 +197,14 @@ const BudgetAllocation = () => {
     }
   };
 
-
   const handleViewDetails = (budget) => {
     setSelectedBudget(budget);
     setShowDetailsModal(true);
   };
 
-
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
-    
+
     switch (type) {
       case "success":
         toast.success(fullMessage);
@@ -245,7 +224,6 @@ const BudgetAllocation = () => {
     }
   };
 
-
   const getUtilizationColor = (percentage) => {
     if (!percentage) return "#cbd5e1";
     if (percentage >= 90) return "#ef4444";
@@ -253,7 +231,6 @@ const BudgetAllocation = () => {
     if (percentage >= 50) return "#10b981";
     return "#3b82f6";
   };
-
 
   return (
     <div className="budget-root">
@@ -263,7 +240,6 @@ const BudgetAllocation = () => {
           {error}
         </div>
       )}
-
 
       {/* HEADER WITH BUTTON */}
       <div className="budget-header">
@@ -277,7 +253,6 @@ const BudgetAllocation = () => {
           </p>
         </div>
 
-
         {/* SHOW BUTTON ONLY FOR LEADERSHIP */}
         {isLeadership && (
           <button className="budget-btn-create" onClick={handleCreateBudget}>
@@ -286,7 +261,6 @@ const BudgetAllocation = () => {
           </button>
         )}
       </div>
-
 
       {/* FILTER BAR WITH TOGGLES */}
       <div className="budget-filters-container">
@@ -314,14 +288,16 @@ const BudgetAllocation = () => {
               </button>
             </div>
 
-
             {/* CLEAR BUTTON */}
-            <button className="btn-clear-filters" onClick={clearFilters} title="Clear all filters">
+            <button
+              className="btn-clear-filters"
+              onClick={clearFilters}
+              title="Clear all filters"
+            >
               <i className="bi bi-x-circle"></i> Clear
             </button>
           </div>
         </div>
-
 
         <div className="filters-grid">
           {/* SEARCH */}
@@ -339,7 +315,6 @@ const BudgetAllocation = () => {
               />
             </div>
           </div>
-
 
           {/* YEAR FILTER */}
           <div className="filter-group">
@@ -359,7 +334,6 @@ const BudgetAllocation = () => {
             </select>
           </div>
 
-
           {/* DEPARTMENT FILTER */}
           <div className="filter-group">
             <label className="filter-label">Department</label>
@@ -377,12 +351,8 @@ const BudgetAllocation = () => {
               ))}
             </select>
           </div>
-
-
-         
         </div>
       </div>
-
 
       {/* CONTENT */}
       {loading ? (
@@ -413,11 +383,12 @@ const BudgetAllocation = () => {
                     {budget.departmentName?.substring(0, 2).toUpperCase()}
                   </div>
                   <div className="budget-card-header-info">
-                    <h5 className="budget-card-title">{budget.departmentName}</h5>
+                    <h5 className="budget-card-title">
+                      {budget.departmentName}
+                    </h5>
                     <p className="budget-card-year">{budget.fiscalYear}</p>
                   </div>
                 </div>
-
 
                 {/* CARD BODY */}
                 <div className="budget-card-body">
@@ -428,14 +399,12 @@ const BudgetAllocation = () => {
                     </span>
                   </div>
 
-
                   <div className="budget-card-row">
                     <span className="budget-card-label">Allocated</span>
                     <span className="budget-card-value">
                       {formatCurrency(budget.allocatedAmount)}
                     </span>
                   </div>
-
 
                   <div className="budget-card-row">
                     <span className="budget-card-label">Utilized</span>
@@ -444,14 +413,12 @@ const BudgetAllocation = () => {
                     </span>
                   </div>
 
-
                   <div className="budget-card-row">
                     <span className="budget-card-label">Utilization</span>
                     <span className="budget-card-value">
                       {budget.utilizationPercentage || 0}%
                     </span>
                   </div>
-
 
                   <div className="budget-card-row">
                     <span className="budget-card-label">Headcount</span>
@@ -460,7 +427,6 @@ const BudgetAllocation = () => {
                     </span>
                   </div>
 
-
                   <div className="budget-card-row">
                     <span className="budget-card-label">Avg Cost/Employee</span>
                     <span className="budget-card-value">
@@ -468,7 +434,6 @@ const BudgetAllocation = () => {
                     </span>
                   </div>
                 </div>
-
 
                 {/* CARD ACTIONS */}
                 {isLeadership && (
@@ -500,7 +465,6 @@ const BudgetAllocation = () => {
             ))}
           </div>
 
-
           {/* PAGINATION */}
           <div className="pagination-container">
             <div className="pagination-left">
@@ -517,15 +481,14 @@ const BudgetAllocation = () => {
               </select>
             </div>
 
-
             <div className="pagination-center">
               <span className="pagination-info">
                 Page {currentPage} of {totalPages} | Showing{" "}
                 {Math.min(startIndex + 1, filteredBudgets.length)}-
-                {Math.min(endIndex, filteredBudgets.length)} of {filteredBudgets.length}
+                {Math.min(endIndex, filteredBudgets.length)} of{" "}
+                {filteredBudgets.length}
               </span>
             </div>
-
 
             <div className="pagination-right">
               <button
@@ -536,7 +499,6 @@ const BudgetAllocation = () => {
                 <i className="bi bi-chevron-left"></i> Prev
               </button>
 
-
               <div className="pagination-numbers">
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .slice(
@@ -546,14 +508,15 @@ const BudgetAllocation = () => {
                   .map((page) => (
                     <button
                       key={page}
-                      className={`pagination-number ${currentPage === page ? "active" : ""}`}
+                      className={`pagination-number ${
+                        currentPage === page ? "active" : ""
+                      }`}
                       onClick={() => goToPage(page)}
                     >
                       {page}
                     </button>
                   ))}
               </div>
-
 
               <button
                 className="pagination-btn"
@@ -580,7 +543,9 @@ const BudgetAllocation = () => {
                   <th>Utilization %</th>
                   <th>Headcount</th>
                   <th>Avg Cost/Employee</th>
-                  {isLeadership && <th className="budget-actions-header">Actions</th>}
+                  {isLeadership && (
+                    <th className="budget-actions-header">Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -609,7 +574,9 @@ const BudgetAllocation = () => {
                         </span>
                       </div>
                     </td>
-                    <td className="budget-text-center">{budget.headcount || 0}</td>
+                    <td className="budget-text-center">
+                      {budget.headcount || 0}
+                    </td>
                     <td>{formatCurrency(budget.avgCostPerEmployee)}</td>
                     {isLeadership && (
                       <td>
@@ -644,7 +611,6 @@ const BudgetAllocation = () => {
             </table>
           </div>
 
-
           {/* PAGINATION */}
           <div className="pagination-container">
             <div className="pagination-left">
@@ -661,15 +627,14 @@ const BudgetAllocation = () => {
               </select>
             </div>
 
-
             <div className="pagination-center">
               <span className="pagination-info">
                 Page {currentPage} of {totalPages} | Showing{" "}
                 {Math.min(startIndex + 1, filteredBudgets.length)}-
-                {Math.min(endIndex, filteredBudgets.length)} of {filteredBudgets.length}
+                {Math.min(endIndex, filteredBudgets.length)} of{" "}
+                {filteredBudgets.length}
               </span>
             </div>
-
 
             <div className="pagination-right">
               <button
@@ -680,7 +645,6 @@ const BudgetAllocation = () => {
                 <i className="bi bi-chevron-left"></i> Prev
               </button>
 
-
               <div className="pagination-numbers">
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .slice(
@@ -690,14 +654,15 @@ const BudgetAllocation = () => {
                   .map((page) => (
                     <button
                       key={page}
-                      className={`pagination-number ${currentPage === page ? "active" : ""}`}
+                      className={`pagination-number ${
+                        currentPage === page ? "active" : ""
+                      }`}
                       onClick={() => goToPage(page)}
                     >
                       {page}
                     </button>
                   ))}
               </div>
-
 
               <button
                 className="pagination-btn"
@@ -711,7 +676,6 @@ const BudgetAllocation = () => {
         </>
       )}
 
-
       {/* MODALS */}
       {showCreateModal && (
         <CreateBudgetModal
@@ -720,7 +684,6 @@ const BudgetAllocation = () => {
           onBudgetCreated={handleBudgetCreated}
         />
       )}
-
 
       {showEditModal && selectedBudget && (
         <EditBudgetModal
@@ -734,7 +697,6 @@ const BudgetAllocation = () => {
         />
       )}
 
-
       {showDetailsModal && selectedBudget && (
         <ViewBudgetDetailsModal
           show={showDetailsModal}
@@ -746,17 +708,18 @@ const BudgetAllocation = () => {
         />
       )}
 
-
       {/* BLUR BACKDROP */}
       <div
         className="budget-blur-backdrop"
         style={{
-          display: showCreateModal || showEditModal || showDetailsModal ? "block" : "none",
+          display:
+            showCreateModal || showEditModal || showDetailsModal
+              ? "block"
+              : "none",
         }}
       ></div>
     </div>
   );
 };
-
 
 export default BudgetAllocation;

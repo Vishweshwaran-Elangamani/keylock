@@ -1,42 +1,48 @@
-// src/components/sla/SLAHistoryTimeline.jsx
-import React from 'react';
+import React from "react";
 import {
-  Clock, CheckCircle, AlertTriangle, RotateCcw, FileText,
-  TrendingUp, XCircle, User, Calendar
-} from 'lucide-react';
+  Clock,
+  CheckCircle,
+  AlertTriangle,
+  RotateCcw,
+  FileText,
+  TrendingUp,
+  XCircle,
+  User,
+  Calendar,
+} from "lucide-react";
 
 const SLAHistoryTimeline = ({ history }) => {
   const getIconAndColor = (changeType) => {
     switch (changeType) {
-      case 'Created':
-        return { icon: FileText, color: '#0F62FE', bgColor: '#0F62FE15' };
-      case 'StatusChanged':
-        return { icon: TrendingUp, color: '#E2B93B', bgColor: '#E2B93B15' };
-      case 'Escalated':
-      case 'EscalatedToDeptHead':
-        return { icon: AlertTriangle, color: '#E01950', bgColor: '#E0195015' };
-      case 'Reopened':
-        return { icon: RotateCcw, color: '#AC5098', bgColor: '#AC509815' };
-      case 'Closed':
-        return { icon: CheckCircle, color: '#24A148', bgColor: '#24A14815' };
-      case 'ComplianceChanged':
-        return { icon: Clock, color: '#6B7280', bgColor: '#6B728015' };
-      case 'AutoClosed':
-        return { icon: XCircle, color: '#E01950', bgColor: '#E0195015' };
+      case "Created":
+        return { icon: FileText, color: "#0F62FE", bgColor: "#0F62FE15" };
+      case "StatusChanged":
+        return { icon: TrendingUp, color: "#E2B93B", bgColor: "#E2B93B15" };
+      case "Escalated":
+      case "EscalatedToDeptHead":
+        return { icon: AlertTriangle, color: "#E01950", bgColor: "#E0195015" };
+      case "Reopened":
+        return { icon: RotateCcw, color: "#AC5098", bgColor: "#AC509815" };
+      case "Closed":
+        return { icon: CheckCircle, color: "#24A148", bgColor: "#24A14815" };
+      case "ComplianceChanged":
+        return { icon: Clock, color: "#6B7280", bgColor: "#6B728015" };
+      case "AutoClosed":
+        return { icon: XCircle, color: "#E01950", bgColor: "#E0195015" };
       default:
-        return { icon: FileText, color: '#6B7280', bgColor: '#6B728015' };
+        return { icon: FileText, color: "#6B7280", bgColor: "#6B728015" };
     }
   };
 
   const formatDateTime = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -54,11 +60,11 @@ const SLAHistoryTimeline = ({ history }) => {
       <div
         className="position-absolute"
         style={{
-          left: '20px',
-          top: '30px',
-          bottom: '30px',
-          width: '2px',
-          backgroundColor: '#e0e0e0'
+          left: "20px",
+          top: "30px",
+          bottom: "30px",
+          width: "2px",
+          backgroundColor: "#e0e0e0",
         }}
       />
 
@@ -66,15 +72,18 @@ const SLAHistoryTimeline = ({ history }) => {
         const { icon: Icon, color, bgColor } = getIconAndColor(item.changeType);
 
         return (
-          <div key={item.historyId || index} className="d-flex gap-3 mb-4 position-relative">
+          <div
+            key={item.historyId || index}
+            className="d-flex gap-3 mb-4 position-relative"
+          >
             <div
               className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 position-relative"
               style={{
-                width: '40px',
-                height: '40px',
+                width: "40px",
+                height: "40px",
                 backgroundColor: bgColor,
                 border: `3px solid white`,
-                zIndex: 1
+                zIndex: 1,
               }}
             >
               <Icon size={18} color={color} strokeWidth={2.5} />
@@ -83,7 +92,10 @@ const SLAHistoryTimeline = ({ history }) => {
             <div className="flex-grow-1">
               <div
                 className="card border-0 shadow-sm"
-                style={{ borderRadius: '8px', borderLeft: `3px solid ${color}` }}
+                style={{
+                  borderRadius: "8px",
+                  borderLeft: `3px solid ${color}`,
+                }}
               >
                 <div className="card-body p-3">
                   <div className="d-flex justify-content-between align-items-start mb-2">
@@ -118,7 +130,11 @@ const SLAHistoryTimeline = ({ history }) => {
                         {item.changedTo && (
                           <span
                             className="badge small"
-                            style={{ backgroundColor: bgColor, color, border: `1px solid ${color}30` }}
+                            style={{
+                              backgroundColor: bgColor,
+                              color,
+                              border: `1px solid ${color}30`,
+                            }}
                           >
                             {item.changedTo}
                           </span>
@@ -128,7 +144,10 @@ const SLAHistoryTimeline = ({ history }) => {
                   </div>
 
                   {item.reason && (
-                    <p className="mb-0 small text-muted" style={{ fontSize: '0.875rem' }}>
+                    <p
+                      className="mb-0 small text-muted"
+                      style={{ fontSize: "0.875rem" }}
+                    >
                       {item.reason}
                     </p>
                   )}

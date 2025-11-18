@@ -3,7 +3,6 @@ import { Modal } from "react-bootstrap";
 import { toast } from "sonner";
 import carearProgressionService from "../../../../services/hr_operations/hr/careerProgressionService";
 
-
 const DeptHeadReviewModal = ({
   show,
   nomination,
@@ -17,12 +16,10 @@ const DeptHeadReviewModal = ({
   const [decision, setDecision] = useState(""); // "approve" or "reject"
   const [error, setError] = useState(null);
 
-
   const handleApprove = async () => {
     setDecision("approve");
     setLoading(true);
     setError(null);
-
 
     try {
       console.log(" Approving nomination...");
@@ -43,18 +40,15 @@ const DeptHeadReviewModal = ({
     }
   };
 
-
   const handleReject = async () => {
     if (!rejectionReason.trim()) {
       setError("Please provide rejection reason");
       return;
     }
 
-
     setDecision("reject");
     setLoading(true);
     setError(null);
-
 
     try {
       console.log(" Rejecting nomination...");
@@ -75,7 +69,6 @@ const DeptHeadReviewModal = ({
     }
   };
 
-
   const handleClose = () => {
     setApprovalComments("");
     setRejectionReason("");
@@ -84,10 +77,9 @@ const DeptHeadReviewModal = ({
     onHide();
   };
 
-
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
-    
+
     switch (type) {
       case "success":
         toast.success(fullMessage);
@@ -107,7 +99,6 @@ const DeptHeadReviewModal = ({
     }
   };
 
-
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return "₹0";
     return new Intl.NumberFormat("en-IN", {
@@ -117,14 +108,11 @@ const DeptHeadReviewModal = ({
     }).format(amount);
   };
 
-
   //  FAVORITISM LOGIC
   const getFavoritismRiskLevel = () => {
     if (!favoritism) return { level: "UNKNOWN", color: "#6b7280" };
 
-
     const riskScore = favoritism.riskScore || 0;
-
 
     if (riskScore >= 75) return { level: " HIGH RISK", color: "#ef4444" };
     if (riskScore >= 50) return { level: " MEDIUM RISK", color: "#f59e0b" };
@@ -132,14 +120,12 @@ const DeptHeadReviewModal = ({
     return { level: " NO RISK", color: "#06b6d4" };
   };
 
-
   const riskLevel = getFavoritismRiskLevel();
   const increment = (nomination.newSalary || 0) - (nomination.oldSalary || 0);
   const incrementPercent =
     nomination.oldSalary > 0
       ? ((increment / nomination.oldSalary) * 100).toFixed(2)
       : 0;
-
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" className="promo-modal">
@@ -150,7 +136,6 @@ const DeptHeadReviewModal = ({
         </Modal.Title>
       </Modal.Header>
 
-
       <Modal.Body className="promo-modal-body">
         {error && (
           <div className="alert alert-danger" role="alert">
@@ -158,7 +143,6 @@ const DeptHeadReviewModal = ({
             {error}
           </div>
         )}
-
 
         {/*  NOMINATION DETAILS */}
         <div className="promo-approval-info">
@@ -179,7 +163,6 @@ const DeptHeadReviewModal = ({
             <span>{formatCurrency(nomination.oldSalary)}</span>
           </div>
         </div>
-
 
         {/*  FAVORITISM CHECK - CRITICAL */}
         <div
@@ -221,7 +204,6 @@ const DeptHeadReviewModal = ({
           </div>
         </div>
 
-
         {/*  PROMOTION DETAILS */}
         <div
           className="promo-details-section"
@@ -256,7 +238,6 @@ const DeptHeadReviewModal = ({
           </div>
         </div>
 
-
         {/*  APPROVAL COMMENTS */}
         {!decision && (
           <div className="mb-3">
@@ -273,7 +254,6 @@ const DeptHeadReviewModal = ({
             />
           </div>
         )}
-
 
         {/*  REJECTION REASON */}
         {decision === "reject" && (
@@ -293,19 +273,17 @@ const DeptHeadReviewModal = ({
           </div>
         )}
 
-
         {/*  INFO ALERT */}
         <div className="alert alert-info" role="alert">
           <i className="bi bi-info-circle me-2"></i>
           <strong>Your Role:</strong>
           <p style={{ marginTop: "8px", marginBottom: 0, fontSize: "12px" }}>
             As Department Head, you review the promotion based on employee
-            performance, budget feasibility, and fairness. The favoritism
-            check helps ensure fair promotion practices.
+            performance, budget feasibility, and fairness. The favoritism check
+            helps ensure fair promotion practices.
           </p>
         </div>
       </Modal.Body>
-
 
       <Modal.Footer className="promo-modal-footer">
         <button
@@ -315,7 +293,6 @@ const DeptHeadReviewModal = ({
         >
           Cancel
         </button>
-
 
         {!decision && (
           <>
@@ -343,7 +320,6 @@ const DeptHeadReviewModal = ({
             </button>
           </>
         )}
-
 
         {decision === "reject" && (
           <>
@@ -386,6 +362,5 @@ const DeptHeadReviewModal = ({
     </Modal>
   );
 };
-
 
 export default DeptHeadReviewModal;

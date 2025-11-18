@@ -1,13 +1,13 @@
-import apii from '../../services/meeting/index';
+import apii from "../../services/meeting/index";
 
 const rsvpService = {
   // Get all invitations for current user
   getMyInvitations: async () => {
     try {
-      const response = await apii.get('/Rsvp/my-invitations');
+      const response = await apii.get("/Rsvp/my-invitations");
       return response.data;
     } catch (error) {
-      console.error('Get my invitations error:', error);
+      console.error("Get my invitations error:", error);
       throw error.response?.data || error;
     }
   },
@@ -15,10 +15,10 @@ const rsvpService = {
   // Submit RSVP response
   submitRsvp: async (rsvpData) => {
     try {
-      const response = await apii.post('/Rsvp/submit', rsvpData);
+      const response = await apii.post("/Rsvp/submit", rsvpData);
       return response.data;
     } catch (error) {
-      console.error('Submit RSVP error:', error);
+      console.error("Submit RSVP error:", error);
       throw error.response?.data || error;
     }
   },
@@ -29,7 +29,7 @@ const rsvpService = {
       const response = await apii.put(`/Rsvp/${meetingId}/update`, rsvpData);
       return response.data;
     } catch (error) {
-      console.error('Update RSVP error:', error);
+      console.error("Update RSVP error:", error);
       throw error.response?.data || error;
     }
   },
@@ -37,10 +37,10 @@ const rsvpService = {
   // Get count of pending RSVPs for current user
   getPendingRsvpCount: async () => {
     try {
-      const response = await apii.get('/Rsvp/pending-count');
+      const response = await apii.get("/Rsvp/pending-count");
       return response.data;
     } catch (error) {
-      console.error('Get pending RSVP count error:', error);
+      console.error("Get pending RSVP count error:", error);
       throw error.response?.data || error;
     }
   },
@@ -51,7 +51,7 @@ const rsvpService = {
       const response = await apii.get(`/Rsvp/meeting/${meetingId}/summary`);
       return response.data;
     } catch (error) {
-      console.error('Get RSVP summary error:', error);
+      console.error("Get RSVP summary error:", error);
       throw error.response?.data || error;
     }
   },
@@ -62,14 +62,14 @@ const rsvpService = {
       const response = await apii.patch(
         `/Rsvp/participant/${participantId}/update`,
         { rsvpStatus },
-        { headers: { 'Content-Type': 'application/json' } }
+        { headers: { "Content-Type": "application/json" } }
       );
       return response.data;
     } catch (error) {
-      console.error('Update participant RSVP error:', error);
+      console.error("Update participant RSVP error:", error);
       throw error.response?.data || error;
     }
-  }
+  },
 };
 
 export default rsvpService;

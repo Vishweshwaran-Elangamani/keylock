@@ -1,6 +1,6 @@
 /**
  * ProfileDropdown Component
- * 
+ *
  * A dropdown menu component for user profile access and logout functionality.
  * Features:
  * - Display user avatar with initials
@@ -9,7 +9,7 @@
  * - Logout functionality with toast notification
  * - Click-outside detection to close dropdown
  * - Responsive design
- * 
+ *
  * @component
  */
 
@@ -64,7 +64,7 @@ const ProfileDropdown = () => {
     /**
      * Handles click outside dropdown
      * Checks if clicked element is outside dropdown ref
-     * 
+     *
      * @param {Event} event - Click event
      */
     const handleClickOutside = (event) => {
@@ -133,7 +133,6 @@ const ProfileDropdown = () => {
   // ========================
   return (
     <div className="profile-dropdown" ref={dropdownRef}>
-      
       {/* ======================== */}
       {/* PROFILE BUTTON - TRIGGER */}
       {/* ======================== */}
@@ -152,21 +151,20 @@ const ProfileDropdown = () => {
       {/* ======================== */}
       {isOpen && (
         <div className="profile-dropdown-menu">
-          
           {/* -------- Header Section -------- */}
           {/* Displays user information at top of dropdown */}
           <div className="profile-header">
             {/* Large Avatar */}
             <div className="profile-avatar-large">{initials}</div>
-            
+
             {/* User Information */}
             <div className="profile-info">
               {/* User Full Name */}
               <div className="profile-name">{displayName}</div>
-              
+
               {/* User Email */}
               <div className="profile-email">{displayEmail}</div>
-              
+
               {/* Employee ID */}
               <div className="profile-empid">Emp ID: {displayEmpId}</div>
             </div>
@@ -175,7 +173,6 @@ const ProfileDropdown = () => {
           {/* -------- Menu Items Section -------- */}
           {/* Contains navigation and action buttons */}
           <div className="profile-menu-items">
-            
             {/* Profile Navigation Button */}
             <button
               className="profile-menu-item"

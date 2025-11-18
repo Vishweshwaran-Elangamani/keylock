@@ -1,6 +1,6 @@
 import { useState } from "react";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import "../../../styles/internal/OpportunityModal.css";
 
 const DeleteOpportunityModal = ({
@@ -66,8 +66,8 @@ const DeleteOpportunityModal = ({
                 </p>
                 <p className="delete-warning">
                   <i className="bi bi-exclamation-circle"></i>
-                  This action cannot be undone. All related nominations will also be
-                  affected.
+                  This action cannot be undone. All related nominations will
+                  also be affected.
                 </p>
               </div>
             </div>

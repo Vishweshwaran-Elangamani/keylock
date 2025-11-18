@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../services/performancemanagement/hr/api";
 
- function DraftsList() {
+function DraftsList() {
   const [draftRows, setDraftRows] = useState([]);
   const [forms, setForms] = useState([]);
   const [users, setUsers] = useState([]);
@@ -14,7 +14,7 @@ import api from "../../../services/performancemanagement/hr/api";
     formId: "",
     employeeId: "",
     assignedBy: 1,
-    action: "Save as Draft"
+    action: "Save as Draft",
   });
 
   const [selectedAssignments, setSelectedAssignments] = useState([]);
@@ -66,14 +66,17 @@ import api from "../../../services/performancemanagement/hr/api";
       formId: assignment.formId,
       employeeId: assignment.employeeId,
       assignedBy: 1,
-      action: assignment.action || "Save as Draft"
+      action: assignment.action || "Save as Draft",
     });
     setShowModal(true);
   };
 
   const handleUpdateDraft = async () => {
     try {
-      await api.put(`/AppraisalProcess/draft/${editingAssignment.assignmentId}`, editData);
+      await api.put(
+        `/AppraisalProcess/draft/${editingAssignment.assignmentId}`,
+        editData
+      );
       setMsg("Draft updated successfully.");
       setShowModal(false);
       fetchDrafts();
@@ -84,13 +87,19 @@ import api from "../../../services/performancemanagement/hr/api";
   };
 
   const handleDeleteAssignment = async (assignmentId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this draft?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this draft?"
+    );
     if (!confirmDelete) return;
 
     try {
       await api.delete(`/FormManagement/draft/${assignmentId}`);
-      setDraftRows(prev => prev.filter(d => d.assignmentId !== assignmentId));
-      setSelectedAssignments(prev => prev.filter(id => id !== assignmentId));
+      setDraftRows((prev) =>
+        prev.filter((d) => d.assignmentId !== assignmentId)
+      );
+      setSelectedAssignments((prev) =>
+        prev.filter((id) => id !== assignmentId)
+      );
       setMsg("Draft deleted successfully.");
     } catch (error) {
       console.error(error);
@@ -99,15 +108,17 @@ import api from "../../../services/performancemanagement/hr/api";
   };
 
   const handleDeleteGroup = async (formId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete all drafts for this form?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete all drafts for this form?"
+    );
     if (!confirmDelete) return;
 
     try {
-      const assignmentsToDelete = draftRows.filter(d => d.formId === formId);
+      const assignmentsToDelete = draftRows.filter((d) => d.formId === formId);
       for (const assignment of assignmentsToDelete) {
         await api.delete(`/FormManagement/draft/${assignment.assignmentId}`);
       }
-      setDraftRows(prev => prev.filter(d => d.formId !== formId));
+      setDraftRows((prev) => prev.filter((d) => d.formId !== formId));
       setMsg("All drafts for this form deleted successfully.");
     } catch (error) {
       console.error(error);
@@ -116,9 +127,9 @@ import api from "../../../services/performancemanagement/hr/api";
   };
 
   const handleSelectAssignment = (assignmentId) => {
-    setSelectedAssignments(prev =>
+    setSelectedAssignments((prev) =>
       prev.includes(assignmentId)
-        ? prev.filter(id => id !== assignmentId)
+        ? prev.filter((id) => id !== assignmentId)
         : [...prev, assignmentId]
     );
   };
@@ -130,17 +141,19 @@ import api from "../../../services/performancemanagement/hr/api";
     }
 
     try {
-      const updates = selectedAssignments.map(id => {
-        const assignment = draftRows.find(a => a.assignmentId === id);
-        if (!assignment) return null;
+      const updates = selectedAssignments
+        .map((id) => {
+          const assignment = draftRows.find((a) => a.assignmentId === id);
+          if (!assignment) return null;
 
-        return api.put(`/AppraisalProcess/draft/${id}`, {
-          formId: assignment.formId,
-          employeeId: assignment.employeeId,
-          assignedBy: 1,
-          action: "Send"
-        });
-      }).filter(Boolean);
+          return api.put(`/AppraisalProcess/draft/${id}`, {
+            formId: assignment.formId,
+            employeeId: assignment.employeeId,
+            assignedBy: 1,
+            action: "Send",
+          });
+        })
+        .filter(Boolean);
 
       await Promise.all(updates);
       setMsg(`${selectedAssignments.length} draft(s) sent successfully.`);
@@ -158,7 +171,7 @@ import api from "../../../services/performancemanagement/hr/api";
       acc[key] = {
         formId: draft.formId,
         formName: draft.formName || `Form #${draft.formId}`,
-        assignments: []
+        assignments: [],
       };
     }
     acc[key].assignments.push(draft);
@@ -172,7 +185,11 @@ import api from "../../../services/performancemanagement/hr/api";
       <div style={styles.header}>
         <h2 style={styles.title}>Saved Drafts</h2>
         <button
-          style={selectedAssignments.length === 0 ? styles.btnDisabled : styles.btnSuccess}
+          style={
+            selectedAssignments.length === 0
+              ? styles.btnDisabled
+              : styles.btnSuccess
+          }
           disabled={selectedAssignments.length === 0}
           onClick={handleSendSelected}
         >
@@ -204,30 +221,44 @@ import api from "../../../services/performancemanagement/hr/api";
                   <table style={styles.table}>
                     <thead style={styles.tableHead}>
                       <tr>
-                        <th style={{...styles.th, width: "50px"}}>Select</th>
+                        <th style={{ ...styles.th, width: "50px" }}>Select</th>
                         <th style={styles.th}>Assignment ID</th>
                         <th style={styles.th}>Employee Name</th>
                         <th style={styles.th}>Status</th>
                         <th style={styles.th}>Assigned At</th>
-                        <th style={{...styles.th, width: "200px"}}>Actions</th>
+                        <th style={{ ...styles.th, width: "200px" }}>
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {group.assignments.map((assignment) => (
-                        <tr key={assignment.assignmentId} style={styles.tableRow}>
-                          <td style={{...styles.td, textAlign: "center"}}>
+                        <tr
+                          key={assignment.assignmentId}
+                          style={styles.tableRow}
+                        >
+                          <td style={{ ...styles.td, textAlign: "center" }}>
                             <input
                               type="checkbox"
-                              checked={selectedAssignments.includes(assignment.assignmentId)}
-                              onChange={() => handleSelectAssignment(assignment.assignmentId)}
+                              checked={selectedAssignments.includes(
+                                assignment.assignmentId
+                              )}
+                              onChange={() =>
+                                handleSelectAssignment(assignment.assignmentId)
+                              }
                               style={styles.checkbox}
                             />
                           </td>
                           <td style={styles.td}>
-                            <span style={styles.badgePrimary}>{assignment.assignmentId}</span>
+                            <span style={styles.badgePrimary}>
+                              {assignment.assignmentId}
+                            </span>
                           </td>
                           <td style={styles.td}>
-                            <strong>{assignment.employeeName || `Employee #${assignment.employeeId}`}</strong>
+                            <strong>
+                              {assignment.employeeName ||
+                                `Employee #${assignment.employeeId}`}
+                            </strong>
                           </td>
                           <td style={styles.td}>
                             <span style={styles.badgeWarning}>
@@ -237,20 +268,28 @@ import api from "../../../services/performancemanagement/hr/api";
                           <td style={styles.td}>
                             <small>
                               {assignment.assignedAt
-                                ? new Date(assignment.assignedAt).toLocaleString()
+                                ? new Date(
+                                    assignment.assignedAt
+                                  ).toLocaleString()
                                 : "-"}
                             </small>
                           </td>
                           <td style={styles.td}>
                             <button
-                              style={{...styles.btnSmall, ...styles.btnEdit}}
+                              style={{ ...styles.btnSmall, ...styles.btnEdit }}
                               onClick={() => handleEditAssignment(assignment)}
                             >
                               Edit
                             </button>
                             <button
-                              style={{...styles.btnSmall, ...styles.btnDelete, marginLeft: "8px"}}
-                              onClick={() => handleDeleteAssignment(assignment.assignmentId)}
+                              style={{
+                                ...styles.btnSmall,
+                                ...styles.btnDelete,
+                                marginLeft: "8px",
+                              }}
+                              onClick={() =>
+                                handleDeleteAssignment(assignment.assignmentId)
+                              }
                             >
                               Delete
                             </button>
@@ -292,7 +331,12 @@ import api from "../../../services/performancemanagement/hr/api";
                   <select
                     style={styles.formSelect}
                     value={editData.formId}
-                    onChange={(e) => setEditData({ ...editData, formId: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setEditData({
+                        ...editData,
+                        formId: parseInt(e.target.value),
+                      })
+                    }
                   >
                     {forms.map((form) => (
                       <option key={form.formId} value={form.formId}>
@@ -306,7 +350,12 @@ import api from "../../../services/performancemanagement/hr/api";
                   <select
                     style={styles.formSelect}
                     value={editData.employeeId}
-                    onChange={(e) => setEditData({ ...editData, employeeId: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setEditData({
+                        ...editData,
+                        employeeId: parseInt(e.target.value),
+                      })
+                    }
                   >
                     {users.map((user) => (
                       <option key={user.profileId} value={user.profileId}>
@@ -320,7 +369,9 @@ import api from "../../../services/performancemanagement/hr/api";
                   <select
                     style={styles.formSelect}
                     value={editData.action}
-                    onChange={(e) => setEditData({ ...editData, action: e.target.value })}
+                    onChange={(e) =>
+                      setEditData({ ...editData, action: e.target.value })
+                    }
                   >
                     <option value="Save as Draft">Save as Draft</option>
                     <option value="Send">Send</option>
@@ -328,10 +379,16 @@ import api from "../../../services/performancemanagement/hr/api";
                 </div>
               </div>
               <div style={styles.modalFooter}>
-                <button style={styles.btnModalSuccess} onClick={handleUpdateDraft}>
+                <button
+                  style={styles.btnModalSuccess}
+                  onClick={handleUpdateDraft}
+                >
                   Save Changes
                 </button>
-                <button style={styles.btnModalSecondary} onClick={() => setShowModal(false)}>
+                <button
+                  style={styles.btnModalSecondary}
+                  onClick={() => setShowModal(false)}
+                >
                   Cancel
                 </button>
               </div>
@@ -349,7 +406,8 @@ const styles = {
     padding: "24px",
     maxWidth: "1400px",
     margin: "0 auto",
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily:
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     backgroundColor: "#FFFFFF",
     minHeight: "100vh",
   },

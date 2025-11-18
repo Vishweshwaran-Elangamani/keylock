@@ -1,6 +1,6 @@
 /**
  * DeptHeadPage Component
- * 
+ *
  * Department Head Dashboard for managing employee performance approvals.
  * Features:
  * - Tab-based view: Pending Approvals vs Approved Employees
@@ -10,7 +10,7 @@
  * - Auto-refresh every 30 seconds
  * - Pagination with customizable rows per page
  * - Toast notifications using Sonner for user feedback
- * 
+ *
  * @component
  */
 
@@ -18,7 +18,7 @@ import React, { useEffect, useState } from "react";
 import {
   getDeptHeadSubmittedRatings,
   approveDeptHeadEmployee,
-  getApprovedEmployees
+  getApprovedEmployees,
 } from "../../../services/performancemanagement/hr/api";
 import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { toast } from "sonner";
@@ -108,7 +108,14 @@ export default function DeptHeadPage() {
    */
   useEffect(() => {
     applyFilters();
-  }, [pendingRequests, approvedRequests, activeTab, searchTerm, filterProject, filterDate]);
+  }, [
+    pendingRequests,
+    approvedRequests,
+    activeTab,
+    searchTerm,
+    filterProject,
+    filterDate,
+  ]);
 
   // ========================
   // API FUNCTIONS
@@ -117,15 +124,15 @@ export default function DeptHeadPage() {
   /**
    * Fetches pending and approved data from backend
    * Shows Sonner toast notifications for user feedback
-   * 
+   *
    * @param {boolean} silent - If true, skips loading toast (for auto-refresh)
    */
   const fetchData = async (silent = false) => {
     try {
       setLoading(true);
-      
+
       const departmentHeadId = getEmployeeIdForFilter();
-      
+
       if (!departmentHeadId) {
         toast.error("Unable to identify department head. Please login again.");
         console.error("Department Head ID not found");
@@ -139,7 +146,7 @@ export default function DeptHeadPage() {
 
       // -------- Fetch Pending Approvals --------
       const pendingRes = await getDeptHeadSubmittedRatings(departmentHeadId);
-      
+
       // -------- Fetch All Approved Employees --------
       // Fetch all pages of approved employees
       const approvedRes = await getApprovedEmployees(1, 1000, departmentHeadId); // Large page size to get all
@@ -154,10 +161,14 @@ export default function DeptHeadPage() {
       }
 
       setLastUpdated(new Date());
-      
+
       if (!silent) {
         toast.dismiss();
-        toast.success(`Loaded ${pendingRes.data.data?.length || 0} pending and ${approvedRes.data.data?.length || 0} approved assessments`);
+        toast.success(
+          `Loaded ${pendingRes.data.data?.length || 0} pending and ${
+            approvedRes.data.data?.length || 0
+          } approved assessments`
+        );
       }
     } catch (err) {
       // -------- Handle Exception --------
@@ -179,7 +190,8 @@ export default function DeptHeadPage() {
    * Updates filteredData state and resets pagination to page 1
    */
   const applyFilters = () => {
-    let filtered = activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
+    let filtered =
+      activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
 
     // -------- Search Filter --------
     if (searchTerm) {
@@ -200,7 +212,8 @@ export default function DeptHeadPage() {
     // -------- Date Filter --------
     if (filterDate) {
       filtered = filtered.filter((emp) => {
-        const dateToCheck = activeTab === "pending" ? emp.requestedAt : emp.approvedAt;
+        const dateToCheck =
+          activeTab === "pending" ? emp.requestedAt : emp.approvedAt;
         if (!dateToCheck) return false;
         const empDate = new Date(dateToCheck);
         const filterDateObj = new Date(filterDate);
@@ -249,24 +262,27 @@ export default function DeptHeadPage() {
       const res = await approveDeptHeadEmployee({
         employeeId: selectedEmployee.employeeId,
         projectId: selectedEmployee.projectId,
-        assessmentId: selectedEmployee.assessmentId
+        assessmentId: selectedEmployee.assessmentId,
       });
 
       // -------- Handle Success Response --------
       if (res.data.success) {
         toast.dismiss();
-        toast.success(`${selectedEmployee.employeeName} approved successfully!`);
-        
+        toast.success(
+          `${selectedEmployee.employeeName} approved successfully!`
+        );
+
         // Close modal and reset
         setShowApproveModal(false);
         setSelectedEmployee(null);
-        
+
         // Refresh data (silent refresh)
         fetchData(true);
       }
     } catch (err) {
       console.error("Error approving employee:", err);
-      const errorMsg = err.response?.data?.message || "Failed to approve employee";
+      const errorMsg =
+        err.response?.data?.message || "Failed to approve employee";
       toast.dismiss();
       toast.error(errorMsg);
     } finally {
@@ -312,8 +328,8 @@ export default function DeptHeadPage() {
   const getAvgRating = (competencies, key) => {
     if (!competencies || competencies.length === 0) return "-";
     const vals = competencies
-      .filter(c => c[key] != null && c[key] !== -1)
-      .map(c => c[key]);
+      .filter((c) => c[key] != null && c[key] !== -1)
+      .map((c) => c[key]);
     if (vals.length === 0) return "-";
     const total = vals.reduce((a, b) => a + b, 0);
     return (total / vals.length).toFixed(2);
@@ -327,9 +343,9 @@ export default function DeptHeadPage() {
     let totalProgress = 0;
     let count = 0;
 
-    checklists.forEach(cl => {
+    checklists.forEach((cl) => {
       if (cl.progresses && cl.progresses.length) {
-        cl.progresses.forEach(p => {
+        cl.progresses.forEach((p) => {
           count++;
           totalProgress += p.isCompleted ? 100 : 0;
         });
@@ -373,7 +389,9 @@ export default function DeptHeadPage() {
     if (!name) return "NA";
     const parts = name.split(" ");
     if (parts.length >= 2) {
-      return parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase();
+      return (
+        parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase()
+      );
     }
     return name.substring(0, 2).toUpperCase();
   };
@@ -382,9 +400,10 @@ export default function DeptHeadPage() {
    * Gets unique project names for filter dropdown
    */
   const getUniqueProjects = () => {
-    const projects = activeTab === "pending" 
-      ? pendingRequests.map(emp => emp.projectName)
-      : approvedRequests.map(emp => emp.projectName);
+    const projects =
+      activeTab === "pending"
+        ? pendingRequests.map((emp) => emp.projectName)
+        : approvedRequests.map((emp) => emp.projectName);
     return [...new Set(projects)].filter(Boolean);
   };
 
@@ -453,7 +472,6 @@ export default function DeptHeadPage() {
         <div className="dp-modal-backdrop"></div>
         <div className="dp-modal-wrapper">
           <div className="dp-modal-dialog">
-            
             {/* Modal Header */}
             <div className="dp-modal-header dp-modal-header-success">
               <h5 className="dp-modal-title">
@@ -473,7 +491,6 @@ export default function DeptHeadPage() {
 
             {/* Modal Body */}
             <div className="dp-modal-body">
-              
               {/* Employee Details Box */}
               <div className="dp-details-box">
                 <h6 className="dp-details-title">
@@ -482,7 +499,6 @@ export default function DeptHeadPage() {
                 </h6>
 
                 <div className="dp-details-grid">
-                  
                   <div className="dp-detail-row">
                     <div className="dp-detail-label">Employee Name:</div>
                     <div className="dp-detail-value">
@@ -492,14 +508,19 @@ export default function DeptHeadPage() {
 
                   <div className="dp-detail-row">
                     <div className="dp-detail-label">Project:</div>
-                    <div className="dp-detail-value">{selectedEmployee.projectName}</div>
+                    <div className="dp-detail-value">
+                      {selectedEmployee.projectName}
+                    </div>
                   </div>
 
                   <div className="dp-detail-row">
                     <div className="dp-detail-label">Avg Employee Rating:</div>
                     <div className="dp-detail-value">
                       <span className="dp-rating-badge emp-rating">
-                        {getAvgRating(selectedEmployee.competencies, "employeeRating")}
+                        {getAvgRating(
+                          selectedEmployee.competencies,
+                          "employeeRating"
+                        )}
                       </span>
                     </div>
                   </div>
@@ -508,7 +529,10 @@ export default function DeptHeadPage() {
                     <div className="dp-detail-label">Avg L1 Rating:</div>
                     <div className="dp-detail-value">
                       <span className="dp-rating-badge l1-rating">
-                        {getAvgRating(selectedEmployee.competencies, "l1Rating")}
+                        {getAvgRating(
+                          selectedEmployee.competencies,
+                          "l1Rating"
+                        )}
                       </span>
                     </div>
                   </div>
@@ -517,7 +541,10 @@ export default function DeptHeadPage() {
                     <div className="dp-detail-label">Avg L2 Rating:</div>
                     <div className="dp-detail-value">
                       <span className="dp-rating-badge l2-rating">
-                        {getAvgRating(selectedEmployee.competencies, "l2Rating")}
+                        {getAvgRating(
+                          selectedEmployee.competencies,
+                          "l2Rating"
+                        )}
                       </span>
                     </div>
                   </div>
@@ -538,8 +565,9 @@ export default function DeptHeadPage() {
               <div className="dp-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <div>
-                  <strong>Note:</strong> Approving this assessment will finalize the performance review process.
-                  The employee will be notified via system notification.
+                  <strong>Note:</strong> Approving this assessment will finalize
+                  the performance review process. The employee will be notified
+                  via system notification.
                 </div>
               </div>
             </div>
@@ -591,7 +619,6 @@ export default function DeptHeadPage() {
         <div className="dp-modal-backdrop"></div>
         <div className="dp-modal-wrapper dp-modal-large">
           <div className="dp-modal-dialog">
-            
             {/* Modal Header */}
             <div className="dp-modal-header dp-modal-header-primary">
               <h5 className="dp-modal-title">
@@ -684,7 +711,9 @@ export default function DeptHeadPage() {
                       </td>
                       <td>{c.l2Comments || "-"}</td>
                       <td>
-                        <span className={`dp-status-badge status-${c.status?.toLowerCase()}`}>
+                        <span
+                          className={`dp-status-badge status-${c.status?.toLowerCase()}`}
+                        >
                           {c.status}
                         </span>
                       </td>
@@ -719,9 +748,13 @@ export default function DeptHeadPage() {
                   <div className="dp-goal-header">
                     <div>
                       <h5 className="dp-goal-title">{goal.goalTitle}</h5>
-                      <p className="dp-goal-description">{goal.goalDescription}</p>
+                      <p className="dp-goal-description">
+                        {goal.goalDescription}
+                      </p>
                     </div>
-                    <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
+                    <span
+                      className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}
+                    >
                       {goal.goalstatus}
                     </span>
                   </div>
@@ -732,8 +765,8 @@ export default function DeptHeadPage() {
                       <span className="dp-progress-value">{avgProgress}%</span>
                     </div>
                     <div className="dp-progress-bar-bg">
-                      <div 
-                        className="dp-progress-bar-fill" 
+                      <div
+                        className="dp-progress-bar-fill"
                         style={{ width: `${avgProgress}%` }}
                       />
                     </div>
@@ -767,7 +800,6 @@ export default function DeptHeadPage() {
 
   return (
     <div className="dp-page">
-      
       {/* Breadcrumb Navigation */}
       <nav className="dp-breadcrumb-nav" aria-label="breadcrumb">
         <ol className="dp-breadcrumb">
@@ -787,7 +819,8 @@ export default function DeptHeadPage() {
           <div className="dp-header-text">
             <h2 className="dp-page-title">Department Head Dashboard</h2>
             <p className="dp-page-description">
-              Review and approve employee performance assessments and track completed reviews
+              Review and approve employee performance assessments and track
+              completed reviews
             </p>
           </div>
         </div>
@@ -832,7 +865,6 @@ export default function DeptHeadPage() {
       <div className="dp-filters-card">
         <div className="dp-filters-content">
           <div className="dp-filters-left">
-            
             {/* Search Box */}
             <div className="dp-search-box">
               <i className="bi bi-search dp-search-icon"></i>
@@ -853,7 +885,9 @@ export default function DeptHeadPage() {
             >
               <option value="">All Projects</option>
               {getUniqueProjects().map((project, idx) => (
-                <option key={idx} value={project}>{project}</option>
+                <option key={idx} value={project}>
+                  {project}
+                </option>
               ))}
             </select>
 
@@ -869,32 +903,30 @@ export default function DeptHeadPage() {
       </div>
 
       {/* Statistics Cards */}
-{/* Statistics Cards - ONLY 2 CARDS */}
-<div className="dp-stats-grid">
-  
-  {/* Total Pending */}
-  <div className="dp-stat-card">
-    <div className="dp-stat-icon dp-stat-icon-warning">
-      <i className="bi bi-hourglass-split"></i>
-    </div>
-    <div className="dp-stat-content">
-      <h3 className="dp-stat-value">{pendingRequests.length}</h3>
-      <p className="dp-stat-label">Pending Approvals</p>
-    </div>
-  </div>
+      {/* Statistics Cards - ONLY 2 CARDS */}
+      <div className="dp-stats-grid">
+        {/* Total Pending */}
+        <div className="dp-stat-card">
+          <div className="dp-stat-icon dp-stat-icon-warning">
+            <i className="bi bi-hourglass-split"></i>
+          </div>
+          <div className="dp-stat-content">
+            <h3 className="dp-stat-value">{pendingRequests.length}</h3>
+            <p className="dp-stat-label">Pending Approvals</p>
+          </div>
+        </div>
 
-  {/* Total Approved */}
-  <div className="dp-stat-card">
-    <div className="dp-stat-icon dp-stat-icon-success">
-      <i className="bi bi-check-circle-fill"></i>
-    </div>
-    <div className="dp-stat-content">
-      <h3 className="dp-stat-value">{approvedRequests.length}</h3>
-      <p className="dp-stat-label">Approved Employees</p>
-    </div>
-  </div>
-</div>
-
+        {/* Total Approved */}
+        <div className="dp-stat-card">
+          <div className="dp-stat-icon dp-stat-icon-success">
+            <i className="bi bi-check-circle-fill"></i>
+          </div>
+          <div className="dp-stat-content">
+            <h3 className="dp-stat-value">{approvedRequests.length}</h3>
+            <p className="dp-stat-label">Approved Employees</p>
+          </div>
+        </div>
+      </div>
 
       {/* Data Table */}
       <div className="dp-table-card">
@@ -915,9 +947,18 @@ export default function DeptHeadPage() {
             <tbody>
               {getPaginatedData().length === 0 ? (
                 <tr>
-                  <td colSpan={activeTab === "approved" ? "8" : "7"} className="dp-empty-state">
+                  <td
+                    colSpan={activeTab === "approved" ? "8" : "7"}
+                    className="dp-empty-state"
+                  >
                     <i className="bi bi-inbox"></i>
-                    <p>No {activeTab === "pending" ? "pending approvals" : "approved employees"} found</p>
+                    <p>
+                      No{" "}
+                      {activeTab === "pending"
+                        ? "pending approvals"
+                        : "approved employees"}{" "}
+                      found
+                    </p>
                   </td>
                 </tr>
               ) : (
@@ -927,38 +968,44 @@ export default function DeptHeadPage() {
                       {/* Employee Info */}
                       <td>
                         <div className="dp-user-info">
-                          <div className="dp-user-avatar">{getInitials(emp.employeeName)}</div>
+                          <div className="dp-user-avatar">
+                            {getInitials(emp.employeeName)}
+                          </div>
                           <div>
-                            <span className="dp-user-name">{emp.employeeName}</span>
-                            <small className="dp-user-id">@{emp.employeeCompanyId}</small>
+                            <span className="dp-user-name">
+                              {emp.employeeName}
+                            </span>
+                            <small className="dp-user-id">
+                              @{emp.employeeCompanyId}
+                            </small>
                           </div>
                         </div>
                       </td>
-                      
+
                       {/* Project */}
                       <td>{emp.projectName}</td>
-                      
+
                       {/* Avg Emp Rating */}
                       <td>
                         <span className="dp-rating-badge emp-rating">
                           {getAvgRating(emp.competencies, "employeeRating")}
                         </span>
                       </td>
-                      
+
                       {/* Avg L1 Rating */}
                       <td>
                         <span className="dp-rating-badge l1-rating">
                           {getAvgRating(emp.competencies, "l1Rating")}
                         </span>
                       </td>
-                      
+
                       {/* Avg L2 Rating */}
                       <td>
                         <span className="dp-rating-badge l2-rating">
                           {getAvgRating(emp.competencies, "l2Rating")}
                         </span>
                       </td>
-                      
+
                       {/* Goals */}
                       <td>
                         <span className="dp-goals-badge">
@@ -966,12 +1013,14 @@ export default function DeptHeadPage() {
                           {emp.goals?.length || 0}
                         </span>
                       </td>
-                      
+
                       {/* Approved At (only in approved tab) */}
                       {activeTab === "approved" && (
-                        <td className="text-muted">{formatDate(emp.approvedAt)}</td>
+                        <td className="text-muted">
+                          {formatDate(emp.approvedAt)}
+                        </td>
                       )}
-                      
+
                       {/* Actions */}
                       <td>
                         <div className="dp-action-buttons">
@@ -1014,7 +1063,6 @@ export default function DeptHeadPage() {
         {/* Pagination */}
         {filteredData.length > 0 && (
           <div className="dp-pagination-container">
-            
             {/* Rows Per Page Selector */}
             <div className="dp-pagination-info">
               <span className="dp-pagination-label">Show</span>
@@ -1043,10 +1091,16 @@ export default function DeptHeadPage() {
             {/* Pagination Navigation */}
             <nav className="dp-pagination-nav">
               <ul className="dp-pagination">
-                <li className={`dp-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <li
+                  className={`dp-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="dp-page-link"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     <i className="bi bi-chevron-left"></i>
@@ -1062,7 +1116,9 @@ export default function DeptHeadPage() {
                   >
                     <button
                       className="dp-page-link"
-                      onClick={() => typeof page === "number" && setCurrentPage(page)}
+                      onClick={() =>
+                        typeof page === "number" && setCurrentPage(page)
+                      }
                       disabled={typeof page !== "number"}
                     >
                       {page}
@@ -1070,10 +1126,16 @@ export default function DeptHeadPage() {
                   </li>
                 ))}
 
-                <li className={`dp-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <li
+                  className={`dp-page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="dp-page-link"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     <i className="bi bi-chevron-right"></i>

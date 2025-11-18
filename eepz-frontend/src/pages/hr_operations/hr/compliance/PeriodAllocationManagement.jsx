@@ -88,7 +88,8 @@ const PeriodAllocationManagement = () => {
 
   const fetchPeriodAllocations = async (budgetId) => {
     try {
-      const response = await periodAllocationService.getPeriodAllocationsByBudget(budgetId);
+      const response =
+        await periodAllocationService.getPeriodAllocationsByBudget(budgetId);
 
       if (response.success) {
         const data = response.data || [];
@@ -103,8 +104,12 @@ const PeriodAllocationManagement = () => {
   };
 
   const generateFilterOptions = (data) => {
-    const years = [...new Set(data.map((p) => p.periodYear))].sort((a, b) => b - a);
-    const periods = [...new Set(data.map((p) => p.period).filter(Boolean))].sort();
+    const years = [...new Set(data.map((p) => p.periodYear))].sort(
+      (a, b) => b - a
+    );
+    const periods = [
+      ...new Set(data.map((p) => p.period).filter(Boolean)),
+    ].sort();
 
     setFilterOptions({
       years,
@@ -120,13 +125,17 @@ const PeriodAllocationManagement = () => {
       const query = filters.search.toLowerCase();
       filtered = filtered.filter((p) => {
         const period = (p.period || "").toLowerCase();
-        return period.includes(query) || p.periodYear?.toString().includes(query);
+        return (
+          period.includes(query) || p.periodYear?.toString().includes(query)
+        );
       });
     }
 
     // Year filter
     if (filters.year !== "all") {
-      filtered = filtered.filter((p) => p.periodYear === parseInt(filters.year));
+      filtered = filtered.filter(
+        (p) => p.periodYear === parseInt(filters.year)
+      );
     }
 
     // Period filter
@@ -263,7 +272,10 @@ const PeriodAllocationManagement = () => {
       period.subAllocationCount || 0,
     ]);
 
-    const csvContent = [headers.join(","), ...csvData.map((row) => row.join(","))].join("\n");
+    const csvContent = [
+      headers.join(","),
+      ...csvData.map((row) => row.join(",")),
+    ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -311,12 +323,16 @@ const PeriodAllocationManagement = () => {
   };
 
   const handleDeletePeriod = async (periodId) => {
-    if (!window.confirm("Are you sure you want to delete this period allocation?")) {
+    if (
+      !window.confirm("Are you sure you want to delete this period allocation?")
+    ) {
       return;
     }
 
     try {
-      const response = await periodAllocationService.deletePeriodAllocation(periodId);
+      const response = await periodAllocationService.deletePeriodAllocation(
+        periodId
+      );
 
       if (response.success) {
         toast.success("Period allocation deleted successfully");
@@ -356,13 +372,24 @@ const PeriodAllocationManagement = () => {
 
   // Calculate summary statistics
   const summaryStats = {
-    totalAllocated: filteredPeriods.reduce((sum, p) => sum + (p.allocatedAmount || 0), 0),
-    totalUtilized: filteredPeriods.reduce((sum, p) => sum + (p.utilizedAmount || 0), 0),
-    totalRemaining: filteredPeriods.reduce((sum, p) => sum + (p.remainingAmount || 0), 0),
+    totalAllocated: filteredPeriods.reduce(
+      (sum, p) => sum + (p.allocatedAmount || 0),
+      0
+    ),
+    totalUtilized: filteredPeriods.reduce(
+      (sum, p) => sum + (p.utilizedAmount || 0),
+      0
+    ),
+    totalRemaining: filteredPeriods.reduce(
+      (sum, p) => sum + (p.remainingAmount || 0),
+      0
+    ),
     avgUtilization:
       filteredPeriods.length > 0
-        ? filteredPeriods.reduce((sum, p) => sum + (p.utilizationPercentage || 0), 0) /
-          filteredPeriods.length
+        ? filteredPeriods.reduce(
+            (sum, p) => sum + (p.utilizationPercentage || 0),
+            0
+          ) / filteredPeriods.length
         : 0,
   };
 
@@ -399,7 +426,11 @@ const PeriodAllocationManagement = () => {
         </div>
 
         <div className="period-header-actions">
-          <button className="period-btn-export" onClick={exportToCSV} title="Export to CSV">
+          <button
+            className="period-btn-export"
+            onClick={exportToCSV}
+            title="Export to CSV"
+          >
             <i className="bi bi-download"></i>
             Export
           </button>
@@ -421,7 +452,9 @@ const PeriodAllocationManagement = () => {
           className="budget-selector-dropdown"
           value={selectedBudget?.budgetId || ""}
           onChange={(e) => {
-            const budget = budgets.find((b) => b.budgetId === parseInt(e.target.value));
+            const budget = budgets.find(
+              (b) => b.budgetId === parseInt(e.target.value)
+            );
             setSelectedBudget(budget);
           }}
         >
@@ -430,7 +463,8 @@ const PeriodAllocationManagement = () => {
           ) : (
             budgets.map((budget) => (
               <option key={budget.budgetId} value={budget.budgetId}>
-                {budget.departmentName} - FY {budget.fiscalYear} ({formatCurrency(budget.totalBudget)})
+                {budget.departmentName} - FY {budget.fiscalYear} (
+                {formatCurrency(budget.totalBudget)})
               </option>
             ))
           )}
@@ -448,7 +482,9 @@ const PeriodAllocationManagement = () => {
                 </div>
                 <div className="summary-card-content">
                   <span className="summary-card-label">Total Allocated</span>
-                  <span className="summary-card-value">{formatCurrency(summaryStats.totalAllocated)}</span>
+                  <span className="summary-card-value">
+                    {formatCurrency(summaryStats.totalAllocated)}
+                  </span>
                 </div>
               </div>
 
@@ -458,7 +494,9 @@ const PeriodAllocationManagement = () => {
                 </div>
                 <div className="summary-card-content">
                   <span className="summary-card-label">Total Utilized</span>
-                  <span className="summary-card-value">{formatCurrency(summaryStats.totalUtilized)}</span>
+                  <span className="summary-card-value">
+                    {formatCurrency(summaryStats.totalUtilized)}
+                  </span>
                 </div>
               </div>
 
@@ -468,7 +506,9 @@ const PeriodAllocationManagement = () => {
                 </div>
                 <div className="summary-card-content">
                   <span className="summary-card-label">Total Remaining</span>
-                  <span className="summary-card-value">{formatCurrency(summaryStats.totalRemaining)}</span>
+                  <span className="summary-card-value">
+                    {formatCurrency(summaryStats.totalRemaining)}
+                  </span>
                 </div>
               </div>
 
@@ -478,7 +518,9 @@ const PeriodAllocationManagement = () => {
                 </div>
                 <div className="summary-card-content">
                   <span className="summary-card-label">Avg Utilization</span>
-                  <span className="summary-card-value">{summaryStats.avgUtilization.toFixed(1)}%</span>
+                  <span className="summary-card-value">
+                    {summaryStats.avgUtilization.toFixed(1)}%
+                  </span>
                 </div>
               </div>
             </div>
@@ -495,14 +537,18 @@ const PeriodAllocationManagement = () => {
                 {/* VIEW TOGGLE BUTTONS */}
                 <div className="period-view-toggle">
                   <button
-                    className={`toggle-btn ${viewType === "card" ? "active" : ""}`}
+                    className={`toggle-btn ${
+                      viewType === "card" ? "active" : ""
+                    }`}
                     onClick={() => setViewType("card")}
                     title="Card View"
                   >
                     <i className="bi bi-grid-3x2-gap"></i>
                   </button>
                   <button
-                    className={`toggle-btn ${viewType === "table" ? "active" : ""}`}
+                    className={`toggle-btn ${
+                      viewType === "table" ? "active" : ""
+                    }`}
                     onClick={() => setViewType("table")}
                     title="Table View"
                   >
@@ -511,7 +557,11 @@ const PeriodAllocationManagement = () => {
                 </div>
 
                 {/* CLEAR BUTTON */}
-                <button className="btn-clear-filters" onClick={clearFilters} title="Clear all filters">
+                <button
+                  className="btn-clear-filters"
+                  onClick={clearFilters}
+                  title="Clear all filters"
+                >
                   <i className="bi bi-x-circle"></i> Clear
                 </button>
               </div>
@@ -612,7 +662,9 @@ const PeriodAllocationManagement = () => {
                       </div>
                       <div className="period-card-header-info">
                         <h5 className="period-card-title">{period.period}</h5>
-                        <p className="period-card-year">Year {period.periodYear}</p>
+                        <p className="period-card-year">
+                          Year {period.periodYear}
+                        </p>
                       </div>
                     </div>
 
@@ -620,29 +672,43 @@ const PeriodAllocationManagement = () => {
                     <div className="period-card-body">
                       <div className="period-card-row">
                         <span className="period-card-label">Allocated</span>
-                        <span className="period-card-value">{formatCurrency(period.allocatedAmount)}</span>
+                        <span className="period-card-value">
+                          {formatCurrency(period.allocatedAmount)}
+                        </span>
                       </div>
 
                       <div className="period-card-row">
                         <span className="period-card-label">Utilized</span>
-                        <span className="period-card-value">{formatCurrency(period.utilizedAmount)}</span>
+                        <span className="period-card-value">
+                          {formatCurrency(period.utilizedAmount)}
+                        </span>
                       </div>
 
                       <div className="period-card-row">
                         <span className="period-card-label">Remaining</span>
-                        <span className="period-card-value">{formatCurrency(period.remainingAmount)}</span>
+                        <span className="period-card-value">
+                          {formatCurrency(period.remainingAmount)}
+                        </span>
                       </div>
 
                       <div className="period-card-row">
                         <span className="period-card-label">Utilization</span>
-                        <span className={getUtilizationBadgeClass(period.utilizationPercentage)}>
+                        <span
+                          className={getUtilizationBadgeClass(
+                            period.utilizationPercentage
+                          )}
+                        >
                           {period.utilizationPercentage || 0}%
                         </span>
                       </div>
 
                       <div className="period-card-row">
-                        <span className="period-card-label">Sub-Allocations</span>
-                        <span className="period-card-value">{period.subAllocationCount || 0}</span>
+                        <span className="period-card-label">
+                          Sub-Allocations
+                        </span>
+                        <span className="period-card-value">
+                          {period.subAllocationCount || 0}
+                        </span>
                       </div>
 
                       {period.notes && (
@@ -682,7 +748,9 @@ const PeriodAllocationManagement = () => {
                       </button>
                       <button
                         className="period-btn-card-action period-btn-delete"
-                        onClick={() => handleDeletePeriod(period.periodAllocationId)}
+                        onClick={() =>
+                          handleDeletePeriod(period.periodAllocationId)
+                        }
                         title="Delete"
                       >
                         <i className="bi bi-trash"></i>
@@ -697,7 +765,9 @@ const PeriodAllocationManagement = () => {
               {totalPages > 1 && (
                 <div className="pagination-container">
                   <div className="pagination-left">
-                    <label className="pagination-label">Records per page:</label>
+                    <label className="pagination-label">
+                      Records per page:
+                    </label>
                     <select
                       value={itemsPerPage}
                       onChange={handleItemsPerPageChange}
@@ -714,7 +784,8 @@ const PeriodAllocationManagement = () => {
                     <span className="pagination-info">
                       Page {currentPage} of {totalPages} | Showing{" "}
                       {Math.min(startIndex + 1, filteredPeriods.length)}-
-                      {Math.min(endIndex, filteredPeriods.length)} of {filteredPeriods.length}
+                      {Math.min(endIndex, filteredPeriods.length)} of{" "}
+                      {filteredPeriods.length}
                     </span>
                   </div>
 
@@ -729,11 +800,16 @@ const PeriodAllocationManagement = () => {
 
                     <div className="pagination-numbers">
                       {Array.from({ length: totalPages }, (_, i) => i + 1)
-                        .slice(Math.max(0, currentPage - 2), Math.min(totalPages, currentPage + 1))
+                        .slice(
+                          Math.max(0, currentPage - 2),
+                          Math.min(totalPages, currentPage + 1)
+                        )
                         .map((page) => (
                           <button
                             key={page}
-                            className={`pagination-number ${currentPage === page ? "active" : ""}`}
+                            className={`pagination-number ${
+                              currentPage === page ? "active" : ""
+                            }`}
                             onClick={() => goToPage(page)}
                           >
                             {page}
@@ -759,19 +835,34 @@ const PeriodAllocationManagement = () => {
                 <table className="period-table">
                   <thead>
                     <tr>
-                      <th onClick={() => handleSort("period")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("period")}
+                        className="period-sortable-header"
+                      >
                         Period {getSortIcon("period")}
                       </th>
-                      <th onClick={() => handleSort("periodYear")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("periodYear")}
+                        className="period-sortable-header"
+                      >
                         Year {getSortIcon("periodYear")}
                       </th>
-                      <th onClick={() => handleSort("allocatedAmount")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("allocatedAmount")}
+                        className="period-sortable-header"
+                      >
                         Allocated {getSortIcon("allocatedAmount")}
                       </th>
-                      <th onClick={() => handleSort("utilizedAmount")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("utilizedAmount")}
+                        className="period-sortable-header"
+                      >
                         Utilized {getSortIcon("utilizedAmount")}
                       </th>
-                      <th onClick={() => handleSort("remainingAmount")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("remainingAmount")}
+                        className="period-sortable-header"
+                      >
                         Remaining {getSortIcon("remainingAmount")}
                       </th>
                       <th
@@ -805,7 +896,9 @@ const PeriodAllocationManagement = () => {
                               className="period-progress-bar"
                               style={{
                                 width: `${period.utilizationPercentage || 0}%`,
-                                backgroundColor: getUtilizationColor(period.utilizationPercentage),
+                                backgroundColor: getUtilizationColor(
+                                  period.utilizationPercentage
+                                ),
                               }}
                             ></div>
                             <span className="period-progress-text">
@@ -813,7 +906,9 @@ const PeriodAllocationManagement = () => {
                             </span>
                           </div>
                         </td>
-                        <td className="period-text-center">{period.subAllocationCount || 0}</td>
+                        <td className="period-text-center">
+                          {period.subAllocationCount || 0}
+                        </td>
                         <td>
                           <div className="period-actions">
                             <button
@@ -840,7 +935,9 @@ const PeriodAllocationManagement = () => {
                             </button>
                             <button
                               className="period-btn-delete"
-                              onClick={() => handleDeletePeriod(period.periodAllocationId)}
+                              onClick={() =>
+                                handleDeletePeriod(period.periodAllocationId)
+                              }
                               title="Delete"
                             >
                               <i className="bi bi-trash"></i>
@@ -857,7 +954,9 @@ const PeriodAllocationManagement = () => {
               {totalPages > 1 && (
                 <div className="pagination-container">
                   <div className="pagination-left">
-                    <label className="pagination-label">Records per page:</label>
+                    <label className="pagination-label">
+                      Records per page:
+                    </label>
                     <select
                       value={itemsPerPage}
                       onChange={handleItemsPerPageChange}
@@ -874,7 +973,8 @@ const PeriodAllocationManagement = () => {
                     <span className="pagination-info">
                       Page {currentPage} of {totalPages} | Showing{" "}
                       {Math.min(startIndex + 1, filteredPeriods.length)}-
-                      {Math.min(endIndex, filteredPeriods.length)} of {filteredPeriods.length}
+                      {Math.min(endIndex, filteredPeriods.length)} of{" "}
+                      {filteredPeriods.length}
                     </span>
                   </div>
 
@@ -889,11 +989,16 @@ const PeriodAllocationManagement = () => {
 
                     <div className="pagination-numbers">
                       {Array.from({ length: totalPages }, (_, i) => i + 1)
-                        .slice(Math.max(0, currentPage - 2), Math.min(totalPages, currentPage + 1))
+                        .slice(
+                          Math.max(0, currentPage - 2),
+                          Math.min(totalPages, currentPage + 1)
+                        )
                         .map((page) => (
                           <button
                             key={page}
-                            className={`pagination-number ${currentPage === page ? "active" : ""}`}
+                            className={`pagination-number ${
+                              currentPage === page ? "active" : ""
+                            }`}
                             onClick={() => goToPage(page)}
                           >
                             {page}
@@ -944,7 +1049,10 @@ const PeriodAllocationManagement = () => {
       )}
 
       {showDetailsModal && selectedPeriod && (
-        <ViewPeriodDetailsModal period={selectedPeriod} onClose={() => setShowDetailsModal(false)} />
+        <ViewPeriodDetailsModal
+          period={selectedPeriod}
+          onClose={() => setShowDetailsModal(false)}
+        />
       )}
 
       {/* BLUR BACKDROP */}
@@ -952,7 +1060,10 @@ const PeriodAllocationManagement = () => {
         className="period-blur-backdrop"
         style={{
           display:
-            showCreatePeriodModal || showUpdatePeriodModal || showAllocateModal || showDetailsModal
+            showCreatePeriodModal ||
+            showUpdatePeriodModal ||
+            showAllocateModal ||
+            showDetailsModal
               ? "block"
               : "none",
         }}

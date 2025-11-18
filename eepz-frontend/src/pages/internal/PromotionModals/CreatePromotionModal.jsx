@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import promotionService from "../../../services/internal/promotionService";
 import internalOpportunityService from "../../../services/internal/internalOpportunityService";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import "../../../styles/internal/NominationModal.css";
 
 const CreatePromotionModal = ({
@@ -228,7 +228,8 @@ const CreatePromotionModal = ({
                   {selectedNomination && (
                     <div className="info-section">
                       <p>
-                        <strong>Nominee:</strong> {selectedNomination.nomineeName}
+                        <strong>Nominee:</strong>{" "}
+                        {selectedNomination.nomineeName}
                       </p>
                       <p>
                         <strong>Opportunity:</strong>{" "}
@@ -251,7 +252,10 @@ const CreatePromotionModal = ({
                     >
                       <option value="">-- Select Department --</option>
                       {departments.map((dept) => (
-                        <option key={dept.departmentId} value={dept.departmentId}>
+                        <option
+                          key={dept.departmentId}
+                          value={dept.departmentId}
+                        >
                           {dept.departmentName}
                         </option>
                       ))}
@@ -313,7 +317,9 @@ const CreatePromotionModal = ({
                       onChange={handleChange}
                     />
                     {errors.promotionDate && (
-                      <div className="error-message">{errors.promotionDate}</div>
+                      <div className="error-message">
+                        {errors.promotionDate}
+                      </div>
                     )}
                   </div>
 
@@ -333,7 +339,9 @@ const CreatePromotionModal = ({
                       maxLength={500}
                     />
                     {errors.justification && (
-                      <div className="error-message">{errors.justification}</div>
+                      <div className="error-message">
+                        {errors.justification}
+                      </div>
                     )}
                   </div>
                 </div>

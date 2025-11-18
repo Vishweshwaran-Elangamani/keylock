@@ -6,7 +6,6 @@ import EditPolicyModal from "../modals/EditPolicyModal";
 import { Alert, Spinner } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/policyManagement.css";
 
-
 const PolicyManagement = () => {
   const [policies, setPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +13,6 @@ const PolicyManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState(null);
   const [alert, setAlert] = useState(null);
-
 
   // Sonner toast function
   const enqueueToast = (variant, message) => {
@@ -37,17 +35,14 @@ const PolicyManagement = () => {
     }
   };
 
-
   useEffect(() => {
     fetchPolicies();
   }, []);
-
 
   const showAlert = (type, message) => {
     setAlert({ type, message });
     setTimeout(() => setAlert(null), 3000);
   };
-
 
   const fetchPolicies = async () => {
     try {
@@ -63,12 +58,10 @@ const PolicyManagement = () => {
     }
   };
 
-
   const handleAddSuccess = () => {
     setShowAddModal(false);
     fetchPolicies();
   };
-
 
   const handleEditSuccess = () => {
     setShowEditModal(false);
@@ -76,12 +69,10 @@ const PolicyManagement = () => {
     fetchPolicies();
   };
 
-
   const handleView = (policy) => {
     setSelectedPolicy(policy);
     setShowEditModal(true);
   };
-
 
   const handleDelete = async (policyId) => {
     try {
@@ -92,7 +83,6 @@ const PolicyManagement = () => {
       enqueueToast("danger", "Failed to delete policy");
     }
   };
-
 
   //  PUBLISH POLICY
   const handlePublish = async (policyId) => {
@@ -105,7 +95,6 @@ const PolicyManagement = () => {
       enqueueToast("danger", "Failed to publish policy");
     }
   };
-
 
   //  NEW: UNPUBLISH POLICY
   const handleUnpublish = async (policyId) => {
@@ -122,7 +111,6 @@ const PolicyManagement = () => {
     }
   };
 
-
   const getStatusBadgeClass = (status) => {
     switch (status?.toLowerCase()) {
       case "active":
@@ -136,7 +124,6 @@ const PolicyManagement = () => {
     }
   };
 
-
   if (loading) {
     return (
       <div className="pm-loading-container">
@@ -145,7 +132,6 @@ const PolicyManagement = () => {
       </div>
     );
   }
-
 
   return (
     <div className="pm-root">
@@ -159,7 +145,6 @@ const PolicyManagement = () => {
           {alert.message}
         </Alert>
       )}
-
 
       {/* Header */}
       <div className="pm-header">
@@ -177,7 +162,6 @@ const PolicyManagement = () => {
           Add New Policy
         </button>
       </div>
-
 
       {/* Policies Table */}
       <div className="pm-table-container">
@@ -247,7 +231,6 @@ const PolicyManagement = () => {
                       </button>
                     )}
 
-
                     {/*  UNPUBLISH BUTTON - Only for Published */}
                     {policy.isPublished && (
                       <button
@@ -258,7 +241,6 @@ const PolicyManagement = () => {
                         <i className="bi bi-eye-slash"></i>
                       </button>
                     )}
-
 
                     <button
                       className="pm-btn-icon pm-btn-view"
@@ -282,12 +264,10 @@ const PolicyManagement = () => {
         </table>
       </div>
 
-
       {/* Blur overlay when modal is open */}
       {(showAddModal || showEditModal) && (
         <div className="pm-blur-backdrop"></div>
       )}
-
 
       {/* Add Policy Modal */}
       {showAddModal && (
@@ -298,7 +278,6 @@ const PolicyManagement = () => {
           onToast={enqueueToast}
         />
       )}
-
 
       {/* Edit Policy Modal */}
       {showEditModal && selectedPolicy && (
@@ -317,6 +296,5 @@ const PolicyManagement = () => {
     </div>
   );
 };
-
 
 export default PolicyManagement;

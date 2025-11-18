@@ -84,9 +84,7 @@ const Navbar = () => {
                   className="bi bi-person-circle"
                   style={{ fontSize: "1.5rem", color: "#97247E" }}
                 ></i>
-                <h6
-                  style={{ margin: 0, fontWeight: "bold", color: "#97247E" }}
-                >
+                <h6 style={{ margin: 0, fontWeight: "bold", color: "#97247E" }}>
                   Welcome, {displayName}
                 </h6>
               </div>

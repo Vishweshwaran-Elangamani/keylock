@@ -1,59 +1,74 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { 
-  RefreshCw, AlertTriangle, Eye, MessageSquare, 
-  FileText, Users, Send, Clock, User, Target, Star, Briefcase
-} from 'lucide-react';
-import { mentorFeedbackApi, peerQueueApi } from '../../../services/feedbackmanagement/feedbackApi';
-import ResponseViewModal from '../../../components/FeedbackManagement/ResponseViewModal';
-import axios from 'axios';
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import {
+  RefreshCw,
+  AlertTriangle,
+  Eye,
+  MessageSquare,
+  FileText,
+  Users,
+  Send,
+  Clock,
+  User,
+  Target,
+  Star,
+  Briefcase,
+} from "lucide-react";
+import {
+  mentorFeedbackApi,
+  peerQueueApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
+import ResponseViewModal from "../../../components/feedback_management/ResponseViewModal";
+import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5333/api';
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 // Robust date formatting helper
 const formatDate = (dateInput) => {
-  if (!dateInput) return '—';
-  
+  if (!dateInput) return "—";
+
   try {
     let dateObj;
-    
-    if (typeof dateInput === 'number') {
+
+    if (typeof dateInput === "number") {
       dateObj = new Date(dateInput);
-    } else if (typeof dateInput === 'string') {
-      const normalized = dateInput.includes(' ') && !dateInput.includes('T')
-        ? dateInput.replace(' ', 'T')
-        : dateInput;
+    } else if (typeof dateInput === "string") {
+      const normalized =
+        dateInput.includes(" ") && !dateInput.includes("T")
+          ? dateInput.replace(" ", "T")
+          : dateInput;
       dateObj = new Date(normalized);
     } else if (dateInput instanceof Date) {
       dateObj = dateInput;
     } else {
-      return '—';
+      return "—";
     }
-    
+
     if (isNaN(dateObj.getTime())) {
-      console.warn('Invalid date detected:', dateInput);
-      return 'Invalid Date';
+      console.warn("Invalid date detected:", dateInput);
+      return "Invalid Date";
     }
-    
-    return dateObj.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+
+    return dateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   } catch (err) {
-    console.error('Date formatting error:', err, dateInput);
-    return 'Invalid Date';
+    console.error("Date formatting error:", err, dateInput);
+    return "Invalid Date";
   }
 };
 
 // Calculate days ago safely
 const getDaysAgo = (dateInput) => {
   try {
-    const dateObj = typeof dateInput === 'string' 
-      ? new Date(dateInput.replace(' ', 'T')) 
-      : new Date(dateInput);
-    
+    const dateObj =
+      typeof dateInput === "string"
+        ? new Date(dateInput.replace(" ", "T"))
+        : new Date(dateInput);
+
     if (isNaN(dateObj.getTime())) return null;
-    
+
     const now = new Date();
     const diffMs = now - dateObj;
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -63,14 +78,28 @@ const getDaysAgo = (dateInput) => {
   }
 };
 
-const RATING_LABELS = { 1: 'Poor', 2: 'Fair', 3: 'Good', 4: 'Very Good', 5: 'Excellent' };
+const RATING_LABELS = {
+  1: "Poor",
+  2: "Fair",
+  3: "Good",
+  4: "Very Good",
+  5: "Excellent",
+};
 
 export default function ManageTeamSubmissions() {
-  const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}') || { empId: 1006, firstName: 'Department', lastName: 'Head' }, []);
-  
+  const user = useMemo(
+    () =>
+      JSON.parse(localStorage.getItem("user") || "{}") || {
+        empId: 1006,
+        firstName: "Department",
+        lastName: "Head",
+      },
+    []
+  );
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [tab, setTab] = useState('HRForms');
+  const [error, setError] = useState("");
+  const [tab, setTab] = useState("HRForms");
   const [hrForms, setHrForms] = useState([]);
   const [mentor, setMentor] = useState([]);
   const [peer, setPeer] = useState([]);
@@ -87,25 +116,32 @@ export default function ManageTeamSubmissions() {
   const fetchEmployeeData = useCallback(async () => {
     try {
       const response = await axios.get(`${API_BASE}/EmployeeManagement/all`);
-      
+
       if (response.data?.success && Array.isArray(response.data.data)) {
         const map = {};
         const deptEmps = [];
-        
-        response.data.data.forEach(emp => {
+
+        response.data.data.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
-          if (emp.departmentId === user?.departmentId || emp.employeeId !== user?.empId) {
+          if (
+            emp.departmentId === user?.departmentId ||
+            emp.employeeId !== user?.empId
+          ) {
             deptEmps.push(emp);
           }
         });
-        
+
         setEmployeeMap(map);
         setDepartmentEmployees(deptEmps);
-        console.log('Employee map loaded:', Object.keys(map).length, 'employees');
-        console.log('Department employees:', deptEmps.length);
+        console.log(
+          "Employee map loaded:",
+          Object.keys(map).length,
+          "employees"
+        );
+        console.log("Department employees:", deptEmps.length);
       }
     } catch (err) {
-      console.error('Error fetching employee data:', err.message);
+      console.error("Error fetching employee data:", err.message);
     }
   }, [user?.empId, user?.departmentId]);
 
@@ -114,17 +150,18 @@ export default function ManageTeamSubmissions() {
     try {
       const response = await axios.get(`${API_BASE}/Orgwideobjectives`);
       const objectivesData = response.data?.data || response.data || [];
-      
+
       if (Array.isArray(objectivesData)) {
         const map = {};
-        objectivesData.forEach(obj => {
-          map[obj.objectiveId] = obj.title || obj.objectiveName || `Objective ${obj.objectiveId}`;
+        objectivesData.forEach((obj) => {
+          map[obj.objectiveId] =
+            obj.title || obj.objectiveName || `Objective ${obj.objectiveId}`;
         });
         setObjectives(map);
-        console.log('Objectives loaded:', Object.keys(map).length);
+        console.log("Objectives loaded:", Object.keys(map).length);
       }
     } catch (err) {
-      console.error('Error fetching objectives:', err.message);
+      console.error("Error fetching objectives:", err.message);
     }
   }, []);
 
@@ -132,8 +169,8 @@ export default function ManageTeamSubmissions() {
   const fetchData = useCallback(async () => {
     setRefreshing(true);
     setLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
       if (departmentEmployees.length === 0) {
         setLoading(false);
@@ -141,27 +178,31 @@ export default function ManageTeamSubmissions() {
         return;
       }
 
-      const deptEmpIds = departmentEmployees.map(emp => emp.employeeId);
+      const deptEmpIds = departmentEmployees.map((emp) => emp.employeeId);
 
       // HR Forms
       try {
         const hrData = [];
         for (const empId of deptEmpIds) {
-          const hrRes = await axios.get(`${API_BASE}/HrFeedbackForm/responses/by-employee/${empId}`);
+          const hrRes = await axios.get(
+            `${API_BASE}/HrFeedbackForm/responses/by-employee/${empId}`
+          );
           if (hrRes.data?.success && Array.isArray(hrRes.data.data)) {
-            hrData.push(...hrRes.data.data.map(item => ({
-              ...item,
-              submittedByEmployeeId: empId,
-              submittedByName: employeeMap[empId] || `Employee ${empId}`,
-              submittedAtFormatted: formatDate(item.submittedAt),
-              daysAgo: getDaysAgo(item.submittedAt)
-            })));
+            hrData.push(
+              ...hrRes.data.data.map((item) => ({
+                ...item,
+                submittedByEmployeeId: empId,
+                submittedByName: employeeMap[empId] || `Employee ${empId}`,
+                submittedAtFormatted: formatDate(item.submittedAt),
+                daysAgo: getDaysAgo(item.submittedAt),
+              }))
+            );
           }
         }
         setHrForms(hrData);
-        console.log('HR forms loaded:', hrData.length);
+        console.log("HR forms loaded:", hrData.length);
       } catch (hrErr) {
-        console.warn('HR feedback API error:', hrErr.message);
+        console.warn("HR feedback API error:", hrErr.message);
         setHrForms([]);
       }
 
@@ -171,78 +212,97 @@ export default function ManageTeamSubmissions() {
         for (const empId of deptEmpIds) {
           const mentorRes = await mentorFeedbackApi.myFeedback(empId);
           if (Array.isArray(mentorRes.data?.data)) {
-            mentorData.push(...mentorRes.data.data.map(m => ({
-              ...m,
-              submittedByEmployeeId: empId,
-              submittedByName: employeeMap[empId] || `Employee ${empId}`,
-              mentorNameFull: employeeMap[m.mentorEmployeeId] || `Employee ${m.mentorEmployeeId}`,
-              createdAtFormatted: formatDate(m.createdAt)
-            })));
+            mentorData.push(
+              ...mentorRes.data.data.map((m) => ({
+                ...m,
+                submittedByEmployeeId: empId,
+                submittedByName: employeeMap[empId] || `Employee ${empId}`,
+                mentorNameFull:
+                  employeeMap[m.mentorEmployeeId] ||
+                  `Employee ${m.mentorEmployeeId}`,
+                createdAtFormatted: formatDate(m.createdAt),
+              }))
+            );
           }
         }
         setMentor(mentorData);
-        console.log('Mentor feedback loaded:', mentorData.length);
+        console.log("Mentor feedback loaded:", mentorData.length);
       } catch (mentorErr) {
-        console.warn('Mentor feedback API error:', mentorErr.message);
+        console.warn("Mentor feedback API error:", mentorErr.message);
         setMentor([]);
       }
 
       // Peer Feedback
       try {
         const peerRes = await peerQueueApi.list(1, 200);
-        const allPeer = Array.isArray(peerRes.data?.data) ? peerRes.data.data : [];
+        const allPeer = Array.isArray(peerRes.data?.data)
+          ? peerRes.data.data
+          : [];
         const peerData = allPeer
-          .filter(p => deptEmpIds.includes(Number(p.submittedByEmployeeId)))
-          .map(p => ({
+          .filter((p) => deptEmpIds.includes(Number(p.submittedByEmployeeId)))
+          .map((p) => ({
             ...p,
-            submittedByName: employeeMap[p.submittedByEmployeeId] || `Employee ${p.submittedByEmployeeId}`,
-            recipientNameFull: employeeMap[p.recipientEmployeeId] || `Employee ${p.recipientEmployeeId}`,
-            createdAtFormatted: formatDate(p.createdAt)
+            submittedByName:
+              employeeMap[p.submittedByEmployeeId] ||
+              `Employee ${p.submittedByEmployeeId}`,
+            recipientNameFull:
+              employeeMap[p.recipientEmployeeId] ||
+              `Employee ${p.recipientEmployeeId}`,
+            createdAtFormatted: formatDate(p.createdAt),
           }));
         setPeer(peerData);
-        console.log('Peer feedback loaded:', peerData.length);
+        console.log("Peer feedback loaded:", peerData.length);
       } catch (peerErr) {
-        console.warn('Peer feedback API error:', peerErr.message);
+        console.warn("Peer feedback API error:", peerErr.message);
         setPeer([]);
       }
 
       // Goal Feedback
       try {
-        console.log('Fetching goal feedback for department...');
-        
+        console.log("Fetching goal feedback for department...");
+
         const goalRes = await axios.get(`${API_BASE}/OrgGoalFeedback/all`, {
           params: {
             pageNumber: 1,
-            pageSize: 200
-          }
+            pageSize: 200,
+          },
         });
-        
+
         if (goalRes.data?.success && Array.isArray(goalRes.data.data)) {
           const deptGoals = goalRes.data.data
-            .filter(g => deptEmpIds.includes(Number(g.submittedByEmployeeId)))
-            .map(g => ({
+            .filter((g) => deptEmpIds.includes(Number(g.submittedByEmployeeId)))
+            .map((g) => ({
               ...g,
-              objectiveTitle: g.organizationGoalName || objectives[g.organizationObjectiveId] || `Objective #${g.organizationObjectiveId}`,
-              submittedByName: employeeMap[g.submittedByEmployeeId] || `Employee ${g.submittedByEmployeeId}`,
+              objectiveTitle:
+                g.organizationGoalName ||
+                objectives[g.organizationObjectiveId] ||
+                `Objective #${g.organizationObjectiveId}`,
+              submittedByName:
+                employeeMap[g.submittedByEmployeeId] ||
+                `Employee ${g.submittedByEmployeeId}`,
               submittedAtFormatted: formatDate(g.createdAt),
               daysAgo: getDaysAgo(g.createdAt),
               feedbackId: g.orgGoalFeedbackId,
               rating: g.rating || 0,
-              feedbackComments: g.feedbackComments || ''
+              feedbackComments: g.feedbackComments || "",
             }));
-          
+
           setGoalFeedback(deptGoals);
-          console.log('Goal feedback loaded:', deptGoals.length, 'items');
+          console.log("Goal feedback loaded:", deptGoals.length, "items");
         } else {
           setGoalFeedback([]);
         }
       } catch (goalErr) {
-        console.error('Goal feedback API error:', goalErr.message);
+        console.error("Goal feedback API error:", goalErr.message);
         setGoalFeedback([]);
       }
     } catch (err) {
-      console.error('Fetch error:', err);
-      setError(err?.response?.data?.message || err.message || 'Failed to fetch submissions');
+      console.error("Fetch error:", err);
+      setError(
+        err?.response?.data?.message ||
+          err.message ||
+          "Failed to fetch submissions"
+      );
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -274,28 +334,46 @@ export default function ManageTeamSubmissions() {
   };
 
   const getActiveData = () => {
-    switch(tab) {
-      case 'HRForms': return hrForms;
-      case 'GoalFeedback': return goalFeedback;
-      case 'Mentor': return mentor;
-      case 'Peer': return peer;
-      default: return [];
+    switch (tab) {
+      case "HRForms":
+        return hrForms;
+      case "GoalFeedback":
+        return goalFeedback;
+      case "Mentor":
+        return mentor;
+      case "Peer":
+        return peer;
+      default:
+        return [];
     }
   };
 
   const activeData = getActiveData();
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8f9fa', padding: '2rem 1rem' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f8f9fa",
+        padding: "2rem 1rem",
+      }}
+    >
+      <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         {/* HEADER */}
-        <div className="d-flex justify-content-between align-items-center mb-4" style={{ flexWrap: 'wrap', gap: '1rem' }}>
+        <div
+          className="d-flex justify-content-between align-items-center mb-4"
+          style={{ flexWrap: "wrap", gap: "1rem" }}
+        >
           <div>
-            <h2 className="fw-bold mb-1" style={{ fontSize: '1.75rem', color: '#212529' }}>
+            <h2
+              className="fw-bold mb-1"
+              style={{ fontSize: "1.75rem", color: "#212529" }}
+            >
               Department Team Submissions
             </h2>
-            <p className="mb-0 text-muted" style={{ fontSize: '0.875rem' }}>
-              View all feedback from your department ({departmentEmployees.length} employees)
+            <p className="mb-0 text-muted" style={{ fontSize: "0.875rem" }}>
+              View all feedback from your department (
+              {departmentEmployees.length} employees)
             </p>
           </div>
           <button
@@ -306,77 +384,111 @@ export default function ManageTeamSubmissions() {
               fetchData();
             }}
             disabled={refreshing || loading}
-            style={{ borderRadius: '8px', padding: '10px 20px', fontWeight: 600, border: '2px solid #dee2e6' }}
+            style={{
+              borderRadius: "8px",
+              padding: "10px 20px",
+              fontWeight: 600,
+              border: "2px solid #dee2e6",
+            }}
           >
-            <RefreshCw size={18} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+            <RefreshCw
+              size={18}
+              style={{
+                animation: refreshing ? "spin 1s linear infinite" : "none",
+              }}
+            />
             Refresh
           </button>
         </div>
 
         {/* ERROR ALERT */}
         {error && (
-          <div className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-4" role="alert" style={{ borderRadius: '8px' }}>
+          <div
+            className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-4"
+            role="alert"
+            style={{ borderRadius: "8px" }}
+          >
             <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
             <div className="flex-grow-1">
               <strong>Error</strong>
               <p className="mb-0 small mt-1">{error}</p>
             </div>
-            <button type="button" className="btn-close" onClick={() => setError('')} />
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => setError("")}
+            />
           </div>
         )}
 
         {/* TABS - CLEAN CARD STYLE */}
-        <div style={{ 
-          background: 'white',
-          border: '1px solid #e5e7eb',
-          borderRadius: '12px',
-          padding: '1.5rem',
-          marginBottom: '1.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-        }}>
+        <div
+          style={{
+            background: "white",
+            border: "1px solid #e5e7eb",
+            borderRadius: "12px",
+            padding: "1.5rem",
+            marginBottom: "1.5rem",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          }}
+        >
           <div className="row g-3">
             {/* HR Forms Card */}
             <div className="col-md-6 col-lg-3">
               <button
                 type="button"
-                onClick={() => setTab('HRForms')}
+                onClick={() => setTab("HRForms")}
                 style={{
-                  width: '100%',
-                  background: tab === 'HRForms' ? '#97247E' : 'white',
-                  border: `2px solid ${tab === 'HRForms' ? '#97247E' : '#e5e7eb'}`,
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  textAlign: 'left'
+                  width: "100%",
+                  background: tab === "HRForms" ? "#97247E" : "white",
+                  border: `2px solid ${
+                    tab === "HRForms" ? "#97247E" : "#e5e7eb"
+                  }`,
+                  borderRadius: "10px",
+                  padding: "1.25rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  textAlign: "left",
                 }}
               >
                 <div className="d-flex align-items-center gap-3">
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '10px',
-                    background: tab === 'HRForms' ? 'rgba(255,255,255,0.2)' : '#97247E15',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <FileText size={24} style={{ color: tab === 'HRForms' ? 'white' : '#97247E' }} />
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "10px",
+                      background:
+                        tab === "HRForms"
+                          ? "rgba(255,255,255,0.2)"
+                          : "#97247E15",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <FileText
+                      size={24}
+                      style={{ color: tab === "HRForms" ? "white" : "#97247E" }}
+                    />
                   </div>
                   <div>
-                    <div style={{ 
-                      fontSize: '0.875rem', 
-                      fontWeight: 600,
-                      color: tab === 'HRForms' ? 'white' : '#6c757d',
-                      marginBottom: '4px'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: tab === "HRForms" ? "white" : "#6c757d",
+                        marginBottom: "4px",
+                      }}
+                    >
                       HR Forms
                     </div>
-                    <div style={{ 
-                      fontSize: '1.5rem', 
-                      fontWeight: 700,
-                      color: tab === 'HRForms' ? 'white' : '#212529'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: 700,
+                        color: tab === "HRForms" ? "white" : "#212529",
+                      }}
+                    >
                       {hrForms.length}
                     </div>
                   </div>
@@ -388,44 +500,60 @@ export default function ManageTeamSubmissions() {
             <div className="col-md-6 col-lg-3">
               <button
                 type="button"
-                onClick={() => setTab('GoalFeedback')}
+                onClick={() => setTab("GoalFeedback")}
                 style={{
-                  width: '100%',
-                  background: tab === 'GoalFeedback' ? '#97247E' : 'white',
-                  border: `2px solid ${tab === 'GoalFeedback' ? '#97247E' : '#e5e7eb'}`,
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  textAlign: 'left'
+                  width: "100%",
+                  background: tab === "GoalFeedback" ? "#97247E" : "white",
+                  border: `2px solid ${
+                    tab === "GoalFeedback" ? "#97247E" : "#e5e7eb"
+                  }`,
+                  borderRadius: "10px",
+                  padding: "1.25rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  textAlign: "left",
                 }}
               >
                 <div className="d-flex align-items-center gap-3">
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '10px',
-                    background: tab === 'GoalFeedback' ? 'rgba(255,255,255,0.2)' : '#97247E15',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Target size={24} style={{ color: tab === 'GoalFeedback' ? 'white' : '#97247E' }} />
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "10px",
+                      background:
+                        tab === "GoalFeedback"
+                          ? "rgba(255,255,255,0.2)"
+                          : "#97247E15",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Target
+                      size={24}
+                      style={{
+                        color: tab === "GoalFeedback" ? "white" : "#97247E",
+                      }}
+                    />
                   </div>
                   <div>
-                    <div style={{ 
-                      fontSize: '0.875rem', 
-                      fontWeight: 600,
-                      color: tab === 'GoalFeedback' ? 'white' : '#6c757d',
-                      marginBottom: '4px'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: tab === "GoalFeedback" ? "white" : "#6c757d",
+                        marginBottom: "4px",
+                      }}
+                    >
                       Goal Feedback
                     </div>
-                    <div style={{ 
-                      fontSize: '1.5rem', 
-                      fontWeight: 700,
-                      color: tab === 'GoalFeedback' ? 'white' : '#212529'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: 700,
+                        color: tab === "GoalFeedback" ? "white" : "#212529",
+                      }}
+                    >
                       {goalFeedback.length}
                     </div>
                   </div>
@@ -437,44 +565,58 @@ export default function ManageTeamSubmissions() {
             <div className="col-md-6 col-lg-3">
               <button
                 type="button"
-                onClick={() => setTab('Mentor')}
+                onClick={() => setTab("Mentor")}
                 style={{
-                  width: '100%',
-                  background: tab === 'Mentor' ? '#97247E' : 'white',
-                  border: `2px solid ${tab === 'Mentor' ? '#97247E' : '#e5e7eb'}`,
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  textAlign: 'left'
+                  width: "100%",
+                  background: tab === "Mentor" ? "#97247E" : "white",
+                  border: `2px solid ${
+                    tab === "Mentor" ? "#97247E" : "#e5e7eb"
+                  }`,
+                  borderRadius: "10px",
+                  padding: "1.25rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  textAlign: "left",
                 }}
               >
                 <div className="d-flex align-items-center gap-3">
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '10px',
-                    background: tab === 'Mentor' ? 'rgba(255,255,255,0.2)' : '#97247E15',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Send size={24} style={{ color: tab === 'Mentor' ? 'white' : '#97247E' }} />
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "10px",
+                      background:
+                        tab === "Mentor"
+                          ? "rgba(255,255,255,0.2)"
+                          : "#97247E15",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Send
+                      size={24}
+                      style={{ color: tab === "Mentor" ? "white" : "#97247E" }}
+                    />
                   </div>
                   <div>
-                    <div style={{ 
-                      fontSize: '0.875rem', 
-                      fontWeight: 600,
-                      color: tab === 'Mentor' ? 'white' : '#6c757d',
-                      marginBottom: '4px'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: tab === "Mentor" ? "white" : "#6c757d",
+                        marginBottom: "4px",
+                      }}
+                    >
                       Mentor
                     </div>
-                    <div style={{ 
-                      fontSize: '1.5rem', 
-                      fontWeight: 700,
-                      color: tab === 'Mentor' ? 'white' : '#212529'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: 700,
+                        color: tab === "Mentor" ? "white" : "#212529",
+                      }}
+                    >
                       {mentor.length}
                     </div>
                   </div>
@@ -486,44 +628,54 @@ export default function ManageTeamSubmissions() {
             <div className="col-md-6 col-lg-3">
               <button
                 type="button"
-                onClick={() => setTab('Peer')}
+                onClick={() => setTab("Peer")}
                 style={{
-                  width: '100%',
-                  background: tab === 'Peer' ? '#97247E' : 'white',
-                  border: `2px solid ${tab === 'Peer' ? '#97247E' : '#e5e7eb'}`,
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  textAlign: 'left'
+                  width: "100%",
+                  background: tab === "Peer" ? "#97247E" : "white",
+                  border: `2px solid ${tab === "Peer" ? "#97247E" : "#e5e7eb"}`,
+                  borderRadius: "10px",
+                  padding: "1.25rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  textAlign: "left",
                 }}
               >
                 <div className="d-flex align-items-center gap-3">
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '10px',
-                    background: tab === 'Peer' ? 'rgba(255,255,255,0.2)' : '#97247E15',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Users size={24} style={{ color: tab === 'Peer' ? 'white' : '#97247E' }} />
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      borderRadius: "10px",
+                      background:
+                        tab === "Peer" ? "rgba(255,255,255,0.2)" : "#97247E15",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Users
+                      size={24}
+                      style={{ color: tab === "Peer" ? "white" : "#97247E" }}
+                    />
                   </div>
                   <div>
-                    <div style={{ 
-                      fontSize: '0.875rem', 
-                      fontWeight: 600,
-                      color: tab === 'Peer' ? 'white' : '#6c757d',
-                      marginBottom: '4px'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: tab === "Peer" ? "white" : "#6c757d",
+                        marginBottom: "4px",
+                      }}
+                    >
                       Peer
                     </div>
-                    <div style={{ 
-                      fontSize: '1.5rem', 
-                      fontWeight: 700,
-                      color: tab === 'Peer' ? 'white' : '#212529'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: 700,
+                        color: tab === "Peer" ? "white" : "#212529",
+                      }}
+                    >
                       {peer.length}
                     </div>
                   </div>
@@ -536,323 +688,498 @@ export default function ManageTeamSubmissions() {
         {/* CONTENT AREA */}
         {loading ? (
           <div className="text-center py-5">
-            <div className="spinner-border" style={{ width: '3rem', height: '3rem', color: '#97247E', borderWidth: '3px' }} role="status">
+            <div
+              className="spinner-border"
+              style={{
+                width: "3rem",
+                height: "3rem",
+                color: "#97247E",
+                borderWidth: "3px",
+              }}
+              role="status"
+            >
               <span className="visually-hidden">Loading...</span>
             </div>
             <p className="text-muted mt-3 fw-medium">Loading submissions...</p>
           </div>
         ) : activeData.length === 0 ? (
-          <div style={{ 
-            background: 'white',
-            border: '1px solid #e5e7eb',
-            borderRadius: '12px',
-            padding: '3rem',
-            textAlign: 'center'
-          }}>
-            <AlertTriangle size={48} style={{ color: '#cbd5e1', marginBottom: '1rem' }} />
-            <h5 className="fw-bold mb-2" style={{ color: '#6c757d' }}>No Submissions Yet</h5>
-            <p className="text-muted mb-0">There are no submissions from your department in this category.</p>
+          <div
+            style={{
+              background: "white",
+              border: "1px solid #e5e7eb",
+              borderRadius: "12px",
+              padding: "3rem",
+              textAlign: "center",
+            }}
+          >
+            <AlertTriangle
+              size={48}
+              style={{ color: "#cbd5e1", marginBottom: "1rem" }}
+            />
+            <h5 className="fw-bold mb-2" style={{ color: "#6c757d" }}>
+              No Submissions Yet
+            </h5>
+            <p className="text-muted mb-0">
+              There are no submissions from your department in this category.
+            </p>
           </div>
         ) : (
           <div className="row g-3">
             {/* HR FORMS */}
-            {tab === 'HRForms' && hrForms.map((hr) => {
-              const statusColor = hr.status === 'Reviewed' ? '#198754' : hr.status === 'Submitted' ? '#97247E' : '#ffc107';
-              return (
-                <div className="col-md-6 col-lg-4" key={hr.responseId}>
-                  <div style={{ 
-                    background: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderLeft: `4px solid ${statusColor}`,
-                    borderRadius: '10px',
-                    padding: '1.25rem',
-                    height: '100%',
-                    transition: 'box-shadow 0.2s',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-                  onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
+            {tab === "HRForms" &&
+              hrForms.map((hr) => {
+                const statusColor =
+                  hr.status === "Reviewed"
+                    ? "#198754"
+                    : hr.status === "Submitted"
+                    ? "#97247E"
+                    : "#ffc107";
+                return (
+                  <div className="col-md-6 col-lg-4" key={hr.responseId}>
+                    <div
+                      style={{
+                        background: "white",
+                        border: "1px solid #e5e7eb",
+                        borderLeft: `4px solid ${statusColor}`,
+                        borderRadius: "10px",
+                        padding: "1.25rem",
+                        height: "100%",
+                        transition: "box-shadow 0.2s",
+                        cursor: "pointer",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.boxShadow =
+                          "0 4px 12px rgba(0,0,0,0.15)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.boxShadow = "none")
+                      }
+                    >
+                      <div className="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                          <div
+                            style={{
+                              fontSize: "0.75rem",
+                              color: "#6c757d",
+                              marginBottom: "4px",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {hr.submittedByName}
+                          </div>
+                          <h6
+                            className="mb-0 fw-bold"
+                            style={{ fontSize: "1rem", color: "#212529" }}
+                          >
+                            {hr.formName || "HR Form"}
+                          </h6>
+                        </div>
+                        <span
+                          style={{
+                            display: "inline-block",
+                            backgroundColor: `${statusColor}15`,
+                            color: statusColor,
+                            padding: "4px 10px",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            borderRadius: "6px",
+                            border: `1.5px solid ${statusColor}40`,
+                          }}
+                        >
+                          {hr.status || "Draft"}
+                        </span>
+                      </div>
+
+                      <div className="mb-3">
+                        <div
+                          className="d-flex align-items-center gap-2 text-muted"
+                          style={{ fontSize: "0.813rem" }}
+                        >
+                          <Clock size={14} />
+                          <span>{hr.submittedAtFormatted}</span>
+                          {hr.daysAgo !== null && (
+                            <span>({hr.daysAgo}d ago)</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {hr.status === "Reviewed" && hr.hrReviewComments && (
+                        <div
+                          className="mb-3"
+                          style={{
+                            background: "#f8f9fa",
+                            padding: "0.75rem",
+                            borderRadius: "6px",
+                            border: "1px solid #e9ecef",
+                          }}
+                        >
+                          <div className="d-flex align-items-center gap-1 mb-1">
+                            <MessageSquare
+                              size={12}
+                              style={{ color: "#6c757d" }}
+                            />
+                            <small
+                              style={{
+                                fontSize: "0.75rem",
+                                fontWeight: 600,
+                                color: "#6c757d",
+                              }}
+                            >
+                              HR Review:
+                            </small>
+                          </div>
+                          <p
+                            className="mb-0"
+                            style={{ fontSize: "0.813rem", color: "#495057" }}
+                          >
+                            {hr.hrReviewComments.substring(0, 80)}...
+                          </p>
+                        </div>
+                      )}
+
+                      <button
+                        className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                        onClick={() => handleViewResponse(hr, "HR")}
+                        style={{
+                          borderRadius: "6px",
+                          padding: "8px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        <Eye size={16} />
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+
+            {/* GOAL FEEDBACK */}
+            {tab === "GoalFeedback" &&
+              goalFeedback.map((goal) => (
+                <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
+                  <div
+                    style={{
+                      background: "white",
+                      border: "1px solid #e5e7eb",
+                      borderLeft: "4px solid #97247E",
+                      borderRadius: "10px",
+                      padding: "1.25rem",
+                      height: "100%",
+                      transition: "box-shadow 0.2s",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.boxShadow =
+                        "0 4px 12px rgba(0,0,0,0.15)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.boxShadow = "none")
+                    }
                   >
                     <div className="d-flex justify-content-between align-items-start mb-3">
                       <div>
-                        <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '4px', fontWeight: 600 }}>
-                          {hr.submittedByName}
+                        <div
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#6c757d",
+                            marginBottom: "4px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {goal.submittedByName}
                         </div>
-                        <h6 className="mb-0 fw-bold" style={{ fontSize: '1rem', color: '#212529' }}>
-                          {hr.formName || 'HR Form'}
+                        <h6
+                          className="mb-0 fw-bold"
+                          style={{ fontSize: "0.938rem", color: "#212529" }}
+                        >
+                          {goal.objectiveTitle}
                         </h6>
                       </div>
-                      <span style={{ 
-                        display: 'inline-block',
-                        backgroundColor: `${statusColor}15`, 
-                        color: statusColor, 
-                        padding: '4px 10px', 
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        borderRadius: '6px',
-                        border: `1.5px solid ${statusColor}40`
-                      }}>
-                        {hr.status || 'Draft'}
+                      <div className="d-flex align-items-center gap-1">
+                        <Star
+                          size={16}
+                          style={{ color: "#ffc107", fill: "#ffc107" }}
+                        />
+                        <span
+                          style={{
+                            fontSize: "1rem",
+                            fontWeight: 700,
+                            color: "#212529",
+                          }}
+                        >
+                          {goal.rating}/5
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mb-3">
+                      <span
+                        style={{
+                          display: "inline-block",
+                          backgroundColor: "#97247E15",
+                          color: "#97247E",
+                          padding: "4px 10px",
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          borderRadius: "6px",
+                          border: "1.5px solid #97247E40",
+                        }}
+                      >
+                        {RATING_LABELS[goal.rating] || "N/A"}
                       </span>
                     </div>
 
                     <div className="mb-3">
-                      <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.813rem' }}>
+                      <div
+                        className="d-flex align-items-center gap-2 text-muted"
+                        style={{ fontSize: "0.813rem" }}
+                      >
                         <Clock size={14} />
-                        <span>{hr.submittedAtFormatted}</span>
-                        {hr.daysAgo !== null && <span>({hr.daysAgo}d ago)</span>}
+                        <span>{goal.submittedAtFormatted}</span>
+                        {goal.daysAgo !== null && (
+                          <span>({goal.daysAgo}d ago)</span>
+                        )}
                       </div>
                     </div>
 
-                    {hr.status === 'Reviewed' && hr.hrReviewComments && (
-                      <div className="mb-3" style={{ 
-                        background: '#f8f9fa',
-                        padding: '0.75rem',
-                        borderRadius: '6px',
-                        border: '1px solid #e9ecef'
-                      }}>
-                        <div className="d-flex align-items-center gap-1 mb-1">
-                          <MessageSquare size={12} style={{ color: '#6c757d' }} />
-                          <small style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6c757d' }}>
-                            HR Review:
-                          </small>
-                        </div>
-                        <p className="mb-0" style={{ fontSize: '0.813rem', color: '#495057' }}>
-                          {hr.hrReviewComments.substring(0, 80)}...
+                    {goal.feedbackComments && (
+                      <div
+                        className="mb-3"
+                        style={{
+                          background: "#f8f9fa",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          minHeight: "60px",
+                        }}
+                      >
+                        <p
+                          className="mb-0"
+                          style={{ fontSize: "0.813rem", color: "#495057" }}
+                        >
+                          {goal.feedbackComments.substring(0, 80)}...
                         </p>
                       </div>
                     )}
 
-                    <button 
-                      className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" 
-                      onClick={() => handleViewResponse(hr, 'HR')}
-                      style={{ borderRadius: '6px', padding: '8px', fontWeight: 600 }}
+                    <button
+                      className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                      onClick={() => handleViewResponse(goal, "Goal")}
+                      style={{
+                        borderRadius: "6px",
+                        padding: "8px",
+                        fontWeight: 600,
+                      }}
                     >
                       <Eye size={16} />
                       View Details
                     </button>
                   </div>
                 </div>
-              );
-            })}
-
-            {/* GOAL FEEDBACK */}
-            {tab === 'GoalFeedback' && goalFeedback.map((goal) => (
-              <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
-                <div style={{ 
-                  background: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderLeft: '4px solid #97247E',
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  height: '100%',
-                  transition: 'box-shadow 0.2s',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-                >
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                      <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '4px', fontWeight: 600 }}>
-                        {goal.submittedByName}
-                      </div>
-                      <h6 className="mb-0 fw-bold" style={{ fontSize: '0.938rem', color: '#212529' }}>
-                        {goal.objectiveTitle}
-                      </h6>
-                    </div>
-                    <div className="d-flex align-items-center gap-1">
-                      <Star size={16} style={{ color: '#ffc107', fill: '#ffc107' }} />
-                      <span style={{ fontSize: '1rem', fontWeight: 700, color: '#212529' }}>
-                        {goal.rating}/5
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <span style={{ 
-                      display: 'inline-block',
-                      backgroundColor: '#97247E15', 
-                      color: '#97247E', 
-                      padding: '4px 10px', 
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      borderRadius: '6px',
-                      border: '1.5px solid #97247E40'
-                    }}>
-                      {RATING_LABELS[goal.rating] || 'N/A'}
-                    </span>
-                  </div>
-
-                  <div className="mb-3">
-                    <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.813rem' }}>
-                      <Clock size={14} />
-                      <span>{goal.submittedAtFormatted}</span>
-                      {goal.daysAgo !== null && <span>({goal.daysAgo}d ago)</span>}
-                    </div>
-                  </div>
-
-                  {goal.feedbackComments && (
-                    <div className="mb-3" style={{ 
-                      background: '#f8f9fa',
-                      padding: '0.75rem',
-                      borderRadius: '6px',
-                      minHeight: '60px'
-                    }}>
-                      <p className="mb-0" style={{ fontSize: '0.813rem', color: '#495057' }}>
-                        {goal.feedbackComments.substring(0, 80)}...
-                      </p>
-                    </div>
-                  )}
-
-                  <button 
-                    className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" 
-                    onClick={() => handleViewResponse(goal, 'Goal')}
-                    style={{ borderRadius: '6px', padding: '8px', fontWeight: 600 }}
-                  >
-                    <Eye size={16} />
-                    View Details
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
 
             {/* MENTOR */}
-            {tab === 'Mentor' && mentor.map((m) => (
-              <div className="col-md-6 col-lg-4" key={m.trackingId || m.id}>
-                <div style={{ 
-                  background: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderLeft: '4px solid #198754',
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  height: '100%',
-                  transition: 'box-shadow 0.2s',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-                >
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                      <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '4px', fontWeight: 600 }}>
-                        {m.submittedByName}
+            {tab === "Mentor" &&
+              mentor.map((m) => (
+                <div className="col-md-6 col-lg-4" key={m.trackingId || m.id}>
+                  <div
+                    style={{
+                      background: "white",
+                      border: "1px solid #e5e7eb",
+                      borderLeft: "4px solid #198754",
+                      borderRadius: "10px",
+                      padding: "1.25rem",
+                      height: "100%",
+                      transition: "box-shadow 0.2s",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.boxShadow =
+                        "0 4px 12px rgba(0,0,0,0.15)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.boxShadow = "none")
+                    }
+                  >
+                    <div className="d-flex justify-content-between align-items-start mb-3">
+                      <div>
+                        <div
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#6c757d",
+                            marginBottom: "4px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {m.submittedByName}
+                        </div>
+                        <div className="d-flex align-items-center gap-1">
+                          <User size={14} style={{ color: "#198754" }} />
+                          <h6
+                            className="mb-0 fw-bold"
+                            style={{ fontSize: "0.938rem", color: "#212529" }}
+                          >
+                            {m.mentorNameFull}
+                          </h6>
+                        </div>
+                      </div>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          backgroundColor: "#19875415",
+                          color: "#198754",
+                          padding: "4px 10px",
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          borderRadius: "6px",
+                          border: "1.5px solid #19875440",
+                        }}
+                      >
+                        {m.rating || 0}/5
+                      </span>
+                    </div>
+
+                    <div className="mb-3">
+                      <div
+                        className="d-flex align-items-center gap-2 text-muted"
+                        style={{ fontSize: "0.813rem" }}
+                      >
+                        <Clock size={14} />
+                        <span>{m.createdAtFormatted}</span>
+                      </div>
+                    </div>
+
+                    <div
+                      className="mb-3"
+                      style={{
+                        background: "#f8f9fa",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        minHeight: "60px",
+                      }}
+                    >
+                      <p
+                        className="mb-0"
+                        style={{ fontSize: "0.813rem", color: "#495057" }}
+                      >
+                        {m.feedbackComments
+                          ? m.feedbackComments.substring(0, 80) + "..."
+                          : "No comments"}
+                      </p>
+                    </div>
+
+                    <button
+                      className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                      onClick={() => handleViewResponse(m, "Mentor")}
+                      style={{
+                        borderRadius: "6px",
+                        padding: "8px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      <Eye size={16} />
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+            {/* PEER */}
+            {tab === "Peer" &&
+              peer.map((p) => (
+                <div className="col-md-6 col-lg-4" key={p.queueId || p.id}>
+                  <div
+                    style={{
+                      background: "white",
+                      border: "1px solid #e5e7eb",
+                      borderLeft: "4px solid #6610f2",
+                      borderRadius: "10px",
+                      padding: "1.25rem",
+                      height: "100%",
+                      transition: "box-shadow 0.2s",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.boxShadow =
+                        "0 4px 12px rgba(0,0,0,0.15)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.boxShadow = "none")
+                    }
+                  >
+                    <div className="mb-3">
+                      <div
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "#6c757d",
+                          marginBottom: "4px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {p.submittedByName}
                       </div>
                       <div className="d-flex align-items-center gap-1">
-                        <User size={14} style={{ color: '#198754' }} />
-                        <h6 className="mb-0 fw-bold" style={{ fontSize: '0.938rem', color: '#212529' }}>
-                          {m.mentorNameFull}
+                        <User size={14} style={{ color: "#6610f2" }} />
+                        <h6
+                          className="mb-0 fw-bold"
+                          style={{ fontSize: "0.938rem", color: "#212529" }}
+                        >
+                          {p.recipientNameFull}
                         </h6>
                       </div>
                     </div>
-                    <span style={{ 
-                      display: 'inline-block',
-                      backgroundColor: '#19875415', 
-                      color: '#198754', 
-                      padding: '4px 10px', 
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      borderRadius: '6px',
-                      border: '1.5px solid #19875440'
-                    }}>
-                      {m.rating || 0}/5
-                    </span>
-                  </div>
 
-                  <div className="mb-3">
-                    <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.813rem' }}>
-                      <Clock size={14} />
-                      <span>{m.createdAtFormatted}</span>
+                    <div className="mb-3">
+                      <div
+                        className="d-flex align-items-center gap-2 text-muted"
+                        style={{ fontSize: "0.813rem" }}
+                      >
+                        <Clock size={14} />
+                        <span>{p.createdAtFormatted}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="mb-3" style={{ 
-                    background: '#f8f9fa',
-                    padding: '0.75rem',
-                    borderRadius: '6px',
-                    minHeight: '60px'
-                  }}>
-                    <p className="mb-0" style={{ fontSize: '0.813rem', color: '#495057' }}>
-                      {m.feedbackComments ? m.feedbackComments.substring(0, 80) + '...' : 'No comments'}
-                    </p>
-                  </div>
+                    <div
+                      className="mb-3"
+                      style={{
+                        background: "#f8f9fa",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        minHeight: "60px",
+                      }}
+                    >
+                      <p
+                        className="mb-0"
+                        style={{ fontSize: "0.813rem", color: "#495057" }}
+                      >
+                        {p.feedbackContent
+                          ? p.feedbackContent.substring(0, 80) + "..."
+                          : "No content"}
+                      </p>
+                    </div>
 
-                  <button 
-                    className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" 
-                    onClick={() => handleViewResponse(m, 'Mentor')}
-                    style={{ borderRadius: '6px', padding: '8px', fontWeight: 600 }}
-                  >
-                    <Eye size={16} />
-                    View Details
-                  </button>
+                    <button
+                      className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2"
+                      onClick={() => handleViewResponse(p, "Peer")}
+                      style={{
+                        borderRadius: "6px",
+                        padding: "8px",
+                        fontWeight: 600,
+                      }}
+                    >
+                      <Eye size={16} />
+                      View Details
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-
-            {/* PEER */}
-            {tab === 'Peer' && peer.map((p) => (
-              <div className="col-md-6 col-lg-4" key={p.queueId || p.id}>
-                <div style={{ 
-                  background: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderLeft: '4px solid #6610f2',
-                  borderRadius: '10px',
-                  padding: '1.25rem',
-                  height: '100%',
-                  transition: 'box-shadow 0.2s',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-                >
-                  <div className="mb-3">
-                    <div style={{ fontSize: '0.75rem', color: '#6c757d', marginBottom: '4px', fontWeight: 600 }}>
-                      {p.submittedByName}
-                    </div>
-                    <div className="d-flex align-items-center gap-1">
-                      <User size={14} style={{ color: '#6610f2' }} />
-                      <h6 className="mb-0 fw-bold" style={{ fontSize: '0.938rem', color: '#212529' }}>
-                        {p.recipientNameFull}
-                      </h6>
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.813rem' }}>
-                      <Clock size={14} />
-                      <span>{p.createdAtFormatted}</span>
-                    </div>
-                  </div>
-
-                  <div className="mb-3" style={{ 
-                    background: '#f8f9fa',
-                    padding: '0.75rem',
-                    borderRadius: '6px',
-                    minHeight: '60px'
-                  }}>
-                    <p className="mb-0" style={{ fontSize: '0.813rem', color: '#495057' }}>
-                      {p.feedbackContent ? p.feedbackContent.substring(0, 80) + '...' : 'No content'}
-                    </p>
-                  </div>
-
-                  <button 
-                    className="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2" 
-                    onClick={() => handleViewResponse(p, 'Peer')}
-                    style={{ borderRadius: '6px', padding: '8px', fontWeight: 600 }}
-                  >
-                    <Eye size={16} />
-                    View Details
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>
 
-      <ResponseViewModal 
-        show={showModal} 
-        response={selectedResponse} 
+      <ResponseViewModal
+        show={showModal}
+        response={selectedResponse}
         onClose={handleCloseModal}
         type={selectedType}
       />

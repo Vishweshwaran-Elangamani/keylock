@@ -1,10 +1,12 @@
 import api from "./api";
 
-export const getSelfAssessment = (assessmentId) => api.get(`/SelfAssessment/${assessmentId}`);
+export const getSelfAssessment = (assessmentId) =>
+  api.get(`/SelfAssessment/${assessmentId}`);
 export const getSelfAssessmentByFormAndUser = (formId, userId) =>
   api.get(`/SelfAssessment/form/${formId}/user/${userId}`);
 
-export const submitSelfAssessment = (payload) => api.post("/SelfAssessment/submit", payload);
+export const submitSelfAssessment = (payload) =>
+  api.post("/SelfAssessment/submit", payload);
 
 export const listSubmitted = (status) => {
   const params = status ? { status } : undefined;

@@ -1,6 +1,6 @@
 /**
  * DeleteRoleModal Component
- * 
+ *
  * A confirmation modal for permanently deleting roles from the system.
  * Features:
  * - Critical warning message to prevent accidental deletions
@@ -9,7 +9,7 @@
  * - Toast notifications using Sonner for success/error feedback
  * - Protection for system roles (cannot be deleted)
  * - Cannot be reversed once executed
- * 
+ *
  * @param {boolean} show - Controls modal visibility
  * @param {Object} role - Role object containing role details to be deleted
  * @param {function} onClose - Callback to close the modal
@@ -45,7 +45,7 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
     try {
       // Set loading state to disable buttons and show spinner
       setLoading(true);
-      
+
       // Show loading toast
       toast.loading("Deleting role...");
 
@@ -55,7 +55,6 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
 
       // Note: Parent component (RoleList) handles success/error toasts
       // and closes the modal after successful deletion
-      
     } catch (error) {
       // -------- Handle Exception --------
       console.error("Error deleting role:", error);
@@ -79,12 +78,11 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-delete-role"></div>
-      
+
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-delete-role">
         <div className="modal-dialog-delete-role">
           <div className="modal-content-delete-role">
-            
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -109,7 +107,6 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
             {/* MODAL BODY */}
             {/* ======================== */}
             <div className="modal-body-delete-role">
-              
               {/* -------- Confirmation Question -------- */}
               {/* Displays role name and code for confirmation */}
               <p className="delete-question-delete-role">
@@ -124,17 +121,29 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
               {/* Shows role details for verification */}
               <div className="role-info-box-delete-role">
                 <div className="role-info-item-delete-role">
-                  <span className="role-info-label-delete-role">Role Name:</span>
-                  <strong className="role-info-value-delete-role">{role?.roleName}</strong>
+                  <span className="role-info-label-delete-role">
+                    Role Name:
+                  </span>
+                  <strong className="role-info-value-delete-role">
+                    {role?.roleName}
+                  </strong>
                 </div>
                 <div className="role-info-item-delete-role">
-                  <span className="role-info-label-delete-role">Role Code:</span>
-                  <code className="role-code-badge-delete-role">{role?.roleCode}</code>
+                  <span className="role-info-label-delete-role">
+                    Role Code:
+                  </span>
+                  <code className="role-code-badge-delete-role">
+                    {role?.roleCode}
+                  </code>
                 </div>
                 {role?.description && (
                   <div className="role-info-item-delete-role">
-                    <span className="role-info-label-delete-role">Description:</span>
-                    <span className="role-info-value-delete-role">{role.description}</span>
+                    <span className="role-info-label-delete-role">
+                      Description:
+                    </span>
+                    <span className="role-info-value-delete-role">
+                      {role.description}
+                    </span>
                   </div>
                 )}
               </div>
@@ -147,7 +156,7 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
                   <i className="bi bi-exclamation-triangle-fill"></i>
                   <span>Critical Warning</span>
                 </div>
-                
+
                 {/* Warning Text - Emphasizes permanence */}
                 <p className="warning-text-delete-role">
                   <strong>
@@ -156,7 +165,7 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
                   <br />
                   Once deleted, this role will:
                 </p>
-                
+
                 {/* Warning List - Details all consequences */}
                 <ul className="warning-list-delete-role">
                   <li>Be permanently removed from the system</li>
@@ -181,7 +190,6 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
             {/* MODAL FOOTER - ACTION BUTTONS */}
             {/* ======================== */}
             <div className="modal-footer-delete-role">
-              
               {/* Cancel Button - Closes modal without deleting */}
               <button
                 type="button"
@@ -192,7 +200,7 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
                 <i className="bi bi-arrow-left"></i>
                 Cancel
               </button>
-              
+
               {/* Delete Button - Executes permanent deletion */}
               {/* Disabled during loading to prevent duplicate requests */}
               <button

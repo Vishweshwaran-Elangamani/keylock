@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:5253';
+const API_BASE_URL = "http://localhost:5253";
 
 const hrFormApi = {
   // ============== FORMS ENDPOINTS ==============
-  
+
   /**
    * POST /api/HrFeedbackForm/forms/create
    * Create a new feedback form
@@ -39,7 +39,7 @@ const hrFormApi = {
    */
   getAllForms: (pageNumber = 1, pageSize = 10) =>
     axios.get(`${API_BASE_URL}/api/HrFeedbackForm/forms`, {
-      params: { pageNumber, pageSize }
+      params: { pageNumber, pageSize },
     }),
 
   /**
@@ -70,7 +70,10 @@ const hrFormApi = {
    * Update a response (save draft)
    */
   updateResponse: (responseId, payload) =>
-    axios.put(`${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}`, payload),
+    axios.put(
+      `${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}`,
+      payload
+    ),
 
   /**
    * DELETE /api/HrFeedbackForm/responses/{responseId}
@@ -98,7 +101,10 @@ const hrFormApi = {
    * Submit a form response (employee finalizes submission)
    */
   submitResponse: (responseId, payload) =>
-    axios.post(`${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}/submit`, payload),
+    axios.post(
+      `${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}/submit`,
+      payload
+    ),
 
   /**
    * POST /api/HrFeedbackForm/responses/{responseId}/hr-review
@@ -106,7 +112,10 @@ const hrFormApi = {
    * payload: { status: 'Approved' | 'Rejected', hrComments: string }
    */
   hrReviewResponse: (responseId, payload) =>
-    axios.post(`${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}/hr-review`, payload)
+    axios.post(
+      `${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}/hr-review`,
+      payload
+    ),
 };
 
 export default hrFormApi;

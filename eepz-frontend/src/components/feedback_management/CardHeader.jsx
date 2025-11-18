@@ -1,5 +1,4 @@
-// src/components/CardHeader.jsx
-import React from 'react';
+import React from "react";
 
 export default function CardHeader({ title, badge, actions }) {
   return (
@@ -8,9 +7,7 @@ export default function CardHeader({ title, badge, actions }) {
         <h5 className="mb-0">{title}</h5>
         {badge}
       </div>
-      <div className="d-flex align-items-center gap-2">
-        {actions}
-      </div>
+      <div className="d-flex align-items-center gap-2">{actions}</div>
     </div>
   );
 }

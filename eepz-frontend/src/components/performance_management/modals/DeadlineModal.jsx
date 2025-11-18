@@ -1,7 +1,6 @@
 import React from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-
 function DeadlineModal({
   isOpen,
   onClose,
@@ -16,7 +15,7 @@ function DeadlineModal({
     <div className="hrformlist-modal-overlay" onClick={onClose}>
       <div
         className="hrformlist-deadline-modal"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <i
           className="bi bi-calendar-check"
@@ -38,7 +37,7 @@ function DeadlineModal({
             min="1"
             max="365"
             value={deadlineInDays}
-            onChange={e => onDeadlineChange(parseInt(e.target.value) || 7)}
+            onChange={(e) => onDeadlineChange(parseInt(e.target.value) || 7)}
           />
         </div>
         <div className="hrformlist-modal-buttons">

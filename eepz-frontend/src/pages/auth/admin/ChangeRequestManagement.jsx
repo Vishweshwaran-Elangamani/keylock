@@ -1,9 +1,9 @@
 /**
  * ChangeRequestManagement Component
- * 
+ *
  * Admin interface for managing employee EMAIL change requests ONLY.
  * Employee Company ID functionality completely removed.
- * 
+ *
  * Features:
  * - Tab-based view: Pending requests vs All requests
  * - Advanced filtering: Search, status, date filters (NO type filter)
@@ -12,7 +12,7 @@
  * - Auto-refresh every 30 seconds
  * - Pagination with customizable rows per page
  * - Toast notifications using Sonner for user feedback
- * 
+ *
  * @component
  */
 
@@ -31,16 +31,16 @@ const ChangeRequestManagement = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [activeTab, setActiveTab] = useState("pending");
-  
+
   // Filter States (filterType REMOVED - email only)
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDate, setFilterDate] = useState("");
-  
+
   // Pagination States
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // Modal States
   const [showProcessModal, setShowProcessModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -73,7 +73,7 @@ const ChangeRequestManagement = () => {
   const fetchRequests = async (silent = false) => {
     try {
       setLoading(true);
-      
+
       if (!silent) {
         toast.loading("Loading email change requests...");
       }
@@ -88,11 +88,13 @@ const ChangeRequestManagement = () => {
       if (response.success) {
         setRequests(response.data || []);
         setLastUpdated(new Date());
-        
+
         if (!silent) {
           toast.dismiss();
           toast.success(
-            `Loaded ${response.data?.length || 0} email change requests successfully`
+            `Loaded ${
+              response.data?.length || 0
+            } email change requests successfully`
           );
         }
       } else {
@@ -176,9 +178,11 @@ const ChangeRequestManagement = () => {
 
     try {
       setProcessing(true);
-      
+
       toast.loading(
-        `${processAction === "Approved" ? "Approving" : "Rejecting"} email change request...`
+        `${
+          processAction === "Approved" ? "Approving" : "Rejecting"
+        } email change request...`
       );
 
       const processData = {
@@ -187,28 +191,35 @@ const ChangeRequestManagement = () => {
         AdminRemarks: adminRemarks.trim() || null,
       };
 
-      const response = await ChangeRequestService.processChangeRequest(processData);
+      const response = await ChangeRequestService.processChangeRequest(
+        processData
+      );
 
       if (response.success) {
         toast.dismiss();
         toast.success(
-          response.message || `Email change request ${processAction.toLowerCase()} successfully!`
+          response.message ||
+            `Email change request ${processAction.toLowerCase()} successfully!`
         );
-        
+
         setShowProcessModal(false);
         setSelectedRequest(null);
         setAdminRemarks("");
-        
+
         fetchRequests(true);
       } else {
         toast.dismiss();
-        toast.error(response.message || "Failed to process email change request");
+        toast.error(
+          response.message || "Failed to process email change request"
+        );
       }
     } catch (error) {
       console.error("Error processing email change request:", error);
       toast.dismiss();
       toast.error(
-        error.response?.data?.message || error.message || "Failed to process email change request"
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to process email change request"
       );
     } finally {
       setProcessing(false);
@@ -233,7 +244,9 @@ const ChangeRequestManagement = () => {
       Rejected: "crm-status-rejected",
       Cancelled: "crm-status-cancelled",
     };
-    return `crm-status-badge ${statusClasses[status] || "crm-status-badge-default"}`;
+    return `crm-status-badge ${
+      statusClasses[status] || "crm-status-badge-default"
+    }`;
   };
 
   // getChangeTypeBadge REMOVED - not needed for email only
@@ -262,7 +275,9 @@ const ChangeRequestManagement = () => {
     if (!name) return "NA";
     const parts = name.split(" ");
     if (parts.length >= 2) {
-      return parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase();
+      return (
+        parts[0].charAt(0).toUpperCase() + parts[1].charAt(0).toUpperCase()
+      );
     }
     return name.substring(0, 2).toUpperCase();
   };
@@ -318,10 +333,9 @@ const ChangeRequestManagement = () => {
     return (
       <>
         <div className="crm-modal-backdrop-process"></div>
-        
+
         <div className="crm-modal-wrapper-process">
           <div className="crm-modal-dialog-process">
-            
             <div
               className={`crm-modal-header-process ${
                 processAction === "Approved"
@@ -353,7 +367,6 @@ const ChangeRequestManagement = () => {
             </div>
 
             <div className="crm-modal-body-process">
-              
               <div className="crm-request-details-box">
                 <h6 className="crm-details-title">
                   <i className="bi bi-info-circle me-2"></i>
@@ -361,10 +374,11 @@ const ChangeRequestManagement = () => {
                 </h6>
 
                 <div className="crm-details-grid-horizontal">
-                  
                   <div className="crm-detail-row">
                     <div className="crm-detail-label">Request ID:</div>
-                    <div className="crm-detail-value">#{selectedRequest.requestId}</div>
+                    <div className="crm-detail-value">
+                      #{selectedRequest.requestId}
+                    </div>
                   </div>
 
                   <div className="crm-detail-row">
@@ -391,20 +405,26 @@ const ChangeRequestManagement = () => {
                   <div className="crm-detail-row">
                     <div className="crm-detail-label">New Email:</div>
                     <div className="crm-detail-value">
-                      <code className="crm-value-code crm-new-value">{selectedRequest.newValue}</code>
+                      <code className="crm-value-code crm-new-value">
+                        {selectedRequest.newValue}
+                      </code>
                     </div>
                   </div>
 
                   <div className="crm-detail-row">
                     <div className="crm-detail-label">Requested At:</div>
-                    <div className="crm-detail-value">{formatDate(selectedRequest.requestedAt)}</div>
+                    <div className="crm-detail-value">
+                      {formatDate(selectedRequest.requestedAt)}
+                    </div>
                   </div>
 
                   {selectedRequest.reason && (
                     <div className="crm-detail-row crm-full-width">
                       <div className="crm-detail-label">Employee Reason:</div>
                       <div className="crm-detail-value">
-                        <div className="crm-reason-box">{selectedRequest.reason}</div>
+                        <div className="crm-reason-box">
+                          {selectedRequest.reason}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -414,7 +434,9 @@ const ChangeRequestManagement = () => {
               <div className="crm-form-group-process">
                 <label className="crm-form-label-process">
                   Admin Remarks{" "}
-                  {processAction === "Rejected" && <span className="crm-required-mark">*</span>}
+                  {processAction === "Rejected" && (
+                    <span className="crm-required-mark">*</span>
+                  )}
                 </label>
                 <textarea
                   className="crm-form-textarea-process"
@@ -438,8 +460,9 @@ const ChangeRequestManagement = () => {
                 <div className="crm-info-alert-process">
                   <i className="bi bi-info-circle"></i>
                   <div>
-                    <strong>Note:</strong> The email will be updated automatically after approval.
-                    The employee will be notified via email.
+                    <strong>Note:</strong> The email will be updated
+                    automatically after approval. The employee will be notified
+                    via email.
                   </div>
                 </div>
               )}
@@ -448,8 +471,8 @@ const ChangeRequestManagement = () => {
                 <div className="crm-warning-alert-process">
                   <i className="bi bi-exclamation-triangle"></i>
                   <div>
-                    <strong>Warning:</strong> Please provide a clear reason for rejection. The employee will
-                    be able to see your remarks.
+                    <strong>Warning:</strong> Please provide a clear reason for
+                    rejection. The employee will be able to see your remarks.
                   </div>
                 </div>
               )}
@@ -465,11 +488,13 @@ const ChangeRequestManagement = () => {
                 <i className="bi bi-x-circle"></i>
                 Cancel
               </button>
-              
+
               <button
                 type="button"
                 className={`crm-btn-submit-process ${
-                  processAction === "Approved" ? "crm-btn-success-process" : "crm-btn-danger-process"
+                  processAction === "Approved"
+                    ? "crm-btn-success-process"
+                    : "crm-btn-danger-process"
                 }`}
                 onClick={handleProcessSubmit}
                 disabled={processing}
@@ -483,7 +508,9 @@ const ChangeRequestManagement = () => {
                   <>
                     <i
                       className={`bi ${
-                        processAction === "Approved" ? "bi-check-circle" : "bi-x-circle"
+                        processAction === "Approved"
+                          ? "bi-check-circle"
+                          : "bi-x-circle"
                       }`}
                     ></i>
                     {processAction === "Approved" ? "Approve" : "Reject"}
@@ -509,7 +536,6 @@ const ChangeRequestManagement = () => {
 
   return (
     <div className="crm-change-request-page">
-      
       <nav className="crm-breadcrumb-nav" aria-label="breadcrumb">
         <ol className="crm-breadcrumb">
           <li className="crm-breadcrumb-item">
@@ -558,7 +584,7 @@ const ChangeRequestManagement = () => {
             </span>
           )}
         </button>
-        
+
         <button
           className={`crm-tab-btn ${activeTab === "all" ? "active" : ""}`}
           onClick={() => setActiveTab("all")}
@@ -571,7 +597,6 @@ const ChangeRequestManagement = () => {
       <div className="crm-filters-card">
         <div className="crm-filters-content">
           <div className="crm-filters-left">
-            
             <div className="crm-search-box">
               <i className="bi bi-search crm-search-icon"></i>
               <input
@@ -610,7 +635,6 @@ const ChangeRequestManagement = () => {
       </div>
 
       <div className="crm-stats-grid">
-        
         <div className="crm-stat-card">
           <div className="crm-stat-icon crm-stat-icon-primary">
             <i className="bi bi-inbox-fill"></i>
@@ -626,7 +650,9 @@ const ChangeRequestManagement = () => {
             <i className="bi bi-hourglass-split"></i>
           </div>
           <div className="crm-stat-content">
-            <h3 className="crm-stat-value">{requests.filter((r) => r.status === "Pending").length}</h3>
+            <h3 className="crm-stat-value">
+              {requests.filter((r) => r.status === "Pending").length}
+            </h3>
             <p className="crm-stat-label">Pending</p>
           </div>
         </div>
@@ -636,7 +662,9 @@ const ChangeRequestManagement = () => {
             <i className="bi bi-check-circle-fill"></i>
           </div>
           <div className="crm-stat-content">
-            <h3 className="crm-stat-value">{requests.filter((r) => r.status === "Approved").length}</h3>
+            <h3 className="crm-stat-value">
+              {requests.filter((r) => r.status === "Approved").length}
+            </h3>
             <p className="crm-stat-label">Approved</p>
           </div>
         </div>
@@ -646,7 +674,9 @@ const ChangeRequestManagement = () => {
             <i className="bi bi-x-circle-fill"></i>
           </div>
           <div className="crm-stat-content">
-            <h3 className="crm-stat-value">{requests.filter((r) => r.status === "Rejected").length}</h3>
+            <h3 className="crm-stat-value">
+              {requests.filter((r) => r.status === "Rejected").length}
+            </h3>
             <p className="crm-stat-label">Rejected</p>
           </div>
         </div>
@@ -679,51 +709,69 @@ const ChangeRequestManagement = () => {
                 getPaginatedRequests().map((request) => (
                   <tr key={request.requestId}>
                     <td>
-                      <span className="crm-request-id">#{request.requestId}</span>
+                      <span className="crm-request-id">
+                        #{request.requestId}
+                      </span>
                     </td>
-                    
+
                     <td>
                       <div className="crm-user-info">
-                        <div className="crm-user-avatar">{getInitials(request.employeeName)}</div>
+                        <div className="crm-user-avatar">
+                          {getInitials(request.employeeName)}
+                        </div>
                         <div>
-                          <span className="crm-user-name">{request.employeeName}</span>
-                          <small className="crm-user-id">@{request.employeeCompanyId}</small>
+                          <span className="crm-user-name">
+                            {request.employeeName}
+                          </span>
+                          <small className="crm-user-id">
+                            @{request.employeeCompanyId}
+                          </small>
                         </div>
                       </div>
                     </td>
-                    
+
                     {/* Type badge column REMOVED */}
-                    
+
                     <td>
                       <code className="crm-value-display crm-current-value">
                         {request.currentValue || "N/A"}
                       </code>
                     </td>
-                    
+
                     <td>
-                      <code className="crm-value-display crm-new-value">{request.newValue}</code>
+                      <code className="crm-value-display crm-new-value">
+                        {request.newValue}
+                      </code>
                     </td>
-                    
+
                     <td>
-                      <span className={getStatusBadge(request.status)}>{request.status}</span>
+                      <span className={getStatusBadge(request.status)}>
+                        {request.status}
+                      </span>
                     </td>
-                    
-                    <td className="text-muted">{formatDate(request.requestedAt)}</td>
-                    
+
+                    <td className="text-muted">
+                      {formatDate(request.requestedAt)}
+                    </td>
+
                     <td>
                       <div className="crm-action-buttons">
                         {request.status === "Pending" ? (
                           <>
                             <button
                               className="crm-action-btn crm-action-btn-approve"
-                              onClick={() => handleProcessClick(request, "Approved")}
+                              onClick={() =>
+                                handleProcessClick(request, "Approved")
+                              }
                               title="Approve Request"
                             >
                               <i className="bi bi-check-circle"></i>
                             </button>
                             <button
                               className="crm-action-btn crm-action-btn-reject"
-                              onClick={() => handleProcessClick(request, "Rejected")}
+                              onClick={() =>
+                                handleProcessClick(request, "Rejected")
+                              }
                               title="Reject Request"
                             >
                               <i className="bi bi-x-circle"></i>
@@ -731,9 +779,14 @@ const ChangeRequestManagement = () => {
                           </>
                         ) : (
                           <div className="crm-processed-info">
-                            <small className="text-muted">{formatDate(request.processedAt)}</small>
+                            <small className="text-muted">
+                              {formatDate(request.processedAt)}
+                            </small>
                             {request.adminRemarks && (
-                              <div className="crm-admin-remarks-tooltip" title={request.adminRemarks}>
+                              <div
+                                className="crm-admin-remarks-tooltip"
+                                title={request.adminRemarks}
+                              >
                                 <i className="bi bi-chat-left-text"></i>
                               </div>
                             )}
@@ -750,7 +803,6 @@ const ChangeRequestManagement = () => {
 
         {filteredRequests.length > 0 && (
           <div className="crm-pagination-container">
-            
             <div className="crm-pagination-info">
               <span className="crm-pagination-label">Show</span>
               <select
@@ -776,10 +828,16 @@ const ChangeRequestManagement = () => {
 
             <nav className="crm-pagination-nav">
               <ul className="crm-pagination">
-                <li className={`crm-page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <li
+                  className={`crm-page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="crm-page-link"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     <i className="bi bi-chevron-left"></i>
@@ -795,7 +853,9 @@ const ChangeRequestManagement = () => {
                   >
                     <button
                       className="crm-page-link"
-                      onClick={() => typeof page === "number" && setCurrentPage(page)}
+                      onClick={() =>
+                        typeof page === "number" && setCurrentPage(page)
+                      }
                       disabled={typeof page !== "number"}
                     >
                       {page}
@@ -803,10 +863,16 @@ const ChangeRequestManagement = () => {
                   </li>
                 ))}
 
-                <li className={`crm-page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <li
+                  className={`crm-page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="crm-page-link"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     <i className="bi bi-chevron-right"></i>

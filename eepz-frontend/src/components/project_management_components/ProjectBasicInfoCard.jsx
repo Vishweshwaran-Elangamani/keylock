@@ -1,9 +1,15 @@
-// src/components/ProjectManagementComponents/ProjectBasicInfoCard.jsx
-import React from 'react';
-import { FileText, Target, User, Activity, Building, Briefcase } from 'lucide-react';
+import React from "react";
+import {
+  FileText,
+  Target,
+  User,
+  Activity,
+  Building,
+  Briefcase,
+} from "lucide-react";
 
 const ProjectBasicInfoCard = ({ project }) => {
-  const clientName = project.clientName || project.ClientName || 'N/A';
+  const clientName = project.clientName || project.ClientName || "N/A";
 
   return (
     <div className="card border-0 shadow-sm mb-4">
@@ -47,7 +53,9 @@ const ProjectBasicInfoCard = ({ project }) => {
               <div>
                 <label className="text-muted small mb-1">Status</label>
                 <div>
-                  <span className={`badge bg-${getStatusColor(project.status)}`}>
+                  <span
+                    className={`badge bg-${getStatusColor(project.status)}`}
+                  >
                     {project.status}
                   </span>
                 </div>
@@ -62,7 +70,9 @@ const ProjectBasicInfoCard = ({ project }) => {
               </div>
               <div>
                 <label className="text-muted small mb-1">Business Unit</label>
-                <p className="mb-0 fw-semibold">{project.businessUnit || 'N/A'}</p>
+                <p className="mb-0 fw-semibold">
+                  {project.businessUnit || "N/A"}
+                </p>
               </div>
             </div>
           </div>
@@ -74,7 +84,9 @@ const ProjectBasicInfoCard = ({ project }) => {
               </div>
               <div>
                 <label className="text-muted small mb-1">Department</label>
-                <p className="mb-0 fw-semibold">{project.department || 'N/A'}</p>
+                <p className="mb-0 fw-semibold">
+                  {project.department || "N/A"}
+                </p>
               </div>
             </div>
           </div>
@@ -85,8 +97,12 @@ const ProjectBasicInfoCard = ({ project }) => {
                 <Target size={20} className="text-secondary" />
               </div>
               <div>
-                <label className="text-muted small mb-1">Engagement Model</label>
-                <p className="mb-0 fw-semibold">{project.engagementModel || 'N/A'}</p>
+                <label className="text-muted small mb-1">
+                  Engagement Model
+                </label>
+                <p className="mb-0 fw-semibold">
+                  {project.engagementModel || "N/A"}
+                </p>
               </div>
             </div>
           </div>
@@ -98,7 +114,9 @@ const ProjectBasicInfoCard = ({ project }) => {
               </div>
               <div className="flex-grow-1">
                 <label className="text-muted small mb-1">Description</label>
-                <p className="mb-0">{project.description || 'No description provided'}</p>
+                <p className="mb-0">
+                  {project.description || "No description provided"}
+                </p>
               </div>
             </div>
           </div>
@@ -110,12 +128,12 @@ const ProjectBasicInfoCard = ({ project }) => {
 
 const getStatusColor = (status) => {
   const colors = {
-    'Active': 'success',
-    'On Hold': 'warning',
-    'Completed': 'info',
-    'Cancelled': 'danger'
+    Active: "success",
+    "On Hold": "warning",
+    Completed: "info",
+    Cancelled: "danger",
   };
-  return colors[status] || 'secondary';
+  return colors[status] || "secondary";
 };
 
 export default ProjectBasicInfoCard;

@@ -85,7 +85,7 @@ const HRDashboard = () => {
       icon: "bi bi-book",
       gradient: "gradient-pink",
       path: "/hr/dasboard/meetmom",
-    }
+    },
   ];
   return (
     <div className="dashboard-container">
@@ -93,8 +93,9 @@ const HRDashboard = () => {
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`management-card ${hoveredCard === index ? "hovered" : ""
-              }`}
+            className={`management-card ${
+              hoveredCard === index ? "hovered" : ""
+            }`}
             onMouseEnter={() => setHoveredCard(index)}
             onMouseLeave={() => setHoveredCard(null)}
             onClick={() => handleNavigation(card.path)}

@@ -13,14 +13,14 @@ const DepartmentHeadBudgetView = () => {
   const [selectedBudgetForAllocations, setSelectedBudgetForAllocations] =
     useState(null);
 
-  // ✅ UPDATED: Use department name instead of ID
+  //  UPDATED: Use department name instead of ID
   const userDepartmentName = localStorage.getItem("departmentName");
   const userName = `${localStorage.getItem("firstName")} ${localStorage.getItem(
     "lastName"
   )}`;
 
   useEffect(() => {
-    console.log("🏢 Department Head logged in:");
+    console.log(" Department Head logged in:");
     console.log("   - Department Name:", userDepartmentName);
     console.log("   - User Name:", userName);
 
@@ -36,47 +36,49 @@ const DepartmentHeadBudgetView = () => {
   const fetchBudgets = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      console.log("📊 Fetching all department budgets...");
+      console.log(" Fetching all department budgets...");
       const response = await budgetAllocationService.getAllDepartmentBudgets();
-      
-      console.log("📋 All budgets from backend:", response.data);
+
+      console.log(" All budgets from backend:", response.data);
 
       if (!response.success || !response.data) {
         throw new Error(response.message || "Failed to fetch budgets");
       }
 
-      // ✅ UPDATED: Filter by department name instead of ID
+      //  UPDATED: Filter by department name instead of ID
       const departmentBudgets = response.data.filter((budget) => {
         console.log(`   Checking budget: DeptName="${budget.departmentName}"`);
-        
+
         // Case-insensitive comparison and trim whitespace
-        return budget.departmentName?.trim().toLowerCase() === 
-               userDepartmentName?.trim().toLowerCase();
+        return (
+          budget.departmentName?.trim().toLowerCase() ===
+          userDepartmentName?.trim().toLowerCase()
+        );
       });
 
       console.log(
-        `✅ Filtered budgets for department "${userDepartmentName}":`,
+        ` Filtered budgets for department "${userDepartmentName}":`,
         departmentBudgets
       );
 
       setBudgets(departmentBudgets);
 
-      // ✅ IMPROVED: Better error handling
+      //  IMPROVED: Better error handling
       if (departmentBudgets.length === 0) {
-        console.warn(`⚠️ No budget found for department "${userDepartmentName}"`);
-        
+        console.warn(` No budget found for department "${userDepartmentName}"`);
+
         // Show available departments for debugging
-        const availableDepts = response.data.map(b => b.departmentName);
-        console.log("📌 Available departments:", availableDepts);
-        
+        const availableDepts = response.data.map((b) => b.departmentName);
+        console.log(" Available departments:", availableDepts);
+
         setError(
           `No budget allocated for ${userDepartmentName} department yet. Contact HR or Leadership to create a budget.`
         );
       }
     } catch (err) {
-      console.error("❌ Error fetching budgets:", err);
+      console.error(" Error fetching budgets:", err);
       setError(err.message || "Failed to fetch budgets");
       toast.error(err.message || "Failed to fetch budgets");
     } finally {
@@ -85,18 +87,18 @@ const DepartmentHeadBudgetView = () => {
   };
 
   const handleShowAllocations = async (budget) => {
-    console.log("👁️ Viewing allocations for budget:", budget.budgetId);
+    console.log(" Viewing allocations for budget:", budget.budgetId);
 
     try {
       setLoading(true);
 
-      console.log("📥 Fetching allocations from backend...");
+      console.log(" Fetching allocations from backend...");
       const response =
         await budgetAllocationService.getBudgetAllocationsByBudget(
           budget.budgetId
         );
 
-      console.log("📦 Backend response:", response);
+      console.log(" Backend response:", response);
 
       let budgetAllocations = [];
       if (response && response.success) {
@@ -109,7 +111,7 @@ const DepartmentHeadBudgetView = () => {
           : [];
       }
 
-      console.log("✅ Fetched allocations:", budgetAllocations);
+      console.log(" Fetched allocations:", budgetAllocations);
 
       setSelectedBudgetForAllocations({
         ...budget,
@@ -118,14 +120,14 @@ const DepartmentHeadBudgetView = () => {
 
       setLoading(false);
     } catch (err) {
-      console.error("❌ Error fetching allocations:", err);
+      console.error(" Error fetching allocations:", err);
       toast.error("Failed to fetch allocations");
       setLoading(false);
     }
   };
 
   const handleBackToList = () => {
-    console.log("🔙 Back to budget list");
+    console.log(" Back to budget list");
     setSelectedBudgetForAllocations(null);
     fetchBudgets();
   };
@@ -179,10 +181,16 @@ const DepartmentHeadBudgetView = () => {
             </div>
           ) : budgets.length === 0 ? (
             <div className="budget-alert-empty">
-              <i className="bi bi-inbox" style={{ fontSize: "48px", color: "#cbd5e1" }}></i>
-              <h4 style={{ marginTop: "16px", color: "#64748b" }}>No Budget Allocated</h4>
+              <i
+                className="bi bi-inbox"
+                style={{ fontSize: "48px", color: "#cbd5e1" }}
+              ></i>
+              <h4 style={{ marginTop: "16px", color: "#64748b" }}>
+                No Budget Allocated
+              </h4>
               <p style={{ color: "#94a3b8" }}>
-                No budget has been allocated for <strong>{userDepartmentName}</strong> department yet.
+                No budget has been allocated for{" "}
+                <strong>{userDepartmentName}</strong> department yet.
               </p>
               <small style={{ color: "#cbd5e1" }}>
                 Contact HR or Leadership to allocate budget for your department.
@@ -206,9 +214,13 @@ const DepartmentHeadBudgetView = () => {
                 </thead>
                 <tbody>
                   {budgets.map((budget) => {
-                    const remaining = (budget.allocatedAmount || 0) - (budget.utilizedAmount || 0);
-                    const status = getUtilizationStatus(budget.utilizationPercentage);
-                    
+                    const remaining =
+                      (budget.allocatedAmount || 0) -
+                      (budget.utilizedAmount || 0);
+                    const status = getUtilizationStatus(
+                      budget.utilizationPercentage
+                    );
+
                     return (
                       <tr key={budget.budgetId}>
                         <td>

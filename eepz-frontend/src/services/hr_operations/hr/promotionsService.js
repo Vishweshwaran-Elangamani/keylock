@@ -15,7 +15,7 @@ const careerProgressionService = {
         return response.data.data;
       }
 
-      console.warn("⚠️ Unexpected response structure");
+      console.warn(" Unexpected response structure");
       return [];
     } catch (error) {
       console.error(" Error fetching promotions:", error);

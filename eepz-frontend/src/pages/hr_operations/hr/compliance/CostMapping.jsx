@@ -5,7 +5,6 @@ import CreateCostMappingModal from "../modals/CreateCostMappingModal";
 import EditCostMappingModal from "../modals/EditCostMappingModal";
 import "../../../../styles/hr_operations/hr/costMapping.css";
 
-
 const CostMapping = () => {
   const [costMappings, setCostMappings] = useState([]);
   const [filteredMappings, setFilteredMappings] = useState([]);
@@ -17,20 +16,16 @@ const CostMapping = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDepartment, setFilterDepartment] = useState("all");
 
-
   const userRole = localStorage.getItem("userRole");
   const isHR = userRole === "HR";
-
 
   useEffect(() => {
     fetchCostMappings();
   }, []);
 
-
   useEffect(() => {
     filterMappings();
   }, [costMappings, searchQuery, filterDepartment]);
-
 
   const fetchCostMappings = async () => {
     setLoading(true);
@@ -50,10 +45,8 @@ const CostMapping = () => {
     }
   };
 
-
   const filterMappings = () => {
     let filtered = costMappings;
-
 
     // Filter by department
     if (filterDepartment !== "all") {
@@ -61,7 +54,6 @@ const CostMapping = () => {
         (m) => m.departmentId === parseInt(filterDepartment)
       );
     }
-
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -74,28 +66,23 @@ const CostMapping = () => {
       );
     }
 
-
     setFilteredMappings(filtered);
   };
-
 
   const handleCreateClick = () => {
     setSelectedMapping(null);
     setShowCreateModal(true);
   };
 
-
   const handleEditClick = (mapping) => {
     setSelectedMapping(mapping);
     setShowEditModal(true);
   };
 
-
   const handleDeleteClick = async (mappingId) => {
     if (!window.confirm("Are you sure you want to delete this cost mapping?")) {
       return;
     }
-
 
     try {
       await costMappingService.deleteCostMapping(mappingId);
@@ -110,13 +97,11 @@ const CostMapping = () => {
     }
   };
 
-
   const handleMappingCreated = () => {
     setShowCreateModal(false);
     fetchCostMappings();
     showToast("Success", "Cost mapping created successfully", "success");
   };
-
 
   const handleMappingUpdated = () => {
     setShowEditModal(false);
@@ -125,10 +110,9 @@ const CostMapping = () => {
     showToast("Success", "Cost mapping updated successfully", "success");
   };
 
-
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
-    
+
     switch (type) {
       case "success":
         toast.success(fullMessage);
@@ -148,7 +132,6 @@ const CostMapping = () => {
     }
   };
 
-
   const formatCurrency = (amount) => {
     if (!amount) return "₹0";
     return new Intl.NumberFormat("en-IN", {
@@ -158,7 +141,6 @@ const CostMapping = () => {
     }).format(amount);
   };
 
-
   const getDepartments = () => {
     const departments = costMappings.map((m) => ({
       id: m.departmentId,
@@ -166,7 +148,6 @@ const CostMapping = () => {
     }));
     return [...new Map(departments.map((d) => [d.id, d])).values()];
   };
-
 
   return (
     <div className="cost-mapping-root">
@@ -176,7 +157,6 @@ const CostMapping = () => {
           {error}
         </div>
       )}
-
 
       <div className="cost-mapping-header">
         <div className="cost-mapping-header-left">
@@ -199,7 +179,6 @@ const CostMapping = () => {
         )}
       </div>
 
-
       <div className="cost-mapping-filters">
         <div className="cost-mapping-search-box">
           <i className="bi bi-search"></i>
@@ -220,7 +199,6 @@ const CostMapping = () => {
           )}
         </div>
 
-
         <select
           className="cost-mapping-filter-select"
           value={filterDepartment}
@@ -234,7 +212,6 @@ const CostMapping = () => {
           ))}
         </select>
       </div>
-
 
       <div className="cost-mapping-table-container">
         {loading ? (
@@ -329,7 +306,6 @@ const CostMapping = () => {
         )}
       </div>
 
-
       {showCreateModal && (
         <CreateCostMappingModal
           show={showCreateModal}
@@ -337,7 +313,6 @@ const CostMapping = () => {
           onMappingCreated={handleMappingCreated}
         />
       )}
-
 
       {showEditModal && selectedMapping && (
         <EditCostMappingModal
@@ -353,6 +328,5 @@ const CostMapping = () => {
     </div>
   );
 };
-
 
 export default CostMapping;

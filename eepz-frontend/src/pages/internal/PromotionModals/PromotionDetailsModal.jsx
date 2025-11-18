@@ -29,11 +29,15 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
                 <div className="details-grid">
                   <div className="detail-item">
                     <span className="detail-label">Employee Name:</span>
-                    <span className="detail-value">{promotion.employeeName || 'N/A'}</span>
+                    <span className="detail-value">
+                      {promotion.employeeName || "N/A"}
+                    </span>
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Department:</span>
-                    <span className="detail-value">{promotion.departmentName || 'N/A'}</span>
+                    <span className="detail-value">
+                      {promotion.departmentName || "N/A"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -43,12 +47,17 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
                 <div className="details-grid">
                   <div className="detail-item">
                     <span className="detail-label">Current Role:</span>
-                    <span className="detail-value">{promotion.oldRole || 'N/A'}</span>
+                    <span className="detail-value">
+                      {promotion.oldRole || "N/A"}
+                    </span>
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">New Role:</span>
                     <span className="detail-value">
-                      {promotion.newRole || promotion.positionName || promotion.opportunityName || 'N/A'}
+                      {promotion.newRole ||
+                        promotion.positionName ||
+                        promotion.opportunityName ||
+                        "N/A"}
                     </span>
                   </div>
                   <div className="detail-item">
@@ -56,12 +65,16 @@ const PromotionDetailsModal = ({ show, onHide, promotion }) => {
                     <span className="detail-value">
                       {promotion.promotionDate
                         ? new Date(promotion.promotionDate).toLocaleDateString()
-                        : 'N/A'}
+                        : "N/A"}
                     </span>
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Status:</span>
-                    <span className={`status-badge ${getStatusBadgeClass(promotion.status)}`}>
+                    <span
+                      className={`status-badge ${getStatusBadgeClass(
+                        promotion.status
+                      )}`}
+                    >
                       {promotion.status}
                     </span>
                   </div>

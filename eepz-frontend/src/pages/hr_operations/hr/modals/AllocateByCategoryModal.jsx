@@ -4,8 +4,12 @@ import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
-
-const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) => {
+const AllocateByCategoryModal = ({
+  show,
+  budget,
+  onHide,
+  onAllocationCreated,
+}) => {
   // Form state with initial values
   const [formData, setFormData] = useState({
     allocationType: "Promotion",
@@ -15,17 +19,13 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
     notes: "",
   });
 
-
   const [loading, setLoading] = useState(false); // Loading spinner state
   const [error, setError] = useState(null); // Error message state
-
 
   // Current logged-in user ID from localStorage
   const currentUserId = parseInt(localStorage.getItem("userId"));
 
-
   const ALLOCATION_TYPES = ["Promotion", "Training", "Bonus", "Other"];
-
 
   // Handle input change, updating form state
   const handleChange = (e) => {
@@ -36,13 +36,11 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
     }));
   };
 
-
   // Form submission handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
 
     try {
       // Validate allocation type selection
@@ -52,7 +50,6 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
         return;
       }
 
-
       // Validate amount must be > 0
       if (!formData.amount || parseFloat(formData.amount) <= 0) {
         toast.error("Amount must be greater than zero");
@@ -60,14 +57,12 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
         return;
       }
 
-
       const allocationAmount = parseFloat(formData.amount);
-
 
       // Calculate remaining budget
       const totalAlreadyAllocated = budget.totalAlreadyAllocated || 0;
-      const remainingBudget = (budget.allocatedAmount || 0) - totalAlreadyAllocated;
-
+      const remainingBudget =
+        (budget.allocatedAmount || 0) - totalAlreadyAllocated;
 
       // Reject if allocation exceeds remaining budget
       if (allocationAmount > remainingBudget) {
@@ -78,18 +73,20 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
             "en-IN"
           )} remaining (Already allocated: Rs.${totalAlreadyAllocated.toLocaleString(
             "en-IN"
-          )} out of Rs.${(budget.allocatedAmount || 0).toLocaleString("en-IN")})`
+          )} out of Rs.${(budget.allocatedAmount || 0).toLocaleString(
+            "en-IN"
+          )})`
         );
         setLoading(false);
         return;
       }
 
-
       // Use provided allocationName or generate a default descriptive name
       const allocationName = formData.allocationName.trim()
         ? formData.allocationName
-        : `${formData.allocationType} Allocation - ${new Date().toLocaleDateString()}`;
-
+        : `${
+            formData.allocationType
+          } Allocation - ${new Date().toLocaleDateString()}`;
 
       // Prepare data payload for backend API
       const allocationData = {
@@ -103,13 +100,12 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
         allocatedByUserId: currentUserId, // Logged-in user ID
       };
 
-
       console.log(" Creating budget allocation with data:", allocationData);
 
-
       // Call backend API to create the allocation
-      const response = await budgetAllocationService.createBudgetAllocation(allocationData);
-
+      const response = await budgetAllocationService.createBudgetAllocation(
+        allocationData
+      );
 
       if (!response.success) {
         toast.error(response.message || "Failed to create allocation");
@@ -117,11 +113,12 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
         return;
       }
 
-
       // Construct allocation object with data, fallback ID with timestamp
       const newAllocation = {
         allocationId:
-          response.data?.allocationId || response.data?.data?.allocationId || Date.now(),
+          response.data?.allocationId ||
+          response.data?.data?.allocationId ||
+          Date.now(),
         budgetId: budget.budgetId,
         departmentId: budget.departmentId,
         allocationType: formData.allocationType,
@@ -134,28 +131,26 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
         allocatedAt: new Date().toISOString(),
       };
 
-
       console.log(" New allocation created:", newAllocation);
-
 
       // Notify parent component so it can update UI accordingly
       onAllocationCreated(newAllocation);
       handleClose();
-
 
       // Success toast
       toast.success("Budget allocation created successfully");
     } catch (err) {
       console.error(" Error creating allocation:", err);
       const message =
-        err.response?.data?.message || err.message || "Failed to create allocation";
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to create allocation";
       toast.error(message);
       setError(message);
     } finally {
       setLoading(false);
     }
   };
-
 
   // Reset form and close modal
   const handleClose = () => {
@@ -170,11 +165,9 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
     onHide();
   };
 
-
   // Calculate remaining budget for display
   const totalAlreadyAllocated = budget.totalAlreadyAllocated || 0;
   const remainingBudget = (budget.allocatedAmount || 0) - totalAlreadyAllocated;
-
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" className="promo-modal">
@@ -185,7 +178,6 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
         </Modal.Title>
       </Modal.Header>
 
-
       <form onSubmit={handleSubmit}>
         <Modal.Body className="promo-modal-body">
           {/* Show old-style error alert for form validation fallback */}
@@ -195,7 +187,6 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
               {error}
             </div>
           )}
-
 
           {/* Budget info display */}
           <div className="promo-approval-info">
@@ -218,7 +209,6 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
               </span>
             </div>
           </div>
-
 
           {/* Form inputs grid */}
           <div className="promo-form-grid">
@@ -244,7 +234,6 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
               </div>
             </div>
 
-
             <div className="promo-form-column">
               <div className="mb-3">
                 <label htmlFor="amount" className="form-label">
@@ -265,12 +254,13 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
                 <small className="form-text text-muted">
                   Remaining budget: {formatCurrency(remainingBudget)}
                   {totalAlreadyAllocated > 0 &&
-                    ` (Already allocated: ${formatCurrency(totalAlreadyAllocated)})`}
+                    ` (Already allocated: ${formatCurrency(
+                      totalAlreadyAllocated
+                    )})`}
                 </small>
               </div>
             </div>
           </div>
-
 
           {/* Allocation name input with placeholder */}
           <div className="mb-3">
@@ -288,7 +278,6 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
             />
           </div>
 
-
           {/* Notes textarea */}
           <div className="mb-3">
             <label htmlFor="notes" className="form-label">
@@ -305,9 +294,11 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
             />
           </div>
 
-
           {/* Budget Summary display */}
-          <div className="promo-details-section" style={{ backgroundColor: "#f0fdf4" }}>
+          <div
+            className="promo-details-section"
+            style={{ backgroundColor: "#f0fdf4" }}
+          >
             <h6 className="promo-details-heading">Budget Summary</h6>
             <div className="promo-details-grid">
               <div className="promo-detail-item">
@@ -337,12 +328,13 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
                         : "#991b1b",
                   }}
                 >
-                  {formatCurrency(remainingBudget - (parseFloat(formData.amount) || 0))}
+                  {formatCurrency(
+                    remainingBudget - (parseFloat(formData.amount) || 0)
+                  )}
                 </span>
               </div>
             </div>
           </div>
-
 
           {/* Warning if amount exceeds remaining budget */}
           {parseFloat(formData.amount) > remainingBudget && (
@@ -363,7 +355,6 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
             </div>
           )}
         </Modal.Body>
-
 
         <Modal.Footer className="promo-modal-footer">
           <button
@@ -398,6 +389,5 @@ const AllocateByCategoryModal = ({ show, budget, onHide, onAllocationCreated }) 
     </Modal>
   );
 };
-
 
 export default AllocateByCategoryModal;

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 
-
 export default function useAuth() {
-  const [role, setRoleState] = useState(localStorage.getItem("role") || "Employee");
+  const [role, setRoleState] = useState(
+    localStorage.getItem("role") || "Employee"
+  );
 
   useEffect(() => {
     localStorage.setItem("role", role);

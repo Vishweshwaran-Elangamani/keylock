@@ -21,7 +21,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
   );
   const canAssign = isCreator && goal.goalType === "team";
 
-  // ✅ NEW: Check if user is Leadership
+  //  NEW: Check if user is Leadership
   const isLeadership = user.role === "Leadership";
   const isOrgGoal = goal.goalType === "org";
 
@@ -29,7 +29,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
   const overdueStatus = isOverdue(goal.endAt) && goal.status !== "completed";
   const daysUntil = getDaysUntilDeadline(goal.endAt);
 
-  // ✅ NEW: Only show comment button if not org goal OR if leadership
+  //  NEW: Only show comment button if not org goal OR if leadership
   const canShowCommentButton = onComment && (!isOrgGoal || isLeadership);
 
   // Get user's acknowledgment status
@@ -288,9 +288,9 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
             ></i>
             <span>
               {daysUntil === 0
-                ? "🔥 Due today!"
+                ? " Due today!"
                 : daysUntil === 1
-                ? "⚡ Due tomorrow"
+                ? " Due tomorrow"
                 : `${daysUntil} days remaining`}
             </span>
           </div>
@@ -444,7 +444,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
               <i className="bi bi-eye-fill" aria-hidden="true"></i>
             </button>
 
-            {/* ✅ UPDATED: Comment Button - Hide for non-leadership on org goals */}
+            {/*  UPDATED: Comment Button - Hide for non-leadership on org goals */}
             {canShowCommentButton && (
               <button
                 className="btn btn-sm btn-outline-info d-flex justify-content-center align-items-center"

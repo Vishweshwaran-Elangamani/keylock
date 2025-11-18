@@ -3,13 +3,13 @@ import internalApi from "../internalApi";
 const API_BASE = "InternalOpportunity";
 
 const internalOpportunityService = {
-  // ✅ Get all opportunities - NO filters, NO pagination
+  //  Get all opportunities - NO filters, NO pagination
   getAllOpportunities: async () => {
     try {
       const response = await internalApi.get(`/${API_BASE}`);
-      
+
       console.log("Raw response:", response.data);
-      
+
       return {
         success: true,
         data: response.data,
@@ -18,7 +18,8 @@ const internalOpportunityService = {
       console.error("Get all opportunities error:", error);
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to fetch opportunities",
+        message:
+          error.response?.data?.message || "Failed to fetch opportunities",
       };
     }
   },
@@ -42,7 +43,10 @@ const internalOpportunityService = {
   // Create new opportunity (HR only)
   createOpportunity: async (opportunityData) => {
     try {
-      const response = await internalApi.post(`/${API_BASE}/create`, opportunityData);
+      const response = await internalApi.post(
+        `/${API_BASE}/create`,
+        opportunityData
+      );
       return {
         success: true,
         data: response.data,
@@ -51,7 +55,8 @@ const internalOpportunityService = {
       console.error("Create opportunity error:", error);
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to create opportunity",
+        message:
+          error.response?.data?.message || "Failed to create opportunity",
       };
     }
   },
@@ -59,7 +64,10 @@ const internalOpportunityService = {
   // Update opportunity (HR only)
   updateOpportunity: async (id, opportunityData) => {
     try {
-      const response = await internalApi.put(`/${API_BASE}/update/${id}`, opportunityData);
+      const response = await internalApi.put(
+        `/${API_BASE}/update/${id}`,
+        opportunityData
+      );
       return {
         success: true,
         data: response.data,
@@ -67,7 +75,8 @@ const internalOpportunityService = {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to update opportunity",
+        message:
+          error.response?.data?.message || "Failed to update opportunity",
       };
     }
   },
@@ -83,7 +92,8 @@ const internalOpportunityService = {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to delete opportunity",
+        message:
+          error.response?.data?.message || "Failed to delete opportunity",
       };
     }
   },
@@ -99,7 +109,9 @@ const internalOpportunityService = {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to fetch active opportunities",
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch active opportunities",
       };
     }
   },

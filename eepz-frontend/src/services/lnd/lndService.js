@@ -592,9 +592,9 @@ export const lndService = {
     role = "all",
     approvalType = "",
     status = "",
-    searchTerm = "", 
-    sortField = "", 
-    sortOrder = "" 
+    searchTerm = "",
+    sortField = "",
+    sortOrder = ""
   ) => {
     try {
       const query = buildQueryString({
@@ -602,9 +602,9 @@ export const lndService = {
         role,
         approvalType,
         status,
-        searchTerm, 
-        sortField, 
-        sortOrder, 
+        searchTerm,
+        sortField,
+        sortOrder,
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/approvals/history${query}`,

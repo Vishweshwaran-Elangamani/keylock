@@ -16,9 +16,9 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
   useEffect(() => {
     if (uploadResult && uploadResult.errors && uploadResult.errors.length > 0) {
       setTimeout(() => {
-        const errorSection = document.querySelector('.error-details-bulk');
+        const errorSection = document.querySelector(".error-details-bulk");
         if (errorSection) {
-          errorSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          errorSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
       }, 100);
     }
@@ -31,15 +31,20 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     const categorized = {
       duplicateEmails: [],
       validationErrors: [],
-      otherErrors: []
+      otherErrors: [],
     };
 
-    errors.forEach(error => {
+    errors.forEach((error) => {
       const errorStr = error.toLowerCase();
-      
-      if (errorStr.includes('email') && (errorStr.includes('already') || errorStr.includes('exists') || errorStr.includes('duplicate'))) {
+
+      if (
+        errorStr.includes("email") &&
+        (errorStr.includes("already") ||
+          errorStr.includes("exists") ||
+          errorStr.includes("duplicate"))
+      ) {
         categorized.duplicateEmails.push(error);
-      } else if (errorStr.includes('row')) {
+      } else if (errorStr.includes("row")) {
         categorized.validationErrors.push(error);
       } else {
         categorized.otherErrors.push(error);
@@ -152,8 +157,10 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
 
     try {
       setLoading(true);
-      
-      const result = await BulkOperationService.bulkCreateUsersFromExcel(selectedFile);
+
+      const result = await BulkOperationService.bulkCreateUsersFromExcel(
+        selectedFile
+      );
 
       console.log("=== BULK IMPORT RESULT ===");
       console.log("Full result:", result);
@@ -170,13 +177,16 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
 
       if (result.success) {
         const data = result.data;
-        
+
         setUploadResult({
           successCount: data.successCount || 0,
           failureCount: data.failureCount || 0,
           totalRecords: data.totalRecords || 0,
           errors: data.errors || [],
-          categorizedErrors: data.errors && data.errors.length > 0 ? categorizeErrors(data.errors) : null
+          categorizedErrors:
+            data.errors && data.errors.length > 0
+              ? categorizeErrors(data.errors)
+              : null,
         });
 
         if (data.failureCount === 0) {
@@ -201,14 +211,14 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
         }
       } else {
         toast.error(result.message || "Import failed", { duration: 5000 });
-        
+
         if (result.data?.errors) {
           setUploadResult({
             successCount: 0,
             failureCount: result.data.failureCount || result.data.errors.length,
             totalRecords: result.data.totalRecords || result.data.errors.length,
             errors: result.data.errors,
-            categorizedErrors: categorizeErrors(result.data.errors)
+            categorizedErrors: categorizeErrors(result.data.errors),
           });
         }
       }
@@ -219,21 +229,27 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
       console.error("Error response:", error.response);
       console.error("Error response data:", error.response?.data);
       console.error("========================");
-      
+
       toast.dismiss(loadingToastId);
 
       const responseData = error.response?.data;
-      const errorMessage = responseData?.message || error.message || "Import failed";
-      
+      const errorMessage =
+        responseData?.message || error.message || "Import failed";
+
       toast.error(errorMessage, { duration: 5000 });
 
-      if (responseData?.data?.errors && Array.isArray(responseData.data.errors)) {
+      if (
+        responseData?.data?.errors &&
+        Array.isArray(responseData.data.errors)
+      ) {
         setUploadResult({
           successCount: responseData.data.successCount || 0,
-          failureCount: responseData.data.failureCount || responseData.data.errors.length,
-          totalRecords: responseData.data.totalRecords || responseData.data.errors.length,
+          failureCount:
+            responseData.data.failureCount || responseData.data.errors.length,
+          totalRecords:
+            responseData.data.totalRecords || responseData.data.errors.length,
           errors: responseData.data.errors,
-          categorizedErrors: categorizeErrors(responseData.data.errors)
+          categorizedErrors: categorizeErrors(responseData.data.errors),
         });
       } else if (responseData?.errors && Array.isArray(responseData.errors)) {
         setUploadResult({
@@ -241,7 +257,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
           failureCount: responseData.errors.length,
           totalRecords: responseData.errors.length,
           errors: responseData.errors,
-          categorizedErrors: categorizeErrors(responseData.errors)
+          categorizedErrors: categorizeErrors(responseData.errors),
         });
       }
     } finally {
@@ -279,14 +295,18 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
             </div>
             <div className="bulk-tabs-container">
               <button
-                className={`bulk-tab-btn ${activeTab === "import" ? "active" : ""}`}
+                className={`bulk-tab-btn ${
+                  activeTab === "import" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("import")}
               >
                 <i className="bi bi-upload"></i>
                 Import Users
               </button>
               <button
-                className={`bulk-tab-btn ${activeTab === "export" ? "active" : ""}`}
+                className={`bulk-tab-btn ${
+                  activeTab === "export" ? "active" : ""
+                }`}
                 onClick={() => setActiveTab("export")}
               >
                 <i className="bi bi-download"></i>
@@ -390,7 +410,8 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       )}
                     </button>
                     <small className="template-hint">
-                      Download the template, fill in user details, and upload it below
+                      Download the template, fill in user details, and upload it
+                      below
                     </small>
                   </div>
 
@@ -400,11 +421,14 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       <strong>Excel Format Requirements:</strong>
                       <ul className="instructions-list">
                         <li>
-                          Required columns: EmployeeCompanyId, Email, FirstName, LastName, Role, Department
+                          Required columns: EmployeeCompanyId, Email, FirstName,
+                          LastName, Role, Department
                         </li>
                         <li>File format: .xlsx or .xls (max 5MB)</li>
                         <li>First row must contain column headers</li>
-                        <li>Follow template format with dropdown validations</li>
+                        <li>
+                          Follow template format with dropdown validations
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -417,7 +441,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       id="bulkImportFile"
                       accept=".xlsx,.xls"
                       onChange={handleFileSelect}
-                      style={{ display: 'none' }}
+                      style={{ display: "none" }}
                     />
                     <button
                       type="button"
@@ -425,8 +449,12 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       className="file-upload-button-bulk"
                     >
                       <i className="bi bi-cloud-upload"></i>
-                      <span className="upload-text">Click to select Excel file</span>
-                      <small className="upload-hint">Supported: .xlsx, .xls (Max 5MB)</small>
+                      <span className="upload-text">
+                        Click to select Excel file
+                      </span>
+                      <small className="upload-hint">
+                        Supported: .xlsx, .xls (Max 5MB)
+                      </small>
                     </button>
                   </div>
 
@@ -481,152 +509,214 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                         <i className="bi bi-bar-chart-fill"></i>
                         Import Results
                       </h6>
-                      
+
                       <div className="result-stats-grid">
                         <div className="result-stat-card total">
                           <i className="bi bi-file-earmark-text"></i>
-                          <span className="stat-value">{uploadResult.totalRecords}</span>
+                          <span className="stat-value">
+                            {uploadResult.totalRecords}
+                          </span>
                           <span className="stat-label">Total Records</span>
                         </div>
                         <div className="result-stat-card success">
                           <i className="bi bi-check-circle-fill"></i>
-                          <span className="stat-value">{uploadResult.successCount}</span>
+                          <span className="stat-value">
+                            {uploadResult.successCount}
+                          </span>
                           <span className="stat-label">Successful</span>
                         </div>
                         <div className="result-stat-card failed">
                           <i className="bi bi-x-circle-fill"></i>
-                          <span className="stat-value">{uploadResult.failureCount}</span>
+                          <span className="stat-value">
+                            {uploadResult.failureCount}
+                          </span>
                           <span className="stat-label">Failed</span>
                         </div>
                       </div>
 
-                      {uploadResult.errors && uploadResult.errors.length > 0 && (
-                        <div className="error-details-bulk">
-                          <div className="error-header">
-                            <i className="bi bi-exclamation-triangle-fill"></i>
-                            <span>Detailed Error Information</span>
+                      {uploadResult.errors &&
+                        uploadResult.errors.length > 0 && (
+                          <div className="error-details-bulk">
+                            <div className="error-header">
+                              <i className="bi bi-exclamation-triangle-fill"></i>
+                              <span>Detailed Error Information</span>
+                            </div>
+
+                            <div className="error-summary-alert">
+                              <i className="bi bi-info-circle-fill"></i>
+                              <div className="error-summary-content">
+                                <strong>
+                                  {uploadResult.failureCount} record
+                                  {uploadResult.failureCount !== 1 ? "s" : ""}{" "}
+                                  failed to import
+                                </strong>
+                                <p>
+                                  Review each error below. Format: Row number
+                                  (Email) - Error description
+                                </p>
+                              </div>
+                            </div>
+
+                            {uploadResult.categorizedErrors ? (
+                              <div className="error-categories">
+                                {/* Duplicate Emails */}
+                                {uploadResult.categorizedErrors.duplicateEmails
+                                  .length > 0 && (
+                                  <details
+                                    className="error-category-section"
+                                    open
+                                  >
+                                    <summary className="error-category-header error-duplicate-header">
+                                      <div className="category-info">
+                                        <i className="bi bi-envelope-x-fill"></i>
+                                        <span className="category-title">
+                                          Duplicate Email Addresses
+                                        </span>
+                                        <span className="category-count">
+                                          {
+                                            uploadResult.categorizedErrors
+                                              .duplicateEmails.length
+                                          }
+                                        </span>
+                                      </div>
+                                      <i className="bi bi-chevron-down chevron-icon"></i>
+                                    </summary>
+                                    <div className="error-category-content">
+                                      <ul className="error-list">
+                                        {uploadResult.categorizedErrors.duplicateEmails.map(
+                                          (error, index) => (
+                                            <li
+                                              key={`dup-${index}`}
+                                              className="error-item error-duplicate"
+                                            >
+                                              <div className="error-icon">
+                                                <i className="bi bi-envelope-x"></i>
+                                              </div>
+                                              <div className="error-content">
+                                                <span className="error-message">
+                                                  {error}
+                                                </span>
+                                              </div>
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    </div>
+                                  </details>
+                                )}
+
+                                {/* Validation Errors */}
+                                {uploadResult.categorizedErrors.validationErrors
+                                  .length > 0 && (
+                                  <details
+                                    className="error-category-section"
+                                    open
+                                  >
+                                    <summary className="error-category-header error-validation-header">
+                                      <div className="category-info">
+                                        <i className="bi bi-exclamation-circle-fill"></i>
+                                        <span className="category-title">
+                                          Data Validation Errors
+                                        </span>
+                                        <span className="category-count">
+                                          {
+                                            uploadResult.categorizedErrors
+                                              .validationErrors.length
+                                          }
+                                        </span>
+                                      </div>
+                                      <i className="bi bi-chevron-down chevron-icon"></i>
+                                    </summary>
+                                    <div className="error-category-content">
+                                      <ul className="error-list">
+                                        {uploadResult.categorizedErrors.validationErrors.map(
+                                          (error, index) => (
+                                            <li
+                                              key={`val-${index}`}
+                                              className="error-item error-validation"
+                                            >
+                                              <div className="error-icon">
+                                                <i className="bi bi-x-circle"></i>
+                                              </div>
+                                              <div className="error-content">
+                                                <span className="error-message">
+                                                  {error}
+                                                </span>
+                                              </div>
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    </div>
+                                  </details>
+                                )}
+
+                                {/* Other Errors */}
+                                {uploadResult.categorizedErrors.otherErrors
+                                  .length > 0 && (
+                                  <details
+                                    className="error-category-section"
+                                    open
+                                  >
+                                    <summary className="error-category-header error-other-header">
+                                      <div className="category-info">
+                                        <i className="bi bi-info-circle-fill"></i>
+                                        <span className="category-title">
+                                          Other Issues
+                                        </span>
+                                        <span className="category-count">
+                                          {
+                                            uploadResult.categorizedErrors
+                                              .otherErrors.length
+                                          }
+                                        </span>
+                                      </div>
+                                      <i className="bi bi-chevron-down chevron-icon"></i>
+                                    </summary>
+                                    <div className="error-category-content">
+                                      <ul className="error-list">
+                                        {uploadResult.categorizedErrors.otherErrors.map(
+                                          (error, index) => (
+                                            <li
+                                              key={`other-${index}`}
+                                              className="error-item error-other"
+                                            >
+                                              <div className="error-icon">
+                                                <i className="bi bi-info-circle"></i>
+                                              </div>
+                                              <div className="error-content">
+                                                <span className="error-message">
+                                                  {error}
+                                                </span>
+                                              </div>
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    </div>
+                                  </details>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="error-category-content">
+                                <ul className="error-list">
+                                  {uploadResult.errors.map((error, index) => (
+                                    <li key={index} className="error-item">
+                                      <div className="error-icon">
+                                        <i className="bi bi-x-circle"></i>
+                                      </div>
+                                      <div className="error-content">
+                                        <span className="error-message">
+                                          {error}
+                                        </span>
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </div>
-
-                          <div className="error-summary-alert">
-                            <i className="bi bi-info-circle-fill"></i>
-                            <div className="error-summary-content">
-                              <strong>
-                                {uploadResult.failureCount} record{uploadResult.failureCount !== 1 ? 's' : ''} failed to import
-                              </strong>
-                              <p>Review each error below. Format: Row number (Email) - Error description</p>
-                            </div>
-                          </div>
-
-                          {uploadResult.categorizedErrors ? (
-                            <div className="error-categories">
-                              {/* Duplicate Emails */}
-                              {uploadResult.categorizedErrors.duplicateEmails.length > 0 && (
-                                <details className="error-category-section" open>
-                                  <summary className="error-category-header error-duplicate-header">
-                                    <div className="category-info">
-                                      <i className="bi bi-envelope-x-fill"></i>
-                                      <span className="category-title">Duplicate Email Addresses</span>
-                                      <span className="category-count">
-                                        {uploadResult.categorizedErrors.duplicateEmails.length}
-                                      </span>
-                                    </div>
-                                    <i className="bi bi-chevron-down chevron-icon"></i>
-                                  </summary>
-                                  <div className="error-category-content">
-                                    <ul className="error-list">
-                                      {uploadResult.categorizedErrors.duplicateEmails.map((error, index) => (
-                                        <li key={`dup-${index}`} className="error-item error-duplicate">
-                                          <div className="error-icon">
-                                            <i className="bi bi-envelope-x"></i>
-                                          </div>
-                                          <div className="error-content">
-                                            <span className="error-message">{error}</span>
-                                          </div>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                </details>
-                              )}
-
-                              {/* Validation Errors */}
-                              {uploadResult.categorizedErrors.validationErrors.length > 0 && (
-                                <details className="error-category-section" open>
-                                  <summary className="error-category-header error-validation-header">
-                                    <div className="category-info">
-                                      <i className="bi bi-exclamation-circle-fill"></i>
-                                      <span className="category-title">Data Validation Errors</span>
-                                      <span className="category-count">
-                                        {uploadResult.categorizedErrors.validationErrors.length}
-                                      </span>
-                                    </div>
-                                    <i className="bi bi-chevron-down chevron-icon"></i>
-                                  </summary>
-                                  <div className="error-category-content">
-                                    <ul className="error-list">
-                                      {uploadResult.categorizedErrors.validationErrors.map((error, index) => (
-                                        <li key={`val-${index}`} className="error-item error-validation">
-                                          <div className="error-icon">
-                                            <i className="bi bi-x-circle"></i>
-                                          </div>
-                                          <div className="error-content">
-                                            <span className="error-message">{error}</span>
-                                          </div>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                </details>
-                              )}
-
-                              {/* Other Errors */}
-                              {uploadResult.categorizedErrors.otherErrors.length > 0 && (
-                                <details className="error-category-section" open>
-                                  <summary className="error-category-header error-other-header">
-                                    <div className="category-info">
-                                      <i className="bi bi-info-circle-fill"></i>
-                                      <span className="category-title">Other Issues</span>
-                                      <span className="category-count">
-                                        {uploadResult.categorizedErrors.otherErrors.length}
-                                      </span>
-                                    </div>
-                                    <i className="bi bi-chevron-down chevron-icon"></i>
-                                  </summary>
-                                  <div className="error-category-content">
-                                    <ul className="error-list">
-                                      {uploadResult.categorizedErrors.otherErrors.map((error, index) => (
-                                        <li key={`other-${index}`} className="error-item error-other">
-                                          <div className="error-icon">
-                                            <i className="bi bi-info-circle"></i>
-                                          </div>
-                                          <div className="error-content">
-                                            <span className="error-message">{error}</span>
-                                          </div>
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                </details>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="error-category-content">
-                              <ul className="error-list">
-                                {uploadResult.errors.map((error, index) => (
-                                  <li key={index} className="error-item">
-                                    <div className="error-icon">
-                                      <i className="bi bi-x-circle"></i>
-                                    </div>
-                                    <div className="error-content">
-                                      <span className="error-message">{error}</span>
-                                    </div>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                        )}
                     </div>
                   )}
                 </div>
@@ -634,7 +724,11 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
             </div>
 
             <div className="modal-footer-bulk">
-              <button type="button" className="btn-close-bulk" onClick={handleClose}>
+              <button
+                type="button"
+                className="btn-close-bulk"
+                onClick={handleClose}
+              >
                 <i className="bi bi-x-circle"></i>
                 Close
               </button>

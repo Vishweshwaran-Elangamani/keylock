@@ -1,6 +1,6 @@
 /**
  * AddRoleModal Component
- * 
+ *
  * A modal component for creating new roles in the system.
  * Features:
  * - Form validation for role name, code, and description
@@ -9,7 +9,7 @@
  * - Prevents duplicate role codes
  * - Toast notifications using Sonner for success/error feedback
  * - Loading state during API operations
- * 
+ *
  * @param {boolean} show - Controls modal visibility
  * @param {function} onClose - Callback to close the modal
  * @param {function} onSuccess - Callback after successful role creation
@@ -55,18 +55,18 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
    * Handles input field changes
    * Updates form data and clears field-specific errors
    * Provides immediate feedback by removing errors when user starts typing
-   * 
+   *
    * @param {Event} e - Input change event
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Update form data with new value
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    
+
     // Clear error for this specific field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
@@ -83,12 +83,12 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
   /**
    * Validates all form fields before submission
    * Applies comprehensive validation rules for each field
-   * 
+   *
    * Validation Rules:
    * - Role Name: Required, minimum 3 characters
    * - Role Code: Required, minimum 2 characters, alphanumeric only
    * - Description: Required, minimum 10 characters
-   * 
+   *
    * @returns {boolean} - True if form is valid, false otherwise
    */
   const validateForm = () => {
@@ -120,7 +120,7 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
 
     // Update errors state with all validation errors
     setErrors(newErrors);
-    
+
     // Return true if no errors found, false otherwise
     return Object.keys(newErrors).length === 0;
   };
@@ -133,7 +133,7 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
    * Handles form submission
    * Validates form, formats payload, and calls API to create role
    * Shows Sonner toast notifications for user feedback
-   * 
+   *
    * @param {Event} e - Form submit event
    */
   const handleSubmit = async (e) => {
@@ -148,7 +148,7 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
     try {
       // Set loading state to disable form and show loading indicator
       setLoading(true);
-      
+
       // Show loading toast
       toast.loading("Creating role...");
 
@@ -168,16 +168,15 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
       if (response.success) {
         toast.dismiss();
         toast.success("Role created successfully");
-        
+
         // Trigger success callback to refresh role list
         onSuccess();
-        
+
         // CRITICAL: Delay closing the modal to allow toast to render
         // Without this delay, modal unmounts before toast displays
         setTimeout(() => {
           onClose();
         }, 500); // 500ms delay
-        
       } else {
         // -------- Handle Failure Response --------
         toast.dismiss();
@@ -206,12 +205,11 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-custom"></div>
-      
+
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-custom">
         <div className="modal-dialog-custom">
           <div className="modal-content-custom">
-            
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -239,12 +237,10 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
               <div className="modal-body-custom">
                 {/* Form Grid - Two-column layout for form fields */}
                 <div className="form-grid">
-                  
                   {/* -------- Role Name Field (Required) -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
-                      Role Name{" "}
-                      <span className="required-mark">*</span>
+                      Role Name <span className="required-mark">*</span>
                     </label>
                     <input
                       type="text"
@@ -260,17 +256,14 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                     />
                     {/* Show validation error if exists */}
                     {errors.roleName && (
-                      <div className="error-message">
-                        {errors.roleName}
-                      </div>
+                      <div className="error-message">{errors.roleName}</div>
                     )}
                   </div>
 
                   {/* -------- Role Code Field (Required) -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
-                      Role Code{" "}
-                      <span className="required-mark">*</span>
+                      Role Code <span className="required-mark">*</span>
                     </label>
                     <input
                       type="text"
@@ -286,17 +279,14 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                     />
                     {/* Show validation error if exists */}
                     {errors.roleCode && (
-                      <div className="error-message">
-                        {errors.roleCode}
-                      </div>
+                      <div className="error-message">{errors.roleCode}</div>
                     )}
                   </div>
 
                   {/* -------- Description Field (Required, Full Width) -------- */}
                   <div className="form-group-custom form-group-full">
                     <label className="form-label-custom">
-                      Description{" "}
-                      <span className="required-mark">*</span>
+                      Description <span className="required-mark">*</span>
                     </label>
                     <textarea
                       className={`form-textarea-custom ${
@@ -312,9 +302,7 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                     ></textarea>
                     {/* Show validation error if exists */}
                     {errors.description && (
-                      <div className="error-message">
-                        {errors.description}
-                      </div>
+                      <div className="error-message">{errors.description}</div>
                     )}
                     {/* Character counter helper text */}
                     <small className="helper-text">
@@ -349,14 +337,10 @@ const AddRoleModal = ({ show, onClose, onSuccess }) => {
                   <i className="bi bi-x-circle"></i>
                   Cancel
                 </button>
-                
+
                 {/* Submit Button - Creates new role */}
                 {/* Disabled during loading to prevent duplicate requests */}
-                <button
-                  type="submit"
-                  className="btn-submit"
-                  disabled={loading}
-                >
+                <button type="submit" className="btn-submit" disabled={loading}>
                   {loading ? (
                     // Show loading state with spinner and text
                     <>

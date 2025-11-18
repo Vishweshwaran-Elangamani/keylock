@@ -1,54 +1,71 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
-  RefreshCw, AlertTriangle, Eye, Trash2, Clock,
-  FileText, Users, Send, Target, Star, ArrowLeft, Inbox
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { mentorFeedbackApi, peerQueueApi, hrFormApi, orgGoalFeedbackApi } from '../../../services/feedbackmanagement/feedbackApi';
-import ResponseViewModal from '../../../components/FeedbackManagement/ResponseViewModal';
-import axios from 'axios';
- 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5333/api';
- 
+  RefreshCw,
+  AlertTriangle,
+  Eye,
+  Trash2,
+  Clock,
+  FileText,
+  Users,
+  Send,
+  Target,
+  Star,
+  ArrowLeft,
+  Inbox,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {
+  mentorFeedbackApi,
+  peerQueueApi,
+  hrFormApi,
+  orgGoalFeedbackApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
+import ResponseViewModal from "../../../components/feedback_management/ResponseViewModal";
+import axios from "axios";
+
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 const formatDate = (dateInput) => {
-  if (!dateInput) return '—';
- 
+  if (!dateInput) return "—";
+
   try {
     let dateObj;
-   
-    if (typeof dateInput === 'number') {
+
+    if (typeof dateInput === "number") {
       dateObj = new Date(dateInput);
-    } else if (typeof dateInput === 'string') {
-      const normalized = dateInput.includes(' ') && !dateInput.includes('T')
-        ? dateInput.replace(' ', 'T')
-        : dateInput;
+    } else if (typeof dateInput === "string") {
+      const normalized =
+        dateInput.includes(" ") && !dateInput.includes("T")
+          ? dateInput.replace(" ", "T")
+          : dateInput;
       dateObj = new Date(normalized);
     } else if (dateInput instanceof Date) {
       dateObj = dateInput;
     } else {
-      return '—';
+      return "—";
     }
-   
-    if (isNaN(dateObj.getTime())) return 'Invalid Date';
-   
-    return dateObj.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+
+    if (isNaN(dateObj.getTime())) return "Invalid Date";
+
+    return dateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   } catch (err) {
-    return 'Invalid Date';
+    return "Invalid Date";
   }
 };
- 
+
 const getDaysAgo = (dateInput) => {
   try {
-    const dateObj = typeof dateInput === 'string'
-      ? new Date(dateInput.replace(' ', 'T'))
-      : new Date(dateInput);
-   
+    const dateObj =
+      typeof dateInput === "string"
+        ? new Date(dateInput.replace(" ", "T"))
+        : new Date(dateInput);
+
     if (isNaN(dateObj.getTime())) return null;
-   
+
     const now = new Date();
     const diffMs = now - dateObj;
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -57,16 +74,30 @@ const getDaysAgo = (dateInput) => {
     return null;
   }
 };
- 
-const RATING_LABELS = { 1: 'Poor', 2: 'Fair', 3: 'Good', 4: 'Very Good', 5: 'Excellent' };
- 
+
+const RATING_LABELS = {
+  1: "Poor",
+  2: "Fair",
+  3: "Good",
+  4: "Very Good",
+  5: "Excellent",
+};
+
 export default function MySubmissions() {
   const navigate = useNavigate();
-  const user = useMemo(() => JSON.parse(localStorage.getItem('user') || '{}') || { empId: 1004, firstName: 'Dave', lastName: 'Dev' }, []);
- 
+  const user = useMemo(
+    () =>
+      JSON.parse(localStorage.getItem("user") || "{}") || {
+        empId: 1004,
+        firstName: "Dave",
+        lastName: "Dev",
+      },
+    []
+  );
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [tab, setTab] = useState('HR Forms');
+  const [error, setError] = useState("");
+  const [tab, setTab] = useState("HR Forms");
   const [hrForms, setHrForms] = useState([]);
   const [mentor, setMentor] = useState([]);
   const [peer, setPeer] = useState([]);
@@ -77,64 +108,66 @@ export default function MySubmissions() {
   const [showModal, setShowModal] = useState(false);
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
-  const [toast, setToast] = useState({ show: false, message: '', type: '' });
- 
-  const showToast = (message, type = 'success') => {
+  const [toast, setToast] = useState({ show: false, message: "", type: "" });
+
+  const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: '', type: '' }), 3000);
+    setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
   };
- 
+
   const fetchEmployeeMap = useCallback(async () => {
     try {
       const response = await axios.get(`${API_BASE}/EmployeeManagement/all`);
       if (response.data?.success && Array.isArray(response.data.data)) {
         const map = {};
-        response.data.data.forEach(emp => {
+        response.data.data.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
       }
     } catch (err) {
-      console.error('Error fetching employee map:', err.message);
+      console.error("Error fetching employee map:", err.message);
     }
   }, []);
- 
+
   const fetchObjectives = useCallback(async () => {
     try {
       const response = await axios.get(`${API_BASE}/Goals/all`, {
-        params: { pageNumber: 1, pageSize: 100 }
+        params: { pageNumber: 1, pageSize: 100 },
       });
-     
+
       const goalsData = response.data?.data || response.data || [];
-     
+
       if (Array.isArray(goalsData)) {
         const map = {};
-        goalsData.forEach(goal => {
+        goalsData.forEach((goal) => {
           map[goal.goalid] = goal.goaltitle || `Goal ${goal.goalid}`;
         });
         setObjectives(map);
       }
     } catch (err) {
-      console.error('Error fetching goals:', err.message);
+      console.error("Error fetching goals:", err.message);
     }
   }, []);
- 
+
   const fetchData = useCallback(async () => {
     setRefreshing(true);
     setLoading(true);
-    setError('');
-   
+    setError("");
+
     try {
       const userEmpId = Number(user?.empId) || 1004;
- 
+
       // HR Forms
       try {
-        const hrRes = await axios.get(`${API_BASE}/HrFeedbackForm/responses/by-employee/${userEmpId}`);
+        const hrRes = await axios.get(
+          `${API_BASE}/HrFeedbackForm/responses/by-employee/${userEmpId}`
+        );
         if (hrRes.data?.success && Array.isArray(hrRes.data.data)) {
-          const enriched = hrRes.data.data.map(hr => ({
+          const enriched = hrRes.data.data.map((hr) => ({
             ...hr,
             submittedAtFormatted: formatDate(hr.submittedAt),
-            daysAgo: getDaysAgo(hr.submittedAt)
+            daysAgo: getDaysAgo(hr.submittedAt),
           }));
           setHrForms(enriched);
         } else {
@@ -143,55 +176,66 @@ export default function MySubmissions() {
       } catch (hrErr) {
         setHrForms([]);
       }
- 
+
       // Mentor Feedback
       try {
         const mentorRes = await mentorFeedbackApi.myFeedback(userEmpId);
-        const mentorData = Array.isArray(mentorRes.data?.data) ? mentorRes.data.data : [];
-        const enriched = mentorData.map(m => ({
+        const mentorData = Array.isArray(mentorRes.data?.data)
+          ? mentorRes.data.data
+          : [];
+        const enriched = mentorData.map((m) => ({
           ...m,
-          mentorNameFull: employeeMap[m.mentorEmployeeId] || `Employee ${m.mentorEmployeeId}`,
+          mentorNameFull:
+            employeeMap[m.mentorEmployeeId] || `Employee ${m.mentorEmployeeId}`,
           createdAtFormatted: formatDate(m.createdAt),
-          trackingId: m.mentorFeedbackId || m.trackingId || m.id
+          trackingId: m.mentorFeedbackId || m.trackingId || m.id,
         }));
         setMentor(enriched);
       } catch (mentorErr) {
         setMentor([]);
       }
- 
+
       // Peer Feedback
       try {
         const peerRes = await peerQueueApi.list(1, 100);
-        const allPeer = Array.isArray(peerRes.data?.data) ? peerRes.data.data : [];
-        const peerData = allPeer.filter(p => Number(p.submittedByEmployeeId) === userEmpId);
-        const enriched = peerData.map(p => ({
+        const allPeer = Array.isArray(peerRes.data?.data)
+          ? peerRes.data.data
+          : [];
+        const peerData = allPeer.filter(
+          (p) => Number(p.submittedByEmployeeId) === userEmpId
+        );
+        const enriched = peerData.map((p) => ({
           ...p,
-          recipientNameFull: employeeMap[p.recipientEmployeeId] || `Employee ${p.recipientEmployeeId}`,
+          recipientNameFull:
+            employeeMap[p.recipientEmployeeId] ||
+            `Employee ${p.recipientEmployeeId}`,
           createdAtFormatted: formatDate(p.createdAt),
-          queueId: p.queueId || p.id
+          queueId: p.queueId || p.id,
         }));
         setPeer(enriched);
       } catch (peerErr) {
         setPeer([]);
       }
- 
+
       // Goal Feedback
       try {
         const goalRes = await orgGoalFeedbackApi.list(1, 100);
-       
+
         if (goalRes.data?.success && Array.isArray(goalRes.data.data)) {
           const myGoals = goalRes.data.data
-            .filter(g => Number(g.submittedByEmployeeId) === userEmpId)
-            .map(g => ({
+            .filter((g) => Number(g.submittedByEmployeeId) === userEmpId)
+            .map((g) => ({
               ...g,
-              objectiveTitle: objectives[g.organizationObjectiveId] || `Goal #${g.organizationObjectiveId}`,
+              objectiveTitle:
+                objectives[g.organizationObjectiveId] ||
+                `Goal #${g.organizationObjectiveId}`,
               submittedAtFormatted: formatDate(g.createdAt),
               daysAgo: getDaysAgo(g.createdAt),
               feedbackId: g.orgGoalFeedbackId,
               rating: g.rating || 0,
-              feedbackComments: g.feedbackComments || ''
+              feedbackComments: g.feedbackComments || "",
             }));
-         
+
           setGoalFeedback(myGoals);
         } else {
           setGoalFeedback([]);
@@ -200,183 +244,215 @@ export default function MySubmissions() {
         setGoalFeedback([]);
       }
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || 'Failed to fetch submissions');
+      setError(
+        err?.response?.data?.message ||
+          err.message ||
+          "Failed to fetch submissions"
+      );
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, [user?.empId, employeeMap, objectives]);
- 
+
   useEffect(() => {
     fetchEmployeeMap();
     fetchObjectives();
   }, [fetchEmployeeMap, fetchObjectives]);
- 
+
   useEffect(() => {
     if (Object.keys(employeeMap).length > 0) {
       fetchData();
     }
   }, [employeeMap, fetchData]);
- 
+
   const handleViewResponse = (data, type) => {
     setSelectedResponse(data);
     setSelectedType(type);
     setShowModal(true);
   };
- 
+
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedResponse(null);
     setSelectedType(null);
   };
- 
+
   const deleteHRForm = async (responseId) => {
     if (!responseId) {
-      showToast('Invalid response ID', 'error');
+      showToast("Invalid response ID", "error");
       return;
     }
-   
-    if (!window.confirm('Delete this HR form submission?')) return;
-   
+
+    if (!window.confirm("Delete this HR form submission?")) return;
+
     try {
       await hrFormApi.removeResponse(responseId);
-      showToast('HR form deleted successfully!', 'success');
+      showToast("HR form deleted successfully!", "success");
       await fetchData();
     } catch (err) {
-      showToast(err?.response?.data?.message || 'Failed to delete', 'error');
+      showToast(err?.response?.data?.message || "Failed to delete", "error");
     }
   };
- 
+
   const deleteMentor = async (trackingId) => {
     if (!trackingId) {
-      showToast('Invalid mentor feedback ID', 'error');
+      showToast("Invalid mentor feedback ID", "error");
       return;
     }
-   
-    if (!window.confirm('Delete this mentor feedback?')) return;
-   
+
+    if (!window.confirm("Delete this mentor feedback?")) return;
+
     try {
       await axios.delete(`${API_BASE}/MentorFeedback/${trackingId}`);
-      showToast('Mentor feedback deleted successfully!', 'success');
+      showToast("Mentor feedback deleted successfully!", "success");
       await fetchData();
     } catch (err) {
-      showToast(err?.response?.data?.message || 'Failed to delete', 'error');
+      showToast(err?.response?.data?.message || "Failed to delete", "error");
     }
   };
- 
+
   const deletePeer = async (queueId) => {
     if (!queueId) {
-      showToast('Invalid peer feedback ID', 'error');
+      showToast("Invalid peer feedback ID", "error");
       return;
     }
-   
-    if (!window.confirm('Delete this peer feedback?')) return;
-   
+
+    if (!window.confirm("Delete this peer feedback?")) return;
+
     try {
       await peerQueueApi.remove(queueId);
-      showToast('Peer feedback deleted successfully!', 'success');
+      showToast("Peer feedback deleted successfully!", "success");
       await fetchData();
     } catch (err) {
-      showToast(err?.response?.data?.message || 'Failed to delete', 'error');
+      showToast(err?.response?.data?.message || "Failed to delete", "error");
     }
   };
- 
+
   const deleteGoalFeedback = async (feedbackId) => {
     if (!feedbackId) {
-      showToast('Invalid goal feedback ID', 'error');
+      showToast("Invalid goal feedback ID", "error");
       return;
     }
-   
-    if (!window.confirm('Delete this goal feedback?')) return;
-   
+
+    if (!window.confirm("Delete this goal feedback?")) return;
+
     try {
       await orgGoalFeedbackApi.remove(feedbackId);
-      showToast('Goal feedback deleted successfully!', 'success');
+      showToast("Goal feedback deleted successfully!", "success");
       await fetchData();
     } catch (err) {
-      showToast(err?.response?.data?.message || 'Failed to delete', 'error');
+      showToast(err?.response?.data?.message || "Failed to delete", "error");
     }
   };
- 
+
   const getTabData = () => {
-    switch(tab) {
-      case 'HR Forms': return hrForms;
-      case 'Goal Feedback': return goalFeedback;
-      case 'Mentor': return mentor;
-      case 'Peer': return peer;
-      default: return [];
+    switch (tab) {
+      case "HR Forms":
+        return hrForms;
+      case "Goal Feedback":
+        return goalFeedback;
+      case "Mentor":
+        return mentor;
+      case "Peer":
+        return peer;
+      default:
+        return [];
     }
   };
- 
+
   const getEmptyStateIcon = () => {
-    switch(tab) {
-      case 'HR Forms': return FileText;
-      case 'Goal Feedback': return Target;
-      case 'Mentor': return Send;
-      case 'Peer': return Users;
-      default: return Inbox;
+    switch (tab) {
+      case "HR Forms":
+        return FileText;
+      case "Goal Feedback":
+        return Target;
+      case "Mentor":
+        return Send;
+      case "Peer":
+        return Users;
+      default:
+        return Inbox;
     }
   };
- 
+
   return (
-    <div style={{ padding: '1.25rem 1.75rem', maxWidth: '100%', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-     
+    <div
+      style={{
+        padding: "1.25rem 1.75rem",
+        maxWidth: "100%",
+        minHeight: "100vh",
+        backgroundColor: "#f8f9fa",
+      }}
+    >
       {/* TOAST */}
       {toast.show && (
         <div
-          className={`alert ${toast.type === 'success' ? 'alert-success' : 'alert-danger'} alert-dismissible fade show position-fixed`}
+          className={`alert ${
+            toast.type === "success" ? "alert-success" : "alert-danger"
+          } alert-dismissible fade show position-fixed`}
           style={{
-            top: '20px',
-            right: '20px',
+            top: "20px",
+            right: "20px",
             zIndex: 9999,
-            minWidth: '300px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            borderRadius: '8px',
-            border: 'none',
-            padding: '0.75rem 1rem',
-            fontSize: '0.875rem'
+            minWidth: "300px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            borderRadius: "8px",
+            border: "none",
+            padding: "0.75rem 1rem",
+            fontSize: "0.875rem",
           }}
         >
           {toast.message}
           <button
             type="button"
             className="btn-close"
-            style={{ fontSize: '0.75rem' }}
-            onClick={() => setToast({ show: false, message: '', type: '' })}
+            style={{ fontSize: "0.75rem" }}
+            onClick={() => setToast({ show: false, message: "", type: "" })}
           />
         </div>
       )}
- 
+
       {/* BACK BUTTON & HEADER */}
       <div className="d-flex align-items-center gap-3 mb-3">
         <button
           className="btn d-flex align-items-center justify-content-center"
           onClick={() => navigate(-1)}
           style={{
-            width: '40px',
-            height: '40px',
+            width: "40px",
+            height: "40px",
             padding: 0,
-            backgroundColor: '#fff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            transition: 'all 0.2s'
+            backgroundColor: "#fff",
+            border: "1px solid #e2e8f0",
+            borderRadius: "8px",
+            transition: "all 0.2s",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#f8fafc';
-            e.currentTarget.style.borderColor = '#cbd5e1';
+            e.currentTarget.style.backgroundColor = "#f8fafc";
+            e.currentTarget.style.borderColor = "#cbd5e1";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#fff';
-            e.currentTarget.style.borderColor = '#e2e8f0';
+            e.currentTarget.style.backgroundColor = "#fff";
+            e.currentTarget.style.borderColor = "#e2e8f0";
           }}
         >
-          <ArrowLeft size={18} style={{ color: '#64748b' }} />
+          <ArrowLeft size={18} style={{ color: "#64748b" }} />
         </button>
         <div className="flex-grow-1">
-          <h2 className="fw-bold mb-0" style={{ color: '#27235c', fontSize: '1.5rem', letterSpacing: '-0.025em' }}>
+          <h2
+            className="fw-bold mb-0"
+            style={{
+              color: "#27235c",
+              fontSize: "1.5rem",
+              letterSpacing: "-0.025em",
+            }}
+          >
             {user?.firstName} {user?.lastName}'s Submissions
           </h2>
-          <p className="mb-0" style={{ color: '#64748b', fontSize: '0.875rem' }}>
+          <p
+            className="mb-0"
+            style={{ color: "#64748b", fontSize: "0.875rem" }}
+          >
             View and manage all feedback you have submitted
           </p>
         </div>
@@ -389,64 +465,113 @@ export default function MySubmissions() {
           }}
           disabled={refreshing || loading}
           style={{
-            backgroundColor: 'transparent',
-            border: '1.5px solid #0F62FE',
-            color: '#0F62FE',
-            borderRadius: '8px',
-            padding: '8px 16px',
-            fontSize: '0.875rem',
-            fontWeight: 600
+            backgroundColor: "transparent",
+            border: "1.5px solid #0F62FE",
+            color: "#0F62FE",
+            borderRadius: "8px",
+            padding: "8px 16px",
+            fontSize: "0.875rem",
+            fontWeight: 600,
           }}
         >
-          <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+          <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
           Refresh
         </button>
       </div>
- 
+
       {/* ERROR ALERT */}
       {error && (
-        <div className="alert alert-danger d-flex align-items-start gap-2 mb-3" style={{ borderRadius: '8px', border: 'none', backgroundColor: '#fee2e2', padding: '0.75rem 1rem' }}>
-          <AlertTriangle size={16} className="flex-shrink-0" style={{ marginTop: '2px', color: '#dc2626' }} />
+        <div
+          className="alert alert-danger d-flex align-items-start gap-2 mb-3"
+          style={{
+            borderRadius: "8px",
+            border: "none",
+            backgroundColor: "#fee2e2",
+            padding: "0.75rem 1rem",
+          }}
+        >
+          <AlertTriangle
+            size={16}
+            className="flex-shrink-0"
+            style={{ marginTop: "2px", color: "#dc2626" }}
+          />
           <div className="flex-grow-1">
-            <p className="mb-0" style={{ fontSize: '0.875rem', color: '#991b1b' }}>{error}</p>
+            <p
+              className="mb-0"
+              style={{ fontSize: "0.875rem", color: "#991b1b" }}
+            >
+              {error}
+            </p>
           </div>
-          <button type="button" className="btn-close" style={{ fontSize: '0.75rem' }} onClick={() => setError('')} />
+          <button
+            type="button"
+            className="btn-close"
+            style={{ fontSize: "0.75rem" }}
+            onClick={() => setError("")}
+          />
         </div>
       )}
- 
+
       {/* TABS */}
-      <div style={{ backgroundColor: '#27235c', borderRadius: '10px 10px 0 0', padding: '0 1rem', marginBottom: 0 }}>
+      <div
+        style={{
+          backgroundColor: "#27235c",
+          borderRadius: "10px 10px 0 0",
+          padding: "0 1rem",
+          marginBottom: 0,
+        }}
+      >
         <ul className="nav nav-tabs border-0 m-0" role="tablist">
           {[
-            { key: 'HR Forms', label: 'HR Forms', icon: FileText, count: hrForms.length },
-            { key: 'Goal Feedback', label: 'Goal Feedback', icon: Target, count: goalFeedback.length },
-            { key: 'Mentor', label: 'Mentor', icon: Send, count: mentor.length },
-            { key: 'Peer', label: 'Peer', icon: Users, count: peer.length },
+            {
+              key: "HR Forms",
+              label: "HR Forms",
+              icon: FileText,
+              count: hrForms.length,
+            },
+            {
+              key: "Goal Feedback",
+              label: "Goal Feedback",
+              icon: Target,
+              count: goalFeedback.length,
+            },
+            {
+              key: "Mentor",
+              label: "Mentor",
+              icon: Send,
+              count: mentor.length,
+            },
+            { key: "Peer", label: "Peer", icon: Users, count: peer.length },
           ].map(({ key, label, icon: Icon, count }) => (
             <li key={key} className="nav-item">
               <button
-                className={`nav-link border-0 d-flex align-items-center gap-2 ${tab === key ? 'active' : ''}`}
+                className={`nav-link border-0 d-flex align-items-center gap-2 ${
+                  tab === key ? "active" : ""
+                }`}
                 onClick={() => setTab(key)}
                 style={{
-                  color: tab === key ? '#fff' : 'rgba(255,255,255,0.7)',
-                  backgroundColor: tab === key ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  borderBottom: tab === key ? '3px solid #fff' : '3px solid transparent',
-                  padding: '1rem 1.25rem',
+                  color: tab === key ? "#fff" : "rgba(255,255,255,0.7)",
+                  backgroundColor:
+                    tab === key ? "rgba(255,255,255,0.1)" : "transparent",
+                  borderBottom:
+                    tab === key ? "3px solid #fff" : "3px solid transparent",
+                  padding: "1rem 1.25rem",
                   fontWeight: 600,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
                   if (tab !== key) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
-                    e.currentTarget.style.color = '#fff';
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(255,255,255,0.05)";
+                    e.currentTarget.style.color = "#fff";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (tab !== key) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.7)";
                   }
                 }}
               >
@@ -457,12 +582,26 @@ export default function MySubmissions() {
           ))}
         </ul>
       </div>
- 
+
       {/* CONTENT */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '0 0 10px 10px', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', padding: '1.5rem', minHeight: '400px' }}>
+      <div
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: "0 0 10px 10px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+          padding: "1.5rem",
+          minHeight: "400px",
+        }}
+      >
         {loading ? (
-          <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
-            <div className="spinner-border text-primary" style={{ width: '3rem', height: '3rem' }}>
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: "300px" }}
+          >
+            <div
+              className="spinner-border text-primary"
+              style={{ width: "3rem", height: "3rem" }}
+            >
               <span className="visually-hidden">Loading...</span>
             </div>
           </div>
@@ -470,50 +609,204 @@ export default function MySubmissions() {
           <div className="text-center py-5">
             {React.createElement(getEmptyStateIcon(), {
               size: 56,
-              style: { color: '#cbd5e1', opacity: 0.5, marginBottom: '1rem' }
+              style: { color: "#cbd5e1", opacity: 0.5, marginBottom: "1rem" },
             })}
-            <h6 className="fw-bold mb-2" style={{ color: '#64748b', fontSize: '1.125rem' }}>
+            <h6
+              className="fw-bold mb-2"
+              style={{ color: "#64748b", fontSize: "1.125rem" }}
+            >
               No {tab} submissions yet
             </h6>
-            <p className="text-muted mb-0" style={{ fontSize: '0.875rem' }}>
+            <p className="text-muted mb-0" style={{ fontSize: "0.875rem" }}>
               You haven't submitted any {tab.toLowerCase()} feedback
             </p>
           </div>
         ) : (
           <div className="row g-3">
             {/* HR FORMS */}
-            {tab === 'HR Forms' && hrForms.map((hr) => {
-              const statusColor = hr.status === 'Reviewed' ? '#24A148' : hr.status === 'Submitted' ? '#0F62FE' : '#E2B93B';
-              return (
-                <div className="col-md-6 col-lg-4" key={hr.responseId}>
-                  <div className="card border-0 h-100" style={{ border: '1px solid #e2e8f0', borderLeft: `4px solid ${statusColor}`, borderRadius: '8px' }}>
-                    <div className="card-body" style={{ padding: '1rem' }}>
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <h6 className="mb-0" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>
-                          {hr.formName || 'HR Form'}
-                        </h6>
-                        <span className="badge" style={{ backgroundColor: `${statusColor}20`, color: statusColor, padding: '4px 8px', fontSize: '0.75rem', borderRadius: '6px' }}>
-                          {hr.status || 'Draft'}
-                        </span>
+            {tab === "HR Forms" &&
+              hrForms.map((hr) => {
+                const statusColor =
+                  hr.status === "Reviewed"
+                    ? "#24A148"
+                    : hr.status === "Submitted"
+                    ? "#0F62FE"
+                    : "#E2B93B";
+                return (
+                  <div className="col-md-6 col-lg-4" key={hr.responseId}>
+                    <div
+                      className="card border-0 h-100"
+                      style={{
+                        border: "1px solid #e2e8f0",
+                        borderLeft: `4px solid ${statusColor}`,
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <div className="card-body" style={{ padding: "1rem" }}>
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <h6
+                            className="mb-0"
+                            style={{
+                              fontSize: "0.875rem",
+                              fontWeight: 600,
+                              color: "#0f172a",
+                            }}
+                          >
+                            {hr.formName || "HR Form"}
+                          </h6>
+                          <span
+                            className="badge"
+                            style={{
+                              backgroundColor: `${statusColor}20`,
+                              color: statusColor,
+                              padding: "4px 8px",
+                              fontSize: "0.75rem",
+                              borderRadius: "6px",
+                            }}
+                          >
+                            {hr.status || "Draft"}
+                          </span>
+                        </div>
+                        <div
+                          className="mb-3"
+                          style={{ fontSize: "0.75rem", color: "#64748b" }}
+                        >
+                          <Clock
+                            size={12}
+                            className="me-1"
+                            style={{ display: "inline" }}
+                          />
+                          {hr.submittedAtFormatted}
+                          {hr.daysAgo !== null && (
+                            <span> ({hr.daysAgo}d ago)</span>
+                          )}
+                        </div>
+                        <div className="d-flex gap-2">
+                          <button
+                            className="btn btn-sm btn-outline-secondary flex-grow-1"
+                            onClick={() => handleViewResponse(hr, "HR")}
+                            style={{
+                              fontSize: "0.813rem",
+                              borderRadius: "6px",
+                              padding: "6px",
+                            }}
+                          >
+                            <Eye
+                              size={14}
+                              className="me-1"
+                              style={{ display: "inline" }}
+                            />
+                            View
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => deleteHRForm(hr.responseId)}
+                            style={{
+                              fontSize: "0.813rem",
+                              borderRadius: "6px",
+                              padding: "6px 10px",
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
-                      <div className="mb-3" style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                        <Clock size={12} className="me-1" style={{ display: 'inline' }} />
-                        {hr.submittedAtFormatted}
-                        {hr.daysAgo !== null && <span> ({hr.daysAgo}d ago)</span>}
+                    </div>
+                  </div>
+                );
+              })}
+
+            {/* GOAL FEEDBACK */}
+            {tab === "Goal Feedback" &&
+              goalFeedback.map((goal) => (
+                <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
+                  <div
+                    className="card border-0 h-100"
+                    style={{
+                      border: "1px solid #e2e8f0",
+                      borderLeft: "4px solid #0F62FE",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <div className="card-body" style={{ padding: "1rem" }}>
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <h6
+                          className="mb-0"
+                          style={{
+                            fontSize: "0.875rem",
+                            fontWeight: 600,
+                            color: "#0f172a",
+                            flex: 1,
+                          }}
+                        >
+                          {goal.objectiveTitle}
+                        </h6>
+                        <div className="d-flex align-items-center gap-1 ms-2">
+                          <Star
+                            size={14}
+                            style={{ color: "#FFB800", fill: "#FFB800" }}
+                          />
+                          <span
+                            className="fw-bold"
+                            style={{ fontSize: "0.813rem" }}
+                          >
+                            {goal.rating}/5
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        className="badge mb-2"
+                        style={{
+                          backgroundColor: "#dbeafe",
+                          color: "#0f62fe",
+                          padding: "4px 8px",
+                          fontSize: "0.75rem",
+                          borderRadius: "6px",
+                        }}
+                      >
+                        {RATING_LABELS[goal.rating] || "N/A"}
+                      </span>
+                      <div
+                        className="mb-3"
+                        style={{ fontSize: "0.75rem", color: "#64748b" }}
+                      >
+                        <Clock
+                          size={12}
+                          className="me-1"
+                          style={{ display: "inline" }}
+                        />
+                        {goal.submittedAtFormatted}
+                        {goal.daysAgo !== null && (
+                          <span> ({goal.daysAgo}d ago)</span>
+                        )}
                       </div>
                       <div className="d-flex gap-2">
                         <button
                           className="btn btn-sm btn-outline-secondary flex-grow-1"
-                          onClick={() => handleViewResponse(hr, 'HR')}
-                          style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '6px' }}
+                          onClick={() => handleViewResponse(goal, "Goal")}
+                          style={{
+                            fontSize: "0.813rem",
+                            borderRadius: "6px",
+                            padding: "6px",
+                          }}
                         >
-                          <Eye size={14} className="me-1" style={{ display: 'inline' }} />
+                          <Eye
+                            size={14}
+                            className="me-1"
+                            style={{ display: "inline" }}
+                          />
                           View
                         </button>
                         <button
                           className="btn btn-sm btn-outline-danger"
-                          onClick={() => deleteHRForm(hr.responseId)}
-                          style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '6px 10px' }}
+                          onClick={() =>
+                            deleteGoalFeedback(goal.orgGoalFeedbackId)
+                          }
+                          style={{
+                            fontSize: "0.813rem",
+                            borderRadius: "6px",
+                            padding: "6px 10px",
+                          }}
                         >
                           <Trash2 size={14} />
                         </button>
@@ -521,144 +814,182 @@ export default function MySubmissions() {
                     </div>
                   </div>
                 </div>
-              );
-            })}
- 
-            {/* GOAL FEEDBACK */}
-            {tab === 'Goal Feedback' && goalFeedback.map((goal) => (
-              <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
-                <div className="card border-0 h-100" style={{ border: '1px solid #e2e8f0', borderLeft: '4px solid #0F62FE', borderRadius: '8px' }}>
-                  <div className="card-body" style={{ padding: '1rem' }}>
-                    <div className="d-flex justify-content-between align-items-start mb-2">
-                      <h6 className="mb-0" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a', flex: 1 }}>
-                        {goal.objectiveTitle}
-                      </h6>
-                      <div className="d-flex align-items-center gap-1 ms-2">
-                        <Star size={14} style={{ color: '#FFB800', fill: '#FFB800' }} />
-                        <span className="fw-bold" style={{ fontSize: '0.813rem' }}>{goal.rating}/5</span>
+              ))}
+
+            {/* MENTOR */}
+            {tab === "Mentor" &&
+              mentor.map((m) => (
+                <div
+                  className="col-md-6 col-lg-4"
+                  key={m.trackingId || `mentor-${Math.random()}`}
+                >
+                  <div
+                    className="card border-0 h-100"
+                    style={{ border: "1px solid #e2e8f0", borderRadius: "8px" }}
+                  >
+                    <div className="card-body" style={{ padding: "1rem" }}>
+                      <div className="mb-2">
+                        <small
+                          style={{ fontSize: "0.75rem", color: "#64748b" }}
+                        >
+                          Mentor:
+                        </small>
+                        <h6
+                          className="mb-0"
+                          style={{
+                            fontSize: "0.875rem",
+                            fontWeight: 600,
+                            color: "#0f172a",
+                          }}
+                        >
+                          {m.mentorNameFull}
+                        </h6>
+                      </div>
+                      <div className="d-flex align-items-center gap-2 mb-2">
+                        <span
+                          className="badge"
+                          style={{
+                            backgroundColor: "#dcfce7",
+                            color: "#24A148",
+                            padding: "4px 8px",
+                            fontSize: "0.75rem",
+                            borderRadius: "6px",
+                          }}
+                        >
+                          {m.rating || 0}/5 Stars
+                        </span>
+                      </div>
+                      <div
+                        className="mb-3"
+                        style={{ fontSize: "0.75rem", color: "#64748b" }}
+                      >
+                        <Clock
+                          size={12}
+                          className="me-1"
+                          style={{ display: "inline" }}
+                        />
+                        {m.createdAtFormatted}
+                      </div>
+                      <div className="d-flex gap-2">
+                        <button
+                          className="btn btn-sm btn-outline-secondary flex-grow-1"
+                          onClick={() => handleViewResponse(m, "Mentor")}
+                          style={{
+                            fontSize: "0.813rem",
+                            borderRadius: "6px",
+                            padding: "6px",
+                          }}
+                        >
+                          <Eye
+                            size={14}
+                            className="me-1"
+                            style={{ display: "inline" }}
+                          />
+                          View
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => deleteMentor(m.trackingId)}
+                          disabled={!m.trackingId}
+                          style={{
+                            fontSize: "0.813rem",
+                            borderRadius: "6px",
+                            padding: "6px 10px",
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </div>
-                    <span className="badge mb-2" style={{ backgroundColor: '#dbeafe', color: '#0f62fe', padding: '4px 8px', fontSize: '0.75rem', borderRadius: '6px' }}>
-                      {RATING_LABELS[goal.rating] || 'N/A'}
-                    </span>
-                    <div className="mb-3" style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                      <Clock size={12} className="me-1" style={{ display: 'inline' }} />
-                      {goal.submittedAtFormatted}
-                      {goal.daysAgo !== null && <span> ({goal.daysAgo}d ago)</span>}
-                    </div>
-                    <div className="d-flex gap-2">
-                      <button
-                        className="btn btn-sm btn-outline-secondary flex-grow-1"
-                        onClick={() => handleViewResponse(goal, 'Goal')}
-                        style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '6px' }}
-                      >
-                        <Eye size={14} className="me-1" style={{ display: 'inline' }} />
-                        View
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => deleteGoalFeedback(goal.orgGoalFeedbackId)}
-                        style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '6px 10px' }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
- 
-            {/* MENTOR */}
-            {tab === 'Mentor' && mentor.map((m) => (
-              <div className="col-md-6 col-lg-4" key={m.trackingId || `mentor-${Math.random()}`}>
-                <div className="card border-0 h-100" style={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                  <div className="card-body" style={{ padding: '1rem' }}>
-                    <div className="mb-2">
-                      <small style={{ fontSize: '0.75rem', color: '#64748b' }}>Mentor:</small>
-                      <h6 className="mb-0" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>
-                        {m.mentorNameFull}
-                      </h6>
-                    </div>
-                    <div className="d-flex align-items-center gap-2 mb-2">
-                      <span className="badge" style={{ backgroundColor: '#dcfce7', color: '#24A148', padding: '4px 8px', fontSize: '0.75rem', borderRadius: '6px' }}>
-                        {m.rating || 0}/5 Stars
-                      </span>
-                    </div>
-                    <div className="mb-3" style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                      <Clock size={12} className="me-1" style={{ display: 'inline' }} />
-                      {m.createdAtFormatted}
-                    </div>
-                    <div className="d-flex gap-2">
-                      <button
-                        className="btn btn-sm btn-outline-secondary flex-grow-1"
-                        onClick={() => handleViewResponse(m, 'Mentor')}
-                        style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '6px' }}
-                      >
-                        <Eye size={14} className="me-1" style={{ display: 'inline' }} />
-                        View
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => deleteMentor(m.trackingId)}
-                        disabled={!m.trackingId}
-                        style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '6px 10px' }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
- 
+              ))}
+
             {/* PEER */}
-            {tab === 'Peer' && peer.map((p) => (
-              <div className="col-md-6 col-lg-4" key={p.queueId || `peer-${Math.random()}`}>
-                <div className="card border-0 h-100" style={{ border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                  <div className="card-body" style={{ padding: '1rem' }}>
-                    <div className="mb-2">
-                      <small style={{ fontSize: '0.75rem', color: '#64748b' }}>Feedback for:</small>
-                      <h6 className="mb-0" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>
-                        {p.recipientNameFull}
-                      </h6>
-                    </div>
-                    <div className="mb-3" style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                      <Clock size={12} className="me-1" style={{ display: 'inline' }} />
-                      {p.createdAtFormatted}
-                    </div>
-                    <div className="d-flex gap-2">
-                      <button
-                        className="btn btn-sm btn-outline-secondary flex-grow-1"
-                        onClick={() => handleViewResponse(p, 'Peer')}
-                        style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '6px' }}
+            {tab === "Peer" &&
+              peer.map((p) => (
+                <div
+                  className="col-md-6 col-lg-4"
+                  key={p.queueId || `peer-${Math.random()}`}
+                >
+                  <div
+                    className="card border-0 h-100"
+                    style={{ border: "1px solid #e2e8f0", borderRadius: "8px" }}
+                  >
+                    <div className="card-body" style={{ padding: "1rem" }}>
+                      <div className="mb-2">
+                        <small
+                          style={{ fontSize: "0.75rem", color: "#64748b" }}
+                        >
+                          Feedback for:
+                        </small>
+                        <h6
+                          className="mb-0"
+                          style={{
+                            fontSize: "0.875rem",
+                            fontWeight: 600,
+                            color: "#0f172a",
+                          }}
+                        >
+                          {p.recipientNameFull}
+                        </h6>
+                      </div>
+                      <div
+                        className="mb-3"
+                        style={{ fontSize: "0.75rem", color: "#64748b" }}
                       >
-                        <Eye size={14} className="me-1" style={{ display: 'inline' }} />
-                        View
-                      </button>
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => deletePeer(p.queueId)}
-                        disabled={!p.queueId}
-                        style={{ fontSize: '0.813rem', borderRadius: '6px', padding: '6px 10px' }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                        <Clock
+                          size={12}
+                          className="me-1"
+                          style={{ display: "inline" }}
+                        />
+                        {p.createdAtFormatted}
+                      </div>
+                      <div className="d-flex gap-2">
+                        <button
+                          className="btn btn-sm btn-outline-secondary flex-grow-1"
+                          onClick={() => handleViewResponse(p, "Peer")}
+                          style={{
+                            fontSize: "0.813rem",
+                            borderRadius: "6px",
+                            padding: "6px",
+                          }}
+                        >
+                          <Eye
+                            size={14}
+                            className="me-1"
+                            style={{ display: "inline" }}
+                          />
+                          View
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => deletePeer(p.queueId)}
+                          disabled={!p.queueId}
+                          style={{
+                            fontSize: "0.813rem",
+                            borderRadius: "6px",
+                            padding: "6px 10px",
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>
- 
+
       <ResponseViewModal
         show={showModal}
         response={selectedResponse}
         onClose={handleCloseModal}
         type={selectedType}
       />
- 
+
       <style>{`
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -666,5 +997,3 @@ export default function MySubmissions() {
     </div>
   );
 }
- 
- 

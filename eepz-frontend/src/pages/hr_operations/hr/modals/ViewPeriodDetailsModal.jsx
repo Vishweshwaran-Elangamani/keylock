@@ -16,9 +16,10 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
   const fetchSubAllocations = async () => {
     try {
       setLoading(true);
-      const response = await budgetAllocationService.getFundAllocationsByDepartment(
-        period.departmentId
-      );
+      const response =
+        await budgetAllocationService.getFundAllocationsByDepartment(
+          period.departmentId
+        );
 
       if (response.success) {
         const periodAllocations = response.data.filter(
@@ -51,13 +52,24 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
   };
 
   return (
-    <Modal show={true} onHide={onClose} centered size="xl" backdrop="static" className="period-modal">
+    <Modal
+      show={true}
+      onHide={onClose}
+      centered
+      size="xl"
+      backdrop="static"
+      className="period-modal"
+    >
       <div className="modal-header-gradient">
         <Modal.Title className="modal-title-custom">
           <i className="bi bi-eye me-2"></i>
           {period.period} {period.periodYear} - Detailed View
         </Modal.Title>
-        <button type="button" className="btn-close btn-close-white" onClick={onClose}></button>
+        <button
+          type="button"
+          className="btn-close btn-close-white"
+          onClick={onClose}
+        ></button>
       </div>
 
       <Modal.Body className="modal-body-custom">
@@ -70,25 +82,33 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
             <div className="col-md-3 col-6">
               <div className="detail-item">
                 <span className="detail-label">Period</span>
-                <span className="detail-value">{period.period} {period.periodYear}</span>
+                <span className="detail-value">
+                  {period.period} {period.periodYear}
+                </span>
               </div>
             </div>
             <div className="col-md-3 col-6">
               <div className="detail-item">
                 <span className="detail-label">Allocated Amount</span>
-                <span className="detail-value text-primary">{formatCurrency(period.allocatedAmount)}</span>
+                <span className="detail-value text-primary">
+                  {formatCurrency(period.allocatedAmount)}
+                </span>
               </div>
             </div>
             <div className="col-md-3 col-6">
               <div className="detail-item">
                 <span className="detail-label">Utilized</span>
-                <span className="detail-value text-danger">{formatCurrency(period.utilizedAmount || 0)}</span>
+                <span className="detail-value text-danger">
+                  {formatCurrency(period.utilizedAmount || 0)}
+                </span>
               </div>
             </div>
             <div className="col-md-3 col-6">
               <div className="detail-item">
                 <span className="detail-label">Remaining</span>
-                <span className="detail-value text-success">{formatCurrency(period.remainingAmount || 0)}</span>
+                <span className="detail-value text-success">
+                  {formatCurrency(period.remainingAmount || 0)}
+                </span>
               </div>
             </div>
           </div>
@@ -115,8 +135,13 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
           </div>
         ) : subAllocations.length === 0 ? (
           <div className="text-center py-5">
-            <i className="bi bi-inbox" style={{ fontSize: "48px", color: "#cbd5e1" }}></i>
-            <p className="mt-3 text-muted">No sub-allocations created yet for this period</p>
+            <i
+              className="bi bi-inbox"
+              style={{ fontSize: "48px", color: "#cbd5e1" }}
+            ></i>
+            <p className="mt-3 text-muted">
+              No sub-allocations created yet for this period
+            </p>
           </div>
         ) : (
           <div className="table-responsive">
@@ -142,11 +167,19 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
                   return (
                     <tr key={alloc.allocationId}>
                       <td>
-                        <span className="badge-type-custom">{alloc.allocationType}</span>
+                        <span className="badge-type-custom">
+                          {alloc.allocationType}
+                        </span>
                       </td>
-                      <td className="fw-bold">{formatCurrency(alloc.amount)}</td>
-                      <td className="text-danger">{formatCurrency(alloc.utilizedAmount || 0)}</td>
-                      <td className="text-success">{formatCurrency(remaining)}</td>
+                      <td className="fw-bold">
+                        {formatCurrency(alloc.amount)}
+                      </td>
+                      <td className="text-danger">
+                        {formatCurrency(alloc.utilizedAmount || 0)}
+                      </td>
+                      <td className="text-success">
+                        {formatCurrency(remaining)}
+                      </td>
                       <td>
                         <div className="d-flex align-items-center gap-2">
                           <div className="progress-mini">
@@ -155,11 +188,15 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
                               style={{ width: `${utilization}%` }}
                             ></div>
                           </div>
-                          <span className="text-muted small">{Math.round(utilization)}%</span>
+                          <span className="text-muted small">
+                            {Math.round(utilization)}%
+                          </span>
                         </div>
                       </td>
                       <td>
-                        <span className={`badge bg-${statusColor}`}>{statusText}</span>
+                        <span className={`badge bg-${statusColor}`}>
+                          {statusText}
+                        </span>
                       </td>
                       <td className="text-muted small">
                         {new Date(alloc.allocatedAt).toLocaleDateString()}
@@ -170,15 +207,29 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
               </tbody>
               <tfoot>
                 <tr className="table-active">
-                  <td><strong>Total</strong></td>
+                  <td>
+                    <strong>Total</strong>
+                  </td>
                   <td className="fw-bold">
-                    {formatCurrency(subAllocations.reduce((sum, a) => sum + a.amount, 0))}
+                    {formatCurrency(
+                      subAllocations.reduce((sum, a) => sum + a.amount, 0)
+                    )}
                   </td>
                   <td className="fw-bold text-danger">
-                    {formatCurrency(subAllocations.reduce((sum, a) => sum + (a.utilizedAmount || 0), 0))}
+                    {formatCurrency(
+                      subAllocations.reduce(
+                        (sum, a) => sum + (a.utilizedAmount || 0),
+                        0
+                      )
+                    )}
                   </td>
                   <td className="fw-bold text-success">
-                    {formatCurrency(subAllocations.reduce((sum, a) => sum + (a.amount - (a.utilizedAmount || 0)), 0))}
+                    {formatCurrency(
+                      subAllocations.reduce(
+                        (sum, a) => sum + (a.amount - (a.utilizedAmount || 0)),
+                        0
+                      )
+                    )}
                   </td>
                   <td colSpan="3"></td>
                 </tr>

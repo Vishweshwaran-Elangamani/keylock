@@ -45,7 +45,7 @@ const GoalTracker = ({ summary }) => {
       bgColor: "#e7d4f5",
       iconColor: "#6f42c1",
       textColor: "#432874",
-      showForRoles: ["Manager", "Department Head", "Leadership"], 
+      showForRoles: ["Manager", "Department Head", "Leadership"],
     },
   ];
 
@@ -54,7 +54,7 @@ const GoalTracker = ({ summary }) => {
     if (card.showForRoles) {
       return card.showForRoles.includes(user.role);
     }
-    return true; 
+    return true;
   });
 
   return (

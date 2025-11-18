@@ -11,7 +11,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
     <div className="hrformlist-modal-overlay" onClick={onClose}>
       <div
         className="hrformlist-view-modal hrformlist-view-modal-large"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div className="hrformlist-view-modal-header">
@@ -41,7 +41,9 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                 </div>
                 <div className="hrformlist-info-content">
                   <span className="hrformlist-info-label">Form Name</span>
-                  <span className="hrformlist-info-value">{formDetails.name}</span>
+                  <span className="hrformlist-info-value">
+                    {formDetails.name}
+                  </span>
                 </div>
               </div>
               <div className="hrformlist-info-card">
@@ -50,7 +52,9 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                 </div>
                 <div className="hrformlist-info-content">
                   <span className="hrformlist-info-label">Type</span>
-                  <span className="hrformlist-type-badge-modal">{formDetails.type}</span>
+                  <span className="hrformlist-type-badge-modal">
+                    {formDetails.type}
+                  </span>
                 </div>
               </div>
               <div className="hrformlist-info-card">
@@ -69,7 +73,9 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   <i className="bi bi-list-check"></i>
                 </div>
                 <div className="hrformlist-info-content">
-                  <span className="hrformlist-info-label">Total Competencies</span>
+                  <span className="hrformlist-info-label">
+                    Total Competencies
+                  </span>
                   <span className="hrformlist-info-value-highlight">
                     {formDetails.competencies?.length || 0}
                   </span>
@@ -91,7 +97,9 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                     <tr>
                       <th className="hrformlist-table-order">#</th>
                       <th className="hrformlist-table-name">Competency Name</th>
-                      <th className="hrformlist-table-description">Description</th>
+                      <th className="hrformlist-table-description">
+                        Description
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -125,7 +133,8 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
           )}
 
           {/* No Competencies Message */}
-          {(!formDetails.competencies || formDetails.competencies.length === 0) && (
+          {(!formDetails.competencies ||
+            formDetails.competencies.length === 0) && (
             <div className="hrformlist-no-competencies">
               <i className="bi bi-inbox"></i>
               <p>No competencies defined for this form</p>
@@ -139,7 +148,9 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
             className="hrformlist-btn-edit-form"
             onClick={() => {
               onClose();
-              navigate(`/hr/dashboard/performance/create/${formDetails.formId}`);
+              navigate(
+                `/hr/dashboard/performance/create/${formDetails.formId}`
+              );
             }}
           >
             <i className="bi bi-pencil-square"></i> Edit Form

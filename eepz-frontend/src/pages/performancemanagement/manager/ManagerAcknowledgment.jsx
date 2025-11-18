@@ -3,17 +3,16 @@ import { getManagerEmployeeAcknowledgments } from "../../../services/performance
 import { getUserIdFromToken } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
- 
+
 export default function ManagerAcknowledgment() {
   const [ackList, setAckList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
- 
- 
+
   useEffect(() => {
     fetchAckList();
   }, []);
- 
+
   const fetchAckList = async () => {
     setLoading(true);
     setError(null);
@@ -37,7 +36,7 @@ export default function ManagerAcknowledgment() {
       setLoading(false);
     }
   };
- 
+
   return (
     <div style={styles.container}>
       <ToastContainer position="top-right" autoClose={3000} />
@@ -69,7 +68,7 @@ export default function ManagerAcknowledgment() {
                         month: "short",
                         day: "numeric",
                         hour: "2-digit",
-                        minute: "2-digit"
+                        minute: "2-digit",
                       })
                     : "-"}
                 </td>
@@ -81,7 +80,7 @@ export default function ManagerAcknowledgment() {
     </div>
   );
 }
- 
+
 const styles = {
   container: {
     maxWidth: 900,
@@ -90,18 +89,18 @@ const styles = {
     background: "#fff",
     borderRadius: 12,
     boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
   },
   title: {
     fontSize: 28,
     color: "#27235C",
     marginBottom: 24,
     fontWeight: 700,
-    textAlign: "center"
+    textAlign: "center",
   },
   loading: {
     padding: 32,
-    textAlign: "center"
+    textAlign: "center",
   },
   error: {
     padding: 32,
@@ -109,17 +108,17 @@ const styles = {
     background: "#fee2e2",
     textAlign: "center",
     borderRadius: 8,
-    marginBottom: 24
+    marginBottom: 24,
   },
   empty: {
     padding: 40,
     color: "#6C757D",
     fontStyle: "italic",
-    textAlign: "center"
+    textAlign: "center",
   },
   table: {
     width: "100%",
-    borderCollapse: "collapse"
+    borderCollapse: "collapse",
   },
   th: {
     padding: "12px 16px",
@@ -127,16 +126,14 @@ const styles = {
     backgroundColor: "#f1f5f9",
     color: "#27235C",
     fontWeight: 700,
-    borderBottom: "2px solid #E0E0E0"
+    borderBottom: "2px solid #E0E0E0",
   },
   tr: {
-    borderBottom: "1px solid #E0E0E0"
+    borderBottom: "1px solid #E0E0E0",
   },
   td: {
     padding: "12px 16px",
     color: "#2C3E50",
-    fontSize: "15px"
-  }
+    fontSize: "15px",
+  },
 };
- 
- 

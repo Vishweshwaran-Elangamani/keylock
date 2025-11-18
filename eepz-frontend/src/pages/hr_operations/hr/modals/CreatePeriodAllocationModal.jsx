@@ -30,7 +30,10 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.allocatedAmount || parseFloat(formData.allocatedAmount) <= 0) {
+    if (
+      !formData.allocatedAmount ||
+      parseFloat(formData.allocatedAmount) <= 0
+    ) {
       newErrors.allocatedAmount = "Please enter a valid amount";
     }
 
@@ -91,10 +94,10 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
   };
 
   return (
-    <Modal 
-      show={true} 
-      onHide={onClose} 
-      centered 
+    <Modal
+      show={true}
+      onHide={onClose}
+      centered
       size="lg"
       backdrop="static"
       className="period-modal"
@@ -104,9 +107,9 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
           <i className="bi bi-calendar-plus me-2"></i>
           Create Period Allocation
         </Modal.Title>
-        <button 
-          type="button" 
-          className="btn-close btn-close-white" 
+        <button
+          type="button"
+          className="btn-close btn-close-white"
           onClick={onClose}
           disabled={loading}
         ></button>
@@ -121,15 +124,21 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
           <div className="budget-info-grid">
             <div className="budget-info-item">
               <span className="info-label">Total Budget</span>
-              <span className="info-value">{formatCurrency(budget.totalBudget)}</span>
+              <span className="info-value">
+                {formatCurrency(budget.totalBudget)}
+              </span>
             </div>
             <div className="budget-info-item">
               <span className="info-label">Already Allocated</span>
-              <span className="info-value allocated">{formatCurrency(budget.allocatedAmount || 0)}</span>
+              <span className="info-value allocated">
+                {formatCurrency(budget.allocatedAmount || 0)}
+              </span>
             </div>
             <div className="budget-info-item highlight">
               <span className="info-label">Available to Allocate</span>
-              <span className="info-value available">{formatCurrency(availableBudget)}</span>
+              <span className="info-value available">
+                {formatCurrency(availableBudget)}
+              </span>
             </div>
           </div>
         </div>
@@ -185,7 +194,9 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
               name="allocatedAmount"
               value={formData.allocatedAmount}
               onChange={handleChange}
-              className={`form-control form-control-custom ${errors.allocatedAmount ? 'is-invalid' : ''}`}
+              className={`form-control form-control-custom ${
+                errors.allocatedAmount ? "is-invalid" : ""
+              }`}
               placeholder="Enter amount"
               step="0.01"
               min="0"
@@ -225,14 +236,17 @@ const CreatePeriodAllocationModal = ({ budget, onClose, onSuccess }) => {
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary-gradient"
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
                   Creating...
                 </>
               ) : (

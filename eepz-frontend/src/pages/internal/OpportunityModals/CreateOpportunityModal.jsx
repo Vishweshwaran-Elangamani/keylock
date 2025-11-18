@@ -3,7 +3,12 @@ import internalOpportunityService from "../../../services/internal/internalOppor
 import { toast } from "sonner";
 import "../../../styles/internal/OpportunityModal.css";
 
-const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, departments }) => {
+const CreateOpportunityModal = ({
+  show,
+  onHide,
+  onOpportunityCreated,
+  departments,
+}) => {
   const [formData, setFormData] = useState({
     opportunityName: "",
     departmentId: "",
@@ -16,14 +21,14 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // ✅ Calculate min and max dates (no blocking, just calendar restrictions)
+  //  Calculate min and max dates (no blocking, just calendar restrictions)
   const { minDate, maxDate } = useMemo(() => {
     const today = new Date();
     const currentYear = today.getFullYear();
-    
+
     // Min date: today
     const min = today.toISOString().split("T")[0];
-    
+
     // Max date: April 30th of current year (or next year if we're past April)
     const currentMonth = today.getMonth();
     const aprilDeadlineYear = currentMonth >= 3 ? currentYear + 1 : currentYear;
@@ -55,7 +60,8 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
     if (!formData.opportunityName.trim()) {
       newErrors.opportunityName = "Opportunity name is required";
     } else if (formData.opportunityName.trim().length < 5) {
-      newErrors.opportunityName = "Opportunity name must be at least 5 characters";
+      newErrors.opportunityName =
+        "Opportunity name must be at least 5 characters";
     }
 
     if (!formData.departmentId) {
@@ -76,12 +82,12 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
       const deadlineDate = new Date(formData.deadline);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       // Check if deadline is in the past
       if (deadlineDate < today) {
         newErrors.deadline = "Deadline cannot be in the past";
       }
-      
+
       // Check if deadline is after April 30th
       const maxDeadline = new Date(maxDate);
       if (deadlineDate > maxDeadline) {
@@ -114,9 +120,11 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
         status: formData.status,
       };
 
-      console.log("📤 Full payload:", JSON.stringify(payload, null, 2));
+      console.log(" Full payload:", JSON.stringify(payload, null, 2));
 
-      const response = await internalOpportunityService.createOpportunity(payload);
+      const response = await internalOpportunityService.createOpportunity(
+        payload
+      );
 
       if (response.success || response.data) {
         toast.success("Opportunity created successfully!");
@@ -136,7 +144,7 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
         toast.error(response.message || "Failed to create opportunity");
       }
     } catch (error) {
-      console.error("❌ Error:", error);
+      console.error(" Error:", error);
 
       const errorMessage =
         error.response?.data?.message ||
@@ -201,14 +209,18 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     <input
                       type="text"
                       name="opportunityName"
-                      className={`form-input-custom ${errors.opportunityName ? "is-invalid" : ""}`}
+                      className={`form-input-custom ${
+                        errors.opportunityName ? "is-invalid" : ""
+                      }`}
                       placeholder="e.g., Senior Java Developer - Project Phoenix"
                       value={formData.opportunityName}
                       onChange={handleChange}
                       maxLength={200}
                     />
                     {errors.opportunityName && (
-                      <div className="error-message">{errors.opportunityName}</div>
+                      <div className="error-message">
+                        {errors.opportunityName}
+                      </div>
                     )}
                   </div>
 
@@ -219,13 +231,18 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     </label>
                     <select
                       name="departmentId"
-                      className={`form-select-custom ${errors.departmentId ? "is-invalid" : ""}`}
+                      className={`form-select-custom ${
+                        errors.departmentId ? "is-invalid" : ""
+                      }`}
                       value={formData.departmentId}
                       onChange={handleChange}
                     >
                       <option value="">Select Department</option>
                       {departments.map((dept) => (
-                        <option key={dept.departmentId} value={dept.departmentId}>
+                        <option
+                          key={dept.departmentId}
+                          value={dept.departmentId}
+                        >
                           {dept.departmentName}
                         </option>
                       ))}
@@ -238,12 +255,15 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                   {/* Deadline - ONLY CALENDAR RESTRICTION */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
-                      Application Deadline <span className="required-mark">*</span>
+                      Application Deadline{" "}
+                      <span className="required-mark">*</span>
                     </label>
                     <input
                       type="date"
                       name="deadline"
-                      className={`form-input-custom ${errors.deadline ? "is-invalid" : ""}`}
+                      className={`form-input-custom ${
+                        errors.deadline ? "is-invalid" : ""
+                      }`}
                       value={formData.deadline}
                       onChange={handleChange}
                       min={minDate}
@@ -253,7 +273,9 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                       <div className="error-message">{errors.deadline}</div>
                     )}
                     <small className="form-text-helper">
-                      Select a date between {new Date(minDate).toLocaleDateString()} and {new Date(maxDate).toLocaleDateString()}
+                      Select a date between{" "}
+                      {new Date(minDate).toLocaleDateString()} and{" "}
+                      {new Date(maxDate).toLocaleDateString()}
                     </small>
                   </div>
 
@@ -264,7 +286,9 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     </label>
                     <textarea
                       name="description"
-                      className={`form-textarea-custom ${errors.description ? "is-invalid" : ""}`}
+                      className={`form-textarea-custom ${
+                        errors.description ? "is-invalid" : ""
+                      }`}
                       placeholder="Provide detailed description of the opportunity..."
                       value={formData.description}
                       onChange={handleChange}
@@ -283,7 +307,9 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                     </label>
                     <textarea
                       name="requirements"
-                      className={`form-textarea-custom ${errors.requirements ? "is-invalid" : ""}`}
+                      className={`form-textarea-custom ${
+                        errors.requirements ? "is-invalid" : ""
+                      }`}
                       placeholder="List required skills and qualifications..."
                       value={formData.requirements}
                       onChange={handleChange}
@@ -333,7 +359,8 @@ const CreateOpportunityModal = ({ show, onHide, onOpportunityCreated, department
                 <div className="info-alert">
                   <i className="bi bi-info-circle"></i>
                   <small>
-                    Employees will be able to view and apply for active opportunities
+                    Employees will be able to view and apply for active
+                    opportunities
                   </small>
                 </div>
               </div>

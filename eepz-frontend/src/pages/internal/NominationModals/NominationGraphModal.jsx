@@ -15,23 +15,35 @@ import {
 import nominationService from "../../../services/internal/nominationService";
 import toastr from "toastr";
 import "../../../styles/internal/GraphModal.css";
- 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend, ArcElement);
- 
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
+
 const SOLID_COLORS = [
-  "#27235C",  // Total Nominations - Blue
-  "#04c000",  // Approved - Green
-  "#9D247D",  // Pending - Purple
-  "#dd7176",  // Rejected - Red
+  "#27235C", // Total Nominations - Blue
+  "#04c000", // Approved - Green
+  "#9D247D", // Pending - Purple
+  "#dd7176", // Rejected - Red
 ];
- 
+
 const NominationGraphModal = ({ show, onHide }) => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [chartType, setChartType] = useState("bar");
- 
-  useEffect(() => { if (show) fetchAnalytics(); }, [show]);
- 
+
+  useEffect(() => {
+    if (show) fetchAnalytics();
+  }, [show]);
+
   const fetchAnalytics = async () => {
     setLoading(true);
     const response = await nominationService.getMyNominationAnalytics();
@@ -39,17 +51,17 @@ const NominationGraphModal = ({ show, onHide }) => {
     else toastr.error("Failed to load analytics");
     setLoading(false);
   };
- 
+
   const getChartData = () => {
     if (!analytics) return null;
- 
+
     const values = [
       analytics.totalNominations,
       analytics.approved,
       analytics.pending,
       analytics.rejected,
     ];
- 
+
     // For Line: single dataset (connect all points), color each point, line blue
     if (chartType === "line") {
       return {
@@ -71,7 +83,7 @@ const NominationGraphModal = ({ show, onHide }) => {
         ],
       };
     }
- 
+
     // Bar & Pie (default)
     return {
       labels: ["Total Nominations", "Approved", "Pending", "Rejected"],
@@ -87,7 +99,7 @@ const NominationGraphModal = ({ show, onHide }) => {
       ],
     };
   };
- 
+
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -97,7 +109,7 @@ const NominationGraphModal = ({ show, onHide }) => {
         text: "My Nomination Statistics",
         font: { size: 18, weight: 600 },
         color: "#27235C",
-        padding: { top: 10, bottom: 30 }
+        padding: { top: 10, bottom: 30 },
       },
       tooltip: {
         backgroundColor: "#27235C",
@@ -106,9 +118,9 @@ const NominationGraphModal = ({ show, onHide }) => {
         borderColor: "#fff",
         borderWidth: 1,
       },
-    }
+    },
   };
- 
+
   const barOptions = {
     ...commonOptions,
     plugins: { ...commonOptions.plugins, legend: { display: false } },
@@ -122,9 +134,9 @@ const NominationGraphModal = ({ show, onHide }) => {
         ticks: { color: "#27235C", stepSize: 1, font: { weight: 600 } },
         grid: { color: "#f4f4f4" },
       },
-    }
+    },
   };
- 
+
   const pieOptions = {
     ...commonOptions,
     plugins: {
@@ -138,16 +150,16 @@ const NominationGraphModal = ({ show, onHide }) => {
           padding: 18,
         },
       },
-    }
+    },
   };
- 
+
   const lineOptions = {
     ...commonOptions,
     plugins: {
       ...commonOptions.plugins,
       legend: {
         display: false,
-      }
+      },
     },
     scales: {
       x: {
@@ -159,11 +171,11 @@ const NominationGraphModal = ({ show, onHide }) => {
         ticks: { color: "#27235C", stepSize: 1, font: { weight: 600 } },
         grid: { color: "#f4f4f4" },
       },
-    }
+    },
   };
- 
+
   if (!show) return null;
- 
+
   return (
     <>
       <div className="modal-backdrop-custom" onClick={onHide}></div>
@@ -175,7 +187,11 @@ const NominationGraphModal = ({ show, onHide }) => {
                 <i className="bi bi-bar-chart-fill"></i>
                 Nomination Analytics
               </h5>
-              <button type="button" className="modal-close-btn" onClick={onHide}>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={onHide}
+              >
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
@@ -191,21 +207,27 @@ const NominationGraphModal = ({ show, onHide }) => {
                 <>
                   <div className="chart-type-selector">
                     <button
-                      className={`chart-type-btn ${chartType === "bar" ? "active" : ""}`}
+                      className={`chart-type-btn ${
+                        chartType === "bar" ? "active" : ""
+                      }`}
                       onClick={() => setChartType("bar")}
                     >
                       <i className="bi bi-bar-chart-fill"></i>
                       Bar Chart
                     </button>
                     <button
-                      className={`chart-type-btn ${chartType === "pie" ? "active" : ""}`}
+                      className={`chart-type-btn ${
+                        chartType === "pie" ? "active" : ""
+                      }`}
                       onClick={() => setChartType("pie")}
                     >
                       <i className="bi bi-pie-chart-fill"></i>
                       Pie Chart
                     </button>
                     <button
-                      className={`chart-type-btn ${chartType === "line" ? "active" : ""}`}
+                      className={`chart-type-btn ${
+                        chartType === "line" ? "active" : ""
+                      }`}
                       onClick={() => setChartType("line")}
                     >
                       <i className="bi bi-graph-up"></i>
@@ -243,7 +265,5 @@ const NominationGraphModal = ({ show, onHide }) => {
     </>
   );
 };
- 
+
 export default NominationGraphModal;
- 
- 

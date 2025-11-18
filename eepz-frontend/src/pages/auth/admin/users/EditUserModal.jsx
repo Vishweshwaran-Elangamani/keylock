@@ -1,6 +1,6 @@
 /**
  * EditUserModal Component
- * 
+ *
  * A modal component for editing employment and work-related details of existing users.
  * Features:
  * - Edit employment type, status, dates, and work details
@@ -9,7 +9,7 @@
  * - Prevents invalid date combinations (e.g., exit before joining)
  * - Toast notifications using Sonner for success/error feedback
  * - Loading state during API operations
- * 
+ *
  * @param {boolean} show - Controls modal visibility
  * @param {function} onHide - Callback to close the modal
  * @param {function} onUserUpdated - Callback after successful update
@@ -101,18 +101,18 @@ const EditUserModal = ({
    * Handles input field changes
    * Updates form data and clears field-specific errors
    * Provides immediate feedback by removing errors when user starts correcting
-   * 
+   *
    * @param {Event} e - Input change event
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Update form data with new value
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    
+
     // Clear error for this specific field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
@@ -129,11 +129,11 @@ const EditUserModal = ({
   /**
    * Validates all form fields before submission
    * Applies comprehensive validation rules including date logic
-   * 
+   *
    * Date Validation Logic:
    * - Confirmation date: Must be after joining date and not in future
    * - Exit date: Must be after both joining and confirmation dates
-   * 
+   *
    * @returns {boolean} - True if form is valid, false otherwise
    */
   const validateForm = () => {
@@ -207,11 +207,11 @@ const EditUserModal = ({
     // -------- Notice Period Validation (Optional but must be valid if provided) --------
     if (formData.noticePeriodDays) {
       const noticePeriod = parseInt(formData.noticePeriodDays);
-      
+
       // Must be a positive number
       if (isNaN(noticePeriod) || noticePeriod < 0) {
         newErrors.noticePeriodDays = "Notice period must be a positive number";
-      } 
+      }
       // Cannot exceed 365 days (1 year)
       else if (noticePeriod > 365) {
         newErrors.noticePeriodDays = "Notice period cannot exceed 365 days";
@@ -221,7 +221,7 @@ const EditUserModal = ({
     // -------- Reporting Manager ID Validation (Optional but must be valid if provided) --------
     if (formData.reportingManagerEmployeeId) {
       const managerId = parseInt(formData.reportingManagerEmployeeId);
-      
+
       // Must be a valid positive integer
       if (isNaN(managerId) || managerId < 1) {
         newErrors.reportingManagerEmployeeId =
@@ -231,7 +231,7 @@ const EditUserModal = ({
 
     // Update errors state with all validation errors
     setErrors(newErrors);
-    
+
     // Return true if no errors found, false otherwise
     return Object.keys(newErrors).length === 0;
   };
@@ -244,7 +244,7 @@ const EditUserModal = ({
    * Handles form submission
    * Validates form, formats payload, and calls API to update user
    * Shows informational toast during update and success/error after completion
-   * 
+   *
    * @param {Event} e - Form submit event
    */
   const handleSubmit = async (e) => {
@@ -259,7 +259,7 @@ const EditUserModal = ({
     try {
       // Set loading state to disable form and show loading indicator
       setLoading(true);
-      
+
       // Show informational toast that update is in progress
       toast.info("Updating user. Please wait...");
 
@@ -298,7 +298,7 @@ const EditUserModal = ({
       if (response.success) {
         // Show success notification using Sonner toast
         toast.success("User updated successfully!");
-        
+
         // Trigger parent callback to refresh user list
         onUserUpdated();
       } else {
@@ -328,12 +328,11 @@ const EditUserModal = ({
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-edit"></div>
-      
+
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-edit">
         <div className="modal-dialog-edit">
           <div className="modal-content-edit">
-            
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -361,11 +360,11 @@ const EditUserModal = ({
               <div className="modal-body-edit">
                 {/* Form Grid - Two-column layout for form fields */}
                 <div className="form-grid-edit">
-                  
                   {/* -------- Employment Type Field (Required) -------- */}
                   <div className="form-group-edit">
                     <label className="form-label-edit">
-                      Employment Type <span className="required-mark-edit">*</span>
+                      Employment Type{" "}
+                      <span className="required-mark-edit">*</span>
                     </label>
                     <select
                       name="employmentType"
@@ -393,7 +392,8 @@ const EditUserModal = ({
                   {/* -------- Employment Status Field (Required) -------- */}
                   <div className="form-group-edit">
                     <label className="form-label-edit">
-                      Employment Status <span className="required-mark-edit">*</span>
+                      Employment Status{" "}
+                      <span className="required-mark-edit">*</span>
                     </label>
                     <select
                       name="employmentStatus"
@@ -419,7 +419,6 @@ const EditUserModal = ({
 
                   {/* -------- Confirmation Date Field (Optional) -------- */}
                   {/* Date when employee is confirmed after probation period */}
-                  
 
                   {/* -------- Exit Date Field (Optional) -------- */}
                   {/* Date when employee left or will leave the organization */}
@@ -477,7 +476,8 @@ const EditUserModal = ({
                   {/* Full-time, Part-time, or Consultant classification */}
                   <div className="form-group-edit">
                     <label className="form-label-edit">
-                      Employee Type <span className="required-mark-edit">*</span>
+                      Employee Type{" "}
+                      <span className="required-mark-edit">*</span>
                     </label>
                     <select
                       name="employeeType"
@@ -532,7 +532,6 @@ const EditUserModal = ({
 
                   {/* -------- Reporting Manager ID Field (Optional) -------- */}
                   {/* Employee ID of the person this employee reports to */}
-                  
                 </div>
 
                 {/* -------- Info Alert -------- */}
@@ -560,7 +559,7 @@ const EditUserModal = ({
                   <i className="bi bi-x-circle"></i>
                   Cancel
                 </button>
-                
+
                 {/* Submit Button - Saves changes and updates user */}
                 {/* Disabled during loading to prevent duplicate requests */}
                 <button

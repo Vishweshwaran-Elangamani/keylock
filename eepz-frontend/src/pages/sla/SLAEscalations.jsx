@@ -1,13 +1,19 @@
-// src/pages/sla/SLAEscalations.jsx
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, AlertTriangle, Clock, CheckCircle, XCircle,
-  User, Calendar, FileText, MessageSquare
-} from 'lucide-react';
-import { toast } from 'sonner';
-import slaService from '../../services/sla/slaService';
-import { formatDate, formatDateTime } from '../../utils/sla/dateFormatter';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  AlertTriangle,
+  Clock,
+  CheckCircle,
+  XCircle,
+  User,
+  Calendar,
+  FileText,
+  MessageSquare,
+} from "lucide-react";
+import { toast } from "sonner";
+import slaService from "../../services/sla/slaService";
+import { formatDate, formatDateTime } from "../../utils/sla/dateFormatter";
 
 const SLAEscalations = () => {
   const { slaid } = useParams();
@@ -18,8 +24,8 @@ const SLAEscalations = () => {
   const [error, setError] = useState(null);
   const [selectedEscalation, setSelectedEscalation] = useState(null);
   const [resolutionForm, setResolutionForm] = useState({
-    escalationStatus: 'Resolved',
-    resolutionComments: ''
+    escalationStatus: "Resolved",
+    resolutionComments: "",
   });
 
   useEffect(() => {
@@ -32,7 +38,7 @@ const SLAEscalations = () => {
     try {
       const [slaResponse, escalationsResponse] = await Promise.all([
         slaService.getSLAById(parseInt(slaid)),
-        slaService.getSLAEscalations(parseInt(slaid))
+        slaService.getSLAEscalations(parseInt(slaid)),
       ]);
 
       if (slaResponse.success) {
@@ -51,31 +57,34 @@ const SLAEscalations = () => {
 
   const handleResolveEscalation = async (escalationId) => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      
+      const user = JSON.parse(localStorage.getItem("user"));
+
       const response = await slaService.resolveEscalation({
         escalationId,
         resolvedByEmployeeId: user.empId,
-        ...resolutionForm
+        ...resolutionForm,
       });
 
       if (response.success) {
-        toast.success('Escalation resolved successfully', {
-          description: 'The escalation has been resolved and saved',
+        toast.success("Escalation resolved successfully", {
+          description: "The escalation has been resolved and saved",
           duration: 4000,
         });
         setSelectedEscalation(null);
-        setResolutionForm({ escalationStatus: 'Resolved', resolutionComments: '' });
+        setResolutionForm({
+          escalationStatus: "Resolved",
+          resolutionComments: "",
+        });
         fetchData();
       } else {
-        toast.error('Failed to resolve escalation', {
-          description: response.message || 'Unable to process resolution',
+        toast.error("Failed to resolve escalation", {
+          description: response.message || "Unable to process resolution",
           duration: 5000,
         });
       }
     } catch (err) {
-      toast.error('Failed to resolve escalation', {
-        description: err.message || 'An unexpected error occurred',
+      toast.error("Failed to resolve escalation", {
+        description: err.message || "An unexpected error occurred",
         duration: 5000,
       });
     }
@@ -83,21 +92,26 @@ const SLAEscalations = () => {
 
   const getEscalationLevelColor = (level) => {
     switch (level) {
-      case 'L1': return { bg: '#0F62FE15', text: '#0F62FE' };
-      case 'L2': return { bg: '#E2B93B15', text: '#E2B93B' };
-      case 'DeptHead': return { bg: '#AC509815', text: '#AC5098' };
-      case 'Leadership': return { bg: '#E0195015', text: '#E01950' };
-      default: return { bg: '#6B728015', text: '#6B7280' };
+      case "L1":
+        return { bg: "#0F62FE15", text: "#0F62FE" };
+      case "L2":
+        return { bg: "#E2B93B15", text: "#E2B93B" };
+      case "DeptHead":
+        return { bg: "#AC509815", text: "#AC5098" };
+      case "Leadership":
+        return { bg: "#E0195015", text: "#E01950" };
+      default:
+        return { bg: "#6B728015", text: "#6B7280" };
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'Resolved':
+      case "Resolved":
         return <CheckCircle size={20} color="#24A148" />;
-      case 'Dismissed':
+      case "Dismissed":
         return <XCircle size={20} color="#6B7280" />;
-      case 'Escalated':
+      case "Escalated":
         return <AlertTriangle size={20} color="#E2B93B" />;
       default:
         return <Clock size={20} color="#0F62FE" />;
@@ -106,7 +120,10 @@ const SLAEscalations = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "400px" }}
+      >
         <div className="spinner-border text-primary" />
       </div>
     );
@@ -120,12 +137,15 @@ const SLAEscalations = () => {
           <button
             className="btn btn-outline-secondary rounded-circle"
             onClick={() => navigate(-1)}
-            style={{ width: '40px', height: '40px', padding: 0 }}
+            style={{ width: "40px", height: "40px", padding: 0 }}
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h2 className="fw-bold mb-1" style={{ color: 'var(--color-primary-1)' }}>
+            <h2
+              className="fw-bold mb-1"
+              style={{ color: "var(--color-primary-1)" }}
+            >
               SLA Escalations
             </h2>
             {sla && (
@@ -137,13 +157,14 @@ const SLAEscalations = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger">{error}</div>
-      )}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       {/* Escalations List */}
       {escalations.length === 0 ? (
-        <div className="card border-0 shadow-sm text-center py-5" style={{ borderRadius: '12px' }}>
+        <div
+          className="card border-0 shadow-sm text-center py-5"
+          style={{ borderRadius: "12px" }}
+        >
           <div className="card-body">
             <AlertTriangle size={64} className="text-muted mb-3" />
             <h5 className="text-muted">No Escalations</h5>
@@ -153,51 +174,63 @@ const SLAEscalations = () => {
       ) : (
         <div className="row g-4">
           {escalations.map((escalation, index) => {
-            const levelColors = getEscalationLevelColor(escalation.escalationLevel);
+            const levelColors = getEscalationLevelColor(
+              escalation.escalationLevel
+            );
             const isExpanded = selectedEscalation === escalation.escalationId;
 
             return (
               <div key={escalation.escalationId} className="col-12">
-                <div className="card border-0 shadow-sm" style={{ borderRadius: '12px' }}>
+                <div
+                  className="card border-0 shadow-sm"
+                  style={{ borderRadius: "12px" }}
+                >
                   <div className="card-body p-4">
                     {/* Header */}
                     <div className="d-flex justify-content-between align-items-start mb-3">
                       <div className="d-flex align-items-center gap-3">
-                        <div 
+                        <div
                           className="rounded-circle d-flex align-items-center justify-content-center"
-                          style={{ 
-                            width: '48px', 
-                            height: '48px',
-                            backgroundColor: levelColors.bg
+                          style={{
+                            width: "48px",
+                            height: "48px",
+                            backgroundColor: levelColors.bg,
                           }}
                         >
                           {getStatusIcon(escalation.escalationStatus)}
                         </div>
                         <div>
                           <div className="d-flex align-items-center gap-2 mb-1">
-                            <h5 className="mb-0 fw-bold">{escalation.reason}</h5>
-                            <span 
+                            <h5 className="mb-0 fw-bold">
+                              {escalation.reason}
+                            </h5>
+                            <span
                               className="badge"
                               style={{
                                 backgroundColor: levelColors.bg,
                                 color: levelColors.text,
-                                border: `1px solid ${levelColors.text}30`
+                                border: `1px solid ${levelColors.text}30`,
                               }}
                             >
                               {escalation.escalationLevel}
                             </span>
                           </div>
-                          <p className="text-muted mb-0 small">{escalation.description}</p>
+                          <p className="text-muted mb-0 small">
+                            {escalation.description}
+                          </p>
                         </div>
                       </div>
 
                       <div className="text-end">
-                        <span 
+                        <span
                           className={`badge ${
-                            escalation.escalationStatus === 'Resolved' ? 'bg-success' :
-                            escalation.escalationStatus === 'Dismissed' ? 'bg-secondary' :
-                            escalation.escalationStatus === 'Escalated' ? 'bg-warning' :
-                            'bg-primary'
+                            escalation.escalationStatus === "Resolved"
+                              ? "bg-success"
+                              : escalation.escalationStatus === "Dismissed"
+                              ? "bg-secondary"
+                              : escalation.escalationStatus === "Escalated"
+                              ? "bg-warning"
+                              : "bg-primary"
                           }`}
                         >
                           {escalation.escalationStatus}
@@ -214,8 +247,12 @@ const SLAEscalations = () => {
                         <div className="d-flex align-items-start gap-2">
                           <User size={16} className="text-muted mt-1" />
                           <div>
-                            <small className="text-muted d-block">Escalated To</small>
-                            <strong className="small">{escalation.escalatedTo}</strong>
+                            <small className="text-muted d-block">
+                              Escalated To
+                            </small>
+                            <strong className="small">
+                              {escalation.escalatedTo}
+                            </strong>
                           </div>
                         </div>
                       </div>
@@ -224,8 +261,12 @@ const SLAEscalations = () => {
                         <div className="d-flex align-items-start gap-2">
                           <User size={16} className="text-muted mt-1" />
                           <div>
-                            <small className="text-muted d-block">Submitted By</small>
-                            <strong className="small">{escalation.submittedBy}</strong>
+                            <small className="text-muted d-block">
+                              Submitted By
+                            </small>
+                            <strong className="small">
+                              {escalation.submittedBy}
+                            </strong>
                           </div>
                         </div>
                       </div>
@@ -234,8 +275,12 @@ const SLAEscalations = () => {
                         <div className="d-flex align-items-start gap-2">
                           <Calendar size={16} className="text-muted mt-1" />
                           <div>
-                            <small className="text-muted d-block">Submitted At</small>
-                            <strong className="small">{formatDateTime(escalation.submittedAt)}</strong>
+                            <small className="text-muted d-block">
+                              Submitted At
+                            </small>
+                            <strong className="small">
+                              {formatDateTime(escalation.submittedAt)}
+                            </strong>
                           </div>
                         </div>
                       </div>
@@ -244,8 +289,12 @@ const SLAEscalations = () => {
                         <div className="d-flex align-items-start gap-2">
                           <Clock size={16} className="text-muted mt-1" />
                           <div>
-                            <small className="text-muted d-block">Escalation Deadline</small>
-                            <strong className="small">{formatDate(escalation.escalationDeadline)}</strong>
+                            <small className="text-muted d-block">
+                              Escalation Deadline
+                            </small>
+                            <strong className="small">
+                              {formatDate(escalation.escalationDeadline)}
+                            </strong>
                           </div>
                         </div>
                       </div>
@@ -253,79 +302,104 @@ const SLAEscalations = () => {
 
                     {/* Resolution Section */}
                     {escalation.resolvedAt && (
-                      <div 
+                      <div
                         className="alert alert-success mb-0 d-flex align-items-start gap-3"
-                        style={{ borderRadius: '8px' }}
+                        style={{ borderRadius: "8px" }}
                       >
-                        <CheckCircle size={20} className="text-success mt-1 flex-shrink-0" />
+                        <CheckCircle
+                          size={20}
+                          className="text-success mt-1 flex-shrink-0"
+                        />
                         <div className="flex-grow-1">
                           <div className="d-flex justify-content-between align-items-start mb-2">
                             <strong className="d-block">Resolution</strong>
                             <small className="text-muted">
-                              Resolved by {escalation.resolvedBy} on {formatDateTime(escalation.resolvedAt)}
+                              Resolved by {escalation.resolvedBy} on{" "}
+                              {formatDateTime(escalation.resolvedAt)}
                             </small>
                           </div>
-                          <p className="mb-0 small">{escalation.resolutionComments}</p>
+                          <p className="mb-0 small">
+                            {escalation.resolutionComments}
+                          </p>
                         </div>
                       </div>
                     )}
 
                     {/* Resolve Button */}
-                    {escalation.escalationStatus === 'Pending' && (
+                    {escalation.escalationStatus === "Pending" && (
                       <div className="mt-3">
                         <button
                           className="btn btn-outline-success btn-sm d-flex align-items-center gap-2"
-                          onClick={() => setSelectedEscalation(
-                            isExpanded ? null : escalation.escalationId
-                          )}
-                          style={{ borderRadius: '8px' }}
+                          onClick={() =>
+                            setSelectedEscalation(
+                              isExpanded ? null : escalation.escalationId
+                            )
+                          }
+                          style={{ borderRadius: "8px" }}
                         >
                           <MessageSquare size={14} />
-                          {isExpanded ? 'Cancel' : 'Resolve Escalation'}
+                          {isExpanded ? "Cancel" : "Resolve Escalation"}
                         </button>
 
                         {/* Resolution Form */}
                         {isExpanded && (
-                          <div className="mt-3 p-3 border rounded" style={{ borderRadius: '8px' }}>
-                            <h6 className="fw-semibold mb-3">Resolve Escalation</h6>
-                            
+                          <div
+                            className="mt-3 p-3 border rounded"
+                            style={{ borderRadius: "8px" }}
+                          >
+                            <h6 className="fw-semibold mb-3">
+                              Resolve Escalation
+                            </h6>
+
                             <div className="mb-3">
-                              <label className="form-label small fw-semibold">Status</label>
+                              <label className="form-label small fw-semibold">
+                                Status
+                              </label>
                               <select
                                 className="form-select"
                                 value={resolutionForm.escalationStatus}
-                                onChange={(e) => setResolutionForm({
-                                  ...resolutionForm,
-                                  escalationStatus: e.target.value
-                                })}
-                                style={{ borderRadius: '8px' }}
+                                onChange={(e) =>
+                                  setResolutionForm({
+                                    ...resolutionForm,
+                                    escalationStatus: e.target.value,
+                                  })
+                                }
+                                style={{ borderRadius: "8px" }}
                               >
                                 <option value="Resolved">Resolved</option>
                                 <option value="Dismissed">Dismissed</option>
-                                <option value="Escalated">Escalate Further</option>
+                                <option value="Escalated">
+                                  Escalate Further
+                                </option>
                               </select>
                             </div>
 
                             <div className="mb-3">
-                              <label className="form-label small fw-semibold">Resolution Comments</label>
+                              <label className="form-label small fw-semibold">
+                                Resolution Comments
+                              </label>
                               <textarea
                                 className="form-control"
                                 rows="3"
                                 value={resolutionForm.resolutionComments}
-                                onChange={(e) => setResolutionForm({
-                                  ...resolutionForm,
-                                  resolutionComments: e.target.value
-                                })}
+                                onChange={(e) =>
+                                  setResolutionForm({
+                                    ...resolutionForm,
+                                    resolutionComments: e.target.value,
+                                  })
+                                }
                                 placeholder="Provide details about the resolution..."
-                                style={{ borderRadius: '8px' }}
+                                style={{ borderRadius: "8px" }}
                               />
                             </div>
 
                             <button
                               className="btn btn-success d-flex align-items-center gap-2"
-                              onClick={() => handleResolveEscalation(escalation.escalationId)}
+                              onClick={() =>
+                                handleResolveEscalation(escalation.escalationId)
+                              }
                               disabled={!resolutionForm.resolutionComments}
-                              style={{ borderRadius: '8px' }}
+                              style={{ borderRadius: "8px" }}
                             >
                               <CheckCircle size={16} />
                               Submit Resolution

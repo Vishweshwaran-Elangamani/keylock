@@ -3,23 +3,19 @@ import { Modal } from "react-bootstrap";
 import { toast } from "sonner";
 import careerProgressionService from "../../../../services/hr_operations/hr/careerProgressionService";
 
-
 const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
   const [newSalary, setNewSalary] = useState(nomination?.newSalary || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-
   const handleSalaryChange = (e) => {
     setNewSalary(e.target.value);
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
 
     try {
       if (!newSalary || parseFloat(newSalary) <= 0) {
@@ -28,20 +24,17 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
         return;
       }
 
-
       if (parseFloat(newSalary) <= (nomination.oldSalary || 0)) {
         setError("New salary must be higher than current salary");
         setLoading(false);
         return;
       }
 
-
       console.log(" Updating salary...");
       await careerProgressionService.updateNomination({
         promotionId: nomination.promotionId,
         newSalary: parseFloat(newSalary),
       });
-
 
       console.log(" Salary updated");
       showToast("Success", "Salary updated successfully", "success");
@@ -56,17 +49,15 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
     }
   };
 
-
   const handleClose = () => {
     setNewSalary(nomination?.newSalary || "");
     setError(null);
     onHide();
   };
 
-
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
-    
+
     switch (type) {
       case "success":
         toast.success(fullMessage);
@@ -86,7 +77,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
     }
   };
 
-
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return "₹0";
     return new Intl.NumberFormat("en-IN", {
@@ -96,14 +86,12 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
     }).format(amount);
   };
 
-
   //  AUTO-CALCULATE
   const currentSalary = nomination?.oldSalary || 0;
   const proposedNewSalary = parseFloat(newSalary) || 0;
   const increment = proposedNewSalary - currentSalary;
   const incrementPercent =
     currentSalary > 0 ? ((increment / currentSalary) * 100).toFixed(2) : 0;
-
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" className="promo-modal">
@@ -114,7 +102,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
         </Modal.Title>
       </Modal.Header>
 
-
       <form onSubmit={handleSubmit}>
         <Modal.Body className="promo-modal-body">
           {error && (
@@ -123,7 +110,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
               {error}
             </div>
           )}
-
 
           {/*  EMPLOYEE DETAILS */}
           <div className="promo-approval-info">
@@ -138,7 +124,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
               </span>
             </div>
           </div>
-
 
           {/*  SALARY COMPARISON */}
           <div
@@ -158,7 +143,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
               </span>
             </div>
           </div>
-
 
           {/*  SALARY EDIT INPUT */}
           <div className="mb-3">
@@ -182,16 +166,12 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
             </small>
           </div>
 
-
           {/*  AUTO-CALCULATED SUMMARY */}
           <div
             className="promo-details-section"
             style={{ backgroundColor: "#fef3c7" }}
           >
-            <h6 className="promo-details-heading">
-              {" "}
-              Auto-Calculated Summary
-            </h6>
+            <h6 className="promo-details-heading"> Auto-Calculated Summary</h6>
             <div className="promo-details-grid">
               <div className="promo-detail-item">
                 <label>Current Salary:</label>
@@ -230,7 +210,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
             </div>
           </div>
 
-
           {/*  VALIDATION WARNING */}
           {newSalary && parseFloat(newSalary) <= currentSalary && (
             <div
@@ -253,7 +232,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
             </div>
           )}
 
-
           {/*  APPROVAL NOTES */}
           <div
             className="promo-approval-info"
@@ -271,7 +249,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
             </div>
           </div>
 
-
           {/*  INFO ALERT */}
           <div
             className="alert alert-info"
@@ -280,9 +257,7 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
           >
             <i className="bi bi-info-circle me-2"></i>
             <strong>HR Instructions:</strong>
-            <ol
-              style={{ marginTop: "8px", marginBottom: 0, fontSize: "12px" }}
-            >
+            <ol style={{ marginTop: "8px", marginBottom: 0, fontSize: "12px" }}>
               <li>Review the proposed salary from Department Head</li>
               <li>Adjust salary if needed (increment % auto-calculates)</li>
               <li>Once approved, click Submit to send to Leadership</li>
@@ -291,7 +266,6 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
             </ol>
           </div>
         </Modal.Body>
-
 
         <Modal.Footer className="promo-modal-footer">
           <button
@@ -328,6 +302,5 @@ const HRSalaryEditModal = ({ show, nomination, onHide, onSalaryUpdated }) => {
     </Modal>
   );
 };
-
 
 export default HRSalaryEditModal;

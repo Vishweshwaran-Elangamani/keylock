@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import momService from '../../services/meeting/momService';
-import meetingService from '../../services/meeting/meetingService';
-import toastr from 'toastr';
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import momService from "../../services/meeting/momService";
+import meetingService from "../../services/meeting/meetingService";
+import toastr from "toastr";
 import {
   FileText,
   Calendar,
@@ -15,15 +15,15 @@ import {
   Trash2,
   ArrowLeft,
   Save,
-  X
-} from 'lucide-react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+  X,
+} from "lucide-react";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const initialActionItem = {
-  task: '',
-  assignTo: '',
-  dueDate: '',
-  status: 'Pending',
+  task: "",
+  assignTo: "",
+  dueDate: "",
+  status: "Pending",
 };
 
 const CreateOrEditMom = ({ isEdit = false }) => {
@@ -37,7 +37,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
   const [formData, setFormData] = useState({
     discussionPoints: [],
     actionItems: [],
-    commentsObservations: ''
+    commentsObservations: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -61,17 +61,17 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       setFormData({
         discussionPoints: mom.discussionPoints || [],
         actionItems: mom.actionItems || [],
-        commentsObservations: mom.commentsObservations || ''
+        commentsObservations: mom.commentsObservations || "",
       });
       setMeetingData({
         meetingTitle: mom.meetingTitle,
         meetingType: mom.meetingType,
         meetingDate: mom.meetingDate,
-        meetingLink: mom.meetingLink || '',
+        meetingLink: mom.meetingLink || "",
         attendees: mom.attendees || [],
       });
     } catch (err) {
-      toastr.error('Failed to load MOM');
+      toastr.error("Failed to load MOM");
       navigate(-1);
     } finally {
       setLoading(false);
@@ -88,11 +88,11 @@ const CreateOrEditMom = ({ isEdit = false }) => {
         meetingTitle: meeting.meetingTitle,
         meetingType: meeting.meetingType,
         meetingDate: meeting.meetingDate,
-        meetingLink: meeting.meetingLink || '',
+        meetingLink: meeting.meetingLink || "",
         attendees: meeting.attendees || [],
       });
     } catch (err) {
-      toastr.error('Meeting not found');
+      toastr.error("Meeting not found");
       navigate(-1);
     } finally {
       setLoading(false);
@@ -101,56 +101,56 @@ const CreateOrEditMom = ({ isEdit = false }) => {
 
   // Discussion Points Functions
   const handleAddDiscussionPoint = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      discussionPoints: [...prev.discussionPoints, { point: '' }]
+      discussionPoints: [...prev.discussionPoints, { point: "" }],
     }));
   };
 
   const handleChangeDiscussionPoint = (index, value) => {
     const newPoints = [...formData.discussionPoints];
     newPoints[index].point = value;
-    setFormData(prev => ({ ...prev, discussionPoints: newPoints }));
+    setFormData((prev) => ({ ...prev, discussionPoints: newPoints }));
   };
 
   const handleRemoveDiscussionPoint = (index) => {
     const newPoints = [...formData.discussionPoints];
     newPoints.splice(index, 1);
-    setFormData(prev => ({ ...prev, discussionPoints: newPoints }));
+    setFormData((prev) => ({ ...prev, discussionPoints: newPoints }));
   };
 
   // Action Items Functions
   const handleAddActionItem = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      actionItems: [...prev.actionItems, { ...initialActionItem }]
+      actionItems: [...prev.actionItems, { ...initialActionItem }],
     }));
   };
 
   const handleChangeActionItem = (index, field, value) => {
     const newItems = [...formData.actionItems];
     newItems[index][field] = value;
-    setFormData(prev => ({ ...prev, actionItems: newItems }));
+    setFormData((prev) => ({ ...prev, actionItems: newItems }));
   };
 
   const handleRemoveActionItem = (index) => {
     const newItems = [...formData.actionItems];
     newItems.splice(index, 1);
-    setFormData(prev => ({ ...prev, actionItems: newItems }));
+    setFormData((prev) => ({ ...prev, actionItems: newItems }));
   };
 
   // Comment/Observation Change
   const handleCommentsChange = (e) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      commentsObservations: e.target.value
+      commentsObservations: e.target.value,
     }));
   };
 
   // Validation
   const validateForm = () => {
     const newErrors = {};
-    if (!meetingData) newErrors.meeting = 'Meeting details missing';
+    if (!meetingData) newErrors.meeting = "Meeting details missing";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -159,7 +159,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      toastr.error('Please check the form');
+      toastr.error("Please check the form");
       return;
     }
     setSubmitting(true);
@@ -173,21 +173,25 @@ const CreateOrEditMom = ({ isEdit = false }) => {
         meetingDate: meetingData.meetingDate,
         meetingLink: meetingData.meetingLink,
         attendees: meetingData.attendees,
-        discussionPoints: formData.discussionPoints.filter(dp => dp.point && dp.point.trim()),
-        actionItems: formData.actionItems.filter(ai => ai.task && ai.task.trim()),
+        discussionPoints: formData.discussionPoints.filter(
+          (dp) => dp.point && dp.point.trim()
+        ),
+        actionItems: formData.actionItems.filter(
+          (ai) => ai.task && ai.task.trim()
+        ),
         commentsObservations: formData.commentsObservations,
       };
 
       if (isEdit) {
         await momService.updateMom(momPayload);
-        toastr.success('MOM updated successfully');
+        toastr.success("MOM updated successfully");
       } else {
         await momService.createMom(momPayload);
-        toastr.success('MOM created successfully');
+        toastr.success("MOM created successfully");
       }
-      navigate('/mom/my-moms');
+      navigate("/mom/my-moms");
     } catch (err) {
-      toastr.error('Failed to submit MOM');
+      toastr.error("Failed to submit MOM");
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -195,25 +199,29 @@ const CreateOrEditMom = ({ isEdit = false }) => {
   };
 
   const formatDateTime = (dateString) => {
-    if (!dateString) return '-';
+    if (!dateString) return "-";
     try {
       const date = new Date(dateString);
-      return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       });
     } catch {
-      return '-';
+      return "-";
     }
   };
 
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100">
-        <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        >
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
@@ -229,7 +237,10 @@ const CreateOrEditMom = ({ isEdit = false }) => {
   }
 
   return (
-    <div className="container-fluid px-4 py-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <div
+      className="container-fluid px-4 py-4"
+      style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
+    >
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
           {/* Header */}
@@ -237,18 +248,21 @@ const CreateOrEditMom = ({ isEdit = false }) => {
             <button
               className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
               onClick={() => navigate(-1)}
-              style={{ width: '40px', height: '40px', flexShrink: 0 }}
+              style={{ width: "40px", height: "40px", flexShrink: 0 }}
             >
               <ArrowLeft size={20} />
             </button>
             <div>
-              <h2 className="fw-bold mb-1" style={{ color: '#1e293b', fontSize: '1.75rem' }}>
-                {isEdit ? 'Edit MOM' : 'Create MOM from Meeting'}
+              <h2
+                className="fw-bold mb-1"
+                style={{ color: "#1e293b", fontSize: "1.75rem" }}
+              >
+                {isEdit ? "Edit MOM" : "Create MOM from Meeting"}
               </h2>
-              <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>
+              <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
                 {isEdit
-                  ? 'Update meeting minutes'
-                  : 'Add discussion points and action items for this meeting (meeting info is read-only)'}
+                  ? "Update meeting minutes"
+                  : "Add discussion points and action items for this meeting (meeting info is read-only)"}
               </p>
             </div>
           </div>
@@ -263,7 +277,9 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                 </h5>
                 <div className="row g-3">
                   <div className="col-12">
-                    <label className="form-label fw-semibold small text-muted">Meeting Title</label>
+                    <label className="form-label fw-semibold small text-muted">
+                      Meeting Title
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -272,7 +288,9 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                     />
                   </div>
                   <div className="col-md-4">
-                    <label className="form-label fw-semibold small text-muted">Meeting Type</label>
+                    <label className="form-label fw-semibold small text-muted">
+                      Meeting Type
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -298,7 +316,9 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                     <input
                       type="text"
                       className="form-control"
-                      value={`${meetingData.attendees?.length || 0} participants`}
+                      value={`${
+                        meetingData.attendees?.length || 0
+                      } participants`}
                       disabled
                     />
                   </div>
@@ -348,13 +368,22 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                           <div className="d-flex align-items-start gap-2">
                             <span
                               className="badge bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                              style={{ width: '28px', height: '28px', flexShrink: 0 }}
+                              style={{
+                                width: "28px",
+                                height: "28px",
+                                flexShrink: 0,
+                              }}
                             >
                               {index + 1}
                             </span>
                             <textarea
-                              value={dp.point || ''}
-                              onChange={(e) => handleChangeDiscussionPoint(index, e.target.value)}
+                              value={dp.point || ""}
+                              onChange={(e) =>
+                                handleChangeDiscussionPoint(
+                                  index,
+                                  e.target.value
+                                )
+                              }
                               className="form-control flex-grow-1"
                               rows="2"
                               placeholder="Enter discussion point..."
@@ -407,15 +436,27 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                               <input
                                 type="text"
                                 placeholder="Task description..."
-                                value={item.task || ''}
-                                onChange={(e) => handleChangeActionItem(index, 'task', e.target.value)}
+                                value={item.task || ""}
+                                onChange={(e) =>
+                                  handleChangeActionItem(
+                                    index,
+                                    "task",
+                                    e.target.value
+                                  )
+                                }
                                 className="form-control"
                               />
                             </div>
                             <div className="col-md-4">
                               <select
-                                value={item.assignTo || ''}
-                                onChange={(e) => handleChangeActionItem(index, 'assignTo', e.target.value)}
+                                value={item.assignTo || ""}
+                                onChange={(e) =>
+                                  handleChangeActionItem(
+                                    index,
+                                    "assignTo",
+                                    e.target.value
+                                  )
+                                }
                                 className="form-select"
                               >
                                 <option value="">Assign to...</option>
@@ -429,15 +470,27 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                             <div className="col-md-3">
                               <input
                                 type="date"
-                                value={item.dueDate || ''}
-                                onChange={(e) => handleChangeActionItem(index, 'dueDate', e.target.value)}
+                                value={item.dueDate || ""}
+                                onChange={(e) =>
+                                  handleChangeActionItem(
+                                    index,
+                                    "dueDate",
+                                    e.target.value
+                                  )
+                                }
                                 className="form-control"
                               />
                             </div>
                             <div className="col-md-3">
                               <select
-                                value={item.status || 'Pending'}
-                                onChange={(e) => handleChangeActionItem(index, 'status', e.target.value)}
+                                value={item.status || "Pending"}
+                                onChange={(e) =>
+                                  handleChangeActionItem(
+                                    index,
+                                    "status",
+                                    e.target.value
+                                  )
+                                }
                                 className="form-select"
                               >
                                 <option value="Pending">Pending</option>
@@ -498,13 +551,17 @@ const CreateOrEditMom = ({ isEdit = false }) => {
               >
                 {submitting ? (
                   <>
-                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    {isEdit ? 'Updating...' : 'Creating...'}
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    {isEdit ? "Updating..." : "Creating..."}
                   </>
                 ) : (
                   <>
                     <Save size={18} />
-                    {isEdit ? 'Update MOM' : 'Create MOM'}
+                    {isEdit ? "Update MOM" : "Create MOM"}
                   </>
                 )}
               </button>

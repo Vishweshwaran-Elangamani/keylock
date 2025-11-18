@@ -505,7 +505,6 @@ const BudgetAllocationBreakdown = () => {
                           <i className="bi bi-eye"></i>
                           <span>View</span>
                         </button>
-                        
                       </div>
                     </div>
                   );

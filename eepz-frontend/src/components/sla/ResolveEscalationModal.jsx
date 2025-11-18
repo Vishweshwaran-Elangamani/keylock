@@ -1,16 +1,15 @@
-// src/components/sla/ResolveEscalationModal.jsx
-import React, { useState } from 'react';
-import { CheckCircle, X } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { CheckCircle, X } from "lucide-react";
+import { toast } from "sonner";
 
 const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
-  const [resolutionComments, setResolutionComments] = useState('');
+  const [resolutionComments, setResolutionComments] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleResolve = async () => {
     if (!resolutionComments.trim()) {
-      toast.warning('Resolution comments required', {
-        description: 'Please provide resolution comments before proceeding',
+      toast.warning("Resolution comments required", {
+        description: "Please provide resolution comments before proceeding",
         duration: 4000,
       });
       return;
@@ -21,16 +20,16 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
       await onResolve({
         escalationId: escalation.escalationId,
         resolutionComments: resolutionComments.trim(),
-        escalationStatus: 'Resolved'
+        escalationStatus: "Resolved",
       });
 
-      toast.success('Escalation resolved successfully', {
-        description: 'Resolution comments have been saved',
+      toast.success("Escalation resolved successfully", {
+        description: "Resolution comments have been saved",
         duration: 4000,
       });
     } catch (error) {
-      toast.error('Failed to resolve escalation', {
-        description: error.message || 'An error occurred while resolving',
+      toast.error("Failed to resolve escalation", {
+        description: error.message || "An error occurred while resolving",
         duration: 5000,
       });
     } finally {
@@ -39,9 +38,12 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
   };
 
   return (
-    <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+    <div
+      className="modal show d-block"
+      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+    >
       <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content" style={{ borderRadius: '8px' }}>
+        <div className="modal-content" style={{ borderRadius: "8px" }}>
           <div className="modal-header border-0">
             <h6 className="modal-title fw-semibold">Resolve Escalation</h6>
             <button
@@ -57,9 +59,7 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
               <div className="mb-2">
                 <strong>{escalation.employeeName}</strong>
               </div>
-              <div className="text-muted">
-                {escalation.reason}
-              </div>
+              <div className="text-muted">{escalation.reason}</div>
             </div>
 
             <textarea
@@ -69,7 +69,7 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
               onChange={(e) => setResolutionComments(e.target.value)}
               placeholder="Enter resolution comments..."
               disabled={loading}
-              style={{ fontSize: '0.9rem' }}
+              style={{ fontSize: "0.9rem" }}
             />
           </div>
 
@@ -89,7 +89,7 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
               disabled={loading || !resolutionComments.trim()}
             >
               <CheckCircle size={14} />
-              {loading ? 'Resolving...' : 'Resolve'}
+              {loading ? "Resolving..." : "Resolve"}
             </button>
           </div>
         </div>

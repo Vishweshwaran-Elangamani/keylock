@@ -80,7 +80,9 @@ function ManagerNomination() {
 
   // ============ HELPER FUNCTIONS ============
   const getNominationStatus = (employeeId) => {
-    const nomination = myNominations.find((n) => n?.nominee?.employeeId === employeeId);
+    const nomination = myNominations.find(
+      (n) => n?.nominee?.employeeId === employeeId
+    );
     if (!nomination) return "No nomination yet";
     return nomination.status || "Unknown";
   };
@@ -112,14 +114,18 @@ function ManagerNomination() {
   };
 
   const handleRewardTypeSelect = async (rewardTypeId) => {
-    const rewardType = rewardTypes.find((rt) => rt?.rewardTypeId === rewardTypeId);
+    const rewardType = rewardTypes.find(
+      (rt) => rt?.rewardTypeId === rewardTypeId
+    );
     setSelectedRewardType(rewardType);
     setParameters([]);
     setParameterValues({});
 
     if (rewardTypeId) {
       try {
-        const { data } = await managerNominationApi.getNominationParameters(rewardTypeId);
+        const { data } = await managerNominationApi.getNominationParameters(
+          rewardTypeId
+        );
         if (data.success) {
           setParameters(data.data || []);
         }
@@ -281,7 +287,9 @@ function ManagerNomination() {
   const approvedMembers = approvedNominations
     .filter((nom) => nom && nom.rewardType && nom.nominee)
     .map((nom) => ({
-      name: `${nom.nominee.firstName || ""} ${nom.nominee.lastName || ""}`.trim(),
+      name: `${nom.nominee.firstName || ""} ${
+        nom.nominee.lastName || ""
+      }`.trim(),
       rewardName: nom.rewardType.rewardName || "N/A",
     }));
 
@@ -312,7 +320,9 @@ function ManagerNomination() {
                 <div className="tlp-approved-member-info">
                   <div className="tlp-approved-member-number">{index + 1}</div>
                   <div>
-                    <div className="tlp-approved-member-name">{member.name}</div>
+                    <div className="tlp-approved-member-name">
+                      {member.name}
+                    </div>
                     <div className="tlp-approved-reward-name">
                       {member.rewardName}
                     </div>
@@ -325,8 +335,6 @@ function ManagerNomination() {
         </div>
       )}
 
-      
-
       {/* Team Members Section with Tabs */}
       {teamMembers.length > 0 && (
         <div className="tlp-card">
@@ -336,19 +344,25 @@ function ManagerNomination() {
           <div className="tlp-tab-container">
             <button
               onClick={() => setActiveTab("pending")}
-              className={`tlp-tab ${activeTab === "pending" ? "tlp-tab-active" : ""}`}
+              className={`tlp-tab ${
+                activeTab === "pending" ? "tlp-tab-active" : ""
+              }`}
             >
               Pending ({pendingNominations.length})
             </button>
             <button
               onClick={() => setActiveTab("approved")}
-              className={`tlp-tab ${activeTab === "approved" ? "tlp-tab-active" : ""}`}
+              className={`tlp-tab ${
+                activeTab === "approved" ? "tlp-tab-active" : ""
+              }`}
             >
               Approved ({approvedNominations.length})
             </button>
             <button
               onClick={() => setActiveTab("rejected")}
-              className={`tlp-tab ${activeTab === "rejected" ? "tlp-tab-active" : ""}`}
+              className={`tlp-tab ${
+                activeTab === "rejected" ? "tlp-tab-active" : ""
+              }`}
             >
               Rejected ({rejectedNominations.length})
             </button>
@@ -454,9 +468,7 @@ function ManagerNomination() {
 
           {/* Available for Nomination */}
           <div className="tlp-available-section">
-            <h3 className="tlp-subsection-title">
-              Available for Nomination
-            </h3>
+            <h3 className="tlp-subsection-title">Available for Nomination</h3>
             <table className="tlp-table">
               <thead>
                 <tr>
@@ -479,9 +491,7 @@ function ManagerNomination() {
                       <td>
                         {member?.firstName || ""} {member?.lastName || ""}
                       </td>
-                      <td>
-                        {member?.department?.departmentName || "N/A"}
-                      </td>
+                      <td>{member?.department?.departmentName || "N/A"}</td>
                       <td>
                         <button
                           onClick={() => handleNominateClick(member)}

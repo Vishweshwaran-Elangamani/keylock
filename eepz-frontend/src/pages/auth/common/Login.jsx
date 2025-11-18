@@ -1,6 +1,6 @@
 /**
  * Login Component
- * 
+ *
  * Handles user authentication and login flow.
  * Features:
  * - Email and password validation
@@ -9,7 +9,7 @@
  * - Remember me functionality
  * - Toast notifications using Sonner
  * - Responsive design with welcome card
- * 
+ *
  * @component
  */
 import { useState } from "react";
@@ -371,7 +371,7 @@ const Login = () => {
                   alt="EEPZ Logo"
                   className="eepz-logo-img"
                   style={{
-                    width: "450px"
+                    width: "450px",
                   }}
                 />
                 <h2 className="fw-bold mb-2" style={{ color: "#2d3565" }}>
@@ -405,11 +405,13 @@ const Login = () => {
                   <div className="eepz-email-input-wrapper">
                     <input
                       type="email"
-                      className={`form-control form-control-lg ${errors.email ? "is-invalid" : ""
-                        } ${touched.email && !errors.email && formData.email
+                      className={`form-control form-control-lg ${
+                        errors.email ? "is-invalid" : ""
+                      } ${
+                        touched.email && !errors.email && formData.email
                           ? "is-valid"
                           : ""
-                        }`}
+                      }`}
                       id="email"
                       name="email"
                       placeholder="your.email@eepz.com"
@@ -437,8 +439,9 @@ const Login = () => {
                   <div className="eepz-password-input-wrapper">
                     <input
                       type={showPassword ? "text" : "password"}
-                      className={`form-control form-control-lg ${errors.password ? "is-invalid" : ""
-                        }`}
+                      className={`form-control form-control-lg ${
+                        errors.password ? "is-invalid" : ""
+                      }`}
                       id="password"
                       name="password"
                       placeholder="Enter your password"
@@ -460,8 +463,9 @@ const Login = () => {
                       title={showPassword ? "Hide password" : "Show password"}
                     >
                       <i
-                        className={`bi ${showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
-                          }`}
+                        className={`bi ${
+                          showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
+                        }`}
                       ></i>
                     </button>
                   </div>
@@ -550,7 +554,7 @@ const Login = () => {
               </div>
               <h1
                 className="text-white fw-bold mb-3"
-                style={{ fontSize: "2.5rem", lineHeight: "1.2"}}
+                style={{ fontSize: "2.5rem", lineHeight: "1.2" }}
               >
                 Welcome to the EEPZ
               </h1>
@@ -591,7 +595,8 @@ const Login = () => {
               </div>
               <p className="text-white-50 text-center mt-5 small">
                 <i className="bi bi-lightbulb me-2"></i>
-                Align your goals, track your growth, and unlock new opportunities
+                Align your goals, track your growth, and unlock new
+                opportunities
               </p>
             </div>
           </div>

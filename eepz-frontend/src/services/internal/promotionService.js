@@ -7,7 +7,7 @@ const promotionService = {
     try {
       const response = await internalApi.get(`/${API_BASE}/list`);
       console.log("Get all promotions response:", response.data);
-      
+
       return {
         success: true,
         data: Array.isArray(response.data) ? response.data : [],
@@ -25,9 +25,12 @@ const promotionService = {
   createPromotion: async (promotionData) => {
     try {
       console.log("Creating promotion with data:", promotionData);
-      const response = await internalApi.post(`/${API_BASE}/create`, promotionData);
+      const response = await internalApi.post(
+        `/${API_BASE}/create`,
+        promotionData
+      );
       console.log("Create promotion response:", response.data);
-      
+
       return {
         success: true,
         data: response.data,
@@ -35,19 +38,24 @@ const promotionService = {
     } catch (error) {
       console.error("Create promotion error:", error);
       console.error("Error details:", error.response?.data);
-      
+
       return {
         success: false,
-        message: error.response?.data?.message || error.response?.data?.errors || "Failed to create promotion",
+        message:
+          error.response?.data?.message ||
+          error.response?.data?.errors ||
+          "Failed to create promotion",
       };
     }
   },
 
   getPendingHRApproval: async () => {
     try {
-      const response = await internalApi.get(`/${API_BASE}/pending-hr-approval`);
+      const response = await internalApi.get(
+        `/${API_BASE}/pending-hr-approval`
+      );
       console.log("Pending HR approval response:", response.data);
-      
+
       return {
         success: true,
         data: Array.isArray(response.data) ? response.data : [],
@@ -64,9 +72,11 @@ const promotionService = {
 
   getPendingLeadershipApproval: async () => {
     try {
-      const response = await internalApi.get(`/${API_BASE}/pending-leadership-approval`);
+      const response = await internalApi.get(
+        `/${API_BASE}/pending-leadership-approval`
+      );
       console.log("Pending leadership approval response:", response.data);
-      
+
       return {
         success: true,
         data: Array.isArray(response.data) ? response.data : [],
@@ -89,7 +99,7 @@ const promotionService = {
         approvalData
       );
       console.log("Approve promotion response:", response.data);
-      
+
       return {
         success: true,
         data: response.data,
@@ -110,7 +120,7 @@ const promotionService = {
         `/${API_BASE}/${promotionId}/reject`
       );
       console.log("Reject promotion response:", response.data);
-      
+
       return {
         success: true,
         data: response.data,
@@ -132,7 +142,7 @@ const promotionService = {
         approvalData
       );
       console.log("Leadership approve response:", response.data);
-      
+
       return {
         success: true,
         data: response.data,
@@ -154,7 +164,7 @@ const promotionService = {
         rejectData
       );
       console.log("Leadership reject response:", response.data);
-      
+
       return {
         success: true,
         data: response.data,
@@ -185,7 +195,9 @@ const promotionService = {
 
   getEmployeePromotions: async (employeeUserId) => {
     try {
-      const response = await internalApi.get(`/${API_BASE}/employee/${employeeUserId}`);
+      const response = await internalApi.get(
+        `/${API_BASE}/employee/${employeeUserId}`
+      );
       return {
         success: true,
         data: Array.isArray(response.data) ? response.data : [],
@@ -193,14 +205,18 @@ const promotionService = {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to fetch employee promotions",
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch employee promotions",
       };
     }
   },
 
   getPromotionHistory: async (employeeUserId) => {
     try {
-      const response = await internalApi.get(`/${API_BASE}/history/${employeeUserId}`);
+      const response = await internalApi.get(
+        `/${API_BASE}/history/${employeeUserId}`
+      );
       return {
         success: true,
         data: Array.isArray(response.data) ? response.data : [],
@@ -208,7 +224,8 @@ const promotionService = {
     } catch (error) {
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to fetch promotion history",
+        message:
+          error.response?.data?.message || "Failed to fetch promotion history",
       };
     }
   },

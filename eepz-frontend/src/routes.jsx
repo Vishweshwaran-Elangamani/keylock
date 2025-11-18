@@ -71,54 +71,53 @@ import TeamAssignments from "./pages/lnd/assignments/TeamAssignments";
 import SmeAssignments from "./pages/lnd/assignments/SmeAssignments";
 import ApprovalHistory from "./pages/lnd/approvals/ApprovalHistory";
 import PendingApprovals from "./pages/lnd/approvals/PendingApprovals";
-import OrganizationSkills from './pages/lnd/hr/OrganizationSkills';
-import OrganizationAssignments from './pages/lnd/hr/OrganizationAssignments';
-import SmeDirectory from './pages/lnd/hr/SmeDirectory';
+import OrganizationSkills from "./pages/lnd/hr/OrganizationSkills";
+import OrganizationAssignments from "./pages/lnd/hr/OrganizationAssignments";
+import SmeDirectory from "./pages/lnd/hr/SmeDirectory";
 //Goals
 import GoalsDashboard from "./pages/goals/GoalsDashboard";
 import YourGoalsPage from "./pages/goals/YourGoalsPage";
 import ViewGoalPage from "./pages/goals/ViewGoalPage";
 import GoalApprovalsPage from "./pages/goals/GoalApprovalsPage";
 //Feedback imports
-import FeedbackEmployeeDashboard from './pages/feedback_management/FeedbackEmployeeDashboard';
-import FeedbackManagerDashboard from './pages/feedback_management/FeedbackManagerDashboard';
-import FeedbackDepartmentHeadDashboard from './pages/feedback_management/FeedbackDepartmentHeadDashboard';
-import SubmitContextFeedback from './pages/feedback_management/feedback/SubmitContextFeedback';
-import MySubmissions from './pages/feedback_management/feedback/MySubmissions';
-import EmployeeAssignedForms from './pages/feedback_management/feedback/EmployeeAssignedForms';
-import EmployeeFillForm from './pages/feedback_management/feedback/EmployeeFillForm';
-import ViewMyPeerFeedback from './pages/feedback_management/feedback/ViewMyPeerFeedback';
-import CreateManagerReview from './pages/feedback_management/manager/CreateManagerReview';
-import ManagerReviewsList from './pages/feedback_management/manager/ManagerReviewsList';
-import ManagerEmployeeList from './pages/feedback_management/manager/ManagerEmployeeList';
-import ManagerTeamSubmissions from './pages/feedback_management/manager/ManagerTeamSubmissions';
-import AllManagerReviews from './pages/feedback_management/head/AllManagerReviews';
+import FeedbackEmployeeDashboard from "./pages/feedback_management/FeedbackEmployeeDashboard";
+import FeedbackManagerDashboard from "./pages/feedback_management/FeedbackManagerDashboard";
+import FeedbackDepartmentHeadDashboard from "./pages/feedback_management/FeedbackDepartmentHeadDashboard";
+import SubmitContextFeedback from "./pages/feedback_management/feedback/SubmitContextFeedback";
+import MySubmissions from "./pages/feedback_management/feedback/MySubmissions";
+import EmployeeAssignedForms from "./pages/feedback_management/feedback/EmployeeAssignedForms";
+import EmployeeFillForm from "./pages/feedback_management/feedback/EmployeeFillForm";
+import ViewMyPeerFeedback from "./pages/feedback_management/feedback/ViewMyPeerFeedback";
+import CreateManagerReview from "./pages/feedback_management/manager/CreateManagerReview";
+import ManagerReviewsList from "./pages/feedback_management/manager/ManagerReviewsList";
+import ManagerEmployeeList from "./pages/feedback_management/manager/ManagerEmployeeList";
+import ManagerTeamSubmissions from "./pages/feedback_management/manager/ManagerTeamSubmissions";
+import AllManagerReviews from "./pages/feedback_management/head/AllManagerReviews";
 import EmployeeHome from "./pages/performancemanagement/employee/employeehome";
 import EmployeeAcknowledgment from "./pages/performancemanagement/employee/EmployeeAcknowledge";
 import ManagerAcknowledgment from "./pages/performancemanagement/manager/ManagerAcknowledgment";
 import MentorFeedbackDashboard from "./pages/feedback_management/feedback/MentorFeedbackDashboard";
 import ViewManagerReview from "./pages/feedback_management/manager/ViewManagerReview";
 //Meeting and MOM
-import EmployeeMomDashboard from './pages/meeting/EmployeeMomDashboard'
+import EmployeeMomDashboard from "./pages/meeting/EmployeeMomDashboard";
 import ManagerMomDashboard from "./pages/meeting/ManagerMomDashboard";
-import CreateOrEditMom from './pages/meeting/CreateOrEditMom'
-import ScheduleMeeting from './pages/meeting/ScheduleMeeting'
-import MeetingInvitations from './pages/meeting/MeetingInvitations'
+import CreateOrEditMom from "./pages/meeting/CreateOrEditMom";
+import ScheduleMeeting from "./pages/meeting/ScheduleMeeting";
+import MeetingInvitations from "./pages/meeting/MeetingInvitations";
 import RSVPSummary from "./pages/meeting/RSVPSummary";
-import MyMomsList from "./pages/meeting/MyMomsList"
-import ActionItemsManagement from "./pages/meeting/ActionItemsManagement"
+import MyMomsList from "./pages/meeting/MyMomsList";
+import ActionItemsManagement from "./pages/meeting/ActionItemsManagement";
 import HRMomDashboard from "./pages/meeting/HRMomDashboard";
-import HRMomDetails from './pages/meeting/HRMomDetails'
+import HRMomDetails from "./pages/meeting/HRMomDetails";
 
 const AppRoutes = () => {
   const { user } = useAuth();
   return (
     <Routes>
-    //region DEFAULT/FALLBACK ROUTES
+      //region DEFAULT/FALLBACK ROUTES
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
-    //endregion DEFAULT/FALLBACK ROUTES
-      //region PUBLIC ROUTES
+      //endregion DEFAULT/FALLBACK ROUTES //region PUBLIC ROUTES
       <Route
         path="/login"
         element={
@@ -160,8 +159,7 @@ const AppRoutes = () => {
         }
       />
       <Route path="/change-password" element={<ChangePassword />} />
-      //endregion PUBLIC ROUTES
-      //region ADMIN ROUTES
+      //endregion PUBLIC ROUTES //region ADMIN ROUTES
       <Route
         path="/admin/dashboard"
         element={
@@ -212,8 +210,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion ADMIN ROUTES
-      //region HR ROUTES
+      //endregion ADMIN ROUTES //region HR ROUTES
       <Route
         path="/hr/dashboard"
         element={
@@ -305,8 +302,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion HR • PERFORMANCE
-      //region HR • PROJECT MANAGEMENT
+      //endregion HR • PERFORMANCE //region HR • PROJECT MANAGEMENT
       <Route
         path="/hr/dashboard/projectmgmt"
         element={
@@ -357,8 +353,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion HR • PROJECT MANAGEMENT
-      //region HR • SLA
+      //endregion HR • PROJECT MANAGEMENT //region HR • SLA
       <Route
         path="/hr/dashboard/sla"
         element={
@@ -379,8 +374,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion HR • SLA
-      //region HR • FEEDBACK
+      //endregion HR • SLA //region HR • FEEDBACK
       <Route
         path="/hr/dashboard/feedback"
         element={
@@ -424,8 +418,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion HR • Feedback
-      //region HR • OPS
+      //endregion HR • Feedback //region HR • OPS
       <Route
         path="/hr/operations/*"
         element={
@@ -436,9 +429,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion HR • OPS
-      //endregion HR ROUTES
-      //region INTERNAL OPPORTUNITIES
+      //endregion HR • OPS //endregion HR ROUTES //region INTERNAL OPPORTUNITIES
       {/* ========== INTERNAL OPPORTUNITY ROUTES ========== */}
       {/*  INTERNAL OPPORTUNITIES - Accessible to Employee, Manager, HR with dynamic role-based UI */}
       <Route
@@ -455,8 +446,12 @@ const AppRoutes = () => {
       <Route
         path="/internal/nominations"
         element={
-          <ProtectedRoute allowedRoles={["Employee", "Manager", "Department Head", "HR"]}>
-            <DashboardLayout role={["Employee", "Manager", "Department Head", "HR"]}>
+          <ProtectedRoute
+            allowedRoles={["Employee", "Manager", "Department Head", "HR"]}
+          >
+            <DashboardLayout
+              role={["Employee", "Manager", "Department Head", "HR"]}
+            >
               <NominationManagement />
             </DashboardLayout>
           </ProtectedRoute>
@@ -514,8 +509,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion INTERNAL OPPORTUNITIES LEADERSHIP
-      //region INTERNAL OPPORTUNITIES DEPARTMENT HEAD
+      //endregion INTERNAL OPPORTUNITIES LEADERSHIP //region INTERNAL
+      OPPORTUNITIES DEPARTMENT HEAD
       <Route
         path="/department-head/dashboard"
         element={
@@ -596,8 +591,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion INTERNAL OPPORTUNITIES DEPARTMENT HEAD
-      //region INTERNAL OPPORTUNITIES MANAGER
+      //endregion INTERNAL OPPORTUNITIES DEPARTMENT HEAD //region INTERNAL
+      OPPORTUNITIES MANAGER
       <Route
         path="/manager/dashboard"
         element={
@@ -678,8 +673,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion INTERNAL OPPORTUNITIES MANAGER
-      //region INTERNAL OPPORTUNITIES EMPLOYEE 
+      //endregion INTERNAL OPPORTUNITIES MANAGER //region INTERNAL OPPORTUNITIES
+      EMPLOYEE
       <Route
         path="/employee/dashboard"
         element={
@@ -705,7 +700,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              < UserAssignments />
+              <UserAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -740,8 +735,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion INTERNAL OPPORTUNITIES EMPLOYEE
-      //region SHARED 
+      //endregion INTERNAL OPPORTUNITIES EMPLOYEE //region SHARED
       <Route
         path="/profile"
         element={
@@ -752,8 +746,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion SHARED
-      //region GOALS LEADERSHIP
+      //endregion SHARED //region GOALS LEADERSHIP
       {/* Leadership Goal Routes */}
       <Route
         path="/leadership/dashboard/goals"
@@ -795,8 +788,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion GOALS LEADERSHIP
-      //region GOALS DEPT HEAD
+      //endregion GOALS LEADERSHIP //region GOALS DEPT HEAD
       <Route
         path="/department-head/dashboard/goals"
         element={
@@ -807,8 +799,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion GOALS DEPT HEAD
-      //region GOALS MANAGER
+      //endregion GOALS DEPT HEAD //region GOALS MANAGER
       {/* Manager Goal Routes */}
       <Route
         path="/manager/dashboard/goals"
@@ -850,8 +841,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion GOALS MANAGER
-      //region GOALS EMPLOYEE
+      //endregion GOALS MANAGER //region GOALS EMPLOYEE
       {/* Employee Goal Routes */}
       <Route
         path="/employee/dashboard/goals"
@@ -893,8 +883,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion GOALS EMPLOYEE
-      //region LND LEADERSHIP
+      //endregion GOALS EMPLOYEE //region LND LEADERSHIP
       {/* Leadership L&D Routes */}
       <Route
         path="/leadership/lnd/dashboard"
@@ -976,8 +965,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion LND LEADERSHIP
-      //region LND DEPARTMENT HEAD
+      //endregion LND LEADERSHIP //region LND DEPARTMENT HEAD
       {/* Department Head L&D Routes */}
       <Route
         path="/department-head/lnd/dashboard"
@@ -1059,8 +1047,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion LND DEPARTMENT HEAD
-      //region LND MANAGER
+      //endregion LND DEPARTMENT HEAD //region LND MANAGER
       {/* Manager L&D Routes */}
       <Route
         path="/manager/lnd/dashboard"
@@ -1142,8 +1129,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion LND MANAGER
-      //region LND EMPLOYEE
+      //endregion LND MANAGER //region LND EMPLOYEE
       {/* Employee L&D Routes */}
       <Route
         path="/employee/lnd/dashboard"
@@ -1205,8 +1191,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion LND EMPLOYEE
-      //region LND HR
+      //endregion LND EMPLOYEE //region LND HR
       <Route
         path="/hr/lnd/dashboard"
         element={
@@ -1297,9 +1282,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-        //endregion LND HR
-      //endregion DEFAULT/FALLBACK ROUTES
-      //region FEEDBACK EMPLOYEE 
+      //endregion LND HR //endregion DEFAULT/FALLBACK ROUTES //region FEEDBACK
+      EMPLOYEE
       <Route
         path="/employee/dashboard/feedback"
         element={
@@ -1350,7 +1334,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/employee/dashboard/feedback/mentor"
         element={
@@ -1361,8 +1344,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-
-
       <Route
         path="/employee/dashboard/feedback/submissions"
         element={
@@ -1505,9 +1486,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-
-      //endregion LND EMPLOYEE
-      //region PERFORMANCE Acknowledge
+      //endregion LND EMPLOYEE //region PERFORMANCE Acknowledge
       <Route
         path="/manager/dashboard/manager-acknowledgments"
         element={
@@ -1523,7 +1502,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              < EmployeeAcknowledgment />
+              <EmployeeAcknowledgment />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1533,171 +1512,158 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              < EmployeeAcknowledgment />
+              <EmployeeAcknowledgment />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      //endregion PERFORMANCE ACKNOWLEDGE
-
-      //region MEETING AND MOM
+      //endregion PERFORMANCE ACKNOWLEDGE //region MEETING AND MOM
       {/* EMPLOYEE ROUTES */}
-<Route
-  path="/employee/dashboard/meetmom"
-  element={
-    <ProtectedRoute allowedRoles={["Employee"]}>
-      <DashboardLayout role="Employee">
-        <EmployeeMomDashboard />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/employee/dashboard/meetmom/my-moms"
-  element={
-    <ProtectedRoute allowedRoles={["Employee"]}>
-      <DashboardLayout role="Employee">
-        <MyMomsList />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/employee/dashboard/meetmom/action-items"
-  element={
-    <ProtectedRoute allowedRoles={["Employee"]}>
-      <DashboardLayout role="Employee">
-        <ActionItemsManagement />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/employee/dashboard/meetmom/invitations"
-  element={
-    <ProtectedRoute allowedRoles={["Employee"]}>
-      <DashboardLayout role="Employee">
-        <MeetingInvitations />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/employee/dashboard/meetmom/:meetingId"
-  element={
-    <ProtectedRoute allowedRoles={["Employee"]}>
-      <DashboardLayout role="Employee">
-        <RSVPSummary />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-{/* NEW: CREATE and EDIT MOM (Employee) */}
-<Route
-  path="/employee/dashboard/meetmom/create-mom/:meetingId"
-  element={
-    <ProtectedRoute allowedRoles={["Employee"]}>
-      <DashboardLayout role="Employee">
-        <CreateOrEditMom />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/employee/dashboard/meetmom/edit-mom/:momId"
-  element={
-    <ProtectedRoute allowedRoles={["Employee"]}>
-      <DashboardLayout role="Employee">
-        <CreateOrEditMom isEdit />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-{/* MANAGER ROUTES */}
-<Route
-  path="/manager/dashboard/meetmom"
-  element={
-    <ProtectedRoute allowedRoles={["Manager"]}>
-      <DashboardLayout role="Manager">
-        <ManagerMomDashboard />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/manager/dashboard/meetmom/schedule"
-  element={
-    <ProtectedRoute allowedRoles={["Manager"]}>
-      <DashboardLayout role="Manager">
-        <ScheduleMeeting />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/manager/dashboard/meetmom/:meetingId"
-  element={
-    <ProtectedRoute allowedRoles={["Manager"]}>
-      <DashboardLayout role="Manager">
-        <RSVPSummary />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-{/* NEW: CREATE and EDIT MOM (Manager) */}
-<Route
-  path="/manager/dashboard/meetmom/create-mom/:meetingId"
-  element={
-    <ProtectedRoute allowedRoles={["Manager"]}>
-      <DashboardLayout role="Manager">
-        <CreateOrEditMom />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/manager/dashboard/meetmom/edit-mom/:momId"
-  element={
-    <ProtectedRoute allowedRoles={["Manager"]}>
-      <DashboardLayout role="Manager">
-        <CreateOrEditMom isEdit />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-{/* HR ROUTES */}
-<Route
-  path="/hr/dasboard/meetmom"
-  element={
-    <ProtectedRoute allowedRoles={["HR"]}>
-      <DashboardLayout role="HR">
-        <HRMomDashboard />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/hr/dasboard/meetmom/:momId"
-  element={
-    <ProtectedRoute allowedRoles={["HR"]}>
-      <DashboardLayout role="HR">
-        <HRMomDetails />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-//endregion MEETING AND MOM
-    
+      <Route
+        path="/employee/dashboard/meetmom"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <EmployeeMomDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/meetmom/my-moms"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <MyMomsList />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/meetmom/action-items"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <ActionItemsManagement />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/meetmom/invitations"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <MeetingInvitations />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/meetmom/:meetingId"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <RSVPSummary />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      {/* NEW: CREATE and EDIT MOM (Employee) */}
+      <Route
+        path="/employee/dashboard/meetmom/create-mom/:meetingId"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <CreateOrEditMom />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/meetmom/edit-mom/:momId"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <CreateOrEditMom isEdit />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      {/* MANAGER ROUTES */}
+      <Route
+        path="/manager/dashboard/meetmom"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <ManagerMomDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/dashboard/meetmom/schedule"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <ScheduleMeeting />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/dashboard/meetmom/:meetingId"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <RSVPSummary />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      {/* NEW: CREATE and EDIT MOM (Manager) */}
+      <Route
+        path="/manager/dashboard/meetmom/create-mom/:meetingId"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <CreateOrEditMom />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/dashboard/meetmom/edit-mom/:momId"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <CreateOrEditMom isEdit />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      {/* HR ROUTES */}
+      <Route
+        path="/hr/dasboard/meetmom"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <HRMomDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/hr/dasboard/meetmom/:momId"
+        element={
+          <ProtectedRoute allowedRoles={["HR"]}>
+            <DashboardLayout role="HR">
+              <HRMomDetails />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      //endregion MEETING AND MOM
     </Routes>
   );
 };

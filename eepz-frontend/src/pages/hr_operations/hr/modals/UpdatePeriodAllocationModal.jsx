@@ -5,7 +5,12 @@ import periodAllocationService from "../../../../services/hr_operations/hr/perio
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import "../../../../styles/hr_operations/hr/periodAllocation.css";
 
-const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => {
+const UpdatePeriodAllocationModal = ({
+  period,
+  budget,
+  onClose,
+  onSuccess,
+}) => {
   const [formData, setFormData] = useState({
     allocatedAmount: period.allocatedAmount,
     notes: period.notes || "",
@@ -19,7 +24,10 @@ const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.allocatedAmount || parseFloat(formData.allocatedAmount) <= 0) {
+    if (
+      !formData.allocatedAmount ||
+      parseFloat(formData.allocatedAmount) <= 0
+    ) {
       newErrors.allocatedAmount = "Please enter a valid amount";
     }
 
@@ -59,7 +67,9 @@ const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => 
         notes: formData.notes,
       };
 
-      const response = await periodAllocationService.updatePeriodAllocation(payload);
+      const response = await periodAllocationService.updatePeriodAllocation(
+        payload
+      );
 
       if (response.success) {
         toast.success("Period allocation updated successfully!");
@@ -76,16 +86,29 @@ const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => 
     }
   };
 
-  const amountChange = parseFloat(formData.allocatedAmount) - period.allocatedAmount;
+  const amountChange =
+    parseFloat(formData.allocatedAmount) - period.allocatedAmount;
 
   return (
-    <Modal show={true} onHide={onClose} centered size="lg" backdrop="static" className="period-modal">
+    <Modal
+      show={true}
+      onHide={onClose}
+      centered
+      size="lg"
+      backdrop="static"
+      className="period-modal"
+    >
       <div className="modal-header-gradient">
         <Modal.Title className="modal-title-custom">
           <i className="bi bi-pencil-square me-2"></i>
           Update {period.period} {period.periodYear} Allocation
         </Modal.Title>
-        <button type="button" className="btn-close btn-close-white" onClick={onClose} disabled={loading}></button>
+        <button
+          type="button"
+          className="btn-close btn-close-white"
+          onClick={onClose}
+          disabled={loading}
+        ></button>
       </div>
 
       <Modal.Body className="modal-body-custom">
@@ -97,19 +120,27 @@ const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => 
           <div className="budget-info-grid">
             <div className="budget-info-item">
               <span className="info-label">Current Allocation</span>
-              <span className="info-value">{formatCurrency(period.allocatedAmount)}</span>
+              <span className="info-value">
+                {formatCurrency(period.allocatedAmount)}
+              </span>
             </div>
             <div className="budget-info-item">
               <span className="info-label">Utilized</span>
-              <span className="info-value allocated">{formatCurrency(period.utilizedAmount || 0)}</span>
+              <span className="info-value allocated">
+                {formatCurrency(period.utilizedAmount || 0)}
+              </span>
             </div>
             <div className="budget-info-item">
               <span className="info-label">Sub-Allocations</span>
-              <span className="info-value">{period.subAllocationCount || 0}</span>
+              <span className="info-value">
+                {period.subAllocationCount || 0}
+              </span>
             </div>
             <div className="budget-info-item highlight">
               <span className="info-label">Available Budget</span>
-              <span className="info-value available">{formatCurrency(availableBudget)}</span>
+              <span className="info-value available">
+                {formatCurrency(availableBudget)}
+              </span>
             </div>
           </div>
         </div>
@@ -120,7 +151,11 @@ const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => 
             <i className="bi bi-exclamation-triangle-fill me-2"></i>
             <div>
               <strong>Warning</strong>
-              <p className="mb-0">This period has {period.subAllocationCount} sub-allocations. Ensure the new amount is sufficient to cover existing sub-allocations.</p>
+              <p className="mb-0">
+                This period has {period.subAllocationCount} sub-allocations.
+                Ensure the new amount is sufficient to cover existing
+                sub-allocations.
+              </p>
             </div>
           </div>
         )}
@@ -136,7 +171,9 @@ const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => 
               name="allocatedAmount"
               value={formData.allocatedAmount}
               onChange={handleChange}
-              className={`form-control form-control-custom ${errors.allocatedAmount ? 'is-invalid' : ''}`}
+              className={`form-control form-control-custom ${
+                errors.allocatedAmount ? "is-invalid" : ""
+              }`}
               placeholder="Enter new amount"
               step="0.01"
               min={period.utilizedAmount}
@@ -144,14 +181,23 @@ const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => 
               required
             />
             {errors.allocatedAmount && (
-              <div className="invalid-feedback d-block">{errors.allocatedAmount}</div>
+              <div className="invalid-feedback d-block">
+                {errors.allocatedAmount}
+              </div>
             )}
             {formData.allocatedAmount && !errors.allocatedAmount && (
               <div className="d-flex justify-content-between align-items-center mt-2">
-                <small className="text-success">✓ {formatCurrency(parseFloat(formData.allocatedAmount))}</small>
+                <small className="text-success">
+                  ✓ {formatCurrency(parseFloat(formData.allocatedAmount))}
+                </small>
                 {amountChange !== 0 && (
-                  <span className={`badge ${amountChange > 0 ? 'bg-success' : 'bg-danger'}`}>
-                    {amountChange > 0 ? '+' : ''}{formatCurrency(amountChange)}
+                  <span
+                    className={`badge ${
+                      amountChange > 0 ? "bg-success" : "bg-danger"
+                    }`}
+                  >
+                    {amountChange > 0 ? "+" : ""}
+                    {formatCurrency(amountChange)}
                   </span>
                 )}
               </div>
@@ -171,10 +217,19 @@ const UpdatePeriodAllocationModal = ({ period, budget, onClose, onSuccess }) => 
           </div>
 
           <div className="modal-actions-custom">
-            <button type="button" className="btn btn-secondary-custom" onClick={onClose} disabled={loading}>
+            <button
+              type="button"
+              className="btn btn-secondary-custom"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary-gradient" disabled={loading}>
+            <button
+              type="submit"
+              className="btn btn-primary-gradient"
+              disabled={loading}
+            >
               {loading ? (
                 <>
                   <span className="spinner-border spinner-border-sm me-2"></span>

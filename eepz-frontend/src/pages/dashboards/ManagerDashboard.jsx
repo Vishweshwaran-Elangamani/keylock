@@ -72,12 +72,12 @@ const ManagerDashboard = () => {
       path: "/manager/dashboard/sla",
     },
     {
-     title: "Meeting & MOM Management",
-     description: "Manage Meetings & MOMs",
-     icon: "bi bi-book",
-     gradient: "gradient-pink",
-     path: "/manager/dashboard/meetmom",
-   }
+      title: "Meeting & MOM Management",
+      description: "Manage Meetings & MOMs",
+      icon: "bi bi-book",
+      gradient: "gradient-pink",
+      path: "/manager/dashboard/meetmom",
+    },
   ];
   return (
     <div className="dashboard-container">
@@ -85,8 +85,9 @@ const ManagerDashboard = () => {
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`management-card ${hoveredCard === index ? "hovered" : ""
-              }`}
+            className={`management-card ${
+              hoveredCard === index ? "hovered" : ""
+            }`}
             onMouseEnter={() => setHoveredCard(index)}
             onMouseLeave={() => setHoveredCard(null)}
             onClick={() => handleNavigation(card.path)}

@@ -1,6 +1,6 @@
 /**
  * EditRoleModal Component
- * 
+ *
  * A modal component for editing existing roles in the system.
  * Features:
  * - Form validation for role name, code, and description
@@ -10,7 +10,7 @@
  * - Toast notifications using Sonner for success/error feedback
  * - Loading state during API operations
  * - Two-column layout for form fields
- * 
+ *
  * @param {boolean} show - Controls modal visibility
  * @param {Object} role - Role object containing current role details
  * @param {function} onClose - Callback to close the modal
@@ -77,18 +77,18 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
    * Handles input field changes
    * Updates form data and clears field-specific errors
    * Provides immediate feedback by removing errors when user starts correcting
-   * 
+   *
    * @param {Event} e - Input change event
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Update form data with new value
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    
+
     // Clear error for this specific field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
@@ -105,12 +105,12 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
   /**
    * Validates all form fields before submission
    * Applies comprehensive validation rules for each field
-   * 
+   *
    * Validation Rules:
    * - Role Name: Required, minimum 3 characters
    * - Role Code: Required, minimum 2 characters, alphanumeric only
    * - Description: Required, minimum 10 characters
-   * 
+   *
    * @returns {boolean} - True if form is valid, false otherwise
    */
   const validateForm = () => {
@@ -142,7 +142,7 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
 
     // Update errors state with all validation errors
     setErrors(newErrors);
-    
+
     // Return true if no errors found, false otherwise
     return Object.keys(newErrors).length === 0;
   };
@@ -155,7 +155,7 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
    * Handles form submission
    * Validates form, formats payload, and calls API to update role
    * Shows Sonner toast notifications for user feedback
-   * 
+   *
    * @param {Event} e - Form submit event
    */
   const handleSubmit = async (e) => {
@@ -170,7 +170,7 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
     try {
       // Set loading state to disable form and show loading indicator
       setLoading(true);
-      
+
       // Show loading toast
       toast.loading("Updating role...");
 
@@ -191,16 +191,15 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
       if (response.success) {
         toast.dismiss();
         toast.success("Role updated successfully");
-        
+
         // Trigger success callback to refresh role list
         onSuccess();
-        
+
         // CRITICAL: Delay closing the modal to allow toast to render
         // Without this delay, modal unmounts before toast displays
         setTimeout(() => {
           onClose();
         }, 500); // 500ms delay
-        
       } else {
         // -------- Handle Failure Response --------
         toast.dismiss();
@@ -229,12 +228,11 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-custom"></div>
-      
+
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-custom">
         <div className="modal-dialog-custom">
           <div className="modal-content-custom">
-            
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -260,7 +258,6 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
             {/* ======================== */}
             <form onSubmit={handleSubmit}>
               <div className="modal-body-custom">
-                
                 {/* -------- System Role Warning -------- */}
                 {/* Only shown for system roles */}
                 {role?.isSystemRole && (
@@ -275,10 +272,8 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
 
                 {/* -------- Form Grid - Two-column layout -------- */}
                 <div className="form-grid">
-                  
                   {/* -------- LEFT COLUMN -------- */}
                   <div className="form-column-custom">
-                    
                     {/* Role ID (Disabled) */}
                     <div className="form-group-custom">
                       <label className="form-label-custom">Role ID</label>
@@ -293,8 +288,7 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                     {/* Role Name */}
                     <div className="form-group-custom">
                       <label className="form-label-custom">
-                        Role Name{" "}
-                        <span className="required-mark">*</span>
+                        Role Name <span className="required-mark">*</span>
                       </label>
                       <input
                         type="text"
@@ -310,17 +304,14 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                       />
                       {/* Show validation error if exists */}
                       {errors.roleName && (
-                        <div className="error-message">
-                          {errors.roleName}
-                        </div>
+                        <div className="error-message">{errors.roleName}</div>
                       )}
                     </div>
 
                     {/* Role Code */}
                     <div className="form-group-custom">
                       <label className="form-label-custom">
-                        Role Code{" "}
-                        <span className="required-mark">*</span>
+                        Role Code <span className="required-mark">*</span>
                       </label>
                       <input
                         type="text"
@@ -336,21 +327,17 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                       />
                       {/* Show validation error if exists */}
                       {errors.roleCode && (
-                        <div className="error-message">
-                          {errors.roleCode}
-                        </div>
+                        <div className="error-message">{errors.roleCode}</div>
                       )}
                     </div>
                   </div>
 
                   {/* -------- RIGHT COLUMN -------- */}
                   <div className="form-column-custom">
-                    
                     {/* Description */}
                     <div className="form-group-custom form-group-full-height">
                       <label className="form-label-custom">
-                        Description{" "}
-                        <span className="required-mark">*</span>
+                        Description <span className="required-mark">*</span>
                       </label>
                       <textarea
                         className={`form-textarea-custom form-textarea-full-height ${
@@ -400,14 +387,10 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                   <i className="bi bi-x-circle"></i>
                   Cancel
                 </button>
-                
+
                 {/* Submit Button - Updates role */}
                 {/* Disabled during loading to prevent duplicate requests */}
-                <button
-                  type="submit"
-                  className="btn-submit"
-                  disabled={loading}
-                >
+                <button type="submit" className="btn-submit" disabled={loading}>
                   {loading ? (
                     // Show loading state with spinner and text
                     <>

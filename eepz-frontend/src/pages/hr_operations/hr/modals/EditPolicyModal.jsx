@@ -51,7 +51,7 @@ const EditPolicyModal = ({
     if (!url) return "";
     if (url.startsWith("http")) return url; // Already full URL
 
-    const baseUrl = import.meta.env.VITE_HR_API_URL || "http://localhost:5253";
+    const baseUrl = import.meta.env.VITE_HR_API_URL;
     return `${baseUrl}${url}`;
   };
 

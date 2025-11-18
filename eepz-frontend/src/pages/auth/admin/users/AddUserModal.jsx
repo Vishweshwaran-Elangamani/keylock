@@ -1,6 +1,6 @@
 /**
  * AddUserModal Component
- * 
+ *
  * A modal component for adding new users to the system.
  * Features:
  * - Multi-field user registration form with validation
@@ -8,7 +8,7 @@
  * - Automatic password generation and email sending
  * - Support for roles, departments, and employment details
  * - Toast notifications using Sonner
- * 
+ *
  * @param {boolean} show - Controls modal visibility
  * @param {function} onHide - Callback to close the modal
  * @param {function} onUserAdded - Callback after successful user creation
@@ -65,18 +65,18 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   /**
    * Handles input field changes
    * Updates form data and clears field-specific errors
-   * 
+   *
    * @param {Event} e - Input change event
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Update form data with new value
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-    
+
     // Clear error for this specific field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
@@ -93,7 +93,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   /**
    * Validates all form fields before submission
    * Applies comprehensive validation rules for each field
-   * 
+   *
    * @returns {boolean} - True if form is valid, false otherwise
    */
   const validateForm = () => {
@@ -152,11 +152,11 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       // Check if date is in the future
       if (dob > today) {
         newErrors.dateOfBirthOfficial = "Date of birth cannot be in the future";
-      } 
+      }
       // Check minimum age requirement (18 years)
       else if (age < 18) {
         newErrors.dateOfBirthOfficial = "User must be at least 18 years old";
-      } 
+      }
       // Check maximum age limit (100 years)
       else if (age > 100) {
         newErrors.dateOfBirthOfficial = "Please enter a valid date of birth";
@@ -175,7 +175,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
 
     // Update errors state with all validation errors
     setErrors(newErrors);
-    
+
     // Return true if no errors found, false otherwise
     return Object.keys(newErrors).length === 0;
   };
@@ -187,100 +187,98 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   /**
    * Handles form submission
    * Validates form, formats payload, and calls API to create user
-   * 
+   *
    * @param {Event} e - Form submit event
    */
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validateForm()) {
-    toast.error("Enter Valid Details!");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const payload = {
-      employeeCompanyId: formData.employeeCompanyId.trim(),
-      email: formData.email.trim(),
-      firstName: formData.firstName.trim(),
-      lastName: formData.lastName.trim(),
-      mobileNumber: formData.mobileNumber.trim()
-        ? `+91-${formData.mobileNumber.trim()}`
-        : null,
-      gender: formData.gender || null,
-      dateOfBirthOfficial: formData.dateOfBirthOfficial || null,
-      employmentType: formData.employmentType,
-      employmentStatus: formData.employmentStatus,
-      joiningDate: formData.joiningDate,
-      employeeType: formData.employeeType,
-      roleId: parseInt(formData.roleId),
-      departmentId: parseInt(formData.departmentId),
-      workLocation: null,
-      noticePeriodDays: 30,
-      confirmationDate: null,
-      middleName: null,
-      callingName: null,
-      referredBy: null,
-      dateOfBirthActual: null,
-      alternateNumber: null,
-      personalEmail: null,
-      reportingManagerEmployeeId: null,
-    };
-
-    console.log("Sending payload:", payload);
-
-    const response = await userService.createUser(payload);
-
-    console.log("Response:", response);
-
-    if (response.success) {
-      // Show success toast
-      toast.success(
-        "User created successfully! Temporary password sent to email."
-      );
-      
-      // Reset form
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        employeeCompanyId: "",
-        mobileNumber: "",
-        dateOfBirthOfficial: "",
-        gender: "",
-        employmentType: "Permanent",
-        employmentStatus: "Active",
-        joiningDate: new Date().toISOString().split("T")[0],
-        employeeType: "FullTime",
-        roleId: "",
-        departmentId: "",
-      });
-      
-      // Trigger parent callback
-      onUserAdded();
-      
-      // CRITICAL: Delay closing the modal to allow toast to render
-      setTimeout(() => {
-        onHide();
-      }, 500); // 500ms delay
-      
-    } else {
-      toast.error(response.message || "Failed to create user");
+    if (!validateForm()) {
+      toast.error("Enter Valid Details!");
+      return;
     }
-  } catch (error) {
-    console.error("Error:", error);
-    toast.error(
-      error.response?.data?.message ||
-        error.message ||
-        "Failed to create user"
-    );
-  } finally {
-    setLoading(false);
-  }
-};
 
+    try {
+      setLoading(true);
+
+      const payload = {
+        employeeCompanyId: formData.employeeCompanyId.trim(),
+        email: formData.email.trim(),
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        mobileNumber: formData.mobileNumber.trim()
+          ? `+91-${formData.mobileNumber.trim()}`
+          : null,
+        gender: formData.gender || null,
+        dateOfBirthOfficial: formData.dateOfBirthOfficial || null,
+        employmentType: formData.employmentType,
+        employmentStatus: formData.employmentStatus,
+        joiningDate: formData.joiningDate,
+        employeeType: formData.employeeType,
+        roleId: parseInt(formData.roleId),
+        departmentId: parseInt(formData.departmentId),
+        workLocation: null,
+        noticePeriodDays: 30,
+        confirmationDate: null,
+        middleName: null,
+        callingName: null,
+        referredBy: null,
+        dateOfBirthActual: null,
+        alternateNumber: null,
+        personalEmail: null,
+        reportingManagerEmployeeId: null,
+      };
+
+      console.log("Sending payload:", payload);
+
+      const response = await userService.createUser(payload);
+
+      console.log("Response:", response);
+
+      if (response.success) {
+        // Show success toast
+        toast.success(
+          "User created successfully! Temporary password sent to email."
+        );
+
+        // Reset form
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          employeeCompanyId: "",
+          mobileNumber: "",
+          dateOfBirthOfficial: "",
+          gender: "",
+          employmentType: "Permanent",
+          employmentStatus: "Active",
+          joiningDate: new Date().toISOString().split("T")[0],
+          employeeType: "FullTime",
+          roleId: "",
+          departmentId: "",
+        });
+
+        // Trigger parent callback
+        onUserAdded();
+
+        // CRITICAL: Delay closing the modal to allow toast to render
+        setTimeout(() => {
+          onHide();
+        }, 500); // 500ms delay
+      } else {
+        toast.error(response.message || "Failed to create user");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to create user"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ========================
   // RENDER LOGIC
@@ -293,12 +291,11 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-custom"></div>
-      
+
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-custom">
         <div className="modal-dialog-custom">
           <div className="modal-content-custom">
-            
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -326,7 +323,6 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
               <div className="modal-body-custom">
                 {/* Form Grid - Two-column layout for form fields */}
                 <div className="form-grid">
-                  
                   {/* -------- First Name Field -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
@@ -587,7 +583,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <i className="bi bi-x-circle"></i>
                   Cancel
                 </button>
-                
+
                 {/* Submit Button - Creates new user */}
                 <button type="submit" className="btn-submit" disabled={loading}>
                   {loading ? (

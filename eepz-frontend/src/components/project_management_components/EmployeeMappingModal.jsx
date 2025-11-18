@@ -1,4 +1,3 @@
-// src/components/ProjectManagementComponents/EmployeeMappingModal.jsx
 import React from 'react';
 import { X, Search, Filter, Users, AlertCircle, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 

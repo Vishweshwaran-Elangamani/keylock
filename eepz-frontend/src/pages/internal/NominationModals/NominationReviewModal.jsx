@@ -1,6 +1,6 @@
 import { useState } from "react";
 import nominationService from "../../../services/internal/nominationService";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import "../../../styles/internal/NominationModal.css";
 
 const NominationReviewModal = ({
@@ -76,64 +76,63 @@ const NominationReviewModal = ({
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validateForm()) {
-    toast.error("Please fix the errors");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    // Prepare payload based on user role
-    let payload;
-    
-    if (isDepartmentHead) {
-      // Department Head review payload
-      payload = {
-        action: formData.action,
-        reviewRemarks: formData.remarks.trim(),
-        ...(formData.action === "Approved" && {
-          meritScore: parseFloat(formData.meritScore),
-          diversityScore: parseFloat(formData.diversityScore),
-          conflictOfInterest: formData.conflictOfInterest === "true",
-          reviewNotes: formData.reviewNotes.trim(),
-        }),
-      };
-    } else {
-      // Manager review payload - FIXED
-      payload = {
-        actionTaken: formData.action,
-        remarks: formData.remarks.trim(), // CHANGED: from 'reviewRemarks' to 'remarks'
-      };
+    if (!validateForm()) {
+      toast.error("Please fix the errors");
+      return;
     }
 
-    console.log("Submitting review:", payload);
+    try {
+      setLoading(true);
 
-    const response = await nominationService.reviewNomination(
-      nomination.nominationId,
-      payload,
-      userRole
-    );
+      // Prepare payload based on user role
+      let payload;
 
-    if (response.success) {
-      toast.success(
-        `Nomination ${formData.action.toLowerCase()} successfully!`
+      if (isDepartmentHead) {
+        // Department Head review payload
+        payload = {
+          action: formData.action,
+          reviewRemarks: formData.remarks.trim(),
+          ...(formData.action === "Approved" && {
+            meritScore: parseFloat(formData.meritScore),
+            diversityScore: parseFloat(formData.diversityScore),
+            conflictOfInterest: formData.conflictOfInterest === "true",
+            reviewNotes: formData.reviewNotes.trim(),
+          }),
+        };
+      } else {
+        // Manager review payload - FIXED
+        payload = {
+          actionTaken: formData.action,
+          remarks: formData.remarks.trim(), // CHANGED: from 'reviewRemarks' to 'remarks'
+        };
+      }
+
+      console.log("Submitting review:", payload);
+
+      const response = await nominationService.reviewNomination(
+        nomination.nominationId,
+        payload,
+        userRole
       );
-      onReviewSubmitted();
-      onHide();
-    } else {
-      toast.error(response.message || "Failed to submit review");
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    toast.error(error.message || "Failed to submit review");
-  } finally {
-    setLoading(false);
-  }
-};
 
+      if (response.success) {
+        toast.success(
+          `Nomination ${formData.action.toLowerCase()} successfully!`
+        );
+        onReviewSubmitted();
+        onHide();
+      } else {
+        toast.error(response.message || "Failed to submit review");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(error.message || "Failed to submit review");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!show) return null;
 
@@ -146,7 +145,8 @@ const NominationReviewModal = ({
             <div className="modal-header-custom">
               <h5 className="modal-title-custom">
                 <i className="bi bi-clipboard-check"></i>
-                Review Nomination - {isDepartmentHead ? "Department Head" : "Manager"}
+                Review Nomination -{" "}
+                {isDepartmentHead ? "Department Head" : "Manager"}
               </h5>
               <button
                 type="button"
@@ -171,7 +171,8 @@ const NominationReviewModal = ({
                   </div>
                   <div className="info-row">
                     <div className="info-item">
-                      <strong>Nominated By:</strong> {nomination.nominatedByName}
+                      <strong>Nominated By:</strong>{" "}
+                      {nomination.nominatedByName}
                     </div>
                     <div className="info-item">
                       <strong>Type:</strong> {nomination.nominationType}
@@ -180,7 +181,9 @@ const NominationReviewModal = ({
                   {nomination.justification && (
                     <div className="info-item full-width">
                       <strong>Justification:</strong>
-                      <p className="justification-text">{nomination.justification}</p>
+                      <p className="justification-text">
+                        {nomination.justification}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -228,7 +231,9 @@ const NominationReviewModal = ({
                           step="0.01"
                         />
                         {errors.meritScore && (
-                          <div className="error-message">{errors.meritScore}</div>
+                          <div className="error-message">
+                            {errors.meritScore}
+                          </div>
                         )}
                       </div>
 
@@ -282,7 +287,9 @@ const NominationReviewModal = ({
                       </div>
 
                       <div className="form-group-custom full-width">
-                        <label className="form-label-custom">Review Notes</label>
+                        <label className="form-label-custom">
+                          Review Notes
+                        </label>
                         <textarea
                           name="reviewNotes"
                           className="form-textarea-custom"
@@ -297,7 +304,8 @@ const NominationReviewModal = ({
 
                   <div className="form-group-custom full-width">
                     <label className="form-label-custom">
-                      {formData.action === "Rejected" ? "Rejection" : ""} Remarks
+                      {formData.action === "Rejected" ? "Rejection" : ""}{" "}
+                      Remarks
                     </label>
                     <textarea
                       name="remarks"

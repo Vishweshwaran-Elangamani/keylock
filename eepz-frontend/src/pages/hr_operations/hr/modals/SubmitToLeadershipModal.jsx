@@ -5,12 +5,10 @@ import careerProgressionService from "../../../../services/hr_operations/hr/care
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import "../../../../styles/hr_operations/hr/submitToLeadershipModal.css";
 
-
 const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
   const [submissionNotes, setSubmissionNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
 
   useEffect(() => {
     if (show && nomination) {
@@ -19,17 +17,14 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
     }
   }, [show, nomination]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-
     try {
       console.log("Submitting to leadership...");
       await careerProgressionService.submitToLeadership(nomination.promotionId);
-
 
       console.log("Submitted to leadership");
       showToast(
@@ -48,17 +43,15 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
     }
   };
 
-
   const handleClose = () => {
     setSubmissionNotes("");
     setError(null);
     onHide();
   };
 
-
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
-    
+
     switch (type) {
       case "success":
         toast.success(fullMessage);
@@ -78,13 +71,11 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
     }
   };
 
-
   const increment = (nomination?.newSalary || 0) - (nomination?.oldSalary || 0);
   const incrementPercent =
     nomination?.oldSalary > 0
       ? ((increment / nomination.oldSalary) * 100).toFixed(2)
       : 0;
-
 
   const employeeFullName =
     `${nomination?.employeeFirstName || ""} ${
@@ -92,7 +83,6 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
     }`.trim() ||
     nomination?.employeeEmail ||
     "N/A";
-
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" className="promo-modal">
@@ -103,7 +93,6 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
         </Modal.Title>
       </Modal.Header>
 
-
       <form onSubmit={handleSubmit}>
         <Modal.Body className="promo-modal-body">
           {error && (
@@ -112,7 +101,6 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
               {error}
             </div>
           )}
-
 
           <div className="promo-approval-info">
             <div className="promo-info-card">
@@ -147,7 +135,6 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
             </div>
           </div>
 
-
           <div
             className="promo-details-section"
             style={{ backgroundColor: "#dbeafe" }}
@@ -161,14 +148,12 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
               </div>
               <div className="approval-chain-line approved"></div>
 
-
               <div className="approval-chain-step">
                 <i className="bi bi-check-circle approval-chain-icon approved"></i>
                 <p className="approval-chain-title">Dept Head</p>
                 <p className="approval-chain-status">Approved</p>
               </div>
               <div className="approval-chain-line approved"></div>
-
 
               <div className="approval-chain-step">
                 <i className="bi bi-check-circle approval-chain-icon approved"></i>
@@ -177,7 +162,6 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
               </div>
             </div>
           </div>
-
 
           <div
             className="promo-details-section"
@@ -216,7 +200,6 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
             </div>
           </div>
 
-
           <div className="mb-3" style={{ marginTop: "16px" }}>
             <label htmlFor="submissionNotes" className="form-label">
               Submission Notes (Optional)
@@ -231,7 +214,6 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
             />
           </div>
         </Modal.Body>
-
 
         <Modal.Footer className="promo-modal-footer">
           <div className="promo-footer-content">
@@ -268,6 +250,5 @@ const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
     </Modal>
   );
 };
-
 
 export default SubmitToLeadershipModal;

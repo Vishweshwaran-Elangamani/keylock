@@ -1,6 +1,6 @@
 /**
  * DeleteDepartmentModal Component
- * 
+ *
  * A confirmation modal for permanently deleting departments from the system.
  * Features:
  * - Critical warning message to prevent accidental deletions
@@ -8,7 +8,7 @@
  * - Loading state during API call
  * - Toast notifications using Sonner for success/error feedback
  * - Cannot be reversed once executed
- * 
+ *
  * @param {boolean} show - Controls modal visibility
  * @param {Object} department - Department object containing department details to be deleted
  * @param {function} onClose - Callback to close the modal
@@ -44,7 +44,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
     try {
       // Set loading state to disable buttons and show spinner
       setLoading(true);
-      
+
       // Show loading toast
       toast.loading("Deleting department...");
 
@@ -54,7 +54,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
 
       // Note: Parent component (DepartmentList) handles success/error toasts
       // and closes the modal after successful deletion
-      
     } catch (error) {
       // -------- Handle Exception --------
       console.error("Error deleting department:", error);
@@ -78,12 +77,11 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-delete-dept"></div>
-      
+
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-delete-dept">
         <div className="modal-dialog-delete-dept">
           <div className="modal-content-delete-dept">
-            
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -108,7 +106,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
             {/* MODAL BODY */}
             {/* ======================== */}
             <div className="modal-body-delete-dept">
-              
               {/* -------- Confirmation Question -------- */}
               {/* Displays department name for confirmation */}
               <p className="delete-question-delete-dept">
@@ -123,13 +120,21 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
               {/* Shows department details for verification */}
               <div className="dept-info-box-delete-dept">
                 <div className="dept-info-item-delete-dept">
-                  <span className="dept-info-label-delete-dept">Department Name:</span>
-                  <strong className="dept-info-value-delete-dept">{department?.departmentName}</strong>
+                  <span className="dept-info-label-delete-dept">
+                    Department Name:
+                  </span>
+                  <strong className="dept-info-value-delete-dept">
+                    {department?.departmentName}
+                  </strong>
                 </div>
                 {department?.description && (
                   <div className="dept-info-item-delete-dept">
-                    <span className="dept-info-label-delete-dept">Description:</span>
-                    <span className="dept-info-value-delete-dept">{department.description}</span>
+                    <span className="dept-info-label-delete-dept">
+                      Description:
+                    </span>
+                    <span className="dept-info-value-delete-dept">
+                      {department.description}
+                    </span>
                   </div>
                 )}
               </div>
@@ -142,7 +147,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                   <i className="bi bi-exclamation-triangle-fill"></i>
                   <span>Critical Warning</span>
                 </div>
-                
+
                 {/* Warning Text - Emphasizes permanence */}
                 <p className="warning-text-delete-dept">
                   <strong>
@@ -151,11 +156,13 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                   <br />
                   Once deleted, this department will:
                 </p>
-                
+
                 {/* Warning List - Details all consequences */}
                 <ul className="warning-list-delete-dept">
                   <li>Be permanently removed from the system</li>
-                  <li>Require all employees in this department to be reassigned</li>
+                  <li>
+                    Require all employees in this department to be reassigned
+                  </li>
                   <li>Cannot be recovered or restored</li>
                 </ul>
               </div>
@@ -175,7 +182,6 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
             {/* MODAL FOOTER - ACTION BUTTONS */}
             {/* ======================== */}
             <div className="modal-footer-delete-dept">
-              
               {/* Cancel Button - Closes modal without deleting */}
               <button
                 type="button"
@@ -186,7 +192,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 <i className="bi bi-arrow-left"></i>
                 Cancel
               </button>
-              
+
               {/* Delete Button - Executes permanent deletion */}
               {/* Disabled during loading to prevent duplicate requests */}
               <button

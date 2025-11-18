@@ -10,7 +10,9 @@ const calculateAverageRating = (items) => {
     .filter((item) => item.employeeRating && item.employeeRating > 0)
     .map((item) => item.employeeRating);
   if (validRatings.length === 0) return 0;
-  return (validRatings.reduce((a, b) => a + b, 0) / validRatings.length).toFixed(2);
+  return (
+    validRatings.reduce((a, b) => a + b, 0) / validRatings.length
+  ).toFixed(2);
 };
 
 const isL1Complete = (assess) => {
@@ -117,8 +119,12 @@ function TeamLeadPage() {
               return detailResp.data;
             } catch (err) {
               return (
-                pendingAssessments.find((a) => a.assessmentId === assessmentId) ||
-                reworkAssessmentsList.find((a) => a.assessmentId === assessmentId)
+                pendingAssessments.find(
+                  (a) => a.assessmentId === assessmentId
+                ) ||
+                reworkAssessmentsList.find(
+                  (a) => a.assessmentId === assessmentId
+                )
               );
             }
           })
@@ -330,8 +336,16 @@ function TeamLeadPage() {
     const categories = getL1Categories(allL1);
     const tabs = [
       { key: "Pending", label: "Pending L1 Review", subs: categories.pending },
-      { key: "Submitted", label: "Awaiting L2 / Approved", subs: categories.submitted },
-      { key: "Rejected", label: "Rejected (Rework)", subs: categories.rejected },
+      {
+        key: "Submitted",
+        label: "Awaiting L2 / Approved",
+        subs: categories.submitted,
+      },
+      {
+        key: "Rejected",
+        label: "Rejected (Rework)",
+        subs: categories.rejected,
+      },
     ];
 
     const currentSubs = tabs.find((t) => t.key === activeL1Tab)?.subs || [];
@@ -372,14 +386,17 @@ function TeamLeadPage() {
               {currentSubs.map((assess) => {
                 const avgRating = calculateAverageRating(assess.items);
                 const l1Complete = isL1Complete(assess);
-                const showReviewBtn = !l1Complete || assess.l2Decision === "Rejected";
+                const showReviewBtn =
+                  !l1Complete || assess.l2Decision === "Rejected";
 
                 return (
                   <tr key={assess.assessmentId}>
                     <td className="tl-emp">{assess.employeeName}</td>
                     <td>{assess.formName}</td>
                     <td className="tl-center">
-                      <span className="tl-badge tl-badge-emp">{avgRating}/5</span>
+                      <span className="tl-badge tl-badge-emp">
+                        {avgRating}/5
+                      </span>
                     </td>
                     <td>
                       <span
@@ -401,7 +418,10 @@ function TeamLeadPage() {
                     <td>{new Date(assess.submittedAt).toLocaleDateString()}</td>
                     <td>
                       {showReviewBtn && (
-                        <button className="tl-btn-action" onClick={() => openModal(assess)}>
+                        <button
+                          className="tl-btn-action"
+                          onClick={() => openModal(assess)}
+                        >
                           <i className="bi bi-pencil-square"></i>
                           Review & Submit
                         </button>
@@ -446,8 +466,9 @@ function TeamLeadPage() {
               assess.items && assess.items.length > 0
                 ? (
                     l1AvgRating /
-                    (assess.items || []).filter((i) => i.approverRating && i.approverRating > 0)
-                      .length
+                    (assess.items || []).filter(
+                      (i) => i.approverRating && i.approverRating > 0
+                    ).length
                   ).toFixed(2)
                 : 0;
 
@@ -466,7 +487,10 @@ function TeamLeadPage() {
                 </td>
                 <td>{new Date(assess.submittedAt).toLocaleDateString()}</td>
                 <td>
-                  <button className="tl-btn-action" onClick={() => openModal(assess)}>
+                  <button
+                    className="tl-btn-action"
+                    onClick={() => openModal(assess)}
+                  >
                     <i className="bi bi-pencil-square"></i>
                     Review
                   </button>
@@ -573,12 +597,30 @@ function TeamLeadPage() {
                   {(modalData.items || []).map((item) => (
                     <tr key={item.detailId}>
                       <td className="tl-comp">{item.competencyName}</td>
-                      {active === "l2" && <td className="tl-center">{item.employeeRating ?? "-"}</td>}
-                      {active === "l2" && <td>{item.employeeComments || "-"}</td>}
-                      {active === "l2" && <td className="tl-center">{item.approverRating ?? "-"}</td>}
-                      {active === "l2" && <td>{item.approverComments || "-"}</td>}
-                      {active === "l1" && <td className="tl-center">{item.employeeRating ?? "-"}</td>}
-                      {active === "l1" && <td>{item.employeeComments || "-"}</td>}
+                      {active === "l2" && (
+                        <td className="tl-center">
+                          {item.employeeRating ?? "-"}
+                        </td>
+                      )}
+                      {active === "l2" && (
+                        <td>{item.employeeComments || "-"}</td>
+                      )}
+                      {active === "l2" && (
+                        <td className="tl-center">
+                          {item.approverRating ?? "-"}
+                        </td>
+                      )}
+                      {active === "l2" && (
+                        <td>{item.approverComments || "-"}</td>
+                      )}
+                      {active === "l1" && (
+                        <td className="tl-center">
+                          {item.employeeRating ?? "-"}
+                        </td>
+                      )}
+                      {active === "l1" && (
+                        <td>{item.employeeComments || "-"}</td>
+                      )}
                       <td className="tl-center">
                         <input
                           type="number"
@@ -586,7 +628,11 @@ function TeamLeadPage() {
                           max="5"
                           value={modalRatings[item.detailId]?.rating || ""}
                           onChange={(e) =>
-                            handleRatingChange(item.detailId, "rating", e.target.value)
+                            handleRatingChange(
+                              item.detailId,
+                              "rating",
+                              e.target.value
+                            )
                           }
                           className="tl-input-num"
                           placeholder="-"
@@ -597,7 +643,11 @@ function TeamLeadPage() {
                           type="text"
                           value={modalRatings[item.detailId]?.comment || ""}
                           onChange={(e) =>
-                            handleRatingChange(item.detailId, "comment", e.target.value)
+                            handleRatingChange(
+                              item.detailId,
+                              "comment",
+                              e.target.value
+                            )
                           }
                           className="tl-input-text"
                           placeholder="Add comments..."
@@ -667,7 +717,10 @@ function TeamLeadPage() {
                     <i className="bi bi-check"></i>
                     Confirm Rejection
                   </button>
-                  <button className="tl-btn tl-btn-cancel" onClick={() => setShowRejectReason(false)}>
+                  <button
+                    className="tl-btn tl-btn-cancel"
+                    onClick={() => setShowRejectReason(false)}
+                  >
                     <i className="bi bi-x"></i>
                     Cancel
                   </button>

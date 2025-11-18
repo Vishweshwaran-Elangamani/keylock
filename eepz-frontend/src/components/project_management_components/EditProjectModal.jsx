@@ -1,6 +1,5 @@
-// src/components/ProjectManagementComponents/EditProjectModal.jsx
-import React from 'react';
-import { X, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import React from "react";
+import { X, Save, AlertCircle, CheckCircle } from "lucide-react";
 
 const EditProjectModal = ({
   showEditModal,
@@ -13,15 +12,26 @@ const EditProjectModal = ({
   modalMessage,
   setModalMessage,
   handleUpdateProject,
-  setShowEditModal
+  setShowEditModal,
 }) => {
   if (!showEditModal) return null;
 
-  const statusOptions = ['Active', 'On Hold', 'Completed', 'Cancelled'];
-  const engagementModels = ['Fixed Price', 'Time and Materials', 'Agile - Scrum', 'Agile - Kanban', 'Consulting', 'Retainer'];
+  const statusOptions = ["Active", "On Hold", "Completed", "Cancelled"];
+  const engagementModels = [
+    "Fixed Price",
+    "Time and Materials",
+    "Agile - Scrum",
+    "Agile - Kanban",
+    "Consulting",
+    "Retainer",
+  ];
 
   return (
-    <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
+    <div
+      className="modal fade show d-block"
+      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+      tabIndex="-1"
+    >
       <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header">
@@ -29,9 +39,9 @@ const EditProjectModal = ({
               <i className="bi bi-pencil-square me-2"></i>
               Edit Project
             </h5>
-            <button 
-              type="button" 
-              className="btn-close" 
+            <button
+              type="button"
+              className="btn-close"
               onClick={() => setShowEditModal(false)}
               disabled={isSubmitting}
             ></button>
@@ -40,10 +50,22 @@ const EditProjectModal = ({
           <form onSubmit={handleUpdateProject}>
             <div className="modal-body">
               {modalMessage && (
-                <div className={`alert alert-${modalMessage.type === 'success' ? 'success' : 'danger'} alert-dismissible fade show d-flex align-items-center gap-2`}>
-                  {modalMessage.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+                <div
+                  className={`alert alert-${
+                    modalMessage.type === "success" ? "success" : "danger"
+                  } alert-dismissible fade show d-flex align-items-center gap-2`}
+                >
+                  {modalMessage.type === "success" ? (
+                    <CheckCircle size={20} />
+                  ) : (
+                    <AlertCircle size={20} />
+                  )}
                   <div className="flex-grow-1">{modalMessage.text}</div>
-                  <button type="button" className="btn-close" onClick={() => setModalMessage(null)}></button>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setModalMessage(null)}
+                  ></button>
                 </div>
               )}
 
@@ -56,11 +78,16 @@ const EditProjectModal = ({
                   <input
                     type="text"
                     name="projectName"
-                    value={editFormData.projectName || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, projectName: e.target.value })}
+                    value={editFormData.projectName || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        projectName: e.target.value,
+                      })
+                    }
                     className="form-control"
                     disabled
-                    style={{ backgroundColor: '#e9ecef' }}
+                    style={{ backgroundColor: "#e9ecef" }}
                   />
                 </div>
 
@@ -72,8 +99,13 @@ const EditProjectModal = ({
                   <input
                     type="text"
                     name="clientName"
-                    value={editFormData.clientName || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, clientName: e.target.value })}
+                    value={editFormData.clientName || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        clientName: e.target.value,
+                      })
+                    }
                     className="form-control"
                     placeholder="Enter client name"
                   />
@@ -86,12 +118,19 @@ const EditProjectModal = ({
                   </label>
                   <select
                     name="status"
-                    value={editFormData.status || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                    value={editFormData.status || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        status: e.target.value,
+                      })
+                    }
                     className="form-select"
                   >
                     {statusOptions.map((status, idx) => (
-                      <option key={idx} value={status}>{status}</option>
+                      <option key={idx} value={status}>
+                        {status}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -101,8 +140,13 @@ const EditProjectModal = ({
                   <label className="form-label">Description</label>
                   <textarea
                     name="description"
-                    value={editFormData.description || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                    value={editFormData.description || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        description: e.target.value,
+                      })
+                    }
                     className="form-control"
                     rows="3"
                     placeholder="Enter project description"
@@ -116,13 +160,20 @@ const EditProjectModal = ({
                   </label>
                   <select
                     name="businessUnit"
-                    value={editFormData.businessUnit || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, businessUnit: e.target.value })}
+                    value={editFormData.businessUnit || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        businessUnit: e.target.value,
+                      })
+                    }
                     className="form-select"
                   >
                     <option value="">Select Business Unit</option>
                     {businessUnits.map((bu, idx) => (
-                      <option key={idx} value={bu}>{bu}</option>
+                      <option key={idx} value={bu}>
+                        {bu}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -134,13 +185,20 @@ const EditProjectModal = ({
                   </label>
                   <select
                     name="department"
-                    value={editFormData.department || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, department: e.target.value })}
+                    value={editFormData.department || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        department: e.target.value,
+                      })
+                    }
                     className="form-select"
                   >
                     <option value="">Select Department</option>
                     {departments.map((dept, idx) => (
-                      <option key={idx} value={dept.departmentName}>{dept.departmentName}</option>
+                      <option key={idx} value={dept.departmentName}>
+                        {dept.departmentName}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -152,13 +210,20 @@ const EditProjectModal = ({
                   </label>
                   <select
                     name="engagementModel"
-                    value={editFormData.engagementModel || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, engagementModel: e.target.value })}
+                    value={editFormData.engagementModel || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        engagementModel: e.target.value,
+                      })
+                    }
                     className="form-select"
                   >
                     <option value="">Select Engagement Model</option>
                     {engagementModels.map((model, idx) => (
-                      <option key={idx} value={model}>{model}</option>
+                      <option key={idx} value={model}>
+                        {model}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -171,8 +236,13 @@ const EditProjectModal = ({
                   <input
                     type="date"
                     name="startDate"
-                    value={editFormData.startDate || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, startDate: e.target.value })}
+                    value={editFormData.startDate || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        startDate: e.target.value,
+                      })
+                    }
                     className="form-control"
                   />
                 </div>
@@ -183,8 +253,13 @@ const EditProjectModal = ({
                   <input
                     type="date"
                     name="endDate"
-                    value={editFormData.endDate || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, endDate: e.target.value })}
+                    value={editFormData.endDate || ""}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        endDate: e.target.value,
+                      })
+                    }
                     className="form-control"
                   />
                 </div>
@@ -192,16 +267,16 @@ const EditProjectModal = ({
             </div>
 
             <div className="modal-footer">
-              <button 
-                type="button" 
-                className="btn btn-secondary" 
+              <button
+                type="button"
+                className="btn btn-secondary"
                 onClick={() => setShowEditModal(false)}
                 disabled={isSubmitting}
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn btn-primary"
                 disabled={isSubmitting}
               >
@@ -211,7 +286,7 @@ const EditProjectModal = ({
                     Updating...
                   </>
                 ) : (
-                  'Update Project'
+                  "Update Project"
                 )}
               </button>
             </div>

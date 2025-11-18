@@ -1,6 +1,6 @@
 /**
  * DeactivateUserModal Component
- * 
+ *
  * A confirmation modal for permanently deactivating users from the system.
  * Features:
  * - Critical warning message to prevent accidental deactivations
@@ -8,7 +8,7 @@
  * - Loading state during API call
  * - Toast notifications using Sonner for success/error feedback
  * - Cannot be reversed once executed
- * 
+ *
  * @param {boolean} show - Controls modal visibility
  * @param {function} onHide - Callback to close the modal
  * @param {function} onUserDeactivated - Callback after successful deactivation
@@ -45,7 +45,7 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
     try {
       // Set loading state to disable buttons and show spinner
       setLoading(true);
-      
+
       // -------- API Call --------
       // Call user service to permanently deactivate the user
       const response = await userService.deactivateUser(user.userId);
@@ -54,16 +54,15 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
       if (response.success) {
         // Show success notification using Sonner toast
         toast.success("User deactivated permanently!");
-        
+
         // Trigger parent callback to refresh user list
         onUserDeactivated();
-        
+
         // CRITICAL: Delay closing the modal to allow toast to render
         // Without this delay, modal unmounts before toast displays
         setTimeout(() => {
           onHide();
         }, 500); // 500ms delay
-        
       } else {
         // -------- Handle Failure Response --------
         // Show error notification with API error message
@@ -91,12 +90,11 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-deactivate"></div>
-      
+
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-deactivate">
         <div className="modal-dialog-deactivate">
           <div className="modal-content-deactivate">
-            
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -121,7 +119,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
             {/* MODAL BODY */}
             {/* ======================== */}
             <div className="modal-body-deactivate">
-              
               {/* -------- Confirmation Question -------- */}
               {/* Displays user's full name for confirmation */}
               <p className="delete-question-deactivate">
@@ -140,7 +137,7 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
                   <i className="bi bi-exclamation-triangle-fill"></i>
                   <span>Critical Warning</span>
                 </div>
-                
+
                 {/* Warning Text - Emphasizes permanence */}
                 <p className="warning-text-deactivate">
                   <strong>
@@ -149,7 +146,7 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
                   <br />
                   Once deactivated, this user will:
                 </p>
-                
+
                 {/* Warning List - Details all consequences */}
                 <ul className="warning-list-deactivate">
                   <li>Lose all access to the system immediately</li>
@@ -173,7 +170,6 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
             {/* MODAL FOOTER - ACTION BUTTONS */}
             {/* ======================== */}
             <div className="modal-footer-deactivate">
-              
               {/* Cancel Button - Closes modal without deactivating */}
               <button
                 type="button"
@@ -184,7 +180,7 @@ const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
                 <i className="bi bi-arrow-left"></i>
                 Cancel
               </button>
-              
+
               {/* Deactivate Button - Executes permanent deactivation */}
               {/* Disabled during loading to prevent duplicate requests */}
               <button

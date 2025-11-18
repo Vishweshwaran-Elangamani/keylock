@@ -70,7 +70,7 @@ const DepartmentHeadDashboard = () => {
       icon: "bi bi-chat-left-text",
       gradient: "gradient-teal",
       path: "/department-head/dashboard/feedback",
-    }
+    },
   ];
   return (
     <div className="dashboard-container">
@@ -83,8 +83,9 @@ const DepartmentHeadDashboard = () => {
             {cards.map((card, index) => (
               <div
                 key={index}
-                className={`management-card ${hoveredCard === index ? "hovered" : ""
-                  }`}
+                className={`management-card ${
+                  hoveredCard === index ? "hovered" : ""
+                }`}
                 onMouseEnter={() => setHoveredCard(index)}
                 onMouseLeave={() => setHoveredCard(null)}
                 onClick={() => handleNavigation(card.path)}

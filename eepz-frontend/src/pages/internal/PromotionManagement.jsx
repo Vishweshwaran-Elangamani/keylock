@@ -5,7 +5,7 @@ import nominationService from "../../services/internal/nominationService";
 import CreatePromotionModal from "./PromotionModals/CreatePromotionModal";
 import PromotionApprovalModal from "./PromotionModals/PromotionApprovalModal";
 import PromotionDetailsModal from "./PromotionModals/PromotionDetailsModal";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import "../../styles/internal/PromotionManagement.css";
 
 const PromotionManagement = () => {
@@ -46,7 +46,8 @@ const PromotionManagement = () => {
       if (user?.role === "HR") {
         promotionsResponse = await promotionService.getPendingHRApproval();
       } else if (user?.role === "Leadership") {
-        promotionsResponse = await promotionService.getPendingLeadershipApproval();
+        promotionsResponse =
+          await promotionService.getPendingLeadershipApproval();
       } else {
         promotionsResponse = await promotionService.getAllPromotions();
       }
@@ -56,7 +57,7 @@ const PromotionManagement = () => {
       if (promotionsResponse.success) {
         const promotionData = Array.isArray(promotionsResponse.data)
           ? promotionsResponse.data
-          : (promotionsResponse.data?.promotions || []);
+          : promotionsResponse.data?.promotions || [];
         console.log("Setting promotions:", promotionData);
         setPromotions(promotionData);
       }
@@ -65,7 +66,7 @@ const PromotionManagement = () => {
       if (nomResponse.success) {
         const nominations = Array.isArray(nomResponse.data)
           ? nomResponse.data
-          : (nomResponse.data?.nominations || []);
+          : nomResponse.data?.nominations || [];
         const approved = nominations.filter(
           (n) => n.status?.toLowerCase() === "approved"
         );
@@ -93,8 +94,8 @@ const PromotionManagement = () => {
     }
 
     if (selectedStatus) {
-      filtered = filtered.filter((promo) =>
-        promo.status?.toLowerCase() === selectedStatus.toLowerCase()
+      filtered = filtered.filter(
+        (promo) => promo.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
     }
 
@@ -189,7 +190,9 @@ const PromotionManagement = () => {
               <option value="">All Status</option>
               <option value="approved">Approved</option>
               <option value="pending_hr_approval">Pending HR</option>
-              <option value="pending_leadership_approval">Pending Leadership</option>
+              <option value="pending_leadership_approval">
+                Pending Leadership
+              </option>
               <option value="rejected">Rejected</option>
             </select>
           </div>
@@ -225,7 +228,10 @@ const PromotionManagement = () => {
           </div>
           <div className="stat-content">
             <h3 className="stat-value">
-              {promotions.filter((p) => p.status?.toLowerCase() === "approved").length}
+              {
+                promotions.filter((p) => p.status?.toLowerCase() === "approved")
+                  .length
+              }
             </h3>
             <p className="stat-label">Approved</p>
           </div>
@@ -238,8 +244,8 @@ const PromotionManagement = () => {
           <div className="stat-content">
             <h3 className="stat-value">
               {
-                promotions.filter(
-                  (p) => p.status?.toLowerCase().includes("pending")
+                promotions.filter((p) =>
+                  p.status?.toLowerCase().includes("pending")
                 ).length
               }
             </h3>
@@ -253,7 +259,10 @@ const PromotionManagement = () => {
           </div>
           <div className="stat-content">
             <h3 className="stat-value">
-              {promotions.filter((p) => p.status?.toLowerCase() === "rejected").length}
+              {
+                promotions.filter((p) => p.status?.toLowerCase() === "rejected")
+                  .length
+              }
             </h3>
             <p className="stat-label">Rejected</p>
           </div>
@@ -284,23 +293,34 @@ const PromotionManagement = () => {
               ) : (
                 getPaginatedPromotions().map((promotion) => (
                   <tr key={promotion.promotionId}>
-                    <td>{promotion.employeeName || 'N/A'}</td>
-                    <td>{promotion.oldRole || 'N/A'}</td>
-                    <td>{promotion.newRole || promotion.positionName || promotion.opportunityName || 'N/A'}</td>
+                    <td>{promotion.employeeName || "N/A"}</td>
+                    <td>{promotion.oldRole || "N/A"}</td>
                     <td>
-                      {promotion.promotionDate 
-                        ? new Date(promotion.promotionDate).toLocaleDateString()
-                        : 'N/A'}
+                      {promotion.newRole ||
+                        promotion.positionName ||
+                        promotion.opportunityName ||
+                        "N/A"}
                     </td>
                     <td>
-                      <span className={`status-badge ${getStatusBadgeClass(promotion.status)}`}>
+                      {promotion.promotionDate
+                        ? new Date(promotion.promotionDate).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td>
+                      <span
+                        className={`status-badge ${getStatusBadgeClass(
+                          promotion.status
+                        )}`}
+                      >
                         {promotion.status}
                       </span>
                     </td>
                     <td>
                       <div className="action-buttons">
                         {(user?.role === "HR" || user?.role === "Leadership") &&
-                          promotion.status?.toLowerCase().includes("pending") && (
+                          promotion.status
+                            ?.toLowerCase()
+                            .includes("pending") && (
                             <button
                               className="action-btn action-btn-edit"
                               onClick={() => {

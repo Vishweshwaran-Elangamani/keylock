@@ -1,6 +1,6 @@
 /**
  * RoleList Component
- * 
+ *
  * Main component for role management in the admin dashboard.
  * Features:
  * - View roles in Grid or Table layout
@@ -10,7 +10,7 @@
  * - Pagination for table view
  * - Protection for system roles (cannot be deleted)
  * - Toast notifications using Sonner for user feedback
- * 
+ *
  * @component
  */
 
@@ -93,7 +93,7 @@ const RoleList = () => {
   const fetchRoles = async () => {
     try {
       setLoading(true);
-      
+
       // Show loading toast
       toast.loading("Loading roles...");
 
@@ -104,7 +104,9 @@ const RoleList = () => {
       if (response.success) {
         setRoles(response.data || []);
         toast.dismiss();
-        toast.success(`Loaded ${response.data?.length || 0} roles successfully`);
+        toast.success(
+          `Loaded ${response.data?.length || 0} roles successfully`
+        );
       } else {
         // -------- Handle Failure Response --------
         toast.dismiss();
@@ -128,7 +130,7 @@ const RoleList = () => {
    * Handles delete button click
    * Validates if role can be deleted (system roles are protected)
    * Opens delete confirmation modal
-   * 
+   *
    * @param {Object} role - Role object to be deleted
    */
   const handleDelete = (role) => {
@@ -138,7 +140,7 @@ const RoleList = () => {
       toast.warning("System roles cannot be deleted");
       return;
     }
-    
+
     // Open delete confirmation modal
     setSelectedRole(role);
     setShowDeleteModal(true);
@@ -162,11 +164,11 @@ const RoleList = () => {
       if (response.success) {
         toast.dismiss();
         toast.success("Role deleted successfully");
-        
+
         // Close modal and reset selected role
         setShowDeleteModal(false);
         setSelectedRole(null);
-        
+
         // Refresh roles list
         fetchRoles();
       } else {
@@ -189,7 +191,7 @@ const RoleList = () => {
   /**
    * Handles edit button click
    * Opens edit modal with selected role data
-   * 
+   *
    * @param {Object} role - Role object to be edited
    */
   const handleEdit = (role) => {
@@ -205,7 +207,7 @@ const RoleList = () => {
    * Filters roles based on search term
    * Searches across: roleName, roleCode, and description
    * Returns filtered array of roles
-   * 
+   *
    * @returns {Array} Filtered roles array
    */
   const filteredRoles = roles.filter(
@@ -234,7 +236,7 @@ const RoleList = () => {
 
   /**
    * Formats ISO date string to readable format
-   * 
+   *
    * @param {string} date - ISO date string
    * @returns {string} Formatted date string (e.g., "12 Jan 2024")
    */
@@ -251,7 +253,7 @@ const RoleList = () => {
   /**
    * Returns appropriate Bootstrap icon class for role
    * Maps role names to specific icons
-   * 
+   *
    * @param {string} roleName - Name of the role
    * @returns {string} Bootstrap icon class name
    */
@@ -270,7 +272,7 @@ const RoleList = () => {
   /**
    * Calculates statistics for role data
    * Returns counts of total, system, and custom roles
-   * 
+   *
    * @returns {Object} Statistics object with role counts
    */
   const getRoleStats = () => {
@@ -306,7 +308,6 @@ const RoleList = () => {
 
   return (
     <div className="role-management-page">
-      
       {/* ======================== */}
       {/* BREADCRUMB NAVIGATION */}
       {/* ======================== */}
@@ -351,7 +352,6 @@ const RoleList = () => {
       {/* STATISTICS CARDS */}
       {/* ======================== */}
       <div className="stats-cards-role">
-        
         {/* Total Roles Card */}
         <div className="stat-card-role stat-total-role">
           <div className="stat-icon-role">
@@ -390,7 +390,6 @@ const RoleList = () => {
       {/* CONTROLS BAR */}
       {/* ======================== */}
       <div className="controls-bar-role">
-        
         {/* -------- Search Section -------- */}
         <div className="search-section-role">
           <div className="search-input-wrapper-role">
@@ -436,7 +435,7 @@ const RoleList = () => {
       {/* ======================== */}
       {/* CONTENT VIEWS */}
       {/* ======================== */}
-      
+
       {/* -------- Empty State -------- */}
       {/* Shown when no roles match the search/filter criteria */}
       {filteredRoles.length === 0 ? (
@@ -456,7 +455,6 @@ const RoleList = () => {
             <div className="roles-grid-role">
               {filteredRoles.map((role) => (
                 <div key={role.roleId} className="role-card-item">
-                  
                   {/* -------- Card Header -------- */}
                   <div className="card-header-role">
                     {/* Role Icon Badge */}
@@ -547,17 +545,17 @@ const RoleList = () => {
                             <span>{role.roleName}</span>
                           </div>
                         </td>
-                        
+
                         {/* Role Code */}
                         <td>
                           <code>{role.roleCode}</code>
                         </td>
-                        
+
                         {/* Description */}
                         <td className="description-cell">
                           {role.description || "N/A"}
                         </td>
-                        
+
                         {/* Type Badge (System/Custom) */}
                         <td>
                           {role.isSystemRole ? (
@@ -566,10 +564,10 @@ const RoleList = () => {
                             <span className="badge-custom">Custom</span>
                           )}
                         </td>
-                        
+
                         {/* Created Date */}
                         <td>{formatDate(role.createdAt)}</td>
-                        
+
                         {/* Action Buttons */}
                         <td>
                           <div className="table-actions-role">
@@ -642,7 +640,7 @@ const RoleList = () => {
       {/* ======================== */}
       {/* MODALS */}
       {/* ======================== */}
-      
+
       {/* -------- Add Role Modal -------- */}
       {showAddModal && (
         <AddRoleModal

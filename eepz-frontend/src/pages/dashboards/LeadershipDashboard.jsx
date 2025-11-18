@@ -20,7 +20,7 @@ const LeadershipDashboard = () => {
       description: "Approve promotions submitted by HR with salary details",
       icon: "bi-check-circle",
       gradient: "gradient-blue",
-      path: "/leadership/promotions", 
+      path: "/leadership/promotions",
     },
     {
       title: "Company Policies",
@@ -42,8 +42,7 @@ const LeadershipDashboard = () => {
       icon: "bi bi-book",
       gradient: "gradient-pink",
       path: "/leadership/lnd/dashboard",
-    }
-
+    },
   ];
   return (
     <div className="dashboard-container">
@@ -56,8 +55,9 @@ const LeadershipDashboard = () => {
             {cards.map((card, index) => (
               <div
                 key={index}
-                className={`management-card ${hoveredCard === index ? "hovered" : ""
-                  }`}
+                className={`management-card ${
+                  hoveredCard === index ? "hovered" : ""
+                }`}
                 onMouseEnter={() => setHoveredCard(index)}
                 onMouseLeave={() => setHoveredCard(null)}
                 onClick={() => handleNavigation(card.path)}
