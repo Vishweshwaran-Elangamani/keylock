@@ -70,3 +70,15 @@ D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.C
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\refint\Relevantz.EEPZ.Common.dll
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.pdb
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\ref\Relevantz.EEPZ.Common.dll
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.deps.json
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.AssemblyReference.cache
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfoInputs.cache
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.AssemblyInfo.cs
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.csproj.CoreCompileInputs.cache
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\refint\Relevantz.EEPZ.Common.dll
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Common\obj\Debug\net8.0\ref\Relevantz.EEPZ.Common.dll

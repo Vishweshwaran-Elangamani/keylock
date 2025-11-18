@@ -1304,7 +1304,7 @@
         },
         "runtime": {
           "Relevantz.EEPZ.Common.dll": {
-            "assemblyVersion": "1.0.0.0",
+            "assemblyVersion": "1.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -1315,7 +1315,7 @@
         },
         "runtime": {
           "Relevantz.EEPZ.Core.dll": {
-            "assemblyVersion": "1.0.0.0",
+            "assemblyVersion": "1.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -1329,7 +1329,7 @@
         },
         "runtime": {
           "Relevantz.EEPZ.Data.dll": {
-            "assemblyVersion": "1.0.0.0",
+            "assemblyVersion": "1.0.0",
             "fileVersion": "1.0.0.0"
           }
         }

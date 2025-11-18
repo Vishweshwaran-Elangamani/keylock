@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\Relevantz.EEPZ.Data.Tests.csproj": {}
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\Relevantz.EEPZ.Data.Tests.csproj": {}
   },
   "projects": {
-    "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "projectName": "Relevantz.EEPZ.Common",
-        "projectPath": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
-        "packagesPath": "C:\\Users\\rishi.manisekaran\\.nuget\\packages\\",
-        "outputPath": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\obj\\",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\rishi.manisekaran\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -64,21 +64,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\Relevantz.EEPZ.Data.Tests.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\Relevantz.EEPZ.Data.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\Relevantz.EEPZ.Data.Tests.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\Relevantz.EEPZ.Data.Tests.csproj",
         "projectName": "Relevantz.EEPZ.Data.Tests",
-        "projectPath": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\Relevantz.EEPZ.Data.Tests.csproj",
-        "packagesPath": "C:\\Users\\rishi.manisekaran\\.nuget\\packages\\",
-        "outputPath": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\obj\\",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\Relevantz.EEPZ.Data.Tests.csproj",
+        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\rishi.manisekaran\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -90,8 +90,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
-                "projectPath": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
               }
             }
           }
@@ -148,21 +148,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "projectName": "Relevantz.EEPZ.Data",
-        "projectPath": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
-        "packagesPath": "C:\\Users\\rishi.manisekaran\\.nuget\\packages\\",
-        "outputPath": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\obj\\",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Data\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\rishi.manisekaran\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -174,8 +174,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.MOM&MeetingApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               }
             }
           }
@@ -230,7 +230,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -5378,19 +5378,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\tarun.balaji\\.nuget\\packages\\": {}
+    "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Capstone\\Sprint 3\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+      "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
       "projectName": "Relevantz.EEPZ.Api.Tests",
-      "projectPath": "D:\\Capstone\\Sprint 3\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
-      "packagesPath": "C:\\Users\\tarun.balaji\\.nuget\\packages\\",
-      "outputPath": "D:\\Capstone\\Sprint 3\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
+      "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+      "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+      "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\tarun.balaji\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -5402,8 +5402,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\Capstone\\Sprint 3\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
-              "projectPath": "D:\\Capstone\\Sprint 3\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
+            "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+              "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.FeedbackApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
             }
           }
         }

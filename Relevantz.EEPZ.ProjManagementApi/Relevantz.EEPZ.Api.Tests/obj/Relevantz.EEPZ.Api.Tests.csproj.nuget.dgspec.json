@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {}
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {}
   },
   "projects": {
-    "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
         "projectName": "Relevantz.EEPZ.Api.Tests",
-        "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
-        "packagesPath": "C:\\Users\\tarun.balaji\\.nuget\\packages\\",
-        "outputPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tarun.balaji\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -26,8 +26,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
-                "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
               }
             }
           }
@@ -96,17 +96,17 @@
         }
       }
     },
-    "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
         "projectName": "Relevantz.EEPZ.Api",
-        "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
-        "packagesPath": "C:\\Users\\tarun.balaji\\.nuget\\packages\\",
-        "outputPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\obj\\",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
+        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tarun.balaji\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -118,8 +118,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
-                "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
               }
             }
           }
@@ -209,17 +209,17 @@
         }
       }
     },
-    "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "projectName": "Relevantz.EEPZ.Common",
-        "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
-        "packagesPath": "C:\\Users\\tarun.balaji\\.nuget\\packages\\",
-        "outputPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\obj\\",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tarun.balaji\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -273,17 +273,17 @@
         }
       }
     },
-    "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
         "projectName": "Relevantz.EEPZ.Core",
-        "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
-        "packagesPath": "C:\\Users\\tarun.balaji\\.nuget\\packages\\",
-        "outputPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\obj\\",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tarun.balaji\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -295,8 +295,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
-                "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
               }
             }
           }
@@ -335,17 +335,17 @@
         }
       }
     },
-    "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "projectName": "Relevantz.EEPZ.Data",
-        "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
-        "packagesPath": "C:\\Users\\tarun.balaji\\.nuget\\packages\\",
-        "outputPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\obj\\",
+        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
+        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Data\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tarun.balaji\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -357,8 +357,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Capstone\\Sprint 4\\Back End\\Back End\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.ProjManagementApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               }
             }
           }
