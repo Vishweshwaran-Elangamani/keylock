@@ -13,7 +13,7 @@ export default function HRHome() {
       icon: "bi-journal-plus",
       color: "#3B82F6",
       bg: "#F0F6FD",
-      path: "/hr/dashboard/performance/formslist",
+      path: "/hr/dashboard/performance/formslist"
     },
     {
       title: "Create Form",
@@ -21,7 +21,7 @@ export default function HRHome() {
       icon: "bi-ui-checks",
       color: "#10B981",
       bg: "#EBFAF4",
-      path: "/hr/dashboard/performance/create",
+      path: "/hr/dashboard/performance/create"
     },
     {
       title: "Drafts",
@@ -29,7 +29,7 @@ export default function HRHome() {
       icon: "bi-pencil-square",
       color: "#F59E0B",
       bg: "#FFF7E6",
-      path: "/hr/dashboard/performance/draftlists",
+      path: "/hr/dashboard/performance/draftlists"
     },
     {
       title: "Form Status",
@@ -37,7 +37,7 @@ export default function HRHome() {
       icon: "bi-file-earmark-text",
       color: "#36d1dc",
       bg: "#e6f4fa",
-      path: "/hr/dashboard/performance/status",
+      path: "/hr/dashboard/performance/status"
     },
     {
       title: "Progress Tracker",
@@ -45,7 +45,7 @@ export default function HRHome() {
       icon: "bi-bar-chart-steps",
       color: "#1e3c72",
       bg: "#edeffd",
-      path: "/hr/dashboard/performance/progress",
+      path: "/hr/dashboard/performance/progress"
     },
     {
       title: "Reward Setup",
@@ -53,7 +53,7 @@ export default function HRHome() {
       icon: "bi-award",
       color: "#8e2de2",
       bg: "#f4f1fb",
-      path: "/hr/dashboard/performance/reward",
+      path: "/hr/dashboard/performance/reward"
     },
     {
       title: "Nominations",
@@ -61,25 +61,24 @@ export default function HRHome() {
       icon: "bi-person-badge",
       color: "#ff416c",
       bg: "#fff3f8",
-      path: "/hr/dashboard/performance/nominations",
-    },
+      path: "/hr/dashboard/performance/nominations"
+    }
   ];
 
   return (
     <div className="eepz-hrhome-bg">
       <div className="eepz-hrhome-container">
-        <h1 className="eepz-hrhome-title">EEPZ Performance Management</h1>
+        <h1 className="eepz-hrhome-title">
+          EEPZ Performance Management
+        </h1>
         <div className="eepz-hrhome-card-grid">
           {cards.map((card, idx) => (
             <div
               key={card.title}
-              className={`eepz-hrhome-card${
-                hoveredCard === idx ? " hovered" : ""
-              }`}
+              className={`eepz-hrhome-card${hoveredCard === idx ? " hovered" : ""}`}
               style={{
                 borderColor: hoveredCard === idx ? "#ac5098" : "#eee",
-                transition:
-                  "border-color 0.2s, box-shadow 0.18s, transform 0.18s",
+                transition: "border-color 0.2s, box-shadow 0.18s, transform 0.18s"
               }}
               onMouseEnter={() => setHoveredCard(idx)}
               onMouseLeave={() => setHoveredCard(null)}
@@ -91,7 +90,7 @@ export default function HRHome() {
                 className="hrhome-icon"
                 style={{
                   background: card.bg,
-                  color: card.color,
+                  color: card.color
                 }}
               >
                 <i className={`bi ${card.icon}`} />

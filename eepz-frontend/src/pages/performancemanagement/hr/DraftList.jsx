@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../../services/performancemanagement/hr/api";
+import EditDraftModal from "../../../components/performance_management/modals/DraftList/EditDraftModal";
+import DeleteConfirmModal from "../../../components/performance_management/modals/DraftList/DeleteConfirmModal";
 
 function DraftsList() {
   const [draftRows, setDraftRows] = useState([]);
@@ -7,6 +9,10 @@ function DraftsList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [toDeleteId, setToDeleteId] = useState(null);
+  const [deleteGroupMode, setDeleteGroupMode] = useState(false);
+
 
   const [showModal, setShowModal] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState(null);
@@ -14,7 +20,7 @@ function DraftsList() {
     formId: "",
     employeeId: "",
     assignedBy: 1,
-    action: "Save as Draft",
+    action: "Save as Draft"
   });
 
   const [selectedAssignments, setSelectedAssignments] = useState([]);
@@ -66,17 +72,14 @@ function DraftsList() {
       formId: assignment.formId,
       employeeId: assignment.employeeId,
       assignedBy: 1,
-      action: assignment.action || "Save as Draft",
+      action: assignment.action || "Save as Draft"
     });
     setShowModal(true);
   };
 
   const handleUpdateDraft = async () => {
     try {
-      await api.put(
-        `/AppraisalProcess/draft/${editingAssignment.assignmentId}`,
-        editData
-      );
+      await api.put(`/AppraisalProcess/draft/${editingAssignment.assignmentId}`, editData);
       setMsg("Draft updated successfully.");
       setShowModal(false);
       fetchDrafts();
@@ -86,50 +89,79 @@ function DraftsList() {
     }
   };
 
-  const handleDeleteAssignment = async (assignmentId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this draft?"
-    );
-    if (!confirmDelete) return;
+  // const handleDeleteAssignment = async (assignmentId) => {
+  //   const confirmDelete = window.confirm("Are you sure you want to delete this draft?");
+  //   if (!confirmDelete) return;
 
+  //   try {
+  //     await api.delete(`/FormManagement/draft/${assignmentId}`);
+  //     setDraftRows(prev => prev.filter(d => d.assignmentId !== assignmentId));
+  //     setSelectedAssignments(prev => prev.filter(id => id !== assignmentId));
+  //     setMsg("Draft deleted successfully.");
+  //   } catch (error) {
+  //     console.error(error);
+  //     setMsg("Failed to delete draft.");
+  //   }
+  // };
+
+  // const handleDeleteGroup = async (formId) => {
+  //   const confirmDelete = window.confirm("Are you sure you want to delete all drafts for this form?");
+  //   if (!confirmDelete) return;
+
+  //   try {
+  //     const assignmentsToDelete = draftRows.filter(d => d.formId === formId);
+  //     for (const assignment of assignmentsToDelete) {
+  //       await api.delete(`/FormManagement/draft/${assignment.assignmentId}`);
+  //     }
+  //     setDraftRows(prev => prev.filter(d => d.formId !== formId));
+  //     setMsg("All drafts for this form deleted successfully.");
+  //   } catch (error) {
+  //     console.error(error);
+  //     setMsg("Failed to delete drafts.");
+  //   }
+  // };
+
+  const confirmDeleteSingle = (assignmentId) => {
+  setToDeleteId(assignmentId);
+  setDeleteGroupMode(false);
+  setShowDeleteModal(true);
+};
+
+const confirmDeleteGroup = (formId) => {
+  setToDeleteId(formId);
+  setDeleteGroupMode(true);
+  setShowDeleteModal(true);
+};
+
+const handleConfirmDelete = async () => {
+  if (deleteGroupMode && toDeleteId !== null) {
     try {
-      await api.delete(`/FormManagement/draft/${assignmentId}`);
-      setDraftRows((prev) =>
-        prev.filter((d) => d.assignmentId !== assignmentId)
-      );
-      setSelectedAssignments((prev) =>
-        prev.filter((id) => id !== assignmentId)
-      );
-      setMsg("Draft deleted successfully.");
-    } catch (error) {
-      console.error(error);
-      setMsg("Failed to delete draft.");
-    }
-  };
-
-  const handleDeleteGroup = async (formId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete all drafts for this form?"
-    );
-    if (!confirmDelete) return;
-
-    try {
-      const assignmentsToDelete = draftRows.filter((d) => d.formId === formId);
+      const assignmentsToDelete = draftRows.filter(d => d.formId === toDeleteId);
       for (const assignment of assignmentsToDelete) {
         await api.delete(`/FormManagement/draft/${assignment.assignmentId}`);
       }
-      setDraftRows((prev) => prev.filter((d) => d.formId !== formId));
+      setDraftRows(prev => prev.filter(d => d.formId !== toDeleteId));
       setMsg("All drafts for this form deleted successfully.");
     } catch (error) {
-      console.error(error);
-      setMsg("Failed to delete drafts.");
+      setMsg("Failed to delete drafts."); console.error(error);
     }
-  };
+  } else if (toDeleteId !== null) {
+    try {
+      await api.delete(`/FormManagement/draft/${toDeleteId}`);
+      setDraftRows(prev => prev.filter(d => d.assignmentId !== toDeleteId));
+      setSelectedAssignments(prev => prev.filter(id => id !== toDeleteId));
+      setMsg("Draft deleted successfully.");
+    } catch (error) {
+      setMsg("Failed to delete draft."); console.error(error);
+    }
+  }
+  setShowDeleteModal(false); setToDeleteId(null);
+};
 
   const handleSelectAssignment = (assignmentId) => {
-    setSelectedAssignments((prev) =>
+    setSelectedAssignments(prev =>
       prev.includes(assignmentId)
-        ? prev.filter((id) => id !== assignmentId)
+        ? prev.filter(id => id !== assignmentId)
         : [...prev, assignmentId]
     );
   };
@@ -141,19 +173,17 @@ function DraftsList() {
     }
 
     try {
-      const updates = selectedAssignments
-        .map((id) => {
-          const assignment = draftRows.find((a) => a.assignmentId === id);
-          if (!assignment) return null;
+      const updates = selectedAssignments.map(id => {
+        const assignment = draftRows.find(a => a.assignmentId === id);
+        if (!assignment) return null;
 
-          return api.put(`/AppraisalProcess/draft/${id}`, {
-            formId: assignment.formId,
-            employeeId: assignment.employeeId,
-            assignedBy: 1,
-            action: "Send",
-          });
-        })
-        .filter(Boolean);
+        return api.put(`/AppraisalProcess/draft/${id}`, {
+          formId: assignment.formId,
+          employeeId: assignment.employeeId,
+          assignedBy: 1,
+          action: "Send"
+        });
+      }).filter(Boolean);
 
       await Promise.all(updates);
       setMsg(`${selectedAssignments.length} draft(s) sent successfully.`);
@@ -171,7 +201,7 @@ function DraftsList() {
       acc[key] = {
         formId: draft.formId,
         formName: draft.formName || `Form #${draft.formId}`,
-        assignments: [],
+        assignments: []
       };
     }
     acc[key].assignments.push(draft);
@@ -185,11 +215,7 @@ function DraftsList() {
       <div style={styles.header}>
         <h2 style={styles.title}>Saved Drafts</h2>
         <button
-          style={
-            selectedAssignments.length === 0
-              ? styles.btnDisabled
-              : styles.btnSuccess
-          }
+          style={selectedAssignments.length === 0 ? styles.btnDisabled : styles.btnSuccess}
           disabled={selectedAssignments.length === 0}
           onClick={handleSendSelected}
         >
@@ -210,11 +236,12 @@ function DraftsList() {
               <div style={styles.cardHeader}>
                 <h5 style={styles.cardHeaderTitle}>{group.formName}</h5>
                 <button
-                  style={styles.btnDanger}
-                  onClick={() => handleDeleteGroup(group.formId)}
-                >
-                  Delete All ({group.assignments.length})
-                </button>
+  style={styles.btnDanger}
+  onClick={() => confirmDeleteGroup(group.formId)}
+>
+  Delete All ({group.assignments.length})
+</button>
+
               </div>
               <div style={styles.cardBody}>
                 <div style={styles.tableContainer}>
@@ -226,39 +253,25 @@ function DraftsList() {
                         <th style={styles.th}>Employee Name</th>
                         <th style={styles.th}>Status</th>
                         <th style={styles.th}>Assigned At</th>
-                        <th style={{ ...styles.th, width: "200px" }}>
-                          Actions
-                        </th>
+                        <th style={{ ...styles.th, width: "200px" }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {group.assignments.map((assignment) => (
-                        <tr
-                          key={assignment.assignmentId}
-                          style={styles.tableRow}
-                        >
+                        <tr key={assignment.assignmentId} style={styles.tableRow}>
                           <td style={{ ...styles.td, textAlign: "center" }}>
                             <input
                               type="checkbox"
-                              checked={selectedAssignments.includes(
-                                assignment.assignmentId
-                              )}
-                              onChange={() =>
-                                handleSelectAssignment(assignment.assignmentId)
-                              }
+                              checked={selectedAssignments.includes(assignment.assignmentId)}
+                              onChange={() => handleSelectAssignment(assignment.assignmentId)}
                               style={styles.checkbox}
                             />
                           </td>
                           <td style={styles.td}>
-                            <span style={styles.badgePrimary}>
-                              {assignment.assignmentId}
-                            </span>
+                            <span style={styles.badgePrimary}>{assignment.assignmentId}</span>
                           </td>
                           <td style={styles.td}>
-                            <strong>
-                              {assignment.employeeName ||
-                                `Employee #${assignment.employeeId}`}
-                            </strong>
+                            <strong>{assignment.employeeName || `Employee #${assignment.employeeId}`}</strong>
                           </td>
                           <td style={styles.td}>
                             <span style={styles.badgeWarning}>
@@ -268,9 +281,7 @@ function DraftsList() {
                           <td style={styles.td}>
                             <small>
                               {assignment.assignedAt
-                                ? new Date(
-                                    assignment.assignedAt
-                                  ).toLocaleString()
+                                ? new Date(assignment.assignedAt).toLocaleString()
                                 : "-"}
                             </small>
                           </td>
@@ -282,17 +293,12 @@ function DraftsList() {
                               Edit
                             </button>
                             <button
-                              style={{
-                                ...styles.btnSmall,
-                                ...styles.btnDelete,
-                                marginLeft: "8px",
-                              }}
-                              onClick={() =>
-                                handleDeleteAssignment(assignment.assignmentId)
-                              }
-                            >
-                              Delete
-                            </button>
+  style={{ ...styles.btnSmall, ...styles.btnDelete, marginLeft: "8px" }}
+  onClick={() => confirmDeleteSingle(assignment.assignmentId)}
+>
+  Delete
+</button>
+
                           </td>
                         </tr>
                       ))}
@@ -311,91 +317,26 @@ function DraftsList() {
         </>
       )}
 
-      {/* Modal for Editing */}
-      {showModal && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modalDialog}>
-            <div style={styles.modalContent}>
-              <div style={styles.modalHeader}>
-                <h5 style={styles.modalTitle}>Edit Draft Assignment</h5>
-                <button
-                  style={styles.closeButton}
-                  onClick={() => setShowModal(false)}
-                >
-                  ×
-                </button>
-              </div>
-              <div style={styles.modalBody}>
-                <div style={styles.formGroup}>
-                  <label style={styles.formLabel}>Form</label>
-                  <select
-                    style={styles.formSelect}
-                    value={editData.formId}
-                    onChange={(e) =>
-                      setEditData({
-                        ...editData,
-                        formId: parseInt(e.target.value),
-                      })
-                    }
-                  >
-                    {forms.map((form) => (
-                      <option key={form.formId} value={form.formId}>
-                        {form.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div style={styles.formGroup}>
-                  <label style={styles.formLabel}>Employee</label>
-                  <select
-                    style={styles.formSelect}
-                    value={editData.employeeId}
-                    onChange={(e) =>
-                      setEditData({
-                        ...editData,
-                        employeeId: parseInt(e.target.value),
-                      })
-                    }
-                  >
-                    {users.map((user) => (
-                      <option key={user.profileId} value={user.profileId}>
-                        {user.firstName} {user.lastName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div style={styles.formGroup}>
-                  <label style={styles.formLabel}>Action</label>
-                  <select
-                    style={styles.formSelect}
-                    value={editData.action}
-                    onChange={(e) =>
-                      setEditData({ ...editData, action: e.target.value })
-                    }
-                  >
-                    <option value="Save as Draft">Save as Draft</option>
-                    <option value="Send">Send</option>
-                  </select>
-                </div>
-              </div>
-              <div style={styles.modalFooter}>
-                <button
-                  style={styles.btnModalSuccess}
-                  onClick={handleUpdateDraft}
-                >
-                  Save Changes
-                </button>
-                <button
-                  style={styles.btnModalSecondary}
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditDraftModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        editData={editData}
+        setEditData={setEditData}
+        forms={forms}
+        users={users}
+        onSave={handleUpdateDraft}
+      />
+      <DeleteConfirmModal
+  show={showDeleteModal}
+  onClose={() => setShowDeleteModal(false)}
+  onConfirm={handleConfirmDelete}
+  message={
+    deleteGroupMode
+      ? "Are you sure you want to delete all drafts for this form?"
+      : "Are you sure you want to delete this draft?"
+  }
+/>
+
     </div>
   );
 }
@@ -406,8 +347,7 @@ const styles = {
     padding: "24px",
     maxWidth: "1400px",
     margin: "0 auto",
-    fontFamily:
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     backgroundColor: "#FFFFFF",
     minHeight: "100vh",
   },

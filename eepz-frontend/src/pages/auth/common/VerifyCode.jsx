@@ -480,7 +480,9 @@ const VerifyCode = () => {
       <div className="verify-code-card">
         <div className="verify-code-header">
           <div className="logo-section-verify">
-            <img src="/logo.png" alt="EEPZ Logo" className="logo-img-verify" />
+            <img src="/logodark.png" alt="EEPZ Logo" className="logo-img-verify" style={{
+              width: "250px"
+            }}/>
           </div>
           <h2 className="verify-title">
             <i className="bi bi-shield-check"></i>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
-import AllocationsList from "../modals/AllocationsList";
+import AllocationsList from "../../../../components/hr_operations/modals/AllocationsList";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import "../../../../styles/hr_operations/hr/allocationsList.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";

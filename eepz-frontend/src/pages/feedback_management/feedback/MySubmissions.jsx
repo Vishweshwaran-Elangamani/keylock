@@ -1,3 +1,5 @@
+// src/pages/feedback_management/feedback/MySubmissions.jsx
+
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
   RefreshCw,
@@ -19,12 +21,12 @@ import {
   peerQueueApi,
   hrFormApi,
   orgGoalFeedbackApi,
+  employeeApi,
+  goalsApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
-import ResponseViewModal from "../../../components/feedback_management/ResponseViewModal";
-import axios from "axios";
+import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
-
+// Format date helper
 const formatDate = (dateInput) => {
   if (!dateInput) return "—";
 
@@ -57,6 +59,7 @@ const formatDate = (dateInput) => {
   }
 };
 
+// Calculate days ago helper
 const getDaysAgo = (dateInput) => {
   try {
     const dateObj =
@@ -110,17 +113,24 @@ export default function MySubmissions() {
   const [selectedType, setSelectedType] = useState(null);
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
+  // Show toast notification
   const showToast = (message, type = "success") => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
   };
 
+  // Fetch employee map using service
   const fetchEmployeeMap = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_BASE}/EmployeeManagement/all`);
-      if (response.data?.success && Array.isArray(response.data.data)) {
+      const response = await employeeApi.getAll();
+      
+      if (response?.data) {
+        const employees = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
+        
         const map = {};
-        response.data.data.forEach((emp) => {
+        employees.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
@@ -130,18 +140,21 @@ export default function MySubmissions() {
     }
   }, []);
 
+  // Fetch objectives/goals using service
   const fetchObjectives = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_BASE}/Goals/all`, {
-        params: { pageNumber: 1, pageSize: 100 },
-      });
+      const response = await goalsApi.getAll(1, 100);
 
-      const goalsData = response.data?.data || response.data || [];
+      const goalsData = response?.data || [];
 
       if (Array.isArray(goalsData)) {
         const map = {};
         goalsData.forEach((goal) => {
-          map[goal.goalid] = goal.goaltitle || `Goal ${goal.goalid}`;
+          const goalId = goal.goalId || goal.goalid;
+          const goalTitle = goal.goalName || goal.goaltitle || goal.title;
+          if (goalId) {
+            map[goalId] = goalTitle || `Goal ${goalId}`;
+          }
         });
         setObjectives(map);
       }
@@ -150,6 +163,7 @@ export default function MySubmissions() {
     }
   }, []);
 
+  // Fetch all submission data using services
   const fetchData = useCallback(async () => {
     setRefreshing(true);
     setLoading(true);
@@ -158,31 +172,29 @@ export default function MySubmissions() {
     try {
       const userEmpId = Number(user?.empId) || 1004;
 
-      // HR Forms
+      // Fetch HR Forms responses
       try {
-        const hrRes = await axios.get(
-          `${API_BASE}/HrFeedbackForm/responses/by-employee/${userEmpId}`
-        );
-        if (hrRes.data?.success && Array.isArray(hrRes.data.data)) {
-          const enriched = hrRes.data.data.map((hr) => ({
-            ...hr,
-            submittedAtFormatted: formatDate(hr.submittedAt),
-            daysAgo: getDaysAgo(hr.submittedAt),
-          }));
-          setHrForms(enriched);
-        } else {
-          setHrForms([]);
-        }
+        const hrRes = await hrFormApi.getResponsesByEmployee(userEmpId);
+        const hrData = hrRes?.data || [];
+        
+        const enriched = hrData.map((hr) => ({
+          ...hr,
+          submittedAtFormatted: formatDate(hr.submittedAt),
+          daysAgo: getDaysAgo(hr.submittedAt),
+        }));
+        setHrForms(enriched);
       } catch (hrErr) {
+        console.error("HR Forms fetch error:", hrErr);
         setHrForms([]);
       }
 
-      // Mentor Feedback
+      // Fetch Mentor Feedback
       try {
         const mentorRes = await mentorFeedbackApi.myFeedback(userEmpId);
-        const mentorData = Array.isArray(mentorRes.data?.data)
-          ? mentorRes.data.data
-          : [];
+        const mentorData = Array.isArray(mentorRes?.data)
+          ? mentorRes.data
+          : mentorRes?.data?.data || [];
+        
         const enriched = mentorData.map((m) => ({
           ...m,
           mentorNameFull:
@@ -192,18 +204,21 @@ export default function MySubmissions() {
         }));
         setMentor(enriched);
       } catch (mentorErr) {
+        console.error("Mentor feedback fetch error:", mentorErr);
         setMentor([]);
       }
 
-      // Peer Feedback
+      // Fetch Peer Feedback
       try {
         const peerRes = await peerQueueApi.list(1, 100);
-        const allPeer = Array.isArray(peerRes.data?.data)
-          ? peerRes.data.data
-          : [];
+        const allPeer = Array.isArray(peerRes?.data)
+          ? peerRes.data
+          : peerRes?.data?.data || [];
+        
         const peerData = allPeer.filter(
           (p) => Number(p.submittedByEmployeeId) === userEmpId
         );
+        
         const enriched = peerData.map((p) => ({
           ...p,
           recipientNameFull:
@@ -214,15 +229,18 @@ export default function MySubmissions() {
         }));
         setPeer(enriched);
       } catch (peerErr) {
+        console.error("Peer feedback fetch error:", peerErr);
         setPeer([]);
       }
 
-      // Goal Feedback
+      // Fetch Goal Feedback
       try {
         const goalRes = await orgGoalFeedbackApi.list(1, 100);
 
-        if (goalRes.data?.success && Array.isArray(goalRes.data.data)) {
-          const myGoals = goalRes.data.data
+        const goalData = goalRes?.data || [];
+
+        if (Array.isArray(goalData)) {
+          const myGoals = goalData
             .filter((g) => Number(g.submittedByEmployeeId) === userEmpId)
             .map((g) => ({
               ...g,
@@ -241,43 +259,45 @@ export default function MySubmissions() {
           setGoalFeedback([]);
         }
       } catch (goalErr) {
+        console.error("Goal feedback fetch error:", goalErr);
         setGoalFeedback([]);
       }
     } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Failed to fetch submissions"
-      );
+      setError(err?.message || "Failed to fetch submissions");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, [user?.empId, employeeMap, objectives]);
 
+  // Initialize data on mount
   useEffect(() => {
     fetchEmployeeMap();
     fetchObjectives();
   }, [fetchEmployeeMap, fetchObjectives]);
 
+  // Fetch data after employee map is loaded
   useEffect(() => {
     if (Object.keys(employeeMap).length > 0) {
       fetchData();
     }
   }, [employeeMap, fetchData]);
 
+  // View response handler
   const handleViewResponse = (data, type) => {
     setSelectedResponse(data);
     setSelectedType(type);
     setShowModal(true);
   };
 
+  // Close modal handler
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedResponse(null);
     setSelectedType(null);
   };
 
+  // Delete HR Form using service
   const deleteHRForm = async (responseId) => {
     if (!responseId) {
       showToast("Invalid response ID", "error");
@@ -287,14 +307,15 @@ export default function MySubmissions() {
     if (!window.confirm("Delete this HR form submission?")) return;
 
     try {
-      await hrFormApi.removeResponse(responseId);
+      await hrFormApi.deleteResponse(responseId);
       showToast("HR form deleted successfully!", "success");
       await fetchData();
     } catch (err) {
-      showToast(err?.response?.data?.message || "Failed to delete", "error");
+      showToast(err?.message || "Failed to delete", "error");
     }
   };
 
+  // Delete Mentor Feedback using service
   const deleteMentor = async (trackingId) => {
     if (!trackingId) {
       showToast("Invalid mentor feedback ID", "error");
@@ -304,14 +325,15 @@ export default function MySubmissions() {
     if (!window.confirm("Delete this mentor feedback?")) return;
 
     try {
-      await axios.delete(`${API_BASE}/MentorFeedback/${trackingId}`);
+      await mentorFeedbackApi.remove(trackingId);
       showToast("Mentor feedback deleted successfully!", "success");
       await fetchData();
     } catch (err) {
-      showToast(err?.response?.data?.message || "Failed to delete", "error");
+      showToast(err?.message || "Failed to delete", "error");
     }
   };
 
+  // Delete Peer Feedback using service
   const deletePeer = async (queueId) => {
     if (!queueId) {
       showToast("Invalid peer feedback ID", "error");
@@ -325,10 +347,11 @@ export default function MySubmissions() {
       showToast("Peer feedback deleted successfully!", "success");
       await fetchData();
     } catch (err) {
-      showToast(err?.response?.data?.message || "Failed to delete", "error");
+      showToast(err?.message || "Failed to delete", "error");
     }
   };
 
+  // Delete Goal Feedback using service
   const deleteGoalFeedback = async (feedbackId) => {
     if (!feedbackId) {
       showToast("Invalid goal feedback ID", "error");
@@ -342,10 +365,11 @@ export default function MySubmissions() {
       showToast("Goal feedback deleted successfully!", "success");
       await fetchData();
     } catch (err) {
-      showToast(err?.response?.data?.message || "Failed to delete", "error");
+      showToast(err?.message || "Failed to delete", "error");
     }
   };
 
+  // Get data for current tab
   const getTabData = () => {
     switch (tab) {
       case "HR Forms":
@@ -361,6 +385,7 @@ export default function MySubmissions() {
     }
   };
 
+  // Get empty state icon for current tab
   const getEmptyStateIcon = () => {
     switch (tab) {
       case "HR Forms":
@@ -385,7 +410,7 @@ export default function MySubmissions() {
         backgroundColor: "#f8f9fa",
       }}
     >
-      {/* TOAST */}
+      {/* Toast Notification */}
       {toast.show && (
         <div
           className={`alert ${
@@ -413,7 +438,7 @@ export default function MySubmissions() {
         </div>
       )}
 
-      {/* BACK BUTTON & HEADER */}
+      {/* Header */}
       <div className="d-flex align-items-center gap-3 mb-3">
         <button
           className="btn d-flex align-items-center justify-content-center"
@@ -479,7 +504,7 @@ export default function MySubmissions() {
         </button>
       </div>
 
-      {/* ERROR ALERT */}
+      {/* Error Alert */}
       {error && (
         <div
           className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -512,7 +537,7 @@ export default function MySubmissions() {
         </div>
       )}
 
-      {/* TABS */}
+      {/* Tabs */}
       <div
         style={{
           backgroundColor: "#27235c",
@@ -583,7 +608,7 @@ export default function MySubmissions() {
         </ul>
       </div>
 
-      {/* CONTENT */}
+      {/* Content Area */}
       <div
         style={{
           backgroundColor: "#fff",
@@ -623,7 +648,7 @@ export default function MySubmissions() {
           </div>
         ) : (
           <div className="row g-3">
-            {/* HR FORMS */}
+            {/* HR Forms Cards */}
             {tab === "HR Forms" &&
               hrForms.map((hr) => {
                 const statusColor =
@@ -716,7 +741,7 @@ export default function MySubmissions() {
                 );
               })}
 
-            {/* GOAL FEEDBACK */}
+            {/* Goal Feedback Cards */}
             {tab === "Goal Feedback" &&
               goalFeedback.map((goal) => (
                 <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
@@ -816,7 +841,7 @@ export default function MySubmissions() {
                 </div>
               ))}
 
-            {/* MENTOR */}
+            {/* Mentor Feedback Cards */}
             {tab === "Mentor" &&
               mentor.map((m) => (
                 <div
@@ -905,7 +930,7 @@ export default function MySubmissions() {
                 </div>
               ))}
 
-            {/* PEER */}
+            {/* Peer Feedback Cards */}
             {tab === "Peer" &&
               peer.map((p) => (
                 <div
@@ -983,6 +1008,7 @@ export default function MySubmissions() {
         )}
       </div>
 
+      {/* Response View Modal */}
       <ResponseViewModal
         show={showModal}
         response={selectedResponse}

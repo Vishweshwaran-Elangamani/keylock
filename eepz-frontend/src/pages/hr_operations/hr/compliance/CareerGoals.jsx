@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import hrApi from "../../../../services/hr_operations/hr/hrApi";
 import {
   Button,
-  Modal,
   Spinner,
   Alert,
   OverlayTrigger,
@@ -11,17 +10,10 @@ import {
   InputGroup,
   Pagination,
 } from "react-bootstrap";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as ChartTooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { FaPaperPlane, FaLightbulb, FaSearch } from "react-icons/fa";
+import GoalSuggestionsModal from "../../../../components/hr_operations/modals/GoalSuggestionsModal";
+import ReminderEmailModal from "../../../../components/hr_operations/modals/ReminderEmailModal";
+import BulkReminderModal from "../../../../components/hr_operations/modals/BulkReminderModal";
 import "../../../../styles/hr_operations/hr/careerGoals.css";
 
 const CareerGoals = () => {
@@ -243,6 +235,11 @@ const CareerGoals = () => {
       .finally(() => setSendingReminder(false));
   };
 
+  const handleCloseReminderModal = () => {
+    setReminderEmailModal(false);
+    setReminderResult(null);
+  };
+
   return (
     <div className="cg-root">
       <h2 className="cg-page-title">Career Goals</h2>
@@ -292,37 +289,6 @@ const CareerGoals = () => {
           )}
         </div>
       )}
-
-      {/* NARROW CHART - 380px max-width */}
-      {/* {adoptionStats && goalStats && (
-        <div className="cg-charts-section">
-          <h4 className="cg-section-title">Goal Analytics</h4>
- 
-          <div className="cg-charts-grid-centered">
-            <div className="cg-chart-card-centered">
-              <h5 className="cg-chart-title">Goal Status Overview</h5>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart
-                  data={[
-                    { name: "Completed", value: goalStats.completedGoals },
-                    { name: "In Progress", value: goalStats.inProgressGoals },
-                    { name: "Expired", value: goalStats.expiredGoals },
-                  ]}
-                  barSize={20}
-                  maxBarSize={20}  
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <ChartTooltip />
-                  <Legend />
-                  <Bar dataKey="value" fill="#9D247D" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-      )} */}
 
       <div className="cg-card-container">
         <div className="cg-card-table-header">
@@ -559,150 +525,29 @@ const CareerGoals = () => {
         )}
       </div>
 
-      <Modal
+      <GoalSuggestionsModal
         show={!!goalSuggestions}
         onHide={() => setGoalSuggestions(null)}
-        size="lg"
-        centered
-        className="cg-suggestions-modal"
-      >
-        <Modal.Header closeButton className="cg-modal-header">
-          <Modal.Title className="cg-modal-title">
-            Goal Suggestions for
-            <br />
-            <span className="cg-modal-email">{goalSuggestions?.email}</span>
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="cg-modal-body">
-          {loadingSuggestions ? (
-            <div className="cg-modal-loading">
-              <Spinner animation="border" />
-            </div>
-          ) : (
-            <ul className="cg-suggestion-list">
-              {goalSuggestions &&
-                goalSuggestions.suggestions.map((g, idx) => (
-                  <li key={idx} className="cg-suggestion-item">
-                    <div className="cg-suggestion-header">
-                      <span className="cg-suggestion-title">{g.goalTitle}</span>
-                      <span className="cg-suggestion-type">({g.goalType})</span>
-                    </div>
-                    <div className="cg-suggestion-description">
-                      {g.goalDescription}
-                    </div>
-                    <div className="cg-suggestion-meta">
-                      <span className="cg-meta-priority">
-                        Priority: <strong>{g.priority}</strong>
-                      </span>
-                      <span className="cg-meta-duration">
-                        Duration: <strong>{g.estimatedDuration}</strong>
-                      </span>
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          )}
-        </Modal.Body>
-      </Modal>
+        goalSuggestions={goalSuggestions}
+        loadingSuggestions={loadingSuggestions}
+      />
 
-      <Modal
+      <ReminderEmailModal
         show={reminderEmailModal}
-        onHide={() => {
-          setReminderEmailModal(false);
-          setReminderResult(null);
-        }}
-        centered
-        className="cg-reminder-modal"
-      >
-        <Modal.Header closeButton className="cg-reminder-modal-header">
-          <Modal.Title>Send Career Goals Reminder</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            Send goal-setting reminder to: <br />
-            <b>{reminderTargetUser?.email ?? reminderTargetUser?.Email}</b>
-          </p>
-          {reminderResult && (
-            <div className="cg-reminder-result">
-              {reminderResult.successful > 0 ? (
-                <span className="text-success">
-                  ✓ Reminder sent successfully!
-                </span>
-              ) : (
-                <span className="text-danger">✗ Failed to send reminder</span>
-              )}
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              setReminderEmailModal(false);
-              setReminderResult(null);
-            }}
-          >
-            Close
-          </Button>
-          <Button
-            variant="primary"
-            onClick={sendReminder}
-            disabled={sendingReminder}
-          >
-            {sendingReminder ? "Sending..." : "Send Reminder"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        onHide={handleCloseReminderModal}
+        reminderTargetUser={reminderTargetUser}
+        reminderResult={reminderResult}
+        sendingReminder={sendingReminder}
+        onSendReminder={sendReminder}
+      />
 
-      <Modal
+      <BulkReminderModal
         show={bulkReminderModal}
         onHide={() => setBulkReminderModal(false)}
-        centered
-        className="cg-reminder-modal"
-      >
-        <Modal.Header closeButton className="cg-reminder-modal-header">
-          <Modal.Title>Send Bulk Reminders</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            You are about to send career goals reminders to{" "}
-            <strong>{selectedEmployees.length}</strong> selected employee(s).
-          </p>
-          <p>
-            Each employee will receive an email reminder to set their career
-            goals.
-          </p>
-          <p className="text-muted">
-            <small>This action cannot be undone.</small>
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setBulkReminderModal(false)}
-            disabled={sendingBulkReminder}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            onClick={sendBulkReminders}
-            disabled={sendingBulkReminder}
-          >
-            {sendingBulkReminder ? (
-              <>
-                <Spinner animation="border" size="sm" className="me-2" />
-                Sending...
-              </>
-            ) : (
-              <>
-                <FaPaperPlane className="me-2" />
-                Send to {selectedEmployees.length} Employee(s)
-              </>
-            )}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        selectedEmployees={selectedEmployees}
+        sendingBulkReminder={sendingBulkReminder}
+        onSendBulkReminders={sendBulkReminders}
+      />
     </div>
   );
 };

@@ -15,17 +15,20 @@
  * @param {Array} roles - List of available roles
  * @param {Array} departments - List of available departments
  */
-
-import { useState } from "react";
+ 
+ 
+import { useState, useEffect } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
 import "../../../../styles/auth/User/AddUserModal.css";
-
+ 
+ 
 const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   // ========================
   // STATE MANAGEMENT
   // ========================
-
+ 
+ 
   /**
    * Form data state - stores all user input fields
    * Initialized with default values for employment details
@@ -45,23 +48,57 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     roleId: "",
     departmentId: "",
   });
-
+ 
+ 
   /**
    * Loading state - tracks form submission status
    * Used to disable buttons and show loading indicator
    */
   const [loading, setLoading] = useState(false);
-
+ 
+ 
   /**
    * Errors state - stores validation error messages for each field
    * Key = field name, Value = error message
    */
   const [errors, setErrors] = useState({});
-
+ 
+ 
+  // ========================
+  // FETCH NEXT EMPLOYEE COMPANY ID ON MOUNT
+  // ========================
+ 
+  useEffect(() => {
+    const fetchNextEmployeeId = async () => {
+      try {
+        const response = await userService.getNextEmployeeCompanyId();
+        if (response.success) {
+          setFormData(prev => ({
+            ...prev,
+            employeeCompanyId: response.data
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching next Employee Company ID:", error);
+        // Set default starting value if API fails
+        setFormData(prev => ({
+          ...prev,
+          employeeCompanyId: "12560"
+        }));
+      }
+    };
+ 
+    if (show) {
+      fetchNextEmployeeId();
+    }
+  }, [show]);
+ 
+ 
   // ========================
   // EVENT HANDLERS
   // ========================
-
+ 
+ 
   /**
    * Handles input field changes
    * Updates form data and clears field-specific errors
@@ -70,13 +107,24 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
    */
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Update form data with new value
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
+   
+    // Special handling for employeeCompanyId - only allow numbers
+    if (name === "employeeCompanyId") {
+      // Only allow numeric input
+      if (value === "" || /^\d+$/.test(value)) {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      }
+    } else {
+      // Update form data with new value for other fields
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+   
     // Clear error for this specific field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
@@ -85,11 +133,13 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       }));
     }
   };
-
+ 
+ 
   // ========================
   // FORM VALIDATION
   // ========================
-
+ 
+ 
   /**
    * Validates all form fields before submission
    * Applies comprehensive validation rules for each field
@@ -98,7 +148,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
    */
   const validateForm = () => {
     const newErrors = {};
-
+ 
+ 
     // -------- First Name Validation --------
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
@@ -107,7 +158,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     } else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim())) {
       newErrors.firstName = "First name must contain only letters";
     }
-
+ 
+ 
     // -------- Last Name Validation --------
     if (!formData.lastName.trim()) {
       newErrors.lastName = "Last name is required";
@@ -116,24 +168,31 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     } else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim())) {
       newErrors.lastName = "Last name must contain only letters";
     }
-
-    // -------- Username (Employee Company ID) Validation --------
+ 
+ 
+    // -------- Employee Company ID Validation --------
     if (!formData.employeeCompanyId.trim()) {
-      newErrors.employeeCompanyId = "Username is required";
-    } else if (formData.employeeCompanyId.trim().length < 3) {
-      newErrors.employeeCompanyId = "Username must be at least 3 characters";
-    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.employeeCompanyId.trim())) {
-      newErrors.employeeCompanyId =
-        "Username must contain only letters, numbers, and underscores";
+      newErrors.employeeCompanyId = "Employee Company ID is required";
+    } else if (!/^\d+$/.test(formData.employeeCompanyId.trim())) {
+      newErrors.employeeCompanyId = "Employee Company ID must contain only numbers";
+    } else {
+      const idNumber = parseInt(formData.employeeCompanyId.trim());
+      if (idNumber < 12560) {
+        newErrors.employeeCompanyId = "Employee Company ID must start from 12560 or higher";
+      } else if (idNumber > 999999) {
+        newErrors.employeeCompanyId = "Employee Company ID must be less than 1000000";
+      }
     }
-
+ 
+ 
     // -------- Email Validation --------
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       newErrors.email = "Please enter a valid email address";
     }
-
+ 
+ 
     // -------- Phone Number Validation (Optional but must be valid if provided) --------
     // Indian phone number format: starts with 6-9, exactly 10 digits
     if (formData.mobileNumber.trim()) {
@@ -142,13 +201,15 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
           "Phone number must start with 6-9 and be exactly 10 digits";
       }
     }
-
+ 
+ 
     // -------- Date of Birth Validation (Optional but must be valid if provided) --------
     if (formData.dateOfBirthOfficial) {
       const dob = new Date(formData.dateOfBirthOfficial);
       const today = new Date();
       const age = today.getFullYear() - dob.getFullYear();
-
+ 
+ 
       // Check if date is in the future
       if (dob > today) {
         newErrors.dateOfBirthOfficial = "Date of birth cannot be in the future";
@@ -162,28 +223,33 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
         newErrors.dateOfBirthOfficial = "Please enter a valid date of birth";
       }
     }
-
+ 
+ 
     // -------- Role Validation --------
     if (!formData.roleId) {
       newErrors.roleId = "Role is required";
     }
-
+ 
+ 
     // -------- Department Validation --------
     if (!formData.departmentId) {
       newErrors.departmentId = "Department is required";
     }
-
+ 
+ 
     // Update errors state with all validation errors
     setErrors(newErrors);
-
+   
     // Return true if no errors found, false otherwise
     return Object.keys(newErrors).length === 0;
   };
-
+ 
+ 
   // ========================
   // FORM SUBMISSION
   // ========================
-
+ 
+ 
   /**
    * Handles form submission
    * Validates form, formats payload, and calls API to create user
@@ -191,111 +257,124 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
    * @param {Event} e - Form submit event
    */
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      toast.error("Enter Valid Details!");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const payload = {
-        employeeCompanyId: formData.employeeCompanyId.trim(),
-        email: formData.email.trim(),
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        mobileNumber: formData.mobileNumber.trim()
-          ? `+91-${formData.mobileNumber.trim()}`
-          : null,
-        gender: formData.gender || null,
-        dateOfBirthOfficial: formData.dateOfBirthOfficial || null,
-        employmentType: formData.employmentType,
-        employmentStatus: formData.employmentStatus,
-        joiningDate: formData.joiningDate,
-        employeeType: formData.employeeType,
-        roleId: parseInt(formData.roleId),
-        departmentId: parseInt(formData.departmentId),
-        workLocation: null,
-        noticePeriodDays: 30,
-        confirmationDate: null,
-        middleName: null,
-        callingName: null,
-        referredBy: null,
-        dateOfBirthActual: null,
-        alternateNumber: null,
-        personalEmail: null,
-        reportingManagerEmployeeId: null,
-      };
-
-      console.log("Sending payload:", payload);
-
-      const response = await userService.createUser(payload);
-
-      console.log("Response:", response);
-
-      if (response.success) {
-        // Show success toast
-        toast.success(
-          "User created successfully! Temporary password sent to email."
-        );
-
-        // Reset form
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          employeeCompanyId: "",
-          mobileNumber: "",
-          dateOfBirthOfficial: "",
-          gender: "",
-          employmentType: "Permanent",
-          employmentStatus: "Active",
-          joiningDate: new Date().toISOString().split("T")[0],
-          employeeType: "FullTime",
-          roleId: "",
-          departmentId: "",
-        });
-
-        // Trigger parent callback
-        onUserAdded();
-
-        // CRITICAL: Delay closing the modal to allow toast to render
-        setTimeout(() => {
-          onHide();
-        }, 500); // 500ms delay
-      } else {
-        toast.error(response.message || "Failed to create user");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to create user"
+  e.preventDefault();
+ 
+ 
+  if (!validateForm()) {
+    toast.error("Enter Valid Details!");
+    return;
+  }
+ 
+ 
+  try {
+    setLoading(true);
+ 
+ 
+    const payload = {
+      employeeCompanyId: formData.employeeCompanyId.trim(),
+      email: formData.email.trim(),
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      mobileNumber: formData.mobileNumber.trim()
+        ? `+91-${formData.mobileNumber.trim()}`
+        : null,
+      gender: formData.gender || null,
+      dateOfBirthOfficial: formData.dateOfBirthOfficial || null,
+      employmentType: formData.employmentType,
+      employmentStatus: formData.employmentStatus,
+      joiningDate: formData.joiningDate,
+      employeeType: formData.employeeType,
+      roleId: parseInt(formData.roleId),
+      departmentId: parseInt(formData.departmentId),
+      workLocation: null,
+      noticePeriodDays: 30,
+      confirmationDate: null,
+      middleName: null,
+      callingName: null,
+      referredBy: null,
+      dateOfBirthActual: null,
+      alternateNumber: null,
+      personalEmail: null,
+      reportingManagerEmployeeId: null,
+    };
+ 
+ 
+    console.log("Sending payload:", payload);
+ 
+ 
+    const response = await userService.createUser(payload);
+ 
+ 
+    console.log("Response:", response);
+ 
+ 
+    if (response.success) {
+      // Show success toast
+      toast.success(
+        "User created successfully! Temporary password sent to email."
       );
-    } finally {
-      setLoading(false);
+     
+      // Reset form
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        employeeCompanyId: "",
+        mobileNumber: "",
+        dateOfBirthOfficial: "",
+        gender: "",
+        employmentType: "Permanent",
+        employmentStatus: "Active",
+        joiningDate: new Date().toISOString().split("T")[0],
+        employeeType: "FullTime",
+        roleId: "",
+        departmentId: "",
+      });
+     
+      // Trigger parent callback
+      onUserAdded();
+     
+      // CRITICAL: Delay closing the modal to allow toast to render
+      setTimeout(() => {
+        onHide();
+      }, 500); // 500ms delay
+     
+    } else {
+      toast.error(response.message || "Failed to create user");
     }
-  };
-
+  } catch (error) {
+    console.error("Error:", error);
+    toast.error(
+      error.response?.data?.message ||
+        error.message ||
+        "Failed to create user"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+ 
+ 
+ 
   // ========================
   // RENDER LOGIC
   // ========================
-
+ 
+ 
   // Don't render modal if show prop is false
   if (!show) return null;
-
+ 
+ 
   return (
     <>
       {/* Modal Backdrop - Darkens background */}
       <div className="modal-backdrop-custom"></div>
-
+     
       {/* Modal Wrapper - Centers modal on screen */}
       <div className="modal-wrapper-custom">
         <div className="modal-dialog-custom">
           <div className="modal-content-custom">
+           
             {/* ======================== */}
             {/* MODAL HEADER */}
             {/* ======================== */}
@@ -315,7 +394,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
-
+ 
+ 
             {/* ======================== */}
             {/* MODAL BODY - FORM */}
             {/* ======================== */}
@@ -323,6 +403,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
               <div className="modal-body-custom">
                 {/* Form Grid - Two-column layout for form fields */}
                 <div className="form-grid">
+                 
                   {/* -------- First Name Field -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
@@ -344,7 +425,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       <div className="error-message">{errors.firstName}</div>
                     )}
                   </div>
-
+ 
+ 
                   {/* -------- Last Name Field -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
@@ -366,11 +448,12 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       <div className="error-message">{errors.lastName}</div>
                     )}
                   </div>
-
+ 
+ 
                   {/* -------- Employee Company ID Field -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
-                      Employee Company ID{" "}
+                      Employee ID{" "}
                       <span className="required-mark">*</span>
                     </label>
                     <input
@@ -379,10 +462,12 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       className={`form-input-custom ${
                         errors.employeeCompanyId ? "is-invalid" : ""
                       }`}
-                      placeholder="Company Id"
+                      placeholder="12560"
                       value={formData.employeeCompanyId}
                       onChange={handleChange}
-                      maxLength={50}
+                      maxLength={6}
+                      inputMode="numeric"
+                      pattern="\d*"
                     />
                     {/* Show validation error if exists */}
                     {errors.employeeCompanyId && (
@@ -390,8 +475,13 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                         {errors.employeeCompanyId}
                       </div>
                     )}
+                    {/* Helper text with validation requirements */}
+                    <small className="helper-text">
+                      Must be numeric and start from 12560 or higher
+                    </small>
                   </div>
-
+ 
+ 
                   {/* -------- Email Field -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
@@ -413,7 +503,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       <div className="error-message">{errors.email}</div>
                     )}
                   </div>
-
+ 
+ 
                   {/* -------- Phone Number Field (Optional) -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">Phone Number</label>
@@ -426,7 +517,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                         className={`form-input-custom input-with-prefix ${
                           errors.mobileNumber ? "is-invalid" : ""
                         }`}
-                        placeholder="9876543210"
+                        placeholder="Enter your number"
                         value={formData.mobileNumber}
                         onChange={handleChange}
                         maxLength={10}
@@ -441,7 +532,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       Optional - Must start with 6-9 (10 digits)
                     </small>
                   </div>
-
+ 
+ 
                   {/* -------- Date of Birth Field (Optional) -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">Date of Birth</label>
@@ -465,7 +557,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       Optional - Must be 18+ years old
                     </small>
                   </div>
-
+ 
+ 
                   {/* -------- Gender Field (Optional) -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">Gender</label>
@@ -481,7 +574,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       <option value="PreferNotToSay">Prefer not to say</option>
                     </select>
                   </div>
-
+ 
+ 
                   {/* -------- Employment Type Field -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
@@ -500,7 +594,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       <option value="Probation">Probation</option>
                     </select>
                   </div>
-
+ 
+ 
                   {/* -------- Role Field -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
@@ -527,7 +622,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       <div className="error-message">{errors.roleId}</div>
                     )}
                   </div>
-
+ 
+ 
                   {/* -------- Department Field -------- */}
                   <div className="form-group-custom">
                     <label className="form-label-custom">
@@ -558,7 +654,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     )}
                   </div>
                 </div>
-
+ 
+ 
                 {/* -------- Info Alert -------- */}
                 {/* Informs user about automatic password generation */}
                 <div className="info-alert">
@@ -568,7 +665,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   </small>
                 </div>
               </div>
-
+ 
+ 
               {/* ======================== */}
               {/* MODAL FOOTER - ACTION BUTTONS */}
               {/* ======================== */}
@@ -583,7 +681,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <i className="bi bi-x-circle"></i>
                   Cancel
                 </button>
-
+               
                 {/* Submit Button - Creates new user */}
                 <button type="submit" className="btn-submit" disabled={loading}>
                   {loading ? (
@@ -608,5 +706,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     </>
   );
 };
-
+ 
+ 
 export default AddUserModal;
+ 

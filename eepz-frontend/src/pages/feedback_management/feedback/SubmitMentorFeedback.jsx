@@ -1,3 +1,5 @@
+// src/pages/feedback_management/feedback/SubmitMentorFeedback.jsx
+
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import {
   CheckCircle,
@@ -8,10 +10,11 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { mentorFeedbackApi } from "../../../services/feedbackmanagement/feedbackApi";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import {
+  mentorFeedbackApi,
+  employeeApi,
+  smeApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
 
 export default function SubmitMentorFeedback() {
   const navigate = useNavigate();
@@ -41,28 +44,32 @@ export default function SubmitMentorFeedback() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Fetch employee map using service
   const fetchEmployeeMap = useCallback(async (signal) => {
     setLoadingEmployees(true);
     try {
-      const response = await axios.get(`${API_BASE}/employeemanagement/all`, {
-        signal,
-      });
+      const response = await employeeApi.getAll();
 
-      if (response.data?.success && Array.isArray(response.data.data)) {
+      if (response?.data) {
+        const employees = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
+
         const map = {};
-        response.data.data.forEach((emp) => {
+        employees.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
       }
     } catch (err) {
-      if (axios.isCancel(err) || err.name === "CanceledError") return;
+      if (err.name === "CanceledError" || err.name === "AbortError") return;
       console.error("Error fetching employees:", err.message);
     } finally {
       setLoadingEmployees(false);
     }
   }, []);
 
+  // Fetch SME list using service
   const fetchSmeList = useCallback(
     async (signal) => {
       if (Object.keys(employeeMap).length === 0 && !loadingEmployees) return;
@@ -70,10 +77,12 @@ export default function SubmitMentorFeedback() {
       setLoadingSme(true);
 
       try {
-        const response = await axios.get(`${API_BASE}/sme/active`, { signal });
+        const response = await smeApi.getActive();
 
-        if (response.data?.success && Array.isArray(response.data.data)) {
-          const activeSmes = response.data.data;
+        if (response?.data) {
+          const activeSmes = Array.isArray(response.data)
+            ? response.data
+            : response.data.data || [];
 
           const formattedSmes = activeSmes.map((sme) => ({
             smeId: sme.smeId,
@@ -94,8 +103,8 @@ export default function SubmitMentorFeedback() {
           setError("No active mentors found at this time.");
         }
       } catch (err) {
-        if (axios.isCancel(err) || err.name === "CanceledError") return;
-        setError(err.response?.data?.message || "Failed to load mentor list.");
+        if (err.name === "CanceledError" || err.name === "AbortError") return;
+        setError(err?.message || "Failed to load mentor list.");
         setSmeList([]);
       } finally {
         setLoadingSme(false);
@@ -104,12 +113,14 @@ export default function SubmitMentorFeedback() {
     [employeeMap, loadingEmployees]
   );
 
+  // Fetch employees on mount
   useEffect(() => {
     const abortController = new AbortController();
     fetchEmployeeMap(abortController.signal);
     return () => abortController.abort();
   }, [fetchEmployeeMap]);
 
+  // Fetch SMEs after employees are loaded
   useEffect(() => {
     if (Object.keys(employeeMap).length === 0) return;
     const abortController = new AbortController();
@@ -117,6 +128,7 @@ export default function SubmitMentorFeedback() {
     return () => abortController.abort();
   }, [employeeMap, fetchSmeList]);
 
+  // Handle SME selection
   const handleSmeChange = useCallback(
     (smeId) => {
       setForm((prev) => ({ ...prev, smeId }));
@@ -138,6 +150,7 @@ export default function SubmitMentorFeedback() {
     [smeList]
   );
 
+  // Handle form submission using service
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
@@ -173,9 +186,11 @@ export default function SubmitMentorFeedback() {
       try {
         const response = await mentorFeedbackApi.create(payload);
 
-        if (response.data?.success === true) {
+        if (response?.success || response?.data?.success) {
           const trackingId =
-            response.data?.data?.mentorFeedbackId || "Generated";
+            response.data?.mentorFeedbackId ||
+            response.data?.data?.mentorFeedbackId ||
+            "Generated";
           setSuccess(`Feedback submitted successfully! ID: ${trackingId}`);
           setForm({
             smeId: "",
@@ -186,10 +201,10 @@ export default function SubmitMentorFeedback() {
           setSmeDetails(null);
           setTimeout(() => setSuccess(""), 5000);
         } else {
-          setError(response.data?.message || "Submission failed");
+          setError(response?.message || "Submission failed");
         }
       } catch (err) {
-        setError(err?.response?.data?.message || "Failed to submit feedback");
+        setError(err?.message || "Failed to submit feedback");
       } finally {
         setLoading(false);
       }
@@ -197,10 +212,12 @@ export default function SubmitMentorFeedback() {
     [smeDetails, form, user?.empId]
   );
 
+  // Handle star rating click
   const handleStarClick = useCallback((rating) => {
     setForm((prev) => ({ ...prev, rating }));
   }, []);
 
+  // Render star rating component
   const renderStars = () => {
     return [...Array(5)].map((_, index) => {
       const rating = index + 1;

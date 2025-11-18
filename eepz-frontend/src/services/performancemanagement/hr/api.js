@@ -18,18 +18,14 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = authService.getToken();
-
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log(
-        `✅ JWT Token Added | ${config.method.toUpperCase()} ${config.url}`
-      );
+      console.log(`✅ JWT Token Added | ${config.method.toUpperCase()} ${config.url}`);
     } else {
-      console.warn(
-        `⚠️  No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`
-      );
+      console.warn(`⚠️  No JWT Token Found | ${config.method.toUpperCase()} ${config.url}`);
     }
-
+    
     return config;
   },
   (error) => {
@@ -46,12 +42,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   // Success response - pass through
   (response) => {
-    console.log(
-      `✅ API Response Success | ${response.status} | ${response.config.url}`
-    );
+    console.log(`✅ API Response Success | ${response.status} | ${response.config.url}`);
     return response;
   },
-
+  
   // Error response - handle token refresh or redirect
   async (error) => {
     const originalRequest = error.config;
@@ -70,7 +64,7 @@ api.interceptors.response.use(
       console.log("🔄 Token expired or invalid. Attempting token refresh...");
 
       const refreshToken = authService.getRefreshToken();
-
+      
       if (!refreshToken) {
         console.warn("❌ No refresh token available. Redirecting to login...");
         authService.clearAuthData();
@@ -83,13 +77,11 @@ api.interceptors.response.use(
         const refreshResponse = await authService.refreshAccessToken();
 
         if (refreshResponse.success) {
-          console.log(
-            "✅ Token refreshed successfully! Retrying original request..."
-          );
-
+          console.log("✅ Token refreshed successfully! Retrying original request...");
+          
           const newToken = authService.getToken();
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
+          
           return api(originalRequest);
         } else {
           console.error("❌ Token refresh failed:", refreshResponse.message);
@@ -107,9 +99,7 @@ api.interceptors.response.use(
 
     // ============ 403 FORBIDDEN ============
     if (errorStatus === 403) {
-      console.error(
-        "❌ Access Denied: You don't have permission to access this resource"
-      );
+      console.error("❌ Access Denied: You don't have permission to access this resource");
     }
 
     // ============ 404 NOT FOUND ============
@@ -126,10 +116,7 @@ api.interceptors.response.use(
     // ============ NETWORK ERROR ============
     if (!error.response) {
       console.error("❌ Network Error: Could not reach the API server");
-      console.error(
-        "   Make sure the backend is running at:",
-        api.defaults.baseURL
-      );
+      console.error("   Make sure the backend is running at:", api.defaults.baseURL);
     }
 
     return Promise.reject(error);
@@ -307,33 +294,81 @@ export const getMyNominations = (managerId) => {
 export const submitNomination = (payload) => {
   return api.post("/EmployeeNomination/submit", payload);
 };
-// NEW: Get submitted ratings for Department Head review
-export function getDeptHeadSubmittedRatings() {
-  return api.get("/AppraisalProcess/depthead/submitted-ratings");
-}
 
-// NEW: Approve an employee's assessment (Department Head)
-export function approveDeptHeadEmployee(payload) {
-  return api.post("/AppraisalProcess/depthead/approve-employee", payload);
-}
+// ============================================================
+// DEPARTMENT HEAD FUNCTIONS
+// ============================================================
 
-// NEW: Get list of approved employees (for Manager/Department Head)
-export function getApprovedEmployees(page = 1, pageSize = 5) {
-  return api.get("/AppraisalProcess/manager/approved-employees", {
-    params: { page, pageSize },
+/**
+ * Get submitted ratings for Department Head review
+ */
+export const getDeptHeadSubmittedRatings = () => {
+  return api.get('/AppraisalProcess/depthead/submitted-ratings');
+};
+
+/**
+ * Approve an employee's assessment (Department Head)
+ * @param {Object} payload - Approval data
+ */
+export const approveDeptHeadEmployee = (payload) => {
+  return api.post('/AppraisalProcess/depthead/approve-employee', payload);
+};
+
+/**
+ * Get approved nominations for department head
+ * @param {number} deptHeadId - Department Head ID
+ */
+export const getDeptHeadApprovedNominations = (deptHeadId) => {
+  return api.get(`/DepartmentHeadNomination/depthead/${deptHeadId}/approved-nominations`);
+};
+
+/**
+ * Get list of approved employees (for Manager/Department Head)
+ * @param {number} page - Page number
+ * @param {number} pageSize - Number of items per page
+ */
+export const getApprovedEmployees = (page = 1, pageSize = 5) => {
+  return api.get('/AppraisalProcess/manager/approved-employees', {
+    params: { page, pageSize }
   });
-}
-// Employee Acknowledgment Functions
-export function getPendingAcknowledgments() {
-  return api.get("/AppraisalProcess/employee/pending-acknowledgments");
-}
+};
 
-export function acknowledgeRating(payload) {
-  return api.post("/AppraisalProcess/employee/acknowledge", payload);
-}
+// ============================================================
+// EMPLOYEE ACKNOWLEDGMENT FUNCTIONS
+// ============================================================
 
-export function getManagerEmployeeAcknowledgments() {
+/**
+ * Get pending acknowledgments for employee
+ */
+export const getPendingAcknowledgments = () => {
+  return api.get('/AppraisalProcess/employee/pending-acknowledgments');
+};
+
+/**
+ * Acknowledge a rating
+ * @param {Object} payload - Acknowledgment data
+ */
+export const acknowledgeRating = (payload) => {
+  return api.post('/AppraisalProcess/employee/acknowledge', payload);
+};
+
+/**
+ * Get manager employee acknowledgments
+ */
+export const getManagerEmployeeAcknowledgments = () => {
   return api.get("/AppraisalProcess/manager/employee-acknowledged-comments");
-}
+};
+
+// ============================================================
+// EMPLOYEE NOMINATION FUNCTIONS
+// ============================================================
+
+/**
+ * Search for employee nominations by employee ID
+ * @param {number} employeeId - The employee ID
+ */
+export const getEmployeeNominations = (employeeId) => {
+  return api.get(`/EmployeeNomination/search?employeeId=${employeeId}`);
+};
 
 export default api;

@@ -10,7 +10,7 @@ import {
   FileText,
   AlertCircle,
 } from "lucide-react";
-import ComplianceCard from "../../components/sla/ComplianceCard";
+import ComplianceCard from "../../components/sla/cards/ComplianceCard";
 import slaService from "../../services/sla/slaService";
 import {
   getComplianceSummary,

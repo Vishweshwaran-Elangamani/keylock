@@ -17,7 +17,7 @@ import {
   mentorFeedbackApi,
   peerQueueApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
-import ResponseViewModal from "../../../components/feedback_management/ResponseViewModal";
+import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
 import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE;

@@ -1,3 +1,4 @@
+// src/pages/Meeting/ManagerMomDashboard.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import momService from "../../services/meeting/momService";
@@ -7,6 +8,9 @@ import rsvpService from "../../services/meeting/rsvpService";
 import toastr from "toastr";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+
+// ✅ Import the separated modal component
+import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerMeetingDetailsModal";
 
 const ManagerMomDashboard = () => {
   const navigate = useNavigate();
@@ -21,7 +25,6 @@ const ManagerMomDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showTableView, setShowTableView] = useState(true);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
-  const [meetingDetails, setMeetingDetails] = useState(null);
 
   useEffect(() => {
     loadDashboardData();
@@ -89,12 +92,10 @@ const ManagerMomDashboard = () => {
 
   const openMeetingDetails = (meeting) => {
     setSelectedMeeting(meeting);
-    setMeetingDetails(meeting);
   };
 
   const closeMeetingDetails = () => {
     setSelectedMeeting(null);
-    setMeetingDetails(null);
   };
 
   const formatDateTime = (isoString) => {
@@ -121,11 +122,6 @@ const ManagerMomDashboard = () => {
       </div>
     );
   }
-
-  const countAccepted =
-    meetingDetails?.rsvpParticipants?.filter((p) => p.rsvpStatus === "Accepted")
-      .length || 0;
-  const totalParticipants = meetingDetails?.rsvpParticipants?.length || 0;
 
   return (
     <div
@@ -551,130 +547,12 @@ const ManagerMomDashboard = () => {
         </div>
       </div>
 
-      {/* Meeting Details Modal */}
-      {selectedMeeting && meetingDetails && (
-        <div
-          className="modal fade show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-          onClick={closeMeetingDetails}
-        >
-          <div
-            className="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-content border-0 shadow">
-              <div className="modal-header border-0 pb-0">
-                <div>
-                  <h5 className="modal-title fw-bold">
-                    {meetingDetails.meetingTitle}
-                  </h5>
-                  <p className="text-muted small mb-0">
-                    <i className="bi bi-calendar3 me-1"></i>
-                    {formatDateTime(meetingDetails.meetingDate)}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={closeMeetingDetails}
-                ></button>
-              </div>
-              <div className="modal-body">
-                {/* Attendance Stats */}
-                <div className="card bg-light border-0 mb-4">
-                  <div className="card-body">
-                    <div className="row g-3">
-                      <div className="col-6">
-                        <div className="text-muted small mb-1">Accepted</div>
-                        <div className="fs-4 fw-bold text-success">
-                          {countAccepted}
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="text-muted small mb-1">
-                          Total Invited
-                        </div>
-                        <div className="fs-4 fw-bold text-primary">
-                          {totalParticipants}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="progress mt-3" style={{ height: "8px" }}>
-                      <div
-                        className="progress-bar bg-success"
-                        role="progressbar"
-                        style={{
-                          width: `${
-                            totalParticipants > 0
-                              ? (countAccepted / totalParticipants) * 100
-                              : 0
-                          }%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Participants List */}
-                <h6 className="fw-semibold mb-3">Participants</h6>
-                {meetingDetails.rsvpParticipants?.length === 0 ? (
-                  <div className="alert alert-info">No participants found</div>
-                ) : (
-                  <div className="list-group">
-                    {meetingDetails.rsvpParticipants?.map((p) => (
-                      <div
-                        key={p.participantId}
-                        className="list-group-item border-0 bg-light mb-2 rounded"
-                      >
-                        <div className="d-flex justify-content-between align-items-start">
-                          <div>
-                            <div className="fw-semibold">{p.employeeName}</div>
-                            {p.rsvpComments && (
-                              <small className="text-muted">
-                                {p.rsvpComments}
-                              </small>
-                            )}
-                          </div>
-                          <span
-                            className={`badge ${
-                              p.rsvpStatus === "Accepted"
-                                ? "bg-success"
-                                : p.rsvpStatus === "Declined"
-                                ? "bg-danger"
-                                : "bg-warning text-dark"
-                            }`}
-                          >
-                            {p.rsvpStatus}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div className="modal-footer border-0">
-                <button
-                  className="btn btn-secondary"
-                  onClick={closeMeetingDetails}
-                >
-                  Close
-                </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => {
-                    closeMeetingDetails();
-                    navigate(
-                      `/manager/dasboard/meetmom/meetdetails/${meetingDetails.meetingId}`
-                    );
-                  }}
-                >
-                  View Full Details
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* ✅ Modal Component */}
+      {selectedMeeting && (
+        <ManagerMeetingDetailsModal 
+          meeting={selectedMeeting}
+          onClose={closeMeetingDetails}
+        />
       )}
     </div>
   );

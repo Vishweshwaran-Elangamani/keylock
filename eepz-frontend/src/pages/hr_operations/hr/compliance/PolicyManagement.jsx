@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import policyService from "../../../../services/hr_operations/hr/policyService";
-import AddPolicyModal from "../modals/AddPolicyModal";
-import EditPolicyModal from "../modals/EditPolicyModal";
+import AddPolicyModal from "../../../../components/hr_operations/modals/AddPolicyModal";
+import EditPolicyModal from "../../../../components/hr_operations/modals/EditPolicyModal";
 import { Alert, Spinner } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/policyManagement.css";
 

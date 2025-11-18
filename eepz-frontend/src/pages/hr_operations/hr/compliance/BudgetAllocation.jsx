@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
-import CreateBudgetModal from "../modals/CreateBudgetModal";
-import EditBudgetModal from "../modals/EditBudgetModal";
-import ViewBudgetDetailsModal from "../modals/ViewBudgetDetailsModal";
+import CreateBudgetModal from "../../../../components/hr_operations/modals/CreateBudgetModal";
+import EditBudgetModal from "../../../../components/hr_operations/modals/EditBudgetModal";
+import ViewBudgetDetailsModal from "../../../../components/hr_operations/modals/ViewBudgetDetailsModal";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 

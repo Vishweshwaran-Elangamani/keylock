@@ -1,13 +1,13 @@
 /**
  * ManagerDashboard Component
- *
+ * 
  * Manager Evaluation Dashboard
  * Features:
  * - Tab-based view (Pending/Completed)
  * - Advanced filtering (Form name + Type)
  * - Simple professional form template
  * - Assessment submission and viewing
- *
+ * 
  * @component
  */
 
@@ -18,6 +18,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
+import "../../../components/performance_management/modals/ManagerPerformanceDashboard/ManagerPerformanceDashboardModal";
 
 export default function ManagerDashboard() {
   const navigate = useNavigate();
@@ -63,9 +64,7 @@ export default function ManagerDashboard() {
     setAssignments([]);
 
     try {
-      const roleResponse = await api.get(
-        `/AppraisalProcess/user/${userId}/role`
-      );
+      const roleResponse = await api.get(`/AppraisalProcess/user/${userId}/role`);
 
       if (!roleResponse.data.success) {
         toast.error("User not found.");
@@ -79,21 +78,13 @@ export default function ManagerDashboard() {
         return;
       }
 
-      const assignmentRes = await api.get(
-        `/AppraisalProcess/employee/${userId}`
-      );
+      const assignmentRes = await api.get(`/AppraisalProcess/employee/${userId}`);
 
       if (assignmentRes.data.success) {
         setAssignments(assignmentRes.data.data);
-        const pending = assignmentRes.data.data.filter(
-          (a) => !a.isCompleted
-        ).length;
-        const completed = assignmentRes.data.data.filter(
-          (a) => a.isCompleted
-        ).length;
-        toast.success(
-          `Found ${pending} pending and ${completed} completed assessments.`
-        );
+        const pending = assignmentRes.data.data.filter((a) => !a.isCompleted).length;
+        const completed = assignmentRes.data.data.filter((a) => a.isCompleted).length;
+        toast.success(`Found ${pending} pending and ${completed} completed assessments.`);
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -174,10 +165,7 @@ export default function ManagerDashboard() {
       }
     } catch (error) {
       console.error("View error:", error);
-      toast.error(
-        "Error loading assessment: " +
-          (error.response?.data?.message || error.message)
-      );
+      toast.error("Error loading assessment: " + (error.response?.data?.message || error.message));
     } finally {
       setSubmitting(false);
     }
@@ -190,26 +178,20 @@ export default function ManagerDashboard() {
   const pendingAssignments = assignments
     .filter((a) => !a.isCompleted)
     .filter((a) => {
-      const matchesFormName = a.formName
-        .toLowerCase()
-        .includes(pendingFormNameFilter.toLowerCase());
-      const matchesType =
-        pendingTypeFilter === "" || a.formType === pendingTypeFilter;
+      const matchesFormName = a.formName.toLowerCase().includes(pendingFormNameFilter.toLowerCase());
+      const matchesType = pendingTypeFilter === "" || a.formType === pendingTypeFilter;
       return matchesFormName && matchesType;
     });
 
   const completedAssignments = assignments
     .filter((a) => a.isCompleted)
     .filter((a) => {
-      const matchesFormName = a.formName
-        .toLowerCase()
-        .includes(completedFormNameFilter.toLowerCase());
-      const matchesType =
-        completedTypeFilter === "" || a.formType === completedTypeFilter;
+      const matchesFormName = a.formName.toLowerCase().includes(completedFormNameFilter.toLowerCase());
+      const matchesType = completedTypeFilter === "" || a.formType === completedTypeFilter;
       return matchesFormName && matchesType;
     });
 
-  const allFormTypes = [...new Set(assignments.map((a) => a.formType))];
+  const allFormTypes = [...new Set(assignments.map(a => a.formType))];
 
   // ========================
   // RENDER FUNCTIONS
@@ -220,41 +202,21 @@ export default function ManagerDashboard() {
       <table className="manevap-table">
         <thead>
           <tr>
-            <th>
-              <i className="bi bi-file-earmark-text"></i> Form Name
-            </th>
-            <th>
-              <i className="bi bi-tag"></i> Type
-            </th>
-            <th>
-              <i className="bi bi-calendar-event"></i> Assigned
-            </th>
-            <th>
-              <i className="bi bi-calendar-check"></i> Deadline
-            </th>
-            <th>
-              <i className="bi bi-info-circle"></i> Status
-            </th>
+            <th><i className="bi bi-file-earmark-text"></i> Form Name</th>
+            <th><i className="bi bi-tag"></i> Type</th>
+            <th><i className="bi bi-calendar-event"></i> Assigned</th>
+            <th><i className="bi bi-calendar-check"></i> Deadline</th>
+            <th><i className="bi bi-info-circle"></i> Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {data.map((assignment) => (
             <tr key={assignment.assignmentId}>
+              <td><strong>{assignment.formName}</strong></td>
               <td>
-                <strong>{assignment.formName}</strong>
-              </td>
-              <td>
-                <span
-                  className={`manevap-badge ${
-                    isCompleted ? "success" : "info"
-                  }`}
-                >
-                  <i
-                    className={`bi ${
-                      isCompleted ? "bi-check-circle-fill" : "bi-bookmark-fill"
-                    }`}
-                  ></i>
+                <span className={`manevap-badge ${isCompleted ? 'success' : 'info'}`}>
+                  <i className={`bi ${isCompleted ? 'bi-check-circle-fill' : 'bi-bookmark-fill'}`}></i>
                   {assignment.formType}
                 </span>
               </td>
@@ -265,18 +227,8 @@ export default function ManagerDashboard() {
                   : "N/A"}
               </td>
               <td>
-                <span
-                  className={`manevap-badge ${
-                    isCompleted ? "success" : "warning"
-                  }`}
-                >
-                  <i
-                    className={`bi ${
-                      isCompleted
-                        ? "bi-patch-check-fill"
-                        : "bi-exclamation-circle-fill"
-                    }`}
-                  ></i>
+                <span className={`manevap-badge ${isCompleted ? 'success' : 'warning'}`}>
+                  <i className={`bi ${isCompleted ? 'bi-patch-check-fill' : 'bi-exclamation-circle-fill'}`}></i>
                   {assignment.status || (isCompleted ? "Submitted" : "Pending")}
                 </span>
               </td>
@@ -287,14 +239,13 @@ export default function ManagerDashboard() {
                     onClick={() => {
                       setCurrentAssignment(assignment);
                       setModalMode("submit");
-                      const initialData =
-                        assignment.competencies?.map((comp) => ({
-                          competencyId: comp.competencyId,
-                          competencyName: comp.name,
-                          competencyDescription: comp.description,
-                          rating: "",
-                          comments: "",
-                        })) || [];
+                      const initialData = assignment.competencies?.map((comp) => ({
+                        competencyId: comp.competencyId,
+                        competencyName: comp.name,
+                        competencyDescription: comp.description,
+                        rating: "",
+                        comments: "",
+                      })) || [];
                       setAssessmentData(initialData);
                       setShowModal(true);
                     }}
@@ -344,8 +295,8 @@ export default function ManagerDashboard() {
       <ToastContainer />
 
       {/* Bootstrap Icons CDN */}
-      <link
-        rel="stylesheet"
+      <link 
+        rel="stylesheet" 
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
       />
 
@@ -356,9 +307,7 @@ export default function ManagerDashboard() {
         </div>
         <div className="manevap-header-text">
           <h2 className="manevap-title">Team Evaluation</h2>
-          <p className="manevap-subtitle">
-            Manage and review your performance assessments
-          </p>
+          <p className="manevap-subtitle">Manage and review your performance assessments</p>
         </div>
       </div>
 
@@ -378,9 +327,7 @@ export default function ManagerDashboard() {
         >
           <i className="bi bi-check-circle"></i>
           Completed
-          <span className="manevap-tab-badge">
-            {completedAssignments.length}
-          </span>
+          <span className="manevap-tab-badge">{completedAssignments.length}</span>
         </button>
       </div>
 
@@ -414,9 +361,7 @@ export default function ManagerDashboard() {
               >
                 <option value="">All Types</option>
                 {allFormTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
+                  <option key={type} value={type}>{type}</option>
                 ))}
               </select>
             </div>
@@ -438,8 +383,8 @@ export default function ManagerDashboard() {
             <div className="manevap-empty-state">
               <i className="bi bi-inbox"></i>
               <h3>
-                {pendingFormNameFilter || pendingTypeFilter
-                  ? "No Matching Assessments"
+                {pendingFormNameFilter || pendingTypeFilter 
+                  ? "No Matching Assessments" 
                   : "No Pending Assessments"}
               </h3>
               <p>
@@ -484,9 +429,7 @@ export default function ManagerDashboard() {
               >
                 <option value="">All Types</option>
                 {allFormTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
+                  <option key={type} value={type}>{type}</option>
                 ))}
               </select>
             </div>
@@ -525,131 +468,102 @@ export default function ManagerDashboard() {
       )}
 
       {/* Assessment Modal - Simple Professional Form */}
+      
+     {showModal && currentAssignment && (
+  <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
+    <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
 
-      {showModal && currentAssignment && (
-        <div
-          className="manevap-modal-overlay"
-          onClick={() => setShowModal(false)}
-        >
-          <div
-            className="manevap-modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="manevap-form-header-strict">
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <img
-                  src={logoImage}
-                  alt="EEPZ Logo"
-                  className="manevap-modal-logo"
-                />
-                <div>
-                  <div className="manevap-form-logo-label">APPRAISAL FORM</div>
-                  <div className="manevap-form-title-main">Appraisal Form</div>
-                  <div className="manevap-form-title-small">
-                    {currentAssignment?.formName || ""}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {submitting && modalMode === "view" ? (
-              <div className="manevap-modal-loading">
-                <div className="spinner-border"></div>
-                <p>Loading assessment...</p>
-              </div>
-            ) : (
-              <>
-                <div className="manevap-strict-form-body">
-                  <table className="manevap-strict-table">
-                    <thead>
-                      <tr>
-                        <th>COMPETENCY NAME</th>
-                        <th>DESCRIPTION</th>
-                        <th>RATING</th>
-                        <th>COMMENTS</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {assessmentData.map((item, idx) => (
-                        <tr key={item.competencyId || idx}>
-                          <td className="manevap-cell-bold">
-                            {item.competencyName}
-                          </td>
-                          <td>{item.competencyDescription || ""}</td>
-                          <td>
-                            {modalMode === "view" ? (
-                              <div className="manevap-modal-cell-view">
-                                {item.rating ? `${item.rating} / 5` : "-"}
-                              </div>
-                            ) : (
-                              <select
-                                value={item.rating}
-                                onChange={(e) =>
-                                  updateAssessmentData(
-                                    item.competencyId,
-                                    "rating",
-                                    e.target.value
-                                  )
-                                }
-                                className="manevap-modal-cell-input"
-                              >
-                                <option value="">-</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                              </select>
-                            )}
-                          </td>
-                          <td>
-                            {modalMode === "view" ? (
-                              <div className="manevap-modal-cell-view">
-                                {item.comments || "-"}
-                              </div>
-                            ) : (
-                              <input
-                                className="manevap-modal-cell-input"
-                                type="text"
-                                value={item.comments}
-                                onChange={(e) =>
-                                  updateAssessmentData(
-                                    item.competencyId,
-                                    "comments",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="-"
-                              />
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="manevap-modal-actions">
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="manevap-btn-close"
-                  >
-                    Cancel
-                  </button>
-                  {modalMode === "submit" && (
-                    <button
-                      onClick={handleSubmitAssessment}
-                      disabled={submitting}
-                      className="manevap-btn-submit-form"
-                    >
-                      {submitting ? "Submitting..." : "Submit Assessment"}
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
+      <div className="manevap-form-header-strict">
+        <div style={{display: 'flex', alignItems: 'center', gap: 16}}>
+          <img src={logoImage} alt="EEPZ Logo" className="manevap-modal-logo" />
+          <div>
+            <div className="manevap-form-logo-label">APPRAISAL FORM</div>
+            <div className="manevap-form-title-main">Appraisal Form</div>
+            <div className="manevap-form-title-small">{currentAssignment?.formName || ""}</div>
           </div>
         </div>
-      )}
+      </div>
+      
+      {submitting && modalMode === "view"
+        ? <div className="manevap-modal-loading"><div className="spinner-border"></div><p>Loading assessment...</p></div>
+        : (
+          <>
+            <div className="manevap-strict-form-body">
+              <table className="manevap-strict-table">
+                <thead>
+                  <tr>
+                    <th>COMPETENCY NAME</th>
+                    <th>DESCRIPTION</th>
+                    <th>RATING</th>
+                    <th>COMMENTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assessmentData.map((item, idx) => (
+                    <tr key={item.competencyId || idx}>
+                      <td className="manevap-cell-bold">{item.competencyName}</td>
+                      <td>{item.competencyDescription || ""}</td>
+                      <td>
+                        {modalMode === "view" ? (
+                          <div className="manevap-modal-cell-view">{item.rating ? `${item.rating} / 5` : '-'}</div>
+                        ) : (
+                          <select
+                            value={item.rating}
+                            onChange={e =>
+                              updateAssessmentData(item.competencyId, "rating", e.target.value)
+                            }
+                            className="manevap-modal-cell-input"
+                          >
+                            <option value="">-</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                          </select>
+                        )}
+                      </td>
+                      <td>
+                        {modalMode === "view" ? (
+                          <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
+                        ) : (
+                          <input
+                            className="manevap-modal-cell-input"
+                            type="text"
+                            value={item.comments}
+                            onChange={e =>
+                              updateAssessmentData(item.competencyId, "comments", e.target.value)
+                            }
+                            placeholder="-"
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="manevap-modal-actions">
+              <button
+                onClick={() => setShowModal(false)}
+                className="manevap-btn-close"
+              >Cancel</button>
+              {modalMode === "submit" && (
+                <button
+                  onClick={handleSubmitAssessment}
+                  disabled={submitting}
+                  className="manevap-btn-submit-form"
+                >
+                  {submitting ? "Submitting..." : "Submit Assessment"}
+                </button>
+              )}
+            </div>
+          </>
+        )}
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

@@ -1,7 +1,8 @@
+ 
 import api from '../api';
-
+ 
 const ChangeRequestService = {
-  // Employee: Submit a change request (EmployeeCompanyId or Email only)
+  // Employee: Submit a change request (Email or EmployeeCompanyId)
   submitChangeRequest: async (requestData) => {
     try {
       const response = await api.post('/ChangeRequest/submit', requestData);
@@ -17,7 +18,7 @@ const ChangeRequestService = {
       };
     }
   },
-
+ 
   // Employee: Get my change requests
   getMyChangeRequests: async () => {
     try {
@@ -34,7 +35,7 @@ const ChangeRequestService = {
       };
     }
   },
-
+ 
   // Employee: Check if user has pending request
   hasPendingRequest: async () => {
     try {
@@ -52,7 +53,7 @@ const ChangeRequestService = {
       };
     }
   },
-
+ 
   // Employee: Cancel a pending change request
   cancelChangeRequest: async (requestId) => {
     try {
@@ -69,7 +70,7 @@ const ChangeRequestService = {
       };
     }
   },
-
+ 
   // Admin: Get all pending change requests
   getPendingRequests: async () => {
     try {
@@ -86,7 +87,7 @@ const ChangeRequestService = {
       };
     }
   },
-
+ 
   // Admin: Get all change requests
   getAllChangeRequests: async () => {
     try {
@@ -103,7 +104,7 @@ const ChangeRequestService = {
       };
     }
   },
-
+ 
   // Admin: Process (approve/reject) a change request
   processChangeRequest: async (processData) => {
     try {
@@ -121,5 +122,7 @@ const ChangeRequestService = {
     }
   }
 };
-
+ 
 export default ChangeRequestService;
+ 
+ 

@@ -1,6 +1,6 @@
 /**
  * MyAssessments Component (formerly UserAssignments)
- *
+ * 
  * Employee Assessment Management Dashboard
  * Features:
  * - Real-time deadline timers for all pending assessments
@@ -8,7 +8,7 @@
  * - Advanced search and filtering
  * - Modal-based assessment submission/viewing
  * - Professional form layout with company branding
- *
+ * 
  * @component
  */
 
@@ -73,7 +73,7 @@ function MyAssessments() {
           const deadline = new Date(assignment.deadline);
           const diffTime = deadline - now;
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+          
           newTimers[assignment.assignmentId] = {
             days: diffDays >= 0 ? diffDays : 0,
             formName: assignment.formName,
@@ -85,9 +85,7 @@ function MyAssessments() {
 
       setTimers(newTimers);
       // Show all pending form timers at the top
-      setVisibleTimers(
-        Object.entries(newTimers).map(([key, value]) => ({ id: key, ...value }))
-      );
+      setVisibleTimers(Object.entries(newTimers).map(([key, value]) => ({ id: key, ...value })));
     }, 1000);
 
     return () => clearInterval(interval);
@@ -134,9 +132,7 @@ function MyAssessments() {
     setModalMode("view");
     setSubmitting(true);
     try {
-      const { data } = await api.get(
-        `/SelfAssessment/view/${assignment.formId}/user/${userId}`
-      );
+      const { data } = await api.get(`/SelfAssessment/view/${assignment.formId}/user/${userId}`);
       if (data.success) {
         const viewData = data.data.details.map((detail) => ({
           competencyId: detail.competencyId,
@@ -189,7 +185,7 @@ function MyAssessments() {
       if (data.success) {
         toast.success("Assessment submitted successfully!");
         setShowModal(false);
-
+        
         // Remove timer for submitted form
         const assignmentIdToRemove = currentAssignment.assignmentId;
         setTimers((prev) => {
@@ -197,7 +193,7 @@ function MyAssessments() {
           delete newTimers[assignmentIdToRemove];
           return newTimers;
         });
-
+        
         setCurrentAssignment(null);
         await fetchAssignments();
       } else {
@@ -218,10 +214,7 @@ function MyAssessments() {
   const pendingAssignments = assignments.filter((a) => !a.isCompleted);
   const completedAssignments = assignments.filter((a) => a.isCompleted);
 
-  const formTypes = [
-    "All",
-    ...new Set(assignments.map((a) => a.formType).filter(Boolean)),
-  ];
+  const formTypes = ["All", ...new Set(assignments.map((a) => a.formType).filter(Boolean))];
 
   const filterAssignments = (assignmentList) => {
     return assignmentList.filter((assignment) => {
@@ -229,13 +222,11 @@ function MyAssessments() {
         assignment.formName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         assignment.formType.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchDate =
-        !dateFilter ||
-        new Date(assignment.deadline).toLocaleDateString("en-GB") ===
-          new Date(dateFilter).toLocaleDateString("en-GB");
+      const matchDate = !dateFilter || 
+        new Date(assignment.deadline).toLocaleDateString("en-GB") === 
+        new Date(dateFilter).toLocaleDateString("en-GB");
 
-      const matchType =
-        formTypeFilter === "All" || assignment.formType === formTypeFilter;
+      const matchType = formTypeFilter === "All" || assignment.formType === formTypeFilter;
 
       return matchSearch && matchDate && matchType;
     });
@@ -276,47 +267,27 @@ function MyAssessments() {
                 <td>
                   <div className="empassper-date-cell">
                     <i className="bi bi-calendar-event"></i>
-                    {new Date(
-                      assignment.deadline || new Date()
-                    ).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
+                    {new Date(assignment.deadline || new Date()).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric', 
+                      year: 'numeric' 
                     })}
                   </div>
                 </td>
                 <td>
-                  <span
-                    className={
-                      assignment.isCompleted
-                        ? "empassper-badge-success"
-                        : "empassper-badge-pending"
-                    }
-                  >
-                    <i
-                      className={`bi ${
-                        assignment.isCompleted
-                          ? "bi-check-circle-fill"
-                          : "bi-clock-fill"
-                      }`}
-                    ></i>
+                  <span className={assignment.isCompleted ? "empassper-badge-success" : "empassper-badge-pending"}>
+                    <i className={`bi ${assignment.isCompleted ? 'bi-check-circle-fill' : 'bi-clock-fill'}`}></i>
                     {assignment.isCompleted ? "Completed" : "Pending"}
                   </span>
                 </td>
                 <td>
                   {!assignment.isCompleted ? (
-                    <button
-                      className="empassper-btn empassper-btn-submit"
-                      onClick={() => openSubmitModal(assignment)}
-                    >
+                    <button className="empassper-btn empassper-btn-submit" onClick={() => openSubmitModal(assignment)}>
                       <i className="bi bi-pencil-square"></i>
                       Submit
                     </button>
                   ) : (
-                    <button
-                      className="empassper-btn empassper-btn-view"
-                      onClick={() => openViewModal(assignment)}
-                    >
+                    <button className="empassper-btn empassper-btn-view" onClick={() => openViewModal(assignment)}>
                       <i className="bi bi-eye-fill"></i>
                       View
                     </button>
@@ -361,49 +332,35 @@ function MyAssessments() {
             <i className="bi bi-clipboard-check"></i>
           </div>
           <div className="empassper-header-text">
-            <h2 className="empassper-header-title">
-              My Performance Assessments
-            </h2>
-            <p className="empassper-header-description">
-              View and complete your assigned performance evaluations
-            </p>
+            <h2 className="empassper-header-title">My Performance Assessments</h2>
+            <p className="empassper-header-description">View and complete your assigned performance evaluations</p>
           </div>
         </div>
-        {showModal &&
-          currentAssignment &&
-          timers[currentAssignment.assignmentId] && (
-            <div className="empassper-timer-container">
-              <div className="empassper-timer-label">Time Remaining</div>
-              <div className="empassper-timer-display">
-                {timers[currentAssignment.assignmentId].days > 0
-                  ? `${timers[currentAssignment.assignmentId].days} days`
-                  : "Expired"}
-              </div>
-              <div className="empassper-timer-subtext">
-                Deadline:{" "}
-                {new Date(currentAssignment.deadline).toLocaleDateString()}
-              </div>
+        {showModal && currentAssignment && timers[currentAssignment.assignmentId] && (
+          <div className="empassper-timer-container">
+            <div className="empassper-timer-label">Time Remaining</div>
+            <div className="empassper-timer-display">
+              {timers[currentAssignment.assignmentId].days > 0
+                ? `${timers[currentAssignment.assignmentId].days} days`
+                : "Expired"}
             </div>
-          )}
+            <div className="empassper-timer-subtext">
+              Deadline: {new Date(currentAssignment.deadline).toLocaleDateString()}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* TIMER BARS - ALWAYS VISIBLE FOR ALL PENDING FORMS */}
       {visibleTimers.length > 0 && (
         <div className="empassper-timer-bars-container">
           {visibleTimers.map((timer) => (
-            <div
-              key={timer.id}
-              className={`empassper-timer-bar ${
-                timer.isExpired ? "expired" : ""
-              }`}
-            >
+            <div key={timer.id} className={`empassper-timer-bar ${timer.isExpired ? 'expired' : ''}`}>
               <div className="empassper-timer-bar-content">
                 <span className="empassper-timer-bar-icon">
                   <i className="bi bi-alarm"></i>
                 </span>
-                <span className="empassper-timer-bar-label">
-                  {timer.formName}
-                </span>
+                <span className="empassper-timer-bar-label">{timer.formName}</span>
                 <span className="empassper-timer-bar-time">
                   {timer.days > 0 ? `${timer.days} days left` : "Expired"}
                 </span>
@@ -430,13 +387,11 @@ function MyAssessments() {
           onChange={(e) => setFormTypeFilter(e.target.value)}
         >
           <option value="">All Form Types</option>
-          {formTypes
-            .filter((t) => t !== "All")
-            .map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
+          {formTypes.filter(t => t !== "All").map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
         </select>
         <input
           type="date"
@@ -454,9 +409,7 @@ function MyAssessments() {
             <i className="bi bi-hourglass-split"></i>
           </div>
           <div className="empassper-stat-content">
-            <h3 className="empassper-stat-value">
-              {pendingAssignments.length}
-            </h3>
+            <h3 className="empassper-stat-value">{pendingAssignments.length}</h3>
             <p className="empassper-stat-label">Pending</p>
           </div>
         </div>
@@ -465,9 +418,7 @@ function MyAssessments() {
             <i className="bi bi-check-circle-fill"></i>
           </div>
           <div className="empassper-stat-content">
-            <h3 className="empassper-stat-value">
-              {completedAssignments.length}
-            </h3>
+            <h3 className="empassper-stat-value">{completedAssignments.length}</h3>
             <p className="empassper-stat-label">Completed</p>
           </div>
         </div>
@@ -485,9 +436,7 @@ function MyAssessments() {
       {/* Tab Navigation */}
       <div className="empassper-tab-container">
         <button
-          className={`empassper-tab-button ${
-            activeTab === "pending" ? "active" : ""
-          }`}
+          className={`empassper-tab-button ${activeTab === "pending" ? "active" : ""}`}
           onClick={() => setActiveTab("pending")}
         >
           <i className="bi bi-hourglass-split"></i>
@@ -495,16 +444,12 @@ function MyAssessments() {
           <span className="empassper-tab-badge">{filteredPending.length}</span>
         </button>
         <button
-          className={`empassper-tab-button ${
-            activeTab === "completed" ? "active" : ""
-          }`}
+          className={`empassper-tab-button ${activeTab === "completed" ? "active" : ""}`}
           onClick={() => setActiveTab("completed")}
         >
           <i className="bi bi-check-circle-fill"></i>
           Completed Assessments
-          <span className="empassper-tab-badge">
-            {filteredCompleted.length}
-          </span>
+          <span className="empassper-tab-badge">{filteredCompleted.length}</span>
         </button>
       </div>
 
@@ -519,9 +464,7 @@ function MyAssessments() {
                 <div className="empassper-empty-icon">
                   <i className="bi bi-inbox"></i>
                 </div>
-                <h3 className="empassper-empty-title">
-                  No Pending Assessments
-                </h3>
+                <h3 className="empassper-empty-title">No Pending Assessments</h3>
                 <p className="empassper-empty-text">
                   {assignments.length === 0
                     ? "You don't have any assessments assigned yet."
@@ -541,9 +484,7 @@ function MyAssessments() {
                 <div className="empassper-empty-icon">
                   <i className="bi bi-clipboard-check"></i>
                 </div>
-                <h3 className="empassper-empty-title">
-                  No Completed Assessments
-                </h3>
+                <h3 className="empassper-empty-title">No Completed Assessments</h3>
                 <p className="empassper-empty-text">
                   Complete your pending assessments to see them here.
                 </p>
@@ -559,7 +500,10 @@ function MyAssessments() {
           className="modal-overlay"
           onClick={() => !submitting && setShowModal(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Form Header */}
             <div className="form-header">
               <div className="logo-section">
@@ -579,21 +523,11 @@ function MyAssessments() {
             {submitting && modalMode === "view" ? (
               <div
                 className="form-body"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
               >
                 <div>
                   <div className="spinner-border"></div>
-                  <p
-                    style={{
-                      marginTop: "16px",
-                      color: "var(--text-light)",
-                      textAlign: "center",
-                    }}
-                  >
+                  <p style={{ marginTop: "16px", color: "var(--text-light)", textAlign: "center" }}>
                     Loading assessment...
                   </p>
                 </div>

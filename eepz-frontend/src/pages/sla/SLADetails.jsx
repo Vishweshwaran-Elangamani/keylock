@@ -12,9 +12,9 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import SLAHistoryTimeline from "../../components/sla/SLAHistoryTimeline";
-import ReopenSLAForm from "../../components/sla/ReopenSLAForm";
-import EscalationForm from "../../components/sla/EscalationForm";
+import SLAHistoryTimeline from "../../components/sla/common/SLAHistoryTimeline";
+import ReopenSLAForm from "../../components/sla/forms/ReopenSLAForm";
+import EscalationForm from "../../components/sla/forms/EscalationForm";
 import slaService, {
   escalationHelpers,
   dateHelpers,
@@ -202,7 +202,7 @@ const SLADetails = () => {
   if (loading) {
     return (
       <div
-        className="d-flex justify-content-center align-items-center"
+        className="d-flex justify-content-center align-items-center" 
         style={{ minHeight: "600px" }}
       >
         <div className="text-center">

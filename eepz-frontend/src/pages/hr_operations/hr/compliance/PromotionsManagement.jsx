@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import careerProgressionService from "../../../../services/hr_operations/hr/careerProgressionService.js";
-import CreatePromotionModal from "../modals/CreatePromotionModal.jsx";
-import FairnessCheckModal from "../modals/FairnessCheckModal.jsx";
-import ApproveRejectModal from "../modals/ApproveRejectModal.jsx.jsx";
-import PayrollUpdateModal from "../modals/PayrollUpdateModal.jsx";
-import SubmitToLeadershipModal from "../modals/SubmitToLeadershipModal.jsx";
-import PromotionDetailsModal from "../modals/PromotionDetailsModal.jsx";
+import CreatePromotionModal from "../../../../components/hr_operations/modals/CreatePromotionModal.jsx";
+import FairnessCheckModal from "../../../../components/hr_operations/modals/FairnessCheckModal.jsx";
+import ApproveRejectModal from "../../../../components/hr_operations/modals/ApproveRejectModal.jsx.jsx";
+import PayrollUpdateModal from "../../../../components/hr_operations/modals/PayrollUpdateModal.jsx";
+import SubmitToLeadershipModal from "../../../../components/hr_operations/modals/SubmitToLeadershipModal.jsx";
+import PromotionDetailsModal from "../../../../components/hr_operations/modals/PromotionDetailsModal.jsx";
 import "../../../../styles/hr_operations/hr/promotionsManagement.css";
 
 const PromotionsManagement = () => {

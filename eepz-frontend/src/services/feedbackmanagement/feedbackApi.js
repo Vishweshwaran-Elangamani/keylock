@@ -112,27 +112,7 @@ export const smeApi = {
     api.get("/sme/all", { params: { pageNumber: page, pageSize: size } }),
 };
 
-// ============================================================================
-// EMPLOYEE API (NEW - Employee Management)
-// ============================================================================
-export const employeeApi = {
-  // Get all employees
-  getAll: () => api.get("/employeemanagement/all"),
 
-  // Get employee by ID
-  getById: (employeeId) => api.get(`/employeemanagement/${employeeId}`),
-
-  // Get employees by department
-  getByDepartment: (departmentId) =>
-    api.get(`/employeemanagement/department/${departmentId}`),
-
-  // Get employees by role
-  getByRole: (roleId) => api.get(`/employeemanagement/role/${roleId}`),
-
-  // Search employees
-  search: (query) =>
-    api.get("/employeemanagement/search", { params: { q: query } }),
-};
 
 // Shared date helpers (re-use index.css tokens for visuals in UI)
 export const dateHelpers = {
@@ -152,4 +132,46 @@ export const dateHelpers = {
     if (diff <= 7) return { status: "Upcoming", color: "#0F62FE", icon: "📅" };
     return { status: "On Track", color: "#24A148", icon: "✅" };
   },
+
+  
+};
+
+
+
+// Update EMPLOYEE API with missing methods
+export const employeeApi = {
+  // Get all employees
+  getAll: () => api.get("/employeemanagement/all"),
+
+  // Get employee by ID
+  getById: (employeeId) => api.get(`/employeemanagement/${employeeId}`),
+
+  // Get employees by department
+  getByDepartment: (departmentId) =>
+    api.get(`/employeemanagement/department/${departmentId}`),
+
+  // Get employees by role
+  getByRole: (roleId) => api.get(`/employeemanagement/role/${roleId}`),
+
+  // Search employees
+  search: (query) =>
+    api.get("/employeemanagement/search", { params: { q: query } }),
+};
+
+
+export const goalsApi = {
+  // Get all goals
+  getAll: () => api.get("/Goals"),  // Capital G
+  
+  // Get goal by ID
+  getById: (goalId) => api.get(`/Goals/${goalId}`),  // Capital G
+  
+  // Get all team goals
+  getTeamAll: () => api.get("/Goals/team/all"),  // Capital G
+  
+  // Get organization-level goals
+  getOrganizationLevel: () => api.get("/Goals/organization-level"),  // Capital G
+  
+  // Get goals by project
+  getByProject: (projectId) => api.get(`/Goals/project/${projectId}`),
 };

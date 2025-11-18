@@ -1,4 +1,6 @@
-import React, { useMemo, useState, useEffect } from "react";
+// src/pages/feedback_management/forms/CreateFeedbackForm.jsx
+
+import React, { useMemo, useState } from "react";
 import {
   CheckCircle,
   Send,
@@ -8,9 +10,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 
 export default function CreateFeedbackForm() {
   const navigate = useNavigate();
@@ -24,10 +24,7 @@ export default function CreateFeedbackForm() {
     []
   );
 
-  // ============================================================================
-  // STATE
-  // ============================================================================
-
+  // State
   const [form, setForm] = useState({
     formName: "",
     formDescription: "",
@@ -39,23 +36,17 @@ export default function CreateFeedbackForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // ============================================================================
-  // FORM TYPES
-  // ============================================================================
-
+  // Form types
   const FORM_TYPES = [
-    { value: "PerformanceReview", label: " Performance Review" },
-    { value: "GeneralFeedback", label: " General Feedback" },
-    { value: "BiasReview", label: " Bias Review" },
-    { value: "ProfessionalismReview", label: " Professionalism Review" },
-    { value: "SurveyForm", label: " Survey" },
-    { value: "EvaluationForm", label: " Evaluation" },
+    { value: "PerformanceReview", label: "Performance Review" },
+    { value: "GeneralFeedback", label: "General Feedback" },
+    { value: "BiasReview", label: "Bias Review" },
+    { value: "ProfessionalismReview", label: "Professionalism Review" },
+    { value: "SurveyForm", label: "Survey" },
+    { value: "EvaluationForm", label: "Evaluation" },
   ];
 
-  // ============================================================================
-  // HANDLE SUBMIT
-  // ============================================================================
-
+  // Handle form submission using service
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -82,7 +73,6 @@ export default function CreateFeedbackForm() {
     setLoading(true);
 
     try {
-      //  SIMPLIFIED: No distribution step needed
       const createPayload = {
         formName: form.formName.trim(),
         formDescription: form.formDescription.trim(),
@@ -91,23 +81,15 @@ export default function CreateFeedbackForm() {
         deadline: new Date(form.deadline).toISOString(),
       };
 
-      console.log(" Creating form:", JSON.stringify(createPayload, null, 2));
+      console.log("Creating form:", createPayload);
 
-      const response = await axios.post(
-        `${API_BASE}/HrFeedbackForm/forms/create`,
-        createPayload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await hrFormApi.createForm(createPayload);
 
-      console.log(" Form created:", response.data);
+      console.log("Form created:", response);
 
-      if (response.data?.success || response.status === 200) {
+      if (response?.success || response?.data?.success) {
         setSuccess(
-          ` Form created successfully!\n\n` +
+          `Form created successfully!\n\n` +
             `Form: ${form.formName}\n` +
             `Type: ${
               FORM_TYPES.find((t) => t.value === form.formType)?.label
@@ -115,7 +97,7 @@ export default function CreateFeedbackForm() {
             `Visible to: All Employees`
         );
 
-        // Reset form
+        // Reset form and navigate
         setTimeout(() => {
           setForm({
             formName: "",
@@ -126,10 +108,10 @@ export default function CreateFeedbackForm() {
           navigate("/hr/dashboard/feedback");
         }, 2500);
       } else {
-        setError(response.data?.message || "Failed to create form");
+        setError(response?.message || "Failed to create form");
       }
     } catch (err) {
-      console.error(" Error:", err);
+      console.error("Error:", err);
       setError(
         err?.response?.data?.message ||
           err?.message ||
@@ -139,10 +121,6 @@ export default function CreateFeedbackForm() {
       setLoading(false);
     }
   };
-
-  // ============================================================================
-  // RENDER
-  // ============================================================================
 
   return (
     <div className="container-fluid py-4" style={{ maxWidth: "900px" }}>
@@ -254,6 +232,7 @@ export default function CreateFeedbackForm() {
                 }
                 placeholder="Describe the purpose and goals of this form..."
                 disabled={loading}
+                maxLength={500}
                 style={{ borderRadius: "var(--radius-md)", resize: "vertical" }}
               />
               <small className="text-muted">
@@ -311,6 +290,7 @@ export default function CreateFeedbackForm() {
                     setForm({ ...form, deadline: e.target.value })
                   }
                   disabled={loading}
+                  min={new Date().toISOString().slice(0, 16)}
                   style={{
                     borderRadius: "0 var(--radius-md) var(--radius-md) 0",
                   }}
@@ -328,7 +308,7 @@ export default function CreateFeedbackForm() {
             >
               <div className="d-flex align-items-start gap-2">
                 <div>
-                  <strong>👥 Visibility:</strong>
+                  <strong>Visibility:</strong>
                   <p className="mb-0 small mt-1">
                     This form will be{" "}
                     <strong>automatically visible to all employees</strong> once
@@ -350,8 +330,11 @@ export default function CreateFeedbackForm() {
                   <>
                     <Loader
                       size={18}
-                      className="me-2 spinner-border spinner-border-sm"
-                      style={{ display: "inline" }}
+                      className="me-2"
+                      style={{
+                        display: "inline",
+                        animation: "spin 1s linear infinite",
+                      }}
                     />
                     Creating Form...
                   </>
@@ -376,7 +359,7 @@ export default function CreateFeedbackForm() {
         className="alert alert-light mt-4"
         style={{ border: "1px solid var(--border)" }}
       >
-        <strong>ℹ️ How it works:</strong>
+        <strong>How it works:</strong>
         <ul className="mb-0 mt-2 ps-3">
           <li>Create the form with name, description, type, and deadline</li>
           <li>

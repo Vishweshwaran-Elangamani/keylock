@@ -14,6 +14,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { getDeptHeadApprovedNominations } from "../../../services/performancemanagement/hr/api";
 import "../../../styles/performancemanagement/hr/TopPerformers.css";
 
 export default function TopPerformers() {
@@ -51,16 +52,11 @@ export default function TopPerformers() {
    */
   const fetchNominations = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5253/api/DepartmentHeadNomination/depthead/${deptHeadId}/approved-nominations`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          // Flatten all nominations from grouped data
-          const allNominations = data.data.flatMap(group => group.nominations);
-          setNominations(allNominations);
-        }
+      const response = await getDeptHeadApprovedNominations(deptHeadId);
+      if (response.status === 200 && response.data.success) {
+        // Flatten all nominations from grouped data
+        const allNominations = response.data.data.flatMap(group => group.nominations);
+        setNominations(allNominations);
       }
     } catch (error) {
       console.error("Error fetching nominations:", error);

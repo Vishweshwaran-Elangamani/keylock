@@ -1,8 +1,7 @@
-/* ===== PERIOD ALLOCATION - COMPLETE STYLESHEET ===== */
-
+/* ===== BUDGET ALLOCATION - SCOPED STYLESHEET ===== */
 
 /* Root Container */
-.period-root {
+.budget-root {
   padding: 20px 24px 64px 24px;
   max-width: 1600px;
   margin: 0 auto;
@@ -10,16 +9,14 @@
   min-height: 100vh;
 }
 
-
 /* Alert */
-.period-alert {
+.budget-alert {
   margin-bottom: 20px;
   border-radius: 8px;
 }
 
-
 /* ===== HEADER SECTION ===== */
-.period-header {
+.budget-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -31,13 +28,11 @@
   border: 1px solid #e2e8f0;
 }
 
-
-.period-header-left {
+.budget-header-left {
   flex: 1;
 }
 
-
-.period-title {
+.budget-title {
   font-size: 28px;
   font-weight: 700;
   color: #1e293b;
@@ -47,58 +42,19 @@
   gap: 12px;
 }
 
-
-.period-title i {
-  color: #27235C;
+.budget-title i {
+  color: #27235c;
   font-size: 30px;
 }
 
-
-.period-subtitle {
+.budget-subtitle {
   font-size: 14px;
   color: #64748b;
   margin: 0;
 }
 
-
-.period-header-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-
-.period-btn-export {
-  background: #ffffff;
-  color: #27235C;
-  border: 2px solid #27235C;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-
-.period-btn-export:hover {
-  background: #27235C;
-  color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.25);
-}
-
-
-.period-btn-export i {
-  font-size: 16px;
-}
-
-
-.period-btn-create {
-  background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+.budget-btn-create {
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
   border: none;
   padding: 10px 20px;
@@ -113,171 +69,17 @@
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
 }
 
-
-.period-btn-create:hover {
+.budget-btn-create:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.35);
 }
 
-
-.period-btn-create i {
+.budget-btn-create i {
   font-size: 16px;
 }
 
-
-/* ===== BUDGET SELECTOR ===== */
-.period-budget-selector {
-  background: #ffffff;
-  padding: 20px 24px;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-
-.budget-selector-label {
-  font-size: 15px;
-  font-weight: 700;
-  color: #27235C;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-
-.budget-selector-label i {
-  font-size: 18px;
-}
-
-
-.budget-selector-dropdown {
-  flex: 1;
-  min-width: 300px;
-  padding: 12px 16px;
-  border: 2px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  background: #fff;
-  color: #27235C;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%2327235c" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1.5em 1.5em;
-  padding-right: 2.5rem;
-}
-
-
-.budget-selector-dropdown:hover {
-  border-color: #27235C;
-}
-
-
-.budget-selector-dropdown:focus {
-  outline: none;
-  border-color: #27235C;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.15);
-}
-
-
-/* ===== SUMMARY STATISTICS CARDS ===== */
-.period-summary-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-
-.period-summary-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: all 0.2s ease;
-}
-
-
-.period-summary-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-
-.summary-card-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  flex-shrink: 0;
-}
-
-
-.period-summary-card.total .summary-card-icon {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-  color: #1e40af;
-}
-
-
-.period-summary-card.utilized .summary-card-icon {
-  background: linear-gradient(135deg, #fed7aa, #fdba74);
-  color: #92400e;
-}
-
-
-.period-summary-card.remaining .summary-card-icon {
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  color: #065f46;
-}
-
-
-.period-summary-card.average .summary-card-icon {
-  background: linear-gradient(135deg, #fce7f3, #fbcfe8);
-  color: #be185d;
-}
-
-
-.summary-card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-
-.summary-card-label {
-  font-size: 13px;
-  color: #64748b;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-
-.summary-card-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-
 /* ===== FILTER SECTION ===== */
-.period-filters-container {
+.budget-filters-container {
   background: #fff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
@@ -287,7 +89,6 @@
   animation: fadeIn 0.3s ease-out;
 }
 
-
 .filters-header {
   display: flex;
   justify-content: space-between;
@@ -296,7 +97,6 @@
   padding-bottom: 0.75rem;
   border-bottom: 2px solid #e5e7eb;
 }
-
 
 .filters-title {
   font-size: 1rem;
@@ -308,19 +108,16 @@
   gap: 0.6rem;
 }
 
-
 .filters-title i {
   color: #27235c;
   font-size: 1.1rem;
 }
-
 
 .filters-right-section {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
-
 
 .btn-clear-filters {
   background: none;
@@ -336,12 +133,10 @@
   padding: 0.4rem 0.8rem;
 }
 
-
 .btn-clear-filters:hover {
   background: rgba(239, 68, 68, 0.1);
   border-radius: 6px;
 }
-
 
 .filters-grid {
   display: grid;
@@ -349,13 +144,11 @@
   gap: 1rem;
 }
 
-
 .filter-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-
 
 .filter-label {
   font-size: 0.8rem;
@@ -366,13 +159,11 @@
   margin: 0;
 }
 
-
 .search-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
-
 
 .search-wrapper i {
   position: absolute;
@@ -381,7 +172,6 @@
   font-size: 1rem;
   pointer-events: none;
 }
-
 
 .filter-search {
   width: 100%;
@@ -394,23 +184,19 @@
   transition: all 0.2s ease;
 }
 
-
 .filter-search::placeholder {
   color: #a0aec0;
 }
 
-
 .filter-search:hover {
   border-color: #27235c;
 }
-
 
 .filter-search:focus {
   outline: none;
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.15);
 }
-
 
 .filter-select {
   padding: 0.65rem 0.75rem;
@@ -429,12 +215,10 @@
   padding-right: 2.5rem;
 }
 
-
 .filter-select:hover {
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
-
 
 .filter-select:focus {
   outline: none;
@@ -442,9 +226,8 @@
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.15);
 }
 
-
 /* VIEW TOGGLE */
-.period-view-toggle {
+.budget-view-toggle {
   display: flex;
   gap: 0.5rem;
   background: #f8f9fa;
@@ -452,7 +235,6 @@
   border-radius: 8px;
   border: 1px solid #e5e7eb;
 }
-
 
 .toggle-btn {
   width: 40px;
@@ -469,12 +251,10 @@
   transition: all 0.3s ease;
 }
 
-
 .toggle-btn:hover {
   background: #cbd5e1;
   color: #27235c;
 }
-
 
 .toggle-btn.active {
   background: #27235c !important;
@@ -482,9 +262,8 @@
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
 }
 
-
 /* ===== TABLE CONTAINER ===== */
-.period-table-container {
+.budget-table-container {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -493,18 +272,16 @@
   margin-bottom: 1.25rem;
 }
 
-
-.period-table {
+.budget-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   margin: 0;
 }
 
-
 /* TABLE HEADER */
-.period-table thead th {
-  background: #27235C;
+.budget-table thead th {
+  background: #27235c;
   color: #ffffff;
   font-weight: 600;
   font-size: 13px;
@@ -517,41 +294,13 @@
   vertical-align: middle;
 }
 
-
-.period-sortable-header {
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.2s ease;
-}
-
-
-.period-sortable-header:hover {
-  background: #1a1842 !important;
-}
-
-
-.period-sort-icon {
-  margin-left: 8px;
-  font-size: 12px;
-  opacity: 0.6;
-  transition: all 0.2s ease;
-}
-
-
-.period-sort-icon.active {
-  opacity: 1;
-  color: #fbbf24;
-}
-
-
-.period-table thead th:nth-child(1) {
+.budget-table thead th:nth-child(1) {
   text-align: left;
   padding-left: 24px;
 }
 
-
 /* TABLE BODY */
-.period-table tbody td {
+.budget-table tbody td {
   padding: 14px 16px;
   border-bottom: 1px solid #e2e8f0;
   font-size: 14px;
@@ -560,29 +309,24 @@
   text-align: left;
 }
 
-
-.period-table tbody td:nth-child(1) {
+.budget-table tbody td:nth-child(1) {
   padding-left: 24px;
 }
 
-
-.period-table tbody tr:last-child td {
+.budget-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-
-.period-table tbody tr:hover {
+.budget-table tbody tr:hover {
   background-color: #f8fafc;
 }
 
-
-.period-text-center {
+.budget-text-center {
   text-align: center;
 }
 
-
 /* Progress Bar Container */
-.period-progress-container {
+.budget-progress-container {
   position: relative;
   width: 100%;
   height: 24px;
@@ -591,70 +335,33 @@
   overflow: hidden;
 }
 
-
-.period-progress-bar {
+.budget-progress-bar {
   height: 100%;
   border-radius: 12px;
   transition: width 0.3s ease;
 }
 
-
-.period-progress-text {
+.budget-progress-text {
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 50%
+;
   transform: translate(-50%, -50%);
   font-size: 12px;
   font-weight: 700;
   color: #1e293b;
 }
 
-
-/* Utilization Badges */
-.period-utilization-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-
-.period-utilization-badge.low {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-
-.period-utilization-badge.medium {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-
-.period-utilization-badge.high {
-  background: #fed7aa;
-  color: #92400e;
-}
-
-
-.period-utilization-badge.critical {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-
 /* Action Buttons */
-.period-actions {
+.budget-actions {
   display: flex;
   gap: 8px;
+  justify-content: center;
 }
 
-
-.period-btn-view,
-.period-btn-edit,
-.period-btn-allocate,
-.period-btn-delete {
+.budget-btn-view,
+.budget-btn-edit,
+.budget-btn-delete {
   background: none;
   border: none;
   padding: 6px;
@@ -664,64 +371,39 @@
   transition: all 0.2s ease;
 }
 
-
-.period-btn-view {
+.budget-btn-view {
   color: #3b82f6;
 }
 
-
-.period-btn-view:hover {
+.budget-btn-view:hover {
   background: #dbeafe;
   color: #1e40af;
 }
 
-
-.period-btn-edit {
+.budget-btn-edit {
   color: #f59e0b;
 }
 
-
-.period-btn-edit:hover {
+.budget-btn-edit:hover {
   background: #fed7aa;
   color: #92400e;
 }
 
-
-.period-btn-allocate {
-  color: #10b981;
-}
-
-
-.period-btn-allocate:hover:not(:disabled) {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-
-.period-btn-allocate:disabled {
-  color: #cbd5e1;
-  cursor: not-allowed;
-}
-
-
-.period-btn-delete {
+.budget-btn-delete {
   color: #ef4444;
 }
 
-
-.period-btn-delete:hover {
+.budget-btn-delete:hover {
   background: #fee2e2;
   color: #b91c1c;
 }
 
-
-.period-actions-header {
+.budget-actions-header {
   text-align: center;
 }
 
-
 /* ===== CARD VIEW ===== */
-.period-cards-grid {
+.budget-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.25rem;
@@ -729,8 +411,7 @@
   margin-bottom: 1.25rem;
 }
 
-
-.period-card {
+.budget-card {
   background: #fff;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
@@ -741,15 +422,13 @@
   flex-direction: column;
 }
 
-
-.period-card:hover {
+.budget-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   border-color: #27235c;
 }
 
-
-.period-card-header {
+.budget-card-header {
   padding: 1.1rem 1.3rem;
   background: linear-gradient(135deg, #27235c 0%, #1a1842 100%);
   color: #fff;
@@ -758,8 +437,7 @@
   gap: 0.95rem;
 }
 
-
-.period-card-avatar {
+.budget-card-avatar {
   width: 48px;
   height: 48px;
   border-radius: 10px;
@@ -773,14 +451,12 @@
   border: 2px solid rgba(251, 191, 36, 0.5);
 }
 
-
-.period-card-header-info {
+.budget-card-header-info {
   flex: 1;
   min-width: 0;
 }
 
-
-.period-card-title {
+.budget-card-title {
   font-size: 1rem;
   font-weight: 700;
   margin: 0;
@@ -790,15 +466,13 @@
   text-overflow: ellipsis;
 }
 
-
-.period-card-year {
+.budget-card-year {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.8);
   margin: 0.3rem 0 0 0;
 }
 
-
-.period-card-body {
+.budget-card-body {
   padding: 1.2rem;
   display: flex;
   flex-direction: column;
@@ -806,8 +480,7 @@
   flex: 1;
 }
 
-
-.period-card-row {
+.budget-card-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -816,14 +489,12 @@
   gap: 0.8rem;
 }
 
-
-.period-card-row:last-child {
+.budget-card-row:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
 
-
-.period-card-label {
+.budget-card-label {
   font-size: 0.78rem;
   font-weight: 700;
   color: #6c757d;
@@ -832,8 +503,7 @@
   flex-shrink: 0;
 }
 
-
-.period-card-value {
+.budget-card-value {
   font-size: 0.95rem;
   color: #27235c;
   font-weight: 600;
@@ -841,45 +511,16 @@
   flex: 1;
 }
 
-
-.period-card-notes {
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border-left: 3px solid #27235c;
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  margin-top: 0.5rem;
-}
-
-
-.period-card-notes i {
-  color: #27235c;
-  font-size: 1rem;
-  margin-top: 0.1rem;
-  flex-shrink: 0;
-}
-
-
-.period-card-notes span {
-  font-size: 0.85rem;
-  color: #64748b;
-  line-height: 1.5;
-}
-
-
-.period-card-actions {
+.budget-card-actions {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   padding: 1rem 1.2rem;
   background: #f8fafc;
   border-top: 1px solid #e5e7eb;
 }
 
-
-.period-btn-card-action {
+.budget-btn-card-action {
   padding: 0.6rem;
   border: none;
   border-radius: 6px;
@@ -894,68 +535,38 @@
   color: #fff;
 }
 
-
-.period-btn-card-action:hover:not(:disabled) {
+.budget-btn-card-action:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-
-.period-btn-card-action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-
-.period-btn-card-action i {
+.budget-btn-card-action i {
   font-size: 1rem;
 }
 
-
-.period-btn-card-action span {
-  display: inline;
-}
-
-
-.period-btn-card-action.period-btn-view {
+.budget-btn-card-action.budget-btn-view {
   background: #3b82f6;
 }
 
-
-.period-btn-card-action.period-btn-view:hover {
+.budget-btn-card-action.budget-btn-view:hover {
   background: #2563eb;
 }
 
-
-.period-btn-card-action.period-btn-edit {
+.budget-btn-card-action.budget-btn-edit {
   background: #f59e0b;
 }
 
-
-.period-btn-card-action.period-btn-edit:hover {
+.budget-btn-card-action.budget-btn-edit:hover {
   background: #d97706;
 }
 
-
-.period-btn-card-action.period-btn-allocate {
-  background: #10b981;
-}
-
-
-.period-btn-card-action.period-btn-allocate:hover:not(:disabled) {
-  background: #059669;
-}
-
-
-.period-btn-card-action.period-btn-delete {
+.budget-btn-card-action.budget-btn-delete {
   background: #ef4444;
 }
 
-
-.period-btn-card-action.period-btn-delete:hover {
+.budget-btn-card-action.budget-btn-delete:hover {
   background: #dc2626;
 }
-
 
 /* ===== PAGINATION ===== */
 .pagination-container {
@@ -971,13 +582,11 @@
   flex-wrap: wrap;
 }
 
-
 .pagination-left {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
-
 
 .pagination-label {
   font-size: 0.875rem;
@@ -986,7 +595,6 @@
   margin: 0;
   white-space: nowrap;
 }
-
 
 .pagination-select {
   padding: 0.5rem 0.75rem;
@@ -1005,11 +613,9 @@
   padding-right: 2rem;
 }
 
-
 .pagination-select:hover {
   border-color: #27235c;
 }
-
 
 .pagination-select:focus {
   outline: none;
@@ -1017,13 +623,11 @@
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-
 .pagination-center {
   flex: 1;
   text-align: center;
   min-width: 300px;
 }
-
 
 .pagination-info {
   font-size: 0.9rem;
@@ -1032,13 +636,11 @@
   display: inline-block;
 }
 
-
 .pagination-right {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-
 
 .pagination-btn {
   padding: 0.6rem 0.9rem;
@@ -1055,14 +657,12 @@
   transition: all 0.2s ease;
 }
 
-
 .pagination-btn:hover:not(:disabled) {
   background: #1a1842;
   border-color: #1a1842;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(39, 35, 92, 0.2);
 }
-
 
 .pagination-btn:disabled {
   background: #cbd5e1;
@@ -1071,12 +671,10 @@
   cursor: not-allowed;
 }
 
-
 .pagination-numbers {
   display: flex;
   gap: 0.5rem;
 }
-
 
 .pagination-number {
   width: 36px;
@@ -1095,12 +693,10 @@
   justify-content: center;
 }
 
-
 .pagination-number:hover {
   background: #e5e7eb;
   border-color: #27235c;
 }
-
 
 .pagination-number.active {
   background: #27235c;
@@ -1108,9 +704,8 @@
   border-color: #27235c;
 }
 
-
 /* ===== EMPTY STATE ===== */
-.period-alert-empty {
+.budget-alert-empty {
   text-align: center;
   padding: 60px 20px;
   background: #fff;
@@ -1119,43 +714,37 @@
   color: #94a3b8;
 }
 
-
-.period-alert-empty i {
+.budget-alert-empty i {
   font-size: 64px;
   color: #cbd5e1;
   margin-bottom: 16px;
   display: block;
 }
 
-
-.period-alert-empty p {
+.budget-alert-empty p {
   font-size: 16px;
   margin-bottom: 0;
   color: #64748b;
 }
 
-
 /* ===== LOADING STATE ===== */
-.period-loading-container {
+.budget-loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 80px 20px;
   gap: 16px;
-  min-height: 100vh;
-  background: #f8f9fc;
+  min-height: 400px;
 }
 
-
-.period-loading-container p {
+.budget-loading-container p {
   color: #64748b;
   font-size: 14px;
 }
 
-
 /* ===== BLUR BACKDROP ===== */
-.period-blur-backdrop {
+.budget-blur-backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -1164,9 +753,7 @@
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(4px);
   z-index: 1040;
-  display: none;
 }
-
 
 /* ===== ANIMATIONS ===== */
 @keyframes fadeIn {
@@ -1180,76 +767,43 @@
   }
 }
 
-
-.period-table-container,
-.period-cards-grid,
-.period-filters-container,
-.period-summary-cards {
-  animation: fadeIn 0.3s ease-out;
-}
-
-
 /* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 1200px) {
-  .period-summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .period-table-container {
-    overflow-x: auto;
-  }
-
-  .period-table {
-    min-width: 1000px;
-  }
-}
-
-
 @media (max-width: 768px) {
-  .period-root {
+  .budget-root {
     padding: 16px 12px 48px 12px;
   }
 
-  .period-header {
+  .budget-header {
     flex-direction: column;
     align-items: stretch;
     gap: 16px;
     padding: 20px;
   }
 
-  .period-header-left {
+  .budget-header-left {
     text-align: center;
   }
 
-  .period-header-actions {
-    flex-direction: column;
-  }
-
-  .period-btn-export,
-  .period-btn-create {
+  .budget-btn-create {
     width: 100%;
     justify-content: center;
   }
 
-  .period-title {
+  .budget-title {
     font-size: 24px;
     justify-content: center;
-  }
-
-  .period-summary-cards {
-    grid-template-columns: 1fr;
   }
 
   .filters-grid {
     grid-template-columns: 1fr;
   }
 
-  .period-cards-grid {
+  .budget-cards-grid {
     grid-template-columns: 1fr;
   }
 
-  .period-card-actions {
-    grid-template-columns: repeat(2, 1fr);
+  .budget-card-actions {
+    grid-template-columns: repeat(3, 1fr);
   }
 
   .pagination-container {
@@ -1268,89 +822,27 @@
     min-width: auto;
   }
 
-  .period-table thead th,
-  .period-table tbody td {
-    padding: 12px 8px;
-    font-size: 12px;
+  .budget-table-container {
+    overflow-x: auto;
   }
 
-  .period-budget-selector {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .budget-selector-dropdown {
-    min-width: 100%;
+  .budget-table {
+    min-width: 900px;
   }
 }
 
-
 @media (max-width: 576px) {
-  .period-root {
+  .budget-root {
     padding: 12px 8px 40px 8px;
   }
 
-  .period-title {
+  .budget-title {
     font-size: 20px;
     flex-direction: column;
     gap: 8px;
   }
 
-  .period-subtitle {
+  .budget-subtitle {
     font-size: 12px;
-  }
-
-  .pagination-info {
-    font-size: 0.8rem;
-  }
-
-  .pagination-btn {
-    font-size: 0.75rem;
-    padding: 0.5rem 0.6rem;
-  }
-
-  .pagination-number {
-    width: 28px;
-    height: 28px;
-    font-size: 0.7rem;
-  }
-
-  .period-btn-card-action span {
-    display: none;
-  }
-
-  .period-card-actions {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-
-/* ===== PRINT STYLES ===== */
-@media print {
-  .period-root {
-    padding: 0;
-    background: #ffffff;
-  }
-
-  .period-header,
-  .period-filters-container,
-  .period-budget-selector,
-  .pagination-container,
-  .period-blur-backdrop {
-    display: none;
-  }
-
-  .period-table-container {
-    box-shadow: none;
-    border: 1px solid #000;
-  }
-
-  .period-table {
-    font-size: 12px;
-  }
-
-  .period-table thead th {
-    background: #333;
-    color: #fff;
   }
 }

@@ -1,3 +1,5 @@
+// src/pages/employee/EmployeeDashboard.jsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -7,7 +9,6 @@ import {
   Send,
   Search,
   Eye,
-  User,
   Zap,
   Star,
   Users,
@@ -15,13 +16,14 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import {
   peerQueueApi,
   smeApi,
+  hrFormApi,
+  managerReviewApi,
+  employeeApi,
+  mentorFeedbackApi,
 } from "../../services/feedbackmanagement/feedbackApi";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
 
 const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
   <div
@@ -74,7 +76,7 @@ const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
   </div>
 );
 
-export default function EmployeeDashboard() {
+export default function FeedbackEmployeeDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -97,28 +99,32 @@ export default function EmployeeDashboard() {
   const [isMentor, setIsMentor] = useState(false);
   const [mentorFeedbackCount, setMentorFeedbackCount] = useState(0);
 
+  // Check if user is a mentor using service
   const checkIfMentor = async () => {
     try {
       const empId = user?.empId || user?.employeeId || 1004;
 
       const smeResponse = await smeApi.getActive();
 
-      if (smeResponse.data?.success && Array.isArray(smeResponse.data.data)) {
-        const isSme = smeResponse.data.data.some(
-          (sme) => sme.employeeId === empId
+      const smeData = Array.isArray(smeResponse?.data)
+        ? smeResponse.data
+        : smeResponse?.data?.data || [];
+
+      if (Array.isArray(smeData)) {
+        const isSme = smeData.some(
+          (sme) => Number(sme.employeeId) === Number(empId)
         );
         setIsMentor(isSme);
 
         if (isSme) {
           try {
-            const feedbackResponse = await axios.get(
-              `${API_BASE}/mentorfeedback/about-me/${empId}`
-            );
-            if (
-              feedbackResponse.data?.success &&
-              Array.isArray(feedbackResponse.data.data)
-            ) {
-              setMentorFeedbackCount(feedbackResponse.data.data.length);
+            const feedbackResponse = await mentorFeedbackApi.getAboutMe(empId);
+            const feedbackData = Array.isArray(feedbackResponse?.data)
+              ? feedbackResponse.data
+              : feedbackResponse?.data?.data || [];
+
+            if (Array.isArray(feedbackData)) {
+              setMentorFeedbackCount(feedbackData.length);
             }
           } catch (err) {
             console.warn("Error fetching mentor feedback count:", err.message);
@@ -130,6 +136,7 @@ export default function EmployeeDashboard() {
     }
   };
 
+  // Fetch dashboard data using services
   const fetchDashboardData = async () => {
     setLoading(true);
     setError("");
@@ -139,11 +146,17 @@ export default function EmployeeDashboard() {
 
       await checkIfMentor();
 
+      // Fetch employee map
       let empMap = {};
       try {
-        const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
-        if (empRes.data?.success && Array.isArray(empRes.data.data)) {
-          empRes.data.data.forEach((emp) => {
+        const empRes = await employeeApi.getAll();
+
+        if (empRes?.data) {
+          const employees = Array.isArray(empRes.data)
+            ? empRes.data
+            : empRes.data.data || [];
+
+          employees.forEach((emp) => {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
           });
           setEmployeeMap(empMap);
@@ -152,44 +165,45 @@ export default function EmployeeDashboard() {
         console.warn("Error fetching employee map:", err.message);
       }
 
+      // Fetch active HR forms
       try {
-        const activeRes = await axios.get(
-          `${API_BASE}/HrFeedbackForm/forms/active`
-        );
-        if (activeRes.data?.success) {
-          setActiveHrForms(activeRes.data.data || []);
-        }
+        const activeRes = await hrFormApi.getActiveForms();
+        const formsData = activeRes?.data || [];
+        setActiveHrForms(Array.isArray(formsData) ? formsData : []);
       } catch (err) {
         console.warn("Error fetching active forms:", err.message);
       }
 
+      // Fetch submitted forms
       try {
-        const submittedRes = await axios.get(
-          `${API_BASE}/HrFeedbackForm/responses/by-employee/${empId}`
-        );
-        if (submittedRes.data?.success) {
-          setSubmittedForms(submittedRes.data.data || []);
-        }
+        const submittedRes = await hrFormApi.getResponsesByEmployee(empId);
+        const responsesData = submittedRes?.data || [];
+        setSubmittedForms(Array.isArray(responsesData) ? responsesData : []);
       } catch (err) {
         console.warn("Error fetching submitted forms:", err.message);
       }
 
+      // Fetch my reviews
       try {
-        const reviewRes = await axios.get(
-          `${API_BASE}/ManagerReview/target/${empId}`
-        );
-        if (reviewRes.data?.success && Array.isArray(reviewRes.data.data)) {
-          setMyReviews(reviewRes.data.data);
-        }
+        const reviewRes = await managerReviewApi.getByTargetEmployee(empId);
+        const reviewsData = Array.isArray(reviewRes?.data)
+          ? reviewRes.data
+          : reviewRes?.data?.data || [];
+        setMyReviews(reviewsData);
       } catch (err) {
         console.warn("Error fetching my reviews:", err.message);
       }
 
+      // Fetch peer feedback
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
-        if (Array.isArray(peerRes.data?.data)) {
-          const myFeedback = peerRes.data.data
-            .filter((p) => p.recipientEmployeeId === empId)
+        const peerData = Array.isArray(peerRes?.data)
+          ? peerRes.data
+          : peerRes?.data?.data || [];
+
+        if (Array.isArray(peerData)) {
+          const myFeedback = peerData
+            .filter((p) => Number(p.recipientEmployeeId) === Number(empId))
             .map((p) => ({
               ...p,
               submittedByName:
@@ -209,16 +223,19 @@ export default function EmployeeDashboard() {
     }
   };
 
+  // Load data on mount
   useEffect(() => {
     fetchDashboardData();
   }, [user?.empId]);
 
+  // Refresh handler
   const refresh = async () => {
     setRefreshing(true);
     await fetchDashboardData();
     setRefreshing(false);
   };
 
+  // Calculate stats
   const stats = useMemo(() => {
     const submittedFormIds = new Set(submittedForms.map((f) => f.formId));
     const pending = activeHrForms.filter(
@@ -258,6 +275,7 @@ export default function EmployeeDashboard() {
     ];
   }, [activeHrForms, submittedForms, myReviews, myPeerFeedback]);
 
+  // Loading state
   if (loading) {
     return (
       <div
@@ -284,7 +302,7 @@ export default function EmployeeDashboard() {
         backgroundColor: "#f8f9fa",
       }}
     >
-      {/* HEADER */}
+      {/* Header */}
       <div className="d-flex justify-content-between align-items-start mb-3">
         <div>
           <div className="d-flex align-items-center gap-2 mb-1">
@@ -340,7 +358,7 @@ export default function EmployeeDashboard() {
         </button>
       </div>
 
-      {/* ERROR ALERT */}
+      {/* Error Alert */}
       {error && (
         <div
           className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -373,7 +391,7 @@ export default function EmployeeDashboard() {
         </div>
       )}
 
-      {/* STATS CARDS */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-3">
         {stats.map((s, idx) => (
           <div key={idx} className="col-lg-3 col-md-6">
@@ -382,7 +400,7 @@ export default function EmployeeDashboard() {
         ))}
       </div>
 
-      {/* TABS */}
+      {/* Tabs */}
       <div
         style={{
           backgroundColor: "#27235c",
@@ -443,7 +461,7 @@ export default function EmployeeDashboard() {
         </ul>
       </div>
 
-      {/* CONTENT AREA */}
+      {/* Content Area */}
       <div
         style={{
           backgroundColor: "#fff",
@@ -452,7 +470,7 @@ export default function EmployeeDashboard() {
           padding: "1.5rem",
         }}
       >
-        {/* OVERVIEW TAB - QUICK ACTIONS */}
+        {/* Overview Tab - Quick Actions */}
         {activeTab === "overview" && (
           <div className="row g-3">
             {/* Mentor Feedback */}
@@ -632,7 +650,7 @@ export default function EmployeeDashboard() {
               </Link>
             </div>
 
-            {/* Peer Feedback Received */}
+            {/* Peer Feedback */}
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/submit-peer"
@@ -833,7 +851,7 @@ export default function EmployeeDashboard() {
           </div>
         )}
 
-        {/* PEER FEEDBACK TAB */}
+        {/* Peer Feedback Tab */}
         {activeTab === "peer-feedback" && (
           <div>
             <h5
@@ -917,7 +935,8 @@ export default function EmployeeDashboard() {
                             fontSize: "0.875rem",
                           }}
                         >
-                          {feedback.comment ||
+                          {feedback.feedbackContent ||
+                            feedback.comment ||
                             feedback.feedbackComment ||
                             "No comment provided"}
                         </p>

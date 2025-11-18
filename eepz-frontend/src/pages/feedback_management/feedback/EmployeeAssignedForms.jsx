@@ -1,3 +1,5 @@
+// src/pages/feedback_management/feedback/EmployeeAssignedForms.jsx
+
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   RefreshCw,
@@ -9,9 +11,7 @@ import {
   Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import { hrFormApi, dateHelpers } from "../../../services/feedbackmanagement/feedbackApi";
 
 export default function EmployeeAssignedForms() {
   const user = useMemo(
@@ -25,7 +25,7 @@ export default function EmployeeAssignedForms() {
   const [error, setError] = useState("");
   const [lastFetchTime, setLastFetchTime] = useState(null);
 
-  // Fetch ALL forms (no server-side status filter)
+  // Fetch ALL forms using existing hrFormApi
   const fetchForms = useCallback(
     async (retryCount = 0) => {
       if (!user?.empId) {
@@ -35,13 +35,18 @@ export default function EmployeeAssignedForms() {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get(`${API_BASE}/HrFeedbackForm/forms`, {
-          timeout: 10000,
-          headers: { Accept: "application/json" },
-        });
-        if (res.status === 200 && Array.isArray(res.data?.data)) {
-          // Optional: sort newest first
-          const sorted = [...res.data.data].sort(
+        const response = await hrFormApi.listForms();
+        
+        if (response?.data?.data && Array.isArray(response.data.data)) {
+          // Sort newest first
+          const sorted = [...response.data.data].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setAllForms(sorted);
+          setLastFetchTime(new Date().toLocaleTimeString());
+        } else if (Array.isArray(response?.data)) {
+          // Handle direct array response
+          const sorted = [...response.data].sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
           setAllForms(sorted);
@@ -51,13 +56,20 @@ export default function EmployeeAssignedForms() {
         }
       } catch (err) {
         let msg = "Failed to load forms.";
-        if (err.response?.status === 404)
-          msg = "Endpoint not found: /HrFeedbackForm/forms";
-        else if (err.code === "ECONNABORTED")
-          msg = "Request timeout. Try again.";
-        else msg = err.response?.data?.message || err.message || msg;
+        
+        if (err.response?.status === 404) {
+          msg = "Endpoint not found. Please contact support.";
+        } else if (err.code === "ECONNABORTED" || err.message?.includes('timeout')) {
+          msg = "Request timeout. Please try again.";
+        } else {
+          msg = err.response?.data?.message || err.message || msg;
+        }
+        
         setError(msg);
+        
+        // Retry once for server errors (5xx)
         if (retryCount < 1 && err.response?.status >= 500) {
+          console.log(`🔄 Retrying... (attempt ${retryCount + 1})`);
           setTimeout(() => fetchForms(retryCount + 1), 2000);
         }
       } finally {
@@ -67,23 +79,25 @@ export default function EmployeeAssignedForms() {
     [user?.empId]
   );
 
-  // Fetch submitted forms for user (to disable action)
+  // Fetch submitted forms by employee
   const fetchSubmittedForms = useCallback(async () => {
     if (!user?.empId) return;
     try {
-      const res = await axios.get(
-        `${API_BASE}/HrFeedbackForm/responses/by-employee/${user.empId}`,
-        {
-          timeout: 8000,
-        }
-      );
-      if (res.status === 200 && Array.isArray(res.data?.data)) {
-        setSubmittedFormIds(new Set(res.data.data.map((r) => r.formId)));
+      // Assuming you have a byEmployee endpoint similar to byForm
+      // If not, you may need to add this to your hrFormApi
+      const response = await hrFormApi.byEmployee?.(user.empId);
+      
+      if (response?.data?.data && Array.isArray(response.data.data)) {
+        setSubmittedFormIds(new Set(response.data.data.map((r) => r.formId)));
+      } else if (Array.isArray(response?.data)) {
+        setSubmittedFormIds(new Set(response.data.map((r) => r.formId)));
       } else {
         setSubmittedFormIds(new Set());
       }
-    } catch {
-      // non-blocking
+    } catch (error) {
+      // Non-blocking error - just log it
+      console.warn('⚠️ Could not fetch submitted forms:', error);
+      setSubmittedFormIds(new Set());
     }
   }, [user?.empId]);
 
@@ -91,14 +105,17 @@ export default function EmployeeAssignedForms() {
     if (user?.empId) {
       fetchForms();
       fetchSubmittedForms();
+      
+      // Auto-refresh every 30 seconds
       const interval = setInterval(() => {
         fetchForms();
       }, 30000);
+      
       return () => clearInterval(interval);
     }
   }, [user?.empId, fetchForms, fetchSubmittedForms]);
 
-  // Stats without status
+  // Calculate stats
   const stats = useMemo(() => {
     const submitted = submittedFormIds.size;
     const total = allForms.length;
@@ -134,7 +151,7 @@ export default function EmployeeAssignedForms() {
             className="fw-bold mb-1"
             style={{ color: "var(--color-primary-1)" }}
           >
-            All Forms
+            📋 All Forms
           </h3>
           <p className="mb-0 small text-muted">
             Every form is listed here regardless of its status
@@ -156,7 +173,7 @@ export default function EmployeeAssignedForms() {
         </button>
       </div>
 
-      {/* Error */}
+      {/* Error Alert */}
       {error && (
         <div
           className="alert alert-warning alert-dismissible fade show mb-4"
@@ -177,7 +194,7 @@ export default function EmployeeAssignedForms() {
         </div>
       )}
 
-      {/* Simple stats (no status-based counts) */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-4">
         <div className="col-6 col-md-4">
           <div
@@ -218,7 +235,7 @@ export default function EmployeeAssignedForms() {
         </div>
       </div>
 
-      {/* Loading */}
+      {/* Loading State */}
       {loading ? (
         <div className="text-center py-5">
           <Loader
@@ -262,6 +279,12 @@ export default function EmployeeAssignedForms() {
                   year: "numeric",
                 })
               : "—";
+            
+            // Use your existing dateHelpers for urgency
+            const urgencyInfo = form.deadline 
+              ? dateHelpers.urgency(form.deadline) 
+              : null;
+
             return (
               <div key={form.formId} className="col-md-6 col-lg-4">
                 <div
@@ -290,6 +313,18 @@ export default function EmployeeAssignedForms() {
                       >
                         {form.formName}
                       </h6>
+                      {urgencyInfo && (
+                        <span
+                          className="badge"
+                          style={{
+                            backgroundColor: urgencyInfo.color,
+                            color: "#fff",
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {urgencyInfo.icon} {urgencyInfo.status}
+                        </span>
+                      )}
                     </div>
 
                     {/* Description */}
@@ -317,7 +352,7 @@ export default function EmployeeAssignedForms() {
                       <div className="fw-bold small">{deadlineStr}</div>
                     </div>
 
-                    {/* Action */}
+                    {/* Action Button */}
                     <div className="d-grid">
                       {isSubmitted ? (
                         <button

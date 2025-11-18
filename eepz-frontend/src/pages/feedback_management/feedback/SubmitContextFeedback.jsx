@@ -1,3 +1,5 @@
+// src/pages/feedback_management/feedback/SubmitContextFeedback.jsx
+
 import React, { useEffect, useMemo, useState } from "react";
 import {
   CheckCircle,
@@ -13,24 +15,20 @@ import { useNavigate } from "react-router-dom";
 import {
   orgGoalFeedbackApi,
   peerQueueApi,
+  employeeApi,
+  goalsApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function SubmitContextFeedback() {
   const navigate = useNavigate();
+  
+  // Get logged-in user from localStorage
   const user = useMemo(
-    () =>
-      JSON.parse(localStorage.getItem("user") || "{}") || {
-        empId: 1004,
-        name: "Dave Dev",
-      },
+    () => JSON.parse(localStorage.getItem("user") || "{}") || {},
     []
   );
 
   const [activeTab, setActiveTab] = useState("goal");
-
   const [goalForm, setGoalForm] = useState({
     organizationObjectiveId: "",
     objectiveTitle: "",
@@ -38,7 +36,6 @@ export default function SubmitContextFeedback() {
     feedbackComments: "",
     isAnonymous: false,
   });
-
   const [contextForm, setContextForm] = useState({
     recipientEmployeeId: "",
     recipientName: "",
@@ -46,7 +43,6 @@ export default function SubmitContextFeedback() {
     feedbackContent: "",
     isAnonymous: false,
   });
-
   const [objectives, setObjectives] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -54,24 +50,49 @@ export default function SubmitContextFeedback() {
   const [successMsg, setSuccessMsg] = useState("");
   const [error, setError] = useState("");
 
+  // Fetch goals and employees on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoadingData(true);
+        setError("");
 
-        const objResponse = await fetch(`${API_BASE}/Orgwideobjectives`);
-        if (objResponse.ok) {
-          const objData = await objResponse.json();
-          setObjectives(objData.data || []);
+        // Fetch organization-level goals
+        try {
+          const goalsResponse = await goalsApi.getOrganizationLevel();
+          
+          let goalsList = [];
+          
+          // Handle different response structures
+          if (Array.isArray(goalsResponse.data)) {
+            goalsList = goalsResponse.data;
+          } else if (goalsResponse.data?.data && Array.isArray(goalsResponse.data.data)) {
+            goalsList = goalsResponse.data.data;
+          } else if (goalsResponse.data?.$values && Array.isArray(goalsResponse.data.$values)) {
+            goalsList = goalsResponse.data.$values;
+          }
+          
+          setObjectives(goalsList);
+        } catch (goalsError) {
+          console.error("Failed to fetch goals:", goalsError);
+          setObjectives([]);
         }
 
-        const empResponse = await fetch(`${API_BASE}/EmployeeManagement/all`);
-        if (empResponse.ok) {
-          const empData = await empResponse.json();
-          setEmployees(empData.data || []);
+        // Fetch employees
+        try {
+          const empResponse = await employeeApi.getAll();
+          const employeesList = Array.isArray(empResponse.data) 
+            ? empResponse.data 
+            : empResponse.data?.data || empResponse.data?.$values || [];
+          setEmployees(employeesList);
+        } catch (empError) {
+          console.error("Failed to fetch employees:", empError);
+          setError("Failed to load employees. Please refresh the page.");
+          setEmployees([]);
         }
+
       } catch (err) {
-        console.error("Error fetching data:", err);
+        console.error("Error in fetchData:", err);
         setError("Failed to load data. Please refresh the page.");
       } finally {
         setLoadingData(false);
@@ -81,28 +102,35 @@ export default function SubmitContextFeedback() {
     fetchData();
   }, []);
 
+  // Handle goal selection
   const handleObjectiveChange = (e) => {
     const selectedId = Number(e.target.value);
+    
     const selectedObjective = objectives.find(
-      (obj) => obj.objectiveId === selectedId
+      (obj) => {
+        const objId = obj.goalId || obj.objectiveId || obj.id;
+        return objId === selectedId;
+      }
     );
+    
     setGoalForm({
       ...goalForm,
       organizationObjectiveId: selectedId,
-      objectiveTitle: selectedObjective?.title || "",
+      objectiveTitle: selectedObjective?.goalName || 
+                     selectedObjective?.title || 
+                     selectedObjective?.name || 
+                     selectedObjective?.goalTitle || "",
     });
   };
 
+  // Submit goal feedback
   const submitGoal = async (e) => {
     e.preventDefault();
     setSuccessMsg("");
     setError("");
 
-    if (
-      !goalForm.organizationObjectiveId ||
-      !goalForm.feedbackComments?.trim()
-    ) {
-      setError("Objective and comments are required.");
+    if (!goalForm.organizationObjectiveId || !goalForm.feedbackComments?.trim()) {
+      setError("Goal and comments are required.");
       return;
     }
 
@@ -130,7 +158,7 @@ export default function SubmitContextFeedback() {
       });
       setTimeout(() => setSuccessMsg(""), 5000);
     } catch (err) {
-      console.error("Goal feedback error:", err);
+      console.error("Goal feedback submission error:", err);
       setError(
         err?.response?.data?.message ||
           err.message ||
@@ -141,6 +169,7 @@ export default function SubmitContextFeedback() {
     }
   };
 
+  // Handle employee selection
   const handleEmployeeChange = (e) => {
     const selectedId = Number(e.target.value);
     const selectedEmployee = employees.find(
@@ -155,6 +184,7 @@ export default function SubmitContextFeedback() {
     });
   };
 
+  // Submit context feedback
   const submitContext = async (e) => {
     e.preventDefault();
     setSuccessMsg("");
@@ -174,6 +204,7 @@ export default function SubmitContextFeedback() {
       const contextPrefix = contextForm.projectContext
         ? `[${contextForm.projectContext}] `
         : "";
+      
       const peerPayload = {
         submittedByEmployeeId: Number(user?.empId),
         recipientEmployeeId: Number(contextForm.recipientEmployeeId),
@@ -183,32 +214,33 @@ export default function SubmitContextFeedback() {
 
       const createResponse = await peerQueueApi.create(peerPayload);
 
-      if (createResponse.data?.success) {
-        const queueId = createResponse.data?.data?.queueId;
+      if (createResponse?.data?.success || createResponse?.success) {
+        const queueId = createResponse.data?.data?.queueId || 
+                       createResponse.data?.queueId;
 
         if (!queueId) {
-          throw new Error("Queue ID not returned");
+          throw new Error("Queue ID not returned from server");
         }
 
-        const approveResponse = await axios.post(
-          `${API_BASE}/PeerFeedbackQueue/${queueId}/approve`,
-          null,
-          {
-            params: {
-              isProfessional: true,
-              isRelevant: true,
-              approvedByHRId: Number(user?.empId),
-            },
-            headers: { "Content-Type": "application/json" },
-            timeout: 10000,
-          }
-        );
+        // Attempt auto-approval
+        try {
+          const approveResponse = await peerQueueApi.approve(queueId, {
+            isProfessional: true,
+            isRelevant: true,
+            approvedByHRId: Number(user?.empId),
+          });
 
-        if (approveResponse.data?.success || approveResponse.status === 200) {
-          setSuccessMsg(
-            `Context feedback submitted successfully for ${contextForm.recipientName}!`
-          );
-        } else {
+          if (approveResponse?.success || approveResponse?.data?.success) {
+            setSuccessMsg(
+              `Context feedback submitted successfully for ${contextForm.recipientName}!`
+            );
+          } else {
+            setSuccessMsg(
+              `Context feedback submitted to ${contextForm.recipientName}, pending approval.`
+            );
+          }
+        } catch (approveErr) {
+          console.warn("Auto-approval failed, feedback queued:", approveErr);
           setSuccessMsg(
             `Context feedback submitted to ${contextForm.recipientName}, pending approval.`
           );
@@ -224,11 +256,13 @@ export default function SubmitContextFeedback() {
         setTimeout(() => setSuccessMsg(""), 5000);
       } else {
         setError(
-          createResponse.data?.message || "Failed to submit context feedback"
+          createResponse?.data?.message ||
+          createResponse?.message ||
+          "Failed to submit context feedback"
         );
       }
     } catch (err) {
-      console.error("Context feedback error:", err);
+      console.error("Context feedback submission error:", err);
       setError(
         err?.response?.data?.message ||
           err.message ||
@@ -239,13 +273,19 @@ export default function SubmitContextFeedback() {
     }
   };
 
+  // Get selected goal/employee for display
   const selectedObjective = objectives.find(
-    (obj) => obj.objectiveId == goalForm.organizationObjectiveId
+    (obj) => {
+      const objId = obj.goalId || obj.objectiveId || obj.id;
+      return objId == goalForm.organizationObjectiveId;
+    }
   );
+  
   const selectedEmployee = employees.find(
     (emp) => emp.employeeId == contextForm.recipientEmployeeId
   );
 
+  // Render star rating
   const renderStars = (rating) => {
     return [...Array(5)].map((_, index) => {
       const starValue = index + 1;
@@ -263,6 +303,16 @@ export default function SubmitContextFeedback() {
     });
   };
 
+  // Helper function to get goal display name
+  const getGoalDisplayName = (goal) => {
+    return goal.goalName || 
+           goal.title || 
+           goal.name || 
+           goal.goalTitle || 
+           goal.objectiveName ||
+           `Untitled Goal`;
+  };
+
   return (
     <div
       style={{
@@ -272,7 +322,7 @@ export default function SubmitContextFeedback() {
         backgroundColor: "#f8f9fa",
       }}
     >
-      {/* BACK BUTTON & HEADER */}
+      {/* Header with back button */}
       <div className="d-flex align-items-center gap-3 mb-3">
         <button
           className="btn d-flex align-items-center justify-content-center"
@@ -317,7 +367,7 @@ export default function SubmitContextFeedback() {
         </div>
       </div>
 
-      {/* ALERTS */}
+      {/* Error alert */}
       {error && (
         <div
           className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -351,6 +401,7 @@ export default function SubmitContextFeedback() {
         </div>
       )}
 
+      {/* Success alert */}
       {successMsg && (
         <div
           className="alert alert-success d-flex align-items-center gap-2 mb-3"
@@ -382,7 +433,7 @@ export default function SubmitContextFeedback() {
         </div>
       )}
 
-      {/* TAB SELECTOR */}
+      {/* Tab selector */}
       <div className="d-flex gap-2 mb-3" style={{ maxWidth: "900px" }}>
         <button
           type="button"
@@ -423,7 +474,7 @@ export default function SubmitContextFeedback() {
         </button>
       </div>
 
-      {/* LOADING STATE */}
+      {/* Loading state */}
       {loadingData && (
         <div
           className="card border-0 shadow-sm"
@@ -448,7 +499,7 @@ export default function SubmitContextFeedback() {
         </div>
       )}
 
-      {/* GOAL FORM */}
+      {/* Goal feedback form */}
       {!loadingData && activeTab === "goal" && (
         <div
           className="card border-0 shadow-sm"
@@ -456,13 +507,12 @@ export default function SubmitContextFeedback() {
         >
           <div className="card-body" style={{ padding: "1.5rem" }}>
             <form onSubmit={submitGoal}>
-              {/* SELECT OBJECTIVE */}
               <div className="mb-4">
                 <label
                   className="form-label fw-semibold mb-2"
                   style={{ fontSize: "0.875rem", color: "#0f172a" }}
                 >
-                  Select Objective <span className="text-danger">*</span>
+                  Select Organization Goal <span className="text-danger">*</span>
                 </label>
                 <select
                   className="form-select"
@@ -476,16 +526,24 @@ export default function SubmitContextFeedback() {
                     padding: "0.625rem 0.875rem",
                   }}
                 >
-                  <option value="">Choose an objective...</option>
-                  {objectives.map((obj) => (
-                    <option key={obj.objectiveId} value={obj.objectiveId}>
-                      {obj.title}
-                    </option>
-                  ))}
+                  <option value="">Choose a goal...</option>
+                  {objectives.map((obj) => {
+                    const objId = obj.goalId || obj.objectiveId || obj.id;
+                    const objName = getGoalDisplayName(obj);
+                    return (
+                      <option key={objId} value={objId}>
+                        {objName}
+                      </option>
+                    );
+                  })}
                 </select>
+                {objectives.length === 0 && (
+                  <small className="text-muted d-block mt-1">
+                    No organization goals available
+                  </small>
+                )}
               </div>
 
-              {/* OBJECTIVE DESCRIPTION */}
               {selectedObjective && (
                 <div
                   className="mb-4 p-3"
@@ -502,7 +560,7 @@ export default function SubmitContextFeedback() {
                       marginBottom: "0.25rem",
                     }}
                   >
-                    Description
+                    Goal Description
                   </div>
                   <p
                     style={{
@@ -511,12 +569,14 @@ export default function SubmitContextFeedback() {
                       marginBottom: 0,
                     }}
                   >
-                    {selectedObjective.description}
+                    {selectedObjective.description || 
+                     selectedObjective.goalDescription || 
+                     selectedObjective.objectiveDescription ||
+                     "No description available"}
                   </p>
                 </div>
               )}
 
-              {/* RATING WITH STARS */}
               <div className="mb-4">
                 <label
                   className="form-label fw-semibold mb-2"
@@ -532,9 +592,7 @@ export default function SubmitContextFeedback() {
                     border: "1px solid #e2e8f0",
                   }}
                 >
-                  <div className="d-flex gap-1">
-                    {renderStars(goalForm.rating)}
-                  </div>
+                  <div className="d-flex gap-1">{renderStars(goalForm.rating)}</div>
                   <span
                     style={{
                       fontSize: "0.875rem",
@@ -547,7 +605,6 @@ export default function SubmitContextFeedback() {
                 </div>
               </div>
 
-              {/* FEEDBACK COMMENTS */}
               <div className="mb-4">
                 <label
                   className="form-label fw-semibold mb-2"
@@ -565,7 +622,7 @@ export default function SubmitContextFeedback() {
                       feedbackComments: e.target.value,
                     })
                   }
-                  placeholder="Provide your detailed feedback on this objective..."
+                  placeholder="Provide your detailed feedback on this goal..."
                   required
                   maxLength={1000}
                   style={{
@@ -597,7 +654,6 @@ export default function SubmitContextFeedback() {
                 </div>
               </div>
 
-              {/* ANONYMOUS */}
               <div className="mb-4">
                 <div className="form-check">
                   <input
@@ -622,7 +678,6 @@ export default function SubmitContextFeedback() {
                 </div>
               </div>
 
-              {/* SUBMIT */}
               <button
                 type="submit"
                 className="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
@@ -653,7 +708,7 @@ export default function SubmitContextFeedback() {
         </div>
       )}
 
-      {/* CONTEXT FORM */}
+      {/* Context feedback form */}
       {!loadingData && activeTab === "context" && (
         <div
           className="card border-0 shadow-sm"
@@ -661,7 +716,6 @@ export default function SubmitContextFeedback() {
         >
           <div className="card-body" style={{ padding: "1.5rem" }}>
             <form onSubmit={submitContext}>
-              {/* SELECT RECIPIENT */}
               <div className="mb-4">
                 <label
                   className="form-label fw-semibold mb-2"
@@ -690,7 +744,6 @@ export default function SubmitContextFeedback() {
                 </select>
               </div>
 
-              {/* SELECTED EMPLOYEE INFO */}
               {selectedEmployee && (
                 <div
                   className="mb-4 p-3"
@@ -724,7 +777,6 @@ export default function SubmitContextFeedback() {
                 </div>
               )}
 
-              {/* PROJECT CONTEXT */}
               <div className="mb-4">
                 <label
                   className="form-label fw-semibold mb-2"
@@ -751,18 +803,8 @@ export default function SubmitContextFeedback() {
                     padding: "0.625rem 0.875rem",
                   }}
                 />
-                <div
-                  style={{
-                    fontSize: "0.75rem",
-                    color: "#64748b",
-                    marginTop: "0.5rem",
-                  }}
-                >
-                  Specify the project or context
-                </div>
               </div>
 
-              {/* FEEDBACK CONTENT */}
               <div className="mb-4">
                 <label
                   className="form-label fw-semibold mb-2"
@@ -812,7 +854,6 @@ export default function SubmitContextFeedback() {
                 </div>
               </div>
 
-              {/* ANONYMOUS */}
               <div className="mb-4">
                 <div className="form-check">
                   <input
@@ -837,7 +878,6 @@ export default function SubmitContextFeedback() {
                 </div>
               </div>
 
-              {/* SUBMIT */}
               <button
                 type="submit"
                 className="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"

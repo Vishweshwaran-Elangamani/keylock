@@ -512,3 +512,361 @@
     padding: 10px 8px;
   }
 }
+
+
+
+/* ============================================
+   NOMINATION MODAL STYLES
+   Modern, Clean, Professional Design
+   ============================================ */
+
+/* Modal Overlay */
+.tlp-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Content Container */
+.tlp-modal-content {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Modal Header */
+.tlp-modal-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 10;
+}
+
+.tlp-modal-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 6px 0;
+}
+
+.tlp-modal-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Close Button */
+.tlp-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 32px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.tlp-modal-close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Modal Form */
+.tlp-modal-form {
+  padding: 24px 28px 28px;
+}
+
+/* Form Sections */
+.tlp-form-section {
+  margin-bottom: 24px;
+}
+
+.tlp-form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.tlp-required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.tlp-parameter-type {
+  font-size: 12px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin-left: 6px;
+}
+
+/* Input Fields */
+.tlp-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tlp-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tlp-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Textarea */
+.tlp-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.tlp-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tlp-textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Reward Type Grid */
+.tlp-reward-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+/* Reward Card */
+.tlp-reward-card {
+  padding: 16px 18px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tlp-reward-card:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.tlp-reward-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 6px;
+}
+
+.tlp-reward-desc {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* Selected Info Banner */
+.tlp-selected-info {
+  padding: 12px 16px;
+  background: #dbeafe;
+  border-left: 4px solid #3b82f6;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1e40af;
+  margin-bottom: 20px;
+}
+
+.tlp-selected-info strong {
+  font-weight: 600;
+}
+
+/* Parameters Section */
+.tlp-parameters-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 16px 0;
+}
+
+.tlp-parameter-field {
+  margin-bottom: 18px;
+}
+
+.tlp-parameter-field:last-child {
+  margin-bottom: 0;
+}
+
+/* Modal Actions (Footer Buttons) */
+.tlp-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Cancel Button */
+.tlp-cancel-button {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tlp-cancel-button:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* Submit Button */
+.tlp-submit-button {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.tlp-submit-button:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.tlp-submit-button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Scrollbar Styling */
+.tlp-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tlp-modal-content::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.tlp-modal-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.tlp-modal-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tlp-modal-content {
+    max-width: 95%;
+    max-height: 95vh;
+  }
+
+  .tlp-modal-header {
+    padding: 20px;
+  }
+
+  .tlp-modal-title {
+    font-size: 20px;
+  }
+
+  .tlp-modal-form {
+    padding: 20px;
+  }
+
+  .tlp-reward-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tlp-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .tlp-cancel-button,
+  .tlp-submit-button {
+    width: 100%;
+  }
+}

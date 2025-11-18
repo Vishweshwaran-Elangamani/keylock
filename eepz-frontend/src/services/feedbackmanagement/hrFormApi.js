@@ -1,6 +1,6 @@
-import axios from "axios";
+// src/services/feedbackmanagement/hrFormApi.js
 
-const API_BASE_URL = "http://localhost:5253";
+import api from "./http";
 
 const hrFormApi = {
   // ============== FORMS ENDPOINTS ==============
@@ -10,35 +10,35 @@ const hrFormApi = {
    * Create a new feedback form
    */
   createForm: (payload) =>
-    axios.post(`${API_BASE_URL}/api/HrFeedbackForm/forms/create`, payload),
+    api.post("/HrFeedbackForm/forms/create", payload),
 
   /**
    * GET /api/HrFeedbackForm/forms/{formId}
    * Get a specific form by ID
    */
   getFormById: (formId) =>
-    axios.get(`${API_BASE_URL}/api/HrFeedbackForm/forms/${formId}`),
+    api.get(`/HrFeedbackForm/forms/${formId}`),
 
   /**
    * PUT /api/HrFeedbackForm/forms/{formId}
    * Update a form
    */
   updateForm: (formId, payload) =>
-    axios.put(`${API_BASE_URL}/api/HrFeedbackForm/forms/${formId}`, payload),
+    api.put(`/HrFeedbackForm/forms/${formId}`, payload),
 
   /**
    * DELETE /api/HrFeedbackForm/forms/{formId}
    * Delete a form
    */
   deleteForm: (formId) =>
-    axios.delete(`${API_BASE_URL}/api/HrFeedbackForm/forms/${formId}`),
+    api.delete(`/HrFeedbackForm/forms/${formId}`),
 
   /**
    * GET /api/HrFeedbackForm/forms
    * Get all forms (paginated)
    */
   getAllForms: (pageNumber = 1, pageSize = 10) =>
-    axios.get(`${API_BASE_URL}/api/HrFeedbackForm/forms`, {
+    api.get("/HrFeedbackForm/forms", {
       params: { pageNumber, pageSize },
     }),
 
@@ -47,7 +47,7 @@ const hrFormApi = {
    * Get only active forms
    */
   getActiveForms: () =>
-    axios.get(`${API_BASE_URL}/api/HrFeedbackForm/forms/active`),
+    api.get("/HrFeedbackForm/forms/active"),
 
   // ============== RESPONSES ENDPOINTS ==============
 
@@ -56,55 +56,56 @@ const hrFormApi = {
    * Create a new form response (employee starts filling)
    */
   createResponse: (payload) =>
-    axios.post(`${API_BASE_URL}/api/HrFeedbackForm/responses/create`, payload),
+    api.post("/HrFeedbackForm/responses/create", payload),
 
   /**
    * GET /api/HrFeedbackForm/responses/{responseId}
    * Get a specific response by ID
    */
   getResponseById: (responseId) =>
-    axios.get(`${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}`),
+    api.get(`/HrFeedbackForm/responses/${responseId}`),
 
   /**
    * PUT /api/HrFeedbackForm/responses/{responseId}
    * Update a response (save draft)
    */
   updateResponse: (responseId, payload) =>
-    axios.put(
-      `${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}`,
-      payload
-    ),
+    api.put(`/HrFeedbackForm/responses/${responseId}`, payload),
 
   /**
    * DELETE /api/HrFeedbackForm/responses/{responseId}
    * Delete a response
    */
   deleteResponse: (responseId) =>
-    axios.delete(`${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}`),
+    api.delete(`/HrFeedbackForm/responses/${responseId}`),
 
   /**
    * GET /api/HrFeedbackForm/responses/by-form/{formId}
    * Get all responses for a specific form
    */
   getResponsesByFormId: (formId) =>
-    axios.get(`${API_BASE_URL}/api/HrFeedbackForm/responses/by-form/${formId}`),
+    api.get(`/HrFeedbackForm/responses/by-form/${formId}`),
+
+  /**
+   * GET /api/HrFeedbackForm/responses/by-employee/{employeeId}
+   * Get all responses by a specific employee
+   */
+  getResponsesByEmployee: (employeeId) =>
+    api.get(`/HrFeedbackForm/responses/by-employee/${employeeId}`),
 
   /**
    * GET /api/HrFeedbackForm/responses/pending-review
    * Get pending responses that need HR review
    */
   getPendingReviews: () =>
-    axios.get(`${API_BASE_URL}/api/HrFeedbackForm/responses/pending-review`),
+    api.get("/HrFeedbackForm/responses/pending-review"),
 
   /**
    * POST /api/HrFeedbackForm/responses/{responseId}/submit
    * Submit a form response (employee finalizes submission)
    */
   submitResponse: (responseId, payload) =>
-    axios.post(
-      `${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}/submit`,
-      payload
-    ),
+    api.post(`/HrFeedbackForm/responses/${responseId}/submit`, payload),
 
   /**
    * POST /api/HrFeedbackForm/responses/{responseId}/hr-review
@@ -112,10 +113,7 @@ const hrFormApi = {
    * payload: { status: 'Approved' | 'Rejected', hrComments: string }
    */
   hrReviewResponse: (responseId, payload) =>
-    axios.post(
-      `${API_BASE_URL}/api/HrFeedbackForm/responses/${responseId}/hr-review`,
-      payload
-    ),
+    api.post(`/HrFeedbackForm/responses/${responseId}/hr-review`, payload),
 };
 
 export default hrFormApi;

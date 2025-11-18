@@ -1,3 +1,5 @@
+// src/pages/feedback_management/department_head/FeedbackDepartmentHeadDashboard.jsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -10,14 +12,14 @@ import {
   BarChart3,
   UserCheck,
   TrendingUp,
-  Award,
   ArrowLeft,
   Inbox,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import {
+  managerReviewApi,
+  employeeApi,
+} from "../../services/feedbackmanagement/feedbackApi"
 
 const formatDate = (dateInput) => {
   if (!dateInput) return "—";
@@ -56,6 +58,7 @@ export default function FeedbackDepartmentHeadDashboard() {
   const [employeeMap, setEmployeeMap] = useState({});
   const [activeTab, setActiveTab] = useState("overview");
 
+  // Enrich reviews with employee names
   const enrichReviews = (reviews, empMap) => {
     return reviews.map((review) => ({
       ...review,
@@ -70,24 +73,31 @@ export default function FeedbackDepartmentHeadDashboard() {
     }));
   };
 
+  // Fetch employee map using service
   const fetchEmployeeMap = async () => {
     try {
-      const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
-      if (empRes.data?.success && Array.isArray(empRes.data.data)) {
+      const empRes = await employeeApi.getAll();
+      
+      if (empRes?.data) {
+        const employees = Array.isArray(empRes.data)
+          ? empRes.data
+          : empRes.data.data || [];
+
         const map = {};
-        empRes.data.data.forEach((emp) => {
+        employees.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
-        console.log(" Employee map loaded:", Object.keys(map).length);
+        console.log("Employee map loaded:", Object.keys(map).length);
         return map;
       }
     } catch (err) {
-      console.warn(" Error fetching employee map:", err.message);
+      console.warn("Error fetching employee map:", err.message);
     }
     return {};
   };
 
+  // Fetch all data using services
   const fetchAllData = async (empMap = {}) => {
     setRefreshing(true);
     setLoading(true);
@@ -98,62 +108,73 @@ export default function FeedbackDepartmentHeadDashboard() {
 
       // Get all reviews
       try {
-        const allRes = await axios.get(`${API_BASE}/ManagerReview/all`);
-        if (allRes.data?.success && Array.isArray(allRes.data.data)) {
-          const enriched = enrichReviews(allRes.data.data, empMap);
+        const allRes = await managerReviewApi.getAll();
+        const reviewsData = Array.isArray(allRes?.data)
+          ? allRes.data
+          : allRes?.data?.data || [];
+        
+        if (Array.isArray(reviewsData)) {
+          const enriched = enrichReviews(reviewsData, empMap);
           setAllReviews(enriched);
         }
       } catch (err) {
-        console.warn(" Error fetching all reviews:", err.message);
+        console.warn("Error fetching all reviews:", err.message);
       }
 
       // Get pending reviews
       try {
-        const pendingRes = await axios.get(
-          `${API_BASE}/ManagerReview/status/Pending`
-        );
-        if (pendingRes.data?.success && Array.isArray(pendingRes.data.data)) {
-          const enriched = enrichReviews(pendingRes.data.data, empMap);
+        const pendingRes = await managerReviewApi.getByStatus("Pending");
+        const pendingData = Array.isArray(pendingRes?.data)
+          ? pendingRes.data
+          : pendingRes?.data?.data || [];
+        
+        if (Array.isArray(pendingData)) {
+          const enriched = enrichReviews(pendingData, empMap);
           setPendingReviews(enriched);
         }
       } catch (err) {
-        console.warn(" Error fetching pending reviews:", err.message);
+        console.warn("Error fetching pending reviews:", err.message);
       }
 
       // Get approved reviews
       try {
-        const approvedRes = await axios.get(
-          `${API_BASE}/ManagerReview/status/Approved`
-        );
-        if (approvedRes.data?.success && Array.isArray(approvedRes.data.data)) {
-          const enriched = enrichReviews(approvedRes.data.data, empMap);
+        const approvedRes = await managerReviewApi.getByStatus("Approved");
+        const approvedData = Array.isArray(approvedRes?.data)
+          ? approvedRes.data
+          : approvedRes?.data?.data || [];
+        
+        if (Array.isArray(approvedData)) {
+          const enriched = enrichReviews(approvedData, empMap);
           setApprovedReviews(enriched);
         }
       } catch (err) {
-        console.warn(" Error fetching approved reviews:", err.message);
+        console.warn("Error fetching approved reviews:", err.message);
       }
 
       // Get reviews about me
       try {
-        const targetRes = await axios.get(
-          `${API_BASE}/ManagerReview/target/${deptHeadId}`
-        );
-        if (targetRes.data?.success && Array.isArray(targetRes.data.data)) {
-          const enriched = enrichReviews(targetRes.data.data, empMap);
+        const targetRes = await managerReviewApi.getByTargetEmployee(deptHeadId);
+        const targetData = Array.isArray(targetRes?.data)
+          ? targetRes.data
+          : targetRes?.data?.data || [];
+        
+        if (Array.isArray(targetData)) {
+          const enriched = enrichReviews(targetData, empMap);
           setReviewsAboutMe(enriched);
         }
       } catch (err) {
-        console.warn(" Error fetching reviews about me:", err.message);
+        console.warn("Error fetching reviews about me:", err.message);
       }
     } catch (err) {
       setError("Failed to load dashboard data");
-      console.error(" Critical error:", err);
+      console.error("Critical error:", err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
+  // Load data on mount
   useEffect(() => {
     const loadData = async () => {
       const empMap = await fetchEmployeeMap();
@@ -162,6 +183,7 @@ export default function FeedbackDepartmentHeadDashboard() {
     loadData();
   }, [user?.empId]);
 
+  // Stats calculation
   const stats = useMemo(
     () => [
       {
@@ -196,6 +218,7 @@ export default function FeedbackDepartmentHeadDashboard() {
     [allReviews, pendingReviews, approvedReviews, reviewsAboutMe]
   );
 
+  // Loading state
   if (loading) {
     return (
       <div
@@ -221,7 +244,7 @@ export default function FeedbackDepartmentHeadDashboard() {
         backgroundColor: "#f8f9fa",
       }}
     >
-      {/* BACK BUTTON & HEADER */}
+      {/* Back Button & Header */}
       <div className="d-flex align-items-center gap-3 mb-3">
         <button
           className="btn d-flex align-items-center justify-content-center"
@@ -283,7 +306,7 @@ export default function FeedbackDepartmentHeadDashboard() {
         </button>
       </div>
 
-      {/* ERROR ALERT */}
+      {/* Error Alert */}
       {error && (
         <div
           className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -316,7 +339,7 @@ export default function FeedbackDepartmentHeadDashboard() {
         </div>
       )}
 
-      {/* STATS CARDS */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-3">
         {stats.map(({ label, value, Icon, bgColor, iconColor }) => (
           <div key={label} className="col-lg-3 col-md-6">
@@ -376,7 +399,7 @@ export default function FeedbackDepartmentHeadDashboard() {
         ))}
       </div>
 
-      {/* TABS */}
+      {/* Tabs */}
       <div
         style={{
           backgroundColor: "#27235c",
@@ -439,7 +462,7 @@ export default function FeedbackDepartmentHeadDashboard() {
         </ul>
       </div>
 
-      {/* CONTENT AREA */}
+      {/* Content Area */}
       <div
         style={{
           backgroundColor: "#fff",
@@ -449,7 +472,7 @@ export default function FeedbackDepartmentHeadDashboard() {
           minHeight: "400px",
         }}
       >
-        {/* OVERVIEW TAB */}
+        {/* Overview Tab */}
         {activeTab === "overview" && (
           <div>
             <h5
@@ -739,7 +762,7 @@ export default function FeedbackDepartmentHeadDashboard() {
           </div>
         )}
 
-        {/* PENDING REVIEWS TAB */}
+        {/* Pending Reviews Tab */}
         {activeTab === "pending" && (
           <div>
             <h5
@@ -848,7 +871,7 @@ export default function FeedbackDepartmentHeadDashboard() {
           </div>
         )}
 
-        {/* TEAM SUBMISSIONS TAB */}
+        {/* Team Submissions Tab */}
         {activeTab === "submissions" && (
           <div className="text-center py-5">
             <Users

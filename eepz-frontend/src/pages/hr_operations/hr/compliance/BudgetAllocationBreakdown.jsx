@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Toast } from "bootstrap";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
-import AllocateByCategoryModal from "../modals/AllocateByCategoryModal";
-import UpdateUtilizedAmountModal from "../modals/UpdateUtilizedAmountModal";
-import AllocationsList from "../modals/AllocationsList";
+import AllocateByCategoryModal from "../../../../components/hr_operations/modals/AllocateByCategoryModal";
+import UpdateUtilizedAmountModal from "../../../../components/hr_operations/modals/UpdateUtilizedAmountModal";
+import AllocationsList from "../../../../components/hr_operations/modals/AllocationsList";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import "../../../../styles/hr_operations/hr/allocationsList.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";

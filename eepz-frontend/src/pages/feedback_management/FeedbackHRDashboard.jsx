@@ -1,3 +1,5 @@
+// src/pages/feedback_management/dashboard/FeedbackHRDashboard.jsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -5,32 +7,40 @@ import {
   FileText,
   Eye,
   Search,
-  TrendingUp,
+  Zap,
   Plus,
   Send,
-  Star,
   Users,
-  ArrowRight,
-  Target,
-  Zap,
-  User,
+  CheckCircle,
   Clock,
+  Star,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { peerQueueApi } from "../../services/feedbackmanagement/feedbackApi";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import { Link } from "react-router-dom";
+import {
+  peerQueueApi,
+  employeeApi,
+  hrFormApi,
+  managerReviewApi,
+} from "../../services/feedbackmanagement/feedbackApi";
 
 const StatCard = ({ label, value, Icon, color }) => (
   <div
     style={{
       background: "white",
-      border: "1px solid  #97247E",
+      border: "1px solid #97247E",
       borderRadius: "10px",
       padding: "1.25rem",
       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
       textAlign: "center",
+      transition: "all 0.3s ease",
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = "translateY(-2px)";
+      e.currentTarget.style.boxShadow = "0 8px 16px rgba(151, 36, 126, 0.15)";
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = "translateY(0)";
+      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
     }}
   >
     <div className="d-flex justify-content-center mb-2">
@@ -58,7 +68,6 @@ const StatCard = ({ label, value, Icon, color }) => (
 );
 
 export default function FeedbackHRDashboard() {
-  const navigate = useNavigate();
   const user = useMemo(
     () =>
       JSON.parse(localStorage.getItem("user") || "{}") || {
@@ -84,32 +93,32 @@ export default function FeedbackHRDashboard() {
   const [activeHrForms, setActiveHrForms] = useState([]);
   const [myReviews, setMyReviews] = useState([]);
 
-  // ============================================================================
-  // FETCH EMPLOYEES
-  // ============================================================================
-
+  // Fetch employees using service
   const fetchEmployeeMap = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/EmployeeManagement/all`);
+      const response = await employeeApi.getAll();
 
-      if (response.data?.success && Array.isArray(response.data.data)) {
+      if (response?.data) {
+        const employeesList = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
+
         const map = {};
-        response.data.data.forEach((emp) => {
+        employeesList.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
         console.log("Employee map created:", Object.keys(map).length);
+        return map;
       }
     } catch (err) {
       console.error("Error fetching employees:", err.message);
     }
+    return {};
   };
 
-  // ============================================================================
-  // FETCH DASHBOARD DATA
-  // ============================================================================
-
-  const fetchDashboardData = async () => {
+  // Fetch dashboard data using services
+  const fetchDashboardData = async (empMap = {}) => {
     setLoading(true);
     setError("");
 
@@ -119,15 +128,17 @@ export default function FeedbackHRDashboard() {
       // Peer feedback queue (HR role)
       try {
         const res = await peerQueueApi.list(1, 100);
-        const feedbackData = res.data?.data || [];
+        const feedbackData = Array.isArray(res?.data)
+          ? res.data
+          : res?.data?.data || [];
 
         const mappedFeedback = feedbackData.map((item) => ({
           ...item,
           submitterName:
-            employeeMap[item.submittedByEmployeeId] ||
+            empMap[item.submittedByEmployeeId] ||
             `Employee ${item.submittedByEmployeeId}`,
           recipientName:
-            employeeMap[item.recipientEmployeeId] ||
+            empMap[item.recipientEmployeeId] ||
             `Employee ${item.recipientEmployeeId}`,
         }));
 
@@ -140,13 +151,17 @@ export default function FeedbackHRDashboard() {
       // Peer feedback received (HR as employee)
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
-        if (Array.isArray(peerRes.data?.data)) {
-          const myFeedback = peerRes.data.data
-            .filter((p) => p.recipientEmployeeId === hrId)
+        const peerData = Array.isArray(peerRes?.data)
+          ? peerRes.data
+          : peerRes?.data?.data || [];
+
+        if (Array.isArray(peerData)) {
+          const myFeedback = peerData
+            .filter((p) => Number(p.recipientEmployeeId) === Number(hrId))
             .map((p) => ({
               ...p,
               submittedByName:
-                employeeMap[p.submittedByEmployeeId] ||
+                empMap[p.submittedByEmployeeId] ||
                 `Employee ${p.submittedByEmployeeId}`,
             }));
           setMyPeerFeedback(myFeedback);
@@ -155,38 +170,31 @@ export default function FeedbackHRDashboard() {
         console.warn("Error fetching my peer feedback:", err.message);
       }
 
-      // Active HR Forms
+      // Active HR Forms using service
       try {
-        const activeRes = await axios.get(
-          `${API_BASE}/HrFeedbackForm/forms/active`
-        );
-        if (activeRes.data?.success) {
-          setActiveHrForms(activeRes.data.data || []);
-        }
+        const activeRes = await hrFormApi.getActiveForms();
+        const forms = activeRes?.data || [];
+        setActiveHrForms(Array.isArray(forms) ? forms : []);
       } catch (err) {
         console.warn("Error fetching active forms:", err.message);
       }
 
       // Submitted HR Forms (HR as employee)
       try {
-        const submittedRes = await axios.get(
-          `${API_BASE}/HrFeedbackForm/responses/by-employee/${hrId}`
-        );
-        if (submittedRes.data?.success) {
-          setSubmittedForms(submittedRes.data.data || []);
-        }
+        const submittedRes = await hrFormApi.getResponsesByEmployee(hrId);
+        const forms = submittedRes?.data || [];
+        setSubmittedForms(Array.isArray(forms) ? forms : []);
       } catch (err) {
         console.warn("Error fetching submitted forms:", err.message);
       }
 
-      // Reviews about me
+      // Reviews about me using service
       try {
-        const reviewRes = await axios.get(
-          `${API_BASE}/ManagerReview/target/${hrId}`
-        );
-        if (reviewRes.data?.success && Array.isArray(reviewRes.data.data)) {
-          setMyReviews(reviewRes.data.data);
-        }
+        const reviewRes = await managerReviewApi.getByTargetEmployee(hrId);
+        const reviews = Array.isArray(reviewRes?.data)
+          ? reviewRes.data
+          : reviewRes?.data?.data || [];
+        setMyReviews(reviews);
       } catch (err) {
         console.warn("Error fetching my reviews:", err.message);
       }
@@ -198,35 +206,24 @@ export default function FeedbackHRDashboard() {
     }
   };
 
-  // ============================================================================
-  // EFFECTS
-  // ============================================================================
-
+  // Effects
   useEffect(() => {
-    fetchEmployeeMap();
-  }, []);
+    const loadData = async () => {
+      const empMap = await fetchEmployeeMap();
+      await fetchDashboardData(empMap);
+    };
+    loadData();
+  }, [user?.empId]);
 
-  useEffect(() => {
-    if (Object.keys(employeeMap).length > 0) {
-      fetchDashboardData();
-    }
-  }, [employeeMap, user?.empId]);
-
-  // ============================================================================
-  // HANDLERS
-  // ============================================================================
-
+  // Handlers
   const refresh = async () => {
     setRefreshing(true);
-    await fetchEmployeeMap();
-    await fetchDashboardData();
+    const empMap = await fetchEmployeeMap();
+    await fetchDashboardData(empMap);
     setRefreshing(false);
   };
 
-  // ============================================================================
-  // STATS
-  // ============================================================================
-
+  // Stats
   const stats = useMemo(() => {
     const submittedFormIds = new Set(submittedForms.map((f) => f.formId));
     const pendingForms = activeHrForms.filter(
@@ -240,8 +237,26 @@ export default function FeedbackHRDashboard() {
         Icon: FileText,
         color: "#97247E",
       },
+      {
+        label: "Active Forms",
+        value: activeHrForms.length,
+        Icon: CheckCircle,
+        color: "#24A148",
+      },
+      {
+        label: "Pending Forms",
+        value: pendingForms,
+        Icon: Clock,
+        color: "#E2B93B",
+      },
+      {
+        label: "Reviews Received",
+        value: myReviews.length,
+        Icon: Star,
+        color: "#0F62FE",
+      },
     ];
-  }, [feedback, activeHrForms, submittedForms, myPeerFeedback]);
+  }, [feedback, activeHrForms, submittedForms, myReviews]);
 
   if (loading) {
     return (
@@ -274,12 +289,18 @@ export default function FeedbackHRDashboard() {
       }}
     >
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        {/* HEADER */}
+        {/* Header */}
         <div
           className="d-flex justify-content-between align-items-center mb-4"
           style={{ flexWrap: "wrap", gap: "1rem" }}
         >
           <div>
+            <h2
+              className="fw-bold mb-1"
+              style={{ color: "#97247E", fontSize: "1.75rem" }}
+            >
+              HR Dashboard
+            </h2>
             <p className="mb-0 text-muted" style={{ fontSize: "0.875rem" }}>
               Welcome back, {user?.firstName} {user?.lastName}
             </p>
@@ -292,7 +313,8 @@ export default function FeedbackHRDashboard() {
               borderRadius: "8px",
               padding: "10px 20px",
               fontWeight: 600,
-              border: "2px solid #dee2e6",
+              border: "2px solid #97247E",
+              color: "#97247E",
             }}
           >
             <RefreshCw
@@ -305,7 +327,7 @@ export default function FeedbackHRDashboard() {
           </button>
         </div>
 
-        {/* ERROR ALERT */}
+        {/* Error Alert */}
         {error && (
           <div
             className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-4"
@@ -325,7 +347,7 @@ export default function FeedbackHRDashboard() {
           </div>
         )}
 
-        {/* STATS - 4 CARDS */}
+        {/* Stats */}
         <div className="row g-3 mb-4">
           {stats.map((s, idx) => (
             <div key={idx} className="col-6 col-md-3">
@@ -334,7 +356,7 @@ export default function FeedbackHRDashboard() {
           ))}
         </div>
 
-        {/* TABS */}
+        {/* Tabs */}
         <div
           style={{
             background: "white",
@@ -346,70 +368,36 @@ export default function FeedbackHRDashboard() {
           }}
         >
           <ul className="nav nav-tabs border-0 mb-0" style={{ gap: "0.5rem" }}>
-            <li className="nav-item">
-              <button
-                className={`nav-link border-0 ${
-                  activeTab === "overview" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("overview")}
-                style={{
-                  color: activeTab === "overview" ? "#97247E" : "#6c757d",
-                  borderBottom:
-                    activeTab === "overview"
-                      ? "3px solid #97247E"
-                      : "3px solid transparent",
-                  fontWeight: 600,
-                  background: "transparent",
-                  padding: "0.75rem 1rem",
-                }}
-              >
-                Overview
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link border-0 ${
-                  activeTab === "hr-operations" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("hr-operations")}
-                style={{
-                  color: activeTab === "hr-operations" ? "#97247E" : "#6c757d",
-                  borderBottom:
-                    activeTab === "hr-operations"
-                      ? "3px solid #97247E"
-                      : "3px solid transparent",
-                  fontWeight: 600,
-                  background: "transparent",
-                  padding: "0.75rem 1rem",
-                }}
-              >
-                HR Operations
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link border-0 ${
-                  activeTab === "peer-feedback" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("peer-feedback")}
-                style={{
-                  color: activeTab === "peer-feedback" ? "#97247E" : "#6c757d",
-                  borderBottom:
-                    activeTab === "peer-feedback"
-                      ? "3px solid #97247E"
-                      : "3px solid transparent",
-                  fontWeight: 600,
-                  background: "transparent",
-                  padding: "0.75rem 1rem",
-                }}
-              >
-                Peer Feedback
-              </button>
-            </li>
+            {[
+              { key: "overview", label: "Overview" },
+              { key: "hr-operations", label: "HR Operations" },
+              { key: "peer-feedback", label: "Peer Feedback" },
+            ].map(({ key, label }) => (
+              <li key={key} className="nav-item">
+                <button
+                  className={`nav-link border-0 ${
+                    activeTab === key ? "active" : ""
+                  }`}
+                  onClick={() => setActiveTab(key)}
+                  style={{
+                    color: activeTab === key ? "#97247E" : "#6c757d",
+                    borderBottom:
+                      activeTab === key
+                        ? "3px solid #97247E"
+                        : "3px solid transparent",
+                    fontWeight: 600,
+                    background: "transparent",
+                    padding: "0.75rem 1rem",
+                  }}
+                >
+                  {label}
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* OVERVIEW TAB */}
+        {/* Overview Tab */}
         {activeTab === "overview" && (
           <div
             style={{
@@ -419,7 +407,7 @@ export default function FeedbackHRDashboard() {
               padding: "1.5rem",
             }}
           >
-            {/* QUICK ACTIONS - DUAL ROLE */}
+            {/* Quick Actions */}
             <div className="mb-4">
               <div className="d-flex align-items-center gap-2 mb-3">
                 <Zap size={20} style={{ color: "#97247E" }} />
@@ -427,12 +415,7 @@ export default function FeedbackHRDashboard() {
               </div>
 
               {/* HR-specific actions */}
-              <h6
-                className="small text-muted mb-2"
-                style={{ textAlign: "left" }}
-              >
-                HR Functions
-              </h6>
+              <h6 className="small text-muted mb-2">HR Functions</h6>
               <div className="row g-2 mb-3">
                 <div className="col-6 col-md-3">
                   <Link
@@ -468,15 +451,27 @@ export default function FeedbackHRDashboard() {
                     <span className="small">Create Form</span>
                   </Link>
                 </div>
+                <div className="col-6 col-md-3">
+                  <Link
+                    to="/hr/dashboard/feedback/report"
+                    className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                    style={{
+                      background: "white",
+                      color: "#97247E",
+                      border: "2px solid #97247E",
+                      borderRadius: "8px",
+                      padding: "10px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    <FileText size={16} />
+                    <span className="small">Reports</span>
+                  </Link>
+                </div>
               </div>
 
               {/* Employee-like actions */}
-              <h6
-                className="small text-muted mb-2"
-                style={{ textAlign: "left" }}
-              >
-                Submit Feedback
-              </h6>
+              <h6 className="small text-muted mb-2">Submit Feedback</h6>
               <div className="row g-2">
                 <div className="col-6 col-md-3">
                   <Link
@@ -495,12 +490,29 @@ export default function FeedbackHRDashboard() {
                     <span className="small">Mentor Feedback</span>
                   </Link>
                 </div>
+                <div className="col-6 col-md-3">
+                  <Link
+                    to="/hr/dashboard/feedback/submit-peer"
+                    className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                    style={{
+                      background: "white",
+                      color: "#97247E",
+                      border: "2px solid #97247E",
+                      borderRadius: "8px",
+                      padding: "10px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Users size={16} />
+                    <span className="small">Peer Feedback</span>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* HR OPERATIONS TAB */}
+        {/* HR Operations Tab */}
         {activeTab === "hr-operations" && (
           <div
             style={{
@@ -570,6 +582,17 @@ export default function FeedbackHRDashboard() {
                           padding: "1rem",
                         }}
                       >
+                        Status
+                      </th>
+                      <th
+                        style={{
+                          color: "#97247E",
+                          fontSize: "0.813rem",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          padding: "1rem",
+                        }}
+                      >
                         Date
                       </th>
                       <th
@@ -586,7 +609,7 @@ export default function FeedbackHRDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {feedback.map((item, index) => (
+                    {feedback.slice(0, 10).map((item, index) => (
                       <tr
                         key={`feedback-${item.queueId || index}`}
                         style={{ borderBottom: "1px solid #f1f5f9" }}
@@ -618,6 +641,30 @@ export default function FeedbackHRDashboard() {
                           className="text-truncate"
                         >
                           {item.feedbackContent || "No content"}
+                        </td>
+                        <td style={{ padding: "1rem" }}>
+                          <span
+                            className="badge"
+                            style={{
+                              backgroundColor:
+                                item.status === "Approved"
+                                  ? "#dcfce7"
+                                  : item.status === "Rejected"
+                                  ? "#fee2e2"
+                                  : "#fef3c7",
+                              color:
+                                item.status === "Approved"
+                                  ? "#24A148"
+                                  : item.status === "Rejected"
+                                  ? "#dc2626"
+                                  : "#d97706",
+                              padding: "4px 10px",
+                              fontSize: "0.75rem",
+                              borderRadius: "6px",
+                            }}
+                          >
+                            {item.status || "Pending"}
+                          </span>
                         </td>
                         <td
                           style={{
@@ -653,10 +700,22 @@ export default function FeedbackHRDashboard() {
                 </table>
               </div>
             )}
+
+            {feedback.length > 10 && (
+              <div className="text-center mt-3">
+                <Link
+                  to="/hr/dashboard/feedback/hrformlist"
+                  className="btn btn-outline-secondary"
+                  style={{ borderRadius: "8px" }}
+                >
+                  View All Feedback
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
-        {/* PEER FEEDBACK TAB */}
+        {/* Peer Feedback Tab */}
         {activeTab === "peer-feedback" && (
           <div
             style={{
@@ -667,7 +726,7 @@ export default function FeedbackHRDashboard() {
             }}
           >
             <h5 className="fw-bold mb-4" style={{ color: "#212529" }}>
-              All Peer Feedback ({myPeerFeedback.length})
+              Peer Feedback Received ({myPeerFeedback.length})
             </h5>
 
             {myPeerFeedback.length === 0 ? (
@@ -731,9 +790,9 @@ export default function FeedbackHRDashboard() {
                         className="mb-0"
                         style={{ lineHeight: "1.6", color: "#495057" }}
                       >
-                        {feedbackItem.comment ||
+                        {feedbackItem.feedbackContent ||
+                          feedbackItem.comment ||
                           feedbackItem.feedbackComment ||
-                          feedbackItem.feedbackContent ||
                           "No comment provided"}
                       </p>
                     </div>

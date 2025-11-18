@@ -1,3 +1,5 @@
+// src/pages/feedback_management/feedback/ViewMyPeerFeedback.jsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -11,10 +13,10 @@ import {
   Loader,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { peerQueueApi } from "../../../services/feedbackmanagement/feedbackApi";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import {
+  peerQueueApi,
+  employeeApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
 
 export default function ViewMyPeerFeedback() {
   const navigate = useNavigate();
@@ -44,9 +46,8 @@ export default function ViewMyPeerFeedback() {
     }
   };
 
-  //  PROPER ANONYMITY HANDLING - Check all possible field name variations
+  // Check if feedback is anonymous - handles multiple field name variations
   const checkIsAnonymous = (feedback) => {
-    // Check multiple field name possibilities from API
     return Boolean(
       feedback.isAnonymous === true ||
         feedback.isAnonymous === 1 ||
@@ -59,7 +60,7 @@ export default function ViewMyPeerFeedback() {
     );
   };
 
-  //  Get sender display name - ALWAYS hide if anonymous
+  // Get sender display name - always hide if anonymous
   const getSenderDisplayName = (feedback) => {
     const isAnon = checkIsAnonymous(feedback);
 
@@ -67,7 +68,6 @@ export default function ViewMyPeerFeedback() {
       return "Anonymous Peer";
     }
 
-    // Not anonymous - show sender's name
     return (
       feedback.submittedByName ||
       feedback.submitterName ||
@@ -75,7 +75,7 @@ export default function ViewMyPeerFeedback() {
     );
   };
 
-  // Fetch Peer Feedback Received
+  // Fetch peer feedback using services
   const fetchPeerFeedback = async () => {
     setLoading(true);
     setError("");
@@ -89,42 +89,51 @@ export default function ViewMyPeerFeedback() {
         return;
       }
 
-      console.log(" Fetching peer feedback for employee ID:", empId);
+      console.log("Fetching peer feedback for employee ID:", empId);
 
       // STEP 1: Fetch employee map for name resolution
       let empMap = {};
       try {
-        const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
-        if (empRes.data?.success && Array.isArray(empRes.data.data)) {
-          empRes.data.data.forEach((emp) => {
+        const empRes = await employeeApi.getAll();
+        
+        if (empRes?.data) {
+          const employees = Array.isArray(empRes.data)
+            ? empRes.data
+            : empRes.data.data || [];
+
+          employees.forEach((emp) => {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
           });
           setEmployeeMap(empMap);
           console.log(
-            " Loaded employee map:",
+            "Loaded employee map:",
             Object.keys(empMap).length,
             "employees"
           );
         }
       } catch (err) {
-        console.warn(" Error fetching employee map:", err.message);
+        console.warn("Error fetching employee map:", err.message);
       }
 
       // STEP 2: Fetch ALL peer feedback
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
-        console.log(" Raw peer feedback response:", peerRes.data);
+        console.log("Raw peer feedback response:", peerRes);
 
-        if (Array.isArray(peerRes.data?.data)) {
-          //  Filter: Only feedback where current user is the RECIPIENT
-          const myFeedback = peerRes.data.data
+        const feedbackData = Array.isArray(peerRes?.data)
+          ? peerRes.data
+          : peerRes?.data?.data || [];
+
+        if (Array.isArray(feedbackData)) {
+          // Filter: Only feedback where current user is the RECIPIENT
+          const myFeedback = feedbackData
             .filter((p) => {
               const isRecipient =
                 Number(p.recipientEmployeeId) === Number(empId);
               const isApproved =
                 p.status === "Approved" || p.Status === "Approved";
 
-              console.log(" Checking feedback:", {
+              console.log("Checking feedback:", {
                 queueId: p.queueId || p.QueueId,
                 recipientEmployeeId: p.recipientEmployeeId,
                 currentUserEmpId: empId,
@@ -141,7 +150,7 @@ export default function ViewMyPeerFeedback() {
 
               return {
                 ...p,
-                isAnonymous: isAnon, //  Normalize the field name
+                isAnonymous: isAnon,
                 submittedByName: isAnon
                   ? "Anonymous Peer"
                   : empMap[p.submittedByEmployeeId] ||
@@ -166,37 +175,35 @@ export default function ViewMyPeerFeedback() {
 
           setPeerFeedback(myFeedback);
           console.log(
-            " Filtered peer feedback (received by me):",
+            "Filtered peer feedback (received by me):",
             myFeedback.length
           );
-          console.log(" Sample feedback:", myFeedback[0]);
+          console.log("Sample feedback:", myFeedback[0]);
         } else {
-          console.warn(" Invalid peer feedback data structure");
+          console.warn("Invalid peer feedback data structure");
           setPeerFeedback([]);
         }
       } catch (err) {
-        console.error(" Error fetching peer feedback:", err);
+        console.error("Error fetching peer feedback:", err);
         setPeerFeedback([]);
         setError("Failed to load peer feedback. Please try refreshing.");
       }
     } catch (err) {
-      console.error(" Fetch error:", err);
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Failed to load peer feedback"
-      );
+      console.error("Fetch error:", err);
+      setError(err?.message || "Failed to load peer feedback");
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch on mount
   useEffect(() => {
     if (user?.empId) {
       fetchPeerFeedback();
     }
   }, [user?.empId]);
 
+  // Loading state
   if (loading) {
     return (
       <div
@@ -228,7 +235,7 @@ export default function ViewMyPeerFeedback() {
           paddingRight: "1rem",
         }}
       >
-        {/* HEADER */}
+        {/* Header */}
         <div className="d-flex align-items-start mb-4">
           <button
             className="btn btn-outline-secondary me-2"
@@ -261,7 +268,7 @@ export default function ViewMyPeerFeedback() {
           </button>
         </div>
 
-        {/* ERROR ALERT */}
+        {/* Error Alert */}
         {error && (
           <div
             className="alert alert-danger alert-dismissible fade show mb-4"
@@ -281,7 +288,7 @@ export default function ViewMyPeerFeedback() {
           </div>
         )}
 
-        {/* STATS CARD */}
+        {/* Stats Card */}
         {peerFeedback.length > 0 && (
           <div className="row g-3 mb-4">
             <div className="col-12">
@@ -310,7 +317,7 @@ export default function ViewMyPeerFeedback() {
           </div>
         )}
 
-        {/* PEER FEEDBACK LIST */}
+        {/* Peer Feedback List */}
         {peerFeedback.length === 0 ? (
           <div
             className="card border-0 shadow-sm"

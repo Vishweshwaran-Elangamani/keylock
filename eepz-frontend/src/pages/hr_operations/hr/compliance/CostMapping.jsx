@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import costMappingService from "../../../../services/hr_operations/hr/costMappingService";
-import CreateCostMappingModal from "../modals/CreateCostMappingModal";
-import EditCostMappingModal from "../modals/EditCostMappingModal";
+import CreateCostMappingModal from "../../../../components/hr_operations/modals/CreateCostMappingModal";
+import EditCostMappingModal from "../../../../components/hr_operations/modals/EditCostMappingModal";
 import "../../../../styles/hr_operations/hr/costMapping.css";
 
 const CostMapping = () => {

@@ -18,8 +18,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import slaService, { escalationHelpers } from "../../services/sla/slaService";
-import ManagerEscalationModal from "../../components/sla/ManagerEscalationModal";
-import ResolveEscalationModal from "../../components/sla/ResolveEscalationModal";
+import ManagerEscalationModal from "../../components/sla/modals/ManagerEscalationModal";
+import ResolveEscalationModal from "../../components/sla/modals/ResolveEscalationModal";
 import { formatDate } from "../../utils/sla/dateFormatter";
 
 const ManagerSLADashboard = () => {

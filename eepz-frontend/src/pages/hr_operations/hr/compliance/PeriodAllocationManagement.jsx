@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
 import periodAllocationService from "../../../../services/hr_operations/hr/periodAllocationService";
-import CreatePeriodAllocationModal from "../modals/CreatePeriodAllocationModal";
-import UpdatePeriodAllocationModal from "../modals/UpdatePeriodAllocationModal";
-import AllocateFromPeriodModal from "../modals/AllocateFromPeriodModal";
-import ViewPeriodDetailsModal from "../modals/ViewPeriodDetailsModal";
+import CreatePeriodAllocationModal from "../../../../components/hr_operations/modals/CreatePeriodAllocationModal";
+import UpdatePeriodAllocationModal from "../../../../components/hr_operations/modals/UpdatePeriodAllocationModal";
+import AllocateFromPeriodModal from "../../../../components/hr_operations/modals/AllocateFromPeriodModal";
+import ViewPeriodDetailsModal from "../../../../components/hr_operations/modals/ViewPeriodDetailsModal";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import "../../../../styles/hr_operations/hr/periodAllocation.css";
 

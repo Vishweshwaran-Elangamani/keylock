@@ -1,3 +1,5 @@
+// src/pages/feedback_management/forms/EmployeeFillForm.jsx
+
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   CheckCircle,
@@ -10,9 +12,7 @@ import {
   Loader,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE ;
+import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 
 export default function EmployeeFillForm() {
   const navigate = useNavigate();
@@ -340,30 +340,25 @@ export default function EmployeeFillForm() {
     5: "Excellent",
   };
 
-  // Fetch form details
+  // Fetch form details using service
   useEffect(() => {
     const fetchForm = async () => {
       try {
-        const response = await axios.get(
-          `${API_BASE}/HrFeedbackForm/forms/${formId}`,
-          {
-            timeout: 10000,
-          }
-        );
+        const response = await hrFormApi.getFormById(formId);
 
-        if (response.data?.success && response.data?.data) {
-          const formData = response.data.data;
+        if (response?.data) {
+          const formData = response.data;
           const templateData =
             QUESTION_TEMPLATES[formData.formType] ||
             QUESTION_TEMPLATES.GeneralFeedback;
           const enrichedForm = { ...formData, ...templateData };
           setForm(enrichedForm);
-          console.log(" Form loaded:", enrichedForm);
+          console.log("Form loaded:", enrichedForm);
         } else {
           throw new Error("Invalid form data");
         }
       } catch (err) {
-        console.error(" Error fetching form:", err);
+        console.error("Error fetching form:", err);
         setError("Failed to load form. Please try again.");
       } finally {
         setLoading(false);
@@ -380,7 +375,7 @@ export default function EmployeeFillForm() {
     setResponses((prev) => ({ ...prev, [questionId]: rating }));
   }, []);
 
-  // Handle form submission with two-step process
+  // Handle form submission using service
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -403,7 +398,7 @@ export default function EmployeeFillForm() {
       formResponse["comments"] = comments.trim();
     }
 
-    // Payload for creating the response (saves as Draft initially)
+    // Payload for creating the response
     const payload = {
       formId: Number(formId),
       submittedByEmployeeId: Number(user?.empId || 1004),
@@ -411,51 +406,33 @@ export default function EmployeeFillForm() {
       formResponse: formResponse,
     };
 
-    console.log(" Step 1: Creating form response as Draft");
+    console.log("Step 1: Creating form response");
     console.log("Payload:", JSON.stringify(payload, null, 2));
 
     setSubmitting(true);
     try {
       // STEP 1: Create the response (saves as Draft)
-      const createResponse = await axios.post(
-        `${API_BASE}/HrFeedbackForm/responses/create`,
-        payload,
-        {
-          headers: { "Content-Type": "application/json" },
-          timeout: 15000,
-        }
-      );
+      const createResponse = await hrFormApi.createResponse(payload);
 
-      console.log(" Step 1 Complete - Response created:", createResponse.data);
+      console.log("Step 1 Complete - Response created:", createResponse);
 
-      if (createResponse.data?.success || createResponse.status === 200) {
-        const responseId = createResponse.data?.data?.responseId;
+      if (createResponse?.success || createResponse?.data?.success) {
+        const responseId = createResponse.data?.responseId || 
+                          createResponse.data?.data?.responseId;
 
         if (!responseId) {
           throw new Error("Response ID not returned from create endpoint");
         }
 
-        console.log(
-          ` Step 2: Submitting response ID ${responseId} to mark as Submitted`
-        );
+        console.log(`Step 2: Submitting response ID ${responseId}`);
 
-        // STEP 2: Call submit endpoint to change status from Draft to Submitted
-        const submitResponse = await axios.post(
-          `${API_BASE}/HrFeedbackForm/responses/${responseId}/submit`,
-          null,
-          {
-            headers: { "Content-Type": "application/json" },
-            timeout: 10000,
-          }
-        );
+        // STEP 2: Submit the response
+        const submitResponse = await hrFormApi.submitResponse(responseId, null);
 
-        console.log(
-          " Step 2 Complete - Response submitted:",
-          submitResponse.data
-        );
+        console.log("Step 2 Complete - Response submitted:", submitResponse);
 
-        if (submitResponse.data?.success || submitResponse.status === 200) {
-          setSuccess(" Form submitted successfully! Redirecting...");
+        if (submitResponse?.success || submitResponse?.data?.success) {
+          setSuccess("Form submitted successfully! Redirecting...");
           setTimeout(() => navigate("/dashboard/feedback"), 2000);
         } else {
           setError(
@@ -464,11 +441,11 @@ export default function EmployeeFillForm() {
         }
       } else {
         setError(
-          createResponse.data?.message || "Failed to create form response"
+          createResponse?.message || "Failed to create form response"
         );
       }
     } catch (err) {
-      console.error(" Submission Error:", {
+      console.error("Submission Error:", {
         status: err?.response?.status,
         message: err?.response?.data?.message,
         errors: err?.response?.data?.errors,

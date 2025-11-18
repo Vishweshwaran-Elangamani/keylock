@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+// src/pages/feedback_management/hr/HRFeedbackReport.jsx
+
+import React, { useEffect, useState } from "react";
 import {
   RefreshCw,
   AlertTriangle,
@@ -10,10 +12,11 @@ import {
   Clock,
   User,
 } from "lucide-react";
-import axios from "axios";
+import {
+  hrFormApi,
+  employeeApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
 import ResponseViewModal from "../../../components/FeedbackManagement/ResponseViewModal";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
 
 const Badge = ({ text, color = "#525252" }) => (
   <span
@@ -40,34 +43,32 @@ export default function HRFeedbackReport() {
   const [showModal, setShowModal] = useState(false);
   const [selectedResponse, setSelectedResponse] = useState(null);
 
-  // ============================================================================
-  // FETCH EMPLOYEE MAP
-  // ============================================================================
-
+  // Fetch employee map using service
   const fetchEmployeeMap = async () => {
     try {
-      console.log(" Fetching employee map...");
-      const response = await axios.get(`${API_BASE}/EmployeeManagement/all`);
+      console.log("Fetching employee map...");
+      const response = await employeeApi.getAll();
 
-      if (response.data?.success && Array.isArray(response.data.data)) {
+      if (response?.data) {
+        const employees = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
+
         const map = {};
-        response.data.data.forEach((emp) => {
+        employees.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
-        console.log(" Employee map loaded:", map);
+        console.log("Employee map loaded:", map);
         return map;
       }
     } catch (err) {
-      console.error(" Error fetching employee map:", err.message);
+      console.error("Error fetching employee map:", err.message);
     }
     return {};
   };
 
-  // ============================================================================
-  // FETCH DATA
-  // ============================================================================
-
+  // Fetch all data using services
   const fetchData = async () => {
     setRefreshing(true);
     setLoading(true);
@@ -78,40 +79,37 @@ export default function HRFeedbackReport() {
       const empMap = await fetchEmployeeMap();
 
       // Step 2: Fetch all active forms
-      console.log(" Fetching active forms...");
-      const formsRes = await axios.get(
-        `${API_BASE}/HrFeedbackForm/forms/active`
-      );
-      console.log(" Raw forms response:", formsRes.data);
+      console.log("Fetching active forms...");
+      const formsRes = await hrFormApi.getActiveForms();
+      console.log("Raw forms response:", formsRes);
 
       let formsData = [];
-      if (formsRes.data?.success && Array.isArray(formsRes.data.data)) {
-        formsData = formsRes.data.data;
+      const forms = formsRes?.data || [];
+      
+      if (Array.isArray(forms)) {
+        formsData = forms;
         setForms(formsData);
-        console.log(` ${formsData.length} forms loaded`);
+        console.log(`${formsData.length} forms loaded`);
       }
 
-      // Step 3: Fetch responses for ALL EMPLOYEES
-      console.log(" Fetching ALL responses...");
+      // Step 3: Fetch responses for all forms
+      console.log("Fetching ALL responses...");
       let allResponses = [];
 
       for (const form of formsData) {
         try {
-          const respRes = await axios.get(
-            `${API_BASE}/HrFeedbackForm/responses/by-form/${form.formId}`
-          );
-          console.log(` Raw responses for form ${form.formId}:`, respRes.data);
+          const respRes = await hrFormApi.getResponsesByFormId(form.formId);
+          console.log(`Raw responses for form ${form.formId}:`, respRes);
 
-          if (respRes.data?.success && Array.isArray(respRes.data.data)) {
-            if (respRes.data.data.length > 0) {
-              console.log(" FIRST RESPONSE OBJECT:", respRes.data.data[0]);
-              console.log(
-                " All field keys:",
-                Object.keys(respRes.data.data[0])
-              );
+          const responseData = respRes?.data || [];
+
+          if (Array.isArray(responseData)) {
+            if (responseData.length > 0) {
+              console.log("FIRST RESPONSE OBJECT:", responseData[0]);
+              console.log("All field keys:", Object.keys(responseData[0]));
             }
 
-            const mappedResponses = respRes.data.data.map((r) => {
+            const mappedResponses = responseData.map((r) => {
               // Debug each field
               console.log(`Processing response:`, {
                 responseId: r.responseId,
@@ -119,7 +117,6 @@ export default function HRFeedbackReport() {
                 submittedDate: r.submittedDate,
                 createdAt: r.createdAt,
                 createdDate: r.createdDate,
-                all: r,
               });
 
               return {
@@ -127,13 +124,11 @@ export default function HRFeedbackReport() {
                 formId: form.formId,
                 formName: form.formName,
                 employeeId: r.employeeId,
-                // Try multiple employee name fields
                 employeeName:
                   empMap[r.employeeId] ||
                   empMap[r.submittedByEmployeeId] ||
                   `Employee ${r.employeeId}`,
                 status: r.status || "Submitted",
-                // Try multiple date fields
                 submittedDate:
                   r.submittedDate ||
                   r.createdAt ||
@@ -147,12 +142,12 @@ export default function HRFeedbackReport() {
 
             allResponses = [...allResponses, ...mappedResponses];
             console.log(
-              ` Added ${mappedResponses.length} responses from form ${form.formId}`
+              `Added ${mappedResponses.length} responses from form ${form.formId}`
             );
           }
         } catch (err) {
           console.warn(
-            ` Error fetching responses for form ${form.formId}:`,
+            `Error fetching responses for form ${form.formId}:`,
             err.message
           );
         }
@@ -162,29 +157,22 @@ export default function HRFeedbackReport() {
         (a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)
       );
       setResponses(allResponses);
-      console.log(
-        ` Total ${allResponses.length} responses loaded:`,
-        allResponses
-      );
+      console.log(`Total ${allResponses.length} responses loaded`);
     } catch (err) {
-      console.error(" Fetch error:", err);
-      setError(
-        err?.response?.data?.message || err.message || "Failed to fetch data"
-      );
+      console.error("Fetch error:", err);
+      setError(err?.message || "Failed to fetch data");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
+  // Fetch data on mount
   useEffect(() => {
     fetchData();
   }, []);
 
-  // ============================================================================
-  // MODAL HANDLERS
-  // ============================================================================
-
+  // Modal handlers
   const handleViewResponse = (response) => {
     setSelectedResponse(response);
     setShowModal(true);
@@ -195,30 +183,22 @@ export default function HRFeedbackReport() {
     setSelectedResponse(null);
   };
 
-  // ============================================================================
-  // DELETE HANDLER
-  // ============================================================================
-
+  // Delete response using service
   const deleteResponse = async (responseId) => {
     if (!window.confirm("Delete this response? This action cannot be undone."))
       return;
     setError("");
 
     try {
-      await axios.delete(`${API_BASE}/HrFeedbackForm/responses/${responseId}`);
+      await hrFormApi.deleteResponse(responseId);
       fetchData();
     } catch (err) {
       console.error("Delete error:", err);
-      setError(
-        err?.response?.data?.message || err.message || "Failed to delete"
-      );
+      setError(err?.message || "Failed to delete");
     }
   };
 
-  // ============================================================================
-  // TAB BUTTON
-  // ============================================================================
-
+  // Tab button component
   const TabBtn = ({ label, icon: Icon, active, count }) => (
     <button
       type="button"
@@ -234,13 +214,9 @@ export default function HRFeedbackReport() {
     </button>
   );
 
-  // ============================================================================
-  // RENDER
-  // ============================================================================
-
   return (
     <div className="container-fluid py-3" style={{ maxWidth: "1200px" }}>
-      {/* HEADER */}
+      {/* Header */}
       <div className="d-flex justify-content-between align-items-start mb-4">
         <div>
           <div className="d-flex align-items-center gap-2 mb-1">
@@ -279,7 +255,7 @@ export default function HRFeedbackReport() {
         </button>
       </div>
 
-      {/* ERROR ALERT */}
+      {/* Error Alert */}
       {error && (
         <div
           className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -294,7 +270,7 @@ export default function HRFeedbackReport() {
         </div>
       )}
 
-      {/* STATS */}
+      {/* Stats */}
       <div className="row g-3 mb-4">
         <div className="col-6 col-md-3">
           <div
@@ -320,7 +296,7 @@ export default function HRFeedbackReport() {
         </div>
       </div>
 
-      {/* TABS */}
+      {/* Tabs */}
       <div
         className="card border-0 mb-3"
         style={{
@@ -345,7 +321,7 @@ export default function HRFeedbackReport() {
         </div>
       </div>
 
-      {/* ========== FORMS TAB ========== */}
+      {/* Forms Tab */}
       {tab === "Forms" && (
         <div
           className="card border-0"
@@ -410,7 +386,7 @@ export default function HRFeedbackReport() {
         </div>
       )}
 
-      {/* ========== RESPONSES TAB ========== */}
+      {/* Responses Tab */}
       {tab === "Responses" && (
         <div
           className="card border-0"
@@ -465,7 +441,7 @@ export default function HRFeedbackReport() {
                                 {response.formName}
                               </p>
                             </div>
-                            <Badge text=" Submitted" color="#24A148" />
+                            <Badge text="Submitted" color="#24A148" />
                           </div>
 
                           <div
@@ -548,7 +524,7 @@ export default function HRFeedbackReport() {
         </div>
       )}
 
-      {/* RESPONSE VIEW MODAL */}
+      {/* Response View Modal */}
       <ResponseViewModal
         show={showModal}
         response={selectedResponse}

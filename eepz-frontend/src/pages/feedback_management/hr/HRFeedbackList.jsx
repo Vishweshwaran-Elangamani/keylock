@@ -1,26 +1,24 @@
-import React, { useEffect, useMemo, useState } from "react";
+// src/pages/feedback_management/hr/HRFeedbackList.jsx
+
+import React, { useEffect, useState } from "react";
 import {
   RefreshCw,
   AlertTriangle,
   Eye,
   Trash2,
-  MessageSquare,
-  FileText,
   Users,
   Send,
   Clock,
   Lock,
   User,
-  BarChart3,
 } from "lucide-react";
 import {
   mentorFeedbackApi,
   peerQueueApi,
+  employeeApi,
+  hrFormApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
-import ResponseViewModal from "../../../components/feedback_management/ResponseViewModal";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
 
 const Badge = ({ text, color = "#525252" }) => (
   <span
@@ -52,18 +50,19 @@ export default function HRFeedbackList() {
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
 
-  // ============================================================================
-  // FETCH EMPLOYEE MAP
-  // ============================================================================
-
+  // Fetch employee map using service
   const fetchEmployeeMap = async () => {
     try {
       console.log("Fetching employee map...");
-      const response = await axios.get(`${API_BASE}/EmployeeManagement/all`);
+      const response = await employeeApi.getAll();
 
-      if (response.data?.success && Array.isArray(response.data.data)) {
+      if (response?.data) {
+        const employees = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
+
         const map = {};
-        response.data.data.forEach((emp) => {
+        employees.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
@@ -74,37 +73,32 @@ export default function HRFeedbackList() {
     }
   };
 
-  // ============================================================================
-  // FETCH DATA
-  // ============================================================================
-
+  // Fetch all feedback data using services
   const fetchData = async () => {
     setRefreshing(true);
     setLoading(true);
     setError("");
 
     try {
-      // ======== FETCH HR FEEDBACK ========
+      // Fetch HR Feedback
       try {
         console.log("Fetching HR feedback...");
-        const formsRes = await axios.get(
-          `${API_BASE}/HrFeedbackForm/forms/active`
-        );
-        console.log("Forms response:", formsRes.data);
+        const formsRes = await hrFormApi.getActiveForms();
+        console.log("Forms response:", formsRes);
 
         let allHRFeedback = [];
 
-        if (formsRes.data?.success && Array.isArray(formsRes.data.data)) {
-          const forms = formsRes.data.data;
+        const forms = formsRes?.data || [];
 
+        if (Array.isArray(forms)) {
           for (const form of forms) {
             try {
-              const respRes = await axios.get(
-                `${API_BASE}/HrFeedbackForm/responses/by-form/${form.formId}`
-              );
+              const respRes = await hrFormApi.getResponsesByFormId(form.formId);
 
-              if (respRes.data?.success && Array.isArray(respRes.data.data)) {
-                const mappedHR = respRes.data.data.map((r) => ({
+              const responses = respRes?.data || [];
+
+              if (Array.isArray(responses)) {
+                const mappedHR = responses.map((r) => ({
                   responseId: r.responseId,
                   formId: form.formId,
                   formName: form.formName,
@@ -135,13 +129,13 @@ export default function HRFeedbackList() {
         setHrForms([]);
       }
 
-      // ======== FETCH MENTOR FEEDBACK ========
+      // Fetch Mentor Feedback
       try {
         console.log("Fetching mentor feedback...");
         const mentorRes = await mentorFeedbackApi.list(1, 100);
-        const mentorData = Array.isArray(mentorRes.data?.data)
-          ? mentorRes.data.data
-          : [];
+        const mentorData = Array.isArray(mentorRes?.data)
+          ? mentorRes.data
+          : mentorRes?.data?.data || [];
 
         const enrichedMentorData = mentorData.map((m) => ({
           ...m,
@@ -156,13 +150,13 @@ export default function HRFeedbackList() {
         setMentor([]);
       }
 
-      // ======== FETCH PEER FEEDBACK ========
+      // Fetch Peer Feedback
       try {
         console.log("Fetching peer feedback...");
         const peerRes = await peerQueueApi.list(1, 100);
-        const allPeer = Array.isArray(peerRes.data?.data)
-          ? peerRes.data.data
-          : [];
+        const allPeer = Array.isArray(peerRes?.data)
+          ? peerRes.data
+          : peerRes?.data?.data || [];
 
         const enrichedPeerData = allPeer.map((p) => ({
           ...p,
@@ -182,31 +176,26 @@ export default function HRFeedbackList() {
       }
     } catch (err) {
       console.error("Fetch error:", err);
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Failed to fetch feedback"
-      );
+      setError(err?.message || "Failed to fetch feedback");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
+  // Fetch employee map on mount
   useEffect(() => {
     fetchEmployeeMap();
   }, []);
 
+  // Fetch data after employee map is loaded
   useEffect(() => {
     if (Object.keys(employeeMap).length > 0) {
       fetchData();
     }
   }, [employeeMap]);
 
-  // ============================================================================
-  // MODAL HANDLERS
-  // ============================================================================
-
+  // Modal handlers
   const handleViewResponse = (data, type) => {
     setSelectedResponse(data);
     setSelectedType(type);
@@ -219,10 +208,7 @@ export default function HRFeedbackList() {
     setSelectedType(null);
   };
 
-  // ============================================================================
-  // DELETE HANDLERS
-  // ============================================================================
-
+  // Delete HR Form using service
   const deleteHRForm = async (responseId) => {
     if (
       !window.confirm(
@@ -233,18 +219,15 @@ export default function HRFeedbackList() {
     setError("");
 
     try {
-      await axios.delete(`${API_BASE}/HrFeedbackForm/responses/${responseId}`);
+      await hrFormApi.deleteResponse(responseId);
       fetchData();
     } catch (err) {
       console.error("Delete error:", err);
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Failed to delete HR form"
-      );
+      setError(err?.message || "Failed to delete HR form");
     }
   };
 
+  // Delete Mentor Feedback using service
   const deleteMentor = async (trackingId) => {
     if (!window.confirm("Delete this mentor feedback submission?")) return;
     setError("");
@@ -253,14 +236,11 @@ export default function HRFeedbackList() {
       await mentorFeedbackApi.remove(trackingId);
       fetchData();
     } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Failed to delete mentor feedback"
-      );
+      setError(err?.message || "Failed to delete mentor feedback");
     }
   };
 
+  // Delete Peer Feedback using service
   const deletePeer = async (queueId) => {
     if (!window.confirm("Delete this peer feedback submission?")) return;
     setError("");
@@ -269,18 +249,11 @@ export default function HRFeedbackList() {
       await peerQueueApi.remove(queueId);
       fetchData();
     } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Failed to delete peer feedback"
-      );
+      setError(err?.message || "Failed to delete peer feedback");
     }
   };
 
-  // ============================================================================
-  // HELPER FUNCTIONS
-  // ============================================================================
-
+  // Helper functions
   const getMentorName = (m) => {
     return m.mentorNameFull || m.mentorName || `Employee ${m.mentorEmployeeId}`;
   };
@@ -310,7 +283,7 @@ export default function HRFeedbackList() {
       }}
     >
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        {/* HEADER */}
+        {/* Header */}
         <div
           className="d-flex justify-content-between align-items-center mb-4"
           style={{ flexWrap: "wrap", gap: "1rem" }}
@@ -350,7 +323,7 @@ export default function HRFeedbackList() {
           </button>
         </div>
 
-        {/* ERROR ALERT */}
+        {/* Error Alert */}
         {error && (
           <div
             className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-4"
@@ -370,7 +343,7 @@ export default function HRFeedbackList() {
           </div>
         )}
 
-        {/* TABS - PURPLE COLOR */}
+        {/* Tabs */}
         <div
           style={{
             background: "white",
@@ -506,7 +479,7 @@ export default function HRFeedbackList() {
           </div>
         </div>
 
-        {/* CONTENT AREA */}
+        {/* Content Area */}
         {loading ? (
           <div className="text-center py-5">
             <div
@@ -525,7 +498,7 @@ export default function HRFeedbackList() {
           </div>
         ) : (
           <>
-            {/* ========== MENTOR TAB ========== */}
+            {/* Mentor Tab */}
             {tab === "Mentor" &&
               (mentor.length === 0 ? (
                 <div
@@ -669,7 +642,7 @@ export default function HRFeedbackList() {
                 </div>
               ))}
 
-            {/* ========== PEER TAB ========== */}
+            {/* Peer Tab */}
             {tab === "Peer" &&
               (peer.length === 0 ? (
                 <div

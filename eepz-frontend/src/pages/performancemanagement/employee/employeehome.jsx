@@ -1,18 +1,19 @@
 /**
  * EmployeeHome Component
- *
+ * 
  * Employee Dashboard Home Page - Minimal Version
  * Features:
  * - Nomination celebration card (if nominated)
  * - Single "My Assessments" action card
  * - Smooth animations and modern design
- *
+ * 
  * @component
  */
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import { getEmployeeNominations } from "../../../services/performancemanagement/hr/api";
 import "react-toastify/dist/ReactToastify.css";
 import "../../../styles/performancemanagement/employee/EmployeeHome.css";
 
@@ -50,14 +51,9 @@ export default function EmployeeHome() {
    */
   const fetchNominations = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5253/api/EmployeeNomination/search?employeeId=${employeeId}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.count > 0) {
-          setNominations(data.data);
-        }
+      const response = await getEmployeeNominations(employeeId);
+      if (response.status === 200 && response.data.success && response.data.count > 0) {
+        setNominations(response.data.data);
       }
     } catch (error) {
       console.error("Error fetching nominations:", error);
@@ -93,8 +89,7 @@ export default function EmployeeHome() {
         <div className="ehp-nomination-content">
           <h3 className="ehp-nomination-title">Congratulations!</h3>
           <p className="ehp-nomination-text">
-            You have been nominated for:{" "}
-            <strong>{nominations.map((n) => n.roleType).join(", ")}</strong>
+            You have been nominated for: <strong>{nominations.map(n => n.roleType).join(", ")}</strong>
           </p>
           <p className="ehp-nomination-subtext">
             Your hard work and dedication have been recognized!
@@ -133,7 +128,7 @@ export default function EmployeeHome() {
 
         {/* My Assessments Card - Single Centered Card */}
         <div className="ehp-assessment-section">
-          <div
+          <div 
             className="ehp-assessment-card"
             onClick={handleNavigateToAssessments}
           >
@@ -143,8 +138,7 @@ export default function EmployeeHome() {
             <div className="ehp-assessment-content">
               <h3 className="ehp-assessment-title">My Assessments</h3>
               <p className="ehp-assessment-description">
-                Complete your performance assessments and track your progress
-                across all assigned evaluations
+                Complete your performance assessments and track your progress across all assigned evaluations
               </p>
               <div className="ehp-assessment-link">
                 View Details

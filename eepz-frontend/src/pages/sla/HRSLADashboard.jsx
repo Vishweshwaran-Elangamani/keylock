@@ -16,9 +16,9 @@ import {
   TrendingUp,
 } from "lucide-react";
 import slaService from "../../services/sla/slaService";
-import Pagination from "../../components/project_management_components/Pagination";
-import EditSLAModal from "../../components/sla/EditSLAModal";
-import CreateSLAModal from "../../components/sla/CreateSLAModal";
+import Pagination from "../../components/project_management_components/common/Pagination";
+import EditSLAModal from "../../components/sla/modals/EditSLAModal";
+import CreateSLAModal from "../../components/sla/modals/CreateSLAModal";
 import ConfirmationModal from "../../components/goals/modals/ConfirmationModal";
 
 const cardBorder = "1.5px solid #a21caf";

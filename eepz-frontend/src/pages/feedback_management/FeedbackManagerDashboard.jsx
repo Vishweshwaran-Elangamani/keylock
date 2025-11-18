@@ -1,3 +1,5 @@
+// src/pages/feedback_management/dashboard/FeedbackManagerDashboard.jsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -15,10 +17,12 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { peerQueueApi } from "../../services/feedbackmanagement/feedbackApi";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import {
+  peerQueueApi,
+  employeeApi,
+  hrFormApi,
+  managerReviewApi,
+} from "../../services/feedbackmanagement/feedbackApi";
 
 const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
   <div
@@ -93,6 +97,7 @@ export default function FeedbackManagerDashboard() {
   const [activeHrForms, setActiveHrForms] = useState([]);
   const [employeeMap, setEmployeeMap] = useState({});
 
+  // Enrich reviews with employee names
   const enrichReviews = (reviews, empMap) => {
     return reviews.map((review) => ({
       ...review,
@@ -106,6 +111,7 @@ export default function FeedbackManagerDashboard() {
     }));
   };
 
+  // Fetch dashboard data using services
   const fetchDashboardData = async () => {
     setLoading(true);
     setError("");
@@ -113,11 +119,16 @@ export default function FeedbackManagerDashboard() {
     try {
       const managerId = user?.empId || 1002;
 
+      // Fetch employee map
       let empMap = {};
       try {
-        const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
-        if (empRes.data?.success && Array.isArray(empRes.data.data)) {
-          empRes.data.data.forEach((emp) => {
+        const empRes = await employeeApi.getAll();
+        if (empRes?.data) {
+          const employees = Array.isArray(empRes.data)
+            ? empRes.data
+            : empRes.data.data || [];
+
+          employees.forEach((emp) => {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
           });
           setEmployeeMap(empMap);
@@ -126,25 +137,31 @@ export default function FeedbackManagerDashboard() {
         console.warn("Error fetching employee map:", err.message);
       }
 
+      // Fetch my reviews
       try {
-        const myRes = await axios.get(
-          `${API_BASE}/ManagerReview/manager/${managerId}`
-        );
-        if (myRes.data?.success && Array.isArray(myRes.data.data)) {
-          const enriched = enrichReviews(myRes.data.data, empMap);
+        const myRes = await managerReviewApi.getByManager(managerId);
+        const reviewsData = Array.isArray(myRes?.data)
+          ? myRes.data
+          : myRes?.data?.data || [];
+
+        if (Array.isArray(reviewsData)) {
+          const enriched = enrichReviews(reviewsData, empMap);
           setMyReviews(enriched);
         }
       } catch (err) {
         console.warn("Error fetching my reviews:", err.message);
       }
 
+      // Fetch draft reviews
       try {
-        const draftRes = await axios.get(
-          `${API_BASE}/ManagerReview/status/Draft`
-        );
-        if (draftRes.data?.success && Array.isArray(draftRes.data.data)) {
-          const myDrafts = draftRes.data.data.filter(
-            (r) => r.managerEmployeeId === managerId
+        const draftRes = await managerReviewApi.getByStatus("Draft");
+        const draftData = Array.isArray(draftRes?.data)
+          ? draftRes.data
+          : draftRes?.data?.data || [];
+
+        if (Array.isArray(draftData)) {
+          const myDrafts = draftData.filter(
+            (r) => Number(r.managerEmployeeId) === Number(managerId)
           );
           const enriched = enrichReviews(myDrafts, empMap);
           setDraftReviews(enriched);
@@ -153,23 +170,31 @@ export default function FeedbackManagerDashboard() {
         console.warn("Error fetching drafts:", err.message);
       }
 
+      // Fetch reviews about me
       try {
-        const targetRes = await axios.get(
-          `${API_BASE}/ManagerReview/target/${managerId}`
-        );
-        if (targetRes.data?.success && Array.isArray(targetRes.data.data)) {
-          const enriched = enrichReviews(targetRes.data.data, empMap);
+        const targetRes = await managerReviewApi.getByTargetEmployee(managerId);
+        const targetData = Array.isArray(targetRes?.data)
+          ? targetRes.data
+          : targetRes?.data?.data || [];
+
+        if (Array.isArray(targetData)) {
+          const enriched = enrichReviews(targetData, empMap);
           setTargetReviews(enriched);
         }
       } catch (err) {
         console.warn("Error fetching reviews about me:", err.message);
       }
 
+      // Fetch peer feedback
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
-        if (Array.isArray(peerRes.data?.data)) {
-          const myFeedback = peerRes.data.data
-            .filter((p) => p.recipientEmployeeId === managerId)
+        const peerData = Array.isArray(peerRes?.data)
+          ? peerRes.data
+          : peerRes?.data?.data || [];
+
+        if (Array.isArray(peerData)) {
+          const myFeedback = peerData
+            .filter((p) => Number(p.recipientEmployeeId) === Number(managerId))
             .map((p) => ({
               ...p,
               submittedByName:
@@ -182,24 +207,20 @@ export default function FeedbackManagerDashboard() {
         console.warn("Error fetching peer feedback:", err.message);
       }
 
+      // Fetch active HR forms
       try {
-        const activeRes = await axios.get(
-          `${API_BASE}/HrFeedbackForm/forms/active`
-        );
-        if (activeRes.data?.success) {
-          setActiveHrForms(activeRes.data.data || []);
-        }
+        const activeRes = await hrFormApi.getActiveForms();
+        const forms = activeRes?.data || [];
+        setActiveHrForms(Array.isArray(forms) ? forms : []);
       } catch (err) {
         console.warn("Error fetching active forms:", err.message);
       }
 
+      // Fetch submitted forms
       try {
-        const submittedRes = await axios.get(
-          `${API_BASE}/HrFeedbackForm/responses/by-employee/${managerId}`
-        );
-        if (submittedRes.data?.success) {
-          setSubmittedForms(submittedRes.data.data || []);
-        }
+        const submittedRes = await hrFormApi.getResponsesByEmployee(managerId);
+        const responses = submittedRes?.data || [];
+        setSubmittedForms(Array.isArray(responses) ? responses : []);
       } catch (err) {
         console.warn("Error fetching submitted forms:", err.message);
       }
@@ -211,16 +232,19 @@ export default function FeedbackManagerDashboard() {
     }
   };
 
+  // Load data on mount
   useEffect(() => {
     fetchDashboardData();
   }, [user?.empId]);
 
+  // Refresh handler
   const refresh = async () => {
     setRefreshing(true);
     await fetchDashboardData();
     setRefreshing(false);
   };
 
+  // Calculate stats
   const stats = useMemo(() => {
     const submittedFormIds = new Set(submittedForms.map((f) => f.formId));
     const pendingForms = activeHrForms.filter(
@@ -284,7 +308,7 @@ export default function FeedbackManagerDashboard() {
         backgroundColor: "#f8f9fa",
       }}
     >
-      {/* HEADER */}
+      {/* Header */}
       <div className="d-flex justify-content-between align-items-start mb-3">
         <div>
           <div className="d-flex align-items-center gap-2 mb-1">
@@ -325,7 +349,7 @@ export default function FeedbackManagerDashboard() {
         </button>
       </div>
 
-      {/* ERROR ALERT */}
+      {/* Error Alert */}
       {error && (
         <div
           className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -358,7 +382,7 @@ export default function FeedbackManagerDashboard() {
         </div>
       )}
 
-      {/* STATS CARDS */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-3">
         {stats.map((s, idx) => (
           <div key={idx} className="col-lg-3 col-md-6">
@@ -367,7 +391,7 @@ export default function FeedbackManagerDashboard() {
         ))}
       </div>
 
-      {/* TABS */}
+      {/* Tabs */}
       <div
         style={{
           backgroundColor: "#27235c",
@@ -434,7 +458,7 @@ export default function FeedbackManagerDashboard() {
         </ul>
       </div>
 
-      {/* CONTENT AREA */}
+      {/* Content Area */}
       <div
         style={{
           backgroundColor: "#fff",
@@ -443,7 +467,7 @@ export default function FeedbackManagerDashboard() {
           padding: "1.5rem",
         }}
       >
-        {/* OVERVIEW TAB - QUICK ACTIONS */}
+        {/* Overview Tab - Quick Actions */}
         {activeTab === "overview" && (
           <div className="row g-3">
             {/* Manager Functions */}
@@ -914,7 +938,7 @@ export default function FeedbackManagerDashboard() {
           </div>
         )}
 
-        {/* MANAGER ACTIONS TAB */}
+        {/* Manager Actions Tab */}
         {activeTab === "manager-actions" && (
           <div>
             <h5
@@ -1080,7 +1104,7 @@ export default function FeedbackManagerDashboard() {
           </div>
         )}
 
-        {/* PEER FEEDBACK TAB */}
+        {/* Peer Feedback Tab */}
         {activeTab === "peer-feedback" && (
           <div>
             <h5
@@ -1164,9 +1188,9 @@ export default function FeedbackManagerDashboard() {
                             fontSize: "0.875rem",
                           }}
                         >
-                          {feedback.comment ||
+                          {feedback.feedbackContent ||
+                            feedback.comment ||
                             feedback.feedbackComment ||
-                            feedback.feedbackContent ||
                             "No comment provided"}
                         </p>
                       </div>

@@ -141,7 +141,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       {
         icon: "bi-arrow-up-circle",
         label: "Career Progression",
-        path: "/internal/nominations",
+        path: "/hr/operations/promotions",
       },
       {
         icon: "bi-shield-check",
@@ -227,7 +227,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       },
       {
         icon: "bi-chat-left-text",
-        label: "Company Policies",
+        label: "Feedback Mangement",
         path: "/employee/dashboard/feedback",
       },
     ],

@@ -1,0 +1,415 @@
+
+:root {
+  --hrview-primary: #27235C;
+  --hrview-secondary: #AC5098;
+  --hrview-bg: #FCFCFD;
+  --hrview-card: #FFFFFF;
+  --hrview-text: #2C3E50;
+  --hrview-border: #E0E0E0;
+  --hrview-success: #10B981;
+  --hrview-warning: #F59E0B;
+}
+
+body, html {
+  background: var(--hrview-bg);
+}
+
+.hrview-page {
+  min-height: 100vh;
+  background: var(--hrview-bg);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hrview-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  background: var(--hrview-card);
+  border-radius: 20px;
+  box-shadow: 0 4px 30px 2px rgba(39, 35, 92, 0.11);
+  padding: 2.2rem 2.2rem 2rem 2.2rem;
+}
+
+.hrview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.9rem;
+  flex-wrap: wrap;
+}
+
+.hrview-page-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #231d4f;
+  margin: 0 0 8px 0;
+  display: flex;
+}
+
+.hrview-btn-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--hrview-secondary);
+  color: white;
+  border: none;
+  border-radius: 13px;
+  padding: 13px 27px;
+  font-size: 1.11rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px 0 rgba(172,80,152,.11);
+  transition: 0.13s;
+}
+
+.hrview-btn-export:hover {
+  filter: brightness(1.09);
+}
+
+.hrview-stats-grid {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 18px;
+}
+
+.hrview-stat-card {
+  background: var(--hrview-primary);
+  border-radius: 15px;
+  min-width: 220px;
+  padding: 26px 37px 20px 28px;
+  color: #fff;
+  box-shadow: 0 6px 24px 0 rgba(39, 35, 92, 0.18);
+  display: flex;
+  align-items: center;
+  font-size: 1.23rem;
+  font-weight: 900;
+  gap: 17px;
+}
+
+.hrview-stat-icon {
+  font-size: 2.7rem;
+  opacity: 0.96;
+}
+
+.hrview-stat-card.pending {
+  background: #e2c14b;
+  color: #35331c;
+}
+
+.hrview-stat-card.completed {
+  background: #5ca378;
+  color: #fff;
+}
+
+.hrview-stat-texts {
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+}
+
+.hrview-stat-label {
+  font-size: 1.27rem;
+  color: inherit;
+  font-weight: 700;
+}
+
+.hrview-stat-number {
+  font-size: 2.55rem;
+  letter-spacing: 0.03em;
+  font-weight: 900;
+}
+
+.hrview-filters {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.hrview-filter-group {
+  flex: 1;
+  min-width: 220px;
+}
+
+.hrview-filter-group label {
+  display: block;
+  font-weight: 700;
+  color: var(--hrview-primary);
+  margin-bottom: 7px;
+  font-size: 1.05rem;
+  margin-left: 2px;
+}
+
+.hrview-filter-group select,
+.hrview-filter-group input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1.05rem;
+  border-radius: 10px;
+  border: 2px solid var(--hrview-secondary);
+  transition: border-color 0.19s;
+}
+
+.hrview-filter-group input:focus,
+.hrview-filter-group select:focus {
+  outline: 0;
+  border-color: var(--hrview-primary);
+}
+
+.hrview-table-wrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(39, 35, 92, 0.07);
+  background: #fff;
+}
+
+.hrview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.hrview-table th {
+  background: var(--hrview-primary);
+  border: none;
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding: 15px 10px;
+  text-align: left;
+  font-size: 1.07rem;
+}
+
+.hrview-table tr {
+  border-radius: 7px;
+}
+
+.hrview-table td {
+  padding: 17px 10px;
+  color: #29214d;
+  border-top: 1.6px solid #ece7f8;
+  vertical-align: middle;
+  font-weight: 600;
+  background: #fff;
+}
+
+.hrview-table td:first-child {
+  font-weight: 800;
+}
+
+.hrview-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 7px;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.hrview-badge-completed {
+  background: #5ca378;
+  color: #fff;
+}
+
+.hrview-badge-pending {
+  background: #ffe5a0;
+  color: #422300;
+}
+
+.hrview-badge-default {
+  background: #ded1ef;
+  color: #251543;
+}
+
+.hrview-btn-view {
+  background: #fff;
+  border: 2px solid #ac5098;
+  border-radius: 11px;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #922672;
+  padding: 10px 20px;
+  cursor: pointer;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: 0.16s;
+}
+
+.hrview-btn-view:hover,
+.hrview-btn-view:focus {
+  background: #ac5098;
+  color: #fff;
+}
+
+.hrview-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #b4b7bb;
+}
+
+.hrview-empty i {
+  font-size: 35px;
+  color: #eceaed;
+  margin-bottom: 12px;
+}
+
+.hrview-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--hrview-bg);
+}
+
+.hrview-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--hrview-primary);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: hrview-spin 1s linear infinite;
+}
+
+@keyframes hrview-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.hrview-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--hrview-bg);
+  color: var(--hrview-text);
+}
+
+.hrview-error i {
+  font-size: 3rem;
+  color: var(--hrview-warning);
+  margin-bottom: 1rem;
+}
+
+.hrview-alert {
+  background: #fef3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #856404;
+}
+
+.hrview-alert i {
+  font-size: 1.5rem;
+}
+.hrview-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(39,35,92,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.hrview-modal {
+  background: #fff;
+  width: 700px;
+  max-width: 96vw;
+  max-height: 92vh;
+  border-radius: 18px;
+  box-shadow: 0 11px 55px 0 rgba(39,35,92,0.16);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-bottom: 1em;
+}
+
+.hrview-modal-header {
+  padding: 28px 34px 0 34px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.hrview-modal-title {
+  font-size: 1.27em;
+  font-weight: 800;
+  color: #28235e;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.hrview-modal-subtitle {
+  font-size: 1rem;
+  color: #ac5098;
+  margin-bottom: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.hrview-modal-close {
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: #ac5098;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.hrview-modal-body {
+  padding: 0 34px 24px 34px;
+  overflow-y: auto;
+}
+
+.hrview-modal-no-data {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #999;
+  margin-top: 24px;
+}
+
+.hrview-comp-card {
+  margin: 22px 0 0 0;
+  padding: 18px 18px 10px 18px;
+  border: 1.6px solid #ac5098;
+  border-radius: 13px;
+  background: #f8f3fc;
+  font-size: 1.08em;
+}
+
+.hrview-comp-card:first-child {
+  margin-top: 12px;
+}
+
+.hrview-comp-card b {
+  font-weight: 700;
+  color: #27235c;
+}
+
+.hrview-comp-card hr {
+  border: none;
+  border-top: 1px solid #ddc0f8;
+  margin: 13px 0;
+}
+.hrview-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 22px;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: #ac5098;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 10;
+}

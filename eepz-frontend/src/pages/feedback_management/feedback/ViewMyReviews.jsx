@@ -1,3 +1,5 @@
+// src/pages/feedback_management/feedback/ViewMyReviews.jsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -9,9 +11,10 @@ import {
   Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import {
+  managerReviewApi,
+  employeeApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
 
 const Badge = ({ text, color = "#525252" }) => (
   <span
@@ -40,10 +43,7 @@ export default function ViewMyReviews() {
   const [error, setError] = useState("");
   const [employeeMap, setEmployeeMap] = useState({});
 
-  // ============================================================================
-  // FETCH REVIEWS
-  // ============================================================================
-
+  // Fetch reviews using services
   const fetchReviews = async () => {
     setLoading(true);
     setError("");
@@ -58,9 +58,14 @@ export default function ViewMyReviews() {
       // STEP 1: Fetch employee map
       let empMap = {};
       try {
-        const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
-        if (empRes.data?.success && Array.isArray(empRes.data.data)) {
-          empRes.data.data.forEach((emp) => {
+        const empRes = await employeeApi.getAll();
+        
+        if (empRes?.data) {
+          const employees = Array.isArray(empRes.data)
+            ? empRes.data
+            : empRes.data.data || [];
+
+          employees.forEach((emp) => {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
           });
           setEmployeeMap(empMap);
@@ -69,12 +74,15 @@ export default function ViewMyReviews() {
         console.warn("Error fetching employee map:", err.message);
       }
 
-      // STEP 2: Fetch reviews about me (where I'm the target)
-      const reviewRes = await axios.get(
-        `${API_BASE}/ManagerReview/target/${empId}`
-      );
-      if (reviewRes.data?.success && Array.isArray(reviewRes.data.data)) {
-        const enriched = reviewRes.data.data.map((r) => ({
+      // STEP 2: Fetch reviews about me using service
+      const reviewRes = await managerReviewApi.getByTargetEmployee(empId);
+      
+      if (reviewRes?.data) {
+        const reviewsData = Array.isArray(reviewRes.data)
+          ? reviewRes.data
+          : reviewRes.data.data || [];
+
+        const enriched = reviewsData.map((r) => ({
           ...r,
           managerName:
             empMap[r.managerEmployeeId] || `Manager ${r.managerEmployeeId}`,
@@ -83,25 +91,26 @@ export default function ViewMyReviews() {
         console.log("My reviews loaded:", enriched.length);
       }
     } catch (err) {
-      setError(
-        err?.response?.data?.message || err.message || "Failed to load reviews"
-      );
+      setError(err?.message || "Failed to load reviews");
       console.error("Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Fetch on mount
   useEffect(() => {
     fetchReviews();
   }, [user?.empId]);
 
+  // Calculate average rating
   const averageRating = useMemo(() => {
     if (reviews.length === 0) return 0;
     const sum = reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
     return (sum / reviews.length).toFixed(1);
   }, [reviews]);
 
+  // Loading state
   if (loading) {
     return (
       <div
@@ -128,7 +137,7 @@ export default function ViewMyReviews() {
           paddingRight: "1rem",
         }}
       >
-        {/* HEADER */}
+        {/* Header */}
         <div className="d-flex align-items-start mb-4">
           <button
             className="btn btn-outline-secondary me-2"
@@ -164,7 +173,7 @@ export default function ViewMyReviews() {
           </button>
         </div>
 
-        {/* ERROR ALERT */}
+        {/* Error Alert */}
         {error && (
           <div
             className="alert alert-danger d-flex align-items-start gap-2 mb-3"
@@ -179,7 +188,7 @@ export default function ViewMyReviews() {
           </div>
         )}
 
-        {/* STATS */}
+        {/* Stats */}
         {reviews.length > 0 && (
           <div className="row g-3 mb-4">
             <div className="col-md-6">
@@ -224,18 +233,24 @@ export default function ViewMyReviews() {
                     </div>
                   </div>
                   <h3 className="fw-bold" style={{ color: "#24A148" }}>
-                    {"⭐".repeat(Math.round(averageRating))}
+                    <Star
+                      size={20}
+                      style={{
+                        color: "#FFB800",
+                        fill: "#FFB800",
+                        display: "inline",
+                      }}
+                    />{" "}
+                    {averageRating}
                   </h3>
-                  <p className="mb-0 small text-muted">
-                    Average Rating: {averageRating}
-                  </p>
+                  <p className="mb-0 small text-muted">Average Rating</p>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* REVIEWS LIST */}
+        {/* Reviews List */}
         {reviews.length === 0 ? (
           <div
             className="card border-0"
@@ -287,13 +302,17 @@ export default function ViewMyReviews() {
                         </div>
                       </div>
                       <div className="text-end">
-                        <div className="mb-2">
-                          <span
-                            title={`Rating: ${review.rating}`}
-                            style={{ fontSize: "1.5rem" }}
-                          >
-                            {"⭐".repeat(review.rating || 0)}
-                          </span>
+                        <div className="mb-2 d-flex gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={18}
+                              style={{
+                                color: i < review.rating ? "#FFB800" : "#e0e0e0",
+                                fill: i < review.rating ? "#FFB800" : "none",
+                              }}
+                            />
+                          ))}
                         </div>
                         <Badge text={`${review.rating}/5`} color="#24A148" />
                       </div>

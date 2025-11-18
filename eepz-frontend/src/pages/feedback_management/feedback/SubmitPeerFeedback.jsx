@@ -1,9 +1,11 @@
+// src/pages/feedback_management/feedback/SubmitPeerFeedback.jsx
+
 import React, { useEffect, useMemo, useState } from "react";
 import { CheckCircle, Send, AlertTriangle, Loader } from "lucide-react";
-import { peerQueueApi } from "../../../services/feedbackmanagement/feedbackApi";
-import axios from "axios";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import {
+  peerQueueApi,
+  employeeApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
 
 export default function SubmitPeerFeedback() {
   const user = useMemo(
@@ -28,6 +30,7 @@ export default function SubmitPeerFeedback() {
   const [successMsg, setSuccessMsg] = useState("");
   const [error, setError] = useState("");
 
+  // Fetch employees using service
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -35,23 +38,28 @@ export default function SubmitPeerFeedback() {
   const fetchEmployees = async () => {
     setLoadingEmployees(true);
     try {
-      const response = await axios.get(`${API_BASE}/employeemanagement/all`);
+      const response = await employeeApi.getAll();
 
-      if (response.data?.success && Array.isArray(response.data.data)) {
-        setEmployees(response.data.data);
-        console.log(` Loaded ${response.data.data.length} employees`);
+      if (response?.data) {
+        const employeesList = Array.isArray(response.data)
+          ? response.data
+          : response.data.data || [];
+
+        setEmployees(employeesList);
+        console.log(`Loaded ${employeesList.length} employees`);
       } else {
-        console.error(" Invalid response format");
+        console.error("Invalid response format");
         setError("Failed to load employees: Invalid data format");
       }
     } catch (err) {
-      console.error(" Error fetching employees:", err.message);
+      console.error("Error fetching employees:", err.message);
       setError(`Failed to load employees: ${err.message}`);
     } finally {
       setLoadingEmployees(false);
     }
   };
 
+  // Submit feedback using service
   const submitFeedback = async (e) => {
     e.preventDefault();
 
@@ -83,74 +91,70 @@ export default function SubmitPeerFeedback() {
         isAnonymous: form.isAnonymous,
       };
 
-      console.log(" Step 1: Creating peer feedback");
+      console.log("Step 1: Creating peer feedback");
       console.log("Payload:", payload);
 
       const createResponse = await peerQueueApi.create(payload);
 
-      console.log(" Step 1 Complete - Feedback created:", createResponse.data);
+      console.log("Step 1 Complete - Feedback created:", createResponse);
 
-      if (createResponse.data?.success) {
-        const queueId = createResponse.data?.data?.queueId;
+      if (createResponse?.success || createResponse?.data?.success) {
+        const queueId =
+          createResponse.data?.queueId || createResponse.data?.data?.queueId;
 
         if (!queueId) {
           throw new Error("Queue ID not returned from create endpoint");
         }
 
-        console.log(` Step 2: Auto-approving feedback with queueId ${queueId}`);
+        console.log(`Step 2: Auto-approving feedback with queueId ${queueId}`);
 
         // STEP 2: Auto-approve the feedback
-        const approveResponse = await axios.post(
-          `${API_BASE}/PeerFeedbackQueue/${queueId}/approve`,
-          null, // No body needed
-          {
-            params: {
-              isProfessional: true,
-              isRelevant: true,
-              approvedByHRId: Number(user?.empId), // Use current user as approver
-            },
-            headers: { "Content-Type": "application/json" },
-            timeout: 10000,
+        try {
+          const approveResponse = await peerQueueApi.approve(queueId, {
+            isProfessional: true,
+            isRelevant: true,
+            approvedByHRId: Number(user?.empId),
+          });
+
+          console.log("Step 2 Complete - Feedback approved:", approveResponse);
+
+          if (approveResponse?.success || approveResponse?.data?.success) {
+            setSuccessMsg(
+              `Feedback submitted and approved successfully for ${selectedEmp.firstName} ${selectedEmp.lastName}!`
+            );
+            resetForm();
+          } else {
+            // Feedback created but approval failed - still show partial success
+            setSuccessMsg(
+              `Feedback submitted to ${selectedEmp.firstName} ${selectedEmp.lastName}, but auto-approval failed. HR will review it.`
+            );
+            resetForm();
           }
-        );
-
-        console.log(
-          " Step 2 Complete - Feedback approved:",
-          approveResponse.data
-        );
-
-        if (approveResponse.data?.success || approveResponse.status === 200) {
+        } catch (approveErr) {
+          console.warn("Auto-approval failed:", approveErr);
           setSuccessMsg(
-            ` Feedback submitted and approved successfully for ${selectedEmp.firstName} ${selectedEmp.lastName}!`
-          );
-          resetForm();
-        } else {
-          // Feedback created but approval failed - still show partial success
-          setSuccessMsg(
-            ` Feedback submitted to ${selectedEmp.firstName} ${selectedEmp.lastName}, but auto-approval failed. HR will review it.`
+            `Feedback submitted to ${selectedEmp.firstName} ${selectedEmp.lastName}, pending HR review.`
           );
           resetForm();
         }
       } else {
-        setError(createResponse.data?.message || "Failed to submit feedback");
+        setError(createResponse?.message || "Failed to submit feedback");
       }
     } catch (err) {
-      console.error(" Submit error:", {
+      console.error("Submit error:", {
         status: err?.response?.status,
         message: err?.response?.data?.message,
         fullError: err,
       });
 
-      const errorMsg =
-        err?.response?.data?.message ||
-        err.message ||
-        "Failed to submit feedback";
+      const errorMsg = err?.message || "Failed to submit feedback";
       setError(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
+  // Form handlers
   const handleRecipientChange = (e) => {
     setForm((prev) => ({ ...prev, recipientEmployeeId: e.target.value }));
   };
@@ -163,6 +167,7 @@ export default function SubmitPeerFeedback() {
     setForm((prev) => ({ ...prev, isAnonymous: e.target.checked }));
   };
 
+  // Form validation
   const validateForm = () => {
     if (!form.recipientEmployeeId) {
       setError("Please select a recipient employee");
@@ -179,6 +184,7 @@ export default function SubmitPeerFeedback() {
     return true;
   };
 
+  // Reset form
   const resetForm = () => {
     setForm({
       recipientEmployeeId: "",
@@ -187,35 +193,38 @@ export default function SubmitPeerFeedback() {
     });
   };
 
+  // Close alert
   const closeAlert = (type) => {
     if (type === "error") setError("");
     if (type === "success") setSuccessMsg("");
   };
 
+  // Get selected employee details
   const selectedEmployee = employees.find(
     (emp) => String(emp.employeeMasterId) === String(form.recipientEmployeeId)
   );
 
+  // Character count tracking
   const charCount = form.feedbackContent.length;
   const charRemaining = 5000 - charCount;
   const isNearLimit = charCount > 4500;
 
   return (
     <div className="container-fluid py-4" style={{ maxWidth: "1000px" }}>
-      {/* HEADER */}
+      {/* Header */}
       <div className="mb-4">
         <h2
           className="fw-bold mb-2"
           style={{ color: "var(--color-primary-1)" }}
         >
-          👥 Submit Peer Feedback
+          Submit Peer Feedback
         </h2>
         <p className="text-muted mb-0">
           Share constructive feedback with a colleague to support their growth
         </p>
       </div>
 
-      {/* ALERTS */}
+      {/* Error Alert */}
       {error && (
         <div
           className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2"
@@ -235,6 +244,7 @@ export default function SubmitPeerFeedback() {
         </div>
       )}
 
+      {/* Success Alert */}
       {successMsg && (
         <div
           className="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2"
@@ -251,31 +261,31 @@ export default function SubmitPeerFeedback() {
         </div>
       )}
 
-      {/* MAIN CARD */}
+      {/* Main Card */}
       <div className="card shadow-sm" style={{ borderRadius: "8px" }}>
         <div className="card-body p-4">
-          {/* DEBUG INFO */}
+          {/* Debug Info */}
           <div className="alert alert-info small mb-4">
-            <strong> Logged in as:</strong> {user?.firstName} {user?.lastName}{" "}
+            <strong>Logged in as:</strong> {user?.firstName} {user?.lastName}{" "}
             (ID: {user?.empId})
             <br />
-            <strong> Available Recipients:</strong> {employees.length} employees
+            <strong>Available Recipients:</strong> {employees.length} employees
             <br />
-            <strong> Auto-approval:</strong> Enabled (feedback will be approved
+            <strong>Auto-approval:</strong> Enabled (feedback will be approved
             immediately)
           </div>
 
-          {/* FORM */}
+          {/* Form */}
           <form onSubmit={submitFeedback} noValidate>
-            {/* RECIPIENT SELECTION ROW */}
+            {/* Recipient Selection Row */}
             <div className="row g-3 mb-4">
-              {/* DROPDOWN COLUMN */}
+              {/* Dropdown Column */}
               <div className="col-lg-6">
                 <label
                   htmlFor="recipientSelect"
                   className="form-label fw-bold mb-2"
                 >
-                  Select Recipient Employee *
+                  Select Recipient Employee <span className="text-danger">*</span>
                 </label>
                 <div className="position-relative">
                   <select
@@ -289,9 +299,9 @@ export default function SubmitPeerFeedback() {
                   >
                     <option value="">
                       {loadingEmployees
-                        ? " Loading employees..."
+                        ? "Loading employees..."
                         : employees.length === 0
-                        ? " No employees available"
+                        ? "No employees available"
                         : "-- Select an employee --"}
                     </option>
                     {employees.map((emp) => (
@@ -318,16 +328,15 @@ export default function SubmitPeerFeedback() {
                 </div>
                 <small className="d-block mt-2 text-muted">
                   {selectedEmployee
-                    ? `✓ Selected: ${selectedEmployee.firstName} ${selectedEmployee.lastName}`
+                    ? `Selected: ${selectedEmployee.firstName} ${selectedEmployee.lastName}`
                     : "Choose an employee to give feedback to"}
                 </small>
               </div>
 
-              {/* RECIPIENT DETAILS COLUMN */}
+              {/* Recipient Details Column */}
               {selectedEmployee && (
                 <div className="col-lg-6">
                   <label className="form-label fw-bold mb-2">
-                    {" "}
                     Recipient Details
                   </label>
                   <div
@@ -365,13 +374,13 @@ export default function SubmitPeerFeedback() {
               )}
             </div>
 
-            {/* FEEDBACK CONTENT */}
+            {/* Feedback Content */}
             <div className="mb-3">
               <label
                 htmlFor="feedbackContent"
                 className="form-label fw-bold mb-2"
               >
-                Feedback Content *
+                Feedback Content <span className="text-danger">*</span>
               </label>
               <textarea
                 id="feedbackContent"
@@ -381,6 +390,7 @@ export default function SubmitPeerFeedback() {
                 value={form.feedbackContent}
                 onChange={handleFeedbackChange}
                 disabled={loading}
+                maxLength={5000}
                 style={{
                   resize: "vertical",
                   minHeight: "140px",
@@ -401,7 +411,7 @@ export default function SubmitPeerFeedback() {
               </div>
             </div>
 
-            {/* ANONYMOUS CHECKBOX */}
+            {/* Anonymous Checkbox */}
             <div className="mb-4">
               <div className="form-check">
                 <input
@@ -421,7 +431,7 @@ export default function SubmitPeerFeedback() {
               </div>
             </div>
 
-            {/* BUTTONS */}
+            {/* Buttons */}
             <div className="d-grid gap-2 d-sm-flex justify-content-sm-between">
               <button
                 type="submit"
@@ -468,9 +478,9 @@ export default function SubmitPeerFeedback() {
         </div>
       </div>
 
-      {/* FOOTER INFO */}
+      {/* Footer Info */}
       <div className="mt-4 p-3 bg-light rounded small text-muted">
-        <strong> Tips for good feedback:</strong>
+        <strong>Tips for good feedback:</strong>
         <ul className="mb-0 mt-2 ps-3">
           <li>Be specific about behaviors and outcomes, not personality</li>
           <li>Provide examples to support your feedback</li>
