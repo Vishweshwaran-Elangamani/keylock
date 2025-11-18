@@ -29,7 +29,7 @@ builder.Services.AddSwaggerGen(c =>
     { 
         Title = "EEPZ API", 
         Version = "v1",
-        Description = "EEPZ Internal Opportunities & Authentication API"
+        Description = "Internal Opportunities API"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

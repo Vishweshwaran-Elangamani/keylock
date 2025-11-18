@@ -14,8 +14,6 @@ using System.IdentityModel.Tokens.Jwt;
  
 var builder = WebApplication.CreateBuilder(args);
  
-Console.WriteLine("Building........");
- 
 // ============ CORE SERVICES ============
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -25,9 +23,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "EEPZ Performance Management API",
+        Title = "EEPZ API",
         Version = "v1",
-        Description = "Backend API for EEPZ Performance Management System"
+        Description = "Performance Management API"
     });
  
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

@@ -31,9 +31,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
-        Title = "EEPZ Backend API",
+        Title = "EEPZ API",
         Version = "v1",
-        Description = "Enterprise Employee Performance & Management System API"
+        Description = "Project Management API"
     });
 
     // Enable XML comments for better Swagger documentation

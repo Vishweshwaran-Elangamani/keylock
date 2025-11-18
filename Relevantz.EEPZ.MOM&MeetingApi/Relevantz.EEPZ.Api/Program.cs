@@ -12,7 +12,6 @@ using System.Text;
 using Relevantz.EEPZ.Data.DBContexts;
 
 var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine("Building........");
 
 // Configure Serilog - optional, uncomment if needed
 // Log.Logger = new LoggerConfiguration()
@@ -29,9 +28,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "EEPZ Internal Opportunities API",
+        Title = "EEPZ API",
         Version = "v1",
-        Description = "Backend API for EEPZ Internal Opportunities Management System"
+        Description = "MoM API"
     });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

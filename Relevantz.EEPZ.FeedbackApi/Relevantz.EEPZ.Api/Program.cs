@@ -35,9 +35,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "EEPZ Feedback Management API",
+        Title = "EEPZ API",
         Version = "v1",
-        Description = "Backend API for EEPZ Feedback Management"
+        Description = "Feedback API"
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

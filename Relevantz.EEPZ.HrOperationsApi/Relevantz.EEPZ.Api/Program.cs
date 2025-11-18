@@ -62,9 +62,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "EEPZ HR Operations API",
+        Title = "EEPZ API",
         Version = "v1",
-        Description = "Sprint 2 (Policies & Goals) + Sprint 3 (Career Progression & Payroll) - Combined API"
+        Description = "HR Operations API"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

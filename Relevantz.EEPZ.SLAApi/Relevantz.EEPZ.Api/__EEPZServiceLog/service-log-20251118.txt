@@ -1,1 +1,18 @@
 2025-11-18 12:53:46.238 +05:30 [INF] Database migration completed successfully
+2025-11-18 14:26:18.310 +05:30 [INF] Database migration completed successfully
+2025-11-18 14:30:14.949 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-18 14:30:14.954 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 7.9871 ms
+2025-11-18 14:30:14.954 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 7.9577 ms
+2025-11-18 14:30:15.233 +05:30 [INF] Getting SLAs for employee 9
+2025-11-18 14:30:15.234 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-18 14:30:15.763 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 783.7189 ms
+2025-11-18 14:30:15.778 +05:30 [INF] Getting SLAs for employee 9
+2025-11-18 14:30:15.789 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-18 14:30:15.848 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 84.8531 ms
+2025-11-18 14:31:38.115 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/9 responded 204 in 0.3141 ms
+2025-11-18 14:31:38.150 +05:30 [INF] Getting SLAs for employee 9
+2025-11-18 14:31:38.151 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-18 14:31:38.159 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 42.6879 ms
+2025-11-18 14:31:38.179 +05:30 [INF] Getting SLAs for employee 9
+2025-11-18 14:31:38.179 +05:30 [INF] Retrieving SLAs for employee 9
+2025-11-18 14:31:38.183 +05:30 [INF] HTTP GET /api/Sla/employee/9 responded 200 in 21.0534 ms

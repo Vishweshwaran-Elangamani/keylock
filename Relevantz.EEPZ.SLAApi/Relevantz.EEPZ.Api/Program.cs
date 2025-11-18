@@ -15,7 +15,6 @@ using eepzbackend.Controllers;
 
 
 var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine("Building........");
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -33,9 +32,9 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "EEPZ Internal Opportunities API",
+        Title = "EEPZ API",
         Version = "v1",
-        Description = "Backend API for EEPZ Internal Opportunities Management System"
+        Description = "SLA API"
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

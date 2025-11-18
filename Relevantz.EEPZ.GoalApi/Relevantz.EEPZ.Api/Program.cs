@@ -42,9 +42,9 @@ builder.Services.AddSwaggerGen(options =>
         "v1",
         new OpenApiInfo
         {
-            Title = "EEPZ Internal Opportunities API",
+            Title = "EEPZ API",
             Version = "v1",
-            Description = "Backend API for EEPZ Internal Opportunities Management System",
+            Description = "Goal API",
         }
     );
 
