@@ -74,8 +74,8 @@ const ManagerDashboard = () => {
     {
       title: "Meeting & MOM Management",
       description: "Manage Meetings & MOMs",
-      icon: "bi bi-book",
-      gradient: "gradient-pink",
+      icon: "bi bi-journal-bookmark",
+      gradient: "gradient-teal",
       path: "/manager/dashboard/meetmom",
     },
   ];

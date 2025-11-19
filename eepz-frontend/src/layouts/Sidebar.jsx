@@ -40,6 +40,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       { icon: "bi-graph-up", label: "Performance Management", path: "/hr/dashboard/performance" },
       { icon: "bi-file-earmark-check", label: "SLA Management", path: "/hr/dashboard/sla" },
       { icon: "bi-chat-left-text", label: "Feedback Management", path: "/hr/dashboard/feedback" },
+      {
+        icon: "bi-journal-bookmark",
+        label: "Meethings & Mom",
+        path: "/hr/dashboard/meetmom",
+      },
     ],
     Leadership: [
       {
@@ -174,6 +179,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "SLA Management",
         path: "/manager/dashboard/sla",
       },
+      {
+        icon: "bi-journal-bookmark",
+        label: "Meethings & Mom",
+        path: "/manager/dashboard/meetmom",
+      },
     ],
     Employee: [
       {
@@ -196,19 +206,19 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Company Policies",
         path: "/employee/policies",
       },
-      
+
       {
         icon: "bi-building-check",
         label: "Employee Acknowledgement",
         path: "/employee/dashboard/employee-acknowledgments",
       },
-      
+
       {
         icon: "bi-graph-up",
         label: "Performance",
         path: "/employee/dashboard/performance",
       },
-      
+
       {
         icon: "bi-file-earmark-check",
         label: "SLA Compliance",
@@ -229,6 +239,10 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         icon: "bi-chat-left-text",
         label: "Feedback Mangement",
         path: "/employee/dashboard/feedback",
+      }, {
+        icon: "bi-journal-bookmark",
+        label: "Meethings & Mom",
+        path: "/employee/dashboard/meetmom",
       },
     ],
   };
@@ -291,7 +305,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
 
       {/* Navigation Menu */}
       <nav
-        style={{ flexGrow: 1, padding: "1rem 0.75rem", overflowY: "auto" }}
+        style={{
+          flexGrow: 1, padding: "1rem 0.75rem", overflowY: "auto",
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
       >
         <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {menuItems.map((item, index) => {
