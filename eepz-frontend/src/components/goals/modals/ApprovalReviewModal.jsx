@@ -138,20 +138,22 @@ const ApprovalReviewModal = ({
         className="modal-dialog modal-lg modal-dialog-scrollable"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="modal-content" style={{ borderRadius: "0.75rem" }}>
+        <div className="modal-content" style={{ borderRadius: "2rem" }}>
           <div
             className="modal-header"
             style={{
-              background: "linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)",
-              borderRadius: "0.75rem 0.75rem 0 0",
+              background: "rgb(39, 35, 92)",
               padding: "1.25rem 1.5rem",
             }}
           >
             <div>
-              <h5 className="modal-title mb-2" style={{ fontWeight: 700 }}>
+              <h5
+                className="modal-title mb-2"
+                style={{ fontWeight: 700, color: "white" }}
+              >
                 <i
                   className="bi bi-clipboard-check me-2"
-                  style={{ color: "#0d6efd" }}
+                  style={{ color: "white" }}
                 ></i>
                 Review Approval Request
               </h5>
@@ -181,12 +183,48 @@ const ApprovalReviewModal = ({
             </div>
             <button
               type="button"
-              className="btn-close"
+              class="btn-close"
               onClick={onClose}
-            ></button>
+              disabled={loading}
+              style={{
+                border: "none",
+                width: "36px",
+                backgroundColor: "transparent",
+                height: "36px",
+                borderRadius: "0.5rem",
+                cursor: loading ? "not-allowed" : "pointer",
+                color: "white",
+                fontSize: "1.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.color = "red";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.color = "white";
+                }
+              }}
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
 
-          <div className="modal-body" style={{ padding: "1.5rem" }}>
+          <div
+            className="modal-body"
+            style={{
+              padding: "1.5rem",
+              overflow: "scroll",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
             {alert && (
               <Alert
                 type={alert.type}
@@ -907,7 +945,6 @@ const ApprovalReviewModal = ({
                     padding: "0.5rem 1.25rem",
                   }}
                 >
-                  <i className="bi bi-x-circle me-1"></i>
                   Cancel
                 </button>
                 <button

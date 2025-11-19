@@ -208,24 +208,8 @@ const YourGoalsPage = () => {
       />
 
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2
-            style={{
-              fontWeight: 700,
-              color: "#212529",
-              marginBottom: "0.5rem",
-              textAlign: "left",
-            }}
-          >
-            Your Goals
-          </h2>
-          <p className="text-muted mb-0">
-            {user?.role === "Leadership"
-              ? "View all goals across the company"
-              : "View and manage all your goals"}
-          </p>
-        </div>
+      <div className="d-flex justify-content-end align-items-center mb-4">
+        
 
         <button
           className="btn btn-primary"

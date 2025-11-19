@@ -7,7 +7,6 @@ import GoalChecklist from "../../components/goals/detail/GoalChecklist";
 import GoalComments from "../../components/goals/detail/GoalComments";
 import GoalTimeline from "../../components/goals/detail/GoalTimeline";
 import GoalFormModal from "../../components/goals/modals/GoalFormModal";
-import AssignGoalModal from "../../components/goals/modals/AssignGoalModal";
 import RequestApprovalModal from "../../components/goals/modals/RequestApprovalModal";
 import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
@@ -20,12 +19,10 @@ import {
 } from "../../utils/goals/goalHelpers";
 import Breadcrumb from "../../components/goals/common/Breadcrumb";
 
-
 const ViewGoalPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -41,17 +38,14 @@ const ViewGoalPage = () => {
     canComment: false,
   });
 
-
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [approvalType, setApprovalType] = useState(null);
 
-
   useEffect(() => {
     loadGoal();
   }, [id]);
-
 
   const loadGoal = async (isRefresh = false) => {
     if (isRefresh) {
@@ -60,28 +54,22 @@ const ViewGoalPage = () => {
       setLoading(true);
     }
 
-
     setAlert(null);
-
 
     try {
       const response = await goalService.getGoal(id);
       const goalData = response.data;
 
-
       setGoal(goalData);
       setCurrentProgress(goalData.progressPercent || 0);
-
 
       const isCompleted = ["completed", "closed", "cancelled"].includes(
         goalData.status?.toLowerCase()
       );
 
-
       const canEdit = !isCompleted && canUserEdit(goalData, user);
       const canAssign = !isCompleted && canUserAssign(goalData, user);
       const canComment = canUserComment(goalData, user);
-
 
       setPermissions({
         canEdit,
@@ -103,16 +91,13 @@ const ViewGoalPage = () => {
     }
   };
 
-
   const handleEdit = () => {
     setShowEditModal(true);
   };
 
-
   const handleAssign = () => {
     setShowAssignModal(true);
   };
-
 
   // ✅ FIXED: Unified callback that handles all approval types
   const handleRequestApproval = (approvalTypeParam) => {
@@ -136,21 +121,17 @@ const ViewGoalPage = () => {
     setShowApprovalModal(true);
   };
 
-
   const handleGoalUpdated = () => {
     loadGoal(false);
   };
-
 
   const handleRefresh = () => {
     loadGoal(true);
   };
 
-
   if (loading) {
     return <LoadingSpinner text="Loading goal..." fullScreen />;
   }
-
 
   if (!goal) {
     return (
@@ -164,7 +145,6 @@ const ViewGoalPage = () => {
     );
   }
 
-
   // Check if Leadership is monitoring team goals
   const isCreator = goal.createdByEmployeeMasterId === user.empMasterId;
   const isAssignee = goal.assignees?.some(
@@ -175,12 +155,10 @@ const ViewGoalPage = () => {
   const isLeadershipMonitoring =
     isLeadership && isTeamGoal && !isCreator && !isAssignee;
 
-
   // Check if should show comments/timeline
   const shouldShowCommentsAndTimeline =
     !(goal.goalType === "org" && user.role !== "Leadership") &&
     !isLeadershipMonitoring;
-
 
   return (
     <div className="container-fluid p-4" style={{ marginBottom: "15px" }}>
@@ -188,7 +166,11 @@ const ViewGoalPage = () => {
       {goal && (
         <Breadcrumb
           items={[
-            { label: "Dashboard", path: "/dashboard/goals", icon: "house-door" },
+            {
+              label: "Dashboard",
+              path: "/dashboard/goals",
+              icon: "house-door",
+            },
             {
               label: "Your Goals",
               path: "/goals/your-goals",
@@ -198,7 +180,6 @@ const ViewGoalPage = () => {
           ]}
         />
       )}
-
 
       {alert && (
         <Alert
@@ -219,19 +200,6 @@ const ViewGoalPage = () => {
         currentProgress={currentProgress}
         userPersonalProgress={personalProgress}
       />
-
-
-      <div className="mb-3 text-end">
-        <button
-          className="btn btn-sm btn-outline-primary"
-          onClick={handleRefresh}
-          disabled={refreshing}
-        >
-          <i
-            className={`bi bi-arrow-clockwise me-2 ${refreshing ? "spin" : ""}`}
-          ></i>
-        </button>
-      </div>
 
       <ul className="nav nav-tabs mb-4">
         <li className="nav-item">
@@ -270,7 +238,6 @@ const ViewGoalPage = () => {
         )}
       </ul>
 
-
       <div className="tab-content">
         {activeTab === "details" && (
           <GoalChecklist
@@ -296,22 +263,12 @@ const ViewGoalPage = () => {
         )}
       </div>
 
-
       <GoalFormModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         goalData={goal}
         onSuccess={handleGoalUpdated}
       />
-
-
-      <AssignGoalModal
-        isOpen={showAssignModal}
-        onClose={() => setShowAssignModal(false)}
-        goalId={id}
-        onSuccess={handleGoalUpdated}
-      />
-
 
       {/* ✅ FIXED: Single RequestApprovalModal with dynamic approvalType */}
       <RequestApprovalModal
@@ -327,7 +284,6 @@ const ViewGoalPage = () => {
         requesterRole={user?.role}
       />
 
-
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
@@ -340,6 +296,5 @@ const ViewGoalPage = () => {
     </div>
   );
 };
-
 
 export default ViewGoalPage;

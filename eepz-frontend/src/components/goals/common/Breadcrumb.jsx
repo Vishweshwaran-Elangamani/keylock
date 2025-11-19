@@ -11,13 +11,11 @@ const Breadcrumb = ({ items }) => {
     }
   };
 
-  const cleanLabel = (label) => label?.replace(/^\/+/, "");
-
   const getRoleBasePath = () => {
     const role = user?.role;
     if (role === "Employee") return "/employee";
     if (role === "Leadership" || role === "Leadership") return "/leadership";
-    if (role === "Department Head") return "/manager"; 
+    if (role === "Department Head") return "/manager";
     return "/manager";
   };
 
@@ -38,15 +36,14 @@ const Breadcrumb = ({ items }) => {
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           // Build full path correctly
-          const fullPath = item.path ? `${basePath}${item.path.replace(/^\/+/, "")}` : null;
+          const fullPath = basePath + item.path;
 
           return (
             <li
               key={index}
               className={`breadcrumb-item ${isLast ? "active" : ""}`}
               aria-current={isLast ? "page" : undefined}
-              style={{ fontSize: "0.95rem"
-              }}
+              style={{ fontSize: "0.95rem" }}
             >
               {!isLast && fullPath ? (
                 <button
@@ -70,7 +67,7 @@ const Breadcrumb = ({ items }) => {
                   }
                 >
                   {item.icon && <i className={`bi bi-${item.icon}`}></i>}
-                  {cleanLabel(item.label)}
+                  {item.label}
                 </button>
               ) : (
                 <span
@@ -83,7 +80,7 @@ const Breadcrumb = ({ items }) => {
                   }}
                 >
                   {item.icon && <i className={`bi bi-${item.icon}`}></i>}
-                  {cleanLabel(item.label)}
+                  {item.label}
                 </span>
               )}
             </li>

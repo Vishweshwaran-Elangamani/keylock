@@ -45,35 +45,35 @@ const RequestApprovalModal = ({
   const getThemeConfig = () => {
     if (isClosure)
       return {
-        color: "#dc3545",
-        bgGradient: "linear-gradient(135deg, #fee 0%, #fdd 100%)",
+        color: "crimson",
+        bgGradient: "rgb(39, 35, 92)",
         icon: "bi-x-circle",
         iconBg: "#dc3545",
       };
     if (isReactivation)
       return {
-        color: "#fd7e14",
-        bgGradient: "linear-gradient(135deg, #fff4e6 0%, #ffe8cc 100%)",
+        color: "blue",
+        bgGradient: "rgb(39, 35, 92)",
         icon: "bi-arrow-repeat",
         iconBg: "#fd7e14",
       };
     if (isReopening)
       return {
-        color: "#ffc107",
-        bgGradient: "linear-gradient(135deg, #fffbea 0%, #fff4cc 100%)",
+        color: "crimson",
+        bgGradient: "rgb(39, 35, 92)",
         icon: "bi-arrow-clockwise",
         iconBg: "#ffc107",
       };
     if (isLeadershipOrgCompletion)
       return {
-        color: "#198754",
-        bgGradient: "linear-gradient(135deg, #e7f5ec 0%, #d4edda 100%)",
+        color: "blue",
+        bgGradient: "rgb(39, 35, 92)",
         icon: "bi-check-circle",
         iconBg: "#198754",
       };
     return {
-      color: "#0d6efd",
-      bgGradient: "linear-gradient(135deg, #e7f1ff 0%, #cfe2ff 100%)",
+      color: "blue",
+      bgGradient: "rgb(39, 35, 92)",
       icon: "bi-send-fill",
       iconBg: "#0d6efd",
     };
@@ -260,7 +260,7 @@ const RequestApprovalModal = ({
       <div
         style={{
           backgroundColor: "#fff",
-          borderRadius: "1rem",
+          borderRadius: "1.5rem",
           boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
           width: "100%",
           maxWidth: "650px",
@@ -276,7 +276,6 @@ const RequestApprovalModal = ({
             padding: "2rem 2rem 1.5rem",
             background: theme.bgGradient,
             borderRadius: "1rem 1rem 0 0",
-            borderBottom: `3px solid ${theme.color}`,
           }}
         >
           <div className="d-flex align-items-start justify-content-between">
@@ -303,7 +302,7 @@ const RequestApprovalModal = ({
                 style={{
                   margin: 0,
                   fontWeight: 700,
-                  color: "#212529",
+                  color: "white",
                   fontSize: "1.5rem",
                 }}
               >
@@ -311,17 +310,18 @@ const RequestApprovalModal = ({
               </h4>
             </div>
             <button
-              type="button"
+              type="button"              
+              class="btn-close"
               onClick={handleClose}
               disabled={loading}
               style={{
-                background: "white",
                 border: "none",
                 width: "36px",
+                backgroundColor: "transparent",
                 height: "36px",
                 borderRadius: "0.5rem",
                 cursor: loading ? "not-allowed" : "pointer",
-                color: "#6c757d",
+                color: "white",
                 fontSize: "1.5rem",
                 display: "flex",
                 alignItems: "center",
@@ -331,14 +331,12 @@ const RequestApprovalModal = ({
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
-                  e.currentTarget.style.background = "#dc3545";
-                  e.currentTarget.style.color = "white";
+                  e.currentTarget.style.color = "red";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!loading) {
-                  e.currentTarget.style.background = "white";
-                  e.currentTarget.style.color = "#6c757d";
+                  e.currentTarget.style.color = "white";
                 }
               }}
             >
@@ -370,7 +368,7 @@ const RequestApprovalModal = ({
                 >
                   <i
                     className="bi bi-paperclip me-2"
-                    style={{ color: theme.color }}
+                    style={{ color: "rgb(39, 35, 92)" }}
                   ></i>
                   {approvalType === APPROVAL_TYPES.COMPLETION
                     ? "Proof of Completion"
@@ -388,7 +386,7 @@ const RequestApprovalModal = ({
                       padding: "3rem 1.5rem",
                       textAlign: "center",
                       backgroundColor: isDragActive
-                        ? `${theme.color}10`
+                        ? `rgba(39, 35, 92, 0.57)`
                         : "#f8f9fa",
                       cursor: "pointer",
                       transition: "all 0.3s ease",
@@ -406,7 +404,9 @@ const RequestApprovalModal = ({
                         height: "80px",
                         margin: "0 auto 1.5rem",
                         borderRadius: "1rem",
-                        background: isDragActive ? theme.color : "#e9ecef",
+                        background: isDragActive
+                          ? "rgb(39, 35, 92)"
+                          : "#e9ecef",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -425,16 +425,18 @@ const RequestApprovalModal = ({
                       style={{
                         fontWeight: 600,
                         fontSize: "1.1rem",
+                        fontWeight: "bold",
                         marginBottom: "0.5rem",
-                        color: "#212529",
+                        color: isDragActive ? "rgb(39, 35, 92)" : "#6c757d",
                       }}
                     >
                       Drop your file here or click to browse
                     </h6>
                     <p
                       style={{
-                        color: "#6c757d",
+                        color: isDragActive ? "rgb(39, 35, 92)" : "#6c757d",
                         fontSize: "0.9rem",
+                        fontWeight: "bold",
                         marginBottom: "1rem",
                       }}
                     >
@@ -444,7 +446,7 @@ const RequestApprovalModal = ({
                       style={{
                         display: "inline-block",
                         padding: "0.5rem 1.5rem",
-                        background: theme.color,
+                        background: "rgb(39, 35, 92)",
                         color: "white",
                         borderRadius: "0.5rem",
                         fontSize: "0.9rem",
@@ -456,8 +458,9 @@ const RequestApprovalModal = ({
                     </div>
                     <p
                       style={{
-                        fontSize: "0.8rem",
-                        color: "#6c757d",
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        color: isDragActive ? "rgb(39, 35, 92)" : "#6c757d",
                         marginTop: "1rem",
                         marginBottom: 0,
                       }}
@@ -477,8 +480,8 @@ const RequestApprovalModal = ({
                   <div
                     style={{
                       padding: "1.5rem",
-                      background: `${theme.color}15`,
-                      border: `2px solid ${theme.color}`,
+                      background: "rgba(39, 35, 92, 0.25)",
+                      border: `2px solid rgb(39, 35, 92)`,
                       borderRadius: "1rem",
                       display: "flex",
                       alignItems: "center",
@@ -490,7 +493,7 @@ const RequestApprovalModal = ({
                         width: "60px",
                         height: "60px",
                         borderRadius: "0.75rem",
-                        background: theme.color,
+                        background: "rgb(39, 35, 92)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -507,26 +510,21 @@ const RequestApprovalModal = ({
                         style={{
                           fontWeight: 600,
                           fontSize: "1rem",
-                          color: "#212529",
+                          color: "black",
                           marginBottom: "0.25rem",
                         }}
                       >
                         {proofFile.name}
                       </div>
-                      <div style={{ fontSize: "0.85rem", color: "#6c757d" }}>
-                        {(proofFile.size / 1024).toFixed(2)} KB
-                      </div>
-                      <span
-                        className="badge mt-2"
+                      <div
                         style={{
-                          background: theme.color,
-                          fontSize: "0.75rem",
-                          padding: "0.35rem 0.75rem",
+                          fontSize: "0.85rem",
+                          color: "black",
+                          textAlign: "left",
                         }}
                       >
-                        <i className="bi bi-check-circle-fill me-1"></i>
-                        Ready to submit
-                      </span>
+                        {(proofFile.size / 1024).toFixed(2)} KB
+                      </div>
                     </div>
                     <button
                       type="button"
@@ -536,6 +534,7 @@ const RequestApprovalModal = ({
                       style={{
                         borderRadius: "0.5rem",
                         padding: "0.5rem 1rem",
+                        marginLeft: "25rem",
                       }}
                     >
                       <i className="bi bi-trash-fill"></i>
@@ -559,17 +558,18 @@ const RequestApprovalModal = ({
         >
           <button
             type="button"
-            className="btn btn-secondary"
+            className="btn btn-outline-secondary"
             onClick={handleClose}
             disabled={loading}
             style={{
               borderRadius: "0.75rem",
-              padding: "0.75rem 1.5rem",
+              padding: "10px 18px",
               fontWeight: 600,
               fontSize: "0.95rem",
+              textAlign: "center",
+              alignContent: "center"
             }}
           >
-            <i className="bi bi-x-circle me-2"></i>
             Cancel
           </button>
           <button
@@ -585,10 +585,22 @@ const RequestApprovalModal = ({
               padding: "0.75rem 2rem",
               fontWeight: 600,
               fontSize: "0.95rem",
-              background: theme.color,
+              background: `${theme.color}`,
               border: "none",
               color: "white",
             }}
+            onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.backgroundColor = `${theme.color}`;
+                  e.currentTarget.style.filter = 'brightness(85%)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.backgroundColor = `${theme.color}`;
+                  e.currentTarget.style.filter = 'brightness(100%)'
+                }
+              }}
           >
             {loading ? (
               <>

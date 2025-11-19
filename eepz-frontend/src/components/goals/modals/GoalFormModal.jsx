@@ -559,25 +559,65 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         style={{ zIndex: 1050 }}
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-          <div className="modal-content" >
-            <div className="modal-header">
-              <h5 className="modal-title">
+        <div
+          className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
+          style={{ borderRadius: "1.5rem" }}
+        >
+          <div className="modal-content">
+            <div
+              className="modal-header"
+              style={{ backgroundColor: "rgb(39, 35, 92)" }}
+            >
+              <h5
+                className="modal-title"
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "600",
+                  color: "white",
+                }}
+              >
                 {isEdit ? "Edit Goal" : "Create New Goal"}
               </h5>
-              <button type="button" className="btn-close" onClick={onClose} />
+              <button
+                type="button"
+                class="btn-close"
+                onClick={onClose}
+                style={{
+                  border: "none",
+                  width: "36px",
+                  backgroundColor: "transparent",
+                  height: "36px",
+                  borderRadius: "0.5rem",
+                  cursor: "pointer",
+                  color: "white",
+                  fontSize: "1.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "red";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "white";
+                }}
+              >
+                <i className="bi bi-x-lg"></i>
+              </button>
             </div>
 
             <div
-  className="modal-body"
-  ref={modalBodyRef}
-  style={{
-    maxHeight: "70vh",
-    overflowY: "auto",
-    msOverflowStyle: "none",   // IE and Edge
-    scrollbarWidth: "none"     // Firefox
-  }}
->
+              className="modal-body"
+              ref={modalBodyRef}
+              style={{
+                maxHeight: "70vh",
+                overflowY: "auto",
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+              }}
+            >
               {alert && (
                 <Alert
                   type={alert.type}
@@ -1146,7 +1186,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-outline-secondary"
                 onClick={onClose}
                 disabled={loading}
               >
@@ -1156,7 +1196,11 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleSubmit}
-                // Require at least 3 checklist items
+                style={{
+                  background:
+                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  border: "none",
+                }}
                 disabled={
                   loading ||
                   loadingData ||

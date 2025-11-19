@@ -128,8 +128,6 @@ const GoalDetailsHeader = ({
     goal.status !== "reopened" &&
     !["closed", "cancelled"].includes(goal.status?.toLowerCase());
 
-  console.log(isCreator);
-
   // Button for org goal reopen (no overdue requirement)
   const canReopenOrgGoal =
     isCreator &&
@@ -529,8 +527,6 @@ const GoalDetailsHeader = ({
             <div
               className="ps-lg-4 pt-3 pt-lg-0"
               style={{
-                borderLeft:
-                  window.innerWidth >= 992 ? "1px solid #dee2e6" : "none",
                 marginLeft: "5rem",
               }}
             >

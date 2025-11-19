@@ -134,8 +134,8 @@ const GoalsDashboard = () => {
     const rolePath = isEmployee
       ? "employee"
       : isLeader
-        ? "leadership"
-        : "manager";
+      ? "leadership"
+      : "manager";
     navigate(`/${rolePath}/goals/your-goals`);
   };
 
@@ -147,23 +147,7 @@ const GoalsDashboard = () => {
   return (
     <div className="container-fluid p-4">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2
-            style={{
-              fontWeight: 700,
-              color: "#212529",
-              marginBottom: "0.5rem",
-              textAlign: "left",
-            }}
-          >
-            Goals Dashboard
-          </h2>
-          <p className="text-muted mb-0">
-            Track and manage your goals in one place
-          </p>
-        </div>
-
+      <div className="d-flex justify-content-end align-items-center mb-4">
         <div className="d-flex gap-2">
           <button className="btn btn-primary" onClick={handleCreateGoal}>
             <i className="bi bi-plus-circle me-2"></i>
@@ -224,17 +208,6 @@ const GoalsDashboard = () => {
                   </span>
                 )}
               </h5>
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-primary d-flex align-items-center"
-                onClick={handleViewAll}
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="View all items"
-                aria-label="View all items"
-              >
-                <i className="bi bi-arrow-right ms-2" aria-hidden="true"></i>
-              </button>
             </div>
 
             {loadingGoals ? (
@@ -256,17 +229,6 @@ const GoalsDashboard = () => {
                 <h6 className="mt-3 mb-2" style={{ color: "#6c757d" }}>
                   No ongoing goals
                 </h6>
-                <p className="text-muted mb-3">
-                  Start by creating your first goal
-                </p>
-                <button
-                  className="btn btn-primary"
-                  onClick={handleCreateGoal}
-                  style={{ maxWidth: "200px", margin: "0 auto" }}
-                >
-                  <i className="bi bi-plus-circle me-2"></i>
-                  Create Goal
-                </button>
               </div>
             ) : (
               <>

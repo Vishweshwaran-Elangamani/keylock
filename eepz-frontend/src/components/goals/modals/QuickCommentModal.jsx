@@ -81,7 +81,7 @@ const QuickCommentModal = ({
         <div
           style={{
             backgroundColor: "#fff",
-            borderRadius: "0.5rem",
+            borderRadius: "1rem",
             boxShadow: "0 10px 40px rgba(0, 0, 0, 0.2)",
             width: "100%",
             maxWidth: "550px",
@@ -92,30 +92,51 @@ const QuickCommentModal = ({
           <div
             style={{
               padding: "1.25rem 1.5rem",
+
+              borderRadius: "1rem 1rem 0rem 0rem",
+              backgroundColor: "rgb(39, 35, 92)",
               borderBottom: "1px solid #dee2e6",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
             }}
           >
-            <h5 style={{ margin: 0, fontWeight: 600 }}>
+            <h5 style={{ margin: 0, fontWeight: 600, color: "white" }}>
               <i className="bi bi-chat-dots me-2"></i>
               Add Comment
             </h5>
             <button
               type="button"
-              onClick={handleClose}
+              class="btn-close"
+              onClick={onClose}
               disabled={loading}
               style={{
-                background: "transparent",
                 border: "none",
+                width: "36px",
+                backgroundColor: "transparent",
+                height: "36px",
+                borderRadius: "0.5rem",
+                cursor: loading ? "not-allowed" : "pointer",
+                color: "white",
                 fontSize: "1.5rem",
-                cursor: "pointer",
-                padding: 0,
-                color: "#6c757d",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.color = "red";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.color = "white";
+                }
               }}
             >
-              &times;
+              <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
@@ -187,6 +208,9 @@ const QuickCommentModal = ({
             <button
               type="submit"
               className="btn btn-primary"
+              style={{
+                background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+              }}
               onClick={handleSubmit}
               disabled={loading || !comment.trim()}
             >
