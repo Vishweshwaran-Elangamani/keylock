@@ -45,11 +45,9 @@ const EditPolicyModal = ({
   ];
 
   const statuses = ["Active", "Inactive", "Draft"];
-
-  //  Helper function to get full document URL
   const getFullDocumentUrl = (url) => {
     if (!url) return "";
-    if (url.startsWith("http")) return url; // Already full URL
+    if (url.startsWith("http")) return url; 
 
     const baseUrl = import.meta.env.VITE_HR_API_URL;
     return `${baseUrl}${url}`;

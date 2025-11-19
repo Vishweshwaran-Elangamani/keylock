@@ -19,6 +19,7 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/VerifyCode.css";
+import logo from "../../../assets/logodarkbarred.png";
 
 const VerifyCode = () => {
   // ========================
@@ -480,9 +481,14 @@ const VerifyCode = () => {
       <div className="verify-code-card">
         <div className="verify-code-header">
           <div className="logo-section-verify">
-            <img src="/logodark.png" alt="EEPZ Logo" className="logo-img-verify" style={{
-              width: "250px"
-            }}/>
+            <img
+              src={logo}
+              alt="EEPZ Logo"
+              className="logo-img-verify"
+              style={{
+                width: "200px",
+              }}
+            />
           </div>
           <h2 className="verify-title">
             <i className="bi bi-shield-check"></i>

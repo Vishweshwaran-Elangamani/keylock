@@ -19,6 +19,7 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 import api from "../../../services/api";
 import { toast } from "sonner";
 import "../../../styles/auth/common/ChangePassword.css";
+import logo from "../../../assets/logodarkbarred.png";
 
 const ChangePassword = () => {
   // ========================
@@ -407,7 +408,14 @@ const ChangePassword = () => {
       <div className="change-password-card">
         <div className="change-password-header">
           <div className="logo-section">
-            <img src="/logo.png" alt="EEPZ Logo" className="logo-img-cp" />
+            <img
+              src={logo}
+              alt="EEPZ Logo"
+              className="logo-img-cp"
+              style={{
+                width: "200px",
+              }}
+            />
           </div>
           <h2 className="change-password-title">
             <i className="bi bi-key"></i>
