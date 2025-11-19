@@ -52,9 +52,6 @@ export default function PerformanceManagerHome() {
 
   return (
     <div className="managerperfromancehome-container">
-      <h1 className="managerperfromancehome-main-title">
-        EEPZ Performance Management - Manager
-      </h1>
       <div className="managerperfromancehome-cards-grid">
         {cards.map((card, index) => (
           <div

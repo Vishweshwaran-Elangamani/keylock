@@ -68,9 +68,7 @@ export default function HRHome() {
   return (
     <div className="eepz-hrhome-bg">
       <div className="eepz-hrhome-container">
-        <h1 className="eepz-hrhome-title">
-          EEPZ Performance Management
-        </h1>
+        
         <div className="eepz-hrhome-card-grid">
           {cards.map((card, idx) => (
             <div

@@ -57,69 +57,7 @@ const ProjectManagementDashboard = () => {
       className="h-100 d-flex flex-column"
       style={{ maxWidth: "100%", width: "100%" }}
     >
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div>
-          <h2
-            className="fw-bold mb-1"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            Project Management Dashboard
-          </h2>
-          <p className="mb-0 medium" style={{ color: "var(--muted)", textAlign:"left"}}>
-            Overview and quick actions
-          </p>
-        </div>
-        <div className="d-flex gap-2 flex-shrink-0">
-          {/* <button
-            className="btn d-flex align-items-center gap-2"
-            onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
-            style={{
-              backgroundColor: "transparent",
-              border: "1px solid var(--border)",
-              color: "var(--color-primary-3)",
-              borderRadius: "var(--radius-md)",
-              padding: "0.5rem 0.9rem",
-              fontWeight: "600",
-              transition: "all 0.12s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--color-primary-5)";
-              e.currentTarget.style.borderColor = "var(--color-primary-3)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.borderColor = "var(--border)";
-            }}
-          >
-            <FolderKanban size={18} />
-            <span>View All</span>
-          </button> */}
-          {/* <button
-            className="btn d-flex align-items-center gap-2"
-            onClick={() => navigate("/hr/dashboard/projectmgmt/create")}
-            style={{
-              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-              border: "none",
-              color: "white",
-              borderRadius: "9px",
-              padding: "0.5rem 0.9rem",
-              fontWeight: "600",
-              boxShadow: "var(--shadow)",
-              transition: "all 0.12s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-1px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
-          >
-            <FolderPlus size={18} />
-            <span>Create</span>
-          </button> */}
-        </div>
-      </div>
+      
 
       {/* Statistics Cards */}
       <div className="row g-4 mb-4">

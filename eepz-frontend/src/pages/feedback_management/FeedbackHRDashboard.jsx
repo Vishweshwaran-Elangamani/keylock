@@ -290,42 +290,7 @@ export default function FeedbackHRDashboard() {
     >
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         {/* Header */}
-        <div
-          className="d-flex justify-content-between align-items-center mb-4"
-          style={{ flexWrap: "wrap", gap: "1rem" }}
-        >
-          <div>
-            <h2
-              className="fw-bold mb-1"
-              style={{ color: "#97247E", fontSize: "1.75rem" }}
-            >
-              HR Dashboard
-            </h2>
-            <p className="mb-0 text-muted" style={{ fontSize: "0.875rem" }}>
-              Welcome back, {user?.firstName} {user?.lastName}
-            </p>
-          </div>
-          <button
-            className="btn btn-outline-secondary d-flex align-items-center gap-2"
-            onClick={refresh}
-            disabled={refreshing}
-            style={{
-              borderRadius: "8px",
-              padding: "10px 20px",
-              fontWeight: 600,
-              border: "2px solid #97247E",
-              color: "#97247E",
-            }}
-          >
-            <RefreshCw
-              size={18}
-              style={{
-                animation: refreshing ? "spin 1s linear infinite" : "none",
-              }}
-            />
-            Refresh
-          </button>
-        </div>
+        
 
         {/* Error Alert */}
         {error && (

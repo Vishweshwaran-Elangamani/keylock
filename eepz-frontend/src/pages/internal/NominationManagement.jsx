@@ -176,17 +176,6 @@ const NominationManagement = () => {
         </ol>
       </nav>
 
-      <div className="page-header">
-        <div className="header-content">
-          <div className="header-text">
-            <h2 className="page-title">Nominations</h2>
-            <p className="page-description">
-              Manage employee nominations for internal opportunities
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="filters-card">
         <div className="filters-content">
           <div className="filters-left">
