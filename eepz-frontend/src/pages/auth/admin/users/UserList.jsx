@@ -363,7 +363,7 @@ const UserList = () => {
                       </div>
                     </td>
                     <td style={{ textAlign: "left" }}>{user.email}</td>
-                    <td className="text-muted">@{user.employeeCompanyId}</td>
+                    <td className="text-muted">{user.employeeCompanyId}</td>
                     <td>
                       <span
                         className={`status-badge ${

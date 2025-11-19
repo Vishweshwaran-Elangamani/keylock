@@ -1,17 +1,3 @@
-/**
- * DepartmentList Component
- *
- * Main component for department management in the admin dashboard.
- * Features:
- * - View departments in Grid or Table layout
- * - Search and filter departments
- * - Create, Edit, and Delete department operations
- * - Statistics dashboard showing department counts
- * - Pagination for table view
- * - Toast notifications using Sonner for user feedback
- *
- * @component
- */
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -458,9 +444,6 @@ const DepartmentList = () => {
                   {/* -------- Card Body -------- */}
                   <div className="card-body-dept">
                     <h3 className="dept-name-text">{dept.departmentName}</h3>
-                    <p className="dept-description-text">
-                      {dept.description || "No description available"}
-                    </p>
                   </div>
 
                   {/* -------- Card Footer -------- */}
@@ -505,7 +488,6 @@ const DepartmentList = () => {
                   <thead>
                     <tr>
                       <th>Department Name</th>
-                      <th>Description</th>
                       <th>Created At</th>
                       <th>Actions</th>
                     </tr>
@@ -526,9 +508,7 @@ const DepartmentList = () => {
                         </td>
 
                         {/* Description */}
-                        <td className="description-cell">
-                          {dept.description || "N/A"}
-                        </td>
+                        
 
                         {/* Created Date */}
                         <td>{formatDate(dept.createdAt)}</td>
@@ -649,3 +629,4 @@ const DepartmentList = () => {
 };
 
 export default DepartmentList;
+

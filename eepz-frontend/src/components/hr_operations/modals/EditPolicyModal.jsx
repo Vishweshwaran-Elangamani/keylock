@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal, Button, Form, Spinner, Badge } from "react-bootstrap";
+import { CloseButton, Badge } from "react-bootstrap";
 import policyService from "../../../services/hr_operations/hr/policyService";
 
 const EditPolicyModal = ({
@@ -18,7 +18,6 @@ const EditPolicyModal = ({
     status: "Active",
   });
 
-  //  Document state
   const [documentType, setDocumentType] = useState("none");
   const [selectedFile, setSelectedFile] = useState(null);
   const [documentLink, setDocumentLink] = useState("");
@@ -45,10 +44,10 @@ const EditPolicyModal = ({
   ];
 
   const statuses = ["Active", "Inactive", "Draft"];
+
   const getFullDocumentUrl = (url) => {
     if (!url) return "";
-    if (url.startsWith("http")) return url; 
-
+    if (url.startsWith("http")) return url;
     const baseUrl = import.meta.env.VITE_HR_API_URL;
     return `${baseUrl}${url}`;
   };
@@ -63,7 +62,6 @@ const EditPolicyModal = ({
         status: policy.status || "Active",
       });
 
-      //  Load existing document if available
       if (policy.documentUrl) {
         setExistingDocument({
           url: policy.documentUrl,
@@ -88,7 +86,6 @@ const EditPolicyModal = ({
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  //  Handle file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -141,7 +138,6 @@ const EditPolicyModal = ({
 
       let documentData = {};
 
-      //  Handle new document upload/link
       if (documentType === "upload" && selectedFile) {
         setUploadingDoc(true);
         const uploadResult = await policyService.uploadDocument(selectedFile);
@@ -181,13 +177,12 @@ const EditPolicyModal = ({
     }
   };
 
-  //  Handle Publish
   const handlePublish = async () => {
     try {
       setPublishing(true);
       await policyService.publishPolicy(policy.policyId);
       if (typeof onToast === "function")
-        onToast("success", " Policy published successfully!");
+        onToast("success", "Policy published successfully!");
       onSuccess();
       onClose();
     } catch (error) {
@@ -199,19 +194,14 @@ const EditPolicyModal = ({
     }
   };
 
-  //  NEW: Handle Unpublish
   const handleUnpublish = async () => {
     try {
       setUnpublishing(true);
       await policyService.unpublishPolicy(policy.policyId);
       if (typeof onToast === "function")
-        onToast("warning", " Policy unpublished - Hidden from employees");
+        onToast("warning", "Policy unpublished - Hidden from employees");
       onSuccess();
       onClose();
-    } catch (error) {
-      console.error("Error unpublishing policy:", error);
-      if (typeof onToast === "function")
-        onToast("danger", "Failed to unpublish policy");
     } finally {
       setUnpublishing(false);
     }
@@ -222,352 +212,952 @@ const EditPolicyModal = ({
     onDelete(policy.policyId, policy.policyName);
   };
 
+  if (!show) return null;
+
+  const isAnyActionLoading = loading || uploadingDoc || publishing || unpublishing;
+
   return (
-    <Modal show={show} onHide={onClose} centered size="lg" className="pm-modal">
-      <Modal.Header closeButton className="pm-modal-header">
-        <Modal.Title>
-          <i className="bi bi-pencil-square me-2"></i>
-          Edit Policy
-          {/*  Show publish status badge */}
-          {policy?.isPublished ? (
-            <Badge bg="success" className="ms-2">
-              Published
-            </Badge>
-          ) : (
-            <Badge bg="warning" className="ms-2">
-              Draft
-            </Badge>
-          )}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="pm-modal-body">
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>
-              Policy Name <span className="text-danger">*</span>
-            </Form.Label>
-            <Form.Control
-              type="text"
-              name="policyName"
-              placeholder="Enter policy name"
-              value={formData.policyName}
-              onChange={handleChange}
-              isInvalid={!!errors.policyName}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.policyName}
-            </Form.Control.Feedback>
-          </Form.Group>
+    <>
+      {/* Backdrop with Blur */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(39, 35, 92, 0.4)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 1040,
+          transition: 'all 0.3s ease'
+        }}
+        onClick={onClose}
+      />
 
-          <Form.Group className="mb-3">
-            <Form.Label>
-              Category <span className="text-danger">*</span>
-            </Form.Label>
-            <Form.Select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              isInvalid={!!errors.category}
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Control.Feedback type="invalid">
-              {errors.category}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>
-              Description <span className="text-danger">*</span>
-            </Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              name="description"
-              placeholder="Enter policy description"
-              value={formData.description}
-              onChange={handleChange}
-              isInvalid={!!errors.description}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.description}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Compliance Guidance</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              name="complianceGuidance"
-              placeholder="Enter compliance guidance (optional)"
-              value={formData.complianceGuidance}
-              onChange={handleChange}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Status</Form.Label>
-            <Form.Select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              {statuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-
-          {/*  DOCUMENT SECTION */}
+      {/* Modal Wrapper */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1050,
+          padding: '20px'
+        }}
+      >
+        {/* Modal Dialog */}
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '900px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: '0.5rem',
+            overflow: 'hidden',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+            backgroundColor: '#ffffff'
+          }}
+        >
+          {/* Modal Header - Dark Navy Blue */}
           <div
-            className="pm-document-section mt-4 p-3"
             style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              background: "#f9fafb",
+              background: '#27235C',
+              color: '#ffffff',
+              padding: '16px 20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexShrink: 0
             }}
           >
-            <Form.Label className="fw-bold mb-3">
-              <i className="bi bi-file-earmark-text me-2"></i>
-              Policy Document
-            </Form.Label>
+            <div
+              style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: '#ffffff'
+              }}
+            >
+              <i className="bi bi-pencil-square"></i>
+              Edit Policy
+              {policy?.isPublished ? (
+                <Badge 
+                  bg="success"
+                  style={{
+                    marginLeft: '8px',
+                    fontSize: '11px',
+                    padding: '4px 8px',
+                    fontWeight: '500'
+                  }}
+                >
+                  Published
+                </Badge>
+              ) : (
+                <Badge 
+                  bg="warning"
+                  style={{
+                    marginLeft: '8px',
+                    fontSize: '11px',
+                    padding: '4px 8px',
+                    fontWeight: '500'
+                  }}
+                >
+                  Draft
+                </Badge>
+              )}
+            </div>
+            <CloseButton
+              onClick={onClose}
+              variant="white"
+              style={{
+                filter: 'brightness(0) invert(1)',
+                opacity: 1
+              }}
+            />
+          </div>
 
-            {/*  Show existing document with FIXED URL */}
-            {existingDocument && (
+          {/* Form - Scrollable Body */}
+          <form 
+            onSubmit={handleSubmit} 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              flex: 1,
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Body - Scrollable */}
+            <div
+              style={{
+                padding: '20px',
+                overflowY: 'auto',
+                flex: 1,
+                backgroundColor: '#ffffff',
+                maxHeight: 'calc(90vh - 200px)'
+              }}
+            >
+              {/* Two Column Grid */}
               <div
-                className="mb-3 p-2"
                 style={{
-                  background: "#e0f2fe",
-                  borderRadius: "6px",
-                  border: "1px solid #7dd3fc",
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '20px',
+                  marginBottom: 0
                 }}
               >
-                <div className="d-flex align-items-center justify-content-between">
+                {/* LEFT COLUMN */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {/* Policy Name */}
                   <div>
-                    <i
-                      className={`bi ${
-                        existingDocument.type === "upload"
-                          ? "bi-file-earmark-pdf"
-                          : "bi-link-45deg"
-                      } me-2`}
-                    ></i>
-                    <strong>{existingDocument.name}</strong>
-                    {existingDocument.size && (
-                      <small className="text-muted ms-2">
-                        ({existingDocument.size})
-                      </small>
+                    <label
+                      style={{
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        color: '#334155',
+                        marginBottom: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      Policy Name <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="policyName"
+                      placeholder="Enter policy name"
+                      value={formData.policyName}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        border: errors.policyName ? '1px solid #ef4444' : '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        fontSize: '13px',
+                        transition: 'all 0.2s ease',
+                        backgroundColor: '#ffffff',
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => {
+                        if (!errors.policyName) {
+                          e.target.style.borderColor = '#27235C';
+                          e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (!errors.policyName) {
+                          e.target.style.borderColor = '#cbd5e1';
+                          e.target.style.boxShadow = 'none';
+                        }
+                      }}
+                    />
+                    {errors.policyName && (
+                      <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                        {errors.policyName}
+                      </div>
                     )}
                   </div>
-                  {/*  FIX: Use getFullDocumentUrl helper */}
-                  <a
-                    href={getFullDocumentUrl(existingDocument.url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-sm btn-outline-primary"
-                  >
-                    <i className="bi bi-eye me-1"></i> View
-                  </a>
+
+                  {/* Category */}
+                  <div>
+                    <label
+                      style={{
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        color: '#334155',
+                        marginBottom: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      Category <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                    </label>
+                    <select
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        border: errors.category ? '1px solid #ef4444' : '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        fontSize: '13px',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer',
+                        backgroundColor: '#ffffff',
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => {
+                        if (!errors.category) {
+                          e.target.style.borderColor = '#27235C';
+                          e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (!errors.category) {
+                          e.target.style.borderColor = '#cbd5e1';
+                          e.target.style.boxShadow = 'none';
+                        }
+                      }}
+                    >
+                      <option value="">Select Category</option>
+                      {categories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.category && (
+                      <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                        {errors.category}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Status */}
+                  <div>
+                    <label
+                      style={{
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        color: '#334155',
+                        marginBottom: '6px',
+                        display: 'block'
+                      }}
+                    >
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleChange}
+                      style={{
+                        width: '100%',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        fontSize: '13px',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer',
+                        backgroundColor: '#ffffff',
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#27235C';
+                        e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#cbd5e1';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    >
+                      {statuses.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* RIGHT COLUMN */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {/* Description */}
+                  <div>
+                    <label
+                      style={{
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        color: '#334155',
+                        marginBottom: '6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      Description <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                    </label>
+                    <textarea
+                      name="description"
+                      placeholder="Enter policy description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      rows={3}
+                      style={{
+                        width: '100%',
+                        border: errors.description ? '1px solid #ef4444' : '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        fontSize: '13px',
+                        transition: 'all 0.2s ease',
+                        resize: 'vertical',
+                        minHeight: '80px',
+                        maxHeight: '120px',
+                        fontFamily: 'inherit',
+                        lineHeight: '1.4',
+                        backgroundColor: '#ffffff',
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => {
+                        if (!errors.description) {
+                          e.target.style.borderColor = '#27235C';
+                          e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (!errors.description) {
+                          e.target.style.borderColor = '#cbd5e1';
+                          e.target.style.boxShadow = 'none';
+                        }
+                      }}
+                    />
+                    {errors.description && (
+                      <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                        {errors.description}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Compliance Guidance */}
+                  <div>
+                    <label
+                      style={{
+                        fontWeight: '600',
+                        fontSize: '13px',
+                        color: '#334155',
+                        marginBottom: '6px',
+                        display: 'block'
+                      }}
+                    >
+                      Compliance Guidance
+                    </label>
+                    <textarea
+                      name="complianceGuidance"
+                      placeholder="Enter compliance guidance (optional)"
+                      value={formData.complianceGuidance}
+                      onChange={handleChange}
+                      rows={3}
+                      style={{
+                        width: '100%',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '8px 10px',
+                        fontSize: '13px',
+                        transition: 'all 0.2s ease',
+                        resize: 'vertical',
+                        minHeight: '80px',
+                        maxHeight: '120px',
+                        fontFamily: 'inherit',
+                        lineHeight: '1.4',
+                        backgroundColor: '#ffffff',
+                        outline: 'none'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = '#27235C';
+                        e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = '#cbd5e1';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
-            )}
 
-            {/* Document update options */}
-            <div className="btn-group w-100 mb-3" role="group">
-              <button
-                type="button"
-                className={`btn ${
-                  documentType === "none"
-                    ? "btn-primary"
-                    : "btn-outline-secondary"
-                }`}
-                onClick={() => setDocumentType("none")}
+              {/* DOCUMENT SECTION */}
+              <div
+                style={{
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  background: '#f9fafb',
+                  padding: '1rem',
+                  marginTop: '20px'
+                }}
               >
-                <i className="bi bi-x-circle me-1"></i>{" "}
-                {existingDocument ? "Keep Existing" : "No Document"}
-              </button>
-              <button
-                type="button"
-                className={`btn ${
-                  documentType === "upload"
-                    ? "btn-primary"
-                    : "btn-outline-secondary"
-                }`}
-                onClick={() => setDocumentType("upload")}
-              >
-                <i className="bi bi-cloud-upload me-1"></i> Upload New File
-              </button>
-              <button
-                type="button"
-                className={`btn ${
-                  documentType === "link"
-                    ? "btn-primary"
-                    : "btn-outline-secondary"
-                }`}
-                onClick={() => setDocumentType("link")}
-              >
-                <i className="bi bi-link-45deg me-1"></i> Add New Link
-              </button>
+                <label
+                  style={{
+                    fontWeight: '600',
+                    marginBottom: '12px',
+                    color: '#334155',
+                    fontSize: '13px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <i className="bi bi-file-earmark-text" style={{ fontSize: '14px' }}></i>
+                  Policy Document
+                </label>
+
+                {/* Existing Document */}
+                {existingDocument && (
+                  <div
+                    style={{
+                      marginBottom: '12px',
+                      padding: '10px',
+                      background: '#e0f2fe',
+                      borderRadius: '6px',
+                      border: '1px solid #7dd3fc'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: '13px' }}>
+                        <i
+                          className={`bi ${
+                            existingDocument.type === "upload"
+                              ? "bi-file-earmark-pdf"
+                              : "bi-link-45deg"
+                          }`}
+                          style={{ marginRight: '8px' }}
+                        ></i>
+                        <strong>{existingDocument.name}</strong>
+                        {existingDocument.size && (
+                          <small style={{ color: '#64748b', marginLeft: '8px' }}>
+                            ({existingDocument.size})
+                          </small>
+                        )}
+                      </div>
+                      <a
+                        href={getFullDocumentUrl(existingDocument.url)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          padding: '4px 12px',
+                          fontSize: '12px',
+                          borderRadius: '4px',
+                          textDecoration: 'none',
+                          border: '1px solid #3b82f6',
+                          color: '#3b82f6',
+                          backgroundColor: '#ffffff',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <i className="bi bi-eye"></i> View
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* Three Button Group */}
+                <div
+                  style={{
+                    display: 'flex',
+                    width: '100%',
+                    marginBottom: '1rem',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    border: '1px solid #cbd5e1',
+                    backgroundColor: '#ffffff'
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setDocumentType("none")}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      border: 'none',
+                      backgroundColor: documentType === "none" ? '#27235C' : '#ffffff',
+                      color: documentType === "none" ? 'white' : '#6c757d',
+                      fontWeight: '500',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      borderRight: '1px solid #cbd5e1',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <i className="bi bi-x-circle" style={{ fontSize: '13px' }}></i>
+                    {existingDocument ? "Keep Existing" : "No Document"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDocumentType("upload")}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      border: 'none',
+                      backgroundColor: documentType === "upload" ? '#27235C' : '#ffffff',
+                      color: documentType === "upload" ? 'white' : '#6c757d',
+                      fontWeight: '500',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      borderRight: '1px solid #cbd5e1',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <i className="bi bi-cloud-upload" style={{ fontSize: '13px' }}></i> Upload New File
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDocumentType("link")}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      border: 'none',
+                      backgroundColor: documentType === "link" ? '#27235C' : '#ffffff',
+                      color: documentType === "link" ? 'white' : '#6c757d',
+                      fontWeight: '500',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <i className="bi bi-link-45deg" style={{ fontSize: '14px' }}></i> Add New Link
+                  </button>
+                </div>
+
+                {documentType === "upload" && (
+                  <div style={{ marginTop: '12px' }}>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      style={{
+                        width: '100%',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '8px',
+                        fontSize: '13px',
+                        backgroundColor: '#ffffff',
+                        cursor: 'pointer'
+                      }}
+                    />
+                    <small style={{ fontSize: '11px', color: '#64748b', display: 'block', marginTop: '6px' }}>
+                      Supported: PDF, DOC, DOCX (Max 5MB)
+                    </small>
+                    {selectedFile && (
+                      <Badge
+                        bg="success"
+                        style={{
+                          marginTop: '12px',
+                          padding: '6px 12px',
+                          fontSize: '12px',
+                          borderRadius: '4px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <i className="bi bi-check-circle"></i>
+                        {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                {documentType === "link" && (
+                  <div style={{ marginTop: '12px' }}>
+                    <div style={{ marginBottom: '12px' }}>
+                      <label
+                        style={{
+                          fontWeight: '600',
+                          fontSize: '13px',
+                          color: '#334155',
+                          marginBottom: '6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        Document URL <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://drive.google.com/file/d/..."
+                        value={documentLink}
+                        onChange={(e) => setDocumentLink(e.target.value)}
+                        style={{
+                          width: '100%',
+                          border: errors.documentLink ? '1px solid #ef4444' : '1px solid #cbd5e1',
+                          borderRadius: '6px',
+                          padding: '8px 10px',
+                          fontSize: '13px',
+                          transition: 'all 0.2s ease',
+                          backgroundColor: '#ffffff',
+                          outline: 'none'
+                        }}
+                      />
+                      {errors.documentLink && (
+                        <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                          {errors.documentLink}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label
+                        style={{
+                          fontWeight: '600',
+                          fontSize: '13px',
+                          color: '#334155',
+                          marginBottom: '6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        Document Name <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Policy Document.pdf"
+                        value={documentName}
+                        onChange={(e) => setDocumentName(e.target.value)}
+                        style={{
+                          width: '100%',
+                          border: errors.documentName ? '1px solid #ef4444' : '1px solid #cbd5e1',
+                          borderRadius: '6px',
+                          padding: '8px 10px',
+                          fontSize: '13px',
+                          transition: 'all 0.2s ease',
+                          backgroundColor: '#ffffff',
+                          outline: 'none'
+                        }}
+                      />
+                      {errors.documentName && (
+                        <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                          {errors.documentName}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {errors.submit && (
+                <div
+                  style={{
+                    marginTop: '16px',
+                    padding: '12px',
+                    backgroundColor: '#fee2e2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '6px',
+                    color: '#991b1b',
+                    fontSize: '13px'
+                  }}
+                >
+                  {errors.submit}
+                </div>
+              )}
             </div>
 
-            {documentType === "upload" && (
-              <div className="upload-section">
-                <Form.Group>
-                  <Form.Control
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleFileChange}
-                  />
-                  <Form.Text className="text-muted">
-                    Supported: PDF, DOC, DOCX (Max 5MB)
-                  </Form.Text>
-                </Form.Group>
-                {selectedFile && (
-                  <Badge bg="success" className="mt-2">
-                    <i className="bi bi-check-circle me-1"></i>
-                    {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)}{" "}
-                    KB)
-                  </Badge>
-                )}
-              </div>
-            )}
-
-            {documentType === "link" && (
-              <div className="link-section">
-                <Form.Group className="mb-2">
-                  <Form.Label>
-                    Document URL <span className="text-danger">*</span>
-                  </Form.Label>
-                  <Form.Control
-                    type="url"
-                    placeholder="https://drive.google.com/file/d/..."
-                    value={documentLink}
-                    onChange={(e) => setDocumentLink(e.target.value)}
-                    isInvalid={!!errors.documentLink}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.documentLink}
-                  </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>
-                    Document Name <span className="text-danger">*</span>
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Policy Document.pdf"
-                    value={documentName}
-                    onChange={(e) => setDocumentName(e.target.value)}
-                    isInvalid={!!errors.documentName}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.documentName}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </div>
-            )}
-          </div>
-
-          {errors.submit && (
-            <div className="alert alert-danger mt-3">{errors.submit}</div>
-          )}
-        </Form>
-      </Modal.Body>
-      <Modal.Footer className="pm-modal-footer">
-        <div className="d-flex justify-content-between w-100">
-          <div>
-            <Button
-              variant="danger"
-              onClick={handleDeleteClick}
-              disabled={loading || uploadingDoc || publishing || unpublishing}
+            {/* Modal Footer - Fixed */}
+            <div
+              style={{
+                padding: '12px 20px',
+                borderTop: '1px solid #e2e8f0',
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexShrink: 0,
+                borderBottomLeftRadius: '0.5rem',
+                borderBottomRightRadius: '0.5rem'
+              }}
             >
-              <i className="bi bi-trash me-2"></i> Delete
-            </Button>
-          </div>
-          <div className="d-flex gap-2">
-            {/*  Publish Button (only show if not published) */}
-            {!policy?.isPublished && (
-              <Button
-                variant="success"
-                onClick={handlePublish}
-                disabled={loading || uploadingDoc || publishing || unpublishing}
+              {/* Left Side - Delete Button */}
+              <button
+                type="button"
+                onClick={handleDeleteClick}
+                disabled={isAnyActionLoading}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: isAnyActionLoading ? 'not-allowed' : 'pointer',
+                  background: '#ef4444',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                  opacity: isAnyActionLoading ? 0.65 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!isAnyActionLoading) {
+                    e.target.style.background = '#dc2626';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isAnyActionLoading) {
+                    e.target.style.background = '#ef4444';
+                  }
+                }}
               >
-                {publishing ? (
-                  <>
-                    <Spinner animation="border" size="sm" className="me-2" />
-                    Publishing...
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-send me-2"></i>
-                    Publish
-                  </>
-                )}
-              </Button>
-            )}
+                <i className="bi bi-trash"></i>
+                Delete
+              </button>
 
-            {/*  NEW: Unpublish Button (only show if published) */}
-            {policy?.isPublished && (
-              <Button
-                variant="warning"
-                onClick={handleUnpublish}
-                disabled={loading || uploadingDoc || publishing || unpublishing}
-              >
-                {unpublishing ? (
-                  <>
-                    <Spinner animation="border" size="sm" className="me-2" />
-                    Unpublishing...
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-eye-slash me-2"></i>
-                    Unpublish
-                  </>
+              {/* Right Side - Action Buttons */}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {/* Publish Button */}
+                {!policy?.isPublished && (
+                  <button
+                    type="button"
+                    onClick={handlePublish}
+                    disabled={isAnyActionLoading}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: isAnyActionLoading ? 'not-allowed' : 'pointer',
+                      background: '#22c55e',
+                      color: '#ffffff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.2s ease',
+                      opacity: isAnyActionLoading ? 0.65 : 1
+                    }}
+                  >
+                    {publishing ? (
+                      <>
+                        <span
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            border: '2px solid #ffffff',
+                            borderTopColor: 'transparent',
+                            borderRadius: '50%',
+                            animation: 'spin 0.6s linear infinite',
+                            display: 'inline-block'
+                          }}
+                        />
+                        Publishing...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-send"></i>
+                        Publish
+                      </>
+                    )}
+                  </button>
                 )}
-              </Button>
-            )}
 
-            <Button
-              variant="secondary"
-              onClick={onClose}
-              disabled={loading || uploadingDoc || publishing || unpublishing}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleSubmit}
-              disabled={loading || uploadingDoc || publishing || unpublishing}
-              className="pm-btn-submit"
-            >
-              {uploadingDoc ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-2" />
-                  Uploading...
-                </>
-              ) : loading ? (
-                <>
-                  <Spinner animation="border" size="sm" className="me-2" />
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <i className="bi bi-check-circle me-2"></i>
-                  Update Policy
-                </>
-              )}
-            </Button>
-          </div>
+                {/* Unpublish Button */}
+                {policy?.isPublished && (
+                  <button
+                    type="button"
+                    onClick={handleUnpublish}
+                    disabled={isAnyActionLoading}
+                    style={{
+                      padding: '8px 16px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: isAnyActionLoading ? 'not-allowed' : 'pointer',
+                      background: '#f59e0b',
+                      color: '#ffffff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.2s ease',
+                      opacity: isAnyActionLoading ? 0.65 : 1
+                    }}
+                  >
+                    {unpublishing ? (
+                      <>
+                        <span
+                          style={{
+                            width: '14px',
+                            height: '14px',
+                            border: '2px solid #ffffff',
+                            borderTopColor: 'transparent',
+                            borderRadius: '50%',
+                            animation: 'spin 0.6s linear infinite',
+                            display: 'inline-block'
+                          }}
+                        />
+                        Unpublishing...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-eye-slash"></i>
+                        Unpublish
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {/* Cancel Button */}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={isAnyActionLoading}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: isAnyActionLoading ? 'not-allowed' : 'pointer',
+                    background: '#6c757d',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease',
+                    opacity: isAnyActionLoading ? 0.65 : 1
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isAnyActionLoading) {
+                      e.target.style.background = '#5a6268';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isAnyActionLoading) {
+                      e.target.style.background = '#6c757d';
+                    }
+                  }}
+                >
+                  Cancel
+                </button>
+
+                {/* Update Button */}
+                <button
+                  type="submit"
+                  disabled={isAnyActionLoading}
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: isAnyActionLoading ? 'not-allowed' : 'pointer',
+                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.12s ease',
+                    boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
+                    opacity: isAnyActionLoading ? 0.65 : 1,
+                    minWidth: '140px',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {uploadingDoc ? (
+                    <>
+                      <span
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          border: '2px solid #ffffff',
+                          borderTopColor: 'transparent',
+                          borderRadius: '50%',
+                          animation: 'spin 0.6s linear infinite',
+                          display: 'inline-block'
+                        }}
+                      />
+                      Uploading...
+                    </>
+                  ) : loading ? (
+                    <>
+                      <span
+                        style={{
+                          width: '14px',
+                          height: '14px',
+                          border: '2px solid #ffffff',
+                          borderTopColor: 'transparent',
+                          borderRadius: '50%',
+                          animation: 'spin 0.6s linear infinite',
+                          display: 'inline-block'
+                        }}
+                      />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-check-circle"></i>
+                      Update Policy
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
-      </Modal.Footer>
-    </Modal>
+      </div>
+
+      {/* Keyframe Animation for Spinner */}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+    </>
   );
 };
 
