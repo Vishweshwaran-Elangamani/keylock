@@ -18,6 +18,7 @@ import {
   Download,
 } from "lucide-react";
 import projectService from "../../services/project_management/projectService";
+import { color } from "chart.js/helpers";
 
 const RESOURCE_POOL_PROJECT_NAME = "ORG.RZ.RESOURCEPOOL";
 
@@ -399,10 +400,10 @@ const ResourcePoolMapping = () => {
           >
             <ArrowLeft size={24} />
           </button>
-          <Users size={36} className="text-primary" />
+          {/* <Users size={36} className="text-primary" /> */}
           <div>
-            <h2 className="mb-0 fw-bold">Resource Pool Mapping</h2>
-            <p className="text-muted mb-0 small">
+            <h2 className="mb-0 fw-bold" style={{textAlign:"left"}}>Resource Pool Mapping</h2>
+            <p className="text-muted mb-0 medium">
               Manage employee mappings to {RESOURCE_POOL_PROJECT_NAME}{" "}
               (employees mapped now will disappear from the list)
             </p>
@@ -494,13 +495,13 @@ const ResourcePoolMapping = () => {
         <div className="col-lg-8">
           <div className="card border-0 shadow-sm h-100 d-flex flex-column">
             <div className="card-header bg-light d-flex align-items-center justify-content-between">
-              <h5 className="mb-0 d-flex align-items-center gap-2">
+              <h5 className="mb-0 d-flex align-items-center gap-2" style={{color:"white"}}>
                 <Database size={20} /> Employees
               </h5>
               <button
-                className="btn btn-sm btn-outline-primary"
+                className="btn btn-sm btn-outline-secondary"
                 onClick={handleSelectAll}
-                disabled={availableCount === 0}
+                disabled={availableCount === 0} style={{color:"white"}}
               >
                 Select All Available ({availableCount})
               </button>
@@ -638,7 +639,7 @@ const ResourcePoolMapping = () => {
         <div className="col-lg-4">
           <div className="card border-0 shadow-sm h-100 d-flex flex-column">
             <div className="card-header bg-light d-flex align-items-center justify-content-between">
-              <h5 className="mb-0 d-flex align-items-center gap-2">
+              <h5 className="mb-0 d-flex align-items-center gap-2" style={{color:"white"}}>
                 <UserCheck size={20} className="text-success" /> Selected
                 Employees ({selectedEmployees.length})
               </h5>

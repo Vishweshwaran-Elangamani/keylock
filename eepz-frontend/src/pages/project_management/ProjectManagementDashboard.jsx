@@ -66,12 +66,12 @@ const ProjectManagementDashboard = () => {
           >
             Project Management Dashboard
           </h2>
-          <p className="mb-0 small" style={{ color: "var(--muted)" }}>
+          <p className="mb-0 medium" style={{ color: "var(--muted)", textAlign:"left"}}>
             Overview and quick actions
           </p>
         </div>
         <div className="d-flex gap-2 flex-shrink-0">
-          <button
+          {/* <button
             className="btn d-flex align-items-center gap-2"
             onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
             style={{
@@ -94,8 +94,8 @@ const ProjectManagementDashboard = () => {
           >
             <FolderKanban size={18} />
             <span>View All</span>
-          </button>
-          <button
+          </button> */}
+          {/* <button
             className="btn d-flex align-items-center gap-2"
             onClick={() => navigate("/hr/dashboard/projectmgmt/create")}
             style={{
@@ -117,7 +117,7 @@ const ProjectManagementDashboard = () => {
           >
             <FolderPlus size={18} />
             <span>Create</span>
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -332,7 +332,7 @@ const ProjectManagementDashboard = () => {
           >
             Project Management
           </h4>
-          <p className="mb-4" style={{ color: "var(--muted)" }}>
+          <p className="mb-4 " style={{ color: "var(--muted)" }}>
             Create new projects, assign managers, map employees, and manage all
             project activities
           </p>

@@ -976,10 +976,21 @@ const CreateProject = () => {
                 style={{
                   backgroundColor: "transparent",
                   border: "1px solid var(--border)",
-                  color: "var(--color-gray-6)",
+                  color: "black",
                   borderRadius: "8px",
                   padding: "0.6rem 1rem",
                   fontWeight: "600",
+                  
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "crimson";
+                  e.currentTarget.style.color = "white";
+                  e.currentTarget.style.borderColor = "var(--color-primary-3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "black";
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.borderColor = "var(--border)";
                 }}
               >
                 <X size={18} />
@@ -991,7 +1002,7 @@ const CreateProject = () => {
                 className="btn d-flex align-items-center gap-2 px-4"
                 style={{
                   background:
-                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                    "rgb(39, 35, 92)",
                   border: "none",
                   color: "white",
                   borderRadius: "8px",

@@ -799,10 +799,10 @@ const ProjectList = () => {
           >
             <ArrowLeft size={24} />
           </button>
-          <FolderKanban size={36} className="text-primary" />
+          {/* <FolderKanban size={36} className="text-primary" /> */}
           <div>
-            <h2 className="mb-0 fw-bold">All Projects</h2>
-            <p className="text-muted mb-0 small">
+            <h2 className="mb-0 fw-bold" style={{textAlign:"left"}}>All Projects</h2>
+            <p className="text-muted mb-0 medium">
               View and manage all projects
             </p>
           </div>

@@ -423,15 +423,15 @@ export default function FeedbackHRDashboard() {
                     className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                     style={{
                       background: "white",
-                      color: "#97247E",
-                      border: "2px solid #97247E",
+                      color: "rgb(39, 35, 92)",
+                      border: "2px solid ",
                       borderRadius: "8px",
                       padding: "10px",
                       fontWeight: 600,
                     }}
                   >
                     <Search size={16} />
-                    <span className="small">All Feedback</span>
+                    <span className="small" >All Feedback</span>
                   </Link>
                 </div>
                 <div className="col-6 col-md-3">
