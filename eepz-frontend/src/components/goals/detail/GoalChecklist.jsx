@@ -125,7 +125,16 @@ const GoalChecklist = ({
         status: "pending",
       });
 
-      const hasPending = response.data?.summary?.myPending > 0 || false;
+      const userId = response.metadata?.userId;
+
+      // Check if there is at least one pending request for this user
+      const hasPending =
+        response.data?.items?.some(
+          (item) =>
+            item.approvalStatus === "pending" &&
+            item.requestedByEmployeeMasterId === userId
+        ) || false;
+
       setHasPendingApproval(hasPending);
     } catch (error) {
       console.error("Failed to check pending approvals:", error);
