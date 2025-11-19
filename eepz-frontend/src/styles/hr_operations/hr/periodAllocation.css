@@ -59,7 +59,10 @@
 /* ========================================
    HEADER SECTION
 ======================================== */
-
+.period-header-div{
+  display: flex;
+  justify-content: flex-end;
+}
 .period-header {
   display: flex;
   justify-content: space-between;
@@ -510,7 +513,7 @@
 
 .period-sortable-header {
   cursor: pointer;
-  user-select: none;
+  /* user-select: none; */
   transition: all 0.2s ease;
 }
 
@@ -1074,7 +1077,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
+  /* backdrop-filter: blur(4px); */
   z-index: 1040;
 }
 

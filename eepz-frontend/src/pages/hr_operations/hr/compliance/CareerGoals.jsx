@@ -242,8 +242,6 @@ const CareerGoals = () => {
 
   return (
     <div className="cg-root">
-      <h2 className="cg-page-title">Career Goals</h2>
-
       {alert && (
         <Alert variant={alert.type} dismissible onClose={() => setAlert(null)}>
           {alert.message}
@@ -292,8 +290,6 @@ const CareerGoals = () => {
 
       <div className="cg-card-container">
         <div className="cg-card-table-header">
-          <div className="cg-card-table-title">Employees Without Goals</div>
-
           {selectedEmployees.length > 0 && (
             <Button
               variant="primary"

@@ -147,16 +147,7 @@ const PolicyManagement = () => {
       )}
 
       {/* Header */}
-      <div className="pm-header">
-        <div className="pm-header-left">
-          <h2 className="pm-title">
-            <i className="bi bi-shield-check me-2"></i>
-            Policy Management
-          </h2>
-          <p className="pm-subtitle">
-            Manage organizational policies and compliance rules
-          </p>
-        </div>
+      <div className="pm-button-div">
         <button className="pm-btn-add" onClick={() => setShowAddModal(true)}>
           <i className="bi bi-plus-circle me-2"></i>
           Add New Policy

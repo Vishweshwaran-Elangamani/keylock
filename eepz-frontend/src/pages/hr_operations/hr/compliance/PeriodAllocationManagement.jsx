@@ -414,16 +414,8 @@ const PeriodAllocationManagement = () => {
       )}
 
       {/* HEADER WITH BUTTON */}
-      <div className="period-header">
-        <div className="period-header-left">
-          <h4 className="period-title">
-            <i className="bi bi-calendar3-range"></i>
-            Period Budget Allocation Management
-          </h4>
-          <p className="period-subtitle">
-            Manage and distribute departmental budgets across fiscal periods
-          </p>
-        </div>
+      <div className="period-header-div">
+        
 
         <div className="period-header-actions">
           <button

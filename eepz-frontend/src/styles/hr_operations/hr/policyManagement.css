@@ -20,18 +20,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding: 24px;
-  background: #ffffff;
+  /* margin-bottom: 24px; */
+  /* padding: 24px; */
+  /* background: #ffffff; */
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  /* border: 1px solid #e2e8f0; */
 }
  
-.pm-header-left {
+/* .pm-header-left {
   flex: 1;
   text-align: center;
-}
+} */
  
 .pm-title {
   font-size: 28px;
@@ -54,6 +54,11 @@
   color: #64748b;
   margin: 0;
 }
+.pm-button-div{
+  
+  display: flex;
+  justify-content:flex-end
+}
  
 /* Gradient Add Button */
 .pm-btn-add {
@@ -69,8 +74,11 @@
   gap: 8px;
   transition: all 0.12s ease;
   cursor: pointer;
+  
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+  
 }
+
  
 .pm-btn-add:hover {
   transform: translateY(-2px);
