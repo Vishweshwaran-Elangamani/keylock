@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import promotionService from "../../services/internal/promotionService";
 import nominationService from "../../services/internal/nominationService";
-import CreatePromotionModal from "./PromotionModals/CreatePromotionModal";
-import PromotionApprovalModal from "./PromotionModals/PromotionApprovalModal";
-import PromotionDetailsModal from "./PromotionModals/PromotionDetailsModal";
+import CreatePromotionModal from "../../components/internal/PromotionModals/CreatePromotionModal";
+import PromotionApprovalModal from "../../components/internal/PromotionModals/PromotionApprovalModal";
+import PromotionDetailsModal from "../../components/internal/PromotionModals/PromotionDetailsModal";
 import { toast } from "sonner";
 import "../../styles/internal/PromotionManagement.css";
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import EmployeeProfileService from "../../../services/auth/EmployeeProfileService";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
-import ChangeRequestModal from "./ChangeRequestModal";
+import ChangeRequestModal from "../../../components/auth/Modal/common/ChangeRequestModal";
 import { toast } from "sonner";
 import "../../../styles/auth/common/EmployeeProfile.css";
 

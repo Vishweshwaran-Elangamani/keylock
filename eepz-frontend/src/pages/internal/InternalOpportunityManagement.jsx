@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
 import departmentService from "../../services/auth/departmentService";
-import CreateOpportunityModal from "./OpportunityModals/CreateOpportunityModal";
-import EditOpportunityModal from "./OpportunityModals/EditOpportunityModal";
-import DeleteOpportunityModal from "./OpportunityModals/DeleteOpportunityModal";
-import SelfNominateModal from "./NominationModals/SelfNominateModal";
-import ManagerNominateModal from "./NominationModals/ManagerNominateModal";
+import CreateOpportunityModal from "../../components/internal/OpportunityModals/CreateOpportunityModal";
+import EditOpportunityModal from "../../components/internal/OpportunityModals/EditOpportunityModal";
+import DeleteOpportunityModal from "../../components/internal/OpportunityModals/DeleteOpportunityModal";
+import SelfNominateModal from "../../components/internal/NominationModals/SelfNominateModal";
+import ManagerNominateModal from "../../components/internal/NominationModals/ManagerNominateModal";
 import { toast } from "sonner";
 import "../../styles/internal/InternalOpportunityManagement.css";
 

@@ -3,10 +3,10 @@ import { Modal } from "react-bootstrap";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import nominationService from "../../services/internal/nominationService";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
-import SelfNominateModal from "./NominationModals/SelfNominateModal";
-import ManagerNominateModal from "./NominationModals/ManagerNominateModal";
-import NominationReviewModal from "./NominationModals/NominationReviewModal";
-import NominationGraphModal from "./NominationModals/NominationGraphModal";
+import SelfNominateModal from "../../components/internal/NominationModals/SelfNominateModal";
+import ManagerNominateModal from "../../components/internal/NominationModals/ManagerNominateModal";
+import NominationReviewModal from "../../components/internal/NominationModals/NominationReviewModal";
+import NominationGraphModal from "../../components/internal/NominationModals/NominationGraphModal";
 import { toast } from "sonner";
 import "../../styles/internal/nominationManagement.css";
 

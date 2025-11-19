@@ -1,8 +1,8 @@
  
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import ChangeRequestService from "../../../services/auth/changeRequestService";
-import "../../../styles/auth/common/ChangeRequestModal.css";
+import ChangeRequestService from "../../../../services/auth/changeRequestService";
+import "../../../../styles/auth/common/ChangeRequestModal.css";
  
 const ChangeRequestModal = ({ show, onClose, onSubmit, profileData, hasPendingRequest, pendingRequestId }) => {
  

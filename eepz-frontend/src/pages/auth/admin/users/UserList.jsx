@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import userService from "../../../../services/auth/userService";
 import roleService from "../../../../services/auth/roleService";
 import departmentService from "../../../../services/auth/departmentService";
-import AddUserModal from "./AddUserModal";
-import EditUserModal from "./EditUserModal";
-import DeactivateUserModal from "./DeactivateUserModal";
-import BulkOperationsModal from "../bulk_operations/BulkOperationsModal";
+import AddUserModal from "../../../../components/auth/Modal/users/AddUserModal";
+import EditUserModal from "../../../../components/auth/Modal/users/EditUserModal";
+import DeactivateUserModal from "../../../../components/auth/Modal/users/DeactivateUserModal";
+import BulkOperationsModal from "../../../../components/auth/Modal/bulk_operations/BulkOperationsModal";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/UserList.css";
 

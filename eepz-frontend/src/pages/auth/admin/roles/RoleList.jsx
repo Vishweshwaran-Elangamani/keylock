@@ -17,9 +17,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import roleService from "../../../../services/auth/roleService";
-import AddRoleModal from "./AddRoleModal";
-import EditRoleModal from "./EditRoleModal";
-import DeleteRoleModal from "./DeleteRoleModal";
+import AddRoleModal from "../../../../components/auth/Modal/roles/AddRoleModal";
+import EditRoleModal from "../../../../components/auth/Modal/roles/EditRoleModal";
+import DeleteRoleModal from "../../../../components/auth/Modal/roles/DeleteRoleModal";
 import { toast } from "sonner";
 import "../../../../styles/auth/roles/RoleList.css";
 

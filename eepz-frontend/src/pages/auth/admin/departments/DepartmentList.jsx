@@ -16,9 +16,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import departmentService from "../../../../services/auth/departmentService";
-import AddDepartmentModal from "./AddDepartmentModal";
-import EditDepartmentModal from "./EditDepartmentModal";
-import DeleteDepartmentModal from "./DeleteDepartmentModal";
+import AddDepartmentModal from "../../../../components/auth/Modal/departments/AddDepartmentModal";
+import EditDepartmentModal from "../../../../components/auth/Modal/departments/EditDepartmentModal";
+import DeleteDepartmentModal from "../../../../components/auth/Modal/departments/DeleteDepartmentModal";
 import { toast } from "sonner";
 import "../../../../styles/auth/department/DepartmentList.css";
 
