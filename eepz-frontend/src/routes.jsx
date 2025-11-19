@@ -323,6 +323,17 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+            <Route
+  path="/hr/dashboard/performance/create/:formId"
+  element={
+    <ProtectedRoute allowedRoles={["HR"]}>
+      <DashboardLayout role="HR">
+        <FormCreate />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/>
+ 
       <Route
         path="/hr/dashboard/projectmgmt/list"
         element={

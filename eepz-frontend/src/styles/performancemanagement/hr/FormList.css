@@ -315,61 +315,65 @@
   /* ============================================================
      USER SEARCH & SELECT ALL
      ============================================================ */
-  .hrformlist-user-search-container {
-    padding: 12px 16px;
-    border-bottom: 2px solid #E5E7EB;
-    background: #FAFBFC;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  
-  .hrformlist-user-search-input {
-    flex: 1;
-    padding: 10px 12px;
-    border: 2px solid #E5E7EB;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #374151;
-    background: #FFFFFF;
-    transition: all 0.3s ease;
-  }
-  
-  .hrformlist-user-search-input:focus {
-    outline: none;
-    border-color: #AC5098;
-    box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
-  }
-  
-  .hrformlist-user-search-input::placeholder {
-    color: #D1D5DB;
-  }
-  
-  .hrformlist-btn-select-all {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 14px;
-    background: #10B981;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-  }
-  
-  .hrformlist-btn-select-all:hover {
-    background: #059669;
-    transform: translateY(-1px);
-  }
-  
-  .hrformlist-btn-select-all i {
-    font-size: 14px;
-  }
-  
+ /* ============================================================
+   USER SEARCH & SELECT ALL
+   ============================================================ */
+.hrformlist-user-search-container {
+  padding: 12px 16px;
+  border-bottom: 2px solid #E5E7EB;
+  background: #FAFBFC;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.hrformlist-user-search-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #27235C;
+  background: #FFFFFF;
+  transition: all 0.3s ease;
+}
+
+.hrformlist-user-search-input:focus {
+  outline: none;
+  border-color: #AC5098;
+  box-shadow: 0 0 0 3px rgba(172, 80, 152, 0.1);
+}
+
+.hrformlist-user-search-input::placeholder {
+  color: #D1D5DB;
+}
+
+.hrformlist-btn-select-all {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  /* REMOVED: background: #10B981; - Now controlled by inline styles */
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.hrformlist-btn-select-all:hover {
+  /* REMOVED: background: #059669; - Now controlled by inline styles */
+  transform: translateY(-1px);
+  opacity: 0.9; /* Added for hover effect */
+}
+
+.hrformlist-btn-select-all i {
+  font-size: 14px;
+}
+
   /* ============================================================
      USERS PANEL BODY - User List
      ============================================================ */
