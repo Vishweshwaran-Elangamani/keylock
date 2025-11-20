@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import icon from "../assets/icon.png";
-import logolightbarred from "../assets/logolightbarred.png";
+import logodarkfull from "../assets/logodarkfull.png";
 import logodarkbarred from "../assets/logodarkbarred.png";
 
 const Sidebar = ({ allowedRoles = [], currentRole }) => {
@@ -316,12 +316,12 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       <div
         style={{
           padding: "1.5rem 1.25rem",
-          borderBottom: "1px solid rgba(0, 0, 0, 0.08)",
+          borderBottom: "1px solid rgba(0, 0, 0, 1)",
           background: "rgba(255, 255, 255, 1)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          minHeight: "1.5rem",
+          maxHeight: "100px",
         }}
       >
         <img
@@ -331,7 +331,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
           style={{
             width: sidebarExpanded ? "180px" : "50px",
             height: sidebarExpanded ? "auto" : "50px",
-            maxHeight: "40px",
+            maxHeight: "30px",
             objectFit: "contain",
             cursor: "pointer",
             transition: "all 0.3s ease-in-out",

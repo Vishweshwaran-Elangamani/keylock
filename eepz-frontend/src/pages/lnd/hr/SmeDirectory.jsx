@@ -85,21 +85,6 @@ const SmeDirectory = () => {
         ]}
       />
 
-      <div style={{ marginBottom: "2rem" }}>
-        <h2
-          style={{
-            marginBottom: "0.5rem",
-            fontWeight: "700",
-            color: "#212529",
-          }}
-        >
-          SME Directory
-        </h2>
-        <p style={{ color: "#6c757d", fontSize: "0.9375rem", margin: 0 }}>
-          View all Subject Matter Experts across the organization
-        </p>
-      </div>
-
       <div style={{ marginBottom: "1.5rem" }}>
         <form
           onSubmit={handleSearchSubmit}
@@ -162,11 +147,10 @@ const SmeDirectory = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "60vh" }}>
+          <div style={{ minHeight: "65vh" }}>
             <div
               style={{
                 background: "#fff",
-                border: "2px solid #abb4c5ff",
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
@@ -176,11 +160,11 @@ const SmeDirectory = () => {
                 style={{
                   display: "grid",
                   gridTemplateColumns: "2fr 1.5fr 1.2fr 1fr",
-                  background: "#f9fafb",
+                  background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
-                  color: "#374151",
-                  fontSize: "0.875rem",
+                  color: "white",
+                  fontSize: "14px",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
@@ -262,12 +246,12 @@ const SmeDirectory = () => {
                     {sme.skillName}
                   </div>
                   <div style={{ textAlign: "left", color: "#6b7280" }}>
-                    {sme.departmentName || "-"}
+                    {sme.departmentName || "None"}
                   </div>
                   <div style={{ textAlign: "left", color: "#6b7280" }}>
                     {sme.approvedDate
                       ? new Date(sme.approvedDate).toLocaleDateString()
-                      : "-"}
+                      : "None"}
                   </div>
                 </div>
               ))}

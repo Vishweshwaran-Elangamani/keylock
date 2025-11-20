@@ -148,7 +148,7 @@ const TeamAssignments = () => {
           style={{
             marginLeft: 4,
             opacity: 0.5,
-            color: "#000000ff",
+            color: "white",
           }}
         />
       );
@@ -158,7 +158,7 @@ const TeamAssignments = () => {
         size={14}
         style={{
           marginLeft: 4,
-          color: "#97247E",
+          color: "lightpink",
           fontWeight: "bold",
         }}
       />
@@ -167,7 +167,7 @@ const TeamAssignments = () => {
         size={14}
         style={{
           marginLeft: 4,
-          color: "#97247E",
+          color: "lightpink",
           fontWeight: "bold",
         }}
       />
@@ -195,22 +195,6 @@ const TeamAssignments = () => {
           { label: "Team Assignments" },
         ]}
       />
-
-      {/* Header */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h2
-          style={{
-            marginBottom: "0.5rem",
-            fontWeight: "700",
-            color: "#212529",
-          }}
-        >
-          Team Assignments
-        </h2>
-        <p style={{ color: "#6c757d", fontSize: "0.9375rem", margin: 0 }}>
-          Monitor and manage learning assignments for your team
-        </p>
-      </div>
 
       {/* Filters and search */}
       <div
@@ -315,7 +299,6 @@ const TeamAssignments = () => {
             <div
               style={{
                 background: "#fff",
-                border: "2px solid #abb4c5ff",
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
@@ -327,11 +310,11 @@ const TeamAssignments = () => {
                   display: "grid",
                   gridTemplateColumns:
                     "1.3fr 1.3fr 1.2fr 1.5fr 1fr 1fr 0.7fr 0.7fr 1fr",
-                  background: "#f9fafb",
+                  background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
-                  color: "#374151",
-                  fontSize: "0.875rem",
+                  fontSize: "14px",
+                  color: "white",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
@@ -358,7 +341,7 @@ const TeamAssignments = () => {
                     align: "center",
                   },
                   { label: "Proof", field: null, align: "center" },
-                  { label: "Quick Actions", field: null, align: "center" },
+                  { label: "Actions", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
                   <div
                     key={field || label}
@@ -373,14 +356,14 @@ const TeamAssignments = () => {
                       cursor: field ? "pointer" : "default",
                       textAlign: align || "left",
                       transition: "color 0.2s",
-                      color: sortField === field ? "#97247E" : "#374151",
+                      color: "white",
                     }}
                     onMouseEnter={(e) => {
-                      if (field) e.currentTarget.style.color = "#97247E";
+                      if (field) e.currentTarget.style.color = "lightpink";
                     }}
                     onMouseLeave={(e) => {
                       if (field && sortField !== field) {
-                        e.currentTarget.style.color = "#374151";
+                        e.currentTarget.style.color = "white";
                       }
                     }}
                   >
@@ -460,7 +443,7 @@ const TeamAssignments = () => {
                         new Date(assignment.createdOn).toLocaleDateString()
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
@@ -469,7 +452,7 @@ const TeamAssignments = () => {
                         new Date(assignment.deadline).toLocaleDateString()
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
@@ -484,7 +467,7 @@ const TeamAssignments = () => {
                         `${assignment.completionRating}/10`
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
@@ -508,11 +491,14 @@ const TeamAssignments = () => {
                             transition: "all 0.2s",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "#AC5098";
-                            e.currentTarget.style.color = "#AC5098";
+                            e.currentTarget.style.borderColor = "white";
+                            e.currentTarget.style.backgroundColor =
+                              "rgb(39, 35, 92)";
+                            e.currentTarget.style.color = "white";
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.borderColor = "#97247E";
+                            e.currentTarget.style.backgroundColor = "white";
                             e.currentTarget.style.color = "#97247E";
                           }}
                         >
@@ -520,7 +506,7 @@ const TeamAssignments = () => {
                         </button>
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
@@ -595,7 +581,7 @@ const TeamAssignments = () => {
                         </button>
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>

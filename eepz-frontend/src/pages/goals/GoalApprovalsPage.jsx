@@ -125,7 +125,7 @@ const GoalApprovalsPage = () => {
   // ✅ Pagination handler
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Filter by view mode
@@ -355,117 +355,174 @@ const GoalApprovalsPage = () => {
       ) : (
         <>
           {/* Table View */}
-          <div className="card">
-            <div className="table-responsive">
-              <table className="table table-hover align-middle mb-0">
-                <thead className="table-light">
-                  <tr>
-                    <th style={{ fontWeight: 600, width: "25%" }}>Goal Title</th>
-                    <th style={{ fontWeight: 600, width: "15%" }}>Type</th>
-                    <th style={{ fontWeight: 600, width: "12%" }}>Status</th>
-                    <th style={{ fontWeight: 600, width: "15%" }}>Requested By</th>
-                    <th style={{ fontWeight: 600, width: "13%" }}>Requested On</th>
-                    <th style={{ fontWeight: 600, width: "15%" }}>Decided</th>
-                    <th style={{ fontWeight: 600, width: "5%", textAlign: "center" }}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentApprovals.map((approval) => {
-                    const isAutoApproved =
-                      approval.approvalStatus === "approved" &&
-                      approval.approverEmployeeMasterId ===
-                        approval.requestedByEmployeeMasterId;
+          <div className="table-responsive">
+            <table className="table table-hover align-start mb-0">
+              <thead
+                style={{
+                  height: "50px",
+                  fontWeight: 600,
+                  verticalAlign: "middle",
+                }}
+              >
+                <tr>
+                  <th
+                    style={{
+                      width: "20%",
+                      color: "white",
+                      backgroundColor: "rgb(39, 35, 92)",
+                      borderRadius: "1.5rem 0rem 0rem 0rem",
+                    }}
+                  >
+                    TITLE
+                  </th>
+                  <th
+                    style={{
+                      width: "15%",
+                      color: "white",
+                      backgroundColor: "rgb(39, 35, 92)",
+                    }}
+                  >
+                    TYPE
+                  </th>
+                  <th
+                    style={{
+                      width: "15%",
+                      color: "white",
+                      backgroundColor: "rgb(39, 35, 92)",
+                    }}
+                  >
+                    STATUS
+                  </th>
+                  <th
+                    style={{
+                      width: "10%",
+                      color: "white",
+                      backgroundColor: "rgb(39, 35, 92)",
+                    }}
+                  >
+                    REQUESTOR
+                  </th>
+                  <th
+                    style={{
+                      width: "13%",
+                      color: "white",
+                      backgroundColor: "rgb(39, 35, 92)",
+                    }}
+                  >
+                    REQUESTED ON
+                  </th>
+                  <th
+                    style={{
+                      width: "15%",
+                      color: "white",
+                      backgroundColor: "rgb(39, 35, 92)",
+                    }}
+                  >
+                    DESCISION
+                  </th>
+                  <th
+                    style={{
+                      width: "10%",
+                      color: "white",
+                      backgroundColor: "rgb(39, 35, 92)",
+                      borderRadius: "0rem 1.5rem 0rem 0rem",
+                    }}
+                  >
+                    REVIEW
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentApprovals.map((approval) => {
+                  const isAutoApproved =
+                    approval.approvalStatus === "approved" &&
+                    approval.approverEmployeeMasterId ===
+                      approval.requestedByEmployeeMasterId;
 
-                    return (
-                      <tr key={approval.approvalId}>
-                        {/* Goal Title */}
-                        <td>
-                          <div style={{ fontWeight: 500 }}>
-                            {approval.goalTitle}
-                          </div>
-                        </td>
+                  return (
+                    <tr key={approval.approvalId}>
+                      {/* Goal Title */}
+                      <td>
+                        <div
+                          style={{
+                            fontWeight: 500,
+                            paddingLeft: "50px",
+                            textAlign: "left",
+                          }}
+                        >
+                          {approval.goalTitle}
+                        </div>
+                      </td>
 
-                        {/* Type */}
-                        <td>
-                          <span className="text-muted" style={{ fontSize: "0.9rem" }}>
-                            {APPROVAL_TYPE_LABELS[approval.approvalType] ||
-                              approval.approvalType}
-                          </span>
-                        </td>
+                      {/* Type */}
+                      <td style={{ paddingLeft: "50px", textAlign: "left" }}>
+                        <span
+                          className="text-muted"
+                          style={{ fontSize: "0.9rem" }}
+                        >
+                          {APPROVAL_TYPE_LABELS[approval.approvalType] ||
+                            approval.approvalType}
+                        </span>
+                      </td>
 
-                        {/* Status */}
-                        <td>
-                          <div className="d-flex align-items-center gap-2">
-                            {getStatusBadge(approval.approvalStatus)}
-                            {isAutoApproved && (
-                              <span
-                                className="badge bg-info"
-                                title="Auto-approved by Leadership without approval flow"
-                                style={{
-                                  fontSize: "0.7rem",
-                                  padding: "0.25rem 0.5rem",
-                                }}
+                      {/* Status */}
+                      <td>{getStatusBadge(approval.approvalStatus)}</td>
+
+                      {/* Requested By */}
+                      <td style={{ paddingLeft: "30px", textAlign: "left" }}>
+                        <span style={{ fontSize: "0.9rem" }}>
+                          {approval.requestedByName}
+                        </span>
+                      </td>
+
+                      {/* Requested On */}
+                      <td>
+                        <span
+                          className="text-muted"
+                          style={{ fontSize: "0.875rem" }}
+                        >
+                          {new Date(approval.requestedOn).toLocaleDateString()}
+                        </span>
+                      </td>
+
+                      {/* Decided */}
+                      <td>
+                        {approval.approvedOn ? (
+                          <div style={{ fontSize: "0.875rem" }}>
+                            <div className="text-muted">
+                              {new Date(
+                                approval.approvedOn
+                              ).toLocaleDateString()}
+                            </div>
+                            {approval.approverName && (
+                              <div
+                                className="text-muted"
+                                style={{ fontSize: "0.8rem" }}
                               >
-                                <i className="bi bi-lightning-charge-fill me-1"></i>
-                                Auto
-                              </span>
+                                by {approval.approverName}
+                              </div>
                             )}
                           </div>
-                        </td>
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
+                      </td>
 
-                        {/* Requested By */}
-                        <td>
-                          <span style={{ fontSize: "0.9rem" }}>
-                            {approval.requestedByName}
-                          </span>
-                        </td>
-
-                        {/* Requested On */}
-                        <td>
-                          <span className="text-muted" style={{ fontSize: "0.875rem" }}>
-                            {new Date(approval.requestedOn).toLocaleDateString()}
-                          </span>
-                        </td>
-
-                        {/* Decided */}
-                        <td>
-                          {approval.approvedOn ? (
-                            <div style={{ fontSize: "0.875rem" }}>
-                              <div className="text-muted">
-                                {new Date(approval.approvedOn).toLocaleDateString()}
-                              </div>
-                              {approval.approverName && (
-                                <div
-                                  className="text-muted"
-                                  style={{ fontSize: "0.8rem" }}
-                                >
-                                  by {approval.approverName}
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-muted">—</span>
-                          )}
-                        </td>
-
-                        {/* Actions */}
-                        <td className="text-center">
-                          <button
-                            className="btn btn-outline-primary btn-sm"
-                            onClick={() => handleReviewClick(approval)}
-                            title="View Details"
-                          >
-                            <i className="bi bi-eye"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                      {/* Actions */}
+                      <td className="text-center">
+                        <button
+                          className="btn btn-outline-primary btn-sm"
+                          onClick={() => handleReviewClick(approval)}
+                          title="View Details"
+                        >
+                          <i className="bi bi-eye"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
 
           {totalPages > 1 && (

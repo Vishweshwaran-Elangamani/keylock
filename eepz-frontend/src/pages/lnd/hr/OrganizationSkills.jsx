@@ -35,7 +35,9 @@ const OrganizationSkills = () => {
 
         // Only filter out Admins if there is no search term
         if (!searchTerm) {
-          employees = employees.filter(emp => emp.departmentName !== "Administration");
+          employees = employees.filter(
+            (emp) => emp.departmentName !== "Administration"
+          );
         }
 
         setEmployees(employees);
@@ -55,7 +57,6 @@ const OrganizationSkills = () => {
       setLoading(false);
     }
   };
-
 
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
@@ -106,21 +107,6 @@ const OrganizationSkills = () => {
           { label: "Organization Skills" },
         ]}
       />
-
-      <div style={{ marginBottom: "2rem" }}>
-        <h2
-          style={{
-            marginBottom: "0.5rem",
-            fontWeight: "700",
-            color: "#212529",
-          }}
-        >
-          Organization Skills Management
-        </h2>
-        <p style={{ color: "#6c757d", fontSize: "0.9375rem", margin: 0 }}>
-          View skills for all employees across the organization
-        </p>
-      </div>
 
       <div style={{ marginBottom: "1.5rem" }}>
         <div style={{ position: "relative", width: "100%", maxWidth: "400px" }}>
@@ -198,7 +184,7 @@ const OrganizationSkills = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "60vh" }}>
+          <div style={{ minHeight: "65vh" }}>
             <div
               style={{
                 display: "grid",
@@ -239,6 +225,7 @@ const OrganizationSkills = () => {
                         display: "flex",
                         alignItems: "center",
                         gap: "0.75rem",
+                        textAlign: "left",
                         marginBottom: "0.5rem",
                       }}
                     >

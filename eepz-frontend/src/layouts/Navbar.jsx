@@ -66,6 +66,7 @@ const Navbar = () => {
             alignItems: "center",
             justifyContent: "space-between",
             padding: "1.15rem 1.5rem",
+            maxHeight: "100px"
           }}
         >
           {/* Left Section */}
@@ -82,7 +83,7 @@ const Navbar = () => {
               >
                 <i
                   className="bi bi-person-circle"
-                  style={{ fontSize: "1.5rem", color: "#97247E" }}
+                  style={{ fontSize: "1rem", color: "#97247E" }}
                 ></i>
                 <h6 style={{ margin: 0, fontWeight: "bold", color: "#97247E" }}>
                   Welcome, {displayName}

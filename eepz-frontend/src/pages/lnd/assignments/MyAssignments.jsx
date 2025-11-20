@@ -146,7 +146,7 @@ const MyAssignments = () => {
           style={{ 
             marginLeft: 4, 
             opacity: 0.5,
-            color: '#000000ff'
+            color: 'white'
           }} 
         />
       );
@@ -156,7 +156,7 @@ const MyAssignments = () => {
         size={14} 
         style={{ 
           marginLeft: 4,
-          color: '#97247E',
+          color: 'lightpink',
           fontWeight: 'bold'
         }} 
       />
@@ -165,7 +165,7 @@ const MyAssignments = () => {
         size={14} 
         style={{ 
           marginLeft: 4,
-          color: '#97247E',
+          color: 'lightpink',
           fontWeight: 'bold'
         }} 
       />
@@ -193,22 +193,6 @@ const MyAssignments = () => {
           { label: "My Assignments" },
         ]}
       />
-
-      {/* Header */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h2
-          style={{
-            marginBottom: "0.5rem",
-            fontWeight: "700",
-            color: "#212529",
-          }}
-        >
-          My Assignments
-        </h2>
-        <p style={{ color: "#6c757d", fontSize: "0.9375rem", margin: 0 }}>
-          View and manage all your learning assignments
-        </p>
-      </div>
 
       {/* Filters and search */}
       <div
@@ -305,11 +289,10 @@ const MyAssignments = () => {
         />
       ) : (
         <>
-        <div style={{ minHeight: "49vh" }}>
+        <div style={{ minHeight: "65vh" }}>
           <div
             style={{
               background: "#fff",
-              border: "2px solid #abb4c5ff",
               borderRadius: "12px",
               overflow: "hidden",
               minWidth: 0,
@@ -321,11 +304,11 @@ const MyAssignments = () => {
                 display: "grid",
                 gridTemplateColumns:
                   "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.7fr 1fr",
-                background: "#f9fafb",
-                borderBottom: "2px solid #abb4c5ff",
-                fontWeight: 600,
-                color: "#374151",
-                fontSize: "0.875rem",
+                  background: "rgb(39, 35, 92)",
+                  borderBottom: "2px solid #abb4c5ff",
+                  fontWeight: 600,
+                  color: "white",
+                  fontSize: "14px",
                 padding: "1rem 1.5rem",
                 textTransform: "uppercase",
                 letterSpacing: "0.025em",
@@ -339,7 +322,7 @@ const MyAssignments = () => {
                 { label: "Due Date", field: "deadline", align: "left" },
                 { label: "Score", field: "completionRating", align: "center" },
                 { label: "Proof", field: null, align: "center" },
-                { label: "Quick Actions", field: null, align: "center" },
+                { label: "Request ack", field: null, align: "center" },
               ].map(({ label, field, align }) => (
                 <div
                   key={field || label}
@@ -354,14 +337,14 @@ const MyAssignments = () => {
                     cursor: field ? "pointer" : "default",
                     textAlign: align || "left",
                     transition: "color 0.2s",
-                    color: sortField === field ? "#97247E" : "#374151",
+                    color: "white",
                   }}
                   onMouseEnter={(e) => {
-                    if (field) e.currentTarget.style.color = "#97247E";
+                    if (field) e.currentTarget.style.color = "lightpink";
                   }}
                   onMouseLeave={(e) => {
                     if (field && sortField !== field) {
-                      e.currentTarget.style.color = "#374151";
+                      e.currentTarget.style.color = "white";
                     }
                   }}
                 >
@@ -426,14 +409,14 @@ const MyAssignments = () => {
                   {assignment.createdOn ? (
                     new Date(assignment.createdOn).toLocaleDateString()
                   ) : (
-                    <span style={{ color: "#9ca3af" }}>-</span>
+                    <span style={{ color: "#9ca3af" }}>None</span>
                   )}
                 </div>
                 <div style={{ textAlign: "left", color: "#6b7280" }}>
                   {assignment.deadline ? (
                     new Date(assignment.deadline).toLocaleDateString()
                   ) : (
-                    <span style={{ color: "#9ca3af" }}>-</span>
+                    <span style={{ color: "#9ca3af" }}>None</span>
                   )}
                 </div>
                 <div
@@ -446,7 +429,7 @@ const MyAssignments = () => {
                   {assignment.completionRating ? (
                     `${assignment.completionRating}/10`
                   ) : (
-                    <span style={{ color: "#9ca3af" }}>-</span>
+                    <span style={{ color: "#9ca3af" }}>None</span>
                   )}
                 </div>
                 <div style={{ textAlign: "center" }}>
@@ -469,18 +452,21 @@ const MyAssignments = () => {
                         transition: "all 0.2s",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = "#AC5098";
-                        e.currentTarget.style.color = "#AC5098";
+                            e.currentTarget.style.borderColor = "white";
+                            e.currentTarget.style.backgroundColor =
+                              "rgb(39, 35, 92)";
+                            e.currentTarget.style.color = "white";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = "#97247E";
-                        e.currentTarget.style.color = "#97247E";
+                            e.currentTarget.style.borderColor = "#97247E";
+                            e.currentTarget.style.backgroundColor = "white";
+                            e.currentTarget.style.color = "#97247E";
                       }}
                     >
                       <Download size={14} />
                     </button>
                   ) : (
-                    <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>-</span>
+                    <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>None</span>
                   )}
                 </div>
                 <div style={{ textAlign: "center" }}>
@@ -516,7 +502,7 @@ const MyAssignments = () => {
                       <Upload size={14} /> Upload
                     </button>
                   ) : (
-                    <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>-</span>
+                    <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>None</span>
                   )}
                 </div>
               </div>

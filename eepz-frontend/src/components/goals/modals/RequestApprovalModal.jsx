@@ -425,7 +425,6 @@ const RequestApprovalModal = ({
                       style={{
                         fontWeight: 600,
                         fontSize: "1.1rem",
-                        fontWeight: "bold",
                         marginBottom: "0.5rem",
                         color: isDragActive ? "rgb(39, 35, 92)" : "#6c757d",
                       }}
@@ -436,7 +435,6 @@ const RequestApprovalModal = ({
                       style={{
                         color: isDragActive ? "rgb(39, 35, 92)" : "#6c757d",
                         fontSize: "0.9rem",
-                        fontWeight: "bold",
                         marginBottom: "1rem",
                       }}
                     >
@@ -459,7 +457,6 @@ const RequestApprovalModal = ({
                     <p
                       style={{
                         fontSize: "0.75rem",
-                        fontWeight: "bold",
                         color: isDragActive ? "rgb(39, 35, 92)" : "#6c757d",
                         marginTop: "1rem",
                         marginBottom: 0,

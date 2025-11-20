@@ -3,7 +3,7 @@ import { X, AlertCircle } from "lucide-react";
 import { lndService } from "../../../services/lnd/lndService";
 import { RATING } from "../../../constants/lnd/lndConstants";
 import ConfirmationModal from "../common/ConfirmationModal";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 
 const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
   const [employees, setEmployees] = useState([]);
@@ -41,7 +41,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
     if (selectedEmployeeId && !isEditMode && allSkillsLoaded) {
       fetchEmployeeSkills();
     }
-  }, [allSkillsLoaded]); 
+  }, [allSkillsLoaded]);
 
   // Load available skills when employee is selected AND all skills are loaded
   useEffect(() => {
@@ -157,9 +157,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
           toast.success("Skill rating updated successfully!");
           onSuccess();
         } else {
-          toast.error(
-            response.data.message || "Failed to update skill rating"
-          );
+          toast.error(response.data.message || "Failed to update skill rating");
         }
       } else {
         const data = {
@@ -233,28 +231,48 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
           <div
             style={{
               padding: "1.5rem",
+              background: "rgb(39, 35, 92)",
               borderBottom: "1px solid #e5e7eb",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
             }}
           >
-            <h5 style={{ margin: 0, fontWeight: "600", color: "#212529" }}>
+            <h5 style={{ margin: 0, fontWeight: "600", color: "white" }}>
               {isEditMode ? "Update Skill Rating" : "Record Employee Skill"}
             </h5>
             <button
+              type="button"
+              class="btn-close"
               onClick={onClose}
+              disabled={loading}
               style={{
-                background: "transparent",
                 border: "none",
-                cursor: "pointer",
-                padding: "0.25rem",
-                color: "#6c757d",
+                width: "36px",
+                backgroundColor: "transparent",
+                height: "36px",
+                borderRadius: "0.5rem",
+                cursor: loading ? "not-allowed" : "pointer",
+                color: "white",
+                fontSize: "1.5rem",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.color = "red";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.currentTarget.style.color = "white";
+                }
               }}
             >
-              <X size={20} />
+              <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
@@ -316,7 +334,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                   <div style={{ marginBottom: "1.5rem" }}>
                     <label
                       style={{
-                        fontSize: "0.875rem",
+                        fontSize: "14px",
                         fontWeight: "600",
                         color: "#212529",
                         marginBottom: "0.5rem",
@@ -354,10 +372,15 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                         padding: "0.625rem",
                         border: "1px solid #e5e7eb",
                         borderRadius: "8px",
-                        fontSize: "0.875rem",
+                        fontSize: "14px",
                         outline: "none",
                         background: "#fff",
                         cursor: fetchingEmployees ? "not-allowed" : "pointer",
+                        disabled: "true",
+                        appearance: "none",
+                        WebkitAppearance: "none",
+                        MozAppearance: "none",
+                        backgroundImage: "none",
                       }}
                     >
                       <option value="">
@@ -377,7 +400,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                   <div style={{ marginBottom: "1.5rem" }}>
                     <label
                       style={{
-                        fontSize: "0.875rem",
+                        fontSize: "14px",
                         fontWeight: "600",
                         color: selectedEmployeeId ? "#212529" : "#9ca3af",
                         marginBottom: "0.5rem",
@@ -398,7 +421,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: "0.75rem",
+                          fontSize: "14px",
                           fontWeight: "700",
                         }}
                       >
@@ -420,7 +443,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                         padding: "0.625rem",
                         border: "1px solid #e5e7eb",
                         borderRadius: "8px",
-                        fontSize: "0.875rem",
+                        fontSize: "14px",
                         outline: "none",
                         background: !selectedEmployeeId ? "#f9fafb" : "#fff",
                         cursor:
@@ -509,266 +532,117 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                   </span>
                 </label>
 
-                <div style={{ position: "relative", paddingBottom: "2rem" }}>
-                  <input
-                    type="range"
-                    min={RATING.MIN}
-                    max={RATING.MAX}
-                    value={rating}
-                    onChange={(e) => setRating(parseInt(e.target.value))}
-                    disabled={!isEditMode && !selectedSkillId}
-                    style={{
-                      width: "100%",
-                      height: "12px",
-                      borderRadius: "6px",
-                      outline: "none",
-                      appearance: "none",
-                      background: `linear-gradient(to right, ${getRatingColor(
-                        rating
-                      )} 0%, ${getRatingColor(rating)} ${
-                        (rating - 1) * 11.11
-                      }%, #e5e7eb ${(rating - 1) * 11.11}%, #e5e7eb 100%)`,
-                      cursor:
-                        !isEditMode && !selectedSkillId
-                          ? "not-allowed"
-                          : "pointer",
-                      WebkitAppearance: "none",
-                      transition: "background 0.3s ease",
-                    }}
-                  />
-
-                  <style>
-                    {`
-                    .EmployeeSelector {
-                        appearance: none;       
-                        -webkit-appearance: none; 
-                        -moz-appearance: none;    
-                        background-image: none;   
-                        }
-
-                      input[type="range"]::-webkit-slider-thumb {
-                        -webkit-appearance: none;
-                        appearance: none;
-                        width: 24px;
-                        height: 24px;
-                        border-radius: 50%;
-                        background: ${getRatingColor(rating)};
-                        cursor: ${
-                          !isEditMode && !selectedSkillId
-                            ? "not-allowed"
-                            : "pointer"
-                        };
-                        border: 3px solid #fff;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                        transition: all 0.2s ease;
-                      }
-                      
-                      input[type="range"]::-webkit-slider-thumb:hover {
-                        transform: scale(1.2);
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                      }
-                      
-                      input[type="range"]::-webkit-slider-thumb:active {
-                        transform: scale(1.1);
-                      }
-                      
-                      input[type="range"]::-moz-range-thumb {
-                        width: 24px;
-                        height: 24px;
-                        border-radius: 50%;
-                        background: ${getRatingColor(rating)};
-                        cursor: ${
-                          !isEditMode && !selectedSkillId
-                            ? "not-allowed"
-                            : "pointer"
-                        };
-                        border: 3px solid #fff;
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                        transition: all 0.2s ease;
-                      }
-                      
-                      input[type="range"]::-moz-range-thumb:hover {
-                        transform: scale(1.2);
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                      }
-                      
-                      input[type="range"]:disabled {
-                        opacity: 0.5;
-                      }
-                      
-                      input[type="range"]:disabled::-webkit-slider-thumb {
-                        cursor: not-allowed;
-                      }
-                      
-                      input[type="range"]:disabled::-moz-range-thumb {
-                        cursor: not-allowed;
-                      }
-
-                      div::-webkit-scrollbar {
-                        display: none;
-                        }
-                    `}
-                  </style>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginTop: "0.75rem",
-                      paddingTop: "0.5rem",
-                      borderTop: "1px solid #f3f4f6",
-                    }}
-                  >
-                    <div style={{ textAlign: "left", flex: 1 }}>
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6c757d",
-                          display: "block",
-                        }}
-                      >
-                        Min
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          fontWeight: "600",
-                          color: "#dc3545",
-                        }}
-                      >
-                        1
-                      </span>
-                    </div>
-
-                    <div style={{ textAlign: "center", flex: 1 }}>
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
-                          fontWeight: "600",
-                          color: getRatingColor(rating),
-                          padding: "0.375rem 0.75rem",
-                          background: `${getRatingColor(rating)}15`,
-                          borderRadius: "12px",
-                          border: `1px solid ${getRatingColor(rating)}30`,
-                        }}
-                      >
-                        {getRatingLabel(rating)}
-                      </span>
-                    </div>
-
-                    <div style={{ textAlign: "right", flex: 1 }}>
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#6c757d",
-                          display: "block",
-                        }}
-                      >
-                        Max
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "0.875rem",
-                          fontWeight: "600",
-                          color: "#198754",
-                        }}
-                      >
-                        10
-                      </span>
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      position: "absolute",
-                      width: "100%",
-                      top: "2px",
-                      pointerEvents: "none",
-                    }}
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                      <div
-                        key={num}
-                        style={{
-                          width: "2px",
-                          height: "8px",
-                          background:
-                            rating >= num ? getRatingColor(rating) : "#d1d5db",
-                          borderRadius: "1px",
-                          opacity: 0.5,
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  padding: "1.25rem",
-                  background: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "12px",
-                  marginTop: "1rem",
-                }}
-              >
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    marginBottom: "1rem",
+                    justifyContent: "space-between",
+                    gap: "8px",
+                    flexWrap: "wrap",
                   }}
                 >
-                  <AlertCircle
-                    size={20}
-                    color="#3b82f6"
-                    style={{ flexShrink: 0 }}
-                  />
-                  <p
-                    style={{
-                      fontSize: "0.9375rem",
-                      color: "#1e40af",
-                      margin: 0,
-                      fontWeight: "600",
-                    }}
-                  >
-                    Rating Guide
-                  </p>
+                  {[...Array(10)].map((_, index) => {
+                    const value = index + 1;
+                    return (
+                      <button
+                        type="button"
+                        key={value}
+                        onClick={() => setRating(value)}
+                        disabled={!isEditMode && !selectedSkillId}
+                        style={{
+                          width: "36px",
+                          height: "36px",
+                          borderRadius: "50%",
+                          border:
+                            rating === value
+                              ? `2px solid ${getRatingColor(value)}`
+                              : "1px solid #ccc",
+                          backgroundColor:
+                            rating === value
+                              ? getRatingColor(value)
+                              : "#f8f9fa",
+                          color: rating === value ? "#fff" : "#212529",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          cursor:
+                            !isEditMode && !selectedSkillId
+                              ? "not-allowed"
+                              : "pointer",
+                          transition: "all 0.2s ease",
+                        }}
+                      >
+                        {value}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <ul
+                <div
                   style={{
-                    fontSize: "0.8rem",
-                    color: "#475569",
-                    margin: 0,
-                    paddingLeft: "1.5rem",
-                    lineHeight: 1.8,
-                    listStyleType: "disc",
-                    textAlign: "left",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: "0.75rem",
+                    paddingTop: "0.5rem",
+                    borderTop: "1px solid #f3f4f6",
                   }}
                 >
-                  <li style={{ marginBottom: "0.5rem" }}>
-                    <span style={{ fontWeight: "600", color: "#1e293b" }}>
-                      1-4:
-                    </span>{" "}
-                    Beginner (Needs Training)
-                  </li>
-                  <li style={{ marginBottom: "0.5rem" }}>
-                    <span style={{ fontWeight: "600", color: "#1e293b" }}>
-                      5-7:
-                    </span>{" "}
-                    Competent
-                  </li>
-                  <li>
-                    <span style={{ fontWeight: "600", color: "#1e293b" }}>
-                      8-10:
-                    </span>{" "}
-                    Expert (Can become SME)
-                  </li>
-                </ul>
+                  <div style={{ textAlign: "left", flex: 1 }}>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#6c757d",
+                        display: "block",
+                      }}
+                    >
+                      Min
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: "600",
+                        color: "#dc3545",
+                      }}
+                    >
+                      1
+                    </span>
+                  </div>
+
+                  <div style={{ textAlign: "center", flex: 1 }}>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        fontWeight: "600",
+                        color: getRatingColor(rating),
+                        padding: "0.375rem 0.75rem",
+                        background: `${getRatingColor(rating)}15`,
+                        borderRadius: "12px",
+                        border: `1px solid ${getRatingColor(rating)}30`,
+                      }}
+                    >
+                      {getRatingLabel(rating)}
+                    </span>
+                  </div>
+
+                  <div style={{ textAlign: "right", flex: 1 }}>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#6c757d",
+                        display: "block",
+                      }}
+                    >
+                      Max
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: "600",
+                        color: "#198754",
+                      }}
+                    >
+                      10
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
