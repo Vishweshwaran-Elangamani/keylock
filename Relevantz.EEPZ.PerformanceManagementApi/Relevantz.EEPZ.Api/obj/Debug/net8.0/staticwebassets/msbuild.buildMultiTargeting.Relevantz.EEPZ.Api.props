@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Relevantz.EEPZ.Api.props" />
-</Project>
