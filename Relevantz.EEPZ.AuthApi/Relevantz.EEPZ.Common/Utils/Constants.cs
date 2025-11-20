@@ -89,6 +89,7 @@ namespace Relevantz.EEPZ.Common.Utils
             public const string EmployeeCompanyId = "EmployeeCompanyId";
             public const string Mobile = "Mobile";
             public const string Address = "Address";
+            public const string Username = "Username";
         }
 
          

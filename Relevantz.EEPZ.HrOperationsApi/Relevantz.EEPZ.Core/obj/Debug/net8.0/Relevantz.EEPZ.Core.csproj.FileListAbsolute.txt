@@ -112,22 +112,41 @@ D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.C
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
-D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.HrOperationsApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll

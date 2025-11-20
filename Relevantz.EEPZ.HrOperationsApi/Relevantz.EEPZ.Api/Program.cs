@@ -8,11 +8,24 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-  
-//  SERVICE CONFIGURATION
+// ===================================
+// Configure Serilog
+// ===================================
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("Service", "HR-Operations")
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+Log.Information("Starting EEPZ HR Operations Microservice...");
+
+// SERVICE CONFIGURATION
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -43,13 +56,13 @@ builder.Services.AddAuthentication(options =>
     {
         OnAuthenticationFailed = context =>
         {
-            Console.WriteLine($"JWT Authentication Failed: {context.Exception.Message}");
+            Log.Warning("JWT Authentication Failed: {Message}", context.Exception.Message);
             return Task.CompletedTask;
         },
         OnTokenValidated = context =>
         {
             var userId = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            Console.WriteLine($"JWT Token Validated for UserId: {userId}");
+            Log.Information("JWT Token Validated for UserId: {UserId}", userId);
             return Task.CompletedTask;
         }
     };
@@ -62,9 +75,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "EEPZ API",
+        Title = "EEPZ HR Operations API",
         Version = "v1",
-        Description = "HR Operations API"
+        Description = "Sprint 2 (Policies & Goals) + Sprint 3 (Career Progression & Payroll) - Combined API"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -124,6 +137,7 @@ builder.Services.AddScoped<ICareerProgressionService, CareerProgressionService>(
 builder.Services.AddScoped<IFundAllocationRepository, FundAllocationRepository>();
 builder.Services.AddScoped<IFundAllocationService, FundAllocationService>();
 builder.Services.AddScoped<ISlaEscalationRepository, SlaEscalationRepository>();
+
 // ---------- CORS ----------
 builder.Services.AddCors(options =>
 {
@@ -143,10 +157,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-  
-// 🗄️ DATABASE INITIALIZATION
-  
-
+// DATABASE INITIALIZATION
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -155,8 +166,7 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<EEPZDbContext>();
         await context.Database.MigrateAsync();
 
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("HR API: Database migration completed successfully");
+        Log.Information("HR API: Database migration completed successfully");
 
         var initializerType = typeof(Program).Assembly.GetType("eepzbackend.Data.DbInitializer");
         var method = initializerType?.GetMethod("InitializeAsync");
@@ -164,20 +174,16 @@ using (var scope = app.Services.CreateScope())
         if (method != null)
         {
             await (Task)method.Invoke(null, new object[] { context });
-            logger.LogInformation("HR API: Database seeding completed");
+            Log.Information("HR API: Database seeding completed");
         }
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "HR API: An error occurred while migrating the database");
+        Log.Error(ex, "HR API: An error occurred while migrating the database");
     }
 }
 
-  
-//  HTTP REQUEST PIPELINE
-  
-
+// HTTP REQUEST PIPELINE
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -187,6 +193,17 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
+
+// Enable Serilog Request Logging
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+        diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+    };
+});
 
 app.UseStaticFiles();
 app.UseHttpsRedirection();
@@ -204,9 +221,22 @@ app.MapGet("/health", () => Results.Ok(new
     timestamp = DateTime.UtcNow
 }));
 
-Console.WriteLine("EEPZ HR Operations Microservice is starting...");
-Console.WriteLine("Sprints: Sprint 2 (Auth & Goals) + Sprint 3 (Career Progression & Payroll)");
-Console.WriteLine("Authentication: JWT Bearer Token Enabled");
-Console.WriteLine("Endpoints: 16 Total");
-
-app.Run();
+try
+{
+    Log.Information("EEPZ HR Operations Microservice Started Successfully");
+    Log.Information("Sprints: Sprint 2 (Auth & Goals) + Sprint 3 (Career Progression & Payroll)");
+    Log.Information("Authentication: JWT Bearer Token Enabled");
+    Log.Information("Endpoints: 16 Total");
+    Log.Information("Environment: {Environment}", app.Environment.EnvironmentName);
+    
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "HR Operations Microservice terminated unexpectedly");
+    throw;
+}
+finally
+{
+    Log.CloseAndFlush();
+}

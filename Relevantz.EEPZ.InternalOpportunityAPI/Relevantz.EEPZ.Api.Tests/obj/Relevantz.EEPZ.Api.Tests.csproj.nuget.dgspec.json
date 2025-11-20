@@ -1,33 +1,40 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {}
+    "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {}
   },
   "projects": {
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {
+    "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+        "projectUniqueName": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
         "projectName": "Relevantz.EEPZ.Api.Tests",
-        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
-        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\obj\\",
+        "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\Relevantz.EEPZ.Api.Tests.csproj",
+        "packagesPath": "C:\\Users\\mukesh.nagasamy\\.nuget\\packages\\",
+        "outputPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api.Tests\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\mukesh.nagasamy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
+              "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+                "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj"
               }
             }
           }
@@ -41,7 +48,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -101,45 +109,62 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
+    "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
+        "projectUniqueName": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
         "projectName": "Relevantz.EEPZ.Api",
-        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
-        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\obj\\",
+        "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\Relevantz.EEPZ.Api.csproj",
+        "packagesPath": "C:\\Users\\mukesh.nagasamy\\.nuget\\packages\\",
+        "outputPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Api\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\mukesh.nagasamy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               },
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
+              "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+                "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj"
               },
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+              "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+                "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
               }
             }
           }
@@ -153,7 +178,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -225,6 +251,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -233,26 +273,33 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+    "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectUniqueName": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "projectName": "Relevantz.EEPZ.Common",
-        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
-        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\obj\\",
+        "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "packagesPath": "C:\\Users\\mukesh.nagasamy\\.nuget\\packages\\",
+        "outputPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\mukesh.nagasamy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -270,7 +317,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -296,42 +344,59 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+    "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "projectUniqueName": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
         "projectName": "Relevantz.EEPZ.Core",
-        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
-        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\obj\\",
+        "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "packagesPath": "C:\\Users\\mukesh.nagasamy\\.nuget\\packages\\",
+        "outputPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Core\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\mukesh.nagasamy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               },
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+              "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+                "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
               }
             }
           }
@@ -345,7 +410,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -375,39 +441,56 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+    "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectUniqueName": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "projectName": "Relevantz.EEPZ.Data",
-        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
-        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\obj\\",
+        "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "packagesPath": "C:\\Users\\mukesh.nagasamy\\.nuget\\packages\\",
+        "outputPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Data\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\mukesh.nagasamy\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\Balaji\\Updated\\Backend\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.InternalOpportunityAPI\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               }
             }
           }
@@ -421,7 +504,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -453,12 +537,22 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.19, 8.0.19]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
