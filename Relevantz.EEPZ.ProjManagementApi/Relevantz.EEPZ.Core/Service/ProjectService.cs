@@ -125,41 +125,32 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return ApiResponse<ProjectResponse>.ErrorResponse($"An error occurred while updating the project: {ex.Message}");
             }
         }
-
         public async Task<ApiResponse<bool>> DeleteProjectAsync(int projectId)
+{
+    try
+    {
+        // Check if project exists
+        if (!await _projectRepository.ProjectExistsAsync(projectId))
         {
-            try
-            {
-                // Check if project exists
-                if (!await _projectRepository.ProjectExistsAsync(projectId))
-                {
-                    return ApiResponse<bool>.ErrorResponse("Project not found.");
-                }
-
-                // Check if employees are mapped to this project
-                var mappedEmployees = await _projectRepository.GetProjectEmployeesAsync(projectId);
-                if (mappedEmployees != null && mappedEmployees.Any())
-                {
-                    return ApiResponse<bool>.ErrorResponse(
-                        "Cannot delete project while employees are still mapped. Please unmap all employees first."
-                    );
-                }
-
-                // Proceed with deletion
-                var result = await _projectRepository.DeleteProjectAsync(projectId);
-
-                if (result)
-                {
-                    return ApiResponse<bool>.SuccessResponse(true, "Project deleted successfully.");
-                }
-
-                return ApiResponse<bool>.ErrorResponse("Failed to delete project.");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<bool>.ErrorResponse($"An error occurred while deleting the project: {ex.Message}");
-            }
+            return ApiResponse<bool>.ErrorResponse("Project not found.");
         }
+
+        // ✅ Repository now handles the manager vs employee separation logic
+        var result = await _projectRepository.DeleteProjectAsync(projectId);
+
+        if (result)
+        {
+            return ApiResponse<bool>.SuccessResponse(true, "Project deleted successfully.");
+        }
+
+        return ApiResponse<bool>.ErrorResponse("Cannot delete project while employees are still mapped. Please unmap all employees first.");
+    }
+    catch (Exception ex)
+    {
+        return ApiResponse<bool>.ErrorResponse($"An error occurred while deleting the project: {ex.Message}");
+    }
+}
+
 
         public async Task<ApiResponse<ProjectDetailResponse>> GetProjectByIdAsync(int projectId)
         {
