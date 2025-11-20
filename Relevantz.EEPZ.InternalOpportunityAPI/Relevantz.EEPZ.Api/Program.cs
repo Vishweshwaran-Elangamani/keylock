@@ -9,14 +9,21 @@ using Microsoft.OpenApi.Models;
 using Relevantz.EEPZ.Data.DBContexts;
 using System.Text;
 using AutoMapper;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog (Optional - uncomment if needed)
-// Log.Logger = new LoggerConfiguration()
-//     .ReadFrom.Configuration(builder.Configuration)
-//     .CreateLogger();
-// builder.Host.UseSerilog();
+// ===================================
+// Configure Serilog
+// ===================================
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+Log.Information("Starting EEPZ Internal Opportunities Service...");
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -29,7 +36,7 @@ builder.Services.AddSwaggerGen(c =>
     { 
         Title = "EEPZ API", 
         Version = "v1",
-        Description = "Internal Opportunities API"
+        Description = "EEPZ Internal Opportunities & Authentication API"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -90,21 +97,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // ============================================================================
-// REGISTER EXISTING REPOSITORIES (Authentication & User Management)
-// ============================================================================
-// builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-// builder.Services.AddScoped<IUserAuthenticationRepository, UserAuthenticationRepository>();
-// builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
-// builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-// builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-// builder.Services.AddScoped<IEmployeeDetailsMasterRepository, EmployeeDetailsMasterRepository>();
-// builder.Services.AddScoped<IOtpRepository, OtpRepository>();
-// builder.Services.AddScoped<ILoginAttemptRepository, LoginAttemptRepository>();
-// builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-// builder.Services.AddScoped<IChangeRequestRepository, ChangeRequestRepository>();
-// builder.Services.AddScoped<IBulkOperationLogRepository, BulkOperationLogRepository>();
-
-// ============================================================================
 // REGISTER NEW REPOSITORIES (Internal Opportunities Module)
 // ============================================================================
 builder.Services.AddScoped<IInternalOpportunityRepository, InternalOpportunityRepository>();
@@ -113,22 +105,6 @@ builder.Services.AddScoped<IManagerNominationTrackingRepository, ManagerNominati
 builder.Services.AddScoped<INominationReviewMetricRepository, NominationReviewMetricRepository>();
 builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
 builder.Services.AddScoped<IPromotionHistoryRepository, PromotionHistoryRepository>();
-
-// ============================================================================
-// REGISTER EXISTING SERVICES (Authentication & User Management)
-// ============================================================================
-// builder.Services.AddScoped<IPasswordService, PasswordService>();
-// builder.Services.AddScoped<IOtpService, OtpService>();
-// builder.Services.AddScoped<ITokenService, TokenService>();
-// builder.Services.AddScoped<IEmailService, EmailService>();
-// builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-// builder.Services.AddScoped<IUserManagementService, UserManagementService>();
-// builder.Services.AddScoped<IRoleService, RoleService>();
-// builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-// builder.Services.AddScoped<IProfileService, ProfileService>();
-// builder.Services.AddScoped<IChangeRequestService, ChangeRequestService>();
-// builder.Services.AddScoped<IBulkOperationService, BulkOperationService>();
-// builder.Services.AddScoped<IExportService, ExportService>();
 
 // ============================================================================
 // REGISTER NEW SERVICES (Internal Opportunities Module)
@@ -148,9 +124,6 @@ var mapperConfig = new MapperConfiguration(mc =>
 
 builder.Services.AddSingleton(mapperConfig.CreateMapper());
 
-// Alternative: Use this if AutoMapper.Extensions.Microsoft.DependencyInjection is installed
-// builder.Services.AddAutoMapper(typeof(InternalOpportunitiesMappingProfile));
-
 // ============================================================================
 // CONFIGURE CORS
 // ============================================================================
@@ -164,46 +137,32 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ============================================================================
-// ADD JSON OPTIONS FOR DATEONLY
-// ============================================================================
-// builder.Services.AddControllers()
-//     .AddJsonOptions(options =>
-//     {
-//         options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
-//         options.JsonSerializerOptions.Converters.Add(new NullableDateOnlyJsonConverter());
-//     });
-
 var app = builder.Build();
 
 // ============================================================================
-// SEED DATABASE
+// VERIFY DATABASE CONNECTION
 // ============================================================================
-// using (var scope = app.Services.CreateScope())
-// {
-//     var services = scope.ServiceProvider;
-//     try
-//     {
-//         var context = services.GetRequiredService<EEPZDbContext>();
-//         var configuration = services.GetRequiredService<IConfiguration>();
-
-//         // Apply pending migrations
-//         // await context.Database.MigrateAsync();
-
-//         // Seed existing data
-//         await DbInitializer.InitializeAsync(context, configuration);
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<EEPZDbContext>();
         
-//         // Seed Internal Opportunities data
-//         await DbInitializer.SeedInternalOpportunitiesAsync(context);
-        
-//         Console.WriteLine("✓ Database seeding completed successfully!");
-//     }
-//     catch (Exception ex)
-//     {
-//         Console.WriteLine($"✗ An error occurred while seeding the database: {ex.Message}");
-//         Console.WriteLine($"  Stack Trace: {ex.StackTrace}");
-//     }
-// }
+        if (context.Database.CanConnect())
+        {
+            Log.Information("Database connection established successfully");
+        }
+        else
+        {
+            Log.Warning("Failed to connect to the database");
+        }
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "An error occurred while connecting to the database");
+    }
+}
 
 // ============================================================================
 // CONFIGURE HTTP REQUEST PIPELINE
@@ -218,7 +177,16 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// app.UseSerilogRequestLogging();
+// Enable Serilog Request Logging
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+        diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+    };
+});
 
 app.UseHttpsRedirection();
 
@@ -229,5 +197,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-Console.WriteLine("🚀 EEPZ API Server is starting...");
-app.Run();
+try
+{
+    Log.Information("EEPZ Internal Opportunities API Server Started Successfully");
+    Log.Information("Environment: {Environment}", app.Environment.EnvironmentName);
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
