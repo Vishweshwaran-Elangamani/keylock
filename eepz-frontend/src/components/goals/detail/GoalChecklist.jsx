@@ -486,129 +486,21 @@ const GoalChecklist = ({
       )}
 
       {/* Description Section */}
-      <div
-        className="card mb-4"
-        style={{ border: "1px solid #dee2e6", borderRadius: "12px" }}
-      >
-        <div
-          className="goal-card-header d-flex justify-content-between align-items-center"
-          style={{
-            backgroundColor: "#f8f9fa",
-            fontWeight: 600,
-            borderBottom: "1px solid #dee2e6",
-            padding: "1rem 1.25rem",
-          }}
-        >
-          <div>
-            <i
-              className="bi bi-file-text me-2"
-              style={{ color: "#0d6efd" }}
-            ></i>
-            Description
-            {/* Include acknowledgment check and canViewAsManager */}
-            {(hasPendingApproval ||
-              isCompleted ||
-              isUserAcknowledged ||
-              isGoalOverdue ||
-              canViewAsManager) && (
-              <span
-                className="badge bg-secondary text-white ms-2"
-                style={{ fontSize: "0.7rem" }}
-              >
-                <i className="bi bi-lock-fill me-1"></i>
-                {isCompleted
-                  ? "View Only"
-                  : isGoalOverdue
-                  ? "Overdue"
-                  : isUserAcknowledged
-                  ? "Acknowledged"
-                  : canViewAsManager
-                  ? "Monitoring"
-                  : "Locked"}
-              </span>
-            )}
-          </div>
-          {!editingDescription && canEdit && (
-            <button
-              className="btn btn-sm btn-outline-primary"
-              onClick={() => setEditingDescription(true)}
-              style={{ fontSize: "0.85rem" }}
-            >
-              <i className="bi bi-pencil me-1"></i>
-            </button>
-          )}
-        </div>
-        <div className="card-body" style={{ padding: "1.25rem" }}>
-          {editingDescription ? (
-            <>
-              <textarea
-                className="form-control mb-3"
-                rows="4"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                disabled={loading}
-                placeholder="Enter goal description..."
-                style={{
-                  fontSize: "0.95rem",
-                  height: "100px",
-                }}
-              />
-              <div className="d-flex gap-2">
-                <button
-                  className="btn btn-primary"
-                  onClick={handleDescriptionSave}
-                  disabled={loading}
-                >
-                  <i className="bi bi-check-lg me-1"></i>
-                  Save
-                </button>
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    setEditingDescription(false);
-                    setDescription(goal.description || "");
-                  }}
-                  disabled={loading}
-                >
-                  <i className="bi bi-x-lg me-1"></i>
-                  Cancel
-                </button>
-              </div>
-            </>
-          ) : (
-            <p
-              style={{
-                whiteSpace: "pre-wrap",
-                marginBottom: 0,
-                fontSize: "0.95rem",
-                lineHeight: "1.6",
-                color: goal.description ? "#495057" : "#6c757d",
-                fontStyle: goal.description ? "normal" : "italic",
-                textAlign: "left",
-              }}
-            >
-              {goal.description || "No description provided"}
-            </p>
-          )}
-        </div>
-      </div>
 
-      {/* Checklist */}
       <div
-        className="card"
-        style={{ border: "1px solid #dee2e6", borderRadius: "12px" }}
+        className="goal-card-header d-flex justify-content-between align-items-center"
+        style={{
+          backgroundColor: "rgb(39, 35, 92)",
+          fontWeight: 600,
+          fontSize: "16px",
+          border: "1px solid rgba(39, 35, 92, 0.46)",
+          padding: "1rem 1.25rem",
+          borderRadius: "1.5rem 1.5rem 0rem 0rem",
+        }}
       >
-        <div
-          className="goal-card-header"
-          style={{
-            backgroundColor: "#f8f9fa",
-            fontWeight: 600,
-            borderBottom: "1px solid #dee2e6",
-            padding: "1rem 1.25rem",
-          }}
-        >
-          <i className="bi bi-list-check me-2" style={{ color: "#0d6efd" }}></i>
-          Checklist ({completedDisplayedItems}/{totalDisplayedItems})
+        <div style={{ color: "white" }}>
+          <i className="bi bi-file-text me-2"></i>
+          Description
           {/* Include acknowledgment check and canViewAsManager */}
           {(hasPendingApproval ||
             isCompleted ||
@@ -632,118 +524,238 @@ const GoalChecklist = ({
             </span>
           )}
         </div>
-        <div className="card-body" style={{ padding: 0 }}>
-          {totalDisplayedItems === 0 ? (
-            <div
+        {!editingDescription && canEdit && (
+          <button
+            className="btn btn-sm"
+            onClick={() => setEditingDescription(true)}
+            style={{ fontSize: "1.5rem", color: "white" }}
+          >
+            <i className="bi bi-pencil me-1"></i>
+          </button>
+        )}
+      </div>
+      <div
+        className="card-body mb-4"
+        style={{
+          padding: "1.25rem",
+          border: "1px solid rgba(39, 35, 92, 0.46)",
+          borderRadius: "0rem 0rem 1.5rem 1.5rem",
+        }}
+      >
+        {editingDescription ? (
+          <>
+            <textarea
+              className="form-control mb-3"
+              rows="4"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={loading}
+              placeholder="Enter goal description..."
               style={{
-                padding: "3rem 2rem",
-                textAlign: "center",
-                color: "#6c757d",
-                backgroundColor: "#f8f9fa",
-              }}
-            >
-              <i
-                className="bi bi-inbox"
-                style={{ fontSize: "3rem", opacity: 0.3 }}
-              ></i>
-              <p className="mt-3 mb-0" style={{ fontWeight: 500 }}>
-                No checklist items
-              </p>
-              <p className="text-muted small mb-0">
-                Add items to track your progress
-              </p>
-            </div>
-          ) : isGrouped ? (
-            // Grouped display for team goals
-            <div style={{ padding: "1rem" }}>
-              {Object.entries(displayedChecklist).map(([assigneeId, group]) => (
-                <div key={assigneeId} className="mb-3">
-                  <div
-                    className="d-flex align-items-center gap-2 mb-2 p-2"
-                    style={{
-                      backgroundColor: group.isCurrentUser
-                        ? "#e3f2fd"
-                        : "#e9ecef",
-                      borderRadius: "0.5rem",
-                      border: group.isCurrentUser
-                        ? "2px solid #2196f3"
-                        : "none",
-                    }}
-                  >
-                    <i
-                      className={`bi ${
-                        group.isCurrentUser
-                          ? "bi-person-fill"
-                          : "bi-person-badge"
-                      } text-primary`}
-                    ></i>
-                    <span className="fw-semibold">
-                      {group.isCurrentUser
-                        ? "Your Tasks"
-                        : `${group.name}'s Tasks`}
-                    </span>
-                    <span className="badge bg-secondary ms-auto">
-                      {
-                        group.items.filter((i) => i.isCompletedForCurrentUser)
-                          .length
-                      }
-                      /{group.items.length}
-                    </span>
-                  </div>
+                fontSize: "16px",
+                height: "100px",
 
-                  <ul className="list-group">
-                    {group.items
-                      .sort(
-                        (a, b) =>
-                          (a.isCompletedForCurrentUser ? 1 : 0) -
-                          (b.isCompletedForCurrentUser ? 1 : 0)
-                      )
-                      .map((item, index) => (
-                        <ChecklistItem
-                          key={item.checklistId || index}
-                          item={item}
-                          isDisabled={
-                            loading ||
-                            hasPendingApproval ||
-                            isCompleted ||
-                            isUserAcknowledged ||
-                            isGoalOverdue ||
-                            !canEditOrgGoal ||
-                            canViewAsManager ||
-                            !group.isCurrentUser
-                          }
-                          onToggle={handleToggleClick}
-                        />
-                      ))}
-                  </ul>
-                </div>
-              ))}
+                resize: "vertical", // allows manual resizing
+                overflowWrap: "break-word", // breaks long words
+                wordBreak: "break-word", // ensures wrapping
+              }}
+            />
+            <div className="d-flex gap-2">
+              <button
+                className="btn"
+                style={{
+                  background:
+                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  color: "white",
+                }}
+                onClick={handleDescriptionSave}
+                disabled={loading}
+              >
+                <i className="bi bi-check-lg me-1"></i>
+                Save
+              </button>
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => {
+                  setEditingDescription(false);
+                  setDescription(goal.description || "");
+                }}
+                disabled={loading}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
             </div>
-          ) : (
-            // Regular list for self goals
-            <ul className="list-group list-group-flush">
-              {(displayedChecklist.ungrouped || checklist).map(
-                (item, index) => (
-                  <ChecklistItem
-                    key={item.checklistId || index}
-                    item={item}
-                    isDisabled={
-                      loading ||
-                      hasPendingApproval ||
-                      isCompleted ||
-                      isUserAcknowledged ||
-                      isGoalOverdue ||
-                      !canEditOrgGoal ||
-                      canViewAsManager
+          </>
+        ) : (
+          <p
+            style={{
+              whiteSpace: "pre-wrap",
+              marginBottom: 0,
+              fontSize: "15px",
+              lineHeight: "1.6",
+              color: goal.description ? "#495057" : "#6c757d",
+              fontStyle: goal.description ? "normal" : "italic",
+              textAlign: "left",
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            {goal.description || "No description provided"}
+          </p>
+        )}
+      </div>
+
+      {/* Checklist */}
+
+      <div
+        className="goal-card-header"
+        style={{
+          color: "white",
+          fontWeight: 600,
+          padding: "1rem 1.25rem",
+          fontSize: "16px",
+          backgroundColor: "rgb(39, 35, 92)",
+          borderRadius: "1.5rem 1.5rem 0rem 0rem",
+        }}
+      >
+        <i className="bi bi-list-check me-2"></i>
+        Checklist ({completedDisplayedItems}/{totalDisplayedItems})
+        {/* Include acknowledgment check and canViewAsManager */}
+        {(hasPendingApproval ||
+          isCompleted ||
+          isUserAcknowledged ||
+          isGoalOverdue ||
+          canViewAsManager) && (
+          <span
+            className="badge bg-secondary text-white ms-2"
+            style={{ fontSize: "0.7rem" }}
+          >
+            <i className="bi bi-lock-fill me-1"></i>
+            {isCompleted
+              ? "View Only"
+              : isGoalOverdue
+              ? "Overdue"
+              : isUserAcknowledged
+              ? "Acknowledged"
+              : canViewAsManager
+              ? "Monitoring"
+              : "Locked"}
+          </span>
+        )}
+      </div>
+      <div
+        className="card-body"
+        style={{
+          padding: "10px",
+          border: "1px solid rgba(39, 35, 92, 0.46)",
+          borderRadius: "0rem 0rem 1.5rem 1.5rem",
+        }}
+      >
+        {totalDisplayedItems === 0 ? (
+          <div
+            style={{
+              padding: "3rem 2rem",
+              textAlign: "center",
+              color: "#6c757d",
+              backgroundColor: "#f8f9fa",
+            }}
+          >
+            <i
+              className="bi bi-inbox"
+              style={{ fontSize: "3rem", opacity: 0.3 }}
+            ></i>
+            <p className="mt-3 mb-0" style={{ fontWeight: 500 }}>
+              No checklist items
+            </p>
+            <p className="text-muted small mb-0">
+              Add items to track your progress
+            </p>
+          </div>
+        ) : isGrouped ? (
+          // Grouped display for team goals
+          <div style={{ padding: "1rem" }}>
+            {Object.entries(displayedChecklist).map(([assigneeId, group]) => (
+              <div key={assigneeId} className="mb-3">
+                <div
+                  className="d-flex align-items-center gap-2 mb-2 p-2"
+                  style={{
+                    backgroundColor: group.isCurrentUser
+                      ? "#e3f2fd"
+                      : "#e9ecef",
+                    borderRadius: "0.5rem",
+                    border: group.isCurrentUser ? "2px solid #2196f3" : "none",
+                  }}
+                >
+                  <i
+                    className={`bi ${
+                      group.isCurrentUser ? "bi-person-fill" : "bi-person-badge"
+                    } text-primary`}
+                  ></i>
+                  <span className="fw-semibold">
+                    {group.isCurrentUser
+                      ? "Your Tasks"
+                      : `${group.name}'s Tasks`}
+                  </span>
+                  <span className="badge bg-secondary ms-auto">
+                    {
+                      group.items.filter((i) => i.isCompletedForCurrentUser)
+                        .length
                     }
-                    onToggle={handleToggleClick}
-                    isLast={index === checklist.length - 1}
-                  />
-                )
-              )}
-            </ul>
-          )}
-        </div>
+                    /{group.items.length}
+                  </span>
+                </div>
+
+                <ul className="list-group">
+                  {group.items
+                    .sort(
+                      (a, b) =>
+                        (a.isCompletedForCurrentUser ? 1 : 0) -
+                        (b.isCompletedForCurrentUser ? 1 : 0)
+                    )
+                    .map((item, index) => (
+                      <ChecklistItem
+                        key={item.checklistId || index}
+                        item={item}
+                        isDisabled={
+                          loading ||
+                          hasPendingApproval ||
+                          isCompleted ||
+                          isUserAcknowledged ||
+                          isGoalOverdue ||
+                          !canEditOrgGoal ||
+                          canViewAsManager ||
+                          !group.isCurrentUser
+                        }
+                        onToggle={handleToggleClick}
+                      />
+                    ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          // Regular list for self goals
+          <ul className="list-group list-group-flush">
+            {(displayedChecklist.ungrouped || checklist).map((item, index) => (
+              <ChecklistItem
+                key={item.checklistId || index}
+                item={item}
+                isDisabled={
+                  loading ||
+                  hasPendingApproval ||
+                  isCompleted ||
+                  isUserAcknowledged ||
+                  isGoalOverdue ||
+                  !canEditOrgGoal ||
+                  canViewAsManager
+                }
+                onToggle={handleToggleClick}
+                isLast={index === checklist.length - 1}
+              />
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* Confirmation Modal */}
@@ -843,7 +855,7 @@ const ChecklistItem = ({ item, isDisabled, onToggle, isLast = false }) => {
               textDecoration: isItemCompleted ? "line-through" : "none",
               color: isItemCompleted ? "#6c757d" : "#212529",
               fontWeight: isItemCompleted ? 400 : 600,
-              fontSize: "0.95rem",
+              fontSize: "1.0rem",
               lineHeight: "1.5",
               marginBottom: item.description ? "0.25rem" : 0,
               opacity: isItemCompleted ? 0.7 : 1,

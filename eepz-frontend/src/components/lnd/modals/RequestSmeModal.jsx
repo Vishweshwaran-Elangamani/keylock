@@ -136,27 +136,42 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
             style={{
               padding: '1.5rem',
               borderBottom: '1px solid #e5e7eb',
+              backgroundColor: "rgb(39, 35, 92)",
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
             }}
           >
-            <h5 style={{ margin: 0, fontWeight: '600', color: '#212529' }}>
+            <h5 style={{ margin: 0, fontWeight: '600', color: 'white' }}>
               Request SME Assignment
             </h5>
-            <button
+           <button
+              type="button"
+              class="btn-close"
               onClick={onClose}
               style={{
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '0.25rem',
-                color: '#6c757d',
-                display: 'flex',
-                alignItems: 'center'
+                border: "none",
+                width: "36px",
+                backgroundColor: "transparent",
+                height: "36px",
+                borderRadius: "0.5rem",
+                cursor: "pointer",
+                color: "white",
+                fontSize: "1.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "red";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "white";
               }}
             >
-              <X size={20} />
+              <i className="bi bi-x-lg"></i>
             </button>
           </div>
 

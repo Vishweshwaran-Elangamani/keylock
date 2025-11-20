@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import * as api from "../../../services/performancemanagement/hr/api"; 
+import * as api from "../../../services/performancemanagement/hr/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -14,9 +14,8 @@ function HRNominations() {
   const [selectedNominationDetails, setSelectedNominationDetails] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
 
-
   const [showActionModal, setShowActionModal] = useState(false);
-  const [actionType, setActionType] = useState(""); // "approve" or "reject"
+  const [actionType, setActionType] = useState("");
   const [actionNominationId, setActionNominationId] = useState(null);
   const [actionRemarks, setActionRemarks] = useState("");
 
@@ -28,10 +27,9 @@ function HRNominations() {
   });
   const [statsLoading, setStatsLoading] = useState(true);
 
-
   const THEME = {
-    primary: "#4C3F8F", // Dark Purple
-    secondary: "#2D5B8C", // Dark Blue
+    primary: "#4C3F8F",
+    secondary: "#2D5B8C",
     background: "#F8FAFC",
     card: "#FFFFFF",
     text: "#1A202C",
@@ -50,20 +48,19 @@ function HRNominations() {
     setCurrentPage(1);
   }, [activeTab]);
 
-const fetchStatistics = async () => {
-  try {
-    setStatsLoading(true);
-    const { data } = await api.getStatistics();  // Use 'api' instead of 'hrNominationApi'
-    if (data.success) {
-      setStatistics(data.data);
+  const fetchStatistics = async () => {
+    try {
+      setStatsLoading(true);
+      const { data } = await api.getStatistics();
+      if (data.success) {
+        setStatistics(data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching statistics:", error);
+    } finally {
+      setStatsLoading(false);
     }
-  } catch (error) {
-    console.error("Error fetching statistics:", error);
-  } finally {
-    setStatsLoading(false);
-  }
-};
-
+  };
 
   const groupApprovedProfiles = (profiles) => {
     const grouped = {};
@@ -151,7 +148,6 @@ const fetchStatistics = async () => {
     currentPage * itemsPerPage
   );
 
- 
   const openApproveModal = (nominationId) => {
     setActionType("approve");
     setActionNominationId(nominationId);
@@ -159,7 +155,6 @@ const fetchStatistics = async () => {
     setShowActionModal(true);
   };
 
-  //  Open Modal for Reject
   const openRejectModal = (nominationId) => {
     setActionType("reject");
     setActionNominationId(nominationId);
@@ -167,54 +162,50 @@ const fetchStatistics = async () => {
     setShowActionModal(true);
   };
 
-  //  Submit Action
-
   const submitAction = async () => {
-  if (!actionRemarks.trim()) {
-    toast.warning("Please enter remarks");
-    return;
-  }
-
-  try {
-    if (actionType === "approve") {
-      const payload = {
-        selectedNominationIds: [actionNominationId],
-        hrUserId: 1,
-        approvalRemarks: actionRemarks,
-        rejectionRemarks: "Not selected in final round",
-      };
-
-      const { data } = await api.approveNominations(payload);
-
-      if (data.success) {
-        toast.success(`✓ Nomination approved successfully!`);
-        setShowActionModal(false);
-        setActionRemarks("");
-        fetchNominations();
-        fetchStatistics();
-      }
-    } else {
-      // ✅ FIXED: Changed from rejectNominationsOnly to rejectNominations
-      const { data } = await api.rejectNominations({
-        selectedNominationIds: [actionNominationId],
-        hrUserId: 1,
-        rejectionRemarks: actionRemarks,
-      });
-
-      if (data.success) {
-        toast.success(`✓ Nomination rejected successfully!`);
-        setShowActionModal(false);
-        setActionRemarks("");
-        fetchNominations();
-        fetchStatistics();
-      }
+    if (!actionRemarks.trim()) {
+      toast.warning("Please enter remarks");
+      return;
     }
-  } catch (error) {
-    console.error("Error submitting action:", error);
-    toast.error("Error: " + (error.response?.data?.message || error.message));
-  }
-};
 
+    try {
+      if (actionType === "approve") {
+        const payload = {
+          selectedNominationIds: [actionNominationId],
+          hrUserId: 1,
+          approvalRemarks: actionRemarks,
+          rejectionRemarks: "Not selected in final round",
+        };
+
+        const { data } = await api.approveNominations(payload);
+
+        if (data.success) {
+          toast.success(`✓ Nomination approved successfully!`);
+          setShowActionModal(false);
+          setActionRemarks("");
+          fetchNominations();
+          fetchStatistics();
+        }
+      } else {
+        const { data } = await api.rejectNominations({
+          selectedNominationIds: [actionNominationId],
+          hrUserId: 1,
+          rejectionRemarks: actionRemarks,
+        });
+
+        if (data.success) {
+          toast.success(`✓ Nomination rejected successfully!`);
+          setShowActionModal(false);
+          setActionRemarks("");
+          fetchNominations();
+          fetchStatistics();
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting action:", error);
+      toast.error("Error: " + (error.response?.data?.message || error.message));
+    }
+  };
 
   const viewDetails = async (nominationId) => {
     try {
@@ -270,11 +261,9 @@ const fetchStatistics = async () => {
 
   return (
     <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "20px", paddingBottom: "40px" }}>
-      {/*  Toastr Container */}
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="container-fluid">
-        {/* Header */}
         <div className="mb-4">
           <h1 className="display-5 fw-bold" style={{ color: THEME.primary, marginBottom: "8px" }}>
             Nomination Management
@@ -284,7 +273,6 @@ const fetchStatistics = async () => {
           </p>
         </div>
 
-        {/* Statistics */}
         {statsLoading ? (
           <div className="text-center mb-4">
             <div className="spinner-border spinner-border-sm" role="status"></div>
@@ -298,7 +286,6 @@ const fetchStatistics = async () => {
           </div>
         )}
 
-        {/* Tabs & Controls */}
         <div className="card border-0 shadow-sm mb-4" style={{ background: THEME.card }}>
           <div className="card-body">
             <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
@@ -351,7 +338,6 @@ const fetchStatistics = async () => {
           </div>
         </div>
 
-        {/* Content */}
         {filteredNominations.length === 0 ? (
           <div className="card border-0 shadow-sm text-center py-5" style={{ background: THEME.card }}>
             <div className="card-body">
@@ -415,6 +401,7 @@ const fetchStatistics = async () => {
                                 fontWeight: "600",
                                 fontSize: "11px",
                                 padding: "4px 8px",
+
                               }}
                               onClick={() => viewDetails(nomination.nominationId)}
                               title="View Details"
@@ -464,7 +451,6 @@ const fetchStatistics = async () => {
               </div>
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <nav aria-label="Page navigation">
                 <ul className="pagination justify-content-center">
@@ -512,7 +498,6 @@ const fetchStatistics = async () => {
           </>
         ) : (
           <>
-            {/* Grid View */}
             <div className="row g-4 mb-4">
               {paginatedNominations.map((nomination) => (
                 <div key={nomination.nominationId} className="col-md-6 col-lg-4">
@@ -598,7 +583,6 @@ const fetchStatistics = async () => {
               ))}
             </div>
 
-            {/* Grid Pagination */}
             {totalPages > 1 && (
               <nav aria-label="Page navigation">
                 <ul className="pagination justify-content-center">
@@ -646,7 +630,7 @@ const fetchStatistics = async () => {
         )}
       </div>
 
-      {/*  Modal for Approve/Reject Action */}
+      {/* ACTION MODAL - THEMED */}
       {showActionModal && (
         <>
           <div
@@ -656,12 +640,14 @@ const fetchStatistics = async () => {
               left: 0,
               right: 0,
               bottom: 0,
-              background: "rgba(0, 0, 0, 0.5)",
+              backgroundColor: "rgba(39, 35, 92, 0.4)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
               zIndex: 1040,
+              textAlign:"left",
             }}
             onClick={() => setShowActionModal(false)}
-          ></div>
-
+          />
           <div
             style={{
               position: "fixed",
@@ -669,48 +655,67 @@ const fetchStatistics = async () => {
               left: "50%",
               transform: "translate(-50%, -50%)",
               zIndex: 1050,
-              width: "90%",
-              maxWidth: "500px",
+              width: "95vw",
+              maxWidth: 420,
+              textAlign:"left",
             }}
           >
-            <div className="card border-0 shadow-lg" style={{ background: THEME.card }}>
+            <div
+              style={{
+                borderRadius: "0.75rem",
+                overflow: "hidden",
+                boxShadow: "0 10px 40px rgba(0, 0, 0, 0.26)",
+                border: "none",
+                background: "#fff",
+                textAlign:"left",
+              }}
+            >
               <div
-                className="card-header"
                 style={{
-                  background: THEME.primary,
+                  background: "#27235C",
                   color: "#fff",
-                  borderBottom: "none",
                   padding: "16px 20px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  textAlign:"left",
                 }}
               >
-                <div className="d-flex justify-content-between align-items-center">
-                  <h6 className="mb-0" style={{ fontWeight: "600" }}>
-                    {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
-                  </h6>
-                  <button
-                    type="button"
-                    className="btn-close btn-close-white"
-                    onClick={() => setShowActionModal(false)}
-                  ></button>
+                <div style={{ fontWeight: 600, fontSize: 17 }}>
+                  {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
                 </div>
+                <button
+                  onClick={() => setShowActionModal(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#fff",
+                    fontSize: 24,
+                    padding: "0 6px",
+                    cursor: "pointer",
+                    textAlign:"left",
+                  }}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
               </div>
-              <div className="card-body" style={{ padding: "20px" }}>
+              <div style={{ padding: 20, background: "#FFF" }}>
                 <label
                   style={{
-                    fontSize: "13px",
-                    fontWeight: "600",
-                    color: THEME.textLight,
-                    marginBottom: "8px",
+                    fontWeight: 600,
+                    fontSize: 13,
+                    color: "#334155",
+                    marginBottom: 6,
                     display: "block",
+                    textAlign:"left",
                   }}
                 >
-                  {actionType === "approve"
-                    ? "Enter approval justification:"
-                    : "Enter rejection reason:"}
+                  {actionType === "approve" ? "Enter approval justification:" : "Enter rejection reason:"}
                 </label>
                 <textarea
                   className="form-control"
-                  rows="4"
+                  rows={4}
                   value={actionRemarks}
                   onChange={(e) => setActionRemarks(e.target.value)}
                   placeholder={
@@ -718,319 +723,360 @@ const fetchStatistics = async () => {
                       ? "Why are you approving this nomination?"
                       : "Why are you rejecting this nomination?"
                   }
-                  style={{ fontSize: "14px", borderColor: THEME.border }}
-                ></textarea>
+                  style={{
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 6,
+                    padding: "10px",
+                    fontSize: 13,
+                    marginBottom: 4,
+                    minHeight: 90,
+                    resize: "vertical",
+                    textAlign:"left",
+                  }}
+                />
               </div>
               <div
-                className="card-footer"
                 style={{
-                  background: THEME.background,
-                  borderTop: `1px solid ${THEME.border}`,
-                  padding: "12px 20px",
+                  borderTop: "1px solid #e2e8f0",
+                  background: "#FFF",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 12,
+                  padding: "14px 20px",
+                  textAlign:"left",
                 }}
               >
-                <div className="d-flex gap-2 justify-content-end">
-                  <button
-                    className="btn btn-sm"
-                    onClick={() => setShowActionModal(false)}
-                    style={{
-                      background: "transparent",
-                      color: THEME.text,
-                      border: `1px solid ${THEME.border}`,
-                      fontWeight: "600",
-                      padding: "6px 16px",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className="btn btn-sm"
-                    onClick={submitAction}
-                    style={{
-                      background: actionType === "approve" ? THEME.success : THEME.danger,
-                      color: "#fff",
-                      border: "none",
-                      fontWeight: "600",
-                      padding: "6px 16px",
-                    }}
-                  >
-                    {actionType === "approve" ? "✓ Approve" : "✗ Reject"}
-                  </button>
-                </div>
+                <button
+                  onClick={() => setShowActionModal(false)}
+                  style={{
+                    background: "#6c757d",
+                    color: "#fff",
+                    border: "none",
+                    fontWeight: 600,
+                    padding: "8px 20px",
+                    fontSize: 13,
+                    borderRadius: 6,
+                    marginRight: 2,
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitAction}
+                  style={{
+                    background:
+                      actionType === "approve"
+                        ? "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+                        : "linear-gradient(90deg, #E01950 0%, #97247E 100%)",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 6,
+                    fontWeight: 600,
+                    fontSize: 13,
+                    padding: "8px 20px",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 8px rgba(151, 36, 126, 0.18)",
+                    textAlign:"left",
+                  }}
+                >
+                  {actionType === "approve" ? "Approve" : "Reject"}
+                </button>
               </div>
             </div>
           </div>
         </>
       )}
 
-      {/* Modal for Details */}
-     {/*  UPDATED: Modal for Details with Parameters */}
-<div
-  className={`modal fade ${showModal ? "show" : ""}`}
-  style={{
-    display: showModal ? "block" : "none",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  }}
-  tabIndex="-1"
->
-  <div className="modal-dialog modal-lg">
-    <div className="modal-content border-0 shadow-lg" style={{ background: THEME.card }}>
-      <div
-        className="modal-header"
-        style={{
-          background: THEME.primary,
-          color: "#fff",
-          borderBottom: "none",
-          paddingBottom: "24px",
-        }}
-      >
-        <h5 className="modal-title" style={{ fontWeight: "600", fontSize: "18px" }}>
-          Nomination Details
-        </h5>
-        <button
-          type="button"
-          className="btn-close btn-close-white"
-          onClick={() => setShowModal(false)}
-        ></button>
-      </div>
-      <div className="modal-body" style={{ paddingTop: "24px" }}>
-        {detailsLoading ? (
-          <div className="text-center">
-            <div className="spinner-border" role="status" style={{ color: THEME.primary }}></div>
-            <p className="text-muted mt-2">Loading details...</p>
-          </div>
-        ) : selectedNominationDetails ? (
-          <div>
-            {/* Basic Details */}
-            <div className="row mb-4">
-              <div className="col-md-6">
-                <label
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    color: THEME.textLight,
-                    marginBottom: "8px",
-                  }}
-                >
-                  NOMINEE NAME
-                </label>
-                <p style={{ fontSize: "14px", color: THEME.text, fontWeight: "500", margin: 0 }}>
-                  {selectedNominationDetails.nomineeName ||
-                    (selectedNominationDetails.nominee?.firstName
-                      ? `${selectedNominationDetails.nominee.firstName} ${selectedNominationDetails.nominee.lastName}`
-                      : "N/A")}
-                </p>
-              </div>
-              <div className="col-md-6">
-                <label
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    color: THEME.textLight,
-                    marginBottom: "8px",
-                  }}
-                >
-                  EMPLOYEE ID
-                </label>
-                <p style={{ fontSize: "14px", color: THEME.text, fontWeight: "500", margin: 0 }}>
-                  {selectedNominationDetails.nomineeEmployeeId ||
-                    selectedNominationDetails.nominee?.employeeId ||
-                    "N/A"}
-                </p>
-              </div>
-            </div>
+      {/* DETAILS MODAL - THEMED */}
+      {showModal && (
+        <>
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(39, 35, 92, 0.4)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              zIndex: 1040,
+              textAlign:"left",
+            }}
+            onClick={() => setShowModal(false)}
+          />
+          <div
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 1050,
+              width: "97vw",
+              maxWidth: 760,
+              textAlign:"left",
+            }}
 
-            <div className="row mb-4">
-
-              <div className="col-md-6">
-                <label
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    color: THEME.textLight,
-                    marginBottom: "8px",
-                  }}
-                >
-                  OPPORTUNITY
-                </label>
-                <p style={{ fontSize: "14px", color: THEME.text, fontWeight: "500", margin: 0 }}>
-                  {selectedNominationDetails.opportunityName ||
-                    selectedNominationDetails.opportunity?.opportunityName ||
-                    "N/A"}
-                </p>
-              </div>
-            </div>
-
-            {/* Justification */}
-            <div className="mb-4">
-              <label
-                style={{
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  color: THEME.textLight,
-                  marginBottom: "8px",
-                  display: "block",
-                }}
-              >
-                JUSTIFICATION
-              </label>
+          >
+            <div
+              style={{
+                borderRadius: "0.85rem",
+                overflow: "hidden",
+                boxShadow: "0 10px 42px rgba(39,35,92,0.20)",
+                border: "none",
+                background: "#fff",
+                textAlign:"left",
+              }}
+            >
               <div
                 style={{
-                  background: THEME.background,
-                  padding: "12px",
-                  borderRadius: "6px",
-                  fontSize: "14px",
-                  color: THEME.text,
-                  minHeight: "80px",
+                  background: "#27235C",
+                  color: "#fff",
+                  padding: "20px 28px 16px 28px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  textAlign:"left",
                 }}
               >
-                {selectedNominationDetails.justification || "No justification provided"}
+                <div style={{ fontWeight: 700, fontSize: 19 }}>Nomination Details</div>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#fff",
+                    fontSize: 25,
+                    padding: "0 6px",
+                    cursor: "pointer",
+                  }}
+                  aria-label="Close"
+                >
+                  ×
+                </button>
               </div>
-            </div>
+              <div
+                style={{
+                  background: "#fff",
+                  padding: "26px 28px 18px 28px",
+                  overflowY: "auto",
+                  maxHeight: "calc(92vh - 140px)",
+                }}
+              >
+                {detailsLoading ? (
+                  <div style={{ textAlign: "left", padding: "38px 0", color: "#6b7280" }}>
+                    <div
+                      style={{
+                        border: "3px solid #f3f4f6",
+                        borderTop: "3px solid #27235C",
+                        borderRadius: "50%",
+                        width: 40,
+                        height: 40,
+                        margin: "0 auto 16px",
+                        animation: "spin 0.8s linear infinite",
+                      }}
+                    />
+                    Loading details...
+                  </div>
+                ) : selectedNominationDetails ? (
+                  <div>
+                    <div className="row mb-4">
+                      <div className="col-md-6">
+                        <label style={{ fontSize: 12, fontWeight: 600, color: THEME.textLight, marginBottom: 8 }}>
+                          NOMINEE NAME
+                        </label>
+                        <p style={{ fontSize: 14, color: THEME.text, fontWeight: 500, margin: 0 }}>
+                          {selectedNominationDetails.nomineeName ||
+                            (selectedNominationDetails.nominee?.firstName
+                              ? `${selectedNominationDetails.nominee.firstName} ${selectedNominationDetails.nominee.lastName}`
+                              : "N/A")}
+                        </p>
+                      </div>
+                      <div className="col-md-6">
+                        <label style={{ fontSize: 12, fontWeight: 600, color: THEME.textLight, marginBottom: 8 }}>
+                          EMPLOYEE ID
+                        </label>
+                        <p style={{ fontSize: 14, color: THEME.text, fontWeight: 500, margin: 0 }}>
+                          {selectedNominationDetails.nomineeEmployeeId ||
+                            selectedNominationDetails.nominee?.employeeId ||
+                            "N/A"}
+                        </p>
+                      </div>
+                    </div>
 
-            {/*  NEW: Parameter Values Section */}
-            {selectedNominationDetails.parameterValues &&
-              selectedNominationDetails.parameterValues.length > 0 && (
-                <div className="mb-4">
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      color: THEME.textLight,
-                      marginBottom: "12px",
-                      display: "block",
-                    }}
-                  >
-                    NOMINATION PARAMETERS
-                  </label>
-                  <div
-                    style={{
-                      background: THEME.background,
-                      padding: "16px",
-                      borderRadius: "6px",
-                      border: `1px solid ${THEME.border}`,
-                    }}
-                  >
-                    {selectedNominationDetails.parameterValues.map((param, index) => (
-                      <div
-                        key={param.parameterId || index}
+                    <div className="row mb-4">
+                      <div className="col-md-6">
+                        <label style={{ fontSize: 12, fontWeight: 600, color: THEME.textLight, marginBottom: 8 }}>
+                          OPPORTUNITY
+                        </label>
+                        <p style={{ fontSize: 14, color: THEME.text, fontWeight: 500, margin: 0 }}>
+                          {selectedNominationDetails.opportunityName ||
+                            selectedNominationDetails.opportunity?.opportunityName ||
+                            "N/A"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <label
                         style={{
-                          marginBottom:
-                            index < selectedNominationDetails.parameterValues.length - 1 ? "16px" : "0",
-                          paddingBottom:
-                            index < selectedNominationDetails.parameterValues.length - 1 ? "16px" : "0",
-                          borderBottom:
-                            index < selectedNominationDetails.parameterValues.length - 1
-                              ? `1px solid ${THEME.border}`
-                              : "none",
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: THEME.textLight,
+                          marginBottom: 8,
+                          display: "block",
                         }}
                       >
-                        <div className="row">
-                          <div className="col-md-5">
-                            <p
-                              style={{
-                                fontSize: "13px",
-                                fontWeight: "600",
-                                color: THEME.text,
-                                margin: 0,
-                              }}
-                            >
-                              {param.parameterName}
-                              {param.isRequired && (
-                                <span style={{ color: THEME.danger, marginLeft: "4px" }}>*</span>
-                              )}
-                            </p>
-                            <p
-                              style={{
-                                fontSize: "11px",
-                                color: THEME.textLight,
-                                margin: "4px 0 0 0",
-                              }}
-                            >
-                              Type: {param.parameterType}
-                            </p>
-                          </div>
-                          <div className="col-md-7">
-                            <div
-                              style={{
-                                background: THEME.card,
-                                padding: "8px 12px",
-                                borderRadius: "4px",
-                                border: `1px solid ${THEME.border}`,
-                              }}
-                            >
-                              <p
+                        JUSTIFICATION
+                      </label>
+                      <div
+                        style={{
+                          background: THEME.background,
+                          padding: 12,
+                          borderRadius: 6,
+                          fontSize: 14,
+                          color: THEME.text,
+                          minHeight: 80,
+                        }}
+                      >
+                        {selectedNominationDetails.justification || "No justification provided"}
+                      </div>
+                    </div>
+
+                    {selectedNominationDetails.parameterValues &&
+                      selectedNominationDetails.parameterValues.length > 0 && (
+                        <div className="mb-4">
+                          <label
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 600,
+                              color: THEME.textLight,
+                              marginBottom: 12,
+                              display: "block",
+                            }}
+                          >
+                            NOMINATION PARAMETERS
+                          </label>
+                          <div
+                            style={{
+                              background: THEME.background,
+                              padding: 16,
+                              borderRadius: 6,
+                              border: `1px solid ${THEME.border}`,
+                            }}
+                          >
+                            {selectedNominationDetails.parameterValues.map((param, index) => (
+                              <div
+                                key={param.parameterId || index}
                                 style={{
-                                  fontSize: "14px",
-                                  color: THEME.text,
-                                  margin: 0,
-                                  fontWeight: "500",
+                                  marginBottom:
+                                    index < selectedNominationDetails.parameterValues.length - 1 ? 16 : 0,
+                                  paddingBottom:
+                                    index < selectedNominationDetails.parameterValues.length - 1 ? 16 : 0,
+                                  borderBottom:
+                                    index < selectedNominationDetails.parameterValues.length - 1
+                                      ? `1px solid ${THEME.border}`
+                                      : "none",
                                 }}
                               >
-                                {param.parameterType === "Rating" && (
-                                  <span>
-                                    {"⭐".repeat(parseInt(param.parameterValue) || 0)}{" "}
-                                    <span style={{ color: THEME.textLight }}>
-                                      ({param.parameterValue}/5)
-                                    </span>
-                                  </span>
-                                )}
-                                {param.parameterType !== "Rating" && param.parameterValue}
-                              </p>
-                            </div>
+                                <div className="row">
+                                  <div className="col-md-5">
+                                    <p style={{ fontSize: 13, fontWeight: 600, color: THEME.text, margin: 0 }}>
+                                      {param.parameterName}
+                                      {param.isRequired && (
+                                        <span style={{ color: THEME.danger, marginLeft: 4 }}>*</span>
+                                      )}
+                                    </p>
+                                    <p style={{ fontSize: 11, color: THEME.textLight, margin: "4px 0 0 0" }}>
+                                      Type: {param.parameterType}
+                                    </p>
+                                  </div>
+                                  <div className="col-md-7">
+                                    <div
+                                      style={{
+                                        background: THEME.card,
+                                        padding: "8px 12px",
+                                        borderRadius: 4,
+                                        border: `1px solid ${THEME.border}`,
+                                      }}
+                                    >
+                                      <p style={{ fontSize: 14, color: THEME.text, margin: 0, fontWeight: 500 }}>
+                                        {param.parameterType === "Rating" && (
+                                          <span>
+                                            {"⭐".repeat(parseInt(param.parameterValue) || 0)}{" "}
+                                            <span style={{ color: THEME.textLight }}>
+                                              ({param.parameterValue}/5)
+                                            </span>
+                                          </span>
+                                        )}
+                                        {param.parameterType !== "Rating" && param.parameterValue}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      )}
 
-            {/* Submission Details */}
-            <div className="row">
-              <div className="col-md-6">
-                <label
+                    <div className="row">
+                      <div className="col-md-6">
+                        <label style={{ fontSize: 12, fontWeight: 600, color: THEME.textLight, marginBottom: 8 }}>
+                          SUBMITTED DATE
+                        </label>
+                        <p style={{ fontSize: 14, color: THEME.text, fontWeight: 500, margin: 0 }}>
+                          {selectedNominationDetails.submittedAt
+                            ? new Date(selectedNominationDetails.submittedAt).toLocaleString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ textAlign: "left", color: "#9ca3af", fontSize: 15, padding: "40px 0" }}>
+                    No details available
+                  </p>
+                )}
+              </div>
+              <div
+                style={{
+                  background: "#F5F5F7",
+                  borderTop: "1px solid #e5e7eb",
+                  padding: "18px 28px",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <button
+                  onClick={() => setShowModal(false)}
                   style={{
-                    fontSize: "12px",
-                    fontWeight: "600",
-                    color: THEME.textLight,
-                    marginBottom: "8px",
+                    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                    color: "#fff",
+                    fontWeight: 700,
+                    border: "none",
+                    fontSize: 15,
+                    borderRadius: 8,
+                    padding: "9px 34px",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
+                    textAlign:"left",
                   }}
                 >
-                  SUBMITTED DATE
-                </label>
-                <p style={{ fontSize: "14px", color: THEME.text, fontWeight: "500", margin: 0 }}>
-                  {selectedNominationDetails.submittedAt
-                    ? new Date(selectedNominationDetails.submittedAt).toLocaleString()
-                    : "N/A"}
-                </p>
+                  Close
+                </button>
               </div>
-
             </div>
           </div>
-        ) : (
-          <p className="text-center text-muted">No details available</p>
-        )}
-      </div>
-      <div className="modal-footer" style={{ borderTop: `1px solid ${THEME.border}` }}>
-        <button
-          type="button"
-          className="btn"
-          onClick={() => setShowModal(false)}
-          style={{
-            background: THEME.primary,
-            color: "#fff",
-            fontWeight: "600",
-            border: "none",
-          }}
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </>
+      )}
     </div>
   );
 }

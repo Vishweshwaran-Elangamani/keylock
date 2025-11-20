@@ -137,7 +137,7 @@ const PendingApprovals = () => {
           style={{
             marginLeft: 4,
             opacity: 0.5,
-            color: "#000000ff",
+            color: "white",
           }}
         />
       );
@@ -147,7 +147,7 @@ const PendingApprovals = () => {
         size={14}
         style={{
           marginLeft: 4,
-          color: "#97247E",
+          color: "lightpink",
           fontWeight: "bold",
         }}
       />
@@ -156,7 +156,7 @@ const PendingApprovals = () => {
         size={14}
         style={{
           marginLeft: 4,
-          color: "#97247E",
+          color: "lightpink",
           fontWeight: "bold",
         }}
       />
@@ -185,24 +185,16 @@ const PendingApprovals = () => {
         ]}
       />
 
-      {/* Header */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h2
-          style={{
-            marginBottom: "0.5rem",
-            fontWeight: "700",
-            color: "#212529",
-          }}
-        >
-          Pending Approvals
-        </h2>
-        <p style={{ color: "#6c757d", fontSize: "0.9375rem", margin: 0 }}>
-          Review and process pending approval requests
-        </p>
-      </div>
-
       {/* Filter */}
-      <div style={{ marginBottom: "1.5rem" }}>
+      <div
+        style={{
+          marginBottom: "1.5rem",
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
         <select
           value={typeFilter}
           onChange={(e) => {
@@ -242,11 +234,10 @@ const PendingApprovals = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "49vh" }}>
+          <div style={{ minHeight: "65vh" }}>
             <div
               style={{
                 background: "#fff",
-                border: "2px solid #abb4c5ff",
                 borderRadius: "12px",
                 overflow: "hidden",
               }}
@@ -257,11 +248,11 @@ const PendingApprovals = () => {
                   display: "grid",
                   gridTemplateColumns: "2fr 1.5fr 1.5fr 1.2fr 1.3fr",
                   padding: "1rem 1.5rem",
-                  background: "#f9fafb",
+                  background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: "600",
-                  fontSize: "0.875rem",
-                  color: "#374151",
+                  fontSize: "14px",
+                  color: "white",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
                 }}
@@ -301,14 +292,14 @@ const PendingApprovals = () => {
                       userSelect: "none",
                       cursor: field ? "pointer" : "default",
                       transition: "color 0.2s",
-                      color: sortField === field ? "#97247E" : "#374151",
+                      color: "white",
                     }}
                     onMouseEnter={(e) => {
-                      if (field) e.currentTarget.style.color = "#97247E";
+                      if (field) e.currentTarget.style.color = "lightpink";
                     }}
                     onMouseLeave={(e) => {
                       if (field && sortField !== field) {
-                        e.currentTarget.style.color = "#374151";
+                        e.currentTarget.style.color = "white";
                       }
                     }}
                   >

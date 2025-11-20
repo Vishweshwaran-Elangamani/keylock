@@ -3,8 +3,8 @@ import api from "../../../services/performancemanagement/hr/api";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import AppraisalDetailsModal from "../../../components/performance_management/modals/HRViewAssessment/AppraisalDetailsModal";
 import "../../../styles/performancemanagement/hr/HRViewAssessment.css";
-
-
+ 
+ 
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
   const separator = ",";
@@ -33,13 +33,13 @@ function exportToCsv(filename, rows) {
   link.click();
   document.body.removeChild(link);
 }
-
+ 
 function average(values) {
   const arr = values.filter((v) => typeof v === "number");
   if (!arr.length) return "-";
   return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
 }
-
+ 
 function statusBadge(status) {
   if (typeof status !== "string") return "";
   const s = status.toLowerCase();
@@ -61,7 +61,7 @@ function statusBadge(status) {
     </span>
   );
 }
-
+ 
 function HRViewAppraisals() {
   const [loading, setLoading] = useState(true);
   const [appraisals, setAppraisals] = useState([]);
@@ -70,7 +70,7 @@ function HRViewAppraisals() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterProject, setFilterProject] = useState("all");
   const [modalRow, setModalRow] = useState(null);
-
+ 
   useEffect(() => {
     async function fetchAppraisals() {
       try {
@@ -99,7 +99,7 @@ function HRViewAppraisals() {
     }
     fetchAppraisals();
   }, []);
-
+ 
   const allSummaryRows = useMemo(() => {
     return appraisals.map((a) => {
       const empRatings = a.competencies
@@ -129,7 +129,7 @@ function HRViewAppraisals() {
       };
     });
   }, [appraisals]);
-
+ 
   const uniqueStatuses = useMemo(() => {
     const statuses = new Set();
     statuses.add("all");
@@ -140,7 +140,7 @@ function HRViewAppraisals() {
     });
     return Array.from(statuses);
   }, [allSummaryRows]);
-
+ 
   const uniqueProjects = useMemo(() => {
     const projects = new Set();
     projects.add("all");
@@ -149,10 +149,10 @@ function HRViewAppraisals() {
     });
     return Array.from(projects);
   }, [allSummaryRows]);
-
+ 
   const summaryRows = useMemo(() => {
     let filtered = [...allSummaryRows];
-
+ 
     if (filterStatus !== "all") {
       filtered = filtered.filter((row) => {
         return row.status && row.status.toLowerCase() === filterStatus;
@@ -169,7 +169,7 @@ function HRViewAppraisals() {
     }
     return filtered;
   }, [allSummaryRows, filterStatus, filterProject, searchTerm]);
-
+ 
   const csvData = useMemo(() => {
     return summaryRows.map((r) => ({
       "Employee Name": r.employeeName,
@@ -182,7 +182,7 @@ function HRViewAppraisals() {
       Status: r.status,
     }));
   }, [summaryRows]);
-
+ 
   const { completedCount, pendingCount } = useMemo(() => {
     let completed = 0,
       pending = 0;
@@ -193,7 +193,7 @@ function HRViewAppraisals() {
     });
     return { completedCount: completed, pendingCount: pending };
   }, [allSummaryRows]);
-
+ 
   if (loading)
     return (
       <div className="hrview-loading">
@@ -218,7 +218,7 @@ function HRViewAppraisals() {
         </div>
       </div>
     );
-
+ 
   return (
     <>
       {/* ... Your content JSX code with class names updated to hrview- prefix */}
@@ -352,5 +352,7 @@ function HRViewAppraisals() {
     </>
   );
 }
-
+ 
 export default HRViewAppraisals;
+ 
+ 

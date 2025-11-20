@@ -7,6 +7,7 @@ import SelfNominateModal from "../../components/internal/NominationModals/SelfNo
 import ManagerNominateModal from "../../components/internal/NominationModals/ManagerNominateModal";
 import NominationReviewModal from "../../components/internal/NominationModals/NominationReviewModal";
 import NominationGraphModal from "../../components/internal/NominationModals/NominationGraphModal";
+import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/internal/nominationManagement.css";
 
@@ -27,6 +28,14 @@ const NominationManagement = () => {
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedNomination, setSelectedNomination] = useState(null);
+
+  // Get role prefix for routing
+  const getRolePrefix = () => {
+    const role = user?.role?.toLowerCase();
+    return `/${role}`;
+  };
+
+  const rolePrefix = getRolePrefix();
 
   useEffect(() => {
     fetchData();
@@ -164,17 +173,13 @@ const NominationManagement = () => {
 
   return (
     <div className="user-list-page">
-      <nav className="breadcrumb-nav" aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <i className="bi bi-house-door"></i>
-            <span>Dashboard</span>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            Nominations
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb
+        items={[
+          {
+            label: "Nominations",
+          },
+        ]}
+      />
 
       <div className="filters-card">
         <div className="filters-content">

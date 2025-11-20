@@ -6,6 +6,7 @@ import CreatePeriodAllocationModal from "../../../../components/hr_operations/mo
 import UpdatePeriodAllocationModal from "../../../../components/hr_operations/modals/UpdatePeriodAllocationModal";
 import AllocateFromPeriodModal from "../../../../components/hr_operations/modals/AllocateFromPeriodModal";
 import ViewPeriodDetailsModal from "../../../../components/hr_operations/modals/ViewPeriodDetailsModal";
+import DeleteConfirmationModal from "../../../../components/hr_operations/modals/DeleteConfirmationModal";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import "../../../../styles/hr_operations/hr/periodAllocation.css";
 
@@ -22,7 +23,10 @@ const PeriodAllocationManagement = () => {
   const [showUpdatePeriodModal, setShowUpdatePeriodModal] = useState(false);
   const [showAllocateModal, setShowAllocateModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [periodToDelete, setPeriodToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // View & Pagination States
   const [viewType, setViewType] = useState("table");
@@ -322,29 +326,40 @@ const PeriodAllocationManagement = () => {
     setShowDetailsModal(true);
   };
 
-  const handleDeletePeriod = async (periodId) => {
-    if (
-      !window.confirm("Are you sure you want to delete this period allocation?")
-    ) {
-      return;
-    }
+  const handleDeletePeriod = (period) => {
+    setPeriodToDelete(period);
+    setShowDeleteModal(true);
+  };
 
+  const confirmDelete = async () => {
+    if (!periodToDelete) return;
+
+    setIsDeleting(true);
     try {
       const response = await periodAllocationService.deletePeriodAllocation(
-        periodId
+        periodToDelete.periodAllocationId
       );
 
       if (response.success) {
         toast.success("Period allocation deleted successfully");
         fetchPeriodAllocations(selectedBudget.budgetId);
         fetchBudgets();
+        setShowDeleteModal(false);
+        setPeriodToDelete(null);
       } else {
         toast.error(response.message || "Failed to delete period allocation");
       }
     } catch (error) {
       console.error("Error deleting period allocation:", error);
       toast.error(error.message || "Failed to delete period allocation");
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setPeriodToDelete(null);
   };
 
   const handleSuccess = () => {
@@ -415,8 +430,6 @@ const PeriodAllocationManagement = () => {
 
       {/* HEADER WITH BUTTON */}
       <div className="period-header-div">
-        
-
         <div className="period-header-actions">
           <button
             className="period-btn-export"
@@ -740,9 +753,7 @@ const PeriodAllocationManagement = () => {
                       </button>
                       <button
                         className="period-btn-card-action period-btn-delete"
-                        onClick={() =>
-                          handleDeletePeriod(period.periodAllocationId)
-                        }
+                        onClick={() => handleDeletePeriod(period)}
                         title="Delete"
                       >
                         <i className="bi bi-trash"></i>
@@ -927,9 +938,7 @@ const PeriodAllocationManagement = () => {
                             </button>
                             <button
                               className="period-btn-delete"
-                              onClick={() =>
-                                handleDeletePeriod(period.periodAllocationId)
-                              }
+                              onClick={() => handleDeletePeriod(period)}
                               title="Delete"
                             >
                               <i className="bi bi-trash"></i>
@@ -1047,6 +1056,21 @@ const PeriodAllocationManagement = () => {
         />
       )}
 
+      {/* DELETE CONFIRMATION MODAL */}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this period allocation?"
+        itemName={
+          periodToDelete
+            ? `${periodToDelete.period} - ${periodToDelete.periodYear}`
+            : ""
+        }
+        isDeleting={isDeleting}
+      />
+
       {/* BLUR BACKDROP */}
       <div
         className="period-blur-backdrop"
@@ -1055,7 +1079,8 @@ const PeriodAllocationManagement = () => {
             showCreatePeriodModal ||
             showUpdatePeriodModal ||
             showAllocateModal ||
-            showDetailsModal
+            showDetailsModal ||
+            showDeleteModal
               ? "block"
               : "none",
         }}

@@ -230,7 +230,10 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
           <div
             style={{
               padding: "1.25rem 1.5rem",
+              background: "rgb(39, 35, 92)",
+              borderRadius: "16px 16px 0px 0px",
               borderBottom: "1px solid #e5e7eb",
+              color: "white",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -249,7 +252,6 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#fff",
                   fontWeight: "700",
                   fontSize: "1.1rem",
                 }}
@@ -266,30 +268,45 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                   style={{
                     margin: 0,
                     fontWeight: "600",
-                    color: "#212529",
-                    fontSize: "1.1rem",
+                    color: "white",
+                    fontSize: "16px",
+                    textAlign: "left",
                   }}
                 >
                   {employee.employeeName}
                 </h5>
-                <p style={{ margin: 0, fontSize: "0.8rem", color: "#6c757d" }}>
+                <p style={{ margin: 0, fontSize: "14px", color: "white" }}>
                   {employee.email}
                 </p>
               </div>
             </div>
             <button
+              type="button"
+              class="btn-close"
               onClick={onClose}
               style={{
-                background: "transparent",
                 border: "none",
+                width: "36px",
+                backgroundColor: "transparent",
+                height: "36px",
+                borderRadius: "0.5rem",
                 cursor: "pointer",
-                padding: "0.25rem",
-                color: "#6c757d",
+                color: "white",
+                fontSize: "1.5rem",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "red";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "white";
               }}
             >
-              <X size={20} />
+              <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
@@ -551,6 +568,8 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
             }}
           >
             <button
+              type="button"
+              className="btn btn-outline-secondary"
               onClick={onClose}
               style={{
                 padding: "0.5rem 1rem",
@@ -563,7 +582,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                 cursor: "pointer",
               }}
             >
-              Close
+              Cancel
             </button>
             {!isReadOnly && (
               <button

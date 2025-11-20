@@ -7,6 +7,7 @@ import EditOpportunityModal from "../../components/internal/OpportunityModals/Ed
 import DeleteOpportunityModal from "../../components/internal/OpportunityModals/DeleteOpportunityModal";
 import SelfNominateModal from "../../components/internal/NominationModals/SelfNominateModal";
 import ManagerNominateModal from "../../components/internal/NominationModals/ManagerNominateModal";
+import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/internal/InternalOpportunityManagement.css";
 
@@ -41,6 +42,14 @@ const InternalOpportunityManagement = () => {
     positionClass: "toast-top-right",
     timeOut: 3000,
   };
+
+  // Get role prefix for routing
+  const getRolePrefix = () => {
+    const role = user?.role?.toLowerCase();
+    return `/${role}`;
+  };
+
+  const rolePrefix = getRolePrefix();
 
   useEffect(() => {
     fetchData();
@@ -230,17 +239,16 @@ const InternalOpportunityManagement = () => {
 
   return (
     <div className="user-list-page">
-      <nav className="breadcrumb-nav" aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <i className="bi bi-house-door"></i>
-            <span>Dashboard</span>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            {isHR ? "Manage Internal Opportunities" : "Internal Opportunities"}
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb
+        items={[
+          {
+            label: isHR
+              ? "Manage Internal Opportunities"
+              : "Internal Opportunities",
+          },
+        ]}
+      />
+
       <div className="filters-card">
         <div className="filters-content">
           <div className="filters-left">

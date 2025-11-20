@@ -127,7 +127,7 @@ const SmeAssignments = () => {
           style={{
             marginLeft: 4,
             opacity: 0.5,
-            color: "#000000ff",
+            color: "white",
           }}
         />
       );
@@ -137,7 +137,7 @@ const SmeAssignments = () => {
         size={14}
         style={{
           marginLeft: 4,
-          color: "#97247E",
+          color: "lightpink",
           fontWeight: "bold",
         }}
       />
@@ -146,7 +146,7 @@ const SmeAssignments = () => {
         size={14}
         style={{
           marginLeft: 4,
-          color: "#97247E",
+          color: "lightpink",
           fontWeight: "bold",
         }}
       />
@@ -174,22 +174,6 @@ const SmeAssignments = () => {
           { label: "SME Assignments" },
         ]}
       />
-
-      {/* Header */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h2
-          style={{
-            marginBottom: "0.5rem",
-            fontWeight: "700",
-            color: "#212529",
-          }}
-        >
-          My SME Assignments
-        </h2>
-        <p style={{ color: "#6c757d", fontSize: "0.9375rem", margin: 0 }}>
-          Mentor and guide employees in their skill development journey
-        </p>
-      </div>
 
       {/* Filters and search */}
       <div
@@ -288,11 +272,10 @@ const SmeAssignments = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "49vh" }}>
+          <div style={{ minHeight: "65vh" }}>
             <div
               style={{
                 background: "#fff",
-                border: "2px solid #abb4c5ff",
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
@@ -304,11 +287,11 @@ const SmeAssignments = () => {
                   display: "grid",
                   gridTemplateColumns:
                     "1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr",
-                  background: "#f9fafb",
+                  background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
-                  color: "#374151",
-                  fontSize: "0.875rem",
+                  color: "white",
+                  fontSize: "14px",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
@@ -344,14 +327,14 @@ const SmeAssignments = () => {
                       userSelect: "none",
                       cursor: field ? "pointer" : "default",
                       transition: "color 0.2s",
-                      color: sortField === field ? "#97247E" : "#374151",
+                      color: "white",
                     }}
                     onMouseEnter={(e) => {
-                      if (field) e.currentTarget.style.color = "#97247E";
+                      if (field) e.currentTarget.style.color = "lightpink";
                     }}
                     onMouseLeave={(e) => {
                       if (field && sortField !== field) {
-                        e.currentTarget.style.color = "#374151";
+                        e.currentTarget.style.color = "white";
                       }
                     }}
                   >
@@ -418,7 +401,7 @@ const SmeAssignments = () => {
                         new Date(assignment.createdOn).toLocaleDateString()
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
@@ -427,7 +410,7 @@ const SmeAssignments = () => {
                         new Date(assignment.deadline).toLocaleDateString()
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
@@ -442,7 +425,7 @@ const SmeAssignments = () => {
                         `${assignment.completionRating}/10`
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
@@ -466,11 +449,14 @@ const SmeAssignments = () => {
                             transition: "all 0.2s",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "#AC5098";
-                            e.currentTarget.style.color = "#AC5098";
+                            e.currentTarget.style.borderColor = "white";
+                            e.currentTarget.style.backgroundColor =
+                              "rgb(39, 35, 92)";
+                            e.currentTarget.style.color = "white";
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.borderColor = "#97247E";
+                            e.currentTarget.style.backgroundColor = "white";
                             e.currentTarget.style.color = "#97247E";
                           }}
                         >
@@ -478,7 +464,7 @@ const SmeAssignments = () => {
                         </button>
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
@@ -518,7 +504,7 @@ const SmeAssignments = () => {
                         </button>
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          -
+                          None
                         </span>
                       )}
                     </div>
