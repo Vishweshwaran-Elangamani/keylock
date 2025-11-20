@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import nominationService from "../../../services/internal/nominationService";
 import userService from "../../../services/auth/userService";
 import { toast } from "sonner";
-import "../../../styles/internal/NominationModal.css";
 
 const ManagerNominateModal = ({
   show,
@@ -29,54 +28,40 @@ const ManagerNominateModal = ({
     try {
       setLoadingEmployees(true);
 
-      //  FIX: Get userId from localStorage and validate it
-
       const userIdStr = localStorage.getItem("userId");
 
-      console.log(" Raw userId from localStorage:", userIdStr);
+      console.log("Raw userId from localStorage:", userIdStr);
 
       if (!userIdStr) {
-        console.error(" No userId found in localStorage");
-
+        console.error("No userId found in localStorage");
         toast.error("User ID not found. Please login again.");
-
         setEmployees([]);
-
         return;
       }
 
       const managerId = parseInt(userIdStr);
 
-      console.log(" Fetching employees for manager ID:", managerId);
+      console.log("Fetching employees for manager ID:", managerId);
 
       if (isNaN(managerId) || managerId <= 0) {
-        console.error(" Invalid manager ID:", managerId);
-
+        console.error("Invalid manager ID:", managerId);
         toast.error("Invalid user ID. Please login again.");
-
         setEmployees([]);
-
         return;
       }
-
-      // Call the service function
 
       const response = await userService.getEmployeesByManager(managerId);
 
       console.log("Employees response:", response);
 
-      // Handle response format
-
       const employeeList = response.data || response || [];
 
       setEmployees(employeeList);
 
-      console.log(" Employees loaded:", employeeList.length);
+      console.log("Employees loaded:", employeeList.length);
     } catch (error) {
       console.error("Error fetching employees:", error);
-
       setEmployees([]);
-
       toast.error("Failed to load employees");
     } finally {
       setLoadingEmployees(false);
@@ -153,124 +138,379 @@ const ManagerNominateModal = ({
 
   return (
     <>
-      <div className="modal-backdrop-custom"></div>
-      <div className="modal-wrapper-custom">
-        <div className="modal-dialog-custom">
-          <div className="modal-content-custom">
-            <div className="modal-header-custom">
-              <h5 className="modal-title-custom">
-                <i className="bi bi-person-plus"></i>
-                Nominate Team Member
-              </h5>
-              <button
-                type="button"
-                className="modal-close-btn"
-                onClick={onHide}
-                disabled={loading}
+      {/* Custom Backdrop with Blur Effect */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(39, 35, 92, 0.4)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 1040,
+          transition: 'all 0.3s ease'
+        }}
+        onClick={onHide}
+      />
+
+      {/* Modal Wrapper */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1050,
+          padding: '20px'
+        }}
+      >
+        {/* Modal Dialog - Compact Size from Image */}
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '650px',
+            maxHeight: '85vh',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: '0.5rem',
+            overflow: 'hidden',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+            backgroundColor: '#ffffff'
+          }}
+        >
+          {/* Modal Header - Navy Blue Theme (AddPolicy) */}
+          <div
+            style={{
+              background: '#27235C',
+              color: '#ffffff',
+              padding: '16px 20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexShrink: 0
+            }}
+          >
+            <div
+              style={{
+                fontSize: '16px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: '#ffffff'
+              }}
+            >
+              <i className="bi bi-person-plus"></i>
+              Nominate Team Member
+            </div>
+            <button
+              onClick={onHide}
+              disabled={loading}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#ffffff',
+                fontSize: '20px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                padding: '0',
+                width: '24px',
+                height: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: loading ? 0.5 : 1
+              }}
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
+
+          {/* Form - Scrollable Body */}
+          <form 
+            onSubmit={handleSubmit}
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              flex: 1,
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Body - Compact Padding */}
+            <div
+              style={{
+                padding: '16px 20px',
+                overflowY: 'auto',
+                flex: 1,
+                backgroundColor: '#ffffff',
+                maxHeight: 'calc(85vh - 120px)'
+              }}
+            >
+              {/* Info Section - Compact */}
+              <div
+                style={{
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  background: '#f0f9ff',
+                  padding: '12px 16px',
+                  marginBottom: '16px'
+                }}
               >
-                <i className="bi bi-x-lg"></i>
-              </button>
+                <p style={{ fontSize: '13px', color: '#334155', marginBottom: '6px' }}>
+                  <strong style={{ fontWeight: '600' }}>Opportunity:</strong> {opportunity.opportunityName}
+                </p>
+                <p style={{ fontSize: '13px', color: '#334155', marginBottom: '6px' }}>
+                  <strong style={{ fontWeight: '600' }}>Department:</strong> {opportunity.departmentName}
+                </p>
+                <p style={{ fontSize: '13px', color: '#334155', marginBottom: 0 }}>
+                  <strong style={{ fontWeight: '600' }}>Deadline:</strong>{" "}
+                  {new Date(opportunity.deadline).toLocaleDateString()}
+                </p>
+              </div>
+
+              {/* Select Team Member */}
+              <div style={{ marginBottom: '12px' }}>
+                <label
+                  style={{
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    color: '#334155',
+                    marginBottom: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  Select Team Member{" "}
+                  <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                </label>
+                <select
+                  name="employeeId"
+                  value={formData.employeeId}
+                  onChange={handleChange}
+                  disabled={loadingEmployees}
+                  style={{
+                    width: '100%',
+                    border: errors.employeeId ? '1px solid #ef4444' : '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    padding: '8px 10px',
+                    fontSize: '13px',
+                    transition: 'all 0.2s ease',
+                    cursor: loadingEmployees ? 'not-allowed' : 'pointer',
+                    backgroundColor: '#ffffff',
+                    color: '#334155'
+                  }}
+                  onFocus={(e) => {
+                    if (!errors.employeeId) {
+                      e.target.style.borderColor = '#27235C';
+                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!errors.employeeId) {
+                      e.target.style.borderColor = '#cbd5e1';
+                      e.target.style.boxShadow = 'none';
+                    }
+                  }}
+                >
+                  <option value="">
+                    {loadingEmployees
+                      ? "Loading team members..."
+                      : "-- Choose a team member --"}
+                  </option>
+                  {employees.map((emp) => (
+                    <option key={emp.userId} value={emp.userId}>
+                      {emp.firstName} {emp.lastName}
+                    </option>
+                  ))}
+                </select>
+                {errors.employeeId && (
+                  <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.employeeId}
+                  </div>
+                )}
+              </div>
+
+              {/* Justification Field */}
+              <div style={{ marginBottom: '12px' }}>
+                <label
+                  style={{
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    color: '#334155',
+                    marginBottom: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  Why is this team member a good fit?{" "}
+                  <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                </label>
+                <textarea
+                  name="justification"
+                  placeholder="Explain why you believe this team member is perfect for this role..."
+                  value={formData.justification}
+                  onChange={handleChange}
+                  rows={4}
+                  maxLength={1000}
+                  style={{
+                    width: '100%',
+                    border: errors.justification ? '1px solid #ef4444' : '1px solid #cbd5e1',
+                    borderRadius: '6px',
+                    padding: '8px 10px',
+                    fontSize: '13px',
+                    transition: 'all 0.2s ease',
+                    resize: 'vertical',
+                    minHeight: '100px',
+                    maxHeight: '180px',
+                    fontFamily: 'inherit',
+                    lineHeight: '1.4',
+                    backgroundColor: '#ffffff'
+                  }}
+                  onFocus={(e) => {
+                    if (!errors.justification) {
+                      e.target.style.borderColor = '#27235C';
+                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!errors.justification) {
+                      e.target.style.borderColor = '#cbd5e1';
+                      e.target.style.boxShadow = 'none';
+                    }
+                  }}
+                />
+                {errors.justification && (
+                  <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
+                    {errors.justification}
+                  </div>
+                )}
+                <small style={{ fontSize: '11px', color: '#64748b', marginTop: '4px', display: 'block' }}>
+                  {formData.justification.length}/1000 characters
+                  {formData.justification.length >= 50 && !errors.justification && (
+                    <span style={{ color: '#22c55e', marginLeft: '8px' }}>
+                      ✓ Minimum length met
+                    </span>
+                  )}
+                </small>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body-custom">
-                <div className="info-section">
-                  <p>
-                    <strong>Opportunity:</strong> {opportunity.opportunityName}
-                  </p>
-                  <p>
-                    <strong>Department:</strong> {opportunity.departmentName}
-                  </p>
-                  <p>
-                    <strong>Deadline:</strong>{" "}
-                    {new Date(opportunity.deadline).toLocaleDateString()}
-                  </p>
-                </div>
+            {/* Modal Footer - Compact */}
+            <div
+              style={{
+                padding: '10px 20px',
+                borderTop: '1px solid #e2e8f0',
+                background: '#ffffff',
+                flexShrink: 0,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '8px',
+                borderBottomLeftRadius: '12px',
+                borderBottomRightRadius: '12px'
+              }}
+            >
+              {/* Cancel Button */}
+              <button
+                type="button"
+                onClick={onHide}
+                disabled={loading}
+                style={{
+                  background: '#6c757d',
+                  borderColor: '#6c757d',
+                  color: '#ffffff',
+                  fontWeight: '600',
+                  padding: '7px 14px',
+                  fontSize: '13px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.65 : 1,
+                  transition: 'all 0.2s ease',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.target.style.background = '#5a6268';
+                    e.target.style.borderColor = '#5a6268';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.target.style.background = '#6c757d';
+                    e.target.style.borderColor = '#6c757d';
+                  }
+                }}
+              >
+                <i className="bi bi-x-circle"></i>
+                Cancel
+              </button>
 
-                <div className="form-grid">
-                  <div className="form-group-custom full-width">
-                    <label className="form-label-custom">
-                      Select Team Member{" "}
-                      <span className="required-mark">*</span>
-                    </label>
-                    <select
-                      name="employeeId"
-                      className={`form-select-custom ${
-                        errors.employeeId ? "is-invalid" : ""
-                      }`}
-                      value={formData.employeeId}
-                      onChange={handleChange}
-                      disabled={loadingEmployees}
-                    >
-                      <option value="">
-                        {loadingEmployees
-                          ? "Loading team members..."
-                          : "-- Choose a team member --"}
-                      </option>
-                      {employees.map((emp) => (
-                        <option key={emp.userId} value={emp.userId}>
-                          {emp.firstName} {emp.lastName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.employeeId && (
-                      <div className="error-message">{errors.employeeId}</div>
-                    )}
-                  </div>
-
-                  <div className="form-group-custom full-width">
-                    <label className="form-label-custom">
-                      Why is this team member a good fit?{" "}
-                      <span className="required-mark">*</span>
-                    </label>
-                    <textarea
-                      name="justification"
-                      className={`form-textarea-custom ${
-                        errors.justification ? "is-invalid" : ""
-                      }`}
-                      placeholder="Explain why you believe this team member is perfect for this role..."
-                      value={formData.justification}
-                      onChange={handleChange}
-                      rows={5}
-                      maxLength={1000}
+              {/* Nominate Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                  border: 'none',
+                  color: '#ffffff',
+                  padding: '7px 14px',
+                  fontWeight: '600',
+                  fontSize: '13px',
+                  borderRadius: '6px',
+                  transition: 'all 0.12s ease',
+                  boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.65 : 1,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span
+                      style={{
+                        width: '14px',
+                        height: '14px',
+                        border: '2px solid #ffffff',
+                        borderTopColor: 'transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 0.6s linear infinite',
+                        display: 'inline-block'
+                      }}
                     />
-                    {errors.justification && (
-                      <div className="error-message">
-                        {errors.justification}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-footer-custom">
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  onClick={onHide}
-                  disabled={loading}
-                >
-                  <i className="bi bi-x-circle"></i>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-submit" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <span className="spinner-custom"></span>
-                      Nominating...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-check-circle"></i>
-                      Nominate
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+                    Nominating...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle"></i>
+                    Nominate
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
+
+      {/* Keyframe Animation for Spinner */}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </>
   );
 };
