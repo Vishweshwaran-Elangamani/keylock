@@ -20,6 +20,8 @@ import Pagination from "../../components/project_management_components/common/Pa
 import EditSLAModal from "../../components/sla/modals/EditSLAModal";
 import CreateSLAModal from "../../components/sla/modals/CreateSLAModal";
 import ConfirmationModal from "../../components/goals/modals/ConfirmationModal";
+import Breadcrumb from "../../components/sla/common/Breadcrumbs";
+import './../../styles/sla/HRSLADashboard.css';
 
 const cardBorder = "1.5px solid #a21caf";
 const cardRadius = "14px";
@@ -44,7 +46,6 @@ const HRSLADashboard = () => {
 
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Confirmation modal for delete
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [slaToDelete, setSlaToDelete] = useState(null);
 
@@ -113,12 +114,12 @@ const HRSLADashboard = () => {
         setShowEditModal(false);
         setSelectedSLA(null);
         fetchSLAs();
-      } else {
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error('Update error:', err);
+    }
   };
 
-  // NEW: Use modal instead of window.confirm for delete
   const handleDelete = (sla) => {
     setSlaToDelete(sla);
     setShowConfirmModal(true);
@@ -130,9 +131,9 @@ const HRSLADashboard = () => {
       const response = await slaService.deleteSLA(slaToDelete.slaid);
       if (response.success) {
         fetchSLAs();
-      } else {
       }
     } catch (err) {
+      console.error('Delete error:', err);
     } finally {
       setShowConfirmModal(false);
       setSlaToDelete(null);
@@ -140,7 +141,7 @@ const HRSLADashboard = () => {
   };
 
   const handleViewDetails = (slaid) => {
-    navigate(`/hr/dashboard/sla/details/` + slaid);
+    navigate(`/hr/dashboard/sla/details/${slaid}`);
   };
 
   const handleExport = () => {
@@ -243,6 +244,13 @@ const HRSLADashboard = () => {
 
   return (
     <div className="container-fluid" style={{ padding: "1.5rem 1.5rem" }}>
+      <Breadcrumb
+        items={[
+          { label: "SLA Management", path: "/hr/dashboard/sla" },
+          { label: "HR" }
+        ]}
+      />
+
       {/* Header */}
       <div
         className="d-flex justify-content-between align-items-center mb-4"
@@ -411,30 +419,11 @@ const HRSLADashboard = () => {
           },
         ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
           <div key={label} className="col-md-2">
-            <div
-              className="card"
-              style={{
-                border: cardBorder,
-                borderRadius: cardRadius,
-                backgroundColor: "#fff",
-                boxShadow: "none",
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                cursor: "pointer",
-                overflow: "hidden",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow =
-                  "0 4px 12px 0 rgba(163,21,175,0.13)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
+            <div className="card sla-stat-card">
               <div
                 className="card-body d-flex flex-column align-items-center justify-content-center text-center"
                 style={{ padding: "1.5rem 1rem" }}
               >
-                {/* Icon */}
                 <div
                   className="d-flex align-items-center justify-content-center mb-3"
                   style={{
@@ -478,15 +467,7 @@ const HRSLADashboard = () => {
       </div>
 
       {/* Filters */}
-      <div
-        className="card mb-4"
-        style={{
-          border: cardBorder,
-          borderRadius: cardRadius,
-          backgroundColor: "#fff",
-          boxShadow: "none",
-        }}
-      >
+      <div className="card sla-filter-card mb-4">
         <div className="card-body" style={{ padding: "1.25rem" }}>
           <div className="row g-3 align-items-center">
             <div className="col-md-4">
@@ -502,33 +483,21 @@ const HRSLADashboard = () => {
                 </span>
                 <input
                   type="text"
-                  className="form-control border-start-0"
+                  className="form-control border-start-0 sla-filter-input"
                   placeholder="Search by employee, type, or ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{
                     borderRadius: "0 8px 8px 0",
-                    borderColor: "#e2e8f0",
-                    paddingTop: "0.5rem",
-                    paddingBottom: "0.5rem",
-                    fontSize: "0.875rem",
                   }}
                 />
               </div>
             </div>
             <div className="col-md-2">
-              {/* status filter */}
               <select
-                className="form-select"
+                className="form-select sla-filter-select"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                style={{
-                  borderRadius: "8px",
-                  paddingTop: "0.5rem",
-                  paddingBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  borderColor: "#e2e8f0",
-                }}
               >
                 <option value="All">All Status</option>
                 <option value="Open">Open</option>
@@ -537,18 +506,10 @@ const HRSLADashboard = () => {
               </select>
             </div>
             <div className="col-md-2">
-              {/* type filter */}
               <select
-                className="form-select"
+                className="form-select sla-filter-select"
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                style={{
-                  borderRadius: "8px",
-                  paddingTop: "0.5rem",
-                  paddingBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  borderColor: "#e2e8f0",
-                }}
               >
                 <option value="All">All Types</option>
                 <option value="Timesheet Approvals">Timesheet Approvals</option>
@@ -558,18 +519,10 @@ const HRSLADashboard = () => {
               </select>
             </div>
             <div className="col-md-3">
-              {/* compliance filter */}
               <select
-                className="form-select"
+                className="form-select sla-filter-select"
                 value={complianceFilter}
                 onChange={(e) => setComplianceFilter(e.target.value)}
-                style={{
-                  borderRadius: "8px",
-                  paddingTop: "0.5rem",
-                  paddingBottom: "0.5rem",
-                  fontSize: "0.875rem",
-                  borderColor: "#e2e8f0",
-                }}
               >
                 <option value="All">All Compliance</option>
                 <option value="OnTime">On Time</option>
@@ -597,131 +550,27 @@ const HRSLADashboard = () => {
       </div>
 
       {/* SLA Table */}
-      <div
-        className="card"
-        style={{
-          border: cardBorder,
-          borderRadius: cardRadius,
-          backgroundColor: "#fff",
-          boxShadow: "none",
-        }}
-      >
+      <div className="card sla-table-card">
         <div className="card-body p-0">
-          <div className="table-responsive">
-            <table className="table table-hover align-middle mb-0">
-              <thead style={{ backgroundColor: "#f8fafc" }}>
+          <div className="table-responsive sla-table-responsive">
+            <table className="table table-hover align-middle mb-0 sla-table">
+              <thead>
                 <tr>
-                  <th
-                    style={{
-                      padding: "1rem 1.25rem",
-                      fontSize: "0.813rem",
-                      color: "#64748b",
-                      borderBottom: "2px solid #e2e8f0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Employee
-                  </th>
-                  <th
-                    style={{
-                      padding: "1rem 1.25rem",
-                      fontSize: "0.813rem",
-                      color: "#64748b",
-                      borderBottom: "2px solid #e2e8f0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Type
-                  </th>
-                  <th
-                    style={{
-                      padding: "1rem 1.25rem",
-                      fontSize: "0.813rem",
-                      color: "#64748b",
-                      borderBottom: "2px solid #e2e8f0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Assigned To
-                  </th>
-                  <th
-                    style={{
-                      padding: "1rem 1.25rem",
-                      fontSize: "0.813rem",
-                      color: "#64748b",
-                      borderBottom: "2px solid #e2e8f0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Deadline
-                  </th>
-                  <th
-                    style={{
-                      padding: "1rem 1.25rem",
-                      fontSize: "0.813rem",
-                      color: "#64748b",
-                      borderBottom: "2px solid #e2e8f0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Status
-                  </th>
-                  <th
-                    style={{
-                      padding: "1rem 1.25rem",
-                      fontSize: "0.813rem",
-                      color: "#64748b",
-                      borderBottom: "2px solid #e2e8f0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Compliance
-                  </th>
-                  <th
-                    style={{
-                      padding: "1rem 1.25rem",
-                      fontSize: "0.813rem",
-                      color: "#64748b",
-                      borderBottom: "2px solid #e2e8f0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      fontWeight: 700,
-                      width: "150px",
-                    }}
-                  >
-                    Actions
-                  </th>
+                  <th>Employee</th>
+                  <th>Type</th>
+                  <th>Assigned To</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th>Compliance</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentSLAs.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="7"
-                      className="text-center"
-                      style={{ padding: "3rem 1.25rem" }}
-                    >
-                      <FileText
-                        size={56}
-                        className="text-muted mb-3"
-                        style={{ opacity: 0.2 }}
-                      />
-                      <p
-                        className="text-muted mb-2 fw-semibold"
-                        style={{ fontSize: "1rem" }}
-                      >
+                    <td colSpan="7" className="sla-empty-state">
+                      <FileText size={56} className="sla-empty-icon" />
+                      <p className="sla-empty-text">
                         {filteredSlas.length === 0 && slas.length > 0
                           ? "No SLAs match your filters"
                           : "No SLAs found"}
@@ -739,192 +588,75 @@ const HRSLADashboard = () => {
                   </tr>
                 ) : (
                   currentSLAs.map((sla) => (
-                    <tr
-                      key={sla.slaid}
-                      style={{
-                        transition: "background-color 0.15s ease",
-                        borderBottom: "1px solid #f1f5f9",
-                      }}
-                    >
-                      <td
-                        style={{
-                          padding: "1rem 1.25rem",
-                          verticalAlign: "middle",
-                        }}
-                      >
+                    <tr key={sla.slaid}>
+                      <td>
                         <div>
-                          <strong
-                            className="d-block"
-                            style={{
-                              fontSize: "0.875rem",
-                              color: "#0f172a",
-                              marginBottom: "4px",
-                              fontWeight: 600,
-                            }}
-                          >
+                          <strong className="sla-employee-name">
                             {sla.employeeName}
                           </strong>
-                          <small
-                            className="text-muted d-block"
-                            style={{ fontSize: "0.75rem", color: "#94a3b8" }}
-                          >
+                          <small className="sla-employee-email">
                             {sla.employeeEmail}
                           </small>
                         </div>
                       </td>
-                      <td
-                        style={{
-                          padding: "1rem 1.25rem",
-                          verticalAlign: "middle",
-                        }}
-                      >
-                        <span
-                          className="badge bg-info"
-                          style={{
-                            fontSize: "0.75rem",
-                            fontWeight: 600,
-                            padding: "0.4rem 0.85rem",
-                            borderRadius: "6px",
-                          }}
-                        >
+                      <td>
+                        <span className="badge bg-info sla-badge">
                           {sla.slatype}
                         </span>
                       </td>
-                      <td
-                        style={{
-                          padding: "1rem 1.25rem",
-                          verticalAlign: "middle",
-                        }}
-                      >
+                      <td>
                         {sla.assignedToName ? (
-                          <small
-                            style={{
-                              fontSize: "0.875rem",
-                              color: "#475569",
-                              fontWeight: 500,
-                            }}
-                          >
+                          <small className="sla-assigned-name">
                             {sla.assignedToName}
                           </small>
                         ) : (
-                          <small
-                            className="text-muted fst-italic"
-                            style={{ fontSize: "0.875rem", color: "#94a3b8" }}
-                          >
+                          <small className="sla-not-assigned">
                             Not assigned
                           </small>
                         )}
                       </td>
-                      <td
-                        style={{
-                          padding: "1rem 1.25rem",
-                          verticalAlign: "middle",
-                        }}
-                      >
+                      <td>
                         <div>
-                          <small
-                            className="d-block"
-                            style={{
-                              fontSize: "0.875rem",
-                              color: "#475569",
-                              marginBottom: "2px",
-                              fontWeight: 500,
-                            }}
-                          >
+                          <small className="sla-deadline-date">
                             {formatDate(sla.deadline)}
                           </small>
                           {sla.closedAt && (
-                            <small
-                              className="text-success d-block"
-                              style={{ fontSize: "0.75rem", fontWeight: 500 }}
-                            >
+                            <small className="sla-closed-date">
                               Closed: {formatDate(sla.closedAt)}
                             </small>
                           )}
                         </div>
                       </td>
-                      <td
-                        style={{
-                          padding: "1rem 1.25rem",
-                          verticalAlign: "middle",
-                        }}
-                      >
-                        <span
-                          className={`badge ${getStatusBadgeClass(sla.status)}`}
-                          style={{
-                            fontSize: "0.75rem",
-                            fontWeight: 600,
-                            padding: "0.4rem 0.85rem",
-                            borderRadius: "6px",
-                          }}
-                        >
+                      <td>
+                        <span className={`badge ${getStatusBadgeClass(sla.status)} sla-badge`}>
                           {sla.status}
                         </span>
                       </td>
-                      <td
-                        style={{
-                          padding: "1rem 1.25rem",
-                          verticalAlign: "middle",
-                        }}
-                      >
-                        <span
-                          className={`badge ${getComplianceBadgeClass(
-                            sla.complianceStatus
-                          )}`}
-                          style={{
-                            fontSize: "0.75rem",
-                            fontWeight: 600,
-                            padding: "0.4rem 0.85rem",
-                            borderRadius: "6px",
-                          }}
-                        >
+                      <td>
+                        <span className={`badge ${getComplianceBadgeClass(sla.complianceStatus)} sla-badge`}>
                           {sla.complianceStatus}
                         </span>
                       </td>
-                      <td
-                        className="text-center"
-                        style={{
-                          padding: "1rem 1.25rem",
-                          verticalAlign: "middle",
-                        }}
-                      >
+                      <td>
                         <div className="d-flex gap-2 justify-content-center">
                           <button
-                            className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
+                            className="btn btn-sm btn-outline-primary sla-action-btn"
                             onClick={() => handleViewDetails(sla.slaid)}
                             title="View details"
-                            style={{
-                              width: "32px",
-                              height: "32px",
-                              padding: 0,
-                              borderRadius: "6px",
-                            }}
                           >
                             <Eye size={14} />
                           </button>
                           <button
-                            className="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center"
+                            className="btn btn-sm btn-outline-warning sla-action-btn"
                             onClick={() => handleEdit(sla)}
                             title="Edit SLA"
-                            style={{
-                              width: "32px",
-                              height: "32px",
-                              padding: 0,
-                              borderRadius: "6px",
-                            }}
                           >
                             <Edit3 size={14} />
                           </button>
                           <button
-                            className="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center"
+                            className="btn btn-sm btn-outline-danger sla-action-btn"
                             onClick={() => handleDelete(sla)}
                             title="Delete SLA"
-                            style={{
-                              width: "32px",
-                              height: "32px",
-                              padding: 0,
-                              borderRadius: "6px",
-                            }}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -937,12 +669,7 @@ const HRSLADashboard = () => {
             </table>
           </div>
           {filteredSlas.length > itemsPerPage && (
-            <div
-              style={{
-                padding: "1rem 1.25rem",
-                borderTop: "1px solid #f1f5f9",
-              }}
-            >
+            <div className="sla-pagination-container">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}

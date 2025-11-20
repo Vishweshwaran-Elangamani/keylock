@@ -1,0 +1,239 @@
+/* ========================================
+   HR MOM Dashboard - Complete Styling
+   ======================================== */
+
+/* Stat Cards with Borders */
+.mom-stat-card {
+  border: 1.5px solid #a21caf !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+}
+
+.mom-stat-card:hover {
+  box-shadow: 0 4px 12px 0 rgba(163, 21, 175, 0.13) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Filter Card */
+.mom-filter-card {
+  border: 1.5px solid #a21caf !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+/* Table Card */
+.mom-table-card {
+  border: none !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Pagination Card */
+.mom-pagination-card {
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Table Styling */
+.mom-table {
+  margin-bottom: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* Table Header - Purple Theme */
+.mom-table thead {
+  background-color: #27235c !important;
+  color: white !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.mom-table thead th {
+  background-color: #27235c !important;
+  color: white !important;
+  border: none !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  padding: 14px 16px !important;
+  vertical-align: middle !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* Center align specific headers */
+.mom-table thead th:nth-child(4), /* Participants */
+.mom-table thead th:nth-child(5), /* Topics */
+.mom-table thead th:nth-child(6), /* Actions */
+.mom-table thead th:last-child {  /* View */
+  text-align: center !important;
+}
+
+/* Table Body Cells */
+.mom-table tbody td {
+  padding: 14px 16px !important;
+  vertical-align: middle !important;
+  border-top: 1px solid #e9ecef !important;
+  border-bottom: none !important;
+  font-size: 0.875rem !important;
+  color: #1e293b !important;
+  text-align: left !important;
+}
+
+/* Center align specific body columns */
+.mom-table tbody td:nth-child(4), /* Participants */
+.mom-table tbody td:nth-child(5), /* Topics */
+.mom-table tbody td:nth-child(6), /* Actions */
+.mom-table tbody td:last-child {  /* View */
+  text-align: center !important;
+}
+
+/* Remove border from first row */
+.mom-table tbody tr:first-child td {
+  border-top: none !important;
+}
+
+/* Row Hover Effect */
+.mom-table tbody tr {
+  transition: background-color 0.15s ease !important;
+}
+
+.mom-table tbody tr:hover {
+  background-color: rgba(39, 35, 92, 0.04) !important;
+}
+
+/* Meeting Title */
+.mom-meeting-title {
+  font-size: 0.938rem !important;
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+}
+
+/* Badge Styling */
+.mom-badge {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 6px !important;
+}
+
+/* Stat Icon Container */
+.mom-stat-icon {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+/* Count Badge in Table */
+.mom-count-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  border-radius: 8px !important;
+  background-color: #f1f5f9 !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+}
+
+/* View Button */
+.mom-view-btn {
+  background-color: #27235c !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.mom-view-btn:hover {
+  background-color: #1e1b4d !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Empty State */
+.mom-empty-state {
+  padding: 3rem 1.5rem !important;
+  text-align: center !important;
+}
+
+/* Filter Inputs */
+.mom-filter-input,
+.mom-filter-select {
+  border-radius: 8px !important;
+  border-color: #e2e8f0 !important;
+  font-size: 0.875rem !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.mom-filter-input:focus,
+.mom-filter-select:focus {
+  border-color: #27235c !important;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1) !important;
+  outline: none !important;
+}
+
+/* Submitted By Cell */
+.mom-submitter-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background-color: #e0e7ff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.mom-submitter-name {
+  font-size: 0.875rem !important;
+  color: #1e293b !important;
+  font-weight: 500 !important;
+  margin-bottom: 2px !important;
+}
+
+.mom-submitter-role {
+  font-size: 0.75rem !important;
+  color: #64748b !important;
+}
+
+/* Meeting Date */
+.mom-meeting-date {
+  font-size: 0.813rem !important;
+  color: #64748b !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mom-table thead th,
+  .mom-table tbody td {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.813rem !important;
+  }
+
+  .mom-stat-icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .mom-table {
+    min-width: 1000px !important;
+  }
+}

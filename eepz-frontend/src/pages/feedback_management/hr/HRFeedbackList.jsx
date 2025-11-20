@@ -19,6 +19,7 @@ import {
   hrFormApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
 import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 
 const Badge = ({ text, color = "#525252" }) => (
   <span
@@ -283,6 +284,14 @@ export default function HRFeedbackList() {
       }}
     >
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+        {/* ========== BREADCRUMB ========== */}
+        <FeedbackBreadcrumb
+          items={[
+            { label: "Feedback Management", path: "/hr/dashboard/feedback" },
+            { label: "Feedback Forms List" }
+          ]}
+        />
+
         {/* Header */}
         <div
           className="d-flex justify-content-between align-items-center mb-4"

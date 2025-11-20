@@ -15,6 +15,19 @@ import {
   employeeApi,
   smeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+
+// Helper function to get role-based feedback dashboard path
+const getFeedbackDashboardPath = (roleName) => {
+  const routes = {
+    Employee: "/employee/dashboard/feedback",
+    Manager: "/manager/dashboard/feedback",
+    DepartmentHead: "/depthead/dashboard/feedback",
+    "Department Head": "/depthead/dashboard/feedback",
+    HR: "/hr/dashboard/feedback",
+  };
+  return routes[roleName] || "/hr/dashboard/feedback";
+};
 
 export default function SubmitMentorFeedback() {
   const navigate = useNavigate();
@@ -248,6 +261,11 @@ export default function SubmitMentorFeedback() {
     form.feedbackComments.length <= 5000;
   const isLoading = loadingSme || loadingEmployees;
 
+  // Get role-based dashboard path
+  const feedbackDashboardPath = user?.roleName 
+    ? getFeedbackDashboardPath(user.roleName) 
+    : "/hr/dashboard/feedback";
+
   return (
     <div
       style={{
@@ -257,6 +275,14 @@ export default function SubmitMentorFeedback() {
         backgroundColor: "#f8f9fa",
       }}
     >
+      {/* ========== BREADCRUMB ========== */}
+      <FeedbackBreadcrumb
+        items={[
+          { label: "Feedback Management", path: feedbackDashboardPath },
+          { label: "Submit Mentor Feedback" }
+        ]}
+      />
+
       {/* BACK BUTTON & HEADER */}
       <div className="d-flex align-items-center gap-3 mb-3">
         <button

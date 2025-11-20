@@ -56,7 +56,7 @@ const ResourcePoolMapping = () => {
     setRecentlyMappedIds([]);
     try {
       // All employees
-      const employeesResponse = await projectService.getAllEmployees();
+      const employeesResponse = await projectService.getInitialStageEmployees();
       if (employeesResponse.success !== false && employeesResponse.data) {
         setAllEmployees(employeesResponse.data);
       } else {

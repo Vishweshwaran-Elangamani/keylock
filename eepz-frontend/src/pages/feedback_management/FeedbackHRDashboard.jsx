@@ -22,6 +22,7 @@ import {
   hrFormApi,
   managerReviewApi,
 } from "../../services/feedbackmanagement/feedbackApi";
+import FeedbackBreadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
 
 const StatCard = ({ label, value, Icon, color }) => (
   <div
@@ -287,7 +288,16 @@ export default function FeedbackHRDashboard() {
         background: "#f8f9fa",
         padding: "2rem 1rem",
       }}
+      
     >
+
+ <FeedbackBreadcrumb
+        items={[
+          { label: "Feedback Management" }
+        ]}
+      />
+
+      
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         {/* Header */}
         
@@ -322,45 +332,7 @@ export default function FeedbackHRDashboard() {
         </div>
 
         {/* Tabs */}
-        <div
-          style={{
-            background: "white",
-            border: "1px solid #e5e7eb",
-            borderRadius: "12px 12px 0 0",
-            padding: "0.5rem 1rem",
-            marginBottom: 0,
-            borderBottom: "none",
-          }}
-        >
-          <ul className="nav nav-tabs border-0 mb-0" style={{ gap: "0.5rem" }}>
-            {[
-              { key: "overview", label: "Overview" },
-              { key: "hr-operations", label: "HR Operations" },
-              { key: "peer-feedback", label: "Peer Feedback" },
-            ].map(({ key, label }) => (
-              <li key={key} className="nav-item">
-                <button
-                  className={`nav-link border-0 ${
-                    activeTab === key ? "active" : ""
-                  }`}
-                  onClick={() => setActiveTab(key)}
-                  style={{
-                    color: activeTab === key ? "#97247E" : "#6c757d",
-                    borderBottom:
-                      activeTab === key
-                        ? "3px solid #97247E"
-                        : "3px solid transparent",
-                    fontWeight: 600,
-                    background: "transparent",
-                    padding: "0.75rem 1rem",
-                  }}
-                >
-                  {label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        
 
         {/* Overview Tab */}
         {activeTab === "overview" && (
@@ -416,23 +388,7 @@ export default function FeedbackHRDashboard() {
                     <span className="small">Create Form</span>
                   </Link>
                 </div>
-                <div className="col-6 col-md-3">
-                  <Link
-                    to="/hr/dashboard/feedback/report"
-                    className="btn w-100 d-flex align-items-center justify-content-center gap-2"
-                    style={{
-                      background: "white",
-                      color: "#97247E",
-                      border: "2px solid #97247E",
-                      borderRadius: "8px",
-                      padding: "10px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <FileText size={16} />
-                    <span className="small">Reports</span>
-                  </Link>
-                </div>
+              
               </div>
 
               {/* Employee-like actions */}
@@ -455,23 +411,7 @@ export default function FeedbackHRDashboard() {
                     <span className="small">Mentor Feedback</span>
                   </Link>
                 </div>
-                <div className="col-6 col-md-3">
-                  <Link
-                    to="/hr/dashboard/feedback/submit-peer"
-                    className="btn w-100 d-flex align-items-center justify-content-center gap-2"
-                    style={{
-                      background: "white",
-                      color: "#97247E",
-                      border: "2px solid #97247E",
-                      borderRadius: "8px",
-                      padding: "10px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <Users size={16} />
-                    <span className="small">Peer Feedback</span>
-                  </Link>
-                </div>
+               
               </div>
             </div>
           </div>

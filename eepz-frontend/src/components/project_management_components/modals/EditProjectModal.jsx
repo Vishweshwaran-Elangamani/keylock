@@ -1,299 +1,302 @@
-import React from "react";
-import { X, Save, AlertCircle, CheckCircle } from "lucide-react";
+// src/components/project_management_components/modals/EditProjectModal.jsx
+
+import React, { useEffect } from 'react';
+import { Edit, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 const EditProjectModal = ({
-  showEditModal,
-  selectedProject,
-  editFormData,
-  setEditFormData,
+  show,
+  onClose,
+  formData,
+  setFormData,
+  onSubmit,
+  isSubmitting,
+  message,
   departments,
   businessUnits,
-  isSubmitting,
-  modalMessage,
-  setModalMessage,
-  handleUpdateProject,
-  setShowEditModal,
 }) => {
-  if (!showEditModal) return null;
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (show) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [show]);
 
-  const statusOptions = ["Active", "On Hold", "Completed", "Cancelled"];
-  const engagementModels = [
-    "Fixed Price",
-    "Time and Materials",
-    "Agile - Scrum",
-    "Agile - Kanban",
-    "Consulting",
-    "Retainer",
-  ];
+  if (!show) return null;
 
   return (
-    <div
-      className="modal fade show d-block"
-      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-      tabIndex="-1"
-    >
-      <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">
-              <i className="bi bi-pencil-square me-2"></i>
-              Edit Project
-            </h5>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setShowEditModal(false)}
-              disabled={isSubmitting}
-            ></button>
-          </div>
+    <>
+      {/* Backdrop */}
+      <div 
+        className="modal-backdrop fade show" 
+        style={{ zIndex: 1040 }}
+        onClick={onClose}
+      />
 
-          <form onSubmit={handleUpdateProject}>
-            <div className="modal-body">
-              {modalMessage && (
-                <div
-                  className={`alert alert-${
-                    modalMessage.type === "success" ? "success" : "danger"
-                  } alert-dismissible fade show d-flex align-items-center gap-2`}
-                >
-                  {modalMessage.type === "success" ? (
-                    <CheckCircle size={20} />
-                  ) : (
-                    <AlertCircle size={20} />
-                  )}
-                  <div className="flex-grow-1">{modalMessage.text}</div>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => setModalMessage(null)}
-                  ></button>
-                </div>
-              )}
-
-              <div className="row g-3">
-                {/* Project Name */}
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Project Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="projectName"
-                    value={editFormData.projectName || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        projectName: e.target.value,
-                      })
-                    }
-                    className="form-control"
-                    disabled
-                    style={{ backgroundColor: "#e9ecef" }}
-                  />
-                </div>
-
-                {/* Client Name */}
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Client Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="clientName"
-                    value={editFormData.clientName || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        clientName: e.target.value,
-                      })
-                    }
-                    className="form-control"
-                    placeholder="Enter client name"
-                  />
-                </div>
-
-                {/* Status */}
-                <div className="col-md-12">
-                  <label className="form-label">
-                    Status <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    name="status"
-                    value={editFormData.status || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        status: e.target.value,
-                      })
-                    }
-                    className="form-select"
-                  >
-                    {statusOptions.map((status, idx) => (
-                      <option key={idx} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Description */}
-                <div className="col-12">
-                  <label className="form-label">Description</label>
-                  <textarea
-                    name="description"
-                    value={editFormData.description || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        description: e.target.value,
-                      })
-                    }
-                    className="form-control"
-                    rows="3"
-                    placeholder="Enter project description"
-                  />
-                </div>
-
-                {/* Business Unit */}
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Business Unit <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    name="businessUnit"
-                    value={editFormData.businessUnit || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        businessUnit: e.target.value,
-                      })
-                    }
-                    className="form-select"
-                  >
-                    <option value="">Select Business Unit</option>
-                    {businessUnits.map((bu, idx) => (
-                      <option key={idx} value={bu}>
-                        {bu}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Department */}
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Department <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    name="department"
-                    value={editFormData.department || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        department: e.target.value,
-                      })
-                    }
-                    className="form-select"
-                  >
-                    <option value="">Select Department</option>
-                    {departments.map((dept, idx) => (
-                      <option key={idx} value={dept.departmentName}>
-                        {dept.departmentName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Engagement Model */}
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Engagement Model <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    name="engagementModel"
-                    value={editFormData.engagementModel || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        engagementModel: e.target.value,
-                      })
-                    }
-                    className="form-select"
-                  >
-                    <option value="">Select Engagement Model</option>
-                    {engagementModels.map((model, idx) => (
-                      <option key={idx} value={model}>
-                        {model}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Start Date */}
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Start Date <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="startDate"
-                    value={editFormData.startDate || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        startDate: e.target.value,
-                      })
-                    }
-                    className="form-control"
-                  />
-                </div>
-
-                {/* End Date */}
-                <div className="col-md-12">
-                  <label className="form-label">End Date</label>
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={editFormData.endDate || ""}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        endDate: e.target.value,
-                      })
-                    }
-                    className="form-control"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="modal-footer">
+      {/* Modal */}
+      <div
+        className="modal fade show d-block"
+        tabIndex="-1"
+        style={{ zIndex: 1050 }}
+        onClick={(e) => {
+          if (e.target.classList.contains('modal')) {
+            onClose();
+          }
+        }}
+      >
+        <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+          <div className="modal-content">
+            <div className="modal-header" style={{ backgroundColor: "#f8f9fa", padding: "1.25rem 1.5rem" }}>
+              <h5 className="modal-title d-flex align-items-center gap-2 mb-0">
+                <Edit size={24} style={{ color: "#0f62fe" }} />
+                <span style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+                  Edit Project
+                </span>
+              </h5>
               <button
                 type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowEditModal(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2"></span>
-                    Updating...
-                  </>
-                ) : (
-                  "Update Project"
-                )}
-              </button>
+                className="btn-close"
+                onClick={onClose}
+                aria-label="Close"
+              />
             </div>
-          </form>
+
+            <form onSubmit={onSubmit}>
+              <div className="modal-body" style={{ padding: "1.5rem" }}>
+                {message && (
+                  <div
+                    className={`alert alert-${
+                      message.type === "success" ? "success" : "danger"
+                    } d-flex align-items-center gap-2 mb-4`}
+                    style={{
+                      borderRadius: "8px",
+                      border: "none",
+                      padding: "1rem",
+                      fontSize: "0.95rem"
+                    }}
+                  >
+                    {message.type === "success" ? (
+                      <CheckCircle size={20} />
+                    ) : (
+                      <AlertCircle size={20} />
+                    )}
+                    <span>{message.text}</span>
+                  </div>
+                )}
+
+                <div className="row g-4">
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold" style={{ fontSize: "1rem" }}>
+                      Project Name <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control form-control-lg"
+                      value={formData.projectName || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          projectName: e.target.value,
+                        })
+                      }
+                      required
+                      style={{ fontSize: "1rem" }}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold" style={{ fontSize: "1rem" }}>
+                      Status <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-select form-select-lg"
+                      value={formData.status || "Active"}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          status: e.target.value,
+                        })
+                      }
+                      required
+                      style={{ fontSize: "1rem" }}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="On Hold">On Hold</option>
+                      <option value="Completed">Completed</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </div>
+
+                  <div className="col-12">
+                    <label className="form-label fw-semibold" style={{ fontSize: "1rem" }}>
+                      Description
+                    </label>
+                    <textarea
+                      className="form-control"
+                      rows="4"
+                      value={formData.description || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          description: e.target.value,
+                        })
+                      }
+                      style={{ fontSize: "1rem", lineHeight: "1.6" }}
+                    />
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold" style={{ fontSize: "1rem" }}>
+                      Business Unit <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-select form-select-lg"
+                      value={formData.businessUnit || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          businessUnit: e.target.value,
+                        })
+                      }
+                      required
+                      style={{ fontSize: "1rem" }}
+                    >
+                      <option value="">Select Business Unit</option>
+                      {businessUnits?.map((bu, idx) => (
+                        <option key={idx} value={bu}>
+                          {bu}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold" style={{ fontSize: "1rem" }}>
+                      Department <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-select form-select-lg"
+                      value={formData.department || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          department: e.target.value,
+                        })
+                      }
+                      required
+                      style={{ fontSize: "1rem" }}
+                    >
+                      <option value="">Select Department</option>
+                      {departments?.map((dept) => (
+                        <option
+                          key={dept.departmentId}
+                          value={dept.departmentName}
+                        >
+                          {dept.departmentName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold" style={{ fontSize: "1rem" }}>
+                      Engagement Model <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-select form-select-lg"
+                      value={formData.engagementModel || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          engagementModel: e.target.value,
+                        })
+                      }
+                      required
+                      style={{ fontSize: "1rem" }}
+                    >
+                      <option value="">Select Model</option>
+                      <option value="Fixed Price">Fixed Price</option>
+                      <option value="Time and Materials">Time and Materials</option>
+                      <option value="Agile - Scrum">Agile - Scrum</option>
+                      <option value="Agile - Kanban">Agile - Kanban</option>
+                      <option value="Consulting">Consulting</option>
+                      <option value="Retainer">Retainer</option>
+                    </select>
+                  </div>
+
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold" style={{ fontSize: "1rem" }}>
+                      Start Date <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control form-control-lg"
+                      value={formData.startDate || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          startDate: e.target.value,
+                        })
+                      }
+                      required
+                      style={{ fontSize: "1rem" }}
+                    />
+                  </div>
+
+                  <div className="col-md-12">
+                    <label className="form-label fw-semibold" style={{ fontSize: "1rem" }}>
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control form-control-lg"
+                      value={formData.endDate || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          endDate: e.target.value,
+                        })
+                      }
+                      style={{ fontSize: "1rem" }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer" style={{ padding: "1rem 1.5rem" }}>
+                <button
+                  type="button"
+                  className="btn btn-lg btn-secondary"
+                  onClick={onClose}
+                  style={{ fontSize: "1rem" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-lg btn-primary"
+                  disabled={isSubmitting}
+                  style={{ fontSize: "1rem" }}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" />
+                      Updating...
+                    </>
+                  ) : (
+                    "Update Project"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

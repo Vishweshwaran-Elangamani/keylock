@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import ComplianceCard from "../../components/sla/cards/ComplianceCard";
 import slaService from "../../services/sla/slaService";
+import Breadcrumb from "../../components/sla/common/Breadcrumbs"
 
 const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
@@ -298,8 +299,15 @@ const DeptHeadSLADashboard = () => {
   return (
     <div className="container-fluid">
       {/* ============= HEADER ============= */}
+             <Breadcrumb
+  items={[
+   
+    { label: "L2 Escalations" }
+  ]}
+/>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
+          
           <p className="text-muted mb-0">
             Review manager escalations (L2) and department compliance
           </p>

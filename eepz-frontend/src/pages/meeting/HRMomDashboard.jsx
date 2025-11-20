@@ -20,9 +20,9 @@ import {
   AlertCircle,
   MessageSquare,
   User,
-  TrendingUp,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import './../../styles/mom/HRMomDashboard.css';
 
 const HRMomDashboard = () => {
   const navigate = useNavigate();
@@ -109,7 +109,7 @@ const HRMomDashboard = () => {
       Other: "secondary",
     };
     return (
-      <span className={`badge bg-${badgeMap[type] || "secondary"}`}>
+      <span className={`badge bg-${badgeMap[type] || "secondary"} mom-badge`}>
         {type}
       </span>
     );
@@ -191,6 +191,7 @@ const HRMomDashboard = () => {
     >
       <div className="row justify-content-center">
         <div className="col-12">
+          {/* Header */}
           <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
             <div className="d-flex align-items-center gap-3">
               <button
@@ -238,22 +239,18 @@ const HRMomDashboard = () => {
             </div>
           </div>
 
+          {/* Stats Cards Row 1 */}
           <div className="row g-3 mb-3">
             <div className="col-lg-3 col-md-6">
-              <div className="card border-0 shadow-sm">
+              <div className="card mom-stat-card">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="d-flex align-items-center gap-3 mb-3">
                     <div
-                      className="rounded d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "#e3f2fd",
-                      }}
+                      className="mom-stat-icon"
+                      style={{ backgroundColor: "#e3f2fd" }}
                     >
                       <FileText size={28} className="text-primary" />
                     </div>
-                    <TrendingUp size={20} className="text-success" />
                   </div>
                   <div
                     className="fw-bold fs-3 mb-1"
@@ -267,20 +264,15 @@ const HRMomDashboard = () => {
             </div>
 
             <div className="col-lg-3 col-md-6">
-              <div className="card border-0 shadow-sm">
+              <div className="card mom-stat-card">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="d-flex align-items-center gap-3 mb-3">
                     <div
-                      className="rounded d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "#e8f5e9",
-                      }}
+                      className="mom-stat-icon"
+                      style={{ backgroundColor: "#e8f5e9" }}
                     >
                       <Calendar size={28} className="text-success" />
                     </div>
-                    <Clock size={20} className="text-muted" />
                   </div>
                   <div
                     className="fw-bold fs-3 mb-1"
@@ -294,16 +286,12 @@ const HRMomDashboard = () => {
             </div>
 
             <div className="col-lg-3 col-md-6">
-              <div className="card border-0 shadow-sm">
+              <div className="card mom-stat-card">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="d-flex align-items-center gap-3 mb-3">
                     <div
-                      className="rounded d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "#e1f5fe",
-                      }}
+                      className="mom-stat-icon"
+                      style={{ backgroundColor: "#e1f5fe" }}
                     >
                       <Users size={28} className="text-info" />
                     </div>
@@ -320,16 +308,12 @@ const HRMomDashboard = () => {
             </div>
 
             <div className="col-lg-3 col-md-6">
-              <div className="card border-0 shadow-sm">
+              <div className="card mom-stat-card">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="d-flex align-items-center gap-3 mb-3">
                     <div
-                      className="rounded d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "#fff3e0",
-                      }}
+                      className="mom-stat-icon"
+                      style={{ backgroundColor: "#fff3e0" }}
                     >
                       <User size={28} className="text-warning" />
                     </div>
@@ -346,18 +330,15 @@ const HRMomDashboard = () => {
             </div>
           </div>
 
+          {/* Stats Cards Row 2 */}
           <div className="row g-3 mb-4">
             <div className="col-lg-4 col-md-6">
-              <div className="card border-0 shadow-sm">
+              <div className="card mom-stat-card">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="d-flex align-items-center gap-3 mb-3">
                     <div
-                      className="rounded d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "#f3e5f5",
-                      }}
+                      className="mom-stat-icon"
+                      style={{ backgroundColor: "#f3e5f5" }}
                     >
                       <MessageSquare size={28} style={{ color: "#9c27b0" }} />
                     </div>
@@ -376,16 +357,12 @@ const HRMomDashboard = () => {
             </div>
 
             <div className="col-lg-4 col-md-6">
-              <div className="card border-0 shadow-sm">
+              <div className="card mom-stat-card">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="d-flex align-items-center gap-3 mb-3">
                     <div
-                      className="rounded d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "#e8f5e9",
-                      }}
+                      className="mom-stat-icon"
+                      style={{ backgroundColor: "#e8f5e9" }}
                     >
                       <CheckCircle size={28} className="text-success" />
                     </div>
@@ -402,16 +379,12 @@ const HRMomDashboard = () => {
             </div>
 
             <div className="col-lg-4 col-md-6">
-              <div className="card border-0 shadow-sm">
+              <div className="card mom-stat-card">
                 <div className="card-body p-4">
-                  <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div className="d-flex align-items-center gap-3 mb-3">
                     <div
-                      className="rounded d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        backgroundColor: "#ffebee",
-                      }}
+                      className="mom-stat-icon"
+                      style={{ backgroundColor: "#ffebee" }}
                     >
                       <AlertCircle size={28} className="text-danger" />
                     </div>
@@ -428,7 +401,8 @@ const HRMomDashboard = () => {
             </div>
           </div>
 
-          <div className="card border-0 shadow-sm mb-4">
+          {/* Filters */}
+          <div className="card mom-filter-card mb-4">
             <div className="card-body p-4">
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h6 className="fw-semibold mb-0 d-flex align-items-center gap-2">
@@ -447,13 +421,12 @@ const HRMomDashboard = () => {
                 <div className="row g-3">
                   <div className="col-md-6 col-lg-3">
                     <label className="form-label fw-semibold small">
-                      <Search size={16} className="me-1" />
                       Search
                     </label>
                     <input
                       type="text"
                       name="searchTerm"
-                      className="form-control"
+                      className="form-control mom-filter-input"
                       placeholder="Search by title..."
                       value={filters.searchTerm}
                       onChange={handleFilterChange}
@@ -466,7 +439,7 @@ const HRMomDashboard = () => {
                     </label>
                     <select
                       name="meetingType"
-                      className="form-select"
+                      className="form-select mom-filter-select"
                       value={filters.meetingType}
                       onChange={handleFilterChange}
                     >
@@ -485,7 +458,7 @@ const HRMomDashboard = () => {
                     <input
                       type="date"
                       name="startDate"
-                      className="form-control"
+                      className="form-control mom-filter-input"
                       value={filters.startDate}
                       onChange={handleFilterChange}
                     />
@@ -498,7 +471,7 @@ const HRMomDashboard = () => {
                     <input
                       type="date"
                       name="endDate"
-                      className="form-control"
+                      className="form-control mom-filter-input"
                       value={filters.endDate}
                       onChange={handleFilterChange}
                     />
@@ -510,7 +483,7 @@ const HRMomDashboard = () => {
                     </label>
                     <select
                       name="pageSize"
-                      className="form-select"
+                      className="form-select mom-filter-select"
                       value={filters.pageSize}
                       onChange={handleFilterChange}
                     >
@@ -546,89 +519,20 @@ const HRMomDashboard = () => {
             </div>
           </div>
 
-          <div className="card border-0 shadow-sm mb-4">
+          {/* Table */}
+          <div className="card mom-table-card mb-4">
             <div className="card-body p-0">
               <div className="table-responsive">
-                <table className="table table-hover align-middle mb-0">
-                  <thead style={{ backgroundColor: "#f8f9fa" }}>
+                <table className="table table-hover align-middle mb-0 mom-table">
+                  <thead>
                     <tr>
-                      <th
-                        className="fw-semibold ps-4 py-3"
-                        style={{
-                          color: "#64748b",
-                          textTransform: "uppercase",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        MEETING DETAILS
-                      </th>
-                      <th
-                        className="fw-semibold py-3"
-                        style={{
-                          color: "#64748b",
-                          textTransform: "uppercase",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        SUBMITTED BY
-                      </th>
-                      <th
-                        className="fw-semibold py-3"
-                        style={{
-                          color: "#64748b",
-                          textTransform: "uppercase",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        MEETING DATE
-                      </th>
-                      <th
-                        className="fw-semibold text-center py-3"
-                        style={{
-                          color: "#64748b",
-                          textTransform: "uppercase",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        PARTICIPANTS
-                      </th>
-                      <th
-                        className="fw-semibold text-center py-3"
-                        style={{
-                          color: "#64748b",
-                          textTransform: "uppercase",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        TOPICS
-                      </th>
-                      <th
-                        className="fw-semibold text-center py-3"
-                        style={{
-                          color: "#64748b",
-                          textTransform: "uppercase",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        ACTIONS
-                      </th>
-                      <th
-                        className="fw-semibold pe-4 py-3"
-                        style={{
-                          color: "#64748b",
-                          textTransform: "uppercase",
-                          fontSize: "0.75rem",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        VIEW
-                      </th>
+                      <th>Meeting Details</th>
+                      <th>Submitted By</th>
+                      <th>Meeting Date</th>
+                      <th>Participants</th>
+                      <th>Topics</th>
+                      <th>Actions</th>
+                      <th>View</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -648,7 +552,7 @@ const HRMomDashboard = () => {
                       </tr>
                     ) : !Array.isArray(moms) || moms.length === 0 ? (
                       <tr>
-                        <td colSpan="7" className="text-center py-5">
+                        <td colSpan="7" className="mom-empty-state">
                           <FileText
                             size={48}
                             className="mb-3 text-muted"
@@ -668,15 +572,15 @@ const HRMomDashboard = () => {
                     ) : (
                       moms.map((mom) => (
                         <tr key={mom.momId}>
-                          <td className="ps-4 py-3">
+                          {/* Meeting Details */}
+                          <td>
                             <div className="d-flex align-items-center gap-3">
                               <div
-                                className="rounded d-flex align-items-center justify-content-center"
+                                className="mom-stat-icon"
                                 style={{
                                   width: "48px",
                                   height: "48px",
                                   backgroundColor: "#e0f2fe",
-                                  flexShrink: 0,
                                 }}
                               >
                                 <FileText
@@ -685,10 +589,7 @@ const HRMomDashboard = () => {
                                 />
                               </div>
                               <div>
-                                <div
-                                  className="fw-semibold"
-                                  style={{ color: "#1e293b" }}
-                                >
+                                <div className="mom-meeting-title">
                                   {mom.meetingTitle}
                                 </div>
                                 <div className="mt-1">
@@ -697,108 +598,86 @@ const HRMomDashboard = () => {
                               </div>
                             </div>
                           </td>
-                          <td className="py-3">
+
+                          {/* Submitted By */}
+                          <td>
                             <div className="d-flex align-items-center gap-2">
-                              <div
-                                className="rounded-circle d-flex align-items-center justify-content-center"
-                                style={{
-                                  width: "32px",
-                                  height: "32px",
-                                  backgroundColor: "#f1f5f9",
-                                  flexShrink: 0,
-                                }}
-                              >
-                                <User size={16} style={{ color: "#64748b" }} />
+                              <div className="mom-submitter-avatar">
+                                <User size={18} style={{ color: "#4f46e5" }} />
                               </div>
                               <div>
-                                <div
-                                  className="fw-medium small"
-                                  style={{ color: "#1e293b" }}
-                                >
+                                <div className="mom-submitter-name">
                                   {mom.submittedByEmployeeName || "Unknown"}
                                 </div>
-                                <small className="text-muted">
+                                <small className="mom-submitter-role">
                                   {mom.submittedByRole || "Employee"}
                                 </small>
                               </div>
                             </div>
                           </td>
-                          <td className="py-3">
+
+                          {/* Meeting Date */}
+                          <td>
                             <div className="d-flex align-items-center gap-2">
                               <Calendar size={16} className="text-muted" />
-                              <span className="text-muted small">
+                              <span className="mom-meeting-date">
                                 {formatDateTime(mom.meetingDate)}
                               </span>
                             </div>
                           </td>
-                          <td className="text-center py-3">
-                            <div
-                              className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded"
-                              style={{ backgroundColor: "#f1f5f9" }}
-                            >
-                              <Users size={18} style={{ color: "#0284c7" }} />
-                              <span
-                                className="fw-semibold"
-                                style={{ color: "#1e293b" }}
-                              >
+
+                          {/* Participants */}
+                          <td>
+                            <div className="mom-count-badge">
+                              <Users size={16} style={{ color: "#0284c7" }} />
+                              <span>
                                 {Array.isArray(mom.attendees)
                                   ? mom.attendees.length
                                   : 0}
                               </span>
                             </div>
                           </td>
-                          <td className="text-center py-3">
-                            <div
-                              className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded"
-                              style={{ backgroundColor: "#f1f5f9" }}
-                            >
+
+                          {/* Topics */}
+                          <td>
+                            <div className="mom-count-badge">
                               <MessageSquare
-                                size={18}
+                                size={16}
                                 style={{ color: "#06b6d4" }}
                               />
-                              <span
-                                className="fw-semibold"
-                                style={{ color: "#1e293b" }}
-                              >
+                              <span>
                                 {Array.isArray(mom.discussionPoints)
                                   ? mom.discussionPoints.length
                                   : 0}
                               </span>
                             </div>
                           </td>
-                          <td className="text-center py-3">
-                            <div
-                              className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded"
-                              style={{ backgroundColor: "#f1f5f9" }}
-                            >
+
+                          {/* Actions */}
+                          <td>
+                            <div className="mom-count-badge">
                               <CheckCircle
-                                size={18}
+                                size={16}
                                 style={{ color: "#10b981" }}
                               />
-                              <span
-                                className="fw-semibold"
-                                style={{ color: "#1e293b" }}
-                              >
+                              <span>
                                 {Array.isArray(mom.actionItems)
                                   ? mom.actionItems.length
                                   : 0}
                               </span>
                             </div>
                           </td>
-                          <td className="pe-4 py-3">
+
+                          {/* View */}
+                          <td>
                             <button
-                              className="btn btn-sm d-flex align-items-center gap-2 px-3 py-2"
-                              style={{
-                                backgroundColor: "#4f46e5",
-                                color: "white",
-                                borderRadius: "6px",
-                              }}
+                              className="btn btn-sm mom-view-btn d-flex align-items-center gap-2"
                               onClick={() =>
                                 navigate(`/hr/dasboard/meetmom/${mom.momId}`)
                               }
                             >
                               <Eye size={16} />
-                              View Details
+                              View
                             </button>
                           </td>
                         </tr>
@@ -810,11 +689,12 @@ const HRMomDashboard = () => {
             </div>
           </div>
 
+          {/* Pagination */}
           {!loading &&
             Array.isArray(moms) &&
             moms.length > 0 &&
             totalPages > 1 && (
-              <div className="card border-0 shadow-sm">
+              <div className="card mom-pagination-card">
                 <div className="card-body p-3">
                   <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div className="text-muted small">

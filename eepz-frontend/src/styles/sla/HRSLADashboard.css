@@ -1,0 +1,266 @@
+/* ========================================
+   HR SLA Dashboard - Table Styling
+   ======================================== */
+
+/* Table Card - Rounded Corners */
+.sla-table-card {
+  border: none !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background-color: #fff !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Table Container */
+.sla-table-responsive {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Main Table Styling */
+.sla-table {
+  margin-bottom: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* Table Header - Purple Theme like Project Management */
+.sla-table thead {
+  background-color: #27235c !important;
+  color: white !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.sla-table thead th {
+  background-color: #27235c !important;
+  color: white !important;
+  border: none !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  padding: 14px 16px !important;
+  vertical-align: middle !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* Center align specific header columns */
+.sla-table thead th:nth-child(2), /* Type */
+.sla-table thead th:nth-child(5), /* Status */
+.sla-table thead th:nth-child(6), /* Compliance */
+.sla-table thead th:last-child {  /* Actions */
+  text-align: center !important;
+}
+
+/* Remove default borders */
+.sla-table thead th {
+  border-bottom: none !important;
+}
+
+/* Table Body Cells */
+.sla-table tbody td {
+  padding: 14px 16px !important;
+  vertical-align: middle !important;
+  border-top: 1px solid #e9ecef !important;
+  border-bottom: none !important;
+  font-size: 0.875rem !important;
+  color: #0f172a !important;
+  text-align: left !important;
+}
+
+/* Center align specific body columns */
+.sla-table tbody td:nth-child(2), /* Type badge */
+.sla-table tbody td:nth-child(5), /* Status badge */
+.sla-table tbody td:nth-child(6), /* Compliance badge */
+.sla-table tbody td:last-child {  /* Actions buttons */
+  text-align: center !important;
+}
+
+/* Remove border from first row */
+.sla-table tbody tr:first-child td {
+  border-top: none !important;
+}
+
+/* Row Hover Effect */
+.sla-table tbody tr {
+  transition: background-color 0.15s ease !important;
+}
+
+.sla-table tbody tr:hover {
+  background-color: rgba(39, 35, 92, 0.04) !important;
+}
+
+/* Employee Name Styling */
+.sla-employee-name {
+  font-size: 0.875rem !important;
+  color: #0f172a !important;
+  margin-bottom: 4px !important;
+  font-weight: 600 !important;
+  display: block !important;
+}
+
+.sla-employee-email {
+  font-size: 0.75rem !important;
+  color: #94a3b8 !important;
+  display: block !important;
+}
+
+/* Badge Styling */
+.sla-badge {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 6px !important;
+  display: inline-block !important;
+  line-height: 1.2 !important;
+}
+
+/* Action Buttons */
+.sla-action-btn {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-width: 1.5px !important;
+  transition: all 0.2s ease !important;
+}
+
+.sla-action-btn:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* Empty State */
+.sla-empty-state {
+  padding: 3rem 1.25rem !important;
+  text-align: center !important;
+}
+
+.sla-empty-icon {
+  color: #cbd5e1 !important;
+  opacity: 0.3 !important;
+  margin-bottom: 1rem !important;
+}
+
+.sla-empty-text {
+  color: #64748b !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+
+/* Pagination Container */
+.sla-pagination-container {
+  padding: 1rem 1.25rem !important;
+  border-top: 1px solid #f1f5f9 !important;
+  background-color: #fff !important;
+}
+
+/* Stats Card Hover Effect */
+.sla-stat-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  border: 1.5px solid #a21caf !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+.sla-stat-card:hover {
+  box-shadow: 0 4px 12px 0 rgba(163, 21, 175, 0.13) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Filter Card Styling */
+.sla-filter-card {
+  border: none !important;
+  border-radius: 12px !important;
+  background-color: #fff !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+.sla-filter-input,
+.sla-filter-select {
+  border-radius: 8px !important;
+  border-color: #e2e8f0 !important;
+  font-size: 0.875rem !important;
+  padding: 0.5rem 0.75rem !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.sla-filter-input:focus,
+.sla-filter-select:focus {
+  border-color: #27235c !important;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1) !important;
+  outline: none !important;
+}
+
+/* Deadline Cell */
+.sla-deadline-date {
+  font-size: 0.875rem !important;
+  color: #475569 !important;
+  margin-bottom: 2px !important;
+  font-weight: 500 !important;
+  display: block !important;
+}
+
+.sla-closed-date {
+  font-size: 0.75rem !important;
+  color: #24A148 !important;
+  font-weight: 500 !important;
+  display: block !important;
+}
+
+/* Assigned To Cell */
+.sla-assigned-name {
+  font-size: 0.875rem !important;
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+.sla-not-assigned {
+  font-size: 0.875rem !important;
+  color: #94a3b8 !important;
+  font-style: italic !important;
+}
+
+/* Icon + Text Alignment Fix */
+.sla-table .d-flex {
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sla-table thead th,
+  .sla-table tbody td {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.813rem !important;
+  }
+
+  .sla-action-btn {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .sla-badge {
+    font-size: 0.688rem !important;
+    padding: 0.3rem 0.6rem !important;
+  }
+}
+
+/* Fix for table overflow on small screens */
+@media (max-width: 992px) {
+  .sla-table-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .sla-table {
+    min-width: 900px !important;
+  }
+}

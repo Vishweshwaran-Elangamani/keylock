@@ -1,0 +1,77 @@
+/* ProjectList.css */
+
+/* Table Card - Rounded corners */
+.table-card-rounded {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Table Header Styling */
+.project-table-header {
+  background-color: var(--color-primary-1) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.project-table-header th {
+  background-color: var(--color-primary-1) !important;
+  color: white !important;
+  border: none !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  padding: 14px 16px !important;
+  vertical-align: middle !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+/* Center align specific header columns */
+.project-table-header th:nth-child(2), /* Status */
+.project-table-header th:last-child {  /* Actions */
+  text-align: center !important;
+}
+
+/* Table body styling */
+.custom-project-table {
+  margin-bottom: 0 !important;
+}
+
+.custom-project-table tbody td {
+  vertical-align: middle !important;
+  padding: 14px 16px !important;
+  border-top: 1px solid #e9ecef !important;
+  text-align: left !important;
+}
+
+/* Center align specific body columns */
+.custom-project-table tbody td:nth-child(2), /* Status badge */
+.custom-project-table tbody td:last-child {  /* Actions buttons */
+  text-align: center !important;
+}
+
+/* Project Name column styling */
+.custom-project-table tbody td:first-child {
+  font-weight: 500 !important;
+}
+
+/* Icon + text alignment fix */
+.custom-project-table tbody td .d-flex {
+  align-items: center !important;
+}
+
+/* Remove default borders */
+.custom-project-table thead th {
+  border-bottom: none !important;
+}
+
+/* Hover effect */
+.custom-project-table tbody tr:hover {
+  background-color: rgba(151, 36, 126, 0.04) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* Empty state centering */
+.custom-project-table tbody td[colspan] {
+  text-align: center !important;
+}

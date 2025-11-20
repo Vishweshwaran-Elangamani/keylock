@@ -1,416 +1,395 @@
-import React from 'react';
-import { X, Search, Filter, Users, AlertCircle, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+// src/components/project_management_components/modals/EmployeeMappingModal.jsx
+
+import React, { useEffect } from 'react';
+import { Users, CheckCircle, AlertCircle, Info, Search } from 'lucide-react';
 
 const EmployeeMappingModal = ({
-  showEmployeeModal,
-  selectedProject,
-  allEmployees,
+  show, // ✅ Changed from showEmployeeModal
+  onClose, // ✅ Changed from setShowEmployeeModal
+  project, // ✅ Changed from selectedProject
+  filteredEmployees,
   mappedEmployees,
   selectedEmployeeIds,
-  setSelectedEmployeeIds,
-  employeeSearchTerm,
-  setEmployeeSearchTerm,
-  employeeFilterRole,
-  setEmployeeFilterRole,
-  employeeFilterDepartment,
-  setEmployeeFilterDepartment,
-  employeeFilterStatus,
-  setEmployeeFilterStatus,
-  employeeCurrentPage,
-  setEmployeeCurrentPage,
-  employeeItemsPerPage,
+  primaryEmployeeIds,
+  searchTerm, // ✅ Changed from employeeSearchTerm
+  setSearchTerm, // ✅ Changed from setEmployeeSearchTerm
+  filterRole, // ✅ Changed from employeeFilterRole
+  setFilterRole, // ✅ Changed from setEmployeeFilterRole
+  filterDepartment, // ✅ Changed from employeeFilterDepartment
+  setFilterDepartment, // ✅ Changed from setEmployeeFilterDepartment
+  filterStatus, // ✅ Changed from employeeFilterStatus
+  setFilterStatus, // ✅ Changed from setEmployeeFilterStatus
+  uniqueRoles,
+  uniqueDepartments,
+  onEmployeeSelect, // ✅ Changed from handleEmployeeToggle
+  onPrimaryToggle, // ✅ Changed from handlePrimaryToggle
+  onSelectAll, // ✅ Changed from handleSelectAllVisible
+  onMap, // ✅ Changed from handleMapEmployees
+  onUnmap, // ✅ Changed from handleUnmapEmployees
   isSubmitting,
-  isLoadingModalData,
-  modalMessage,
-  setModalMessage,
-  handleMapEmployees,
-  handleUnmapEmployees,
-  setShowEmployeeModal,
-  getProjectManagerIds
+  message, // ✅ Changed from modalMessage
+  isLoadingData, // ✅ Changed from isLoadingModalData
+  getMappedCount,
+  getUnmappedCount,
+  hasSelectedMapped, // ✅ Changed from hasSelectedMappedEmployees
+  hasSelectedUnmapped, // ✅ Changed from hasSelectedUnmappedEmployees
 }) => {
-  if (!showEmployeeModal) return null;
-
-  const managerIds = getProjectManagerIds();
-
-  // Filter employees
-  const filteredEmployees = allEmployees.filter(emp => {
-    if (managerIds.includes(emp.employeeMasterId)) return false;
-
-    const isMapped = mappedEmployees.some(m => m.employeeMasterId === emp.employeeMasterId);
-    
-    const searchMatch = employeeSearchTerm === '' || 
-      `${emp.firstName} ${emp.lastName} ${emp.roleName} ${emp.departmentName}`
-        .toLowerCase()
-        .includes(employeeSearchTerm.toLowerCase());
-    
-    const roleMatch = employeeFilterRole === 'All' || emp.roleName === employeeFilterRole;
-    const deptMatch = employeeFilterDepartment === 'All' || emp.departmentName === employeeFilterDepartment;
-    const statusMatch = 
-      employeeFilterStatus === 'All' || 
-      (employeeFilterStatus === 'Mapped' && isMapped) ||
-      (employeeFilterStatus === 'Unmapped' && !isMapped);
-    
-    return searchMatch && roleMatch && deptMatch && statusMatch;
-  });
-
-  const availableEmployees = allEmployees.filter(emp => !managerIds.includes(emp.employeeMasterId));
-  const uniqueRoles = [...new Set(availableEmployees.map(emp => emp.roleName))].sort();
-  const uniqueDepartments = [...new Set(availableEmployees.map(emp => emp.departmentName))].sort();
-
-  // Pagination
-  const totalPages = Math.ceil(filteredEmployees.length / employeeItemsPerPage);
-  const startIndex = (employeeCurrentPage - 1) * employeeItemsPerPage;
-  const endIndex = startIndex + employeeItemsPerPage;
-  const paginatedEmployees = filteredEmployees.slice(startIndex, endIndex);
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-    
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (show) {
+      document.body.style.overflow = 'hidden';
     } else {
-      if (employeeCurrentPage <= 3) {
-        for (let i = 1; i <= 4; i++) pages.push(i);
-        pages.push('...');
-        pages.push(totalPages);
-      } else if (employeeCurrentPage >= totalPages - 2) {
-        pages.push(1);
-        pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push('...');
-        for (let i = employeeCurrentPage - 1; i <= employeeCurrentPage + 1; i++) pages.push(i);
-        pages.push('...');
-        pages.push(totalPages);
-      }
+      document.body.style.overflow = 'unset';
     }
-    return pages;
-  };
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [show]);
 
-  const handleEmployeeToggle = (employeeId) => {
-    setSelectedEmployeeIds(prev => {
-      if (prev.includes(employeeId)) {
-        return prev.filter(id => id !== employeeId);
-      } else {
-        return [...prev, employeeId];
-      }
-    });
-  };
+  if (!show) return null;
 
-  const handleSelectAllVisible = () => {
-    const visibleIds = paginatedEmployees.map(emp => emp.employeeMasterId);
-    const allVisibleSelected = visibleIds.every(id => selectedEmployeeIds.includes(id));
-    
-    if (allVisibleSelected) {
-      setSelectedEmployeeIds(prev => prev.filter(id => !visibleIds.includes(id)));
-    } else {
-      setSelectedEmployeeIds(prev => [...new Set([...prev, ...visibleIds])]);
+  const getProjectManagerIds = () => {
+    if (!project) return [];
+    const managerIds = [];
+    if (project.resourceOwner?.employeeMasterId) {
+      managerIds.push(project.resourceOwner.employeeMasterId);
     }
+    if (project.l1Approver?.employeeMasterId) {
+      managerIds.push(project.l1Approver.employeeMasterId);
+    }
+    if (project.l2Approver?.employeeMasterId) {
+      managerIds.push(project.l2Approver.employeeMasterId);
+    }
+    return managerIds;
   };
-
-  const allVisibleSelected = paginatedEmployees.length > 0 && 
-    paginatedEmployees.every(emp => selectedEmployeeIds.includes(emp.employeeMasterId));
-
-  const hasSelectedMappedEmployees = selectedEmployeeIds.some(id => 
-    mappedEmployees.some(m => m.employeeMasterId === id)
-  );
-
-  const hasSelectedUnmappedEmployees = selectedEmployeeIds.some(id => 
-    !mappedEmployees.some(m => m.employeeMasterId === id)
-  );
-
-  const mappedCount = selectedEmployeeIds.filter(id => 
-    mappedEmployees.some(m => m.employeeMasterId === id)
-  ).length;
-
-  const unmappedCount = selectedEmployeeIds.filter(id => 
-    !mappedEmployees.some(m => m.employeeMasterId === id)
-  ).length;
-
-  // Get manager names for note
-  const getManagerNames = () => {
-    const resourceOwner = selectedProject?.resourceOwner ? 
-      `${selectedProject.resourceOwner.firstName} ${selectedProject.resourceOwner.lastName}` : null;
-    const l1Approver = selectedProject?.l1Approver ? 
-      `${selectedProject.l1Approver.firstName} ${selectedProject.l1Approver.lastName}` : null;
-    const l2Approver = selectedProject?.l2Approver ? 
-      `${selectedProject.l2Approver.firstName} ${selectedProject.l2Approver.lastName}` : null;
-    
-    return { resourceOwner, l1Approver, l2Approver };
-  };
-
-  const managers = getManagerNames();
 
   return (
-    <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
-      <div className="modal-dialog modal-xl modal-dialog-centered" style={{ maxWidth: '90%' }}>
-        <div className="modal-content" style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
-          <div className="modal-header border-bottom">
-            <h5 className="modal-title d-flex align-items-center gap-2">
-              <Users size={24} className="text-primary" />
-              <span>Map/Unmap Employees - {selectedProject?.projectName}</span>
-            </h5>
-            <button 
-              type="button" 
-              className="btn-close" 
-              onClick={() => setShowEmployeeModal(false)}
-              disabled={isSubmitting}
-            ></button>
-          </div>
+    <>
+      {/* Backdrop */}
+      <div 
+        className="modal-backdrop fade show" 
+        style={{ zIndex: 1040 }}
+        onClick={onClose}
+      />
 
-          <div className="modal-body" style={{ flex: '1 1 auto', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-            {/* Manager Note */}
-            <div className="alert alert-info mb-3">
-              <strong>Note:</strong> The following employees are automatically associated with this project as managers:
-              <ul className="mb-0 mt-2">
-                {managers.resourceOwner && <li><strong>Resource Owner:</strong> {managers.resourceOwner}</li>}
-                {managers.l1Approver && <li><strong>L1 Approver:</strong> {managers.l1Approver}</li>}
-                {managers.l2Approver && <li><strong>L2 Approver:</strong> {managers.l2Approver}</li>}
-              </ul>
+      {/* Modal */}
+      <div
+        className="modal fade show d-block"
+        tabIndex="-1"
+        style={{ zIndex: 1050 }}
+      >
+        <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+          <div className="modal-content">
+            <div className="modal-header" style={{ backgroundColor: "#f8f9fa", padding: "1.25rem 1.5rem" }}>
+              <h5 className="modal-title d-flex align-items-center gap-2 mb-0">
+                <Users size={24} style={{ color: "#0f62fe" }} />
+                <span style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+                  Map/Unmap Employees - {project?.projectName}
+                </span>
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={onClose}
+              />
             </div>
 
-            {modalMessage && (
-              <div className={`alert alert-${modalMessage.type === 'success' ? 'success' : 'danger'} alert-dismissible fade show d-flex align-items-center gap-2`}>
-                {modalMessage.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-                <div className="flex-grow-1">{modalMessage.text}</div>
-                <button type="button" className="btn-close" onClick={() => setModalMessage(null)}></button>
-              </div>
-            )}
-
-            {/* Filters */}
-            <div className="row g-3 mb-3">
-              <div className="col-md-3">
-                <div className="input-group">
-                  <span className="input-group-text bg-white">
-                    <Search size={18} />
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search employees..."
-                    value={employeeSearchTerm}
-                    onChange={(e) => {
-                      setEmployeeSearchTerm(e.target.value);
-                      setEmployeeCurrentPage(1);
-                    }}
-                  />
-                </div>
-              </div>
-              <div className="col-md-3">
-                <div className="input-group">
-                  <span className="input-group-text bg-white">
-                    <Filter size={18} />
-                  </span>
-                  <select
-                    className="form-select"
-                    value={employeeFilterRole}
-                    onChange={(e) => {
-                      setEmployeeFilterRole(e.target.value);
-                      setEmployeeCurrentPage(1);
-                    }}
-                  >
-                    <option value="All">All Roles</option>
-                    {uniqueRoles.map(role => (
-                      <option key={role} value={role}>{role}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="col-md-3">
-                <div className="input-group">
-                  <span className="input-group-text bg-white">
-                    <Filter size={18} />
-                  </span>
-                  <select
-                    className="form-select"
-                    value={employeeFilterDepartment}
-                    onChange={(e) => {
-                      setEmployeeFilterDepartment(e.target.value);
-                      setEmployeeCurrentPage(1);
-                    }}
-                  >
-                    <option value="All">All Departments</option>
-                    {uniqueDepartments.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="col-md-3">
-                <div className="input-group">
-                  <span className="input-group-text bg-white">
-                    <Filter size={18} />
-                  </span>
-                  <select
-                    className="form-select"
-                    value={employeeFilterStatus}
-                    onChange={(e) => {
-                      setEmployeeFilterStatus(e.target.value);
-                      setEmployeeCurrentPage(1);
-                    }}
-                  >
-                    <option value="All">All Status</option>
-                    <option value="Mapped">Mapped</option>
-                    <option value="Unmapped">Unmapped</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Selection Info with badges */}
-            <div className="d-flex gap-2 mb-3">
-              <span className="badge bg-primary">{selectedEmployeeIds.length} Selected</span>
-              <span className="badge bg-success">Mapped: {mappedCount}</span>
-              <span className="badge bg-warning text-dark">Unmapped: {unmappedCount}</span>
-              {selectedEmployeeIds.length > 0 && (
-                <button 
-                  className="btn btn-sm btn-outline-secondary ms-auto" 
-                  onClick={() => setSelectedEmployeeIds([])}
+            <div className="modal-body" style={{ padding: "1.5rem" }}>
+              {message && (
+                <div
+                  className={`alert alert-${
+                    message.type === "success" ? "success" : "danger"
+                  } d-flex align-items-center gap-2 mb-4`}
+                  style={{
+                    borderRadius: "8px",
+                    border: "none",
+                    padding: "1rem",
+                  }}
                 >
-                  Select/Deselect Page
-                </button>
+                  {message.type === "success" ? (
+                    <CheckCircle size={20} />
+                  ) : (
+                    <AlertCircle size={20} />
+                  )}
+                  <span style={{ fontSize: "0.95rem" }}>{message.text}</span>
+                </div>
+              )}
+
+              {getProjectManagerIds().length > 0 && (
+                <div
+                  className="alert alert-info d-flex align-items-start gap-3 mb-4"
+                  style={{
+                    borderRadius: "8px",
+                    border: "none",
+                    padding: "1rem",
+                  }}
+                >
+                  <Info size={20} className="flex-shrink-0 mt-1" />
+                  <div>
+                    <strong style={{ fontSize: "0.95rem" }}>Note:</strong> The following employees are
+                    automatically associated with this project as managers:
+                    <ul className="mb-0 mt-2" style={{ fontSize: "0.9rem" }}>
+                      {project.resourceOwner && (
+                        <li>
+                          <strong>Resource Owner:</strong>{" "}
+                          {project.resourceOwner.firstName}{" "}
+                          {project.resourceOwner.lastName}
+                        </li>
+                      )}
+                      {project.l1Approver && (
+                        <li>
+                          <strong>L1 Approver:</strong>{" "}
+                          {project.l1Approver.firstName}{" "}
+                          {project.l1Approver.lastName}
+                        </li>
+                      )}
+                      {project.l2Approver && (
+                        <li>
+                          <strong>L2 Approver:</strong>{" "}
+                          {project.l2Approver.firstName}{" "}
+                          {project.l2Approver.lastName}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {isLoadingData ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" style={{ width: "3rem", height: "3rem" }}></div>
+                  <p className="mt-3 text-muted" style={{ fontSize: "0.95rem" }}>Loading employees...</p>
+                </div>
+              ) : (
+                <>
+                  {/* Filters */}
+                  <div className="row g-3 mb-4">
+                    <div className="col-md-6">
+                      <div className="input-group input-group-lg">
+                        <span className="input-group-text bg-white">
+                          <Search size={20} />
+                        </span>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Search employees..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          style={{ fontSize: "0.95rem" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-2">
+                      <select
+                        className="form-select form-select-lg"
+                        value={filterRole}
+                        onChange={(e) => setFilterRole(e.target.value)}
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        <option value="All">All Roles</option>
+                        {uniqueRoles.map((role, idx) => (
+                          <option key={idx} value={role}>
+                            {role}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-md-2">
+                      <select
+                        className="form-select form-select-lg"
+                        value={filterDepartment}
+                        onChange={(e) => setFilterDepartment(e.target.value)}
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        <option value="All">All Departments</option>
+                        {uniqueDepartments.map((dept, idx) => (
+                          <option key={idx} value={dept}>
+                            {dept}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-md-2">
+                      <select
+                        className="form-select form-select-lg"
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                        style={{ fontSize: "0.95rem" }}
+                      >
+                        <option value="All">All Status</option>
+                        <option value="Mapped">Mapped</option>
+                        <option value="Unmapped">Unmapped</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Selection Summary */}
+                  <div className="mb-4 d-flex justify-content-between align-items-center">
+                    <div>
+                      <span className="badge bg-info me-2" style={{ fontSize: "0.9rem", padding: "0.5rem 0.75rem" }}>
+                        {selectedEmployeeIds.length} Selected
+                      </span>
+                      <span className="badge bg-success me-2" style={{ fontSize: "0.9rem", padding: "0.5rem 0.75rem" }}>
+                        Mapped: {getMappedCount()}
+                      </span>
+                      <span className="badge bg-warning text-dark" style={{ fontSize: "0.9rem", padding: "0.5rem 0.75rem" }}>
+                        Unmapped: {getUnmappedCount()}
+                      </span>
+                      {primaryEmployeeIds.length > 0 && (
+                        <span className="badge bg-primary ms-2" style={{ fontSize: "0.9rem", padding: "0.5rem 0.75rem" }}>
+                          {primaryEmployeeIds.length} Primary Set
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={onSelectAll}
+                      style={{ fontSize: "0.95rem" }}
+                    >
+                      Select/Deselect All
+                    </button>
+                  </div>
+
+                  <div
+                    className="alert alert-warning d-flex align-items-start gap-3 mb-4"
+                    style={{
+                      borderRadius: "8px",
+                      border: "none",
+                      padding: "1rem",
+                    }}
+                  >
+                    <Info size={20} className="flex-shrink-0 mt-1" />
+                    <div style={{ fontSize: "0.9rem" }}>
+                      <strong>Primary Project:</strong> You can select multiple
+                      employees and mark multiple as primary for this project.
+                      Employees must be selected first before marking as primary.
+                    </div>
+                  </div>
+
+                  {/* Employee Table */}
+                  <div
+                    className="table-responsive"
+                    style={{
+                      minHeight: "350px",
+                      maxHeight: "600px",
+                      overflowY: "auto",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <table className="table table-hover mb-0">
+                      <thead className="table-light" style={{ position: "sticky", top: 0 }}>
+                        <tr>
+                          <th style={{ width: "60px", fontSize: "0.9rem", padding: "1rem" }}>Select</th>
+                          <th style={{ fontSize: "0.9rem", padding: "1rem" }}>Employee Name</th>
+                          <th style={{ fontSize: "0.9rem", padding: "1rem" }}>Role</th>
+                          <th style={{ fontSize: "0.9rem", padding: "1rem" }}>Department</th>
+                          <th style={{ width: "100px", fontSize: "0.9rem", padding: "1rem" }}>Status</th>
+                          <th style={{ width: "120px", fontSize: "0.9rem", padding: "1rem" }}>Primary Project</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredEmployees.length === 0 ? (
+                          <tr>
+                            <td
+                              colSpan="6"
+                              className="text-center py-5 text-muted"
+                              style={{ fontSize: "0.95rem" }}
+                            >
+                              No employees match the filters
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredEmployees.map((emp) => {
+                            const isMapped = mappedEmployees.some(
+                              (m) => m.employeeMasterId === emp.employeeMasterId
+                            );
+                            const isSelected = selectedEmployeeIds.includes(
+                              emp.employeeMasterId
+                            );
+                            const isPrimary = primaryEmployeeIds.includes(
+                              emp.employeeMasterId
+                            );
+                            const currentlyMappedAsPrimary = mappedEmployees.find(
+                              (m) => m.employeeMasterId === emp.employeeMasterId
+                            )?.isPrimary;
+
+                            return (
+                              <tr
+                                key={emp.employeeMasterId}
+                                className={isSelected ? "table-active" : ""}
+                              >
+                                <td onClick={(e) => e.stopPropagation()} style={{ padding: "1rem" }}>
+                                  <input
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    checked={isSelected}
+                                    onChange={() =>
+                                      onEmployeeSelect(emp.employeeMasterId)
+                                    }
+                                    style={{ width: "18px", height: "18px" }}
+                                  />
+                                </td>
+                                <td style={{ fontSize: "0.9rem", padding: "1rem" }}>
+                                  {emp.firstName} {emp.lastName}
+                                </td>
+                                <td style={{ fontSize: "0.9rem", padding: "1rem" }}>{emp.roleName}</td>
+                                <td style={{ fontSize: "0.9rem", padding: "1rem" }}>{emp.departmentName}</td>
+                                <td style={{ padding: "1rem" }}>
+                                  {isMapped ? (
+                                    <span className="badge bg-success" style={{ fontSize: "0.85rem" }}>
+                                      Mapped {currentlyMappedAsPrimary && "★"}
+                                    </span>
+                                  ) : (
+                                    <span className="badge bg-secondary" style={{ fontSize: "0.85rem" }}>
+                                      Unmapped
+                                    </span>
+                                  )}
+                                </td>
+                                <td onClick={(e) => e.stopPropagation()} style={{ padding: "1rem" }}>
+                                  <input
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    checked={isPrimary}
+                                    disabled={!isSelected}
+                                    onChange={() =>
+                                      onPrimaryToggle(emp.employeeMasterId)
+                                    }
+                                    title={
+                                      !isSelected
+                                        ? "Select employee first"
+                                        : "Mark as primary"
+                                    }
+                                    style={{ width: "18px", height: "18px" }}
+                                  />
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </div>
 
-            {/* Employees Table - FIXED HEIGHT */}
-            {isLoadingModalData ? (
-              <div className="text-center py-5">
-                <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="text-muted mt-3">Loading employees...</p>
-              </div>
-            ) : (
-              <div className="flex-grow-1" style={{ minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-                <div className="table-responsive" style={{ flex: '1 1 auto', maxHeight: '300px', overflowY: 'auto' }}>
-                  <table className="table table-hover mb-0">
-                    <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
-                      <tr>
-                        <th style={{ width: '50px' }}>
-                          <input
-                            type="checkbox"
-                            className="form-check-input"
-                            checked={allVisibleSelected}
-                            onChange={handleSelectAllVisible}
-                            disabled={paginatedEmployees.length === 0}
-                          />
-                        </th>
-                        <th>Select</th>
-                        <th>Employee Name</th>
-                        <th>Role</th>
-                        <th>Department</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedEmployees.length === 0 ? (
-                        <tr>
-                          <td colSpan="6" className="text-center py-4 text-muted">
-                            No employees found
-                          </td>
-                        </tr>
-                      ) : (
-                        paginatedEmployees.map(emp => {
-                          const isMapped = mappedEmployees.some(m => m.employeeMasterId === emp.employeeMasterId);
-                          const isSelected = selectedEmployeeIds.includes(emp.employeeMasterId);
-                          
-                          return (
-                            <tr key={emp.employeeMasterId} className={isSelected ? 'table-active' : ''}>
-                              <td>
-                                <input
-                                  type="checkbox"
-                                  className="form-check-input"
-                                  checked={isSelected}
-                                  onChange={() => handleEmployeeToggle(emp.employeeMasterId)}
-                                />
-                              </td>
-                              <td>{emp.employeeMasterId}</td>
-                              <td>{emp.firstName} {emp.lastName}</td>
-                              <td>{emp.roleName}</td>
-                              <td>{emp.departmentName}</td>
-                              <td>
-                                <span className={`badge ${isMapped ? 'bg-success' : 'bg-secondary'}`}>
-                                  {isMapped ? 'Mapped' : 'Unmapped'}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Pagination - ALWAYS VISIBLE */}
-                {totalPages > 1 && (
-                  <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                    <div className="text-muted small">
-                      Showing {startIndex + 1} to {Math.min(endIndex, filteredEmployees.length)} of {filteredEmployees.length}
-                    </div>
-                    <nav>
-                      <ul className="pagination pagination-sm mb-0">
-                        <li className={`page-item ${employeeCurrentPage === 1 ? 'disabled' : ''}`}>
-                          <button 
-                            className="page-link" 
-                            onClick={() => setEmployeeCurrentPage(employeeCurrentPage - 1)}
-                            disabled={employeeCurrentPage === 1}
-                          >
-                            <ChevronLeft size={14} />
-                          </button>
-                        </li>
-                        {getPageNumbers().map((page, index) => (
-                          page === '...' ? (
-                            <li key={`ellipsis-${index}`} className="page-item disabled">
-                              <span className="page-link">...</span>
-                            </li>
-                          ) : (
-                            <li key={page} className={`page-item ${employeeCurrentPage === page ? 'active' : ''}`}>
-                              <button 
-                                className="page-link" 
-                                onClick={() => setEmployeeCurrentPage(page)}
-                              >
-                                {page}
-                              </button>
-                            </li>
-                          )
-                        ))}
-                        <li className={`page-item ${employeeCurrentPage === totalPages ? 'disabled' : ''}`}>
-                          <button 
-                            className="page-link" 
-                            onClick={() => setEmployeeCurrentPage(employeeCurrentPage + 1)}
-                            disabled={employeeCurrentPage === totalPages}
-                          >
-                            <ChevronRight size={14} />
-                          </button>
-                        </li>
-                      </ul>
-                    </nav>
-                    <div className="text-muted small">
-                      Page {employeeCurrentPage} of {totalPages}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="modal-footer border-top">
-            <button 
-              type="button" 
-              className="btn btn-secondary" 
-              onClick={() => setShowEmployeeModal(false)}
-              disabled={isSubmitting}
-            >
-              Close
-            </button>
-            {hasSelectedUnmappedEmployees && (
+            <div className="modal-footer" style={{ padding: "1rem 1.5rem" }}>
               <button
                 type="button"
-                className="btn btn-success"
-                onClick={handleMapEmployees}
-                disabled={isSubmitting}
+                className="btn btn-lg btn-secondary"
+                onClick={onClose}
+                style={{ fontSize: "0.95rem" }}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="btn btn-lg btn-success"
+                onClick={onMap}
+                disabled={!hasSelectedUnmapped || isSubmitting}
+                style={{ fontSize: "0.95rem" }}
               >
                 {isSubmitting ? (
                   <>
@@ -418,18 +397,15 @@ const EmployeeMappingModal = ({
                     Mapping...
                   </>
                 ) : (
-                  <>
-                    Map Selected ({unmappedCount})
-                  </>
+                  <>Map Selected ({getUnmappedCount()})</>
                 )}
               </button>
-            )}
-            {hasSelectedMappedEmployees && (
               <button
                 type="button"
-                className="btn btn-danger"
-                onClick={handleUnmapEmployees}
-                disabled={isSubmitting}
+                className="btn btn-lg btn-danger"
+                onClick={onUnmap}
+                disabled={!hasSelectedMapped || isSubmitting}
+                style={{ fontSize: "0.95rem" }}
               >
                 {isSubmitting ? (
                   <>
@@ -437,16 +413,14 @@ const EmployeeMappingModal = ({
                     Unmapping...
                   </>
                 ) : (
-                  <>
-                    Unmap Selected ({mappedCount})
-                  </>
+                  <>Unmap Selected ({getMappedCount()})</>
                 )}
               </button>
-            )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

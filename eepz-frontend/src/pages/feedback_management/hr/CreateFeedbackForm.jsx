@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 
 export default function CreateFeedbackForm() {
   const navigate = useNavigate();
@@ -124,6 +125,14 @@ export default function CreateFeedbackForm() {
 
   return (
     <div className="container-fluid py-4" style={{ maxWidth: "900px" }}>
+      {/* ========== BREADCRUMB ========== */}
+      <FeedbackBreadcrumb
+        items={[
+          { label: "Feedback Management", path: "/hr/dashboard/feedback" },
+          { label: "Create Feedback Form" }
+        ]}
+      />
+
       {/* HEADER */}
       <div className="d-flex align-items-center mb-4">
         <button

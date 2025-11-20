@@ -1,5 +1,5 @@
 // src/pages/sla/EmployeeSLADashboard.jsx
-
+import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -15,6 +15,8 @@ import {
   List,
 } from "lucide-react";
 import slaService, { dateHelpers } from "../../services/sla/slaService";
+
+
 
 const cardBorder = "1.5px solid #a21caf"; // Purple border from your image
 const cardRadius = "14px"; // Rounded corners matching UI
@@ -289,6 +291,13 @@ const EmployeeSLADashboard = () => {
           />
         </div>
       )}
+
+                        <Breadcrumb
+  items={[
+   
+    { label: "My SLAs" }
+  ]}
+/>
 
       {/* ========== STATS CARDS - VERTICAL CENTERED LAYOUT ========== */}
       <div className="row g-3 mb-3">
@@ -844,7 +853,9 @@ const EmployeeSLADashboard = () => {
               const IconComponent = style.icon;
 
               return (
+                
                 <div key={sla._key} className="col-md-6 col-lg-4">
+
                   <div
                     className="card h-100"
                     style={{

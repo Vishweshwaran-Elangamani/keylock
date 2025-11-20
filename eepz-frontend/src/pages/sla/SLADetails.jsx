@@ -19,6 +19,19 @@ import slaService, {
   escalationHelpers,
   dateHelpers,
 } from "../../services/sla/slaService";
+import Breadcrumb from "../../components/sla/common/Breadcrumbs";
+
+// Helper function to get role-based dashboard path
+const getSLADashboardPath = (roleName) => {
+  const routes = {
+    Employee: "/employee/dashboard/sla",
+    Manager: "/employee/dashboard/sla",
+    DepartmentHead: "/sla/depthead/dashboard",
+    "Department Head": "/sla/depthead/dashboard",
+    HR: "/hr/dashboard/sla",
+  };
+  return routes[roleName] || "/employee/dashboard/sla";
+};
 
 const SLADetails = () => {
   const { slaid } = useParams();
@@ -202,7 +215,7 @@ const SLADetails = () => {
   if (loading) {
     return (
       <div
-        className="d-flex justify-content-center align-items-center" 
+        className="d-flex justify-content-center align-items-center"
         style={{ minHeight: "600px" }}
       >
         <div className="text-center">
@@ -234,9 +247,25 @@ const SLADetails = () => {
 
   const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
   const hasEscalations = escalations.length > 0;
+  
+  // Get role-based dashboard path
+  const slaDashboardPath = user ? getSLADashboardPath(user.roleName) : "/employee/dashboard/sla";
 
   return (
     <div className="container-fluid" style={{ padding: "1.5rem" }}>
+      {/* ========== BREADCRUMB ========== */}
+      <Breadcrumb
+        items={[
+          { 
+            label: "SLA Management", 
+            path: slaDashboardPath 
+          },
+          { 
+            label: `${sla.slatype} - ${sla.employeeName}` 
+          }
+        ]}
+      />
+
       {/* ========== HEADER ========== */}
       <div
         className="d-flex justify-content-between align-items-center mb-4 gap-3"
@@ -425,7 +454,7 @@ const SLADetails = () => {
                       letterSpacing: "0.5px",
                     }}
                   >
-                    Department
+                    SLA Created By
                   </small>
                   <strong style={{ color: "#0f172a", fontSize: "0.938rem" }}>
                     {sla.departmentName || "—"}

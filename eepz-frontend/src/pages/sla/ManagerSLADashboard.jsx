@@ -21,6 +21,7 @@ import slaService, { escalationHelpers } from "../../services/sla/slaService";
 import ManagerEscalationModal from "../../components/sla/modals/ManagerEscalationModal";
 import ResolveEscalationModal from "../../components/sla/modals/ResolveEscalationModal";
 import { formatDate } from "../../utils/sla/dateFormatter";
+import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 
 const ManagerSLADashboard = () => {
   const navigate = useNavigate();
@@ -467,9 +468,17 @@ const ManagerSLADashboard = () => {
         flexDirection: "column",
       }}
     >
+        <Breadcrumb
+  items={[
+    { label: "SLA Management", path: "/hr/dashboard/sla" },
+    { label: "Manager" }
+  ]}
+/>
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
+      
         <div>
+
           <p
             className="mb-0"
             style={{ color: "#64748b", fontSize: "0.875rem" }}
