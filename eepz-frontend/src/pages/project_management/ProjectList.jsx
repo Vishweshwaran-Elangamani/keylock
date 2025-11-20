@@ -7,7 +7,7 @@ import '../../styles/projectmanagement/ProjectList.css'
 
 // Import the separated modal components
 import EditProjectModal from '../../components/project_management_components/modals/EditProjectModal'
-import EditManagersModal from '../../components/project_management_components/modals/ManagerSelectionModal'
+import ManagerSelectionModal from '../../components/project_management_components/modals/ManagerSelectionModal'
 import EmployeeMappingModal from '../../components/project_management_components/modals/EmployeeMappingModal'
 
 const ProjectList = () => {
@@ -928,7 +928,7 @@ const ProjectList = () => {
         businessUnits={businessUnits}
       />
 
-      <EditManagersModal 
+      <ManagerSelectionModal 
         show={showManagerModal}
         onClose={() => setShowManagerModal(false)}
         project={selectedProject}
@@ -936,7 +936,7 @@ const ProjectList = () => {
         selectedL1Approver={selectedL1Approver}
         selectedL2Approver={selectedL2Approver}
         onManagerSelect={handleManagerSelect}
-        onUpdateManagers={handleUpdateManagers}
+        onUpdate={handleUpdateManagers}
         isSubmitting={isSubmitting}
         message={modalMessage}
         activeTab={activeManagerTab}
@@ -961,37 +961,37 @@ const ProjectList = () => {
       />
 
       <EmployeeMappingModal 
-        show={showEmployeeModal}
-        onClose={() => setShowEmployeeModal(false)}
-        project={selectedProject}
-        filteredEmployees={filteredEmployees}
-        mappedEmployees={mappedEmployees}
-        selectedEmployeeIds={selectedEmployeeIds}
-        primaryEmployeeIds={primaryEmployeeIds}
-        onEmployeeSelect={handleEmployeeSelect}
-        onPrimaryToggle={handlePrimaryToggle}
-        onSelectAll={handleSelectAllEmployees}
-        onMapEmployees={handleMapEmployees}
-        onUnmapEmployees={handleUnmapEmployees}
-        isSubmitting={isSubmitting}
-        message={modalMessage}
-        isLoadingData={isLoadingModalData}
-        searchTerm={employeeSearchTerm}
-        setSearchTerm={setEmployeeSearchTerm}
-        filterRole={employeeFilterRole}
-        setFilterRole={setEmployeeFilterRole}
-        filterDepartment={employeeFilterDepartment}
-        setFilterDepartment={setEmployeeFilterDepartment}
-        filterStatus={employeeFilterStatus}
-        setFilterStatus={setEmployeeFilterStatus}
-        uniqueRoles={getUniqueRoles()}
-        uniqueDepartments={getUniqueDepartments()}
-        getMappedCount={getMappedCount}              // Function reference
-getUnmappedCount={getUnmappedCount}          // Function reference
-hasSelectedMapped={hasSelectedMappedEmployees}    // Function reference
-hasSelectedUnmapped={hasSelectedUnmappedEmployees} // Function reference
+  show={showEmployeeModal}
+  onClose={() => setShowEmployeeModal(false)}
+  project={selectedProject}
+  filteredEmployees={filteredEmployees}
+  mappedEmployees={mappedEmployees}
+  selectedEmployeeIds={selectedEmployeeIds}
+  primaryEmployeeIds={primaryEmployeeIds}
+  onEmployeeSelect={handleEmployeeSelect}
+  onPrimaryToggle={handlePrimaryToggle}
+  onSelectAll={handleSelectAllEmployees}
+  onMap={handleMapEmployees}      // ✅ CORRECT prop name
+  onUnmap={handleUnmapEmployees}  // ✅ CORRECT prop name
+  isSubmitting={isSubmitting}
+  message={modalMessage}
+  isLoadingData={isLoadingModalData}
+  searchTerm={employeeSearchTerm}
+  setSearchTerm={setEmployeeSearchTerm}
+  filterRole={employeeFilterRole}
+  setFilterRole={setEmployeeFilterRole}
+  filterDepartment={employeeFilterDepartment}
+  setFilterDepartment={setEmployeeFilterDepartment}
+  filterStatus={employeeFilterStatus}
+  setFilterStatus={setEmployeeFilterStatus}
+  uniqueRoles={getUniqueRoles()}
+  uniqueDepartments={getUniqueDepartments()}
+  getMappedCount={getMappedCount}
+  getUnmappedCount={getUnmappedCount}
+  hasSelectedMapped={hasSelectedMappedEmployees}
+  hasSelectedUnmapped={hasSelectedUnmappedEmployees}
+/>
 
-      />
     </div>
   );
 };
