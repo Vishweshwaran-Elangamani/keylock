@@ -1,15 +1,15 @@
 import React from "react";
 
-const ApproveRejectModal = ({ 
-  showActionModal, 
-  setShowActionModal, 
-  actionType, 
-  actionRemarks, 
-  setActionRemarks, 
-  submitAction, 
-  THEME 
+const ActionModal = ({
+  show,
+  onClose,
+  actionType,
+  actionRemarks,
+  setActionRemarks,
+  onSubmit,
+  THEME,
 }) => {
-  if (!showActionModal) return null;
+  if (!show) return null;
 
   return (
     <>
@@ -23,7 +23,7 @@ const ApproveRejectModal = ({
           background: "rgba(0, 0, 0, 0.5)",
           zIndex: 1040,
         }}
-        onClick={() => setShowActionModal(false)}
+        onClick={onClose}
       ></div>
 
       <div
@@ -54,7 +54,7 @@ const ApproveRejectModal = ({
               <button
                 type="button"
                 className="btn-close btn-close-white"
-                onClick={() => setShowActionModal(false)}
+                onClick={onClose}
               ></button>
             </div>
           </div>
@@ -96,7 +96,7 @@ const ApproveRejectModal = ({
             <div className="d-flex gap-2 justify-content-end">
               <button
                 className="btn btn-sm"
-                onClick={() => setShowActionModal(false)}
+                onClick={onClose}
                 style={{
                   background: "transparent",
                   color: THEME.text,
@@ -109,7 +109,7 @@ const ApproveRejectModal = ({
               </button>
               <button
                 className="btn btn-sm"
-                onClick={submitAction}
+                onClick={onSubmit}
                 style={{
                   background: actionType === "approve" ? THEME.success : THEME.danger,
                   color: "#fff",
@@ -128,4 +128,4 @@ const ApproveRejectModal = ({
   );
 };
 
-export default ApproveRejectModal;
+export default ActionModal;
