@@ -1,6 +1,7 @@
 {
   "format": 1,
   "restore": {
+<<<<<<< HEAD
     "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {}
   },
   "projects": {
@@ -12,12 +13,29 @@
         "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "packagesPath": "C:\\Users\\ranjithkumar.p\\.nuget\\packages\\",
         "outputPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\obj\\",
+=======
+    "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {}
+  },
+  "projects": {
+    "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectName": "Relevantz.EEPZ.Common",
+        "projectPath": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "packagesPath": "C:\\Users\\balaji.udayasankar\\.nuget\\packages\\",
+        "outputPath": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\obj\\",
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
+<<<<<<< HEAD
           "C:\\Users\\ranjithkumar.p\\AppData\\Roaming\\NuGet\\NuGet.Config",
+=======
+          "C:\\Users\\balaji.udayasankar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -105,6 +123,7 @@
         }
       }
     },
+<<<<<<< HEAD
     "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -113,12 +132,26 @@
         "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
         "packagesPath": "C:\\Users\\ranjithkumar.p\\.nuget\\packages\\",
         "outputPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\obj\\",
+=======
+    "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "projectName": "Relevantz.EEPZ.Core",
+        "projectPath": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "packagesPath": "C:\\Users\\balaji.udayasankar\\.nuget\\packages\\",
+        "outputPath": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\obj\\",
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
+<<<<<<< HEAD
           "C:\\Users\\ranjithkumar.p\\AppData\\Roaming\\NuGet\\NuGet.Config",
+=======
+          "C:\\Users\\balaji.udayasankar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -133,8 +166,13 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
+<<<<<<< HEAD
               "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
                 "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+=======
+              "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+                "projectPath": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
               }
             }
           }
@@ -218,6 +256,7 @@
         }
       }
     },
+<<<<<<< HEAD
     "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -226,12 +265,26 @@
         "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "packagesPath": "C:\\Users\\ranjithkumar.p\\.nuget\\packages\\",
         "outputPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\obj\\",
+=======
+    "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectName": "Relevantz.EEPZ.Data",
+        "projectPath": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "packagesPath": "C:\\Users\\balaji.udayasankar\\.nuget\\packages\\",
+        "outputPath": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\obj\\",
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
+<<<<<<< HEAD
           "C:\\Users\\ranjithkumar.p\\AppData\\Roaming\\NuGet\\NuGet.Config",
+=======
+          "C:\\Users\\balaji.udayasankar\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -246,8 +299,13 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
+<<<<<<< HEAD
               "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
                 "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+=======
+              "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\Capstone Integrated\\Needed to Push\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
               }
             }
           }

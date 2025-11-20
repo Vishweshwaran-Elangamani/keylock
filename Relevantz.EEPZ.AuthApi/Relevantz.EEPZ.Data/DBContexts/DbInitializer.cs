@@ -259,7 +259,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 var adminProfile = new Userprofile
                 {
                     EmployeeId = adminEmployee.EmployeeId,
-                    FirstName = configuration["AdminSeedData:FirstName"] ?? "System",
+                    FirstName = configuration["AdminSeedData:FirstName"] ?? "Super",
                     LastName = configuration["AdminSeedData:LastName"] ?? "Administrator",
                     CallingName = "Admin",
                     Gender = Constants.Genders.PreferNotToSay,

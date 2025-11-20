@@ -112,6 +112,7 @@ D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
 D:\EEPZ\EEPZ Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+<<<<<<< HEAD
 D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
 D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
 D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
@@ -150,3 +151,43 @@ D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\n
 D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
 D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
 D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+=======
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+D:\Capstone Integrated\Back End\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.deps.json
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.runtimeconfig.json
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.AssemblyReference.cache
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfoInputs.cache
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.AssemblyInfo.cs
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.csproj.CoreCompileInputs.cache
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevant.4E83F17F.Up2Date
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\refint\Relevantz.EEPZ.Core.dll
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.pdb
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\Relevantz.EEPZ.Core.genruntimeconfig.cache
+D:\Capstone Integrated\Needed to Push\eepz\Relevantz.EEPZ.AuthApi\Relevantz.EEPZ.Core\obj\Debug\net8.0\ref\Relevantz.EEPZ.Core.dll
+>>>>>>> 38cea6fa36d834382f31736547d58591f117a8ee
