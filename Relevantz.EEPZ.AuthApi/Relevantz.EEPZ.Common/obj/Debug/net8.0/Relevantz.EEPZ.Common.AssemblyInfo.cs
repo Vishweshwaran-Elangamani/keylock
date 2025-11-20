@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Relevantz.EEPZ.Common")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eefc3529de38375265131481591b85fc67d7a8fc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a661503ccaecf7a1965b430428d35420e5e9f72b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Relevantz.EEPZ.Common")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Relevantz.EEPZ.Common")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

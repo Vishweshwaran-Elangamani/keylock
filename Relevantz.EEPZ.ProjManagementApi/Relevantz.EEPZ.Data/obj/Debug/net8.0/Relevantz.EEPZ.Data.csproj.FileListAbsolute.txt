@@ -100,3 +100,20 @@ D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.ProjManagementApi\R
 D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
 D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
 D:\Repos\EEPZ\EEPZ_Integrated\Back End Normal\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.deps.json
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.runtimeconfig.json
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.dll
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\bin\Debug\net8.0\Relevantz.EEPZ.Common.pdb
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.AssemblyReference.cache
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfoInputs.cache
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.AssemblyInfo.cs
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.csproj.CoreCompileInputs.cache
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevant.CA3B5C75.Up2Date
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.dll
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\refint\Relevantz.EEPZ.Data.dll
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.pdb
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\Relevantz.EEPZ.Data.genruntimeconfig.cache
+D:\EEPZ v2.1\backend\eepz\Relevantz.EEPZ.ProjManagementApi\Relevantz.EEPZ.Data\obj\Debug\net8.0\ref\Relevantz.EEPZ.Data.dll

@@ -841,56 +841,53 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             }
         }
 
-        [HttpGet("statistics")]
-        public async Task<IActionResult> GetStatistics()
+[HttpGet("statistics")]
+public async Task<IActionResult> GetStatistics()
+{
+    try
+    {
+        var totalNominations = await _context.Recognitionstatuses.CountAsync();
+        var pendingNominations = await _context.Recognitionstatuses.CountAsync(n => n.Status == "Pending");
+        var approvedNominations = await _context.Recognitionstatuses.CountAsync(n => n.Status == "Approved");
+        var rejectedNominations = await _context.Recognitionstatuses.CountAsync(n => n.Status == "Rejected");
+        var activeOpportunities = await _context.Recognitiondetails.CountAsync(o => o.Status == "Active");
+ 
+        // Load Recognitionstatuses including Opportunities and RewardTypes eagerly
+        var nominationsWithOpportunities = await _context.Recognitionstatuses
+            .Include(n => n.Opportunity)
+                .ThenInclude(o => o.RewardType)
+            .ToListAsync();
+ 
+        var recognitionCount = nominationsWithOpportunities
+            .Count(x => x.Opportunity?.RewardType?.RewardCategory == "Recognition");
+ 
+        var promotionCount = nominationsWithOpportunities
+            .Count(x => x.Opportunity?.RewardType?.RewardCategory == "Promotion");
+ 
+        return Ok(new
         {
-            try
+            success = true,
+            data = new
             {
-                var totalNominations = await _context.Recognitionstatuses.CountAsync();
-                var pendingNominations = await _context.Recognitionstatuses.CountAsync(n => n.Status == "Pending");
-                var approvedNominations = await _context.Recognitionstatuses.CountAsync(n => n.Status == "Approved");
-                var rejectedNominations = await _context.Recognitionstatuses.CountAsync(n => n.Status == "Rejected");
-                var activeOpportunities = await _context.Recognitiondetails.CountAsync(o => o.Status == "Active");
-
-                // Get recognition and promotion counts by joining properly
-                var nominationsWithOpportunities = await _context.Recognitionstatuses
-                    .Join(
-                        _context.Recognitiondetails,
-                        n => n.OpportunityId,
-                        o => o.OpportunityId,
-                        (n, o) => new { Nomination = n, Opportunity = o }
-                    )
-                    .Include(x => x.Opportunity.RewardType)
-                    .ToListAsync();
-
-                var recognitionCount = nominationsWithOpportunities
-                    .Count(x => x.Opportunity.RewardType.RewardCategory == "Recognition");
-
-                var promotionCount = nominationsWithOpportunities
-                    .Count(x => x.Opportunity.RewardType.RewardCategory == "Promotion");
-
-                return Ok(new
-                {
-                    success = true,
-                    data = new
-                    {
-                        totalNominations,
-                        pendingNominations,
-                        approvedNominations,
-                        rejectedNominations,
-                        activeOpportunities,
-                        recognitionCount,
-                        promotionCount
-                    }
-                });
+                totalNominations,
+                pendingNominations,
+                approvedNominations,
+                rejectedNominations,
+                activeOpportunities,
+                recognitionCount,
+                promotionCount
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[STATISTICS] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
+        });
     }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[STATISTICS] Error: {ex.Message}");
+        return StatusCode(500, new { success = false, message = ex.Message });
+    }
+}
+
+ 
+ 
 
     public class ReviewMetricsDto
     {
@@ -901,4 +898,6 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
         public bool ConflictOfInterest { get; set; }
         public string ReviewNotes { get; set; }
     }
+}
+
 }

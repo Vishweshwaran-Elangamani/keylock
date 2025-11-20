@@ -38,7 +38,7 @@ scope_assessments AS (
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
   WHERE sa.status = 'Submitted'
@@ -89,7 +89,7 @@ JOIN UserAuthentication emp_ua     ON emp_ua.UserId = sa.employee_id
 JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
 LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
 JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId
+JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
 JOIN Project p                     ON p.ProjectId = pe.ProjectId
 WHERE da.assessment_id IS NULL
   AND h1.assessment_id IS NULL
@@ -126,7 +126,7 @@ scope_assessments AS (
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
   WHERE sa.status = 'Submitted'
@@ -185,7 +185,7 @@ JOIN UserAuthentication emp_ua     ON emp_ua.UserId = sa.employee_id
 JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
 LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
 JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId
+JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
 JOIN Project p                     ON p.ProjectId = pe.ProjectId
 GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
 ORDER BY sa.submitted_at DESC
@@ -218,7 +218,7 @@ scope_assessment AS (
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
   WHERE sa.assessment_id = @assessmentId
@@ -333,7 +333,7 @@ scope AS (
 
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
 
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
 
   JOIN Project p ON p.ProjectId = pe.ProjectId
 
@@ -441,7 +441,7 @@ header AS (
 
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = e.EmployeeId
 
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
 
   JOIN Project p ON p.ProjectId = pe.ProjectId
 
@@ -562,7 +562,7 @@ scope AS (
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
   WHERE sa.assessment_id = @assessmentId
@@ -771,7 +771,7 @@ FROM SelfAssessment sa
 JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
 JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
 JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
 JOIN Project p ON p.ProjectId = pe.ProjectId
 JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
 WHERE sa.assessment_id = @assessmentId
@@ -932,7 +932,7 @@ scope_assessments AS (
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
 ),
@@ -963,7 +963,7 @@ JOIN UserAuthentication emp_ua     ON emp_ua.UserId = sa.employee_id
 JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
 LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
 JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId
+JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
 JOIN Project p                     ON p.ProjectId = pe.ProjectId
 WHERE ls.review_status = 'Rejected'
 GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
@@ -995,7 +995,7 @@ scope AS (
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
   WHERE sa.assessment_id = @assessmentId
@@ -1037,7 +1037,7 @@ header AS (
   JOIN Employee e ON e.EmployeeId = emp_ua.EmployeeId
   LEFT JOIN UserProfile up ON up.EmployeeId = e.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = e.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
 )
@@ -1113,7 +1113,7 @@ scope_assessments AS (
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
   WHERE sa.status = 'Submitted'
@@ -1190,7 +1190,7 @@ headers AS (
   JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
   LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p                     ON p.ProjectId = pe.ProjectId
   GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
   ORDER BY sa.submitted_at DESC
@@ -1275,7 +1275,7 @@ scope_assessments AS (
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p ON p.ProjectId = pe.ProjectId
   JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
   WHERE sa.status = 'Submitted'
@@ -1347,7 +1347,7 @@ headers AS (
   JOIN Employee emp                  ON emp.EmployeeId = emp_ua.EmployeeId
   LEFT JOIN UserProfile up           ON up.EmployeeId = emp.EmployeeId
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId
+  JOIN ProjectEmployees pe           ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
   JOIN Project p                     ON p.ProjectId = pe.ProjectId
   GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
   ORDER BY sa.submitted_at DESC

@@ -1,4 +1,5 @@
 @echo off
+
 echo Building all 10 Web APIs...
 
 :: Navigate to each API folder and build dotnet:

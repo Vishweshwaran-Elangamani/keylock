@@ -1,25 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {}
+    "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {}
   },
   "projects": {
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+    "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "projectUniqueName": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
         "projectName": "Relevantz.EEPZ.Common",
-        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
-        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\obj\\",
+        "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj",
+        "packagesPath": "C:\\Users\\ranjithkumar.p\\.nuget\\packages\\",
+        "outputPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\ranjithkumar.p\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -37,7 +43,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -75,39 +82,59 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
+    "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "projectUniqueName": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
         "projectName": "Relevantz.EEPZ.Core",
-        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
-        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\obj\\",
+        "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\Relevantz.EEPZ.Core.csproj",
+        "packagesPath": "C:\\Users\\ranjithkumar.p\\.nuget\\packages\\",
+        "outputPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Core\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\ranjithkumar.p\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
+              "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+                "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj"
               }
             }
           }
@@ -121,7 +148,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -167,39 +195,59 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
+    "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "projectUniqueName": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
         "projectName": "Relevantz.EEPZ.Data",
-        "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
-        "packagesPath": "C:\\Users\\nisanth.saravanan\\.nuget\\packages\\",
-        "outputPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\obj\\",
+        "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\Relevantz.EEPZ.Data.csproj",
+        "packagesPath": "C:\\Users\\ranjithkumar.p\\.nuget\\packages\\",
+        "outputPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Data\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\nisanth.saravanan\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\ranjithkumar.p\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
-                "projectPath": "D:\\Repos\\EEPZ\\EEPZ_Integrated\\Back End Normal\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
+              "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj": {
+                "projectPath": "D:\\EEPZ v2.1\\backend\\eepz\\Relevantz.EEPZ.AuthApi\\Relevantz.EEPZ.Common\\Relevantz.EEPZ.Common.csproj"
               }
             }
           }
@@ -213,7 +261,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -257,12 +306,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.17, 8.0.17]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
