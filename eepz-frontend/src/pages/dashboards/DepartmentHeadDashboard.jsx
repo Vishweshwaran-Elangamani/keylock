@@ -36,13 +36,7 @@ const DepartmentHeadDashboard = () => {
       gradient: "gradient-blue",
       path: "/department-head/dashboard/performance",
     },
-    {
-      title: "Performance",
-      description: "Employee Performance Management",
-      icon: "bi bi-graph-up",
-      gradient: "gradient-blue",
-      path: "/manager/dashboard/performance",
-    },
+    
     {
       title: "SLA Management",
       description: "Service Level Agreement",

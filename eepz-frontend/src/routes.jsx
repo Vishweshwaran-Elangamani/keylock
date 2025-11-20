@@ -617,8 +617,8 @@ const AppRoutes = () => {
       <Route
         path="/manager/dashboard/performance"
         element={
-          <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>
-            <DashboardLayout role={["Manager", "Department Head"]}>
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role={["Manager"]}>
               <PerformanceManagerHome />
             </DashboardLayout>
           </ProtectedRoute>
@@ -647,8 +647,8 @@ const AppRoutes = () => {
       <Route
         path="/manager/dashboard/performance/teamlead"
         element={
-          <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>
-            <DashboardLayout role={["Manager", "Department Head"]}>
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role={["Manager"]}>
               <TeamLeadPage />
             </DashboardLayout>
           </ProtectedRoute>
