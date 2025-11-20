@@ -13,8 +13,7 @@ const ComplianceIssues = () => {
   const [loading, setLoading] = useState(true);
 
   // Modal States
-  const [showEscalationDetailModal, setShowEscalationDetailModal] =
-    useState(false);
+  const [showEscalationDetailModal, setShowEscalationDetailModal] = useState(false);
   const [selectedEscalation, setSelectedEscalation] = useState(null);
 
   // Filter States
@@ -75,10 +74,8 @@ const ComplianceIssues = () => {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (e) =>
-          (e.employeeName &&
-            e.employeeName.toLowerCase().includes(searchLower)) ||
-          (e.employeeEmail &&
-            e.employeeEmail.toLowerCase().includes(searchLower)) ||
+          (e.employeeName && e.employeeName.toLowerCase().includes(searchLower)) ||
+          (e.employeeEmail && e.employeeEmail.toLowerCase().includes(searchLower)) ||
           (e.slaType && e.slaType.toLowerCase().includes(searchLower)) ||
           (e.reason && e.reason.toLowerCase().includes(searchLower))
       );
@@ -98,10 +95,7 @@ const ComplianceIssues = () => {
   // ===== PAGINATION HELPERS =====
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
-  const currentItems = filteredEscalations.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = filteredEscalations.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredEscalations.length / rowsPerPage);
 
   const getPageNumbers = () => {
@@ -185,7 +179,7 @@ const ComplianceIssues = () => {
             />
           </InputGroup>
 
-          <Form.Select
+          <select
             className="ci-filter-select"
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -194,9 +188,9 @@ const ComplianceIssues = () => {
             <option value="Open">Open</option>
             <option value="Pending">Pending</option>
             <option value="Resolved">Resolved</option>
-          </Form.Select>
+          </select>
 
-          <Form.Select
+          <select
             className="ci-filter-select"
             value={selectedLevel}
             onChange={(e) => setSelectedLevel(e.target.value)}
@@ -205,7 +199,7 @@ const ComplianceIssues = () => {
             <option value="Level 1">Level 1</option>
             <option value="Level 2">Level 2</option>
             <option value="Level 3">Level 3</option>
-          </Form.Select>
+          </select>
 
           <Button
             variant="outline-secondary"
@@ -216,8 +210,7 @@ const ComplianceIssues = () => {
           </Button>
 
           <div className="ci-results-count-inline">
-            Showing {currentItems.length} of {filteredEscalations.length}{" "}
-            escalations
+            Showing {currentItems.length} of {filteredEscalations.length} escalations
           </div>
         </div>
       </div>
@@ -237,22 +230,15 @@ const ComplianceIssues = () => {
                   <div>
                     <h5 className="ci-employee-name">
                       {escalation.employeeName || "Unknown Employee"}
-                      <Badge
-                        bg={getSeverityBadge(escalation.severity)}
-                        className="ms-2"
-                      >
+                      <Badge bg={getSeverityBadge(escalation.severity)} className="ms-2">
                         {escalation.severity} Severity
                       </Badge>
                     </h5>
                     <p className="ci-employee-id">
-                      User ID: {escalation.employeeUserId} •{" "}
-                      {escalation.employeeEmail || "N/A"}
+                      User ID: {escalation.employeeUserId} • {escalation.employeeEmail || "N/A"}
                     </p>
                   </div>
-                  <Badge
-                    bg={getStatusBadge(escalation.escalationStatus)}
-                    className="ci-status-badge"
-                  >
+                  <Badge bg={getStatusBadge(escalation.escalationStatus)} className="ci-status-badge">
                     {escalation.escalationStatus}
                   </Badge>
                 </div>
@@ -260,15 +246,11 @@ const ComplianceIssues = () => {
                 <div className="ci-violation-details">
                   <div className="ci-detail-row">
                     <span className="ci-detail-label">SLA Type</span>
-                    <span className="ci-detail-value">
-                      {escalation.slaType || "N/A"}
-                    </span>
+                    <span className="ci-detail-value">{escalation.slaType || "N/A"}</span>
                   </div>
                   <div className="ci-detail-row">
                     <span className="ci-detail-label">Escalation Level</span>
-                    <span className="ci-detail-value">
-                      {escalation.escalationLevel}
-                    </span>
+                    <span className="ci-detail-value">{escalation.escalationLevel}</span>
                   </div>
                   <div className="ci-detail-row">
                     <span className="ci-detail-label">Days Overdue</span>
@@ -278,9 +260,7 @@ const ComplianceIssues = () => {
                   </div>
                   <div className="ci-detail-row">
                     <span className="ci-detail-label">Escalated To</span>
-                    <span className="ci-detail-value">
-                      {escalation.escalatedToName || "N/A"}
-                    </span>
+                    <span className="ci-detail-value">{escalation.escalatedToName || "N/A"}</span>
                   </div>
                 </div>
 
@@ -330,21 +310,16 @@ const ComplianceIssues = () => {
             </div>
 
             <div className="pagination-status">
-              Showing {indexOfFirstItem + 1} to{" "}
-              {Math.min(indexOfLastItem, filteredEscalations.length)} of{" "}
+              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEscalations.length)} of{" "}
               {filteredEscalations.length} entries
             </div>
 
             <nav className="pagination-nav">
               <ul className="pagination">
-                <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                >
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
                     className="page-link"
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                   >
                     <i className="bi bi-chevron-left"></i>
@@ -354,15 +329,13 @@ const ComplianceIssues = () => {
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`page-item ${
-                      page === currentPage ? "active" : ""
-                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                    className={`page-item ${page === currentPage ? "active" : ""} ${
+                      typeof page !== "number" ? "disabled" : ""
+                    }`}
                   >
                     <button
                       className="page-link"
-                      onClick={() =>
-                        typeof page === "number" && setCurrentPage(page)
-                      }
+                      onClick={() => typeof page === "number" && setCurrentPage(page)}
                       disabled={typeof page !== "number"}
                     >
                       {page}
@@ -370,16 +343,10 @@ const ComplianceIssues = () => {
                   </li>
                 ))}
 
-                <li
-                  className={`page-item ${
-                    currentPage === totalPages ? "disabled" : ""
-                  }`}
-                >
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                   <button
                     className="page-link"
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                    }
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                   >
                     <i className="bi bi-chevron-right"></i>

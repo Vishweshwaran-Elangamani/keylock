@@ -41,10 +41,13 @@
 .pm-search-input .input-group-text {
   background-color: #f8f9fa;
   border-right: none;
+  padding: 0.5rem 0.75rem;
 }
 
 .pm-search-input .form-control {
   border-left: none;
+  padding: 0.5rem 0.75rem;
+  font-size: 14px;
 }
 
 .pm-search-input .form-control:focus {
@@ -52,15 +55,51 @@
   border-color: #ced4da;
 }
 
+/* Native Select Dropdowns - Clean Style */
 .pm-filter-select {
   min-width: 160px;
   max-width: 180px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #ffffff;
+  color: #212529;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 38px;
+  line-height: 1.5;
 }
 
+.pm-filter-select:focus {
+  outline: none;
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.pm-filter-select:hover {
+  border-color: #27235c;
+}
+
+/* Clear Button */
 .pm-clear-btn {
   white-space: nowrap;
-  padding: 0.375rem 1rem;
+  padding: 0.5rem 1rem;
   font-weight: 500;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #212529;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 38px;
+}
+
+.pm-clear-btn:hover {
+  background: #f8f9fa;
+  border-color: #6c757d;
+  color: #212529;
 }
 
 /* Add Button - Compact for Filter Bar */
@@ -68,7 +107,7 @@
   background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
   border: none;
-  padding: 0.375rem 1rem;
+  padding: 0.5rem 1.25rem;
   border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
@@ -79,6 +118,7 @@
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
   white-space: nowrap;
+  height: 38px;
 }
 
 .pm-btn-add:hover {
@@ -91,7 +131,7 @@
 }
 
 .pm-results-count-inline {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: #6c757d;
   white-space: nowrap;
   margin-left: auto;
@@ -327,11 +367,12 @@
 .pagination-select {
   padding: 0.375rem 0.75rem;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 0.875rem;
   cursor: pointer;
   background: #ffffff;
   color: #212529;
+  height: 32px;
 }
 
 .pagination-select:focus {
@@ -610,6 +651,7 @@
     width: 100%;
     margin-top: 0.5rem;
     margin-left: 0;
+    text-align: center;
   }
 }
 

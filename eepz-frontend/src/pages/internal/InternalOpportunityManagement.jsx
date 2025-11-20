@@ -117,6 +117,12 @@ const InternalOpportunityManagement = () => {
     setCurrentPage(1);
   };
 
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedDepartment("");
+    setSelectedStatus("");
+  };
+
   const handleCreateOpportunity = () => {
     setShowCreateModal(true);
   };
@@ -222,7 +228,7 @@ const InternalOpportunityManagement = () => {
     });
   };
 
-  //  ROLE-BASED UI RENDERING
+  // ROLE-BASED UI RENDERING
   const isHR = user?.role === "HR";
   const isEmployee = user?.role === "Employee";
   const isManager = user?.role === "Manager";
@@ -249,47 +255,7 @@ const InternalOpportunityManagement = () => {
         ]}
       />
 
-      <div className="filters-card">
-        <div className="filters-content">
-          <div className="filters-left">
-            <div className="search-box">
-              <i className="bi bi-search search-icon"></i>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search opportunities..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            {(isHR || isEmployee || isManager) && (
-              <select
-                className="filter-select"
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-              >
-                <option value="">All Status</option>
-                <option value="Active">Active</option>
-                <option value="Closed">Closed</option>
-                <option value="Pending">Pending</option>
-              </select>
-            )}
-          </div>
-
-          <div className="filters-actions">
-            {/*  ONLY HR CAN CREATE */}
-            {isHR && (
-              <button className="btn-add" onClick={handleCreateOpportunity}>
-                <i className="bi bi-plus-circle"></i>
-                Create Opportunity
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Statistics Cards */}
+      {/* Statistics Cards - Compact */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-icon-primary">
@@ -297,9 +263,7 @@ const InternalOpportunityManagement = () => {
           </div>
           <div className="stat-content">
             <h3 className="stat-value">{opportunities.length}</h3>
-            <p className="stat-label">
-              {isHR ? "Total Created" : "Available Opportunities"}
-            </p>
+            <p className="stat-label">{isHR ? "Total Created" : "Available"}</p>
           </div>
         </div>
 
@@ -311,7 +275,7 @@ const InternalOpportunityManagement = () => {
             <h3 className="stat-value">
               {opportunities.filter((o) => o.status === "Active").length}
             </h3>
-            <p className="stat-label">Active Openings</p>
+            <p className="stat-label">Active</p>
           </div>
         </div>
 
@@ -336,6 +300,52 @@ const InternalOpportunityManagement = () => {
               {opportunities.filter((o) => o.status === "Pending").length}
             </h3>
             <p className="stat-label">Pending</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Section */}
+      <div className="filters-card">
+        <div className="filters-content">
+          <div className="search-box">
+            <i className="bi bi-search search-icon"></i>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search opportunities..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {(isHR || isEmployee || isManager) && (
+            <select
+              className="filter-select"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option value="">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Closed">Closed</option>
+              <option value="Pending">Pending</option>
+            </select>
+          )}
+
+          <button className="btn-clear" onClick={clearFilters}>
+            Clear Filters
+          </button>
+
+          {/* ONLY HR CAN CREATE */}
+          {isHR && (
+            <button className="btn-add" onClick={handleCreateOpportunity}>
+              <i className="bi bi-plus-circle"></i>
+              Create Opportunity
+            </button>
+          )}
+
+          <div className="results-count-inline">
+            Showing {getPaginatedOpportunities().length} of{" "}
+            {filteredOpportunities.length} opportunities
           </div>
         </div>
       </div>
@@ -396,7 +406,7 @@ const InternalOpportunityManagement = () => {
                     </td>
                     <td>
                       <div className="action-buttons">
-                        {/*  HR: Edit & Delete */}
+                        {/* HR: Edit & Delete */}
                         {isHR && (
                           <>
                             <button
@@ -418,7 +428,7 @@ const InternalOpportunityManagement = () => {
                           </>
                         )}
 
-                        {/*  EMPLOYEE: Self Nominate */}
+                        {/* EMPLOYEE: Self Nominate */}
                         {isEmployee && (
                           <button
                             className="action-btn action-btn-nominate"
@@ -429,7 +439,7 @@ const InternalOpportunityManagement = () => {
                           </button>
                         )}
 
-                        {/*  MANAGER: Self Nominate & Nominate Team Members */}
+                        {/* MANAGER: Self Nominate & Nominate Team Members */}
                         {isManager && (
                           <>
                             <button
@@ -555,7 +565,7 @@ const InternalOpportunityManagement = () => {
         )}
       </div>
 
-      {/*  MODALS */}
+      {/* MODALS */}
       {isHR && showCreateModal && (
         <CreateOpportunityModal
           show={showCreateModal}

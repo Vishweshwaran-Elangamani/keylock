@@ -181,51 +181,6 @@ const NominationManagement = () => {
         ]}
       />
 
-      <div className="filters-card">
-        <div className="filters-content">
-          <div className="filters-left">
-            <div className="search-box">
-              <i className="bi bi-search search-icon"></i>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search nominations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <select
-              className="filter-select"
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-            >
-              <option value="">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="Approved">Approved</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-          </div>
-
-          <div className="filters-actions">
-            {user?.role !== "HR" && (
-              <button
-                className="btn-graph"
-                onClick={() => setShowGraphModal(true)}
-                title="View Analytics Graph"
-              >
-                <i className="bi bi-bar-chart-fill"></i> View Graph
-              </button>
-            )}
-
-            {user?.role === "Employee" && (
-              <button className="btn-add" onClick={handleSelfNominate}>
-                <i className="bi bi-hand-thumbs-up"></i> Self Nominate
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-icon-primary">
@@ -282,6 +237,50 @@ const NominationManagement = () => {
               }
             </h3>
             <p className="stat-label">Rejected</p>
+          </div>
+        </div>
+      </div>
+      <div className="filters-card">
+        <div className="filters-content">
+          <div className="filters-left">
+            <div className="search-box">
+              <i className="bi bi-search search-icon"></i>
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search nominations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <select
+              className="filter-select"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option value="">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+
+          <div className="filters-actions">
+            {user?.role !== "HR" && (
+              <button
+                className="btn-graph"
+                onClick={() => setShowGraphModal(true)}
+                title="View Analytics Graph"
+              >
+                <i className="bi bi-bar-chart-fill"></i> View Graph
+              </button>
+            )}
+
+            {user?.role === "Employee" && (
+              <button className="btn-add" onClick={handleSelfNominate}>
+                <i className="bi bi-hand-thumbs-up"></i> Self Nominate
+              </button>
+            )}
           </div>
         </div>
       </div>

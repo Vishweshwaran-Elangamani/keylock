@@ -247,7 +247,6 @@ const CareerGoals = () => {
       .then((res) => {
         setReminderResult(res.data.data);
         setAlert({ type: "success", message: "Reminder sent successfully!" });
-
         setTimeout(() => {
           setReminderEmailModal(false);
           setReminderResult(null);
@@ -340,7 +339,7 @@ const CareerGoals = () => {
               />
             </InputGroup>
 
-            <Form.Select
+            <select
               className="cg-filter-select"
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
@@ -351,9 +350,9 @@ const CareerGoals = () => {
                   {dept}
                 </option>
               ))}
-            </Form.Select>
+            </select>
 
-            <Form.Select
+            <select
               className="cg-filter-select"
               value={daysFilter}
               onChange={(e) => setDaysFilter(e.target.value)}
@@ -362,7 +361,7 @@ const CareerGoals = () => {
               <option value="0-7">0-7 days</option>
               <option value="8-30">8-30 days</option>
               <option value="30+">30+ days</option>
-            </Form.Select>
+            </select>
 
             <Button
               variant="outline-secondary"
@@ -378,7 +377,7 @@ const CareerGoals = () => {
           </div>
         </div>
 
-        {/* Table Card - Updated Design */}
+        {/* Table Card */}
         <div className="table-card">
           <div className="table-wrapper">
             <table className="cg-employee-table">
@@ -497,7 +496,7 @@ const CareerGoals = () => {
             </table>
           </div>
 
-          {/* Pagination - Updated Design */}
+          {/* Pagination */}
           {filteredData.length > 0 && (
             <div className="pagination-container">
               <div className="pagination-info">

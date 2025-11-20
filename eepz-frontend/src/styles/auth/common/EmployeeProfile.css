@@ -1,5 +1,5 @@
 /* ============================================
-   MODERN EMPLOYEE PROFILE - ENHANCED CSS
+   EMPLOYEE PROFILE - PURPLE THEME
    ============================================ */
 
    * {
@@ -11,7 +11,7 @@
   /* Container */
   .employee-profile-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: #f8f9fc;
     overflow-x: hidden;
   }
   
@@ -24,7 +24,7 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: #f8f9fc;
   }
   
   .loading-content {
@@ -39,18 +39,22 @@
     width: 3.5rem;
     height: 3.5rem;
     border: 4px solid #f0f0f0;
-    border-top: 4px solid #667eea;
+    border-top: 4px solid #27235c;
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
   
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
   
   .loading-content p {
-    color: #667eea;
+    color: #27235c;
     font-weight: 500;
     font-size: 1rem;
   }
@@ -95,12 +99,12 @@
   }
   
   /* ============================================
-     PROFILE HEADER - MODERN DESIGN
+     PROFILE HEADER - PURPLE GRADIENT
      ============================================ */
   
   .profile-header-modern {
     position: relative;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #27235c;
     padding: 2rem;
     margin-bottom: 2rem;
     overflow: hidden;
@@ -112,14 +116,19 @@
     right: -100px;
     width: 400px;
     height: 400px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 50%;
     animation: float 6s ease-in-out infinite;
   }
   
   @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
   
   .profile-header-content {
@@ -147,7 +156,7 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+    background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -175,8 +184,13 @@
   }
   
   @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
-    50% { box-shadow: 0 0 0 8px rgba(40, 167, 69, 0); }
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(40, 167, 69, 0);
+    }
   }
   
   .profile-basic-info {
@@ -189,6 +203,7 @@
     color: white;
     margin: 0 0 0.25rem 0;
     letter-spacing: -0.02em;
+    text-align: left;
   }
   
   .profile-role-modern {
@@ -196,6 +211,7 @@
     color: rgba(255, 255, 255, 0.9);
     margin: 0 0 0.75rem 0;
     font-weight: 500;
+    text-align: left;
   }
   
   .profile-meta {
@@ -253,8 +269,13 @@
   }
   
   @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
   }
   
   .profile-actions {
@@ -263,6 +284,7 @@
     flex-wrap: wrap;
   }
   
+  /* PURPLE THEME BUTTONS */
   .btn-modern {
     padding: 0.75rem 1.5rem;
     border-radius: 10px;
@@ -275,6 +297,11 @@
     gap: 0.5rem;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  .btn-primary{
+    color: white;
+    background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
+    font-weight: 500;
   }
   
   .btn-outline-light {
@@ -291,7 +318,7 @@
   
   .btn-light {
     background: white;
-    color: #667eea;
+    color: #27235c;
   }
   
   .btn-light:hover {
@@ -308,6 +335,28 @@
   .btn-light.btn-success:hover {
     color: white;
     background: #28a745;
+  }
+  
+  .btn-success {
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+  
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  }
+  
+  .btn-outline-danger {
+    background: red;
+    color: white;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+  }
+  
+  .btn-outline-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    transform: translateY(-2px);
   }
   
   .btn-light:disabled {
@@ -345,7 +394,7 @@
   }
   
   /* ============================================
-     INFO CARDS (SIDEBAR)
+     INFO CARDS (SIDEBAR) - TABLE HEADER STYLE
      ============================================ */
   
   .info-card {
@@ -360,32 +409,36 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
   
+  /* TABLE HEADER STYLE - DARK PURPLE WITH WHITE TEXT */
   .card-header-modern {
-    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-    padding: 1.25rem;
+    background: #27235c;
+    padding: 1rem 1.25rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 3px solid #1a1842;
   }
   
   .card-header-modern i {
     font-size: 1.25rem;
-    color: #667eea;
+    color: #ffffff;
     width: 2rem;
     height: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
   }
   
   .card-header-modern h3 {
     margin: 0;
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #27235c;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: left;
   }
   
   .card-content {
@@ -398,10 +451,12 @@
     gap: 1rem;
   }
   
+  /* LEFT ALIGNED INFO ITEMS */
   .info-item-modern {
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
+    text-align: left;
   }
   
   .info-item-modern label {
@@ -410,6 +465,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: #6c757d;
+    text-align: left;
   }
   
   .info-item-modern span {
@@ -417,6 +473,7 @@
     font-weight: 600;
     color: #27235c;
     line-height: 1.4;
+    text-align: left;
   }
   
   .info-item-modern small {
@@ -424,10 +481,11 @@
     color: #6c757d;
     font-style: italic;
     margin-top: 0.25rem;
+    text-align: left;
   }
   
   /* ============================================
-     FORM CARDS (MAIN CONTENT)
+     FORM CARDS (MAIN CONTENT) - TABLE HEADER STYLE
      ============================================ */
   
   .form-card {
@@ -443,9 +501,9 @@
   }
   
   .form-card .card-header-modern {
-    background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-    padding: 1.25rem;
-    border-bottom: 1px solid #e5e7eb;
+    background: #27235c;
+    padding: 1rem 1.25rem;
+    border-bottom: 3px solid #1a1842;
   }
   
   .form-card .card-content {
@@ -462,10 +520,12 @@
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
   
+  /* LEFT ALIGNED FORM FIELDS */
   .form-field {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    text-align: left;
   }
   
   .form-field label {
@@ -475,6 +535,7 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    text-align: left;
   }
   
   .required {
@@ -492,12 +553,13 @@
     font-family: inherit;
     transition: all 0.2s ease;
     min-height: 44px;
+    text-align: left;
   }
   
   .form-control-modern:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #27235c;
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
     background: white;
   }
   
@@ -530,6 +592,7 @@
     color: #dc3545;
     font-weight: 500;
     margin-top: 0.25rem;
+    text-align: left;
   }
   
   .error-message::before {
@@ -539,7 +602,7 @@
   }
   
   /* ============================================
-     ADDRESS SECTIONS
+     ADDRESS SECTIONS - LEFT ALIGNED
      ============================================ */
   
   .address-section-modern {
@@ -553,13 +616,14 @@
   .section-title {
     font-size: 1rem;
     font-weight: 700;
-    color: #667eea;
+    color: #27235c;
     margin-bottom: 1rem;
     padding-left: 12px;
-    border-left: 3px solid #667eea;
+    border-left: 3px solid #97247e;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    text-align: left;
   }
   
   .address-display-modern {
@@ -572,19 +636,21 @@
     color: #27235c;
     white-space: pre-wrap;
     word-break: break-word;
+    text-align: left;
   }
   
   .address-auto-filled {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(102, 126, 234, 0.08);
-    border: 1px solid rgba(102, 126, 234, 0.2);
+    background: rgba(39, 35, 92, 0.08);
+    border: 1px solid rgba(39, 35, 92, 0.2);
     padding: 0.75rem 1rem;
     border-radius: 8px;
     font-size: 0.8125rem;
-    color: #667eea;
+    color: #27235c;
     margin-top: 1rem;
+    text-align: left;
   }
   
   .address-auto-filled i {
@@ -597,8 +663,8 @@
      ============================================ */
   
   .address-checkbox-modern {
-    background: rgba(102, 126, 234, 0.05);
-    border: 1px solid rgba(102, 126, 234, 0.2);
+    background: rgba(39, 35, 92, 0.05);
+    border: 1px solid rgba(39, 35, 92, 0.2);
     border-radius: 10px;
     padding: 1rem;
     margin: 1.5rem 0;
@@ -612,7 +678,8 @@
     /* user-select: none; */
     font-size: 0.95rem;
     font-weight: 500;
-    color: #667eea;
+    color: #27235c;
+    text-align: left;
   }
   
   .checkbox-label input {
@@ -622,7 +689,7 @@
   .checkmark {
     width: 22px;
     height: 22px;
-    border: 2px solid #667eea;
+    border: 2px solid #27235c;
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -633,8 +700,8 @@
   }
   
   .checkbox-label input:checked + .checkmark {
-    background: #667eea;
-    border-color: #667eea;
+    background: #27235c;
+    border-color: #27235c;
   }
   
   .checkbox-label input:checked + .checkmark::after {
@@ -645,7 +712,7 @@
   }
   
   .checkbox-label input:focus + .checkmark {
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.2);
   }
   
   /* ============================================
@@ -661,6 +728,32 @@
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     margin-right: 0.5rem;
+  }
+  
+  /* ============================================
+     RETRY BUTTON
+     ============================================ */
+  
+  .btn-retry {
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
+  }
+  
+  .btn-retry:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(151, 36, 126, 0.4);
   }
   
   /* ============================================
@@ -711,6 +804,11 @@
   
     .profile-name-modern {
       font-size: 1.5rem;
+      text-align: center;
+    }
+  
+    .profile-role-modern {
+      text-align: center;
     }
   
     .profile-actions {
@@ -846,7 +944,7 @@
   
   .form-control-modern:focus-visible,
   .btn-modern:focus-visible {
-    outline: 2px solid #667eea;
+    outline: 2px solid #27235c;
     outline-offset: 2px;
   }
   
@@ -856,6 +954,7 @@
     color: #6c757d;
     margin-top: 0.375rem;
     font-style: italic;
+    text-align: left;
   }
   
   /* ============================================

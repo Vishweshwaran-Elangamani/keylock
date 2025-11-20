@@ -200,15 +200,55 @@ const UserList = () => {
         </ol>
       </nav>
 
-      {/* Page Header */}
-      <div className="page-header">
-        <div className="header-content">
-          <div className="header-text">
-            <h2 className="page-title">User Management</h2>
-            <p className="page-description">
-              Manage all users in one place. Control access, assign roles, and
-              monitor activity.
-            </p>
+      {/* Statistics Cards */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-icon stat-icon-primary">
+            <i className="bi bi-people-fill"></i>
+          </div>
+          <div className="stat-content">
+            <h3 className="stat-value">{users.length}</h3>
+            <p className="stat-label">Total Users</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon stat-icon-success">
+            <i className="bi bi-person-check-fill"></i>
+          </div>
+          <div className="stat-content">
+            <h3 className="stat-value">
+              {users.filter((u) => u.isActive).length}
+            </h3>
+            <p className="stat-label">Active Users</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon stat-icon-danger">
+            <i className="bi bi-person-x-fill"></i>
+          </div>
+          <div className="stat-content">
+            <h3 className="stat-value">
+              {users.filter((u) => !u.isActive).length}
+            </h3>
+            <p className="stat-label">Inactive Users</p>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon stat-icon-warning">
+            <i className="bi bi-person-plus-fill"></i>
+          </div>
+          <div className="stat-content">
+            <h3 className="stat-value">
+              {
+                users.filter((u) => {
+                  const joinDate = new Date(u.joiningDate);
+                  const thirtyDaysAgo = new Date();
+                  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                  return joinDate > thirtyDaysAgo;
+                }).length
+              }
+            </h3>
+            <p className="stat-label">New (Last 30 Days)</p>
           </div>
         </div>
       </div>
@@ -271,59 +311,6 @@ const UserList = () => {
               <i className="bi bi-plus-circle"></i>
               Add User
             </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Statistics Cards */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-primary">
-            <i className="bi bi-people-fill"></i>
-          </div>
-          <div className="stat-content">
-            <h3 className="stat-value">{users.length}</h3>
-            <p className="stat-label">Total Users</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-success">
-            <i className="bi bi-person-check-fill"></i>
-          </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
-              {users.filter((u) => u.isActive).length}
-            </h3>
-            <p className="stat-label">Active Users</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-danger">
-            <i className="bi bi-person-x-fill"></i>
-          </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
-              {users.filter((u) => !u.isActive).length}
-            </h3>
-            <p className="stat-label">Inactive Users</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon stat-icon-warning">
-            <i className="bi bi-person-plus-fill"></i>
-          </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
-              {
-                users.filter((u) => {
-                  const joinDate = new Date(u.joiningDate);
-                  const thirtyDaysAgo = new Date();
-                  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                  return joinDate > thirtyDaysAgo;
-                }).length
-              }
-            </h3>
-            <p className="stat-label">New (Last 30 Days)</p>
           </div>
         </div>
       </div>

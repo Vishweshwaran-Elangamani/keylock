@@ -234,7 +234,7 @@ const PolicyManagement = () => {
             />
           </InputGroup>
 
-          <Form.Select
+          <select
             className="pm-filter-select"
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
@@ -245,9 +245,9 @@ const PolicyManagement = () => {
                 {category}
               </option>
             ))}
-          </Form.Select>
+          </select>
 
-          <Form.Select
+          <select
             className="pm-filter-select"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -255,7 +255,7 @@ const PolicyManagement = () => {
             <option value="">All Status</option>
             <option value="Published">Published</option>
             <option value="Draft">Draft</option>
-          </Form.Select>
+          </select>
 
           <Button
             variant="outline-secondary"
@@ -264,14 +264,15 @@ const PolicyManagement = () => {
           >
             Clear Filters
           </Button>
-          <div className="pm-results-count-inline">
-            Showing {currentItems.length} of {filteredPolicies.length} policies
-          </div>
 
           <button className="pm-btn-add" onClick={() => setShowAddModal(true)}>
             <i className="bi bi-plus-circle"></i>
             Add Policy
           </button>
+
+          <div className="pm-results-count-inline">
+            Showing {currentItems.length} of {filteredPolicies.length} policies
+          </div>
         </div>
       </div>
 

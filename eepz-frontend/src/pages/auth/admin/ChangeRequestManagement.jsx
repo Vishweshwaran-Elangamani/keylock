@@ -1,38 +1,16 @@
-/**
- * ChangeRequestManagement Component
- *
- * Admin interface for managing employee EMAIL change requests ONLY.
- * Employee Company ID functionality completely removed.
- *
- * Features:
- * - Tab-based view: Pending requests vs All requests
- * - Advanced filtering: Search, status, date filters (NO type filter)
- * - Real-time statistics dashboard
- * - Approve/Reject workflow with admin remarks
- * - Auto-refresh every 30 seconds
- * - Pagination with customizable rows per page
- * - Toast notifications using Sonner for user feedback
- *
- * @component
- */
-
 import { useState, useEffect } from "react";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
 import { toast } from "sonner";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
 
 const ChangeRequestManagement = () => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [activeTab, setActiveTab] = useState("pending");
 
-  // Filter States (filterType REMOVED - email only)
+  // Filter States
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDate, setFilterDate] = useState("");
@@ -48,10 +26,7 @@ const ChangeRequestManagement = () => {
   const [adminRemarks, setAdminRemarks] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  // ========================
-  // EFFECTS
-  // ========================
-
+  // FETCH ALL REQUESTS ONLY ONCE ON MOUNT
   useEffect(() => {
     fetchRequests();
 
@@ -60,15 +35,12 @@ const ChangeRequestManagement = () => {
     }, 30000000);
 
     return () => clearInterval(refreshInterval);
-  }, [activeTab]);
+  }, []); // No dependency on activeTab
 
+  // APPLY FILTERS WHEN TAB CHANGES OR FILTER VALUES CHANGE
   useEffect(() => {
     applyFilters();
-  }, [requests, searchTerm, filterStatus, filterDate]); // filterType removed
-
-  // ========================
-  // API FUNCTIONS
-  // ========================
+  }, [requests, searchTerm, filterStatus, filterDate, activeTab]);
 
   const fetchRequests = async (silent = false) => {
     try {
@@ -78,12 +50,8 @@ const ChangeRequestManagement = () => {
         toast.loading("Loading email change requests...");
       }
 
-      let response;
-      if (activeTab === "pending") {
-        response = await ChangeRequestService.getPendingRequests();
-      } else {
-        response = await ChangeRequestService.getAllChangeRequests();
-      }
+      // ALWAYS FETCH ALL REQUESTS
+      const response = await ChangeRequestService.getAllChangeRequests();
 
       if (response.success) {
         setRequests(response.data || []);
@@ -110,18 +78,15 @@ const ChangeRequestManagement = () => {
     }
   };
 
-  // ========================
-  // FILTER FUNCTIONS
-  // ========================
-
   const applyFilters = () => {
     let filtered = [...requests];
 
+    // FILTER BY TAB
     if (activeTab === "pending") {
       filtered = filtered.filter((req) => req.status === "Pending");
     }
 
-    // Search filter (removed changeType search)
+    // FILTER BY SEARCH TERM
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -133,12 +98,12 @@ const ChangeRequestManagement = () => {
       );
     }
 
-    // Type filter REMOVED
-
+    // FILTER BY STATUS (ONLY FOR ALL TAB)
     if (filterStatus && activeTab === "all") {
       filtered = filtered.filter((req) => req.status === filterStatus);
     }
 
+    // FILTER BY DATE
     if (filterDate) {
       filtered = filtered.filter((req) => {
         const requestDate = new Date(req.requestedAt);
@@ -151,9 +116,20 @@ const ChangeRequestManagement = () => {
     setCurrentPage(1);
   };
 
-  // ========================
-  // PROCESS REQUEST HANDLERS
-  // ========================
+  const clearFilters = () => {
+    setSearchTerm("");
+    setFilterStatus("");
+    setFilterDate("");
+  };
+
+  // TAB SWITCHING HANDLER
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    // Clear status filter when switching to pending tab
+    if (tab === "pending") {
+      setFilterStatus("");
+    }
+  };
 
   const handleProcessClick = (request, action) => {
     setSelectedRequest(request);
@@ -233,10 +209,6 @@ const ChangeRequestManagement = () => {
     setProcessAction("");
   };
 
-  // ========================
-  // UI HELPER FUNCTIONS
-  // ========================
-
   const getStatusBadge = (status) => {
     const statusClasses = {
       Pending: "crm-status-pending",
@@ -248,8 +220,6 @@ const ChangeRequestManagement = () => {
       statusClasses[status] || "crm-status-badge-default"
     }`;
   };
-
-  // getChangeTypeBadge REMOVED - not needed for email only
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -281,10 +251,6 @@ const ChangeRequestManagement = () => {
     }
     return name.substring(0, 2).toUpperCase();
   };
-
-  // ========================
-  // PAGINATION FUNCTIONS
-  // ========================
 
   const totalPages = Math.ceil(filteredRequests.length / rowsPerPage);
 
@@ -322,10 +288,6 @@ const ChangeRequestManagement = () => {
 
     return pages;
   };
-
-  // ========================
-  // RENDER FUNCTIONS
-  // ========================
 
   const renderProcessModal = () => {
     if (!showProcessModal || !selectedRequest) return null;
@@ -390,8 +352,6 @@ const ChangeRequestManagement = () => {
                       </small>
                     </div>
                   </div>
-
-                  {/* Change Type row REMOVED */}
 
                   <div className="crm-detail-row">
                     <div className="crm-detail-label">Current Email:</div>
@@ -536,6 +496,7 @@ const ChangeRequestManagement = () => {
 
   return (
     <div className="crm-change-request-page">
+      {/* BREADCRUMB */}
       <nav className="crm-breadcrumb-nav" aria-label="breadcrumb">
         <ol className="crm-breadcrumb">
           <li className="crm-breadcrumb-item">
@@ -548,92 +509,7 @@ const ChangeRequestManagement = () => {
         </ol>
       </nav>
 
-      <div className="crm-page-header">
-        <div className="crm-header-content">
-          <div className="crm-header-text">
-            <h2 className="crm-page-title">Email Change Request Management</h2>
-            <p className="crm-page-description">
-              Review and manage employee email change requests
-            </p>
-          </div>
-        </div>
-        <div className="crm-header-actions">
-          {lastUpdated && (
-            <span className="crm-last-updated-text">
-              <i className="bi bi-clock-history"></i>
-              Last updated: {formatTime(lastUpdated)}
-            </span>
-          )}
-          <button className="crm-btn-refresh" onClick={() => fetchRequests()}>
-            <i className="bi bi-arrow-clockwise"></i>
-            Refresh
-          </button>
-        </div>
-      </div>
-
-      <div className="crm-request-tabs">
-        <button
-          className={`crm-tab-btn ${activeTab === "pending" ? "active" : ""}`}
-          onClick={() => setActiveTab("pending")}
-        >
-          <i className="bi bi-hourglass-split me-2"></i>
-          Pending Requests
-          {requests.filter((r) => r.status === "Pending").length > 0 && (
-            <span className="badge bg-warning ms-2">
-              {requests.filter((r) => r.status === "Pending").length}
-            </span>
-          )}
-        </button>
-
-        <button
-          className={`crm-tab-btn ${activeTab === "all" ? "active" : ""}`}
-          onClick={() => setActiveTab("all")}
-        >
-          <i className="bi bi-list-ul me-2"></i>
-          All Requests
-        </button>
-      </div>
-
-      <div className="crm-filters-card">
-        <div className="crm-filters-content">
-          <div className="crm-filters-left">
-            <div className="crm-search-box">
-              <i className="bi bi-search crm-search-icon"></i>
-              <input
-                type="text"
-                className="crm-search-input"
-                placeholder="Search by name, ID, or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            {/* Type Filter REMOVED */}
-
-            {activeTab === "all" && (
-              <select
-                className="crm-filter-select"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-              >
-                <option value="">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-            )}
-
-            <input
-              type="date"
-              className="crm-filter-date"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
+      {/* COMPACT STATISTICS CARDS - LEFT ALIGNED */}
       <div className="crm-stats-grid">
         <div className="crm-stat-card">
           <div className="crm-stat-icon crm-stat-icon-primary">
@@ -682,6 +558,77 @@ const ChangeRequestManagement = () => {
         </div>
       </div>
 
+      {/* REQUEST TABS */}
+      <div className="crm-request-tabs">
+        <button
+          className={`crm-tab-btn ${activeTab === "pending" ? "active" : ""}`}
+          onClick={() => handleTabChange("pending")}
+        >
+          <i className="bi bi-hourglass-split me-2"></i>
+          Pending Requests
+          {requests.filter((r) => r.status === "Pending").length > 0 && (
+            <span className="badge bg-warning ms-2">
+              {requests.filter((r) => r.status === "Pending").length}
+            </span>
+          )}
+        </button>
+
+        <button
+          className={`crm-tab-btn ${activeTab === "all" ? "active" : ""}`}
+          onClick={() => handleTabChange("all")}
+        >
+          <i className="bi bi-list-ul me-2"></i>
+          All Requests
+        </button>
+      </div>
+
+      {/* FILTERS CARD */}
+      <div className="crm-filters-card">
+        <div className="crm-filters-content">
+          <div className="crm-search-box">
+            <i className="bi bi-search crm-search-icon"></i>
+            <input
+              type="text"
+              className="crm-search-input"
+              placeholder="Search by name, ID, or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {activeTab === "all" && (
+            <select
+              className="crm-filter-select"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          )}
+
+          <input
+            type="date"
+            className="crm-filter-date"
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
+          />
+
+          <button className="btn-clear-crm" onClick={clearFilters}>
+            Clear Filters
+          </button>
+
+          <div className="results-count-inline-crm">
+            Showing {getPaginatedRequests().length} of {filteredRequests.length}{" "}
+            requests
+          </div>
+        </div>
+      </div>
+
+      {/* TABLE CARD - ONLY THIS SECTION UPDATES ON TAB CHANGE */}
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -689,12 +636,11 @@ const ChangeRequestManagement = () => {
               <tr>
                 <th>Request ID</th>
                 <th>Employee</th>
-                {/* Type column REMOVED */}
                 <th>Current Email</th>
                 <th>New Email</th>
                 <th>Status</th>
                 <th>Requested</th>
-                <th className="text-center">Actions</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -730,8 +676,6 @@ const ChangeRequestManagement = () => {
                       </div>
                     </td>
 
-                    {/* Type badge column REMOVED */}
-
                     <td>
                       <code className="crm-value-display crm-current-value">
                         {request.currentValue || "N/A"}
@@ -759,7 +703,7 @@ const ChangeRequestManagement = () => {
                         {request.status === "Pending" ? (
                           <>
                             <button
-                              className="crm-action-btn crm-action-btn-approve"
+                              className="action-btn action-btn-approve"
                               onClick={() =>
                                 handleProcessClick(request, "Approved")
                               }
@@ -768,7 +712,7 @@ const ChangeRequestManagement = () => {
                               <i className="bi bi-check-circle"></i>
                             </button>
                             <button
-                              className="crm-action-btn crm-action-btn-reject"
+                              className="action-btn action-btn-reject"
                               onClick={() =>
                                 handleProcessClick(request, "Rejected")
                               }
@@ -801,12 +745,13 @@ const ChangeRequestManagement = () => {
           </table>
         </div>
 
+        {/* PAGINATION */}
         {filteredRequests.length > 0 && (
-          <div className="crm-pagination-container">
-            <div className="crm-pagination-info">
-              <span className="crm-pagination-label">Show</span>
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span className="pagination-label">Show</span>
               <select
-                className="crm-pagination-select"
+                className="pagination-select"
                 value={rowsPerPage}
                 onChange={(e) => {
                   setRowsPerPage(Number(e.target.value));
@@ -817,24 +762,22 @@ const ChangeRequestManagement = () => {
                 <option value="25">25</option>
                 <option value="50">50</option>
               </select>
-              <span className="crm-pagination-label">entries</span>
+              <span className="pagination-label">entries</span>
             </div>
 
-            <div className="crm-pagination-status">
+            <div className="pagination-status">
               Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
               {Math.min(currentPage * rowsPerPage, filteredRequests.length)} of{" "}
               {filteredRequests.length} entries
             </div>
 
-            <nav className="crm-pagination-nav">
-              <ul className="crm-pagination">
+            <nav className="pagination-nav">
+              <ul className="pagination">
                 <li
-                  className={`crm-page-item ${
-                    currentPage === 1 ? "disabled" : ""
-                  }`}
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
                 >
                   <button
-                    className="crm-page-link"
+                    className="page-link"
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))
                     }
@@ -847,12 +790,12 @@ const ChangeRequestManagement = () => {
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`crm-page-item ${
+                    className={`page-item ${
                       page === currentPage ? "active" : ""
                     } ${typeof page !== "number" ? "disabled" : ""}`}
                   >
                     <button
-                      className="crm-page-link"
+                      className="page-link"
                       onClick={() =>
                         typeof page === "number" && setCurrentPage(page)
                       }
@@ -864,12 +807,12 @@ const ChangeRequestManagement = () => {
                 ))}
 
                 <li
-                  className={`crm-page-item ${
+                  className={`page-item ${
                     currentPage === totalPages ? "disabled" : ""
                   }`}
                 >
                   <button
-                    className="crm-page-link"
+                    className="page-link"
                     onClick={() =>
                       setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }

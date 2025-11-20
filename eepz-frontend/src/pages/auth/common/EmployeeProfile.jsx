@@ -1120,7 +1120,7 @@ const EmployeeProfile = () => {
                   {checkingPending ? "Checking..." : "Request Change"}
                 </button>
                 <button
-                  className="btn btn-light btn-modern btn-primary"
+                  className="btn  btn-primary"
                   onClick={() => {
                     setIsEditing(true);
                     toast.info("Edit mode enabled");
@@ -1133,7 +1133,7 @@ const EmployeeProfile = () => {
             ) : (
               <>
                 <button
-                  className="btn btn-outline-danger btn-modern"
+                  className="btn btn-danger btn-modern"
                   onClick={handleCancel}
                   disabled={saving}
                 >
