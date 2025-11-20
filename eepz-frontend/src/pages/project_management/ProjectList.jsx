@@ -915,7 +915,7 @@ const ProjectList = () => {
         </>
       )}
 
-      {/* ✅ Separated Modals with Props */}
+  
       <EditProjectModal 
         show={showEditModal}
         onClose={() => setShowEditModal(false)}
@@ -971,8 +971,8 @@ const ProjectList = () => {
   onEmployeeSelect={handleEmployeeSelect}
   onPrimaryToggle={handlePrimaryToggle}
   onSelectAll={handleSelectAllEmployees}
-  onMap={handleMapEmployees}      // ✅ CORRECT prop name
-  onUnmap={handleUnmapEmployees}  // ✅ CORRECT prop name
+  onMap={handleMapEmployees}   
+  onUnmap={handleUnmapEmployees} 
   isSubmitting={isSubmitting}
   message={modalMessage}
   isLoadingData={isLoadingModalData}

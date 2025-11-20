@@ -1,24 +1,11 @@
-/**
- * MyAssessments Component (formerly UserAssignments)
- * 
- * Employee Assessment Management Dashboard
- * Features:
- * - Real-time deadline timers for all pending assessments
- * - Tab-based view (Pending/Completed)
- * - Advanced search and filtering
- * - Modal-based assessment submission/viewing
- * - Professional form layout with company branding
- * 
- * @component
- */
-
+ 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import api from "../../../services/performancemanagement/hr/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
-
+ 
 // Utility function to get days and hours left
 function getTimeLeft(deadline) {
   const now = new Date();
@@ -29,7 +16,7 @@ function getTimeLeft(deadline) {
   const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   return { days, hours, expired: ms === 0 };
 }
-
+ 
 function MyAssessments() {
   const navigate = useNavigate();
   const [assignments, setAssignments] = useState([]);
@@ -45,14 +32,14 @@ function MyAssessments() {
   const [formTypeFilter, setFormTypeFilter] = useState("All");
   const [timers, setTimers] = useState({}); // Store all pending form timers
   const [visibleTimers, setVisibleTimers] = useState([]); // Store visible timer bars
-
+ 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
-
+ 
   // ========================
   // EFFECTS
   // ========================
-
+ 
   useEffect(() => {
     if (!userId) {
       navigate("/employee/login");
@@ -60,20 +47,20 @@ function MyAssessments() {
     }
     fetchAssignments();
   }, [userId, navigate]);
-
+ 
   // TIMER EFFECT - RUNS EVERY SECOND FOR ALL PENDING FORMS
   useEffect(() => {
     const interval = setInterval(() => {
       const pendingAssignments = assignments.filter((a) => !a.isCompleted);
       const newTimers = {};
       const now = new Date();
-
+ 
       pendingAssignments.forEach((assignment) => {
         if (assignment.deadline) {
           const deadline = new Date(assignment.deadline);
           const diffTime = deadline - now;
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          
+         
           newTimers[assignment.assignmentId] = {
             days: diffDays >= 0 ? diffDays : 0,
             formName: assignment.formName,
@@ -82,19 +69,19 @@ function MyAssessments() {
           };
         }
       });
-
+ 
       setTimers(newTimers);
       // Show all pending form timers at the top
       setVisibleTimers(Object.entries(newTimers).map(([key, value]) => ({ id: key, ...value })));
     }, 1000);
-
+ 
     return () => clearInterval(interval);
   }, [assignments]);
-
+ 
   // ========================
   // API FUNCTIONS
   // ========================
-
+ 
   const fetchAssignments = async () => {
     setLoading(true);
     try {
@@ -112,7 +99,7 @@ function MyAssessments() {
       setLoading(false);
     }
   };
-
+ 
   const openSubmitModal = (assignment) => {
     setCurrentAssignment(assignment);
     setModalMode("submit");
@@ -126,7 +113,7 @@ function MyAssessments() {
     setAssessmentData(initialData);
     setShowModal(true);
   };
-
+ 
   const openViewModal = async (assignment) => {
     setCurrentAssignment(assignment);
     setModalMode("view");
@@ -154,7 +141,7 @@ function MyAssessments() {
       setSubmitting(false);
     }
   };
-
+ 
   const updateAssessmentData = (competencyId, field, value) => {
     setAssessmentData((prev) =>
       prev.map((item) =>
@@ -162,83 +149,94 @@ function MyAssessments() {
       )
     );
   };
-
-  const handleSubmitAssessment = async () => {
-    const incomplete = assessmentData.filter((item) => !item.rating);
-    if (incomplete.length > 0) {
-      toast.error("Please provide ratings for all competencies.");
-      return;
-    }
-    setSubmitting(true);
-    const payload = {
-      formId: currentAssignment.formId,
-      userId: parseInt(userId),
-      status: "Submitted",
-      assessmentDetails: assessmentData.map((item) => ({
-        competencyId: item.competencyId,
-        employeeRating: parseInt(item.rating),
-        employeeComments: item.comments || "",
-      })),
-    };
-    try {
-      const { data } = await api.post("/SelfAssessment/submit", payload);
-      if (data.success) {
-        toast.success("Assessment submitted successfully!");
-        setShowModal(false);
-        
-        // Remove timer for submitted form
-        const assignmentIdToRemove = currentAssignment.assignmentId;
-        setTimers((prev) => {
-          const newTimers = { ...prev };
-          delete newTimers[assignmentIdToRemove];
-          return newTimers;
-        });
-        
-        setCurrentAssignment(null);
-        await fetchAssignments();
-      } else {
-        toast.error("Submission failed.");
-      }
-    } catch (error) {
-      toast.error("Submission failed.");
-      console.error(error);
-    } finally {
-      setSubmitting(false);
-    }
+ 
+const handleSubmitAssessment = async () => {
+  // ✅ Validate ratings
+  const incompleteRatings = assessmentData.filter((item) => !item.rating);
+  if (incompleteRatings.length > 0) {
+    toast.error("Please provide ratings for all competencies.");
+    return;
+  }
+ 
+  // ✅ Validate comments
+  const incompleteComments = assessmentData.filter(
+    (item) => !item.comments || item.comments.trim() === ""
+  );
+  if (incompleteComments.length > 0) {
+    toast.error("Please provide comments for all competencies.");
+    return;
+  }
+ 
+  setSubmitting(true);
+  const payload = {
+    formId: currentAssignment.formId,
+    userId: parseInt(userId),
+    status: "Submitted",
+    assessmentDetails: assessmentData.map((item) => ({
+      competencyId: item.competencyId,
+      employeeRating: parseInt(item.rating),
+      employeeComments: item.comments.trim(),
+    })),
   };
-
+ 
+  try {
+    const { data } = await api.post("/SelfAssessment/submit", payload);
+    if (data.success) {
+      toast.success("Assessment submitted successfully!");
+      setShowModal(false);
+ 
+      // Remove timer for submitted form
+      const assignmentIdToRemove = currentAssignment.assignmentId;
+      setTimers((prev) => {
+        const newTimers = { ...prev };
+        delete newTimers[assignmentIdToRemove];
+        return newTimers;
+      });
+ 
+      setCurrentAssignment(null);
+      await fetchAssignments();
+    } else {
+      toast.error("Submission failed.");
+    }
+  } catch (error) {
+    toast.error("Submission failed.");
+    console.error(error);
+  } finally {
+    setSubmitting(false);
+  }
+};
   // ========================
   // FILTER & DATA PROCESSING
   // ========================
-
+ 
   const pendingAssignments = assignments.filter((a) => !a.isCompleted);
   const completedAssignments = assignments.filter((a) => a.isCompleted);
-
+ 
   const formTypes = ["All", ...new Set(assignments.map((a) => a.formType).filter(Boolean))];
-
+ 
   const filterAssignments = (assignmentList) => {
     return assignmentList.filter((assignment) => {
       const matchSearch =
         assignment.formName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         assignment.formType.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchDate = !dateFilter || 
-        new Date(assignment.deadline).toLocaleDateString("en-GB") === 
+ 
+      const matchDate = !dateFilter ||
+        new Date(assignment.deadline).toLocaleDateString("en-GB") ===
         new Date(dateFilter).toLocaleDateString("en-GB");
-
+ 
       const matchType = formTypeFilter === "All" || assignment.formType === formTypeFilter;
-
+ 
       return matchSearch && matchDate && matchType;
     });
   };
-
+ 
   const filteredPending = filterAssignments(pendingAssignments);
   const filteredCompleted = filterAssignments(completedAssignments);
-
+ 
   // ========================
   // RENDER FUNCTIONS
   // ========================
-
+ 
   const renderTable = (data) => (
     <div className="empassper-table-container">
       <table className="empassper-table">
@@ -267,10 +265,10 @@ function MyAssessments() {
                 <td>
                   <div className="empassper-date-cell">
                     <i className="bi bi-calendar-event"></i>
-                    {new Date(assignment.deadline || new Date()).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      day: 'numeric', 
-                      year: 'numeric' 
+                    {new Date(assignment.deadline || new Date()).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
                     })}
                   </div>
                 </td>
@@ -300,11 +298,11 @@ function MyAssessments() {
       </table>
     </div>
   );
-
+ 
   // ========================
   // MAIN RENDER - LOADING STATE
   // ========================
-
+ 
   if (loading) {
     return (
       <div className="empassper-container">
@@ -316,15 +314,15 @@ function MyAssessments() {
       </div>
     );
   }
-
+ 
   // ========================
   // MAIN RENDER - PAGE CONTENT
   // ========================
-
+ 
   return (
     <div className="empassper-container">
       <Toaster position="top-right" richColors />
-
+ 
       {/* Header Section */}
       <div className="empassper-header-section">
         <div className="empassper-header-content">
@@ -350,7 +348,7 @@ function MyAssessments() {
           </div>
         )}
       </div>
-
+ 
       {/* TIMER BARS - ALWAYS VISIBLE FOR ALL PENDING FORMS */}
       {visibleTimers.length > 0 && (
         <div className="empassper-timer-bars-container">
@@ -369,7 +367,7 @@ function MyAssessments() {
           ))}
         </div>
       )}
-
+ 
       {/* Search & Filter */}
       <div className="empassper-search-filter-container">
         <div className="empassper-search-box">
@@ -401,7 +399,7 @@ function MyAssessments() {
           placeholder="Filter by deadline"
         />
       </div>
-
+ 
       {/* Statistics Cards */}
       <div className="empassper-stats-grid">
         <div className="empassper-stat-card empassper-stat-pending">
@@ -432,7 +430,7 @@ function MyAssessments() {
           </div>
         </div>
       </div>
-
+ 
       {/* Tab Navigation */}
       <div className="empassper-tab-container">
         <button
@@ -452,7 +450,7 @@ function MyAssessments() {
           <span className="empassper-tab-badge">{filteredCompleted.length}</span>
         </button>
       </div>
-
+ 
       {/* Content */}
       <div className="empassper-card">
         {activeTab === "pending" && (
@@ -474,7 +472,7 @@ function MyAssessments() {
             )}
           </>
         )}
-
+ 
         {activeTab === "completed" && (
           <>
             {filteredCompleted.length > 0 ? (
@@ -493,7 +491,7 @@ function MyAssessments() {
           </>
         )}
       </div>
-
+ 
       {/* Modal - KEEPING ORIGINAL FORMAT */}
       {showModal && currentAssignment && (
         <div
@@ -517,9 +515,9 @@ function MyAssessments() {
                 </p>
               </div>
             </div>
-
+ 
             <div className="form-divider"></div>
-
+ 
             {submitting && modalMode === "view" ? (
               <div
                 className="form-body"
@@ -592,9 +590,10 @@ function MyAssessments() {
                                     e.target.value
                                   )
                                 }
-                                placeholder="-"
+                                placeholder="Justify through comments"
                                 className="form-textarea"
                                 disabled={submitting}
+                             
                               />
                             )}
                           </td>
@@ -603,7 +602,7 @@ function MyAssessments() {
                     </tbody>
                   </table>
                 </div>
-
+ 
                 {/* Form Footer */}
                 <div className="form-footer">
                   <button
@@ -631,5 +630,8 @@ function MyAssessments() {
     </div>
   );
 }
-
+ 
 export default MyAssessments;
+ 
+ 
+ 
