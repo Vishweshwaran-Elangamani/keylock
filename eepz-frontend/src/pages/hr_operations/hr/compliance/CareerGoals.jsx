@@ -8,7 +8,6 @@ import {
   Tooltip,
   Form,
   InputGroup,
-  Pagination,
 } from "react-bootstrap";
 import { FaPaperPlane, FaLightbulb, FaSearch } from "react-icons/fa";
 import GoalSuggestionsModal from "../../../../components/hr_operations/modals/GoalSuggestionsModal";
@@ -42,7 +41,7 @@ const CareerGoals = () => {
   const [daysFilter, setDaysFilter] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     fetchWithoutGoals();
@@ -145,12 +144,37 @@ const CareerGoals = () => {
     ...new Set(withoutGoals.map((emp) => emp.departmentName).filter(Boolean)),
   ];
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const indexOfLastItem = currentPage * rowsPerPage;
+  const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
+      }
+    }
+    return pages;
+  };
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
@@ -354,171 +378,208 @@ const CareerGoals = () => {
           </div>
         </div>
 
-        <div className="cg-table-wrapper">
-          <table className="cg-employee-table">
-            <thead>
-              <tr>
-                <th className="col-checkbox">
-                  <Form.Check
-                    type="checkbox"
-                    checked={selectAll}
-                    onChange={handleSelectAll}
-                    label=""
-                  />
-                </th>
-                <th className="col-emp-id">EMPLOYEE ID</th>
-                <th className="col-name">EMPLOYEE NAME</th>
-                <th className="col-department">DEPARTMENT</th>
-                <th className="col-email">EMAIL</th>
-                <th className="col-days">DAYS WITHOUT GOALS</th>
-                <th className="col-action-text">RECOMMENDED ACTION</th>
-                <th className="col-action-btns">ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loadingWithoutGoals ? (
+        {/* Table Card - Updated Design */}
+        <div className="table-card">
+          <div className="table-wrapper">
+            <table className="cg-employee-table">
+              <thead>
                 <tr>
-                  <td colSpan={8} className="cg-table-loading">
-                    <Spinner animation="border" size="sm" /> Loading...
-                  </td>
+                  <th>
+                    <Form.Check
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      label=""
+                    />
+                  </th>
+                  <th>EMPLOYEE ID</th>
+                  <th>EMPLOYEE NAME</th>
+                  <th>DEPARTMENT</th>
+                  <th>EMAIL</th>
+                  <th>DAYS WITHOUT GOALS</th>
+                  <th>RECOMMENDED ACTION</th>
+                  <th className="text-center">ACTIONS</th>
                 </tr>
-              ) : currentItems.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="cg-table-no-data">
-                    No employees found matching the criteria!
-                  </td>
-                </tr>
-              ) : (
-                currentItems.map((emp) => {
-                  const empId = emp.userId ?? emp.UserId;
-                  return (
-                    <tr key={empId}>
-                      <td className="col-checkbox">
-                        <Form.Check
-                          type="checkbox"
-                          checked={selectedEmployees.includes(empId)}
-                          onChange={() => handleSelectEmployee(empId)}
-                          label=""
-                        />
-                      </td>
-                      <td className="col-emp-id">
-                        <strong>
-                          {emp.employeeCompanyId ?? emp.EmployeeCompanyId}
-                        </strong>
-                      </td>
-                      <td className="col-name">
-                        {emp.employeeName ?? emp.EmployeeName}
-                      </td>
-                      <td className="col-department">
-                        {emp.departmentName ?? emp.DepartmentName}
-                      </td>
-                      <td className="col-email">{emp.email ?? emp.Email}</td>
-                      <td className="col-days">
-                        <span
-                          className={`cg-days-badge ${
-                            (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) > 30
-                              ? "badge-danger"
-                              : (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) >
-                                7
-                              ? "badge-warning"
-                              : "badge-info"
-                          }`}
-                        >
-                          {emp.daysWithoutGoals ?? emp.DaysWithoutGoals}
-                        </span>
-                      </td>
-                      <td className="col-action-text">
-                        {emp.recommendedAction ?? emp.RecommendedAction}
-                      </td>
-                      <td className="col-action-btns">
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={
-                            <Tooltip id={`tooltip-send-${empId}`}>
-                              Send Reminder
-                            </Tooltip>
-                          }
-                        >
-                          <button
-                            className="cg-icon-btn cg-icon-btn-primary"
-                            onClick={() => openSendReminder(emp)}
+              </thead>
+              <tbody>
+                {loadingWithoutGoals ? (
+                  <tr>
+                    <td colSpan={8} className="empty-state">
+                      <Spinner animation="border" size="sm" /> Loading...
+                    </td>
+                  </tr>
+                ) : currentItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="empty-state">
+                      <i className="bi bi-inbox"></i>
+                      <p>No employees found matching the criteria!</p>
+                    </td>
+                  </tr>
+                ) : (
+                  currentItems.map((emp) => {
+                    const empId = emp.userId ?? emp.UserId;
+                    return (
+                      <tr key={empId}>
+                        <td>
+                          <Form.Check
+                            type="checkbox"
+                            checked={selectedEmployees.includes(empId)}
+                            onChange={() => handleSelectEmployee(empId)}
+                            label=""
+                          />
+                        </td>
+                        <td>
+                          <strong>
+                            {emp.employeeCompanyId ?? emp.EmployeeCompanyId}
+                          </strong>
+                        </td>
+                        <td>{emp.employeeName ?? emp.EmployeeName}</td>
+                        <td>{emp.departmentName ?? emp.DepartmentName}</td>
+                        <td className="email-cell">{emp.email ?? emp.Email}</td>
+                        <td>
+                          <span
+                            className={`cg-days-badge ${
+                              (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) >
+                              30
+                                ? "badge-danger"
+                                : (emp.daysWithoutGoals ??
+                                    emp.DaysWithoutGoals) > 7
+                                ? "badge-warning"
+                                : "badge-info"
+                            }`}
                           >
-                            <FaPaperPlane />
-                          </button>
-                        </OverlayTrigger>
+                            {emp.daysWithoutGoals ?? emp.DaysWithoutGoals}
+                          </span>
+                        </td>
+                        <td>
+                          {emp.recommendedAction ?? emp.RecommendedAction}
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <OverlayTrigger
+                              placement="top"
+                              overlay={
+                                <Tooltip id={`tooltip-send-${empId}`}>
+                                  Send Reminder
+                                </Tooltip>
+                              }
+                            >
+                              <button
+                                className="action-btn action-btn-edit"
+                                onClick={() => openSendReminder(emp)}
+                              >
+                                <i className="bi bi-send"></i>
+                              </button>
+                            </OverlayTrigger>
 
-                        <OverlayTrigger
-                          placement="top"
-                          overlay={
-                            <Tooltip id={`tooltip-suggest-${empId}`}>
-                              Suggest Goals
-                            </Tooltip>
-                          }
-                        >
-                          <button
-                            className="cg-icon-btn cg-icon-btn-secondary"
-                            onClick={() => fetchSuggestions(empId)}
-                          >
-                            <FaLightbulb />
-                          </button>
-                        </OverlayTrigger>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {totalPages > 1 && (
-          <div className="cg-pagination-wrapper">
-            <Pagination>
-              <Pagination.First
-                onClick={() => paginate(1)}
-                disabled={currentPage === 1}
-              />
-              <Pagination.Prev
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-              />
-
-              {[...Array(totalPages)].map((_, index) => {
-                const pageNum = index + 1;
-                if (
-                  pageNum === 1 ||
-                  pageNum === totalPages ||
-                  (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-                ) {
-                  return (
-                    <Pagination.Item
-                      key={pageNum}
-                      active={pageNum === currentPage}
-                      onClick={() => paginate(pageNum)}
-                    >
-                      {pageNum}
-                    </Pagination.Item>
-                  );
-                } else if (
-                  pageNum === currentPage - 2 ||
-                  pageNum === currentPage + 2
-                ) {
-                  return <Pagination.Ellipsis key={pageNum} disabled />;
-                }
-                return null;
-              })}
-
-              <Pagination.Next
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              />
-              <Pagination.Last
-                onClick={() => paginate(totalPages)}
-                disabled={currentPage === totalPages}
-              />
-            </Pagination>
+                            <OverlayTrigger
+                              placement="top"
+                              overlay={
+                                <Tooltip id={`tooltip-suggest-${empId}`}>
+                                  Suggest Goals
+                                </Tooltip>
+                              }
+                            >
+                              <button
+                                className="action-btn action-btn-view"
+                                onClick={() => fetchSuggestions(empId)}
+                              >
+                                <i className="bi bi-lightbulb"></i>
+                              </button>
+                            </OverlayTrigger>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          {/* Pagination - Updated Design */}
+          {filteredData.length > 0 && (
+            <div className="pagination-container">
+              <div className="pagination-info">
+                <span className="pagination-label">Show</span>
+                <select
+                  className="pagination-select"
+                  value={rowsPerPage}
+                  onChange={(e) => {
+                    setRowsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+                <span className="pagination-label">entries</span>
+              </div>
+
+              <div className="pagination-status">
+                Showing {indexOfFirstItem + 1} to{" "}
+                {Math.min(indexOfLastItem, filteredData.length)} of{" "}
+                {filteredData.length} entries
+              </div>
+
+              <nav className="pagination-nav">
+                <ul className="pagination">
+                  <li
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      <i className="bi bi-chevron-left"></i>
+                    </button>
+                  </li>
+
+                  {getPageNumbers().map((page, index) => (
+                    <li
+                      key={index}
+                      className={`page-item ${
+                        page === currentPage ? "active" : ""
+                      } ${typeof page !== "number" ? "disabled" : ""}`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() =>
+                          typeof page === "number" && setCurrentPage(page)
+                        }
+                        disabled={typeof page !== "number"}
+                      >
+                        {page}
+                      </button>
+                    </li>
+                  ))}
+
+                  <li
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      <i className="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          )}
+        </div>
       </div>
 
       <GoalSuggestionsModal

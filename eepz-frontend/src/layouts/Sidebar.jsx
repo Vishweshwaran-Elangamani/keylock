@@ -26,20 +26,44 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
     ],
     HR: [
       { icon: "bi-speedometer2", label: "Dashboard", path: "/hr/dashboard" },
-      { icon: "bi-briefcase", label: "Internal Oppurtunities", path: "/internal/opportunities" },
-      { icon: "bi-hand-thumbs-up", label: "Nominations", path: "/internal/nominations" },
-      { icon: "bi-arrow-up-circle", label: "Promotions", path: "/internal/promotions" },
-      { icon: "bi-bar-chart-line", label: "Career Progression", path: "/hr/operations/promotions" },
+      {
+        icon: "bi-briefcase",
+        label: "Internal Oppurtunities",
+        path: "/internal/opportunities",
+      },
+      {
+        icon: "bi-hand-thumbs-up",
+        label: "Nominations",
+        path: "/internal/nominations",
+      },
+      // { icon: "bi-arrow-up-circle", label: "Promotions", path: "/internal/promotions" },
+      // { icon: "bi-bar-chart-line", label: "Career Progression", path: "/hr/operations/promotions" },
       {
         icon: "bi-book",
         label: "Learning & Development",
         path: "/hr/lnd/dashboard",
       },
       { icon: "bi-gear", label: "Operations", path: "/hr/operations/policies" },
-      { icon: "bi-stack", label: "Project Management", path: "/hr/dashboard/projectmgmt" },
-      { icon: "bi-graph-up", label: "Performance Management", path: "/hr/dashboard/performance" },
-      { icon: "bi-file-earmark-check", label: "SLA Management", path: "/hr/dashboard/sla" },
-      { icon: "bi-chat-left-text", label: "Feedback Management", path: "/hr/dashboard/feedback" },
+      {
+        icon: "bi-stack",
+        label: "Project Management",
+        path: "/hr/dashboard/projectmgmt",
+      },
+      {
+        icon: "bi-graph-up",
+        label: "Performance Management",
+        path: "/hr/dashboard/performance",
+      },
+      {
+        icon: "bi-file-earmark-check",
+        label: "SLA Management",
+        path: "/hr/dashboard/sla",
+      },
+      {
+        icon: "bi-chat-left-text",
+        label: "Feedback Management",
+        path: "/hr/dashboard/feedback",
+      },
       {
         icon: "bi-journal-bookmark",
         label: "Meethings & Mom",
@@ -57,7 +81,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Company Policies",
         path: "/leadership/policies",
       },
-      { icon: "bi-bullseye", label: "Goals", path: "/leadership/dashboard/goals" },
+      {
+        icon: "bi-bullseye",
+        label: "Goals",
+        path: "/leadership/dashboard/goals",
+      },
       {
         icon: "bi-check2-square",
         label: "Goals Approvals",
@@ -105,7 +133,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "SLA Management",
         path: "/department-head/dashboard/sla",
       },
-      { icon: "bi-bullseye", label: "Goals", path: "/department-head/dashboard/goals" },
+      {
+        icon: "bi-bullseye",
+        label: "Goals",
+        path: "/department-head/dashboard/goals",
+      },
       {
         icon: "bi-check2-square",
         label: "Goals Approvals",
@@ -143,11 +175,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Nominations",
         path: "/internal/nominations",
       },
-      {
-        icon: "bi-arrow-up-circle",
-        label: "Career Progression",
-        path: "/hr/operations/promotions",
-      },
+      // {
+      //   icon: "bi-arrow-up-circle",
+      //   label: "Career Progression",
+      //   path: "/hr/operations/promotions",
+      // },
       {
         icon: "bi-shield-check",
         label: "Company Policies",
@@ -224,7 +256,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "SLA Compliance",
         path: "/employee/dashboard/sla",
       },
-      { icon: "bi-bullseye", label: "Goals", path: "/employee/dashboard/goals" },
+      {
+        icon: "bi-bullseye",
+        label: "Goals",
+        path: "/employee/dashboard/goals",
+      },
       {
         icon: "bi-check2-square",
         label: "Goals Approvals",
@@ -239,7 +275,8 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         icon: "bi-chat-left-text",
         label: "Feedback Mangement",
         path: "/employee/dashboard/feedback",
-      }, {
+      },
+      {
         icon: "bi-journal-bookmark",
         label: "Meethings & Mom",
         path: "/employee/dashboard/meetmom",
@@ -275,7 +312,6 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         position: "relative",
       }}
     >
-
       {/* Logo Section */}
       <div
         style={{
@@ -306,7 +342,9 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       {/* Navigation Menu */}
       <nav
         style={{
-          flexGrow: 1, padding: "1rem 0.75rem", overflowY: "auto",
+          flexGrow: 1,
+          padding: "1rem 0.75rem",
+          overflowY: "auto",
           msOverflowStyle: "none",
           scrollbarWidth: "none",
         }}
@@ -349,8 +387,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
                   onMouseLeave={(e) => {
                     if (!active) {
                       e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color =
-                        "rgba(255, 255, 255, 0.65)";
+                      e.currentTarget.style.color = "rgba(255, 255, 255, 0.65)";
                     }
                   }}
                   title={sidebarExpanded ? "" : item.label}

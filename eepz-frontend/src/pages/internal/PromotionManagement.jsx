@@ -5,6 +5,7 @@ import nominationService from "../../services/internal/nominationService";
 import CreatePromotionModal from "../../components/internal/PromotionModals/CreatePromotionModal";
 import PromotionApprovalModal from "../../components/internal/PromotionModals/PromotionApprovalModal";
 import PromotionDetailsModal from "../../components/internal/PromotionModals/PromotionDetailsModal";
+import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/internal/PromotionManagement.css";
 
@@ -22,6 +23,14 @@ const PromotionManagement = () => {
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedPromotion, setSelectedPromotion] = useState(null);
+
+  // Get role prefix for routing
+  const getRolePrefix = () => {
+    const role = user?.role?.toLowerCase().replace(/\s+/g, "-");
+    return `/${role}`;
+  };
+
+  const rolePrefix = getRolePrefix();
 
   toast.options = {
     closeButton: true,
@@ -145,17 +154,13 @@ const PromotionManagement = () => {
 
   return (
     <div className="user-list-page">
-      <nav className="breadcrumb-nav" aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <i className="bi bi-house-door"></i>
-            <span>Dashboard</span>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            Promotions
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb
+        items={[
+          {
+            label: "Promotions",
+          },
+        ]}
+      />
 
       <div className="filters-card">
         <div className="filters-content">

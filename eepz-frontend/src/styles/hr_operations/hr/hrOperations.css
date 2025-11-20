@@ -99,7 +99,7 @@
   background: #2c2762;
   border-radius: 50px;
   padding: 0.5rem;
-  margin-bottom: 2rem;
+  /* margin-bottom: 2rem; */
   box-shadow: 0 4px 12px rgba(44, 39, 98, 0.3);
   gap: 0.25rem;
   flex-wrap: wrap;
@@ -115,7 +115,6 @@
   color: rgba(255, 255, 255, 0.7);
   font-weight: 600;
   font-size: 0.95rem;
-  border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -125,6 +124,7 @@
 .tab-button.active {
   background: #ffffff !important;
   color: #2c2762 !important;
+  border-radius: 50px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   font-weight: 700 !important;
 }
@@ -293,7 +293,6 @@
     min-width: 60px;
     font-size: 0.75rem;
     padding: 0.6rem 0.5rem;
-    border-radius: 6px;
   }
 
   .toggle-buttons {

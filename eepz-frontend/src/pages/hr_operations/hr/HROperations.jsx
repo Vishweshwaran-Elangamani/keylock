@@ -4,9 +4,10 @@ import PolicyManagement from "./compliance/PolicyManagement";
 import CareerGoals from "./compliance/CareerGoals";
 import ComplianceIssues from "./compliance/ComplianceIssues";
 import BudgetAllocationBreakdown from "./compliance/BudgetAllocationBreakdown";
-import PeriodAllocationManagement from "./compliance/PeriodAllocationManagement"; //  NEW
+import PeriodAllocationManagement from "./compliance/PeriodAllocationManagement";
 import WorkloadDistribution from "./compliance/WorkloadDistribution";
 import PromotionsManagement from "./compliance/PromotionsManagement";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../styles/hr_operations/hr/hrOperations.css";
 
 const HROperations = () => {
@@ -22,7 +23,7 @@ const HROperations = () => {
     if (path.includes("/career-goals")) return "career-goals";
     if (path.includes("/compliance")) return "compliance";
     if (path.includes("/budget-allocation")) return "budget";
-    if (path.includes("/period-allocations")) return "period-allocations"; //  NEW
+    if (path.includes("/period-allocations")) return "period-allocations";
     if (path.includes("/workload")) return "workload";
     if (path.includes("/promotions")) return "promotions";
     return "policies";
@@ -46,19 +47,17 @@ const HROperations = () => {
       label: "Compliance",
       path: "/hr/operations/compliance",
     },
-    
-    //  NEW: Period Allocations Tab
     {
       key: "period-allocations",
       label: "Budget Allocations",
       path: "/hr/operations/period-allocations",
     },
     { key: "workload", label: "Workload", path: "/hr/operations/workload" },
-    {
-      key: "promotions",
-      label: "Promotions",
-      path: "/hr/operations/promotions",
-    },
+    // {
+    //   key: "promotions",
+    //   label: "Promotions",
+    //   path: "/hr/operations/promotions",
+    // },
   ];
 
   const handleTabChange = (tab) => {
@@ -70,19 +69,25 @@ const HROperations = () => {
     setActiveSection(section);
   };
 
+  // Get current tab label for breadcrumb
+  const getCurrentTabLabel = () => {
+    const currentTab = tabs.find((tab) => tab.key === activeTab);
+    return currentTab ? currentTab.label : "Policies";
+  };
+
   return (
     <div className="hr-operations-container">
-      <div className="toggle-buttons">
-        <button
-          className={`toggle-btn-main ${
-            activeSection === "hr-operations" ? "active" : ""
-          }`}
-          onClick={() => handleSectionChange("hr-operations")}
-        >
-          <i className="bi bi-gear"></i>
-          HR Operations
-        </button>
-      </div>
+      <Breadcrumb
+        items={[
+          {
+            label: "HR Operations",
+            path: "/hr/operations/dashboard",
+          },
+          {
+            label: getCurrentTabLabel(),
+          },
+        ]}
+      />
 
       {activeSection === "internal-opportunities" ? (
         <div className="coming-soon-container">
@@ -122,13 +127,12 @@ const HROperations = () => {
                 path="budget-allocation"
                 element={<BudgetAllocationBreakdown />}
               />
-              {/*  NEW: Period Allocations Route */}
               <Route
                 path="period-allocations"
                 element={<PeriodAllocationManagement />}
               />
               <Route path="workload" element={<WorkloadDistribution />} />
-              <Route path="promotions" element={<PromotionsManagement />} />
+              {/* <Route path="promotions" element={<PromotionsManagement />} /> */}
               <Route path="*" element={<PolicyManagement />} />
             </Routes>
           </div>
