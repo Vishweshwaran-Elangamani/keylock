@@ -697,7 +697,6 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
 
             {/* CANCEL BUTTON - Updated Color */}
             <Button
-              variant="secondary"
               onClick={onClose}
               disabled={loading || uploadingDoc}
               style={{
@@ -705,19 +704,21 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                 borderColor: '#6c757d',
                 color: '#ffffff',
                 fontWeight: '600',
-                padding: '8px 16px',  
-                transition: 'all 0.12s ease',
+                padding: '8px 16px',
                 fontSize: '13px',
                 borderRadius: '6px',
-                transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.target.style.background = '#5a6268';
-                e.target.style.borderColor = '#5a6268';
+                if (!sendingReminder) {
+                  e.target.style.background = '#5a6268';
+                  e.target.style.borderColor = '#5a6268';
+                }
               }}
               onMouseLeave={(e) => {
-                e.target.style.background = '#6c757d';
-                e.target.style.borderColor = '#6c757d';
+                if (!sendingReminder) {
+                  e.target.style.background = '#6c757d';
+                  e.target.style.borderColor = '#6c757d';
+                }
               }}
             >
               Cancel

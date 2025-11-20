@@ -653,96 +653,101 @@ const CreateOpportunityModal = ({
             </div>
 
             {/* Modal Footer - Fixed */}
-            <div
-              style={{
-                padding: '12px 20px',
-                borderTop: '1px solid #e2e8f0',
-                backgroundColor: '#ffffff',
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: '8px',
-                flexShrink: 0,
-                borderBottomLeftRadius: '0.5rem',
-                borderBottomRightRadius: '0.5rem'
-              }}
-            >
-              <button
-                type="button"
-                onClick={handleClose}
-                disabled={loading}
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  background: '#6c757d',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s ease',
-                  opacity: loading ? 0.65 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) {
-                    e.target.style.background = '#5a6268';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) {
-                    e.target.style.background = '#6c757d';
-                  }
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '13px',
-                  fontWeight: '600',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.12s ease',
-                  boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
-                  opacity: loading ? 0.65 : 1,
-                  minWidth: '170px',
-                  justifyContent: 'center'
-                }}
-              >
-                {loading ? (
-                  <>
-                    <span
-                      style={{
-                        width: '14px',
-                        height: '14px',
-                        border: '2px solid #ffffff',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                        animation: 'spin 0.6s linear infinite',
-                        display: 'inline-block'
-                      }}
-                    />
-                    <span>Creating...</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-check-circle"></i>
-                    Create Opportunity
-                  </>
-                )}
-              </button>
-            </div>
+<div
+  style={{
+    padding: '12px 20px',
+    borderTop: '1px solid #e2e8f0',
+    background: '#ffffff',
+    flexShrink: 0,
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '8px',
+    borderBottomLeftRadius: '12px',
+    borderBottomRightRadius: '12px'
+  }}
+>
+  {/* Close Button */}
+  <button
+    type="button"
+    onClick={handleClose}
+    disabled={loading}
+    style={{
+      background: '#6c757d',
+      borderColor: '#6c757d',
+      color: '#ffffff',
+      fontWeight: '600',
+      padding: '8px 16px',
+      fontSize: '13px',
+      borderRadius: '6px',
+      border: 'none',
+      cursor: loading ? 'not-allowed' : 'pointer',
+      opacity: loading ? 0.65 : 1,
+      transition: 'all 0.2s ease',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px'
+    }}
+    onMouseEnter={(e) => {
+      if (!loading) {
+        e.target.style.background = '#5a6268';
+        e.target.style.borderColor = '#5a6268';
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (!loading) {
+        e.target.style.background = '#6c757d';
+        e.target.style.borderColor = '#6c757d';
+      }
+    }}
+  >
+    Cancel
+  </button>
+  
+  {/* Create Opportunity Button */}
+  <button
+    type="submit"
+    disabled={loading}
+    style={{
+      background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+      border: 'none',
+      color: '#ffffff',
+      padding: '8px 16px',
+      fontWeight: '600',
+      fontSize: '13px',
+      borderRadius: '6px',
+      transition: 'all 0.12s ease',
+      boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
+      cursor: loading ? 'not-allowed' : 'pointer',
+      opacity: loading ? 0.65 : 1,
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px'
+    }}
+  >
+    {loading ? (
+      <>
+        <span
+          style={{
+            width: '14px',
+            height: '14px',
+            border: '2px solid #ffffff',
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            animation: 'spin 0.6s linear infinite',
+            display: 'inline-block'
+          }}
+        />
+        Creating...
+      </>
+    ) : (
+      <>
+        <i className="bi bi-check-circle"></i>
+        Create Opportunity
+      </>
+    )}
+  </button>
+</div>
+
           </form>
         </div>
       </div>
