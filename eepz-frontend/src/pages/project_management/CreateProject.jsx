@@ -320,7 +320,7 @@ const CreateProject = () => {
   }) => (
     <div className="mb-3">
       <label
-        className="form-label d-flex align-items-center gap-2"
+        className="form-label d-flex align-items-center gap-2 text-start"
         style={{
           color: "var(--color-primary-2)",
           fontWeight: "500",
@@ -336,7 +336,7 @@ const CreateProject = () => {
           name={name}
           value={value}
           onChange={onChange}
-          className={`form-select ${error ? "is-invalid" : ""}`}
+          className={`form-select text-start ${error ? "is-invalid" : ""}`}
           style={{
             borderColor: error ? "#E01950" : "var(--border)",
             borderRadius: "8px",
@@ -377,6 +377,7 @@ const CreateProject = () => {
       </div>
       {error && (
         <div
+          className="text-start"
           style={{
             color: "#E01950",
             fontSize: "0.85rem",
@@ -394,7 +395,7 @@ const CreateProject = () => {
       {/* Breadcrumbs */}
       <nav aria-label="breadcrumb" className="mb-3">
         <ol
-          className="breadcrumb mb-0 p-3 rounded"
+          className="breadcrumb mb-0 p-3 rounded text-start"
           style={{
             backgroundColor: "rgba(151, 36, 126, 0.05)",
             fontSize: "0.875rem",
@@ -438,7 +439,7 @@ const CreateProject = () => {
             <ArrowLeft size={24} />
           </button>
           <FolderPlus size={36} style={{ color: "#97247E" }} />
-          <div>
+          <div className="text-start">
             <h2
               className="mb-0 fw-bold"
               style={{ color: "var(--color-primary-1)" }}
@@ -486,7 +487,7 @@ const CreateProject = () => {
         </div>
       )}
 
-      {/* Form Card */}
+      {/* Form Card with 2x2 Grid Layout */}
       <div
         className="card border-0 flex-grow-1"
         style={{
@@ -499,473 +500,518 @@ const CreateProject = () => {
         <div className="card-body p-4 overflow-auto">
           <form onSubmit={handleSubmit} className="h-100 d-flex flex-column">
             <div className="flex-grow-1">
-              {/* Basic Information */}
-              <div className="mb-4">
-                <h5
-                  className="fw-bold mb-3 pb-2"
-                  style={{
-                    borderBottom: "2px solid var(--border)",
-                    color: "var(--color-primary-1)",
-                  }}
-                >
-                  Basic Information
-                </h5>
-
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label
-                      className="form-label"
-                      style={{
-                        color: "var(--color-primary-2)",
-                        fontWeight: "500",
-                        fontSize: "0.9rem",
-                      }}
+              {/* 2x2 GRID LAYOUT */}
+              <div className="row g-4">
+                {/* TOP LEFT: Basic Information */}
+                <div className="col-md-6">
+                  <div
+                    className="card h-100"
+                    style={{
+                      border: "1px solid var(--border)",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <div
+                      className="card-header bg-white"
+                      style={{ borderBottom: "2px solid var(--border)" }}
                     >
-                      Project Name <span style={{ color: "#E01950" }}>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="projectName"
-                      value={formData.projectName}
-                      onChange={handleChange}
-                      placeholder="Example: ORG.IT.INTRANET"
-                      className={`form-control ${
-                        errors.projectName ? "is-invalid" : ""
-                      }`}
-                      style={{
-                        borderColor: errors.projectName
-                          ? "#E01950"
-                          : "var(--border)",
-                        borderRadius: "8px",
-                        padding: "0.65rem 0.75rem",
-                        fontSize: "0.95rem",
-                        letterSpacing: "0.5px",
-                      }}
-                    />
-                    <div className="form-text" style={{ fontSize: "0.85rem" }}>
-                      Use format <strong>ORG.(Dept).(Project)</strong> —
-                      letters/numbers/hyphen only. No spaces.
+                      <h5
+                        className="mb-0 fw-bold text-start"
+                        style={{ color: "var(--color-white)" }}
+                      >
+                        Basic Information
+                      </h5>
                     </div>
-                    {errors.projectName && (
-                      <div
-                        style={{
-                          color: "#E01950",
-                          fontSize: "0.85rem",
-                          marginTop: "0.25rem",
-                        }}
-                      >
-                        {errors.projectName}
+                    <div className="card-body">
+                      <div className="mb-3">
+                        <label
+                          className="form-label text-start"
+                          style={{
+                            color: "var(--color-primary-2)",
+                            fontWeight: "500",
+                            fontSize: "0.9rem",
+                          }}
+                        >
+                          Project Name{" "}
+                          <span style={{ color: "#E01950" }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="projectName"
+                          value={formData.projectName}
+                          onChange={handleChange}
+                          placeholder="Example: ORG.IT.INTRANET"
+                          className={`form-control text-start ${
+                            errors.projectName ? "is-invalid" : ""
+                          }`}
+                          style={{
+                            borderColor: errors.projectName
+                              ? "#E01950"
+                              : "var(--border)",
+                            borderRadius: "8px",
+                            padding: "0.65rem 0.75rem",
+                            fontSize: "0.95rem",
+                          }}
+                        />
+                        <div
+                          className="form-text text-start"
+                          style={{ fontSize: "0.8rem" }}
+                        >
+                          Format: <strong>ORG.(Dept).(Project)</strong>
+                        </div>
+                        {errors.projectName && (
+                          <div
+                            className="text-start"
+                            style={{
+                              color: "#E01950",
+                              fontSize: "0.85rem",
+                              marginTop: "0.25rem",
+                            }}
+                          >
+                            {errors.projectName}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  <div className="col-md-6">
-                    <label
-                      className="form-label"
-                      style={{
-                        color: "var(--color-primary-2)",
-                        fontWeight: "500",
-                        fontSize: "0.9rem",
-                      }}
-                    >
-                      Client Name <span style={{ color: "#E01950" }}>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="clientName"
-                      value={formData.clientName}
-                      onChange={handleChange}
-                      placeholder="Example: ACME CORPORATION"
-                      className={`form-control ${
-                        errors.clientName ? "is-invalid" : ""
-                      }`}
-                      style={{
-                        borderColor: errors.clientName
-                          ? "#E01950"
-                          : "var(--border)",
-                        borderRadius: "8px",
-                        padding: "0.65rem 0.75rem",
-                        fontSize: "0.95rem",
-                      }}
-                    />
-                    {errors.clientName && (
-                      <div
-                        style={{
-                          color: "#E01950",
-                          fontSize: "0.85rem",
-                          marginTop: "0.25rem",
-                        }}
-                      >
-                        {errors.clientName}
+                      <div className="mb-3">
+                        <label
+                          className="form-label text-start"
+                          style={{
+                            color: "var(--color-primary-2)",
+                            fontWeight: "500",
+                            fontSize: "0.9rem",
+                          }}
+                        >
+                          Client Name{" "}
+                          <span style={{ color: "#E01950" }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="clientName"
+                          value={formData.clientName}
+                          onChange={handleChange}
+                          placeholder="Example: ACME CORPORATION"
+                          className={`form-control text-start ${
+                            errors.clientName ? "is-invalid" : ""
+                          }`}
+                          style={{
+                            borderColor: errors.clientName
+                              ? "#E01950"
+                              : "var(--border)",
+                            borderRadius: "8px",
+                            padding: "0.65rem 0.75rem",
+                            fontSize: "0.95rem",
+                          }}
+                        />
+                        {errors.clientName && (
+                          <div
+                            className="text-start"
+                            style={{
+                              color: "#E01950",
+                              fontSize: "0.85rem",
+                              marginTop: "0.25rem",
+                            }}
+                          >
+                            {errors.clientName}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  <div className="col-md-6">
-                    <CustomSelect
-                      label="Status"
-                      name="status"
-                      value={formData.status}
-                      onChange={handleChange}
-                      options={statusOptions}
-                      required
-                      placeholder="Select status"
-                    />
-                  </div>
+                      <CustomSelect
+                        label="Status"
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        options={statusOptions}
+                        required
+                        placeholder="Select status"
+                      />
 
-                  <div className="col-12">
-                    <label
-                      className="form-label"
-                      style={{
-                        color: "var(--color-primary-2)",
-                        fontWeight: "500",
-                        fontSize: "0.9rem",
-                      }}
-                    >
-                      Description
-                    </label>
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      placeholder="Enter project description"
-                      rows="3"
-                      className="form-control"
-                      style={{
-                        borderColor: "var(--border)",
-                        borderRadius: "8px",
-                        padding: "0.65rem 0.75rem",
-                        fontSize: "0.95rem",
-                      }}
-                    />
+                      <div className="mb-0">
+                        <label
+                          className="form-label text-start"
+                          style={{
+                            color: "var(--color-primary-2)",
+                            fontWeight: "500",
+                            fontSize: "0.9rem",
+                          }}
+                        >
+                          Description
+                        </label>
+                        <textarea
+                          name="description"
+                          value={formData.description}
+                          onChange={handleChange}
+                          placeholder="Enter project description"
+                          rows="3"
+                          className="form-control text-start"
+                          style={{
+                            borderColor: "var(--border)",
+                            borderRadius: "8px",
+                            padding: "0.65rem 0.75rem",
+                            fontSize: "0.95rem",
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Organization Details */}
-              <div className="mb-4">
-                <h5
-                  className="fw-bold mb-3 pb-2 d-flex align-items-center gap-2"
-                  style={{
-                    borderBottom: "2px solid var(--border)",
-                    color: "var(--color-primary-1)",
-                  }}
-                >
-                  <Building size={20} style={{ color: "#97247E" }} />
-                  Organization Details
-                </h5>
-
-                {isLoadingData ? (
-                  <div className="text-center py-4">
+                {/* TOP RIGHT: Organization Details */}
+                <div className="col-md-6">
+                  <div
+                    className="card h-100"
+                    style={{
+                      border: "1px solid var(--border)",
+                      borderRadius: "8px",
+                    }}
+                  >
                     <div
-                      className="spinner-border"
-                      style={{ color: "var(--color-primary-3)" }}
-                    />
-                    <p className="mt-2" style={{ color: "var(--muted)" }}>
-                      Loading data...
-                    </p>
-                  </div>
-                ) : (
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <CustomSelect
-                        label="Business Unit"
-                        name="businessUnit"
-                        value={formData.businessUnit}
-                        onChange={handleChange}
-                        options={businessUnits}
-                        error={errors.businessUnit}
-                        required
-                        placeholder="Select Business Unit"
-                      />
-                    </div>
-
-                    <div className="col-md-6">
-                      <CustomSelect
-                        label="Department"
-                        name="department"
-                        value={formData.department}
-                        onChange={handleChange}
-                        options={departments.map((d) => ({
-                          value: d.departmentName,
-                          label: d.departmentName,
-                        }))}
-                        error={errors.department}
-                        required
-                        placeholder="Select Department"
-                      />
-                    </div>
-
-                    <div className="col-md-6">
-                      <CustomSelect
-                        label="Engagement Model"
-                        name="engagementModel"
-                        value={formData.engagementModel}
-                        onChange={handleChange}
-                        options={engagementModels}
-                        error={errors.engagementModel}
-                        required
-                        placeholder="Select engagement model"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Timeline */}
-              <div className="mb-4">
-                <h5
-                  className="fw-bold mb-3 pb-2 d-flex align-items-center gap-2"
-                  style={{
-                    borderBottom: "2px solid var(--border)",
-                    color: "var(--color-primary-1)",
-                  }}
-                >
-                  <Calendar size={20} style={{ color: "#0F62FE" }} />
-                  Project Timeline
-                </h5>
-
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label
-                      className="form-label"
-                      style={{
-                        color: "var(--color-primary-2)",
-                        fontWeight: "500",
-                        fontSize: "0.9rem",
-                      }}
+                      className="card-header bg-white"
+                      style={{ borderBottom: "2px solid var(--border)" }}
                     >
-                      Start Date <span style={{ color: "#E01950" }}>*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={formData.startDate}
-                      onChange={handleChange}
-                      min={today}
-                      className={`form-control ${
-                        errors.startDate ? "is-invalid" : ""
-                      }`}
-                      style={{
-                        borderColor: errors.startDate
-                          ? "#E01950"
-                          : "var(--border)",
-                        borderRadius: "8px",
-                        padding: "0.65rem 0.75rem",
-                      }}
-                    />
-                    {errors.startDate && (
-                      <div
-                        style={{
-                          color: "#E01950",
-                          fontSize: "0.85rem",
-                          marginTop: "0.25rem",
-                        }}
+                      <h5
+                        className="mb-0 fw-bold d-flex align-items-center gap-2 text-start"
+                        style={{ color: "var(--color-White)" }}
                       >
-                        {errors.startDate}
-                      </div>
-                    )}
-                  </div>
+                        <Building size={20} style={{ color: "White" }} />
+                        Organization Details
+                      </h5>
+                    </div>
+                    <div className="card-body">
+                      {isLoadingData ? (
+                        <div className="text-center py-5">
+                          <div
+                            className="spinner-border"
+                            style={{ color: "var(--color-primary-3)" }}
+                          />
+                          <p className="mt-2" style={{ color: "var(--muted)" }}>
+                            Loading data...
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <CustomSelect
+                            label="Business Unit"
+                            name="businessUnit"
+                            value={formData.businessUnit}
+                            onChange={handleChange}
+                            options={businessUnits}
+                            error={errors.businessUnit}
+                            required
+                            placeholder="Select Business Unit"
+                          />
 
-                  <div className="col-md-6">
-                    <label
-                      className="form-label"
-                      style={{
-                        color: "var(--color-primary-2)",
-                        fontWeight: "500",
-                        fontSize: "0.9rem",
-                      }}
-                    >
-                      End Date{" "}
-                      <span style={{ color: "var(--muted)" }}>(Optional)</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={formData.endDate}
-                      onChange={handleChange}
-                      min={formData.startDate || today}
-                      className={`form-control ${
-                        errors.endDate ? "is-invalid" : ""
-                      }`}
-                      style={{
-                        borderColor: errors.endDate
-                          ? "#E01950"
-                          : "var(--border)",
-                        borderRadius: "8px",
-                        padding: "0.65rem 0.75rem",
-                      }}
-                    />
-                    {errors.endDate && (
-                      <div
-                        style={{
-                          color: "#E01950",
-                          fontSize: "0.85rem",
-                          marginTop: "0.25rem",
-                        }}
-                      >
-                        {errors.endDate}
-                      </div>
-                    )}
+                          <CustomSelect
+                            label="Department"
+                            name="department"
+                            value={formData.department}
+                            onChange={handleChange}
+                            options={departments.map((d) => ({
+                              value: d.departmentName,
+                              label: d.departmentName,
+                            }))}
+                            error={errors.department}
+                            required
+                            placeholder="Select Department"
+                          />
+
+                          <CustomSelect
+                            label="Engagement Model"
+                            name="engagementModel"
+                            value={formData.engagementModel}
+                            onChange={handleChange}
+                            options={engagementModels}
+                            error={errors.engagementModel}
+                            required
+                            placeholder="Select engagement model"
+                          />
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Reporting Managers */}
-              <div className="mb-4">
-                <h5
-                  className="fw-bold mb-3 pb-2 d-flex align-items-center gap-2"
-                  style={{
-                    borderBottom: "2px solid var(--border)",
-                    color: "var(--color-primary-1)",
-                  }}
-                >
-                  <Users size={20} style={{ color: "#AC5098" }} />
-                  Reporting Managers
-                </h5>
-
-                {isLoadingData ? (
-                  <div className="text-center py-4">
+                {/* BOTTOM LEFT: Project Timeline */}
+                <div className="col-md-6">
+                  <div
+                    className="card h-100"
+                    style={{
+                      border: "1px solid var(--border)",
+                      borderRadius: "8px",
+                    }}
+                  >
                     <div
-                      className="spinner-border"
-                      style={{ color: "var(--color-primary-3)" }}
-                    />
-                  </div>
-                ) : (
-                  <div className="row g-3">
-                    <div className="col-md-4">
-                      <label
-                        className="form-label"
-                        style={{
-                          color: "var(--color-primary-2)",
-                          fontWeight: "500",
-                          fontSize: "0.9rem",
-                        }}
+                      className="card-header bg-white"
+                      style={{ borderBottom: "2px solid var(--border)" }}
+                    >
+                      <h5
+                        className="mb-0 fw-bold d-flex align-items-center gap-2 text-start"
+                        style={{ color: "var(--color-White)" }}
                       >
-                        Resource Owner
-                      </label>
-                      <div
-                        className="p-3 border rounded"
-                        style={{
-                          cursor: "pointer",
-                          borderColor: "var(--border)",
-                          backgroundColor: selectedResourceOwner
-                            ? "rgba(151, 36, 126, 0.05)"
-                            : "transparent",
-                          transition: "all 0.2s",
-                        }}
-                        onClick={() => handleOpenManagerModal("resource")}
-                      >
-                        {selectedResourceOwner ? (
-                          <div>
-                            <div className="fw-semibold">
-                              {selectedResourceOwner.firstName}{" "}
-                              {selectedResourceOwner.lastName}
-                            </div>
-                            <small className="text-muted">
-                              {selectedResourceOwner.roleName}
-                            </small>
-                          </div>
-                        ) : (
-                          <div className="text-muted d-flex align-items-center gap-2">
-                            <UserCog size={16} />
-                            Click to select
+                        <Calendar size={20} style={{ color: "White" }} />
+                        Project Timeline
+                      </h5>
+                    </div>
+                    <div className="card-body">
+                      <div className="mb-3">
+                        <label
+                          className="form-label text-start"
+                          style={{
+                            color: "var(--color-primary-2)",
+                            fontWeight: "500",
+                            fontSize: "0.9rem",
+                          }}
+                        >
+                          Start Date{" "}
+                          <span style={{ color: "#E01950" }}>*</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="startDate"
+                          value={formData.startDate}
+                          onChange={handleChange}
+                          min={today}
+                          className={`form-control text-start ${
+                            errors.startDate ? "is-invalid" : ""
+                          }`}
+                          style={{
+                            borderColor: errors.startDate
+                              ? "#E01950"
+                              : "var(--border)",
+                            borderRadius: "8px",
+                            padding: "0.65rem 0.75rem",
+                          }}
+                        />
+                        {errors.startDate && (
+                          <div
+                            className="text-start"
+                            style={{
+                              color: "#E01950",
+                              fontSize: "0.85rem",
+                              marginTop: "0.25rem",
+                            }}
+                          >
+                            {errors.startDate}
                           </div>
                         )}
                       </div>
-                    </div>
 
-                    <div className="col-md-4">
-                      <label
-                        className="form-label"
-                        style={{
-                          color: "var(--color-primary-2)",
-                          fontWeight: "500",
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        L1 Approver
-                      </label>
-                      <div
-                        className="p-3 border rounded"
-                        style={{
-                          cursor: "pointer",
-                          borderColor: "var(--border)",
-                          backgroundColor: selectedL1Approver
-                            ? "rgba(151, 36, 126, 0.05)"
-                            : "transparent",
-                          transition: "all 0.2s",
-                        }}
-                        onClick={() => handleOpenManagerModal("l1")}
-                      >
-                        {selectedL1Approver ? (
-                          <div>
-                            <div className="fw-semibold">
-                              {selectedL1Approver.firstName}{" "}
-                              {selectedL1Approver.lastName}
-                            </div>
-                            <small className="text-muted">
-                              {selectedL1Approver.roleName}
-                            </small>
-                          </div>
-                        ) : (
-                          <div className="text-muted d-flex align-items-center gap-2">
-                            <UserCog size={16} />
-                            Click to select
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="col-md-4">
-                      <label
-                        className="form-label"
-                        style={{
-                          color: "var(--color-primary-2)",
-                          fontWeight: "500",
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        L2 Approver
-                      </label>
-                      <div
-                        className="p-3 border rounded"
-                        style={{
-                          cursor: "pointer",
-                          borderColor: "var(--border)",
-                          backgroundColor: selectedL2Approver
-                            ? "rgba(151, 36, 126, 0.05)"
-                            : "transparent",
-                          transition: "all 0.2s",
-                        }}
-                        onClick={() => handleOpenManagerModal("l2")}
-                      >
-                        {selectedL2Approver ? (
-                          <div>
-                            <div className="fw-semibold">
-                              {selectedL2Approver.firstName}{" "}
-                              {selectedL2Approver.lastName}
-                            </div>
-                            <small className="text-muted">
-                              {selectedL2Approver.roleName}
-                            </small>
-                          </div>
-                        ) : (
-                          <div className="text-muted d-flex align-items-center gap-2">
-                            <UserCog size={16} />
-                            Click to select
+                      <div className="mb-0">
+                        <label
+                          className="form-label text-start"
+                          style={{
+                            color: "var(--color-primary-2)",
+                            fontWeight: "500",
+                            fontSize: "0.9rem",
+                          }}
+                        >
+                          End Date{" "}
+                          <span style={{ color: "var(--muted)" }}>
+                            (Optional)
+                          </span>
+                        </label>
+                        <input
+                          type="date"
+                          name="endDate"
+                          value={formData.endDate}
+                          onChange={handleChange}
+                          min={formData.startDate || today}
+                          className={`form-control text-start ${
+                            errors.endDate ? "is-invalid" : ""
+                          }`}
+                          style={{
+                            borderColor: errors.endDate
+                              ? "#E01950"
+                              : "var(--border)",
+                            borderRadius: "8px",
+                            padding: "0.65rem 0.75rem",
+                          }}
+                        />
+                        {errors.endDate && (
+                          <div
+                            className="text-start"
+                            style={{
+                              color: "#E01950",
+                              fontSize: "0.85rem",
+                              marginTop: "0.25rem",
+                            }}
+                          >
+                            {errors.endDate}
                           </div>
                         )}
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
+
+                {/* BOTTOM RIGHT: Reporting Managers */}
+                <div className="col-md-6">
+                  <div
+                    className="card h-100"
+                    style={{
+                      border: "1px solid var(--border)",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <div
+                      className="card-header bg-white"
+                      style={{ borderBottom: "2px solid var(--border)" }}
+                    >
+                      <h5
+                        className="mb-0 fw-bold d-flex align-items-center gap-2 text-start"
+                        style={{ color: "var(--color-White)" }}
+                      >
+                        <Users size={20} style={{ color: "White" }} />
+                        Reporting Managers
+                      </h5>
+                    </div>
+                    <div className="card-body">
+                      {isLoadingData ? (
+                        <div className="text-center py-5">
+                          <div
+                            className="spinner-border"
+                            style={{ color: "var(--color-primary-3)" }}
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="mb-3">
+                            <label
+                              className="form-label text-start"
+                              style={{
+                                color: "var(--color-primary-2)",
+                                fontWeight: "500",
+                                fontSize: "0.9rem",
+                              }}
+                            >
+                              Resource Owner
+                            </label>
+                            <div
+                              className="p-3 border rounded text-start"
+                              style={{
+                                cursor: "pointer",
+                                borderColor: "var(--border)",
+                                backgroundColor: selectedResourceOwner
+                                  ? "rgba(151, 36, 126, 0.05)"
+                                  : "transparent",
+                                transition: "all 0.2s",
+                              }}
+                              onClick={() => handleOpenManagerModal("resource")}
+                            >
+                              {selectedResourceOwner ? (
+                                <div>
+                                  <div className="fw-semibold">
+                                    {selectedResourceOwner.firstName}{" "}
+                                    {selectedResourceOwner.lastName}
+                                  </div>
+                                  <small className="text-muted">
+                                    {selectedResourceOwner.roleName}
+                                  </small>
+                                </div>
+                              ) : (
+                                <div className="text-muted d-flex align-items-center gap-2">
+                                  <UserCog size={16} />
+                                  Click to select
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="mb-3">
+                            <label
+                              className="form-label text-start"
+                              style={{
+                                color: "var(--color-primary-2)",
+                                fontWeight: "500",
+                                fontSize: "0.9rem",
+                              }}
+                            >
+                              L1 Approver
+                            </label>
+                            <div
+                              className="p-3 border rounded text-start"
+                              style={{
+                                cursor: "pointer",
+                                borderColor: "var(--border)",
+                                backgroundColor: selectedL1Approver
+                                  ? "rgba(151, 36, 126, 0.05)"
+                                  : "transparent",
+                                transition: "all 0.2s",
+                              }}
+                              onClick={() => handleOpenManagerModal("l1")}
+                            >
+                              {selectedL1Approver ? (
+                                <div>
+                                  <div className="fw-semibold">
+                                    {selectedL1Approver.firstName}{" "}
+                                    {selectedL1Approver.lastName}
+                                  </div>
+                                  <small className="text-muted">
+                                    {selectedL1Approver.roleName}
+                                  </small>
+                                </div>
+                              ) : (
+                                <div className="text-muted d-flex align-items-center gap-2">
+                                  <UserCog size={16} />
+                                  Click to select
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="mb-0">
+                            <label
+                              className="form-label text-start"
+                              style={{
+                                color: "var(--color-primary-2)",
+                                fontWeight: "500",
+                                fontSize: "0.9rem",
+                              }}
+                            >
+                              L2 Approver
+                            </label>
+                            <div
+                              className="p-3 border rounded text-start"
+                              style={{
+                                cursor: "pointer",
+                                borderColor: "var(--border)",
+                                backgroundColor: selectedL2Approver
+                                  ? "rgba(151, 36, 126, 0.05)"
+                                  : "transparent",
+                                transition: "all 0.2s",
+                              }}
+                              onClick={() => handleOpenManagerModal("l2")}
+                            >
+                              {selectedL2Approver ? (
+                                <div>
+                                  <div className="fw-semibold">
+                                    {selectedL2Approver.firstName}{" "}
+                                    {selectedL2Approver.lastName}
+                                  </div>
+                                  <small className="text-muted">
+                                    {selectedL2Approver.roleName}
+                                  </small>
+                                </div>
+                              ) : (
+                                <div className="text-muted d-flex align-items-center gap-2">
+                                  <UserCog size={16} />
+                                  Click to select
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Form Actions */}
             <div
-              className="d-flex gap-3 justify-content-end pt-3 mt-auto"
+              className="d-flex gap-3 justify-content-end pt-3 mt-4"
               style={{ borderTop: "1px solid var(--border)" }}
             >
               <button
@@ -980,7 +1026,6 @@ const CreateProject = () => {
                   borderRadius: "8px",
                   padding: "0.6rem 1rem",
                   fontWeight: "600",
-                  
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = "crimson";
@@ -1001,8 +1046,7 @@ const CreateProject = () => {
                 disabled={isSubmitting}
                 className="btn d-flex align-items-center gap-2 px-4"
                 style={{
-                  background:
-                    "rgb(39, 35, 92)",
+                  background: "rgb(39, 35, 92)",
                   border: "none",
                   color: "white",
                   borderRadius: "8px",
@@ -1063,7 +1107,7 @@ const CreateProject = () => {
                       </span>
                       <input
                         type="text"
-                        className="form-control"
+                        className="form-control text-start"
                         placeholder="Search by name..."
                         value={managerSearchTerm}
                         onChange={(e) => setManagerSearchTerm(e.target.value)}
@@ -1072,7 +1116,7 @@ const CreateProject = () => {
                   </div>
                   <div className="col-md-3">
                     <select
-                      className="form-select"
+                      className="form-select text-start"
                       value={managerFilterRole}
                       onChange={(e) => setManagerFilterRole(e.target.value)}
                     >
@@ -1086,7 +1130,7 @@ const CreateProject = () => {
                   </div>
                   <div className="col-md-3">
                     <select
-                      className="form-select"
+                      className="form-select text-start"
                       value={managerFilterDepartment}
                       onChange={(e) =>
                         setManagerFilterDepartment(e.target.value)
@@ -1110,10 +1154,12 @@ const CreateProject = () => {
                   <table className="table table-sm table-hover">
                     <thead className="table-light sticky-top">
                       <tr>
-                        <th style={{ width: "50px" }}>Select</th>
-                        <th>Employee Name</th>
-                        <th>Role</th>
-                        <th>Department</th>
+                        <th style={{ width: "50px" }} className="text-start">
+                          Select
+                        </th>
+                        <th className="text-start">Employee Name</th>
+                        <th className="text-start">Role</th>
+                        <th className="text-start">Department</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1149,7 +1195,7 @@ const CreateProject = () => {
                               style={{ cursor: "pointer" }}
                               onClick={() => handleManagerSelect(emp)}
                             >
-                              <td>
+                              <td className="text-start">
                                 <input
                                   type="checkbox"
                                   className="form-check-input"
@@ -1158,11 +1204,13 @@ const CreateProject = () => {
                                   onClick={(e) => e.stopPropagation()}
                                 />
                               </td>
-                              <td>
+                              <td className="text-start">
                                 {emp.firstName} {emp.lastName}
                               </td>
-                              <td>{emp.roleName}</td>
-                              <td>{emp.departmentName}</td>
+                              <td className="text-start">{emp.roleName}</td>
+                              <td className="text-start">
+                                {emp.departmentName}
+                              </td>
                             </tr>
                           );
                         })

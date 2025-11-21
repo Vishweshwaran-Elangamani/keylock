@@ -58,7 +58,11 @@ const ResourcePoolMapping = () => {
       // All employees
       const employeesResponse = await projectService.getInitialStageEmployees();
       if (employeesResponse.success !== false && employeesResponse.data) {
-        setAllEmployees(employeesResponse.data);
+        // Filter out Admin role employees
+        const filteredEmployees = employeesResponse.data.filter(
+          (emp) => emp.roleName?.toLowerCase() !== "admin"
+        );
+        setAllEmployees(filteredEmployees);
       } else {
         throw new Error(
           employeesResponse?.message || "Failed to load employees"
@@ -74,6 +78,9 @@ const ResourcePoolMapping = () => {
         projectsResponse.data.forEach((project) => {
           if (Array.isArray(project.mappedEmployees)) {
             project.mappedEmployees.forEach((emp) => {
+              // Filter out Admin role from mapped employees too
+              if (emp.roleName?.toLowerCase() === "admin") return;
+              
               if (
                 !allMapped.some(
                   (m) => m.employeeMasterId === emp.employeeMasterId
@@ -402,8 +409,8 @@ const ResourcePoolMapping = () => {
           </button>
           {/* <Users size={36} className="text-primary" /> */}
           <div>
-            <h2 className="mb-0 fw-bold" style={{textAlign:"left"}}>Resource Pool Mapping</h2>
-            <p className="text-muted mb-0 medium">
+            <h2 className="mb-0 fw-bold text-start">Resource Pool Mapping</h2>
+            <p className="text-muted mb-0 medium text-start">
               Manage employee mappings to {RESOURCE_POOL_PROJECT_NAME}{" "}
               (employees mapped now will disappear from the list)
             </p>
@@ -495,13 +502,14 @@ const ResourcePoolMapping = () => {
         <div className="col-lg-8">
           <div className="card border-0 shadow-sm h-100 d-flex flex-column">
             <div className="card-header bg-light d-flex align-items-center justify-content-between">
-              <h5 className="mb-0 d-flex align-items-center gap-2" style={{color:"white"}}>
+              <h5 className="mb-0 d-flex align-items-center gap-2 text-start" style={{ color: "white" }}>
                 <Database size={20} /> Employees
               </h5>
               <button
                 className="btn btn-sm btn-outline-secondary"
                 onClick={handleSelectAll}
-                disabled={availableCount === 0} style={{color:"white"}}
+                disabled={availableCount === 0}
+                style={{ color: "white" }}
               >
                 Select All Available ({availableCount})
               </button>
@@ -516,7 +524,7 @@ const ResourcePoolMapping = () => {
                   </span>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control text-start"
                     placeholder="Search by name, role, department, or ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -529,17 +537,17 @@ const ResourcePoolMapping = () => {
                 <table className="table table-hover mb-0">
                   <thead className="table-light sticky-top">
                     <tr>
-                      <th className="py-3 px-3">Employee</th>
-                      <th className="py-3">Role</th>
-                      <th className="py-3">Department</th>
+                      <th className="py-3 px-3 text-start">Employee</th>
+                      <th className="py-3 text-start">Role</th>
+                      <th className="py-3 text-start">Department</th>
                       <th
-                        className="py-3 text-center"
+                        className="py-3 text-start"
                         style={{ width: "120px" }}
                       >
                         Status
                       </th>
                       <th
-                        className="py-3 text-center"
+                        className="py-3 text-start"
                         style={{ width: "90px" }}
                       >
                         Action
@@ -565,7 +573,7 @@ const ResourcePoolMapping = () => {
                         const isUnavailable = status.text !== "Available";
                         return (
                           <tr key={emp.employeeMasterId}>
-                            <td className="py-2 px-3 align-middle">
+                            <td className="py-2 px-3 align-middle text-start">
                               <div className="fw-semibold">
                                 {emp.firstName} {emp.lastName}
                               </div>
@@ -574,17 +582,17 @@ const ResourcePoolMapping = () => {
                               </small>
                               <small className="text-muted">{emp.email}</small>
                             </td>
-                            <td className="py-2 align-middle">
+                            <td className="py-2 align-middle text-start">
                               <span className="badge bg-light text-dark fs-6">
                                 {emp.roleName}
                               </span>
                             </td>
-                            <td className="py-2 align-middle">
+                            <td className="py-2 align-middle text-start">
                               <small className="text-muted">
                                 {emp.departmentName}
                               </small>
                             </td>
-                            <td className="py-2 text-center align-middle">
+                            <td className="py-2 align-middle text-start">
                               <span className={`badge ${status.badge}`}>
                                 {React.createElement(status.icon, {
                                   size: 12,
@@ -593,7 +601,7 @@ const ResourcePoolMapping = () => {
                                 {status.text}
                               </span>
                             </td>
-                            <td className="py-2 text-center align-middle">
+                            <td className="py-2 align-middle text-start">
                               <button
                                 className={`btn btn-sm ${
                                   isEmployeeSelected(emp.employeeMasterId)
@@ -639,7 +647,7 @@ const ResourcePoolMapping = () => {
         <div className="col-lg-4">
           <div className="card border-0 shadow-sm h-100 d-flex flex-column">
             <div className="card-header bg-light d-flex align-items-center justify-content-between">
-              <h5 className="mb-0 d-flex align-items-center gap-2" style={{color:"white"}}>
+              <h5 className="mb-0 d-flex align-items-center gap-2 text-start" style={{ color: "white" }}>
                 <UserCheck size={20} className="text-success" /> Selected
                 Employees ({selectedEmployees.length})
               </h5>
@@ -680,12 +688,12 @@ const ResourcePoolMapping = () => {
                         key={emp.employeeMasterId}
                         className="d-flex align-items-center justify-content-between p-2 mb-2 bg-white rounded shadow-sm border"
                       >
-                        <div className="flex-grow-1">
+                        <div className="flex-grow-1 text-start">
                           <div className="fw-semibold small">
                             {index + 1}. {emp.firstName} {emp.lastName}
                           </div>
                           <div
-                            className="text-muted"
+                            className="text-muted text-start"
                             style={{ fontSize: "0.75rem" }}
                           >
                             {emp.employeeCompanyId} • {emp.roleName} •{" "}

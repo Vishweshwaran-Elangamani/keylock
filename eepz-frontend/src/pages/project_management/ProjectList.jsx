@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FolderKanban, Plus, ArrowLeft, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { toast } from 'sonner';
 import projectService from '../../services/project_management/projectService';
 import '../../styles/projectmanagement/ProjectList.css'
 
@@ -9,6 +10,7 @@ import '../../styles/projectmanagement/ProjectList.css'
 import EditProjectModal from '../../components/project_management_components/modals/EditProjectModal'
 import ManagerSelectionModal from '../../components/project_management_components/modals/ManagerSelectionModal'
 import EmployeeMappingModal from '../../components/project_management_components/modals/EmployeeMappingModal'
+import DeleteConfirmationModal from '../../components/project_management_components/modals/DeleteConfirmationModal'
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -34,10 +36,13 @@ const ProjectList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showManagerModal, setShowManagerModal] = useState(false);
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalMessage, setModalMessage] = useState(null);
   const [isLoadingModalData, setIsLoadingModalData] = useState(false);
+  const [isDeletingProject, setIsDeletingProject] = useState(false);
 
   // Form states
   const [editFormData, setEditFormData] = useState({});
@@ -98,6 +103,7 @@ const ProjectList = () => {
       if (buRes.success) setBusinessUnits(buRes.data || []);
     } catch (err) {
       console.error('Error fetching dropdown data:', err);
+      toast.error('Failed to load dropdown data');
     }
   };
 
@@ -110,10 +116,12 @@ const ProjectList = () => {
         setProjects(response.data);
       } else {
         setError('Failed to load projects');
+        toast.error('Failed to load projects');
       }
     } catch (err) {
       console.error('Error fetching projects:', err);
       setError('Failed to load projects. Please try again.');
+      toast.error('Failed to load projects. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -331,13 +339,16 @@ const ProjectList = () => {
 
       if (response.success) {
         setModalMessage({ type: 'success', text: 'Project updated successfully!' });
+        toast.success('Project updated successfully!');
         setTimeout(() => {
           setShowEditModal(false);
           fetchProjects();
         }, 1500);
       }
     } catch (error) {
-      setModalMessage({ type: 'error', text: error.message || 'Failed to update project' });
+      const errorMessage = error.message || 'Failed to update project';
+      setModalMessage({ type: 'error', text: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -389,13 +400,16 @@ const ProjectList = () => {
 
       if (response.success) {
         setModalMessage({ type: 'success', text: 'Reporting managers updated successfully!' });
+        toast.success('Reporting managers updated successfully!');
         setTimeout(() => {
           setShowManagerModal(false);
           fetchProjects();
         }, 1500);
       }
     } catch (error) {
-      setModalMessage({ type: 'error', text: error.message || 'Failed to update managers' });
+      const errorMessage = error.message || 'Failed to update managers';
+      setModalMessage({ type: 'error', text: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -423,7 +437,9 @@ const ProjectList = () => {
       }
     } catch (error) {
       console.error('Error fetching employee data:', error);
-      setModalMessage({ type: 'error', text: 'Failed to load employee data' });
+      const errorMessage = 'Failed to load employee data';
+      setModalMessage({ type: 'error', text: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setIsLoadingModalData(false);
     }
@@ -444,7 +460,9 @@ const ProjectList = () => {
 
   const handlePrimaryToggle = (employeeId) => {
     if (!selectedEmployeeIds.includes(employeeId)) {
-      setModalMessage({ type: 'error', text: 'Please select the employee first before marking as primary' });
+      const errorMessage = 'Please select the employee first before marking as primary';
+      setModalMessage({ type: 'error', text: errorMessage });
+      toast.warning(errorMessage);
       setTimeout(() => setModalMessage(null), 3000);
       return;
     }
@@ -479,7 +497,9 @@ const ProjectList = () => {
     );
 
     if (employeesToMap.length === 0) {
-      setModalMessage({ type: 'error', text: 'Please select at least one unmapped employee' });
+      const errorMessage = 'Please select at least one unmapped employee';
+      setModalMessage({ type: 'error', text: errorMessage });
+      toast.warning(errorMessage);
       setTimeout(() => setModalMessage(null), 3000);
       return;
     }
@@ -497,10 +517,9 @@ const ProjectList = () => {
 
       if (response.success) {
         const primaryCount = employeesWithPrimary.filter(e => e.isPrimary).length;
-        setModalMessage({ 
-          type: 'success', 
-          text: `${employeesToMap.length} employee(s) mapped successfully! ${primaryCount > 0 ? `(${primaryCount} marked as primary)` : ''}` 
-        });
+        const successMessage = `${employeesToMap.length} employee(s) mapped successfully! ${primaryCount > 0 ? `(${primaryCount} marked as primary)` : ''}`;
+        setModalMessage({ type: 'success', text: successMessage });
+        toast.success(successMessage);
         setSelectedEmployeeIds([]);
         setPrimaryEmployeeIds([]);
 
@@ -517,7 +536,9 @@ const ProjectList = () => {
         }, 1500);
       }
     } catch (error) {
-      setModalMessage({ type: 'error', text: error.message || 'Failed to map employees' });
+      const errorMessage = error.message || 'Failed to map employees';
+      setModalMessage({ type: 'error', text: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -529,7 +550,9 @@ const ProjectList = () => {
     );
 
     if (employeesToUnmap.length === 0) {
-      setModalMessage({ type: 'error', text: 'Please select at least one mapped employee' });
+      const errorMessage = 'Please select at least one mapped employee';
+      setModalMessage({ type: 'error', text: errorMessage });
+      toast.warning(errorMessage);
       setTimeout(() => setModalMessage(null), 3000);
       return;
     }
@@ -541,7 +564,9 @@ const ProjectList = () => {
       const response = await projectService.unmapEmployees(selectedProject.projectId, employeesToUnmap);
 
       if (response.success) {
-        setModalMessage({ type: 'success', text: `${employeesToUnmap.length} employee(s) unmapped successfully!` });
+        const successMessage = `${employeesToUnmap.length} employee(s) unmapped successfully!`;
+        setModalMessage({ type: 'success', text: successMessage });
+        toast.success(successMessage);
         setSelectedEmployeeIds([]);
         
         setPrimaryEmployeeIds(prev => prev.filter(id => !employeesToUnmap.includes(id)));
@@ -559,25 +584,57 @@ const ProjectList = () => {
         }, 1500);
       }
     } catch (error) {
-      setModalMessage({ type: 'error', text: error.message || 'Failed to unmap employees' });
+      const errorMessage = error.message || 'Failed to unmap employees';
+      setModalMessage({ type: 'error', text: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDeleteProject = async (projectId) => {
-    if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-      return;
-    }
+  const handleDeleteClick = (project) => {
+    setProjectToDelete(project);
+    setShowDeleteModal(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!projectToDelete) return;
+
+    setIsDeletingProject(true);
     try {
-      const response = await projectService.deleteProject(projectId);
+      const response = await projectService.deleteProject(projectToDelete.projectId);
+      
       if (response.success) {
+        toast.success('Project deleted successfully!');
+        setShowDeleteModal(false);
+        setProjectToDelete(null);
         fetchProjects();
+      } else {
+        // Handle error response from backend
+        const errorMessage = response.message || 'Failed to delete project';
+        toast.error(errorMessage, {
+          duration: 5000,
+        });
       }
     } catch (error) {
-      alert('Failed to delete project: ' + (error.message || 'Unknown error'));
+      console.error('Failed to delete project:', error);
+      
+      // Check if error has the response structure from backend
+      const errorMessage = error.message || 
+                          error.response?.data?.message || 
+                          'Failed to delete project. Please try again.';
+      
+      toast.error(errorMessage, {
+        duration: 5000,
+      });
+    } finally {
+      setIsDeletingProject(false);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setProjectToDelete(null);
   };
 
   const formatDate = (dateString) => {
@@ -750,20 +807,20 @@ const ProjectList = () => {
       {!isLoading && !error && (
         <>
           <div className="card border-0 shadow-sm flex-grow-1 table-card-rounded">
-      <div className="card-body p-0">
-        <div className="table-responsive">
-          <table className="table table-hover mb-0 custom-project-table">
-            <thead className="project-table-header">
-              <tr>
-                <th className="px-4 py-3">Project Name</th>
-                <th className="py-3">Status</th>
-                <th className="py-3">Business Unit</th>
-                <th className="py-3">Department</th>
-                <th className="py-3">Start Date</th>
-                <th className="py-3">Resource Owner</th>
-                <th className="py-3 text-center">Actions</th>
-              </tr>
-            </thead>
+            <div className="card-body p-0">
+              <div className="table-responsive">
+                <table className="table table-hover mb-0 custom-project-table">
+                  <thead className="project-table-header">
+                    <tr>
+                      <th className="px-4 py-3">Project Name</th>
+                      <th className="py-3">Status</th>
+                      <th className="py-3">Business Unit</th>
+                      <th className="py-3">Department</th>
+                      <th className="py-3">Start Date</th>
+                      <th className="py-3">Resource Owner</th>
+                      <th className="py-3 text-center">Actions</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     {paginatedProjects.length === 0 ? (
                       <tr>
@@ -848,7 +905,7 @@ const ProjectList = () => {
                               </button>
                               <button 
                                 className="btn btn-sm btn-outline-danger" 
-                                onClick={() => handleDeleteProject(project.projectId)} 
+                                onClick={() => handleDeleteClick(project)} 
                                 title="Delete Project"
                               >
                                 <Trash2 size={16} />
@@ -915,7 +972,7 @@ const ProjectList = () => {
         </>
       )}
 
-  
+      {/* Modals */}
       <EditProjectModal 
         show={showEditModal}
         onClose={() => setShowEditModal(false)}
@@ -961,37 +1018,44 @@ const ProjectList = () => {
       />
 
       <EmployeeMappingModal 
-  show={showEmployeeModal}
-  onClose={() => setShowEmployeeModal(false)}
-  project={selectedProject}
-  filteredEmployees={filteredEmployees}
-  mappedEmployees={mappedEmployees}
-  selectedEmployeeIds={selectedEmployeeIds}
-  primaryEmployeeIds={primaryEmployeeIds}
-  onEmployeeSelect={handleEmployeeSelect}
-  onPrimaryToggle={handlePrimaryToggle}
-  onSelectAll={handleSelectAllEmployees}
-  onMap={handleMapEmployees}   
-  onUnmap={handleUnmapEmployees} 
-  isSubmitting={isSubmitting}
-  message={modalMessage}
-  isLoadingData={isLoadingModalData}
-  searchTerm={employeeSearchTerm}
-  setSearchTerm={setEmployeeSearchTerm}
-  filterRole={employeeFilterRole}
-  setFilterRole={setEmployeeFilterRole}
-  filterDepartment={employeeFilterDepartment}
-  setFilterDepartment={setEmployeeFilterDepartment}
-  filterStatus={employeeFilterStatus}
-  setFilterStatus={setEmployeeFilterStatus}
-  uniqueRoles={getUniqueRoles()}
-  uniqueDepartments={getUniqueDepartments()}
-  getMappedCount={getMappedCount}
-  getUnmappedCount={getUnmappedCount}
-  hasSelectedMapped={hasSelectedMappedEmployees}
-  hasSelectedUnmapped={hasSelectedUnmappedEmployees}
-/>
+        show={showEmployeeModal}
+        onClose={() => setShowEmployeeModal(false)}
+        project={selectedProject}
+        filteredEmployees={filteredEmployees}
+        mappedEmployees={mappedEmployees}
+        selectedEmployeeIds={selectedEmployeeIds}
+        primaryEmployeeIds={primaryEmployeeIds}
+        onEmployeeSelect={handleEmployeeSelect}
+        onPrimaryToggle={handlePrimaryToggle}
+        onSelectAll={handleSelectAllEmployees}
+        onMap={handleMapEmployees}   
+        onUnmap={handleUnmapEmployees} 
+        isSubmitting={isSubmitting}
+        message={modalMessage}
+        isLoadingData={isLoadingModalData}
+        searchTerm={employeeSearchTerm}
+        setSearchTerm={setEmployeeSearchTerm}
+        filterRole={employeeFilterRole}
+        setFilterRole={setEmployeeFilterRole}
+        filterDepartment={employeeFilterDepartment}
+        setFilterDepartment={setEmployeeFilterDepartment}
+        filterStatus={employeeFilterStatus}
+        setFilterStatus={setEmployeeFilterStatus}
+        uniqueRoles={getUniqueRoles()}
+        uniqueDepartments={getUniqueDepartments()}
+        getMappedCount={getMappedCount}
+        getUnmappedCount={getUnmappedCount}
+        hasSelectedMapped={hasSelectedMappedEmployees}
+        hasSelectedUnmapped={hasSelectedUnmappedEmployees}
+      />
 
+      <DeleteConfirmationModal 
+        show={showDeleteModal}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        project={projectToDelete}
+        isDeleting={isDeletingProject}
+      />
     </div>
   );
 };

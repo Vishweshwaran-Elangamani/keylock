@@ -1,4 +1,4 @@
-// src/pages/sla/ManagerSLADashboard.jsx - FIXED WITH COMPLIANCE
+// src/pages/sla/ManagerSLADashboard.jsx - PROPERLY STRUCTURED
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -17,31 +17,27 @@ import {
   TrendingUp,
   ChevronLeft,
   ChevronRight,
-  TrendingDown,
-  BarChart3,
 } from 'lucide-react';
 import slaService, { escalationHelpers } from '../../services/sla/slaService';
 import ManagerEscalationModal from '../../components/sla/modals/ManagerEscalationModal';
 import ResolveEscalationModal from '../../components/sla/modals/ResolveEscalationModal';
 import { formatDate } from '../../utils/sla/dateFormatter';
-import { getComplianceSummary, getComplianceRating } from '../../utils/sla/slaCalculations';
 import Breadcrumb from '../../components/sla/common/Breadcrumbs';
+import '../../styles/sla/ManagerSLADashboard.css';
 
 const ManagerSLADashboard = () => {
   const navigate = useNavigate();
 
-  const [allSLAs, setAllSLAs] = useState([]);
   const [managerSLAs, setManagerSLAs] = useState([]);
   const [managerEscalations, setManagerEscalations] = useState([]);
   const [filteredSlas, setFilteredSlas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(10);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [complianceFilter, setComplianceFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All Status');
+  const [complianceFilter, setComplianceFilter] = useState('All Compliance');
   const [activeTab, setActiveTab] = useState('all');
 
   const [showEscalationModal, setShowEscalationModal] = useState(false);
@@ -49,130 +45,51 @@ const ManagerSLADashboard = () => {
   const [selectedSLAForEscalation, setSelectedSLAForEscalation] = useState(null);
   const [selectedEscalationForResolve, setSelectedEscalationForResolve] = useState(null);
   const [deptHeads, setDeptHeads] = useState([]);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    setUser(userData);
     loadData();
   }, []);
 
   useEffect(() => {
     applyFilters();
-  }, [
-    managerSLAs,
-    managerEscalations,
-    searchTerm,
-    statusFilter,
-    complianceFilter,
-    activeTab,
-  ]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, complianceFilter, activeTab, itemsPerPage]);
-
-  // ✅ COMPLIANCE METRICS CALCULATION
-  const complianceMetrics = useMemo(() => {
-    if (managerSLAs.length === 0) {
-      return {
-        compliancePercentage: 0,
-        complianceRating: 'N/A',
-        onTimeSLAs: 0,
-        breachedSLAs: 0,
-        extendedSLAs: 0,
-        closedSLAs: 0,
-        openSLAs: 0,
-        ratingColor: '#94a3b8',
-      };
-    }
-
-    // Use getComplianceSummary (CLOSED SLAs ONLY for compliance %)
-    const summary = getComplianceSummary(managerSLAs);
-    const ratingObj = getComplianceRating(summary.compliancePercentage);
-
-    return {
-      compliancePercentage: summary.compliancePercentage,
-      complianceRating: summary.rating,
-      onTimeSLAs: summary.onTimeSLAs,
-      breachedSLAs: summary.breachedSLAs,
-      extendedSLAs: managerSLAs.filter(
-        (s) => s.status === 'Closed' && s.complianceStatus === 'Extended'
-      ).length,
-      closedSLAs: summary.closedSLAs,
-      openSLAs: summary.openSLAs,
-      ratingColor: ratingObj.color,
-    };
-  }, [managerSLAs]);
-
-  const fetchDeptHeads = async (departmentId) => {
-    try {
-      const res = await slaService.getDepartmentHeads(departmentId);
-
-      if (res?.success && Array.isArray(res.data)) {
-        setDeptHeads(res.data);
-      } else {
-        setDeptHeads([]);
-      }
-    } catch (err) {
-      console.error('Error fetching dept heads:', err.message);
-      setDeptHeads([]);
-    }
-  };
-
-  const fetchManagerEscalations = async (managerId) => {
-    try {
-      const res = await slaService.getManagerEscalations(managerId);
-
-      if (res?.success && Array.isArray(res.data)) {
-        setManagerEscalations(res.data);
-      } else {
-        setManagerEscalations([]);
-      }
-    } catch (err) {
-      console.error('Error fetching escalations:', err.message);
-      setManagerEscalations([]);
-    }
-  };
+  }, [managerSLAs, managerEscalations, searchTerm, statusFilter, complianceFilter, activeTab]);
 
   const loadData = async () => {
     setLoading(true);
-    setError(null);
-
     try {
       const userData = JSON.parse(localStorage.getItem('user'));
 
       if (!userData?.empId) {
-        setError('User not found in session');
+        toast.error('User not found');
         setLoading(false);
         return;
       }
 
+      // Fetch department heads
       if (userData.departmentId) {
-        fetchDeptHeads(userData.departmentId);
+        const deptHeadRes = await slaService.getDepartmentHeads(userData.departmentId);
+        if (deptHeadRes?.success && Array.isArray(deptHeadRes.data)) {
+          setDeptHeads(deptHeadRes.data);
+        }
       }
 
-      fetchManagerEscalations(userData.empId);
+      // Fetch escalations
+      const escalationsRes = await slaService.getManagerEscalations(userData.empId);
+      if (escalationsRes?.success && Array.isArray(escalationsRes.data)) {
+        setManagerEscalations(escalationsRes.data);
+      }
 
+      // Fetch SLAs
       const response = await slaService.getAllSLAs();
-
       if (response?.success && Array.isArray(response.data)) {
-        setAllSLAs(response.data);
-
         const filtered = response.data.filter(
           (sla) => sla.assignedToEmployeeId === userData.empId
         );
         setManagerSLAs(filtered);
-      } else {
-        setAllSLAs([]);
-        setManagerSLAs([]);
-        setError('No data received from server');
       }
     } catch (err) {
       console.error('Error loading data:', err);
-      setError(err.message || 'Failed to load SLAs');
-      setAllSLAs([]);
-      setManagerSLAs([]);
+      toast.error('Failed to load SLAs');
     } finally {
       setLoading(false);
     }
@@ -181,7 +98,7 @@ const ManagerSLADashboard = () => {
   const getTabData = () => {
     switch (activeTab) {
       case 'open':
-        return managerSLAs.filter((s) => s.status === 'Open' || s.status === 'InProgress');
+        return managerSLAs.filter((s) => s.status === 'Open');
       case 'closed':
         return managerSLAs.filter((s) => s.status === 'Closed');
       case 'escalations':
@@ -201,16 +118,15 @@ const ManagerSLADashboard = () => {
           (sla) =>
             sla.employeeName?.toLowerCase().includes(term) ||
             sla.departmentName?.toLowerCase().includes(term) ||
-            sla.relatedEntityType?.toLowerCase().includes(term) ||
             sla.slaid?.toString().includes(term)
         );
       }
 
-      if (statusFilter !== 'All') {
+      if (statusFilter !== 'All Status') {
         result = result.filter((sla) => sla.status === statusFilter);
       }
 
-      if (complianceFilter !== 'All') {
+      if (complianceFilter !== 'All Compliance') {
         result = result.filter((sla) => sla.complianceStatus === complianceFilter);
       }
     } else {
@@ -219,12 +135,11 @@ const ManagerSLADashboard = () => {
         result = result.filter(
           (esc) =>
             esc.reason?.toLowerCase().includes(term) ||
-            esc.employeeName?.toLowerCase().includes(term) ||
-            esc.description?.toLowerCase().includes(term)
+            esc.employeeName?.toLowerCase().includes(term)
         );
       }
 
-      if (statusFilter !== 'All') {
+      if (statusFilter !== 'All Status') {
         result = result.filter((esc) => esc.escalationStatus === statusFilter);
       }
     }
@@ -235,23 +150,15 @@ const ManagerSLADashboard = () => {
   const calculateStats = () => {
     return {
       total: managerSLAs.length,
-      open: managerSLAs.filter((s) => s.status === 'Open' || s.status === 'InProgress').length,
-      escalated: managerSLAs.filter((s) => s.status === 'Escalated').length,
+      open: managerSLAs.filter((s) => s.status === 'Open').length,
       closed: managerSLAs.filter((s) => s.status === 'Closed').length,
-      escalations: managerEscalations.length,
+      escalated: managerSLAs.filter((s) => s.status === 'Escalated').length,
+      totalEscalations: managerEscalations.length,
       pending: managerEscalations.filter((e) => e.escalationStatus === 'Pending').length,
     };
   };
 
   const handleEscalateClick = (sla) => {
-    if (!escalationHelpers.canEscalateToL2(sla, [sla])) {
-      const reason = escalationHelpers.getEscalationBlockReason(sla, [sla], 'L2');
-      toast.warning('Cannot Escalate', {
-        description: reason || 'This SLA cannot be escalated at this time.',
-      });
-      return;
-    }
-
     setSelectedSLAForEscalation(sla);
     setShowEscalationModal(true);
   };
@@ -259,16 +166,14 @@ const ManagerSLADashboard = () => {
   const handleEscalateToDeptHead = async (payload) => {
     try {
       const res = await slaService.escalateToDeptHead(payload);
-
       if (res.success) {
+        toast.success('Escalated successfully');
         setShowEscalationModal(false);
         setSelectedSLAForEscalation(null);
         loadData();
-      } else {
-        throw new Error(res.message || 'Failed to escalate');
       }
     } catch (err) {
-      console.error('Escalation Error:', err);
+      toast.error('Escalation failed');
       throw err;
     }
   };
@@ -281,1066 +186,305 @@ const ManagerSLADashboard = () => {
   const handleResolveEscalation = async (payload) => {
     try {
       const res = await slaService.resolveEscalation(payload);
-
       if (res.success) {
-        toast.success('Escalation Resolved!', {
-          description: 'The escalation has been resolved successfully.',
-        });
-
+        toast.success('Escalation resolved');
         setShowResolveModal(false);
         setSelectedEscalationForResolve(null);
         loadData();
-      } else {
-        toast.error('Resolution Failed', {
-          description: res.message || 'Failed to resolve escalation.',
-        });
       }
     } catch (err) {
-      console.error('Resolve Error:', err);
-      toast.error('Resolution Error', {
-        description: err.message || 'An error occurred while resolving.',
-      });
+      toast.error('Resolution failed');
     }
-  };
-
-  const handleExport = () => {
-    if (filteredSlas.length === 0) {
-      toast.warning('No Data to Export', {
-        description: 'There are no records to export.',
-      });
-      return;
-    }
-
-    let csvData, filename;
-
-    if (activeTab === 'escalations') {
-      csvData = filteredSlas.map((esc) => ({
-        ID: esc.escalationId,
-        Employee: esc.employeeName,
-        Reason: esc.reason,
-        Level: esc.escalationLevel,
-        Status: esc.escalationStatus,
-        SubmittedAt: formatDate(esc.submittedAt),
-        Description: esc.description,
-      }));
-      filename = `manager-escalations-${new Date().toISOString().split('T')[0]}.csv`;
-    } else {
-      csvData = filteredSlas.map((sla) => ({
-        ID: sla.slaid,
-        Employee: sla.employeeName,
-        Department: sla.departmentName,
-        Type: sla.relatedEntityType,
-        Status: sla.status,
-        Compliance: sla.complianceStatus,
-        Deadline: formatDate(sla.deadline),
-      }));
-      filename = `manager-slas-${new Date().toISOString().split('T')[0]}.csv`;
-    }
-
-    const csv = [
-      Object.keys(csvData[0]).join(','),
-      ...csvData.map((row) =>
-        Object.values(row)
-          .map((v) => `"${String(v).replace(/"/g, '""')}"`)
-          .join(',')
-      ),
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-
-    toast.success('Export Successful', {
-      description: `${csvData.length} records exported to ${filename}`,
-    });
-  };
-
-  const clearFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('All');
-    setComplianceFilter('All');
-  };
-
-  const getStatusBadge = (status) => {
-    const statusMap = {
-      Open: 'bg-primary',
-      Pending: 'bg-warning text-dark',
-      Submitted: 'bg-success',
-      InProgress: 'bg-info',
-      Closed: 'bg-success',
-      Escalated: 'bg-danger',
-    };
-    return statusMap[status] || 'bg-secondary';
-  };
-
-  const getComplianceBadge = (compliance) => {
-    const complianceMap = {
-      OnTime: 'bg-success',
-      Breached: 'bg-danger',
-      Extended: 'bg-warning text-dark',
-      NotStarted: 'bg-secondary',
-    };
-    return complianceMap[compliance] || 'bg-secondary';
-  };
-
-  const getEscalationLevelColor = (level) => {
-    switch (level) {
-      case 'L1':
-        return 'badge bg-info';
-      case 'L2':
-        return 'badge bg-warning text-dark';
-      case 'L3':
-        return 'badge bg-danger';
-      default:
-        return 'badge bg-secondary';
-    }
-  };
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handleItemsPerPageChange = (e) => {
-    setItemsPerPage(Number(e.target.value));
-    setCurrentPage(1);
-  };
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) {
-          pages.push(i);
-        }
-        pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1);
-        pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        pages.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push('...');
-        pages.push(totalPages);
-      }
-    }
-
-    return pages;
   };
 
   const stats = calculateStats();
   const totalPages = Math.ceil(filteredSlas.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedData = filteredSlas.slice(startIndex, endIndex);
+  const paginatedData = filteredSlas.slice(startIndex, startIndex + itemsPerPage);
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: '600px' }}
-      >
-        <div
-          className="spinner-border text-primary"
-          role="status"
-          style={{ width: '3rem', height: '3rem' }}
-        >
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div className="loading-container">
+        <div className="spinner-border text-primary" />
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        padding: '1.25rem 1.75rem',
-        maxWidth: '100%',
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <Breadcrumb
-        items={[
-          { label: 'SLA Management', path: '/manager/dashboard/sla' },
-          { label: 'Manager' },
-        ]}
-      />
-
-      {/* HEADER */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
+    <div className="manager-dashboard">
+      {/* Header */}
+      <div className="dashboard-header">
         <div>
-          <h2 className="fw-bold mb-1" style={{ color: 'var(--color-primary-1)' }}>
-            Manager SLA Dashboard
-          </h2>
-          <p className="mb-0" style={{ color: '#64748b', fontSize: '0.875rem' }}>
-            Track and manage all assigned SLAs with compliance metrics
-          </p>
+          <Breadcrumb items={[{ label: 'Dashboard' }, { label: 'SLA Management' }, { label: 'Manager' }]} />
+          <h1 className="dashboard-title">Manager SLA Dashboard</h1>
+          <p className="dashboard-subtitle">Track and manage all assigned SLAs with compliance metrics</p>
         </div>
-        <div className="d-flex gap-2">
-          <button
-            className="btn d-flex align-items-center gap-2"
-            onClick={loadData}
-            style={{
-              backgroundColor: 'transparent',
-              border: '1.5px solid #0F62FE',
-              color: '#0F62FE',
-              borderRadius: '8px',
-              padding: '8px 16px',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-            }}
-          >
+        <div className="header-actions">
+          <button className="btn-refresh" onClick={loadData}>
             <RefreshCw size={16} />
             Refresh
           </button>
-          <button
-            className="btn d-flex align-items-center gap-2"
-            onClick={handleExport}
-            disabled={filteredSlas.length === 0}
-            style={{
-              backgroundColor: 'transparent',
-              border: '1.5px solid #24A148',
-              color: '#24A148',
-              borderRadius: '8px',
-              padding: '8px 16px',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-            }}
-          >
+          <button className="btn-export" onClick={() => toast.info('Export feature coming soon')}>
             <Download size={16} />
             Export
           </button>
         </div>
       </div>
 
-      {/* ERROR ALERT */}
-      {error && (
-        <div
-          className="alert alert-danger alert-dismissible fade show mb-3"
-          role="alert"
-          style={{ borderRadius: '8px', padding: '0.75rem 1rem' }}
-        >
-          <div className="d-flex align-items-start gap-2">
-            <AlertTriangle size={18} style={{ marginTop: '2px' }} />
-            <span style={{ flex: 1 }}>{error}</span>
+      {/* Compliance Summary Bar */}
+      <div className="compliance-card">
+        <div className="compliance-metrics">
+          <div className="compliance-metric">
+            <div className="metric-icon icon-red">
+              <TrendingUp size={20} />
+            </div>
+            <div className="compliance-metric-content">
+              <h4>0.0%</h4>
+              <small>Compliance</small>
+            </div>
           </div>
-          <button type="button" className="btn-close" onClick={() => setError(null)} />
+
+          <div className="compliance-metric">
+            <div className="metric-icon icon-green">
+              <CheckCircle size={20} />
+            </div>
+            <div className="compliance-metric-content">
+              <h4>0</h4>
+              <small>On-Time</small>
+            </div>
+          </div>
+
+          <div className="compliance-metric">
+            <div className="metric-icon icon-pink">
+              <AlertTriangle size={20} />
+            </div>
+            <div className="compliance-metric-content">
+              <h4>0</h4>
+              <small>Breached</small>
+            </div>
+          </div>
+
+          <div className="compliance-metric">
+            <div className="metric-icon icon-yellow">
+              <Clock size={20} />
+            </div>
+            <div className="compliance-metric-content">
+              <h4>0</h4>
+              <small>Extended</small>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* ✅ COMPLIANCE METRICS CARD */}
-      <div className="card border-0 shadow-sm mb-3" style={{ borderRadius: '12px' }}>
-        <div className="card-body p-3">
-          <div className="row g-3 align-items-center">
-            <div className="col-lg-8">
-              <div className="row g-3">
-                <div className="col-md-3">
-                  <div className="d-flex align-items-center gap-2">
-                    <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        backgroundColor: `${complianceMetrics.ratingColor}20`,
-                        borderRadius: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <BarChart3 size={20} color={complianceMetrics.ratingColor} />
-                    </div>
-                    <div>
-                      <h4 className="fw-bold mb-0" style={{ color: complianceMetrics.ratingColor }}>
-                        {complianceMetrics.compliancePercentage.toFixed(1)}%
-                      </h4>
-                      <small className="text-muted">Compliance</small>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-3">
-                  <div className="d-flex align-items-center gap-2">
-                    <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        backgroundColor: '#24A14820',
-                        borderRadius: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <TrendingUp size={20} color="#24A148" />
-                    </div>
-                    <div>
-                      <h4 className="fw-bold mb-0" style={{ color: '#24A148' }}>
-                        {complianceMetrics.onTimeSLAs}
-                      </h4>
-                      <small className="text-muted">On-Time</small>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-3">
-                  <div className="d-flex align-items-center gap-2">
-                    <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        backgroundColor: '#E0195020',
-                        borderRadius: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <TrendingDown size={20} color="#E01950" />
-                    </div>
-                    <div>
-                      <h4 className="fw-bold mb-0" style={{ color: '#E01950' }}>
-                        {complianceMetrics.breachedSLAs}
-                      </h4>
-                      <small className="text-muted">Breached</small>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-3">
-                  <div className="d-flex align-items-center gap-2">
-                    <div
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        backgroundColor: '#E2B93B20',
-                        borderRadius: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Clock size={20} color="#E2B93B" />
-                    </div>
-                    <div>
-                      <h4 className="fw-bold mb-0" style={{ color: '#E2B93B' }}>
-                        {complianceMetrics.extendedSLAs}
-                      </h4>
-                      <small className="text-muted">Extended</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-lg-4">
-              <div className="d-flex align-items-center justify-content-end gap-3">
-                <div className="text-end">
-                  <span
-                    className="badge"
-                    style={{
-                      backgroundColor: `${complianceMetrics.ratingColor}15`,
-                      color: complianceMetrics.ratingColor,
-                      border: `2px solid ${complianceMetrics.ratingColor}`,
-                      padding: '8px 16px',
-                      fontSize: '0.875rem',
-                      fontWeight: 700,
-                    }}
-                  >
-                    {complianceMetrics.complianceRating}
-                  </span>
-                  <p className="text-muted mb-0 mt-2" style={{ fontSize: '0.75rem' }}>
-                    Based on {complianceMetrics.closedSLAs} Closed SLAs
-                  </p>
-                </div>
-                <div
-                  style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '50%',
-                    background: `conic-gradient(${complianceMetrics.ratingColor} ${complianceMetrics.compliancePercentage}%, #e5e7eb 0%)`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '64px',
-                      height: '64px',
-                      borderRadius: '50%',
-                      backgroundColor: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 700,
-                      fontSize: '1rem',
-                      color: complianceMetrics.ratingColor,
-                    }}
-                  >
-                    {complianceMetrics.compliancePercentage.toFixed(0)}%
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="compliance-rating">
+          <span className="rating-badge critical">Critical</span>
+          <p className="rating-info">Based on 0 Closed SLAs</p>
+          <div className="rating-circle">
+            <div className="rating-circle-inner">0%</div>
           </div>
         </div>
       </div>
 
-      {/* STATS CARDS */}
-      <div className="row g-3 mb-3">
+      {/* Stats Grid */}
+      <div className="stats-grid">
         {[
-          {
-            label: 'Total SLAs',
-            value: stats.total,
-            icon: Users,
-            bgColor: '#dbeafe',
-            iconColor: '#0F62FE',
-          },
-          {
-            label: 'Open',
-            value: stats.open,
-            icon: Clock,
-            bgColor: '#e0e7ff',
-            iconColor: '#4f46e5',
-          },
-          {
-            label: 'Escalated',
-            value: stats.escalated,
-            icon: AlertTriangle,
-            bgColor: '#fee2e2',
-            iconColor: '#E01950',
-          },
-          {
-            label: 'Closed',
-            value: stats.closed,
-            icon: CheckCircle,
-            bgColor: '#dcfce7',
-            iconColor: '#24A148',
-          },
-          {
-            label: 'Total Escalations',
-            value: stats.escalations,
-            icon: TrendingUp,
-            bgColor: '#fef3c7',
-            iconColor: '#E2B93B',
-          },
-          {
-            label: 'Pending',
-            value: stats.pending,
-            icon: Clock,
-            bgColor: '#fef3c7',
-            iconColor: '#D4941E',
-          },
-        ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
-          <div key={label} className="col-lg-2 col-md-4 col-6">
-            <div
-              className="card border-0 h-100"
-              style={{
-                borderRadius: '10px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-              }}
-            >
-              <div
-                className="card-body d-flex flex-column align-items-center justify-content-center text-center"
-                style={{ padding: '1rem 0.75rem' }}
-              >
-                <div
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    backgroundColor: bgColor,
-                    borderRadius: '10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '0.75rem',
-                  }}
-                >
-                  <Icon size={24} color={iconColor} strokeWidth={2.5} />
-                </div>
-                <h3
-                  className="fw-bold mb-1"
-                  style={{
-                    fontSize: '1.75rem',
-                    color: '#0f172a',
-                    lineHeight: 1,
-                  }}
-                >
-                  {value}
-                </h3>
-                <p
-                  className="mb-0"
-                  style={{
-                    fontSize: '0.813rem',
-                    color: '#64748b',
-                    fontWeight: 600,
-                  }}
-                >
-                  {label}
-                </p>
-              </div>
+          { label: 'Total SLAs', value: stats.total, icon: Users, className: 'icon-blue' },
+          { label: 'Open', value: stats.open, icon: Clock, className: 'icon-light-blue' },
+          { label: 'Escalated', value: stats.escalated, icon: AlertTriangle, className: 'icon-red' },
+          { label: 'Closed', value: stats.closed, icon: CheckCircle, className: 'icon-green' },
+          { label: 'Total Escalations', value: stats.totalEscalations, icon: TrendingUp, className: 'icon-yellow' },
+          { label: 'Pending', value: stats.pending, icon: Clock, className: 'icon-orange' },
+        ].map(({ label, value, icon: Icon, className }) => (
+          <div key={label} className="stat-card">
+            <div className={`stat-icon ${className}`}>
+              <Icon size={24} />
             </div>
+            <h3>{value}</h3>
+            <p>{label}</p>
           </div>
         ))}
       </div>
 
-      {/* TABS */}
-      <div
-        style={{
-          backgroundColor: '#27235c',
-          borderRadius: '10px 10px 0 0',
-          padding: '0 1rem',
-          marginBottom: 0,
-        }}
-      >
-        <ul className="nav nav-tabs border-0 m-0" role="tablist">
+      {/* Tabs Container */}
+      <div className="tabs-container">
+        <div className="tabs-header">
           {[
-            {
-              key: 'all',
-              label: 'All',
-              icon: Users,
-              count: managerSLAs.length,
-            },
+            { key: 'all', label: 'All', icon: Users, count: stats.total },
             { key: 'open', label: 'Open', icon: Clock, count: stats.open },
-            {
-              key: 'closed',
-              label: 'Closed',
-              icon: CheckCircle,
-              count: stats.closed,
-            },
-            {
-              key: 'escalations',
-              label: 'Escalations',
-              icon: TrendingUp,
-              count: stats.escalations,
-            },
+            { key: 'closed', label: 'Closed', icon: CheckCircle, count: stats.closed },
+            { key: 'escalations', label: 'Escalations', icon: TrendingUp, count: stats.totalEscalations },
           ].map(({ key, label, icon: Icon, count }) => (
-            <li key={key} className="nav-item">
-              <button
-                className={`nav-link border-0 d-flex align-items-center gap-2 ${
-                  activeTab === key ? 'active' : ''
-                }`}
-                onClick={() => setActiveTab(key)}
-                style={{
-                  color: activeTab === key ? '#fff' : 'rgba(255,255,255,0.7)',
-                  backgroundColor:
-                    activeTab === key ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  borderBottom:
-                    activeTab === key ? '3px solid #fff' : '3px solid transparent',
-                  padding: '1rem 1.25rem',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab !== key) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
-                    e.currentTarget.style.color = '#fff';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab !== key) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
-                  }
-                }}
-              >
-                <Icon size={16} />
-                {label} <span style={{ marginLeft: '4px' }}>({count})</span>
-              </button>
-            </li>
+            <button
+              key={key}
+              className={`tab-button ${activeTab === key ? 'active' : ''}`}
+              onClick={() => setActiveTab(key)}
+            >
+              <Icon size={16} />
+              {label} <span className="tab-count">({count})</span>
+            </button>
           ))}
-        </ul>
+        </div>
       </div>
 
-      {/* FILTERS */}
-      <div
-        className="card border-0 shadow-sm mb-3"
-        style={{ borderRadius: '0 0 10px 10px' }}
-      >
-        <div className="card-body" style={{ padding: '1rem' }}>
-          <div className="row g-3">
-            <div className="col-md-5">
-              <div className="input-group">
-                <span
-                  className="input-group-text bg-white border-end-0"
-                  style={{
-                    borderRadius: '8px 0 0 8px',
-                    borderColor: '#e2e8f0',
-                  }}
-                >
-                  <Search size={16} className="text-muted" />
-                </span>
-                <input
-                  type="text"
-                  className="form-control border-start-0"
-                  placeholder={
-                    activeTab === 'escalations'
-                      ? 'Search by employee, reason, or description...'
-                      : 'Search by employee, department, type, or SLA ID...'
-                  }
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{
-                    borderRadius: '0 8px 8px 0',
-                    borderColor: '#e2e8f0',
-                    fontSize: '0.875rem',
-                  }}
-                />
-              </div>
-            </div>
+      {/* Filters Section */}
+      <div className="filters-container">
+        <div className="search-input-wrapper">
+          <Search size={16} className="search-icon" />
+          <input
+            type="text"
+            className="form-control"
+            placeholder={
+              activeTab === 'escalations'
+                ? 'Search by employee, department, type, or SLA ID...'
+                : 'Search by employee, department, type, or SLA ID...'
+            }
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-            <div className="col-md-3">
-              <select
-                className="form-select"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                style={{
-                  borderRadius: '8px',
-                  borderColor: '#e2e8f0',
-                  fontSize: '0.875rem',
-                }}
-              >
-                <option value="All">All Status</option>
+        <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+          <option>All Status</option>
+          {activeTab === 'escalations' ? (
+            <>
+              <option>Pending</option>
+              <option>Resolved</option>
+            </>
+          ) : (
+            <>
+              <option>Open</option>
+              <option>Closed</option>
+            </>
+          )}
+        </select>
+
+        {activeTab !== 'escalations' && (
+          <select className="filter-select" value={complianceFilter} onChange={(e) => setComplianceFilter(e.target.value)}>
+            <option>All Compliance</option>
+            <option>OnTime</option>
+            <option>Breached</option>
+            <option>Extended</option>
+          </select>
+        )}
+
+        <button className="btn-filter-icon">
+          <Filter size={16} />
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="table-card">
+        <div className="table-responsive">
+          <table className="sla-table">
+            <thead>
+              <tr>
                 {activeTab === 'escalations' ? (
                   <>
-                    <option value="Pending">Pending</option>
-                    <option value="Resolved">Resolved</option>
+                    <th>EMPLOYEE</th>
+                    <th>REASON</th>
+                    <th>LEVEL</th>
+                    <th>STATUS</th>
+                    <th>SUBMITTED</th>
+                    <th>ACTIONS</th>
                   </>
                 ) : (
                   <>
-                    <option value="Open">Open</option>
-                    <option value="InProgress">In Progress</option>
-                    <option value="Closed">Closed</option>
+                    <th>EMPLOYEE</th>
+                    <th>SLA'S DEPARTMENT</th>
+                    <th>DEADLINE</th>
+                    <th>STATUS</th>
+                    <th>COMPLIANCE</th>
+                    <th>ACTIONS</th>
                   </>
                 )}
-              </select>
-            </div>
-
-            {activeTab !== 'escalations' && (
-              <div className="col-md-3">
-                <select
-                  className="form-select"
-                  value={complianceFilter}
-                  onChange={(e) => setComplianceFilter(e.target.value)}
-                  style={{
-                    borderRadius: '8px',
-                    borderColor: '#e2e8f0',
-                    fontSize: '0.875rem',
-                  }}
-                >
-                  <option value="All">All Compliance</option>
-                  <option value="OnTime">On Time</option>
-                  <option value="Breached">Breached</option>
-                  <option value="Extended">Extended</option>
-                </select>
-              </div>
-            )}
-
-            <div className={activeTab === 'escalations' ? 'col-md-4' : 'col-md-1'}>
-              <button
-                className="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center"
-                onClick={clearFilters}
-                style={{
-                  borderRadius: '8px',
-                  height: '38px',
-                  borderColor: '#e2e8f0',
-                }}
-                title="Clear all filters"
-              >
-                <Filter size={16} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* DATA TABLE */}
-      <div style={{ flex: 1 }}>
-        <div className="card border-0 shadow-sm" style={{ borderRadius: '10px' }}>
-          <div className="table-responsive">
-            <table
-              className="table table-hover align-middle mb-0"
-              style={{ fontSize: '0.875rem' }}
-            >
-              <thead style={{ backgroundColor: '#f8fafc' }}>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedData.length === 0 ? (
                 <tr>
-                  {activeTab === 'escalations' ? (
-                    <>
-                      <th style={tableHeaderStyle}>Employee</th>
-                      <th style={tableHeaderStyle}>Reason</th>
-                      <th style={tableHeaderStyle}>Level</th>
-                      <th style={tableHeaderStyle}>Status</th>
-                      <th style={tableHeaderStyle}>Submitted At</th>
-                      <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>Actions</th>
-                    </>
-                  ) : (
-                    <>
-                      <th style={tableHeaderStyle}>Employee</th>
-                      <th style={tableHeaderStyle}>SLA's Department</th>
-                      <th style={tableHeaderStyle}>Deadline</th>
-                      <th style={tableHeaderStyle}>Status</th>
-                      <th style={tableHeaderStyle}>Compliance</th>
-                      <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>Actions</th>
-                    </>
-                  )}
+                  <td colSpan="6">
+                    <div className="empty-state">
+                      <FileText size={56} className="empty-icon" />
+                      <h6>No SLAs found</h6>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {paginatedData.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="text-center" style={{ padding: '3rem' }}>
-                      {activeTab === 'escalations' ? (
-                        <>
-                          <TrendingUp
-                            size={56}
-                            style={{ color: '#cbd5e1', opacity: 0.5 }}
-                            className="mb-3"
-                          />
-                          <p className="text-muted mb-0" style={{ fontSize: '0.938rem' }}>
-                            No escalations yet
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <FileText
-                            size={56}
-                            style={{ color: '#cbd5e1', opacity: 0.5 }}
-                            className="mb-3"
-                          />
-                          <h6
-                            className="fw-bold mb-2"
-                            style={{ color: '#64748b', fontSize: '1.125rem' }}
-                          >
-                            {managerSLAs.length === 0
-                              ? 'No SLAs assigned to you'
-                              : 'No SLAs match your filters'}
-                          </h6>
-                          {managerSLAs.length > 0 && filteredSlas.length === 0 && (
-                            <button
-                              className="btn btn-sm btn-outline-primary mt-2"
-                              onClick={clearFilters}
-                              style={{ borderRadius: '6px' }}
-                            >
-                              Clear Filters
-                            </button>
-                          )}
-                        </>
-                      )}
+              ) : activeTab === 'escalations' ? (
+                paginatedData.map((esc) => (
+                  <tr key={esc.escalationId}>
+                    <td><strong>{esc.employeeName || '—'}</strong></td>
+                    <td>{esc.reason || '—'}</td>
+                    <td><span className="badge">{esc.escalationLevel}</span></td>
+                    <td><span className={`badge ${esc.escalationStatus === 'Resolved' ? 'status-closed' : 'status-open'}`}>{esc.escalationStatus}</span></td>
+                    <td>{formatDate(esc.submittedAt)}</td>
+                    <td>
+                      <div className="action-buttons">
+                        <button className="action-btn btn-view" onClick={() => navigate(`/sla/manager/details/${esc.slaid}`)}>
+                          <Eye size={14} />
+                        </button>
+                        {esc.escalationStatus === 'Pending' && (
+                          <button className="action-btn btn-approve" onClick={() => handleResolveClick(esc)}>
+                            <CheckCircle size={14} />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ) : activeTab === 'escalations' ? (
-                  paginatedData.map((esc) => (
-                    <tr key={esc.escalationId} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={tableCellStyle}>
-                        <strong style={{ fontSize: '0.875rem', color: '#0f172a' }}>
-                          {esc.employeeName || '—'}
-                        </strong>
-                      </td>
-                      <td style={tableCellStyle}>
-                        <strong style={{ fontSize: '0.875rem', color: '#0f172a' }}>
-                          {esc.reason || '—'}
-                        </strong>
-                        <br />
-                        <small className="text-muted" style={{ fontSize: '0.813rem' }}>
-                          {esc.description || '—'}
-                        </small>
-                      </td>
-                      <td style={tableCellStyle}>
-                        <span
-                          className={getEscalationLevelColor(esc.escalationLevel)}
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '4px 10px',
-                            borderRadius: '6px',
-                          }}
-                        >
-                          {esc.escalationLevel}
-                        </span>
-                      </td>
-                      <td style={tableCellStyle}>
-                        <span
-                          className={`badge ${
-                            esc.escalationStatus === 'Resolved'
-                              ? 'bg-success'
-                              : 'bg-warning text-dark'
-                          }`}
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '4px 10px',
-                            borderRadius: '6px',
-                          }}
-                        >
-                          {esc.escalationStatus}
-                        </span>
-                      </td>
-                      <td style={tableCellStyle}>
-                        <small style={{ fontSize: '0.813rem', color: '#475569' }}>
-                          {formatDate(esc.submittedAt)}
-                        </small>
-                      </td>
-                      <td style={{ ...tableCellStyle, textAlign: 'center' }}>
-                        <div className="d-flex gap-2 justify-content-center">
-                          <button
-                            className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
-                            onClick={() => navigate(`/sla/manager/details/${esc.slaid}`)}
-                            title="View SLA details"
-                            style={actionButtonStyle}
-                          >
-                            <Eye size={14} />
-                          </button>
-                          {esc.escalationStatus === 'Pending' && (
-                            <button
-                              className="btn btn-sm btn-outline-success d-inline-flex align-items-center justify-content-center"
-                              onClick={() => handleResolveClick(esc)}
-                              title="Resolve escalation"
-                              style={actionButtonStyle}
-                            >
-                              <CheckCircle size={14} />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  paginatedData.map((sla) => (
-                    <tr
-                      key={`${sla.slaid}-${sla.employeeId}`}
-                      style={{ borderBottom: '1px solid #f1f5f9' }}
-                    >
-                      <td style={tableCellStyle}>
-                        <strong style={{ fontSize: '0.875rem', color: '#0f172a' }}>
-                          {sla.employeeName || '—'}
-                        </strong>
-                        <br />
-                        <small className="text-muted" style={{ fontSize: '0.813rem' }}>
-                          {sla.employeeEmail || '—'}
-                        </small>
-                      </td>
-                      <td style={tableCellStyle}>
-                        <span
-                          className="badge bg-light text-dark"
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '4px 10px',
-                            borderRadius: '6px',
-                            fontWeight: 600,
-                          }}
-                        >
-                          {sla.departmentName || '—'}
-                        </span>
-                      </td>
-                      <td style={tableCellStyle}>
-                        <small style={{ fontSize: '0.813rem', color: '#475569' }}>
-                          {sla.deadline ? formatDate(sla.deadline) : '—'}
-                        </small>
-                      </td>
-                      <td style={tableCellStyle}>
-                        <span
-                          className={`badge ${getStatusBadge(sla.status)}`}
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '4px 10px',
-                            borderRadius: '6px',
-                          }}
-                        >
-                          {sla.status || '—'}
-                        </span>
-                      </td>
-                      <td style={tableCellStyle}>
-                        <span
-                          className={`badge ${getComplianceBadge(sla.complianceStatus)}`}
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '4px 10px',
-                            borderRadius: '6px',
-                          }}
-                        >
-                          {sla.complianceStatus || '—'}
-                        </span>
-                      </td>
-                      <td style={{ ...tableCellStyle, textAlign: 'center' }}>
-                        <div className="d-flex gap-2 justify-content-center">
-                          <button
-                            className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
-                            onClick={() => navigate(`/sla/manager/details/${sla.slaid}`)}
-                            title="View details"
-                            style={actionButtonStyle}
-                          >
-                            <Eye size={14} />
-                          </button>
-                          {sla.status !== 'Closed' && (
-                            <button
-                              className="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center"
-                              onClick={() => handleEscalateClick(sla)}
-                              title="Escalate to Department Head"
-                              style={actionButtonStyle}
-                            >
-                              <Send size={14} />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* PAGINATION */}
-          {filteredSlas.length > 0 && (
-            <div
-              className="card-footer bg-white border-top"
-              style={{ padding: '1rem 1.5rem' }}
-            >
-              <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                <div className="d-flex align-items-center gap-2">
-                  <small
-                    className="text-muted"
-                    style={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}
-                  >
-                    Rows per page:
-                  </small>
-                  <select
-                    className="form-select form-select-sm"
-                    value={itemsPerPage}
-                    onChange={handleItemsPerPageChange}
-                    style={{
-                      width: '80px',
-                      borderRadius: '6px',
-                      borderColor: '#e2e8f0',
-                      fontSize: '0.875rem',
-                      padding: '0.25rem 0.5rem',
-                    }}
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={15}>15</option>
-                    <option value={20}>20</option>
-                    <option value={25}>25</option>
-                    <option value={50}>50</option>
-                  </select>
-                </div>
-
-                <div>
-                  <small className="text-muted" style={{ fontSize: '0.875rem' }}>
-                    Showing <strong>{startIndex + 1}</strong> to{' '}
-                    <strong>{Math.min(endIndex, filteredSlas.length)}</strong> of{' '}
-                    <strong>{filteredSlas.length}</strong> entries
-                  </small>
-                </div>
-
-                {totalPages > 1 && (
-                  <nav aria-label="Page navigation">
-                    <ul className="pagination pagination-sm mb-0" style={{ gap: '4px' }}>
-                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button
-                          className="page-link d-flex align-items-center justify-content-center"
-                          onClick={handlePreviousPage}
-                          disabled={currentPage === 1}
-                          style={paginationButtonStyle(currentPage === 1)}
-                        >
-                          <ChevronLeft size={16} />
+                ))
+              ) : (
+                paginatedData.map((sla) => (
+                  <tr key={sla.slaid}>
+                    <td><strong>{sla.employeeName || '—'}</strong></td>
+                    <td>{sla.departmentName || '—'}</td>
+                    <td>{formatDate(sla.deadline)}</td>
+                    <td><span className={`badge status-${sla.status?.toLowerCase()}`}>{sla.status}</span></td>
+                    <td><span className={`badge compliance-${sla.complianceStatus?.toLowerCase()}`}>{sla.complianceStatus}</span></td>
+                    <td>
+                      <div className="action-buttons">
+                        <button className="action-btn btn-view" onClick={() => navigate(`/sla/manager/details/${sla.slaid}`)}>
+                          <Eye size={14} />
                         </button>
-                      </li>
-
-                      {getPageNumbers().map((pageNum, index) =>
-                        pageNum === '...' ? (
-                          <li key={`ellipsis-${index}`} className="page-item disabled">
-                            <span
-                              className="page-link"
-                              style={{
-                                border: 'none',
-                                background: 'transparent',
-                                color: '#64748b',
-                              }}
-                            >
-                              ...
-                            </span>
-                          </li>
-                        ) : (
-                          <li
-                            key={pageNum}
-                            className={`page-item ${currentPage === pageNum ? 'active' : ''}`}
-                          >
-                            <button
-                              className="page-link"
-                              onClick={() => handlePageChange(pageNum)}
-                              style={{
-                                width: '32px',
-                                height: '32px',
-                                padding: 0,
-                                borderRadius: '6px',
-                                border: '1px solid #e2e8f0',
-                                backgroundColor:
-                                  currentPage === pageNum ? '#0F62FE' : 'transparent',
-                                color: currentPage === pageNum ? '#fff' : '#64748b',
-                                fontWeight: currentPage === pageNum ? 600 : 400,
-                                fontSize: '0.875rem',
-                              }}
-                            >
-                              {pageNum}
-                            </button>
-                          </li>
-                        )
-                      )}
-
-                      <li
-                        className={`page-item ${
-                          currentPage === totalPages ? 'disabled' : ''
-                        }`}
-                      >
-                        <button
-                          className="page-link d-flex align-items-center justify-content-center"
-                          onClick={handleNextPage}
-                          disabled={currentPage === totalPages}
-                          style={paginationButtonStyle(currentPage === totalPages)}
-                        >
-                          <ChevronRight size={16} />
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
-                )}
-              </div>
-            </div>
-          )}
+                        {sla.status !== 'Closed' && (
+                          <button className="action-btn btn-escalate" onClick={() => handleEscalateClick(sla)}>
+                            <Send size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination */}
+        {filteredSlas.length > 0 && totalPages > 1 && (
+          <div className="pagination-container">
+            <div className="pagination-info">
+              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredSlas.length)} of {filteredSlas.length} entries
+            </div>
+            <nav className="pagination-nav">
+              <button className="pagination-btn" onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
+                <ChevronLeft size={16} />
+              </button>
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  className={`pagination-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button className="pagination-btn" onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
+                <ChevronRight size={16} />
+              </button>
+            </nav>
+          </div>
+        )}
       </div>
 
-      {/* MODALS */}
+      {/* Modals */}
       {showEscalationModal && selectedSLAForEscalation && (
         <ManagerEscalationModal
           review={selectedSLAForEscalation}
@@ -1357,48 +501,8 @@ const ManagerSLADashboard = () => {
           onResolve={handleResolveEscalation}
         />
       )}
-
-      <style>{`
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-      `}</style>
     </div>
   );
 };
-
-// Styles
-const tableHeaderStyle = {
-  padding: '1rem',
-  fontSize: '0.813rem',
-  color: '#64748b',
-  fontWeight: 700,
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-  borderBottom: '2px solid #e2e8f0',
-  backgroundColor: '#f8fafc',
-};
-
-const tableCellStyle = {
-  padding: '1rem',
-  verticalAlign: 'middle',
-};
-
-const actionButtonStyle = {
-  width: '32px',
-  height: '32px',
-  padding: 0,
-  borderRadius: '6px',
-};
-
-const paginationButtonStyle = (disabled) => ({
-  width: '32px',
-  height: '32px',
-  padding: 0,
-  borderRadius: '6px',
-  border: '1px solid #e2e8f0',
-  color: disabled ? '#cbd5e1' : '#0F62FE',
-});
 
 export default ManagerSLADashboard;

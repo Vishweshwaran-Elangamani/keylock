@@ -14,6 +14,7 @@ import {
   Clock,
   CheckCircle,
   TrendingUp,
+  X,
 } from "lucide-react";
 import slaService from "../../services/sla/slaService";
 import Pagination from "../../components/project_management_components/common/Pagination";
@@ -23,7 +24,8 @@ import ConfirmationModal from "../../components/goals/modals/ConfirmationModal";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import './../../styles/sla/HRSLADashboard.css';
 
-const cardBorder = "1.5px solid #a21caf";
+// Use table head blue (#0F62FE) for card borders
+const cardBorder = "1.5px solid #0F62FE";
 const cardRadius = "14px";
 
 const HRSLADashboard = () => {
@@ -48,6 +50,9 @@ const HRSLADashboard = () => {
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [slaToDelete, setSlaToDelete] = useState(null);
+
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     fetchSLAs();
@@ -131,6 +136,8 @@ const HRSLADashboard = () => {
       const response = await slaService.deleteSLA(slaToDelete.slaid);
       if (response.success) {
         fetchSLAs();
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2500);
       }
     } catch (err) {
       console.error('Delete error:', err);
@@ -244,10 +251,57 @@ const HRSLADashboard = () => {
 
   return (
     <div className="container-fluid" style={{ padding: "1.5rem 1.5rem" }}>
+      {/* Sonner-style white toast */}
+      {showToast && (
+        <div
+          style={{
+            position: "fixed",
+            top: "2.5rem",
+            right: "2rem",
+            zIndex: 9999,
+            minWidth: "256px",
+            maxWidth: "340px",
+            background: "#fff",
+            color: "#111419",
+            borderRadius: "12px",
+            boxShadow: "0 10px 38px 0px rgba(16,20,39,.09), 0 2px 4px rgba(16,20,39,.05)",
+            display: "flex",
+            alignItems: "center",
+            padding: "1.1rem 1.2rem",
+            border: "1px solid #ebecf0",
+            fontWeight: 600,
+            gap: "0.8rem",
+            fontSize: "1.04rem",
+            userSelect: "none",
+            transition: "opacity 0.35s",
+          }}
+          role="status"
+          aria-live="polite"
+        >
+          
+          SLA deleted successfully!
+          <button
+            style={{
+              background: "none",
+              border: "none",
+              color: "#111419",
+              fontSize: "1.15rem",
+              marginLeft: "auto",
+              cursor: "pointer",
+              opacity: 0.7,
+            }}
+            onClick={() => setShowToast(false)}
+            aria-label="Close"
+          >
+            <X size={21} />
+          </button>
+        </div>
+      )}
+
       <Breadcrumb
         items={[
           { label: "SLA Management", path: "/hr/dashboard/sla" },
-          { label: "HR" }
+          { label: "HR" },
         ]}
       />
 
@@ -318,6 +372,7 @@ const HRSLADashboard = () => {
             <Download size={16} />
             Export
           </button>
+          {/* Gradient theme for Create SLA button */}
           <button
             className="btn d-flex align-items-center gap-2"
             onClick={() => setShowCreateModal(true)}
@@ -326,18 +381,19 @@ const HRSLADashboard = () => {
               padding: "10px 20px",
               fontSize: "0.875rem",
               fontWeight: 600,
-              backgroundColor: "#27235c",
+              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
               color: "#fff",
               border: "none",
+              boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
               transition: "all 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#1e1b4d";
-              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#27235c";
               e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
             }}
           >
             <Plus size={16} />
@@ -419,7 +475,7 @@ const HRSLADashboard = () => {
           },
         ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
           <div key={label} className="col-md-2">
-            <div className="card sla-stat-card">
+            <div className="card sla-stat-card" style={{ border: cardBorder, borderRadius: cardRadius }}>
               <div
                 className="card-body d-flex flex-column align-items-center justify-content-center text-center"
                 style={{ padding: "1.5rem 1rem" }}

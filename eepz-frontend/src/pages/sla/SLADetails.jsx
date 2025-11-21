@@ -56,6 +56,11 @@ const SLADetails = () => {
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
       setUser(userData);
+      console.log("👤 Current User:", {
+        empId: userData.empId,
+        name: userData.name,
+        role: userData.roleName,
+      });
     } catch (err) {
       console.error("Error parsing user:", err);
     }
@@ -70,7 +75,7 @@ const SLADetails = () => {
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
 
-      console.log(`Fetching SLA ${slaid}`);
+      console.log(`🔍 Fetching SLA ${slaid}`);
       const slaResponse = await slaService.getSLAById(parseInt(slaid));
 
       if (!slaResponse?.success || !slaResponse.data) {
@@ -81,19 +86,19 @@ const SLADetails = () => {
       }
 
       setSla(slaResponse.data);
-      console.log("SLA loaded:", slaResponse.data);
+      console.log("✅ SLA loaded:", slaResponse.data);
 
       // Fetch SLA history
       try {
         const historyResponse = await slaService.getSLAHistory(parseInt(slaid));
         if (historyResponse?.success && Array.isArray(historyResponse.data)) {
           setHistory(historyResponse.data);
-          console.log(`${historyResponse.data.length} history entries loaded`);
+          console.log(`📜 ${historyResponse.data.length} history entries loaded`);
         } else {
           setHistory([]);
         }
       } catch (err) {
-        console.warn("Could not load history:", err.message);
+        console.warn("⚠️ Could not load history:", err.message);
         setHistory([]);
       }
 
@@ -108,19 +113,19 @@ const SLADetails = () => {
         ) {
           const escData = escalationsResponse.data;
           setEscalations(escData);
-          console.log(`${escData.length} escalations loaded`);
+          console.log(`🔺 ${escData.length} escalations loaded`);
           updateEscalationStatus(slaResponse.data, escData, userData);
         } else {
           setEscalations([]);
           updateEscalationStatus(slaResponse.data, [], userData);
         }
       } catch (err) {
-        console.warn("Could not load escalations:", err.message);
+        console.warn("⚠️ Could not load escalations:", err.message);
         setEscalations([]);
         updateEscalationStatus(slaResponse.data, [], userData);
       }
     } catch (err) {
-      console.error("Error fetching SLA details:", err);
+      console.error("❌ Error fetching SLA details:", err);
       setError(err.message || "Failed to fetch SLA details");
     } finally {
       setLoading(false);
@@ -132,20 +137,43 @@ const SLADetails = () => {
     (slaData, escalationsData, userData) => {
       if (!slaData || !userData) return;
 
-      const canEsc =
-        escalationHelpers.canEscalateToL2(slaData, escalationsData) &&
-        (userData.roleName === "Employee" || userData.roleName === "Manager");
+      console.log("🔍 Checking escalation permissions:", {
+        slaStatus: slaData.status,
+        userRole: userData.roleName,
+        escalationsCount: escalationsData.length,
+      });
+
+      // ✅ FIXED: Check L1 escalation capability for Employees/Managers
+      // L1 = Employee/Manager → Their Manager
+      const canEscalateL1 = escalationHelpers.canEscalateToL1(
+        slaData,
+        escalationsData
+      );
+
+      const isEligibleRole =
+        userData.roleName === "Employee" || userData.roleName === "Manager";
+
+      const canEsc = canEscalateL1 && isEligibleRole;
+
+      console.log("🎯 Escalation Check Result:", {
+        canEscalateL1,
+        isEligibleRole,
+        finalDecision: canEsc,
+      });
 
       setCanEscalate(canEsc);
 
       if (!canEsc) {
         const reason = escalationHelpers.getEscalationBlockReason(
           slaData,
-          escalationsData
+          escalationsData,
+          "L1" // Check L1 block reason
         );
         setEscalationBlockReason(reason);
+        console.log("⚠️ Escalation blocked:", reason);
       } else {
         setEscalationBlockReason(null);
+        console.log("✅ Escalation allowed");
       }
 
       setCanReopen(
@@ -157,13 +185,16 @@ const SLADetails = () => {
 
   // ========== ACTION HANDLERS ==========
   const handleEscalateClick = useCallback(() => {
+    console.log("🚀 Escalate button clicked");
     if (!canEscalate) {
+      console.warn("⚠️ Escalation blocked:", escalationBlockReason);
       toast.error("Cannot escalate", {
         description: escalationBlockReason || "Escalation is not available",
         duration: 4000,
       });
       return;
     }
+    console.log("✅ Opening escalation form");
     setShowEscalationForm(true);
   }, [canEscalate, escalationBlockReason]);
 
@@ -171,7 +202,7 @@ const SLADetails = () => {
     try {
       setRefreshing(true);
       setShowCloseConfirmation(false);
-      console.log(`Closing SLA ${sla.slaid}`);
+      console.log(`🔒 Closing SLA ${sla.slaid}`);
       const res = await slaService.closeSLA({
         slaid: sla.slaid,
         closedByEmployeeId: user.empId,
@@ -179,19 +210,21 @@ const SLADetails = () => {
       });
 
       if (res?.success) {
+        console.log("✅ SLA closed successfully");
         toast.success("SLA closed successfully", {
           description: "The SLA has been marked as closed",
           duration: 4000,
         });
         await fetchSLADetails();
       } else {
+        console.error("❌ Failed to close SLA:", res?.message);
         toast.error("Failed to close SLA", {
           description: res?.message || "Unable to close the SLA",
           duration: 5000,
         });
       }
     } catch (err) {
-      console.error("Error closing SLA:", err);
+      console.error("❌ Error closing SLA:", err);
       toast.error("Error closing SLA", {
         description: err.message || "An unexpected error occurred",
         duration: 5000,
@@ -202,11 +235,13 @@ const SLADetails = () => {
   }, [sla, user, fetchSLADetails]);
 
   const handleReopenSuccess = useCallback(() => {
+    console.log("✅ SLA reopened successfully");
     setShowReopenForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
 
   const handleEscalationSuccess = useCallback(() => {
+    console.log("✅ Escalation submitted successfully");
     setShowEscalationForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
@@ -247,22 +282,24 @@ const SLADetails = () => {
 
   const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
   const hasEscalations = escalations.length > 0;
-  
+
   // Get role-based dashboard path
-  const slaDashboardPath = user ? getSLADashboardPath(user.roleName) : "/employee/dashboard/sla";
+  const slaDashboardPath = user
+    ? getSLADashboardPath(user.roleName)
+    : "/employee/dashboard/sla";
 
   return (
     <div className="container-fluid" style={{ padding: "1.5rem" }}>
       {/* ========== BREADCRUMB ========== */}
       <Breadcrumb
         items={[
-          { 
-            label: "SLA Management", 
-            path: slaDashboardPath 
+          {
+            label: "SLA Management",
+            path: slaDashboardPath,
           },
-          { 
-            label: `${sla.slatype} - ${sla.employeeName}` 
-          }
+          {
+            label: `${sla.slatype} - ${sla.employeeName}`,
+          },
         ]}
       />
 
@@ -299,6 +336,7 @@ const SLADetails = () => {
 
         {/* ACTION BUTTONS */}
         <div className="d-flex gap-2 flex-wrap justify-content-end">
+          {/* ✅ UPDATED: Show escalate button for Employee/Manager on non-closed SLAs */}
           {sla.status !== "Closed" &&
             (user?.roleName === "Employee" || user?.roleName === "Manager") &&
             (canEscalate ? (
@@ -372,7 +410,10 @@ const SLADetails = () => {
             className="card border-0 shadow-sm mb-4"
             style={{ borderRadius: "12px" }}
           >
-            <div className="card-body" style={{ padding: "1.5rem" }}>
+            <div
+              className="card-body"
+              style={{ padding: "1.5rem", textAlign: "left" }}
+            >
               <div className="d-flex gap-3 mb-4 align-items-start">
                 <div
                   className="d-flex align-items-center justify-content-center"
@@ -387,10 +428,16 @@ const SLADetails = () => {
                   <FileText size={28} className="text-primary" />
                 </div>
                 <div className="flex-grow-1">
-                  <h4 className="mb-2 fw-bold" style={{ color: "#0f172a" }}>
+                  <h4
+                    className="mb-2 fw-bold"
+                    style={{ color: "#0f172a", textAlign: "left" }}
+                  >
                     {sla.slatype}
                   </h4>
-                  <div className="d-flex gap-2 flex-wrap">
+                  <div
+                    className="d-flex gap-2 flex-wrap"
+                    style={{ justifyContent: "flex-start" }}
+                  >
                     <span
                       className={`badge ${
                         sla.status === "Closed"
@@ -427,15 +474,14 @@ const SLADetails = () => {
               </div>
 
               {/* DETAILS GRID */}
-              <div className="row g-4">
+              <div className="row g-4" style={{ textAlign: "left" }}>
                 <div className="col-md-6">
                   <small
                     className="text-muted d-block mb-2"
                     style={{
                       fontSize: "0.75rem",
                       fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
+                      fontStyle: "italic",
                     }}
                   >
                     Employee
@@ -450,8 +496,7 @@ const SLADetails = () => {
                     style={{
                       fontSize: "0.75rem",
                       fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
+                      fontStyle: "italic",
                     }}
                   >
                     SLA Created By
@@ -466,8 +511,7 @@ const SLADetails = () => {
                     style={{
                       fontSize: "0.75rem",
                       fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
+                      fontStyle: "italic",
                     }}
                   >
                     Deadline
@@ -482,8 +526,7 @@ const SLADetails = () => {
                     style={{
                       fontSize: "0.75rem",
                       fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
+                      fontStyle: "italic",
                     }}
                   >
                     Compliance Status
@@ -509,6 +552,7 @@ const SLADetails = () => {
                     borderRadius: "8px",
                     border: "1px solid #fbbf24",
                     backgroundColor: "#fef3c7",
+                    textAlign: "left",
                   }}
                 >
                   <RotateCcw
@@ -548,7 +592,10 @@ const SLADetails = () => {
               className="card border-0 shadow-sm mb-4"
               style={{ borderRadius: "12px" }}
             >
-              <div className="card-body" style={{ padding: "1.5rem" }}>
+              <div
+                className="card-body"
+                style={{ padding: "1.5rem", textAlign: "left" }}
+              >
                 <h5
                   className="mb-3 fw-bold d-flex align-items-center gap-2"
                   style={{ color: "#0f172a" }}
@@ -566,9 +613,13 @@ const SLADetails = () => {
                         idx < escalations.length - 1
                           ? "1px solid #e2e8f0"
                           : "none",
+                      textAlign: "left",
                     }}
                   >
-                    <div className="d-flex gap-2 mb-2 flex-wrap">
+                    <div
+                      className="d-flex gap-2 mb-2 flex-wrap"
+                      style={{ justifyContent: "flex-start" }}
+                    >
                       <span
                         className={`badge ${
                           esc.escalationLevel === "L2"
@@ -617,13 +668,18 @@ const SLADetails = () => {
                         backgroundColor: "#f8fafc",
                         borderRadius: "8px",
                         border: "1px solid #e2e8f0",
+                        textAlign: "left",
                       }}
                     >
                       <div className="row g-3 mb-2">
                         <div className="col-md-6">
                           <small
                             className="text-muted d-block mb-1"
-                            style={{ fontSize: "0.75rem", fontWeight: 600 }}
+                            style={{
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              fontStyle: "italic",
+                            }}
                           >
                             Escalated By
                           </small>
@@ -637,7 +693,11 @@ const SLADetails = () => {
                         <div className="col-md-6">
                           <small
                             className="text-muted d-block mb-1"
-                            style={{ fontSize: "0.75rem", fontWeight: 600 }}
+                            style={{
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              fontStyle: "italic",
+                            }}
                           >
                             Escalated To
                           </small>
@@ -674,12 +734,11 @@ const SLADetails = () => {
             </div>
           )}
 
-          {/* TABS - IMPROVED STYLING */}
+          {/* TABS */}
           <div
             className="card border-0 shadow-sm"
             style={{ borderRadius: "12px", overflow: "hidden" }}
           >
-            {/* TAB HEADERS */}
             <div
               style={{
                 backgroundColor: "#27235c",
@@ -716,19 +775,6 @@ const SLADetails = () => {
                       transition: "all 0.2s ease",
                       cursor: "pointer",
                     }}
-                    onMouseEnter={(e) => {
-                      if (activeTab !== "details") {
-                        e.currentTarget.style.backgroundColor =
-                          "rgba(255,255,255,0.05)";
-                        e.currentTarget.style.color = "#fff";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (activeTab !== "details") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "rgba(255,255,255,0.7)";
-                      }
-                    }}
                   >
                     <FileText size={16} />
                     Details
@@ -759,19 +805,6 @@ const SLADetails = () => {
                       transition: "all 0.2s ease",
                       cursor: "pointer",
                     }}
-                    onMouseEnter={(e) => {
-                      if (activeTab !== "history") {
-                        e.currentTarget.style.backgroundColor =
-                          "rgba(255,255,255,0.05)";
-                        e.currentTarget.style.color = "#fff";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (activeTab !== "history") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "rgba(255,255,255,0.7)";
-                      }
-                    }}
                   >
                     <History size={16} />
                     History ({history.length})
@@ -780,8 +813,10 @@ const SLADetails = () => {
               </ul>
             </div>
 
-            {/* TAB CONTENT */}
-            <div className="card-body" style={{ padding: "1.5rem" }}>
+            <div
+              className="card-body"
+              style={{ padding: "1.5rem", textAlign: "left" }}
+            >
               {activeTab === "details" && (
                 <div className="row g-4">
                   {sla.createdAt && (
@@ -791,8 +826,7 @@ const SLADetails = () => {
                         style={{
                           fontSize: "0.75rem",
                           fontWeight: 600,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.5px",
+                          fontStyle: "italic",
                         }}
                       >
                         Created At
@@ -811,8 +845,7 @@ const SLADetails = () => {
                         style={{
                           fontSize: "0.75rem",
                           fontWeight: 600,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.5px",
+                          fontStyle: "italic",
                         }}
                       >
                         Last Updated
@@ -861,7 +894,10 @@ const SLADetails = () => {
             className="card border-0 shadow-sm sticky-top"
             style={{ top: "20px", borderRadius: "12px" }}
           >
-            <div className="card-body" style={{ padding: "1.5rem" }}>
+            <div
+              className="card-body"
+              style={{ padding: "1.5rem", textAlign: "left" }}
+            >
               <h5 className="mb-4 fw-bold" style={{ color: "#0f172a" }}>
                 Status Summary
               </h5>
@@ -875,8 +911,7 @@ const SLADetails = () => {
                   style={{
                     fontSize: "0.75rem",
                     fontWeight: 600,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
+                    fontStyle: "italic",
                   }}
                 >
                   Total Escalations
@@ -898,8 +933,7 @@ const SLADetails = () => {
                   style={{
                     fontSize: "0.75rem",
                     fontWeight: 600,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
+                    fontStyle: "italic",
                   }}
                 >
                   Status
@@ -932,8 +966,7 @@ const SLADetails = () => {
                   style={{
                     fontSize: "0.75rem",
                     fontWeight: 600,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
+                    fontStyle: "italic",
                   }}
                 >
                   Days Until Deadline
@@ -971,8 +1004,7 @@ const SLADetails = () => {
                   style={{
                     color: "#1e40af",
                     fontSize: "0.75rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
+                    fontStyle: "italic",
                   }}
                 >
                   Pending Escalations

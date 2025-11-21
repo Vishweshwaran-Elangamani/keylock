@@ -18,7 +18,7 @@ import slaService, { dateHelpers } from "../../services/sla/slaService";
 
 
 
-const cardBorder = "1.5px solid #a21caf"; // Purple border from your image
+const cardBorder = "1.5px solid #27235c"; // Purple border from your image
 const cardRadius = "14px"; // Rounded corners matching UI
 
 const EmployeeSLADashboard = () => {
@@ -339,7 +339,7 @@ const EmployeeSLADashboard = () => {
                 style={{
                   border: cardBorder,
                   borderRadius: cardRadius,
-                  backgroundColor: "#fff",
+                  backgroundColor: "",
                   boxShadow: "none",
                   transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   cursor: "pointer",

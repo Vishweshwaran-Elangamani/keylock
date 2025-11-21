@@ -4,31 +4,31 @@ import React, { useEffect } from 'react';
 import { X, Search, Filter, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, UserCog, Info } from 'lucide-react';
 
 const ManagerSelectionModal = ({
-  show, // ✅ Changed from showManagerModal
-  onClose, // ✅ Changed from setShowManagerModal
-  project, // ✅ Changed from selectedProject
+  show,
+  onClose,
+  project,
   selectedResourceOwner,
   selectedL1Approver,
   selectedL2Approver,
-  onManagerSelect, // ✅ This will handle the selection
-  activeTab, // ✅ Changed from activeManagerTab
-  setActiveTab, // ✅ Changed from setActiveManagerTab
-  searchTerm, // ✅ Changed from managerSearchTerm
-  setSearchTerm, // ✅ Changed from setManagerSearchTerm
-  filterRole, // ✅ Changed from managerFilterRole
-  setFilterRole, // ✅ Changed from setManagerFilterRole
-  filterDepartment, // ✅ Changed from managerFilterDepartment
-  setFilterDepartment, // ✅ Changed from setManagerFilterDepartment
+  onManagerSelect,
+  activeTab,
+  setActiveTab,
+  searchTerm,
+  setSearchTerm,
+  filterRole,
+  setFilterRole,
+  filterDepartment,
+  setFilterDepartment,
   paginatedManagers,
-  currentPage, // ✅ Changed from managerCurrentPage
-  totalPages, // ✅ Changed from managerTotalPages
-  goToPage, // ✅ Changed from goToManagerPage
-  getPageNumbers, // ✅ Changed from getManagerPageNumbers
+  currentPage,
+  totalPages,
+  goToPage,
+  getPageNumbers,
   uniqueRoles,
   uniqueDepartments,
-  onUpdate, // ✅ Changed from handleUpdateManagers
+  onUpdate,
   isSubmitting,
-  message, // ✅ Changed from modalMessage
+  message,
 }) => {
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -61,7 +61,7 @@ const ManagerSelectionModal = ({
       {/* Backdrop */}
       <div 
         className="modal-backdrop fade show" 
-        style={{ zIndex: 1040 }}
+        style={{ zIndex: 1040, backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
         onClick={onClose}
       />
 
@@ -70,34 +70,73 @@ const ManagerSelectionModal = ({
         className="modal fade show d-block"
         tabIndex="-1"
         style={{ zIndex: 1050 }}
+        onClick={(e) => {
+          if (e.target.classList.contains('modal')) {
+            onClose();
+          }
+        }}
       >
         <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-          <div className="modal-content">
-            <div className="modal-header" style={{ backgroundColor: "#f8f9fa", padding: "1.25rem 1.5rem" }}>
-              <h5 className="modal-title d-flex align-items-center gap-2 mb-0">
-                <UserCog size={24} style={{ color: "#0f62fe" }} />
-                <span style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+          <div 
+            className="modal-content" 
+            style={{ 
+              borderRadius: '12px',
+              border: 'none',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Header */}
+            <div 
+              className="modal-header" 
+              style={{ 
+                backgroundColor: '#3c3862',
+                borderBottom: 'none',
+                padding: '1.25rem 1.5rem',
+                color: 'white'
+              }}
+            >
+              <h5 className="modal-title d-flex align-items-center gap-2 mb-0 text-start">
+                <UserCog size={22} style={{ color: 'white' }} />
+                <span 
+                  style={{ 
+                    fontSize: '1.1rem', 
+                    fontWeight: 600,
+                    color: 'white'
+                  }}
+                >
                   Edit Reporting Managers - {project?.projectName}
                 </span>
               </h5>
               <button
                 type="button"
-                className="btn-close"
+                className="btn-close btn-close-white"
                 onClick={onClose}
                 disabled={isSubmitting}
+                aria-label="Close"
+                style={{
+                  opacity: 0.8,
+                  filter: 'brightness(0) invert(1)'
+                }}
               />
             </div>
 
-            <div className="modal-body" style={{ padding: "1.5rem" }}>
+            <div className="modal-body" style={{ padding: '1.75rem', backgroundColor: '#f8f9fa' }}>
               {message && (
                 <div
                   className={`alert alert-${
                     message.type === "success" ? "success" : "danger"
                   } d-flex align-items-center gap-2 mb-4`}
                   style={{
-                    borderRadius: "8px",
-                    border: "none",
-                    padding: "1rem",
+                    borderRadius: '8px',
+                    border: 'none',
+                    padding: '1rem',
+                    fontSize: '0.95rem',
+                    backgroundColor: message.type === 'success' 
+                      ? 'rgba(36, 161, 72, 0.1)' 
+                      : 'rgba(224, 25, 80, 0.1)',
+                    color: message.type === 'success' ? '#24A148' : '#E01950',
+                    textAlign: 'left'
                   }}
                 >
                   {message.type === "success" ? (
@@ -105,21 +144,48 @@ const ManagerSelectionModal = ({
                   ) : (
                     <AlertCircle size={20} />
                   )}
-                  <span style={{ fontSize: "0.95rem" }}>{message.text}</span>
+                  <span>{message.text}</span>
                 </div>
               )}
 
               {/* Manager Tabs */}
-              <ul className="nav nav-tabs mb-4" style={{ borderBottom: "2px solid #e2e8f0" }}>
+              <ul 
+                className="nav nav-pills mb-4" 
+                style={{ 
+                  borderBottom: 'none',
+                  gap: '0.5rem'
+                }}
+              >
                 <li className="nav-item">
                   <button
                     className={`nav-link ${activeTab === "resource" ? "active" : ""}`}
                     onClick={() => setActiveTab("resource")}
-                    style={{ fontSize: "0.95rem", fontWeight: 600 }}
+                    style={{ 
+                      fontSize: '0.95rem', 
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                      padding: '0.6rem 1.2rem',
+                      backgroundColor: activeTab === 'resource' ? 'var(--color-primary-1)' : 'white',
+                      color: activeTab === 'resource' ? 'white' : '#6b7280',
+                      border: activeTab === 'resource' ? 'none' : '1px solid #d1d5db',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
                   >
                     Resource Owner{" "}
                     {selectedResourceOwner && (
-                      <span className="badge bg-success ms-2">✓</span>
+                      <span 
+                        className="badge" 
+                        style={{ 
+                          backgroundColor: activeTab === 'resource' ? 'rgba(255,255,255,0.3)' : '#10b981',
+                          color: 'white',
+                          fontSize: '0.75rem'
+                        }}
+                      >
+                        <CheckCircle size={12} />
+                      </span>
                     )}
                   </button>
                 </li>
@@ -127,11 +193,32 @@ const ManagerSelectionModal = ({
                   <button
                     className={`nav-link ${activeTab === "l1" ? "active" : ""}`}
                     onClick={() => setActiveTab("l1")}
-                    style={{ fontSize: "0.95rem", fontWeight: 600 }}
+                    style={{ 
+                      fontSize: '0.95rem', 
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                      padding: '0.6rem 1.2rem',
+                      backgroundColor: activeTab === 'l1' ? 'var(--color-primary-1)' : 'white',
+                      color: activeTab === 'l1' ? 'white' : '#6b7280',
+                      border: activeTab === 'l1' ? 'none' : '1px solid #d1d5db',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
                   >
                     L1 Approver{" "}
                     {selectedL1Approver && (
-                      <span className="badge bg-success ms-2">✓</span>
+                      <span 
+                        className="badge" 
+                        style={{ 
+                          backgroundColor: activeTab === 'l1' ? 'rgba(255,255,255,0.3)' : '#10b981',
+                          color: 'white',
+                          fontSize: '0.75rem'
+                        }}
+                      >
+                        <CheckCircle size={12} />
+                      </span>
                     )}
                   </button>
                 </li>
@@ -139,11 +226,32 @@ const ManagerSelectionModal = ({
                   <button
                     className={`nav-link ${activeTab === "l2" ? "active" : ""}`}
                     onClick={() => setActiveTab("l2")}
-                    style={{ fontSize: "0.95rem", fontWeight: 600 }}
+                    style={{ 
+                      fontSize: '0.95rem', 
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                      padding: '0.6rem 1.2rem',
+                      backgroundColor: activeTab === 'l2' ? 'var(--color-primary-1)' : 'white',
+                      color: activeTab === 'l2' ? 'white' : '#6b7280',
+                      border: activeTab === 'l2' ? 'none' : '1px solid #d1d5db',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
                   >
                     L2 Approver{" "}
                     {selectedL2Approver && (
-                      <span className="badge bg-success ms-2">✓</span>
+                      <span 
+                        className="badge" 
+                        style={{ 
+                          backgroundColor: activeTab === 'l2' ? 'rgba(255,255,255,0.3)' : '#10b981',
+                          color: 'white',
+                          fontSize: '0.75rem'
+                        }}
+                      >
+                        <CheckCircle size={12} />
+                      </span>
                     )}
                   </button>
                 </li>
@@ -153,23 +261,34 @@ const ManagerSelectionModal = ({
               <div
                 className="alert alert-info d-flex align-items-start gap-3 mb-4"
                 style={{
-                  borderRadius: "8px",
-                  border: "none",
-                  padding: "1rem",
+                  borderRadius: '8px',
+                  border: 'none',
+                  padding: '1rem',
+                  backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                  color: '#084298',
+                  textAlign: 'left'
                 }}
               >
                 <Info size={20} className="flex-shrink-0 mt-1" />
-                <div>
-                  <strong style={{ fontSize: "0.95rem" }}>Current Selection:</strong>
+                <div style={{ textAlign: 'left' }}>
+                  <strong style={{ fontSize: '0.95rem' }}>Current Selection:</strong>
                   <div className="mt-2">
                     {getSelectedManager() ? (
-                      <span className="badge bg-success" style={{ fontSize: "0.9rem", padding: "0.5rem 0.75rem" }}>
+                      <span 
+                        className="badge" 
+                        style={{ 
+                          fontSize: '0.9rem', 
+                          padding: '0.5rem 0.75rem',
+                          backgroundColor: '#10b981',
+                          color: 'white'
+                        }}
+                      >
                         {getSelectedManager().firstName}{" "}
                         {getSelectedManager().lastName} -{" "}
                         {getSelectedManager().roleName}
                       </span>
                     ) : (
-                      <span className="text-muted" style={{ fontSize: "0.9rem" }}>None selected</span>
+                      <span className="text-muted" style={{ fontSize: '0.9rem' }}>None selected</span>
                     )}
                   </div>
                 </div>
@@ -178,26 +297,43 @@ const ManagerSelectionModal = ({
               {/* Filters */}
               <div className="row g-3 mb-4">
                 <div className="col-md-6">
-                  <div className="input-group input-group-lg">
-                    <span className="input-group-text bg-white">
-                      <Search size={20} />
+                  <div className="input-group">
+                    <span 
+                      className="input-group-text"
+                      style={{
+                        backgroundColor: 'white',
+                        border: '1px solid #d1d5db',
+                        borderRight: 'none'
+                      }}
+                    >
+                      <Search size={20} style={{ color: '#6b7280' }} />
                     </span>
                     <input
                       type="text"
-                      className="form-control"
+                      className="form-control text-start"
                       placeholder="Search by name..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ fontSize: "0.95rem" }}
+                      style={{ 
+                        fontSize: '0.95rem',
+                        border: '1px solid #d1d5db',
+                        borderLeft: 'none',
+                        padding: '0.65rem 0.75rem'
+                      }}
                     />
                   </div>
                 </div>
                 <div className="col-md-3">
                   <select
-                    className="form-select form-select-lg"
+                    className="form-select text-start"
                     value={filterRole}
                     onChange={(e) => setFilterRole(e.target.value)}
-                    style={{ fontSize: "0.95rem" }}
+                    style={{ 
+                      fontSize: '0.95rem',
+                      border: '1px solid #d1d5db',
+                      padding: '0.65rem 0.75rem',
+                      borderRadius: '8px'
+                    }}
                   >
                     <option value="All">All Roles</option>
                     {uniqueRoles.map((role, idx) => (
@@ -209,10 +345,15 @@ const ManagerSelectionModal = ({
                 </div>
                 <div className="col-md-3">
                   <select
-                    className="form-select form-select-lg"
+                    className="form-select text-start"
                     value={filterDepartment}
                     onChange={(e) => setFilterDepartment(e.target.value)}
-                    style={{ fontSize: "0.95rem" }}
+                    style={{ 
+                      fontSize: '0.95rem',
+                      border: '1px solid #d1d5db',
+                      padding: '0.65rem 0.75rem',
+                      borderRadius: '8px'
+                    }}
                   >
                     <option value="All">All Departments</option>
                     {uniqueDepartments.map((dept, idx) => (
@@ -227,15 +368,35 @@ const ManagerSelectionModal = ({
               {/* Manager List Table */}
               <div
                 className="table-responsive"
-                style={{ minHeight: "350px", borderRadius: "8px", border: "1px solid #e2e8f0" }}
+                style={{ 
+                  minHeight: '350px', 
+                  borderRadius: '8px', 
+                  border: '1px solid #e5e7eb',
+                  backgroundColor: 'white'
+                }}
               >
                 <table className="table table-hover mb-0">
-                  <thead className="table-light" style={{ position: "sticky", top: 0 }}>
-                    <tr>
-                      <th style={{ width: "60px", fontSize: "0.9rem", padding: "1rem" }}>Select</th>
-                      <th style={{ fontSize: "0.9rem", padding: "1rem" }}>Employee Name</th>
-                      <th style={{ fontSize: "0.9rem", padding: "1rem" }}>Role</th>
-                      <th style={{ fontSize: "0.9rem", padding: "1rem" }}>Department</th>
+                  <thead 
+                    className="table-light" 
+                    style={{ 
+                      position: 'sticky', 
+                      top: 0,
+                      zIndex: 10
+                    }}
+                  >
+                    <tr style={{ textAlign: 'left' }}>
+                      <th style={{ width: '60px', fontSize: '0.9rem', padding: '1rem', fontWeight: 600, textAlign: 'left' }}>
+                        Select
+                      </th>
+                      <th style={{ fontSize: '0.9rem', padding: '1rem', fontWeight: 600, textAlign: 'left' }}>
+                        Employee Name
+                      </th>
+                      <th style={{ fontSize: '0.9rem', padding: '1rem', fontWeight: 600, textAlign: 'left' }}>
+                        Role
+                      </th>
+                      <th style={{ fontSize: '0.9rem', padding: '1rem', fontWeight: 600, textAlign: 'left' }}>
+                        Department
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -244,7 +405,7 @@ const ManagerSelectionModal = ({
                         <td
                           colSpan="4"
                           className="text-center py-5 text-muted"
-                          style={{ fontSize: "0.95rem" }}
+                          style={{ fontSize: '0.95rem' }}
                         >
                           No employees found
                         </td>
@@ -255,25 +416,41 @@ const ManagerSelectionModal = ({
                         return (
                           <tr
                             key={emp.employeeMasterId}
-                            className={isSelected ? "table-active" : ""}
-                            style={{ cursor: "pointer" }}
+                            className={isSelected ? 'table-active' : ''}
+                            style={{ 
+                              cursor: 'pointer',
+                              transition: 'background-color 0.15s ease'
+                            }}
                             onClick={() => onManagerSelect(emp)}
                           >
-                            <td onClick={(e) => e.stopPropagation()} style={{ padding: "1rem" }}>
+                            <td 
+                              onClick={(e) => e.stopPropagation()} 
+                              style={{ padding: '1rem', textAlign: 'left' }}
+                            >
                               <input
                                 type="radio"
                                 className="form-check-input"
                                 name={`manager-${activeTab}`}
                                 checked={isSelected}
                                 onChange={() => onManagerSelect(emp)}
-                                style={{ width: "18px", height: "18px" }}
+                                style={{ 
+                                  width: '18px', 
+                                  height: '18px',
+                                  cursor: 'pointer'
+                                }}
                               />
                             </td>
-                            <td style={{ fontSize: "0.9rem", padding: "1rem" }}>
-                              {emp.firstName} {emp.lastName}
+                            <td style={{ fontSize: '0.9rem', padding: '1rem', textAlign: 'left' }}>
+                              <span style={{ fontWeight: 500 }}>
+                                {emp.firstName} {emp.lastName}
+                              </span>
                             </td>
-                            <td style={{ fontSize: "0.9rem", padding: "1rem" }}>{emp.roleName}</td>
-                            <td style={{ fontSize: "0.9rem", padding: "1rem" }}>{emp.departmentName}</td>
+                            <td style={{ fontSize: '0.9rem', padding: '1rem', color: '#6b7280', textAlign: 'left' }}>
+                              {emp.roleName}
+                            </td>
+                            <td style={{ fontSize: '0.9rem', padding: '1rem', color: '#6b7280', textAlign: 'left' }}>
+                              {emp.departmentName}
+                            </td>
                           </tr>
                         );
                       })
@@ -285,7 +462,7 @@ const ManagerSelectionModal = ({
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                  <div className="text-muted" style={{ fontSize: "0.9rem" }}>
+                  <div className="text-muted" style={{ fontSize: '0.9rem' }}>
                     Page {currentPage} of {totalPages}
                   </div>
                   <nav>
@@ -299,6 +476,7 @@ const ManagerSelectionModal = ({
                           className="page-link"
                           onClick={() => goToPage(currentPage - 1)}
                           disabled={currentPage === 1}
+                          style={{ borderRadius: '6px 0 0 6px' }}
                         >
                           <ChevronLeft size={16} />
                         </button>
@@ -336,6 +514,7 @@ const ManagerSelectionModal = ({
                           className="page-link"
                           onClick={() => goToPage(currentPage + 1)}
                           disabled={currentPage === totalPages}
+                          style={{ borderRadius: '0 6px 6px 0' }}
                         >
                           <ChevronRight size={16} />
                         </button>
@@ -346,29 +525,83 @@ const ManagerSelectionModal = ({
               )}
             </div>
 
-            <div className="modal-footer" style={{ padding: "1rem 1.5rem" }}>
+            {/* Footer */}
+            <div 
+              className="modal-footer" 
+              style={{ 
+                padding: '1rem 1.5rem',
+                borderTop: '1px solid #e5e7eb',
+                backgroundColor: 'white',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '0.75rem'
+              }}
+            >
               <button
                 type="button"
-                className="btn btn-lg btn-secondary"
+                className="btn"
                 onClick={onClose}
-                style={{ fontSize: "0.95rem" }}
+                style={{ 
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  padding: '0.6rem 1.25rem',
+                  borderRadius: '8px',
+                  backgroundColor: '#6b7280',
+                  border: 'none',
+                  color: 'white',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#4b5563';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#6b7280';
+                }}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="btn btn-lg btn-primary"
+                className="btn"
                 onClick={onUpdate}
                 disabled={isSubmitting}
-                style={{ fontSize: "0.95rem" }}
+                style={{ 
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  padding: '0.6rem 1.5rem',
+                  borderRadius: '8px',
+                  background: 'var(--gradient-primary)',
+                  border: 'none',
+                  color: 'white',
+                  boxShadow: '0 4px 12px rgba(192, 38, 211, 0.3)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  opacity: isSubmitting ? 0.7 : 1,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isSubmitting) {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(192, 38, 211, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(192, 38, 211, 0.3)';
+                }}
               >
                 {isSubmitting ? (
                   <>
-                    <span className="spinner-border spinner-border-sm me-2"></span>
+                    <span className="spinner-border spinner-border-sm" />
                     Updating...
                   </>
                 ) : (
-                  "Update Managers"
+                  <>
+                    <CheckCircle size={18} />
+                    Update Managers
+                  </>
                 )}
               </button>
             </div>

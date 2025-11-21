@@ -1,4 +1,4 @@
-// src/pages/sla/DeptHeadSLADashboard.jsx - COMPLETE REWRITE FOR L2 ESCALATIONS
+// src/pages/sla/DeptHeadSLADashboard.jsx - REDESIGNED WITH PROPER CSS CLASSES
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,24 +11,25 @@ import {
   RefreshCw,
   AlertTriangle,
   Eye,
-  Send,
+  Search,
+  Calendar,
 } from "lucide-react";
 import { toast } from "sonner";
-import ComplianceCard from "../../components/sla/cards/ComplianceCard";
 import slaService from "../../services/sla/slaService";
-import Breadcrumb from "../../components/sla/common/Breadcrumbs"
+import Breadcrumb from "../../components/sla/common/Breadcrumbs";
+import "../../styles/sla/DeptHeadSLADashboard.css";
 
 const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
 
   // State Management
-  const [allL2Escalations, setAllL2Escalations] = useState([]); // ALL L2 escalations
-  const [filteredL2Escalations, setFilteredL2Escalations] = useState([]); // FILTERED by period
-  const [departmentCompliance, setDepartmentCompliance] = useState(null);
+  const [allL2Escalations, setAllL2Escalations] = useState([]);
+  const [filteredL2Escalations, setFilteredL2Escalations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState("Q1-2025");
-  const [activeTab, setActiveTab] = useState("escalations");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
   // Resolution modal state
   const [showResolutionModal, setShowResolutionModal] = useState(false);
@@ -42,9 +43,8 @@ const DeptHeadSLADashboard = () => {
   }, []);
 
   useEffect(() => {
-    filterEscalationsByPeriod(selectedPeriod);
-    fetchComplianceData();
-  }, [selectedPeriod]);
+    applyFilters();
+  }, [selectedPeriod, searchQuery, selectedStatus, allL2Escalations]);
 
   // ============= DATA FETCHING =============
   const fetchAllData = async () => {
@@ -52,13 +52,6 @@ const DeptHeadSLADashboard = () => {
     setError(null);
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-
-      console.log("Dept Head Info:", {
-        empId: user.empId,
-        deptId: user.departmentId,
-      });
-
-      // Fetch L2 Escalations (Manager → Dept Head)
       await fetchL2Escalations(user.empId);
     } catch (err) {
       console.error("Error in fetchAllData:", err);
@@ -70,95 +63,67 @@ const DeptHeadSLADashboard = () => {
 
   const fetchL2Escalations = async (deptHeadId) => {
     try {
-      console.log("Fetching L2 Escalations for Dept Head:", deptHeadId);
-
       const response = await slaService.getManagerEscalations(deptHeadId);
 
       if (response && response.success) {
         const escalations = Array.isArray(response.data) ? response.data : [];
 
-        console.log("L2 Escalations from API:", escalations.length);
-
-        // Process escalations
         const processed = escalations.map((e) => ({
           escalationId: e.escalationId,
           slaid: e.slaid,
           slaType: e.slatype || "Performance Review",
-
-          // Employee info
           employeeId: e.employeeId,
           employeeName: e.employeeName || "Unknown Employee",
           employeeEmail: e.employeeEmail || "",
-
-          // Manager info (who escalated)
           managerId: e.submittedByEmployeeId,
           managerName: e.submittedByName || "Unknown Manager",
-          managerEmail: e.employeeEmail || "",
-
-          // Escalation details
           reason: e.reason || "No reason provided",
           description: e.description || "",
           escalationLevel: e.escalationLevel || "L2",
           escalationStatus: e.escalationStatus || "Pending",
-
-          // Dates
           submittedAt: e.submittedAt,
-          resolvedAt: e.resolvedAt,
-          deadline: e.escalationDeadline,
-
-          // Additional
-          resolutionComments: e.resolutionComments,
           period: e.reviewCycle || "Q1-2025",
           daysLeft: e.daysUntilDeadline || 0,
         }));
 
         setAllL2Escalations(processed);
-        filterEscalationsByPeriod(selectedPeriod, processed);
       } else {
-        console.warn("No escalations found");
         setAllL2Escalations([]);
-        setFilteredL2Escalations([]);
       }
     } catch (err) {
       console.error("L2 Escalations error:", err.message);
       setAllL2Escalations([]);
-      setFilteredL2Escalations([]);
     }
   };
 
-  const filterEscalationsByPeriod = (
-    period,
-    escalations = allL2Escalations
-  ) => {
-    console.log(`Filtering escalations for period: ${period}`);
+  // ============= FILTERING =============
+  const applyFilters = () => {
+    let filtered = [...allL2Escalations];
 
-    const filtered = escalations.filter((e) => e.period === period);
+    // Period filter
+    if (selectedPeriod !== "all") {
+      filtered = filtered.filter((e) => e.period === selectedPeriod);
+    }
 
-    console.log(`Filtered escalations for ${period}:`, filtered.length);
-    setFilteredL2Escalations(filtered);
-  };
-
-  const fetchComplianceData = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      console.log("Fetching department compliance for:", selectedPeriod);
-
-      const response = await slaService.getDepartmentCompliance(
-        user.departmentId,
-        selectedPeriod
+    // Status filter
+    if (selectedStatus !== "all") {
+      filtered = filtered.filter(
+        (e) => e.escalationStatus.toLowerCase() === selectedStatus
       );
-
-      if (response && response.success && response.data) {
-        setDepartmentCompliance(response.data);
-        console.log("Compliance loaded:", response.data);
-      } else {
-        setDepartmentCompliance(null);
-      }
-    } catch (err) {
-      console.warn("Compliance fetch error:", err.message);
-      setDepartmentCompliance(null);
     }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (e) =>
+          e.employeeName.toLowerCase().includes(query) ||
+          e.managerName.toLowerCase().includes(query) ||
+          e.reason.toLowerCase().includes(query)
+      );
+    }
+
+    setFilteredL2Escalations(filtered);
   };
 
   // ============= EVENT HANDLERS =============
@@ -180,10 +145,7 @@ const DeptHeadSLADashboard = () => {
 
   const handleApproveEscalation = async () => {
     if (!resolutionComments.trim()) {
-      toast.warning("Approval comments required", {
-        description: "Please provide approval comments before proceeding",
-        duration: 4000,
-      });
+      toast.warning("Approval comments required");
       return;
     }
 
@@ -198,29 +160,17 @@ const DeptHeadSLADashboard = () => {
         resolutionComments: resolutionComments.trim(),
       };
 
-      console.log("Approving L2 escalation:", payload);
-
       const response = await slaService.resolveEscalation(payload);
 
       if (response.success) {
-        toast.success("Escalation approved successfully", {
-          description: "Resolution comments have been saved",
-          duration: 4000,
-        });
+        toast.success("Escalation approved successfully");
         handleCloseResolutionModal();
         fetchAllData();
       } else {
-        toast.error("Failed to approve escalation", {
-          description: response.message || "Unable to process approval",
-          duration: 5000,
-        });
+        toast.error("Failed to approve escalation");
       }
     } catch (err) {
-      console.error("Error approving escalation:", err);
-      toast.error("Error approving escalation", {
-        description: err.message || "An unexpected error occurred",
-        duration: 5000,
-      });
+      toast.error("Error approving escalation");
     } finally {
       setApprovingEscalation(false);
     }
@@ -228,56 +178,50 @@ const DeptHeadSLADashboard = () => {
 
   // ============= HELPER FUNCTIONS =============
   const calculateStats = () => {
+    const filteredByPeriod =
+      selectedPeriod === "all"
+        ? allL2Escalations
+        : allL2Escalations.filter((e) => e.period === selectedPeriod);
+
     return {
-      total: filteredL2Escalations.length,
-      pending: filteredL2Escalations.filter(
-        (e) => e.escalationStatus === "Pending"
-      ).length,
-      resolved: filteredL2Escalations.filter(
+      total: filteredByPeriod.length,
+      pending: filteredByPeriod.filter((e) => e.escalationStatus === "Pending")
+        .length,
+      resolved: filteredByPeriod.filter(
         (e) => e.escalationStatus === "Resolved"
       ).length,
-      compliance: departmentCompliance?.compliancePercentage || 0,
+      rejected: filteredByPeriod.filter(
+        (e) => e.escalationStatus === "Rejected"
+      ).length,
     };
+  };
+
+  const getInitials = (name) => {
+    if (!name) return "??";
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const getAvatarClass = (index) => {
+    const classes = [
+      "avatar-pink",
+      "avatar-purple",
+      "avatar-deep-purple",
+      "avatar-indigo",
+      "avatar-blue",
+      "avatar-teal",
+    ];
+    return classes[index % classes.length];
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
       year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
-  };
-
-  const formatDateShort = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const getComplianceColor = (percentage) => {
-    if (percentage >= 90) return "#24A148";
-    if (percentage >= 75) return "#0F62FE";
-    if (percentage >= 60) return "#E2B93B";
-    return "#E01950";
-  };
-
-  const getDaysColor = (days) => {
-    if (days < 0) return "#E01950"; // RED - Overdue
-    if (days <= 2) return "#E2B93B"; // YELLOW - Due soon
-    return "#0F62FE"; // BLUE - Normal
-  };
-
-  const getDaysLabel = (days) => {
-    if (days < 0) return `${Math.abs(days)}d Overdue`;
-    if (days === 0) return "Due Today";
-    return `${days}d Left`;
   };
 
   // ============= RENDER =============
@@ -298,52 +242,10 @@ const DeptHeadSLADashboard = () => {
 
   return (
     <div className="container-fluid">
-      {/* ============= HEADER ============= */}
-             <Breadcrumb
-  items={[
-   
-    { label: "L2 Escalations" }
-  ]}
-/>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          
-          <p className="text-muted mb-0">
-            Review manager escalations (L2) and department compliance
-          </p>
-        </div>
-        <div className="d-flex gap-2">
-          <select
-            className="form-select"
-            value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
-            style={{ borderRadius: "8px", width: "auto" }}
-          >
-            <option value="Q4-2024">Q4 2024</option>
-            <option value="Q1-2025">Q1 2025</option>
-            <option value="Q2-2025">Q2 2025</option>
-            <option value="Q3-2025">Q3 2025</option>
-            <option value="Q4-2025">Q4 2025</option>
-          </select>
-          <button
-            className="btn btn-outline-primary d-flex align-items-center gap-2"
-            onClick={fetchAllData}
-            style={{ borderRadius: "8px" }}
-          >
-            <RefreshCw size={16} />
-            Refresh
-          </button>
-          <button
-            className="btn btn-primary d-flex align-items-center gap-2"
-            style={{ borderRadius: "8px" }}
-          >
-            <Download size={16} />
-            Export
-          </button>
-        </div>
-      </div>
+      {/* Breadcrumb */}
+      <Breadcrumb items={[{ label: "L2 Escalations" }]} />
 
-      {/* ============= ERROR ALERT ============= */}
+      {/* Error Alert */}
       {error && (
         <div className="alert alert-danger alert-dismissible fade show mb-4">
           <AlertCircle size={20} className="me-2" />
@@ -356,339 +258,242 @@ const DeptHeadSLADashboard = () => {
         </div>
       )}
 
-      {/* ============= STATS CARDS ============= */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-4">
-        <div className="col-md-3">
-          <div
-            className="card border-0 shadow-sm h-100"
-            style={{ borderRadius: "12px" }}
-          >
+        <div className="col-lg-3 col-md-6">
+          <div className="stat-card card">
             <div className="card-body">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center mb-3"
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  backgroundColor: "#0F62FE15",
-                }}
-              >
-                <Users size={24} color="#0F62FE" />
+              <div className="stat-icon stat-icon-blue">
+                <Users size={28} color="#1976D2" />
               </div>
-              <h3 className="fw-bold mb-1">{stats.total}</h3>
-              <p className="text-muted mb-0">
-                L2 Escalations ({selectedPeriod})
-              </p>
+              <div className="stat-content">
+                <h3>{stats.total}</h3>
+                <p>Total Escalations</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="col-md-3">
-          <div
-            className="card border-0 shadow-sm h-100"
-            style={{ borderRadius: "12px" }}
-          >
+        <div className="col-lg-3 col-md-6">
+          <div className="stat-card card">
             <div className="card-body">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center mb-3"
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  backgroundColor: "#E2B93B15",
-                }}
-              >
-                <Clock size={24} color="#E2B93B" />
+              <div className="stat-icon stat-icon-green">
+                <CheckCircle size={28} color="#388E3C" />
               </div>
-              <h3 className="fw-bold mb-1">{stats.pending}</h3>
-              <p className="text-muted mb-0">Pending Approvals</p>
+              <div className="stat-content">
+                <h3>{stats.resolved}</h3>
+                <p>Approved</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="col-md-3">
-          <div
-            className="card border-0 shadow-sm h-100"
-            style={{ borderRadius: "12px" }}
-          >
+        <div className="col-lg-3 col-md-6">
+          <div className="stat-card card">
             <div className="card-body">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center mb-3"
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  backgroundColor: "#24A14815",
-                }}
-              >
-                <CheckCircle size={24} color="#24A148" />
+              <div className="stat-icon stat-icon-orange">
+                <Clock size={28} color="#F57C00" />
               </div>
-              <h3 className="fw-bold mb-1">{stats.resolved}</h3>
-              <p className="text-muted mb-0">Resolved</p>
+              <div className="stat-content">
+                <h3>{stats.pending}</h3>
+                <p>Pending</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="col-md-3">
-          <div
-            className="card border-0 shadow-sm h-100"
-            style={{ borderRadius: "12px" }}
-          >
+        <div className="col-lg-3 col-md-6">
+          <div className="stat-card card">
             <div className="card-body">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center mb-3"
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  backgroundColor: "#24A14815",
-                }}
-              >
-                <TrendingUp size={24} color="#24A148" />
+              <div className="stat-icon stat-icon-red">
+                <AlertTriangle size={28} color="#C62828" />
               </div>
-              <h3
-                className="fw-bold mb-1"
-                style={{ color: getComplianceColor(stats.compliance) }}
-              >
-                {stats.compliance.toFixed(1)}%
-              </h3>
-              <p className="text-muted mb-0">Compliance</p>
+              <div className="stat-content">
+                <h3>{stats.rejected}</h3>
+                <p>Rejected</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ============= TABS ============= */}
-      <div
-        className="card border-0 shadow-sm mb-4"
-        style={{ borderRadius: "12px" }}
-      >
-        <div className="card-body p-0">
-          <ul className="nav nav-tabs border-0 px-3 pt-3" role="tablist">
-            <li className="nav-item">
-              <button
-                className={`nav-link ${
-                  activeTab === "escalations" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("escalations")}
-              >
-                <AlertTriangle size={16} className="me-2" />
-                L2 Escalations ({stats.total})
-              </button>
-            </li>
-            <li className="nav-item">
-              <button
-                className={`nav-link ${
-                  activeTab === "compliance" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("compliance")}
-              >
-                <TrendingUp size={16} className="me-2" />
-                Compliance
-              </button>
-            </li>
-          </ul>
+      {/* Search and Filter Bar */}
+      <div className="search-filter-bar">
+        <div className="search-input-wrapper">
+          <Search size={18} className="search-icon" />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search escalations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-      </div>
 
-      {/* ============= TAB: ESCALATIONS ============= */}
-      {activeTab === "escalations" && (
-        <div
-          className="card border-0 shadow-sm"
-          style={{ borderRadius: "12px" }}
+        <select
+          className="form-select filter-select"
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
         >
-          <div className="card-body">
-            <h5 className="fw-bold mb-4">
-              L2 Escalations - Manager to Dept Head
-            </h5>
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="resolved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
 
-            {filteredL2Escalations.length === 0 ? (
-              <div className="text-center py-5">
-                <AlertTriangle size={64} className="text-muted mb-3" />
-                <h5 className="text-muted">No Escalations</h5>
-                <p className="text-muted mb-0">
-                  No manager escalations pending for {selectedPeriod}
-                </p>
-              </div>
-            ) : (
-              <div className="table-responsive">
-                <table className="table table-hover align-middle">
-                  <thead style={{ backgroundColor: "#f8f9fa" }}>
-                    <tr>
-                      <th className="px-4 py-3">Employee</th>
-                      <th className="py-3">Manager</th>
-                      <th className="py-3">Reason</th>
-                      <th className="py-3">Status</th>
-                      <th className="py-3">Days Left</th>
-                      <th className="px-4 py-3">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredL2Escalations.map((esc) => (
-                      <tr key={esc.escalationId}>
-                        <td className="px-4">
-                          <strong>{esc.employeeName}</strong>
-                          <br />
-                          <small className="text-muted">
-                            {esc.employeeEmail || "N/A"}
-                          </small>
-                        </td>
-                        <td>
-                          <strong>{esc.managerName}</strong>
-                        </td>
-                        <td>
-                          <strong>{esc.reason}</strong>
-                          <br />
-                          <small className="text-muted">
-                            {esc.description || "No details"}
-                          </small>
-                        </td>
-                        <td>
-                          <span
-                            className={`badge ${
-                              esc.escalationStatus === "Pending"
-                                ? "bg-warning text-dark"
-                                : "bg-success"
-                            }`}
-                          >
-                            {esc.escalationStatus}
-                          </span>
-                        </td>
-                        <td>
-                          <small
-                            className="fw-semibold"
-                            style={{ color: getDaysColor(esc.daysLeft) }}
-                          >
-                            {getDaysLabel(esc.daysLeft)}
-                          </small>
-                        </td>
-                        <td className="px-4">
-                          <div className="d-flex gap-2">
-                            <button
-                              className="btn btn-sm btn-outline-primary"
-                              onClick={() => handleViewDetails(esc.slaid)}
-                              title="View SLA details"
-                            >
-                              <Eye size={14} />
-                            </button>
-                            {esc.escalationStatus === "Pending" && (
-                              <button
-                                className="btn btn-sm btn-success"
-                                onClick={() => handleOpenResolutionModal(esc)}
-                                title="Approve escalation"
-                              >
-                                Approve
-                              </button>
-                            )}
+        <select
+          className="form-select filter-select"
+          value={selectedPeriod}
+          onChange={(e) => setSelectedPeriod(e.target.value)}
+        >
+          <option value="all">All Periods</option>
+          <option value="Q4-2024">Q4 2024</option>
+          <option value="Q1-2025">Q1 2025</option>
+          <option value="Q2-2025">Q2 2025</option>
+          <option value="Q3-2025">Q3 2025</option>
+        </select>
+
+        <button
+          className="btn btn-outline-primary d-flex align-items-center gap-2"
+          onClick={fetchAllData}
+          style={{ borderRadius: "8px", height: "44px" }}
+        >
+          <RefreshCw size={16} />
+          Refresh
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="table-card">
+        <div className="table-responsive">
+          <table className="escalations-table table table-hover">
+            <thead>
+              <tr>
+                <th>Full Name</th>
+                <th>Manager</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Submitted Date</th>
+                <th className="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredL2Escalations.length === 0 ? (
+                <tr>
+                  <td colSpan="6">
+                    <div className="table-empty-state">
+                      <div className="empty-state-icon">
+                        <Users size={40} color="#9CA3AF" />
+                      </div>
+                      <p className="empty-state-text">No escalations found</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredL2Escalations.map((esc, index) => (
+                  <tr key={esc.escalationId}>
+                    <td>
+                      <div className="employee-cell">
+                        <div
+                          className={`employee-avatar ${getAvatarClass(index)}`}
+                        >
+                          {getInitials(esc.employeeName)}
+                        </div>
+                        <div className="employee-info">
+                          <div className="employee-name">
+                            {esc.employeeName}
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ============= TAB: COMPLIANCE ============= */}
-      {activeTab === "compliance" && (
-        <div className="row g-4">
-          <div className="col-lg-8">
-            {departmentCompliance && departmentCompliance.totalSlas > 0 ? (
-              <ComplianceCard
-                compliance={departmentCompliance}
-                showActions={true}
-              />
-            ) : (
-              <div
-                className="card border-0 shadow-sm"
-                style={{ borderRadius: "12px" }}
-              >
-                <div className="card-body text-center py-5">
-                  <TrendingUp size={64} className="text-muted mb-3" />
-                  <p className="text-muted mb-3">
-                    No compliance data for {selectedPeriod}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="col-lg-4">
-            <div
-              className="card border-0 shadow-sm"
-              style={{ borderRadius: "12px" }}
-            >
-              <div className="card-body">
-                <h6 className="fw-bold mb-4">Compliance Summary</h6>
-
-                {departmentCompliance ? (
-                  <>
-                    <div className="mb-3 pb-3 border-bottom">
-                      <small className="text-muted d-block mb-1">Period</small>
-                      <strong>{departmentCompliance.period}</strong>
-                    </div>
-
-                    <div className="mb-3 pb-3 border-bottom">
-                      <small className="text-muted d-block mb-1">
-                        Compliance Rate
-                      </small>
-                      <h4
-                        className="fw-bold mb-0"
-                        style={{
-                          color: getComplianceColor(
-                            departmentCompliance.compliancePercentage
-                          ),
-                        }}
+                          <div className="employee-email">
+                            {esc.employeeEmail || "No email"}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="manager-cell">{esc.managerName}</div>
+                    </td>
+                    <td>
+                      <div className="reason-cell">
+                        <div className="reason-title">{esc.reason}</div>
+                        {esc.description && (
+                          <div className="reason-description">
+                            {esc.description.substring(0, 40)}
+                            {esc.description.length > 40 ? "..." : ""}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        className={`status-badge ${
+                          esc.escalationStatus === "Pending"
+                            ? "status-pending"
+                            : esc.escalationStatus === "Resolved"
+                            ? "status-resolved"
+                            : "status-rejected"
+                        }`}
                       >
-                        {departmentCompliance.compliancePercentage.toFixed(1)}%
-                      </h4>
-                    </div>
-
-                    <div className="mb-3 pb-3 border-bottom">
-                      <small className="text-muted d-block mb-1">
-                        Total SLAs
-                      </small>
-                      <strong>{departmentCompliance.totalSlas}</strong>
-                    </div>
-
-                    <div className="mb-3 pb-3 border-bottom">
-                      <small className="text-muted d-block mb-1">On Time</small>
-                      <strong className="text-success">
-                        {departmentCompliance.onTimeSlas}
-                      </strong>
-                    </div>
-
-                    <div className="mb-0">
-                      <small className="text-muted d-block mb-1">
-                        Breached
-                      </small>
-                      <strong className="text-danger">
-                        {departmentCompliance.breachedSlas}
-                      </strong>
-                    </div>
-                  </>
-                ) : (
-                  <p className="small text-muted">No data available</p>
-                )}
-              </div>
-            </div>
-          </div>
+                        {esc.escalationStatus}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="date-cell">
+                        {formatDate(esc.submittedAt)}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          className="action-btn btn-view"
+                          onClick={() => handleViewDetails(esc.slaid)}
+                          title="View Details"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        {esc.escalationStatus === "Pending" && (
+                          <button
+                            className="action-btn btn-approve"
+                            onClick={() => handleOpenResolutionModal(esc)}
+                            title="Approve Escalation"
+                          >
+                            <CheckCircle size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
 
-      {/* ============= APPROVAL MODAL ============= */}
+      {/* Approval Modal */}
       {showResolutionModal && selectedEscalation && (
         <div
-          className="modal show d-block"
+          className="modal show d-block escalation-modal"
           style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1055 }}
+          onClick={handleCloseResolutionModal}
         >
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content" style={{ borderRadius: "12px" }}>
-              <div className="modal-header border-0">
-                <h5 className="modal-title fw-bold d-flex align-items-center gap-2">
-                  <AlertTriangle size={20} color="#E01950" />
+          <div
+            className="modal-dialog modal-dialog-centered"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title fw-bold">
+                  <AlertTriangle
+                    size={20}
+                    color="#E01950"
+                    className="me-2"
+                    style={{ verticalAlign: "middle" }}
+                  />
                   Approve L2 Escalation
                 </h5>
                 <button
+
+                
                   type="button"
                   className="btn-close"
                   onClick={handleCloseResolutionModal}
@@ -697,23 +502,26 @@ const DeptHeadSLADashboard = () => {
               </div>
 
               <div className="modal-body">
-                <div
-                  className="mb-4 p-3"
-                  style={{ backgroundColor: "#f8f9fa", borderRadius: "8px" }}
-                >
-                  <div className="mb-2">
-                    <small className="text-muted d-block">Employee</small>
-                    <strong>{selectedEscalation.employeeName}</strong>
+                <div className="info-box">
+                  <div className="info-box-item">
+                    <span className="info-box-label">Employee</span>
+                    <div className="info-box-value">
+                      {selectedEscalation.employeeName}
+                    </div>
                   </div>
-                  <div className="mb-2">
-                    <small className="text-muted d-block">
+                  <div className="info-box-item">
+                    <span className="info-box-label">
                       Manager (Escalated By)
-                    </small>
-                    <strong>{selectedEscalation.managerName}</strong>
+                    </span>
+                    <div className="info-box-value">
+                      {selectedEscalation.managerName}
+                    </div>
                   </div>
-                  <div>
-                    <small className="text-muted d-block">Reason</small>
-                    <strong>{selectedEscalation.reason}</strong>
+                  <div className="info-box-item">
+                    <span className="info-box-label">Reason</span>
+                    <div className="info-box-value">
+                      {selectedEscalation.reason}
+                    </div>
                   </div>
                 </div>
 
@@ -727,8 +535,8 @@ const DeptHeadSLADashboard = () => {
                     value={resolutionComments}
                     onChange={(e) => setResolutionComments(e.target.value)}
                     placeholder="Provide your decision and comments..."
-                    style={{ borderRadius: "8px" }}
                     disabled={approvingEscalation}
+                    style={{ borderRadius: "8px", resize: "none" }}
                   />
                   <small className="text-muted mt-2 d-block">
                     {resolutionComments.length}/500
@@ -736,12 +544,13 @@ const DeptHeadSLADashboard = () => {
                 </div>
               </div>
 
-              <div className="modal-footer border-0">
+              <div className="modal-footer">
                 <button
                   type="button"
                   className="btn btn-secondary"
                   onClick={handleCloseResolutionModal}
                   disabled={approvingEscalation}
+                  style={{ borderRadius: "8px" }}
                 >
                   Cancel
                 </button>
@@ -750,6 +559,7 @@ const DeptHeadSLADashboard = () => {
                   className="btn btn-success d-flex align-items-center gap-2"
                   onClick={handleApproveEscalation}
                   disabled={approvingEscalation || !resolutionComments.trim()}
+                  style={{ borderRadius: "8px" }}
                 >
                   <CheckCircle size={16} />
                   {approvingEscalation ? "Approving..." : "Approve Escalation"}

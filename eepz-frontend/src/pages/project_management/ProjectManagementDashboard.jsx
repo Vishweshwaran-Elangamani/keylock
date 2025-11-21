@@ -57,8 +57,6 @@ const ProjectManagementDashboard = () => {
       className="h-100 d-flex flex-column"
       style={{ maxWidth: "100%", width: "100%" }}
     >
-      
-
       {/* Statistics Cards */}
       <div className="row g-4 mb-4">
         {/* Total Projects Card */}
@@ -72,36 +70,35 @@ const ProjectManagementDashboard = () => {
             }}
           >
             <div className="card-body">
-              <div className="d-flex align-items-center justify-content-between mb-3">
+              <div className="d-flex align-items-center gap-3">
                 <div
-                  className="rounded p-3"
+                  className="rounded p-2"
                   style={{
                     backgroundColor: "rgba(82, 79, 125, 0.1)",
+                    flexShrink: 0,
                   }}
                 >
                   <FolderKanban
-                    size={24}
+                    size={20}
                     style={{ color: "var(--color-primary-3)" }}
                   />
                 </div>
-                <TrendingUp
-                  size={20}
-                  style={{ color: "var(--color-success)" }}
-                />
+                <div className="flex-grow-1">
+                  <h3
+                    className="mb-0 fw-bold"
+                    style={{ color: "var(--color-primary-1)", fontSize: "1.5rem" }}
+                  >
+                    {stats.isLoading ? (
+                      <span className="spinner-border spinner-border-sm" />
+                    ) : (
+                      stats.totalProjects
+                    )}
+                  </h3>
+                  <p className="mb-0 small" style={{ color: "var(--muted)" }}>
+                    Total Projects
+                  </p>
+                </div>
               </div>
-              <h3
-                className="mb-1 fw-bold"
-                style={{ color: "var(--color-primary-1)" }}
-              >
-                {stats.isLoading ? (
-                  <span className="spinner-border spinner-border-sm" />
-                ) : (
-                  stats.totalProjects
-                )}
-              </h3>
-              <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-                Total Projects
-              </p>
             </div>
           </div>
         </div>
@@ -117,43 +114,35 @@ const ProjectManagementDashboard = () => {
             }}
           >
             <div className="card-body">
-              <div className="d-flex align-items-center justify-content-between mb-3">
+              <div className="d-flex align-items-center gap-3">
                 <div
-                  className="rounded p-3"
+                  className="rounded p-2"
                   style={{
                     backgroundColor: "rgba(36, 161, 72, 0.1)",
+                    flexShrink: 0,
                   }}
                 >
                   <Activity
-                    size={24}
+                    size={20}
                     style={{ color: "var(--color-success)" }}
                   />
                 </div>
-                <span
-                  className="badge"
-                  style={{
-                    backgroundColor: "rgba(36, 161, 72, 0.1)",
-                    color: "var(--color-success)",
-                    padding: "0.35rem 0.65rem",
-                    borderRadius: "var(--radius-sm)",
-                  }}
-                >
-                  Active
-                </span>
+                <div className="flex-grow-1">
+                  <h3
+                    className="mb-0 fw-bold"
+                    style={{ color: "var(--color-primary-1)", fontSize: "1.5rem" }}
+                  >
+                    {stats.isLoading ? (
+                      <span className="spinner-border spinner-border-sm" />
+                    ) : (
+                      stats.activeProjects
+                    )}
+                  </h3>
+                  <p className="mb-0 small" style={{ color: "var(--muted)" }}>
+                    Active Projects
+                  </p>
+                </div>
               </div>
-              <h3
-                className="mb-1 fw-bold"
-                style={{ color: "var(--color-primary-1)" }}
-              >
-                {stats.isLoading ? (
-                  <span className="spinner-border spinner-border-sm" />
-                ) : (
-                  stats.activeProjects
-                )}
-              </h3>
-              <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-                Active Projects
-              </p>
             </div>
           </div>
         </div>
@@ -169,33 +158,32 @@ const ProjectManagementDashboard = () => {
             }}
           >
             <div className="card-body">
-              <div className="d-flex align-items-center justify-content-between mb-3">
+              <div className="d-flex align-items-center gap-3">
                 <div
-                  className="rounded p-3"
+                  className="rounded p-2"
                   style={{
                     backgroundColor: "rgba(15, 98, 254, 0.1)",
+                    flexShrink: 0,
                   }}
                 >
-                  <Users size={24} style={{ color: "var(--color-accent-5)" }} />
+                  <Users size={20} style={{ color: "var(--color-accent-5)" }} />
                 </div>
-                <TrendingUp
-                  size={20}
-                  style={{ color: "var(--color-accent-5)" }}
-                />
+                <div className="flex-grow-1">
+                  <h3
+                    className="mb-0 fw-bold"
+                    style={{ color: "var(--color-primary-1)", fontSize: "1.5rem" }}
+                  >
+                    {stats.isLoading ? (
+                      <span className="spinner-border spinner-border-sm" />
+                    ) : (
+                      stats.totalEmployees
+                    )}
+                  </h3>
+                  <p className="mb-0 small" style={{ color: "var(--muted)" }}>
+                    Total Employees
+                  </p>
+                </div>
               </div>
-              <h3
-                className="mb-1 fw-bold"
-                style={{ color: "var(--color-primary-1)" }}
-              >
-                {stats.isLoading ? (
-                  <span className="spinner-border spinner-border-sm" />
-                ) : (
-                  stats.totalEmployees
-                )}
-              </h3>
-              <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-                Total Employees
-              </p>
             </div>
           </div>
         </div>
@@ -211,36 +199,35 @@ const ProjectManagementDashboard = () => {
             }}
           >
             <div className="card-body">
-              <div className="d-flex align-items-center justify-content-between mb-3">
+              <div className="d-flex align-items-center gap-3">
                 <div
-                  className="rounded p-3"
+                  className="rounded p-2"
                   style={{
                     backgroundColor: "rgba(151, 36, 126, 0.1)",
+                    flexShrink: 0,
                   }}
                 >
                   <UserCog
-                    size={24}
+                    size={20}
                     style={{ color: "var(--color-accent-1)" }}
                   />
                 </div>
-                <TrendingUp
-                  size={20}
-                  style={{ color: "var(--color-success)" }}
-                />
+                <div className="flex-grow-1">
+                  <h3
+                    className="mb-0 fw-bold"
+                    style={{ color: "var(--color-primary-1)", fontSize: "1.5rem" }}
+                  >
+                    {stats.isLoading ? (
+                      <span className="spinner-border spinner-border-sm" />
+                    ) : (
+                      stats.projectsWithManagers
+                    )}
+                  </h3>
+                  <p className="mb-0 small" style={{ color: "var(--muted)" }}>
+                    Managed Projects
+                  </p>
+                </div>
               </div>
-              <h3
-                className="mb-1 fw-bold"
-                style={{ color: "var(--color-primary-1)" }}
-              >
-                {stats.isLoading ? (
-                  <span className="spinner-border spinner-border-sm" />
-                ) : (
-                  stats.projectsWithManagers
-                )}
-              </h3>
-              <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-                Managed Projects
-              </p>
             </div>
           </div>
         </div>

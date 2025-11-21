@@ -66,8 +66,8 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       },
       {
         icon: "bi-journal-bookmark",
-        label: "Meethings & Mom",
-        path: "/hr/dashboard/meetmom",
+        label: "Meetings & Mom",
+        path: "/hr/dasboard/meetmom",
       },
     ],
     Leadership: [

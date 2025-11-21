@@ -165,13 +165,13 @@
 .sla-stat-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   cursor: pointer !important;
-  border: 1.5px solid #a21caf !important;
+  border: 1.5px solid #27235c !important;
   border-radius: 14px !important;
   box-shadow: none !important;
 }
 
 .sla-stat-card:hover {
-  box-shadow: 0 4px 12px 0 rgba(163, 21, 175, 0.13) !important;
+  /* box-shadow: 0 4px 12px 0 #27235c !important; */
   transform: translateY(-2px) !important;
 }
 
