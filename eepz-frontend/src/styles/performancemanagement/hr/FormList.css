@@ -1001,3 +1001,59 @@
   opacity: 0.93;
   box-shadow: none;
 }
+
+/* Analytics Cards - Medium */
+.fld-analytics-card {
+  padding: 0.85rem 1.2rem;
+  min-width: 130px;
+}
+
+.fld-analytics-card h4 {
+  font-size: 1rem;
+  margin: 0 0 0.4rem 0;
+}
+
+.fld-analytics-card p {
+  font-size: 1.5rem;
+}
+
+/* Action Buttons - Medium */
+.themed-action-btn {
+  width: 36px;
+  height: 36px;
+  font-size: 17px;
+  border-radius: 8px;
+  border: 1.5px solid #e5e7eb;
+}
+
+/* User Panel - Medium Height */
+.fld-users-panel {
+  height: 600px;
+  min-height: 450px;
+}
+
+/* Pagination - Medium */
+.fld-pagination .fld-page-link {
+  min-width: 32px;
+  height: 32px;
+  font-size: 0.8125rem;
+  padding: 0.3rem 0.65rem;
+}
+
+/* Table - Medium */
+.fld-table thead th {
+  padding: 0.85rem 1rem;
+  font-size: 0.8125rem;
+}
+
+.fld-table tbody td {
+  padding: 0.85rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* User Cards - Medium */
+.fld-user-card {
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.4rem;
+}
+

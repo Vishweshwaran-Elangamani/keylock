@@ -1,15 +1,13 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import api from "../../../services/performancemanagement/hr/api";
-import "../../../styles/performancemanagement/hr/FormList.css";
-
 import ViewFormDetailsModal from "../../../components/performance_management/modals/FormsList/ViewFormDetailsModal";
 import DeadlineModal from "../../../components/performance_management/modals/FormsList/DeadlineModal";
+import "../../../styles/performancemanagement/hr/FormList.css";
 
 function FormsList() {
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [rows, setRows] = useState([]);
@@ -38,10 +36,6 @@ function FormsList() {
 
   const formTypes = useMemo(() => ["All", ...new Set(rows.map(f => f.type).filter(Boolean))], [rows]);
   const formDeliveryOptions = ["All", "Delivery", "Enablement", "Delivery and Enablement"];
-  const userRoles = useMemo(() => {
-    const roles = new Set(users.map(u => (u.role || u.Role || "").toUpperCase()));
-    return ["All", ...[...roles].filter(r => r !== "")];
-  }, [users]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -362,30 +356,25 @@ function FormsList() {
   return (
     <>
       <div className="fld-root">
-       
-  <nav className="cg-breadcrumbs" aria-label="breadcrumb">
-  <ol className="cg-breadcrumb">
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard")}
-      style={{ cursor: "pointer" }}>
-      <i className="bi bi-house-door"></i>
-    </li>
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard/performance")}
-      style={{ cursor: "pointer" }}>
-      Performance
-    </li>
-    <li className="cg-breadcrumb-item active" aria-current="page">
-      Initiate Form
-    </li>
-  </ol>
-</nav>
-
-
-
-
+        <nav className="cg-breadcrumbs" aria-label="breadcrumb">
+          <ol className="cg-breadcrumb">
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard")}
+              style={{ cursor: "pointer" }}>
+              <i className="bi bi-house-door"></i>
+            </li>
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard/performance")}
+              style={{ cursor: "pointer" }}>
+              Performance
+            </li>
+            <li className="cg-breadcrumb-item active" aria-current="page">
+              Initiate Form
+            </li>
+          </ol>
+        </nav>
 
         <div className="fld-analytics-cards">
           <div className="fld-analytics-card">
@@ -528,31 +517,29 @@ function FormsList() {
                           </td>
                           <td>
                             <div className="fld-action-buttons">
-<button
-  className="themed-action-btn btn-view"
-  onClick={() => handleView(f)}
-  title="View Form"
->
-  <i className="bi bi-eye" />
-</button>
-<button
-  className="themed-action-btn btn-edit"
-  onClick={() =>
-    navigate(`/hr/dashboard/performance/create/${f.formId}`)
-  }
-  title="Edit Form"
->
-  <i className="bi bi-pencil" />
-</button>
-<button
-  className={`themed-action-btn btn-choose${selectedFormId === f.formId ? " btn-active" : ""}`}
-  onClick={() => handleFormSelect(f.formId)}
-  title="Choose Form"
->
-  <i className="bi bi-hand-index" />
-</button>
-
-
+                              <button
+                                className="themed-action-btn btn-view"
+                                onClick={() => handleView(f)}
+                                title="View Form"
+                              >
+                                <i className="bi bi-eye" />
+                              </button>
+                              <button
+                                className="themed-action-btn btn-edit"
+                                onClick={() =>
+                                  navigate(`/hr/dashboard/performance/create/${f.formId}`)
+                                }
+                                title="Edit Form"
+                              >
+                                <i className="bi bi-pencil" />
+                              </button>
+                              <button
+                                className={`themed-action-btn btn-choose${selectedFormId === f.formId ? " btn-active" : ""}`}
+                                onClick={() => handleFormSelect(f.formId)}
+                                title="Choose Form"
+                              >
+                                <i className="bi bi-hand-index" />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -639,9 +626,9 @@ function FormsList() {
             </div>
 
             <div
-  className="fld-panel-body"
-  style={{ overflowY: "auto", maxHeight: "700px", minHeight: "400px" }}
->
+              className="fld-panel-body"
+              style={{ overflowY: "auto", maxHeight: "580px", minHeight: "350px" }}
+            >
               {!selectedFormId ? (
                 <div className="fld-empty-box">
                   <i className="bi bi-hand-index"></i>
@@ -723,8 +710,6 @@ function FormsList() {
                     </li>
                   </ul>
                 </nav>
-
-              
               </div>
             )}
 

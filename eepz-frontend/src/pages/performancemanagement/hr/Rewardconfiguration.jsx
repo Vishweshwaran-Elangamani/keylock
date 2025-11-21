@@ -226,8 +226,8 @@ function RewardConfiguration() {
   const RL_BORDER = "#27235c";
   const RL_TABLE_HEADER = "#f8f6fb";
   const RL_LIGHT = "#f5f5fa";
-  const BTN_RADIUS = "8px";
-  const PREVIEW_CHAR_LIMIT = 340;
+  const BTN_RADIUS = "7px";
+  const PREVIEW_CHAR_LIMIT = 280;
 
   function renderRewardDetails() {
     if (!selectedRewardType) return null;
@@ -238,11 +238,11 @@ function RewardConfiguration() {
 
     return (
       <>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div
             style={{
               fontWeight: 800,
-              fontSize: "22px",
+              fontSize: "18px",
               color: RL_DARK,
               fontFamily: "Montserrat, Nunito, sans-serif",
               textAlign: "left",
@@ -259,10 +259,10 @@ function RewardConfiguration() {
               background: "#F3EBFA",
               color: RL_PURPLE,
               fontWeight: 700,
-              fontSize: "13px",
-              padding: "2px 10px",
-              borderRadius: 10,
-              marginLeft: 6,
+              fontSize: "11px",
+              padding: "2px 8px",
+              borderRadius: 8,
+              marginLeft: 4,
               display: "inline-block",
             }}
           >
@@ -272,16 +272,16 @@ function RewardConfiguration() {
             onClick={openParameterModal}
             style={{
               marginLeft: "auto",
-              padding: "7px 16px",
-             background: "linear-gradient(90deg, #97247e 0%, #e01950 100%)",
+              padding: "6px 14px",
+              background: "linear-gradient(90deg, #97247e 0%, #e01950 100%)",
               color: "#fff",
               borderRadius: BTN_RADIUS,
               fontWeight: 700,
               cursor: "pointer",
               border: "none",
-              fontSize: 14,
-              height: 32,
-              boxShadow: "0 1.5px 6px rgba(39,35,92,0.10)",
+              fontSize: 12,
+              height: 28,
+              boxShadow: "0 1px 4px rgba(39,35,92,0.08)",
               whiteSpace: "nowrap",
             }}
           >
@@ -290,18 +290,18 @@ function RewardConfiguration() {
         </div>
         <div
           style={{
-            fontSize: "15px",
+            fontSize: "13px",
             color: "#8886b3",
-            marginTop: 8,
+            marginTop: 6,
             maxWidth: "100%",
             textAlign: "justify",
-            lineHeight: 1.7,
+            lineHeight: 1.6,
             wordBreak: "break-word",
             whiteSpace: "pre-wrap",
-            minHeight: needsCollapse ? 90 : "auto",
+            minHeight: needsCollapse ? 75 : "auto",
             display: "flex",
             alignItems: "center",
-            gap: 8,
+            gap: 6,
           }}
         >
           <span style={{ flex: 1 }}>
@@ -316,7 +316,7 @@ function RewardConfiguration() {
                 border: "none",
                 color: RL_PURPLE,
                 fontWeight: 600,
-                fontSize: 13,
+                fontSize: 12,
                 cursor: "pointer",
                 outline: "none",
                 padding: 0,
@@ -341,17 +341,17 @@ function RewardConfiguration() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          border: `1.5px solid ${RL_PURPLE}`,
+          border: `1.3px solid ${RL_PURPLE}`,
           background: "#fff",
           color: RL_PURPLE,
           fontWeight: 700,
           borderRadius: "50%",
-          width: 38,
-          height: 38,
-          fontSize: 17,
+          width: 32,
+          height: 32,
+          fontSize: 15,
           cursor: "pointer",
           transition: "box-shadow 0.15s",
-          marginLeft: 6,
+          marginLeft: 5,
         }}
         title="Select Reward Type"
       >
@@ -362,25 +362,25 @@ function RewardConfiguration() {
 
   return (
     <div style={{ background: RL_BG, minHeight: "100vh", minWidth: 0 }}>
-      {/* Top Bar: Breadcrumbs + Create Button - MOVED HIGHER */}
+      {/* Top Bar: Breadcrumbs + Create Button */}
       <div
         style={{
-          padding: "20px 34px 0 34px",
+          padding: "16px 28px 0 28px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           background: RL_BG,
-          gap: 12,
-          marginBottom: "1.5rem",
+          gap: 10,
+          marginBottom: "1.2rem",
         }}
       >
         <nav className="cg-breadcrumbs" style={{ marginBottom: 0, background: "transparent" }} aria-label="breadcrumb">
           <ol className="cg-breadcrumb" style={{ margin: 0 }}>
-            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard")}>
+            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard")} style={{ cursor: "pointer" }}>
               <i className="bi bi-house-door"></i>
             </li>
-            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")}>
-              Performance Management
+            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")} style={{ cursor: "pointer" }}>
+              Performance
             </li>
             <li className="cg-breadcrumb-item active" aria-current="page">
               Rewards
@@ -390,22 +390,23 @@ function RewardConfiguration() {
         <button
           onClick={openAddRewardTypeModal}
           style={{
-            padding: "10px 20px",
+            padding: "8px 16px",
             background: "linear-gradient(90deg, #97247e 0%, #e01950 100%)",
             color: "#fff",
             borderRadius: BTN_RADIUS,
             fontWeight: "700",
-            fontSize: "15px",
+            fontSize: "13px",
             border: "none",
-            boxShadow: "0 2px 10px rgba(151,36,126,0.15)",
+            boxShadow: "0 1.5px 6px rgba(151,36,126,0.12)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
-            gap: 10,
+            gap: 8,
+            height: 32,
           }}
           title="Create a new Reward Type"
         >
-          <i className="bi bi-plus-circle" style={{ fontSize: "18px" }}></i>
+          <i className="bi bi-plus-circle" style={{ fontSize: "15px" }}></i>
           Create Reward Type
         </button>
       </div>
@@ -414,108 +415,109 @@ function RewardConfiguration() {
       <div
         style={{
           margin: "0 auto",
-          maxWidth: 1600,
+          maxWidth: 1500,
           background: RL_BG,
           minHeight: "100vh",
           display: "flex",
-          gap: "30px",
-          padding: "0 40px 40px 40px",
+          gap: "24px",
+          padding: "0 32px 32px 32px",
           alignItems: "flex-start",
         }}
       >
         {/* LEFT COLUMN (Recognition Cards) */}
-       <div
-  style={{
-    flex: 1.3,
-    background: "#fff",
-    borderRadius: 14,
-    marginTop: 0,
-    border: `1px solid ${RL_BORDER}`,
-    boxShadow: "0 1.5px 6px rgba(0,0,0,0.02)",
-    display: "flex",
-    flexDirection: "column",
-    minHeight: 530,
-    maxHeight: "81vh",
-  }}
->
-          {/* Tabs: Active/Inactive - NOT STICKY */}
-           <div
-    style={{
-      background: "#fff",
-      padding: "16px 22px 10px 22px",
-      borderRadius: "14px 14px 0 0",
-      display: "flex",
-      justifyContent: "center",
-    }}
-  >
-    <div
-      style={{
-        background: RL_DARK,
-        padding: "6px",
-        borderRadius: "50px",
-        display: "inline-flex",
-        gap: "6px",
-      }}
-    >
-      <button
-        onClick={() => setActiveTab("Active")}
-        style={{
-          padding: "10px 32px",
-          background: activeTab === "Active" ? "#fff" : "transparent",
-          color: activeTab === "Active" ? RL_DARK : "#fff",
-          borderRadius: "50px",
-          fontWeight: "700",
-          fontSize: "15px",
-          cursor: "pointer",
-          border: "none",
-          transition: "all 0.2s ease",
-          whiteSpace: "nowrap",
-        }}
-      >
-        Active ({activeRewardTypes.length})
-      </button>
-      <button
-        onClick={() => setActiveTab("Inactive")}
-        style={{
-          padding: "10px 32px",
-          background: activeTab === "Inactive" ? "#fff" : "transparent",
-          color: activeTab === "Inactive" ? RL_DARK : "#fff",
-          borderRadius: "50px",
-          fontWeight: "700",
-          fontSize: "15px",
-          cursor: "pointer",
-          border: "none",
-          transition: "all 0.2s ease",
-          whiteSpace: "nowrap",
-        }}
-      >
-        Inactive ({inactiveRewardTypes.length})
-      </button>
-    </div>
-  </div>
-  <div
-    style={{
-      flex: 1,
-      overflowY: "auto",
-      padding: "8px 19px 17px 22px",
-      minHeight: 0,
-      maxHeight: "calc(81vh - 80px)",
-    }}
-  >
+        <div
+          style={{
+            flex: 1.3,
+            background: "#fff",
+            borderRadius: 12,
+            marginTop: 0,
+            border: `1px solid ${RL_BORDER}`,
+            boxShadow: "0 1px 4px rgba(0,0,0,0.02)",
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 480,
+            maxHeight: "75vh",
+          }}
+        >
+          {/* Tabs: Active/Inactive */}
+          <div
+            style={{
+              background: "#fff",
+              padding: "14px 18px 8px 18px",
+              borderRadius: "12px 12px 0 0",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                background: RL_DARK,
+                padding: "5px",
+                borderRadius: "40px",
+                display: "inline-flex",
+                gap: "5px",
+              }}
+            >
+              <button
+                onClick={() => setActiveTab("Active")}
+                style={{
+                  padding: "8px 26px",
+                  background: activeTab === "Active" ? "#fff" : "transparent",
+                  color: activeTab === "Active" ? RL_DARK : "#fff",
+                  borderRadius: "40px",
+                  fontWeight: "700",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  border: "none",
+                  transition: "all 0.18s ease",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Active ({activeRewardTypes.length})
+              </button>
+              <button
+                onClick={() => setActiveTab("Inactive")}
+                style={{
+                  padding: "8px 26px",
+                  background: activeTab === "Inactive" ? "#fff" : "transparent",
+                  color: activeTab === "Inactive" ? RL_DARK : "#fff",
+                  borderRadius: "40px",
+                  fontWeight: "700",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  border: "none",
+                  transition: "all 0.18s ease",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Inactive ({inactiveRewardTypes.length})
+              </button>
+            </div>
+          </div>
+          <div
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              padding: "6px 16px 14px 18px",
+              minHeight: 0,
+              maxHeight: "calc(75vh - 70px)",
+            }}
+          >
             {loading ? (
-              <div style={{ textAlign: "center", color: "#aaa", padding: "42px 3px 18px 5px" }}>
-                <div className="spinner-border" style={{ width: 22, height: 22 }}></div>
-                <div style={{ fontSize: 14, marginTop: 6 }}>Loading...</div>
+              <div style={{ textAlign: "center", color: "#aaa", padding: "36px 3px 14px 4px" }}>
+                <div className="spinner-border" style={{ width: 18, height: 18 }}></div>
+                <div style={{ fontSize: 12, marginTop: 5 }}>Loading...</div>
               </div>
             ) : displayedRewards.length === 0 ? (
               <div
                 style={{
                   color: "#a1a9b9",
                   background: "#f7f5fa",
-                  borderRadius: 9,
-                  border: `1.2px dashed ${RL_BORDER}`,
-                  padding: "36px 10px",
+                  borderRadius: 8,
+                  border: `1px dashed ${RL_BORDER}`,
+                  padding: "30px 8px",
                   textAlign: "center",
+                  fontSize: "13px",
                 }}
               >
                 No {activeTab.toLowerCase()} rewards
@@ -525,45 +527,45 @@ function RewardConfiguration() {
                 <div
                   key={rt.rewardTypeId}
                   style={{
-                    padding: "13px 13px 14px 14px",
-                    marginBottom: "14px",
-                    borderRadius: 10,
+                    padding: "11px 11px 12px 12px",
+                    marginBottom: "12px",
+                    borderRadius: 8,
                     background: "#fcfcfc",
                     border:
                       selectedRewardType?.rewardTypeId === rt.rewardTypeId
-                        ? `2px solid ${RL_PURPLE}`
+                        ? `1.5px solid ${RL_PURPLE}`
                         : `1px solid ${RL_BORDER}`,
                     boxShadow:
                       selectedRewardType?.rewardTypeId === rt.rewardTypeId
-                        ? "0 2px 10px rgba(149,51,161,0.10)"
+                        ? "0 1.5px 8px rgba(149,51,161,0.08)"
                         : "none",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    transition: ".16s",
+                    transition: ".14s",
                   }}
                 >
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: "16px", color: RL_DARK, marginBottom: 4 }}>
+                    <div style={{ fontWeight: 700, fontSize: "14px", color: RL_DARK, marginBottom: 3 }}>
                       {rt.rewardName}
                     </div>
                     <div
                       style={{
-                        fontSize: "13px",
+                        fontSize: "11.5px",
                         color: "#85779c",
-                        marginBottom: 8,
+                        marginBottom: 6,
                         textOverflow: "ellipsis",
                         overflow: "hidden",
                         whiteSpace: "nowrap",
-                        maxWidth: 220,
+                        maxWidth: 190,
                       }}
                     >
-                      {rt.description || "\u2014"}
+                      {rt.description || "—"}
                     </div>
-                    <div style={{ display: "flex", gap: 7, alignItems: "center", fontSize: 12 }}>
+                    <div style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 11 }}>
                       <span
                         style={{
-                          padding: "1.7px 8px",
+                          padding: "1.5px 7px",
                           background: "#f3f4fa",
                           borderRadius: 3,
                           fontWeight: "500",
@@ -573,7 +575,7 @@ function RewardConfiguration() {
                       </span>
                       <span
                         style={{
-                          padding: "2.5px 11px",
+                          padding: "2px 9px",
                           borderRadius: 4,
                           fontWeight: "600",
                           background: rt.isActive ? "#e7e0fa" : "#fbe2f3",
@@ -584,20 +586,18 @@ function RewardConfiguration() {
                       </span>
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <button
-                      onClick={() => {
-                        openEditRewardTypeModal(rt);
-                      }}
+                      onClick={() => openEditRewardTypeModal(rt)}
                       title="Edit Reward Type"
                       style={{
-                        padding: "7px 10px",
-                        marginRight: 4,
+                        padding: "6px 8px",
+                        marginRight: 3,
                         background: "#fff",
                         color: RL_PURPLE,
-                        border: `1.4px solid ${RL_PURPLE}`,
+                        border: `1.3px solid ${RL_PURPLE}`,
                         borderRadius: BTN_RADIUS,
-                        fontSize: "17px",
+                        fontSize: "15px",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
@@ -610,12 +610,12 @@ function RewardConfiguration() {
                       onClick={() => confirmStatusChange(rt)}
                       title={rt.isActive ? "Deactivate Reward Type" : "Activate Reward Type"}
                       style={{
-                        padding: "7px 10px",
+                        padding: "6px 8px",
                         background: "#fff",
                         color: rt.isActive ? "#E01950" : RL_PURPLE,
-                        border: `1.4px solid ${rt.isActive ? "#E01950" : RL_PURPLE}`,
+                        border: `1.3px solid ${rt.isActive ? "#E01950" : RL_PURPLE}`,
                         borderRadius: BTN_RADIUS,
-                        fontSize: "17px",
+                        fontSize: "15px",
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
@@ -643,12 +643,12 @@ function RewardConfiguration() {
           style={{
             flex: 2,
             background: "#fff",
-            borderRadius: 14,
+            borderRadius: 12,
             marginTop: 0,
             border: `1px solid ${RL_BORDER}`,
-            boxShadow: "0 1.5px 6px rgba(0,0,0,0.02)",
-            minHeight: 530,
-            maxHeight: "81vh",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.02)",
+            minHeight: 480,
+            maxHeight: "75vh",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
@@ -656,7 +656,7 @@ function RewardConfiguration() {
         >
           <div
             style={{
-              padding: "24px 32px 0px 32px",
+              padding: "20px 26px 0px 26px",
               background: "#fff",
               zIndex: 2,
               display: "flex",
@@ -669,7 +669,7 @@ function RewardConfiguration() {
               flex: 1,
               overflowY: "auto",
               minHeight: 0,
-              padding: "4px 32px 22px 32px",
+              padding: "3px 26px 18px 26px",
               width: "100%",
               boxSizing: "border-box",
             }}
@@ -677,31 +677,31 @@ function RewardConfiguration() {
             {selectedRewardType ? (
               <>
                 <div style={{ marginTop: 0 }}>{renderRewardDetails()}</div>
-                <div style={{ height: 18 }} />
+                <div style={{ height: 14 }} />
                 {parameters.length === 0 ? (
                   <div
                     style={{
                       color: "#85799a",
-                      padding: "48px 12px",
+                      padding: "40px 10px",
                       background: "#fcfbff",
-                      borderRadius: "10px",
-                      border: `1.2px dashed ${RL_BORDER}`,
+                      borderRadius: "8px",
+                      border: `1px dashed ${RL_BORDER}`,
                       textAlign: "center",
                     }}
                   >
-                    <div style={{ fontSize: "16px", marginBottom: 8 }}>No parameters configured</div>
-                    <div style={{ fontSize: "13px", color: "#b9bace" }}>
+                    <div style={{ fontSize: "14px", marginBottom: 6 }}>No parameters configured</div>
+                    <div style={{ fontSize: "12px", color: "#b9bace" }}>
                       Add parameters to customize nomination forms
                     </div>
                   </div>
                 ) : (
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "15px" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
                     <thead>
-                      <tr style={{ background: RL_TABLE_HEADER, borderBottom: `2px solid ${RL_BORDER}` }}>
+                      <tr style={{ background: RL_TABLE_HEADER, borderBottom: `1.5px solid ${RL_BORDER}` }}>
                         <th
                           style={{
                             textAlign: "left",
-                            padding: "13px",
+                            padding: "11px",
                             fontWeight: 800,
                             color: RL_PURPLE,
                           }}
@@ -711,7 +711,7 @@ function RewardConfiguration() {
                         <th
                           style={{
                             textAlign: "left",
-                            padding: "13px",
+                            padding: "11px",
                             fontWeight: 700,
                             color: RL_DARK,
                           }}
@@ -721,7 +721,7 @@ function RewardConfiguration() {
                         <th
                           style={{
                             textAlign: "center",
-                            padding: "13px",
+                            padding: "11px",
                             fontWeight: 700,
                             color: "#333",
                           }}
@@ -731,7 +731,7 @@ function RewardConfiguration() {
                         <th
                           style={{
                             textAlign: "center",
-                            padding: "13px",
+                            padding: "11px",
                             fontWeight: 700,
                             color: "#333",
                           }}
@@ -741,7 +741,7 @@ function RewardConfiguration() {
                         <th
                           style={{
                             textAlign: "center",
-                            padding: "13px",
+                            padding: "11px",
                             fontWeight: 800,
                             color: RL_DARK,
                           }}
@@ -760,7 +760,7 @@ function RewardConfiguration() {
                         >
                           <td
                             style={{
-                              padding: "16px 13px",
+                              padding: "13px 11px",
                               fontWeight: "600",
                               color: RL_DARK,
                             }}
@@ -769,7 +769,7 @@ function RewardConfiguration() {
                           </td>
                           <td
                             style={{
-                              padding: "16px 13px",
+                              padding: "13px 11px",
                               color: RL_PURPLE,
                               fontWeight: 500,
                             }}
@@ -778,7 +778,7 @@ function RewardConfiguration() {
                           </td>
                           <td
                             style={{
-                              padding: "16px 13px",
+                              padding: "13px 11px",
                               textAlign: "center",
                               fontWeight: "700",
                             }}
@@ -791,7 +791,7 @@ function RewardConfiguration() {
                           </td>
                           <td
                             style={{
-                              padding: "16px 13px",
+                              padding: "13px 11px",
                               textAlign: "center",
                               color: "#65599b",
                             }}
@@ -800,21 +800,21 @@ function RewardConfiguration() {
                           </td>
                           <td
                             style={{
-                              padding: "16px 13px",
+                              padding: "13px 11px",
                               textAlign: "center",
                             }}
                           >
                             <button
                               onClick={() => confirmDelete(param.parameterId, "parameter")}
                               style={{
-                                padding: "7px 22px",
+                                padding: "6px 18px",
                                 background: RL_LIGHT,
                                 color: RL_PURPLE,
-                                borderRadius: 6,
+                                borderRadius: 5,
                                 fontWeight: "700",
-                                border: `1.2px solid ${RL_PURPLE}22`,
+                                border: `1px solid ${RL_PURPLE}22`,
                                 cursor: "pointer",
-                                fontSize: 15,
+                                fontSize: 13,
                               }}
                               title="Delete Parameter"
                             >
@@ -832,13 +832,13 @@ function RewardConfiguration() {
                 style={{
                   textAlign: "center",
                   color: "#bbb",
-                  padding: "85px 12px",
+                  padding: "70px 10px",
                 }}
               >
-                <div style={{ fontSize: "16px", fontWeight: 600, marginBottom: 9 }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: 7 }}>
                   Select a recognition reward to view parameters
                 </div>
-                <div style={{ fontSize: 13 }}>Choose from Active or Inactive rewards</div>
+                <div style={{ fontSize: 12 }}>Choose from Active or Inactive rewards</div>
               </div>
             )}
           </div>

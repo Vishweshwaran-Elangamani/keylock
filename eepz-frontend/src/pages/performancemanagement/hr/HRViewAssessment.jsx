@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/hr/api";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import AppraisalDetailsModal from "../../../components/performance_management/modals/HRViewAssessment/AppraisalDetailsModal";
 import "../../../styles/performancemanagement/hr/HRViewAssessment.css";
-
-import { useNavigate } from "react-router-dom";
 
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
@@ -77,7 +75,6 @@ function HRViewAppraisals() {
   const [modalRow, setModalRow] = useState(null);
   const navigate = useNavigate();
 
-  // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -111,7 +108,7 @@ function HRViewAppraisals() {
   }, []);
 
   const allSummaryRows = useMemo(() => {
-    return appraisals.map((a) => {
+    return appraisals.map((a, idx) => {
       const empRatings = a.competencies
         .map((c) => c.employeeRating)
         .filter((r) => typeof r === "number");
@@ -126,7 +123,7 @@ function HRViewAppraisals() {
       let status = a.competencies[0]?.status ?? "-";
       if (a.competencies.some((c) => c.status !== status)) status = "Mixed";
       return {
-        key: `${a.employeeId}-${a.projectName}`,
+        key: `${a.employeeId}-${a.projectName}-${idx}`,
         employeeName: a.employeeName,
         projectName: a.projectName,
         empAvg: average(empRatings),
@@ -140,17 +137,6 @@ function HRViewAppraisals() {
     });
   }, [appraisals]);
 
-  const uniqueStatuses = useMemo(() => {
-    const statuses = new Set();
-    statuses.add("all");
-    allSummaryRows.forEach((row) => {
-      if (row.status && row.status !== "-" && row.status !== "Mixed") {
-        statuses.add(row.status.toLowerCase());
-      }
-    });
-    return Array.from(statuses);
-  }, [allSummaryRows]);
-
   const uniqueProjects = useMemo(() => {
     const projects = new Set();
     projects.add("all");
@@ -163,24 +149,33 @@ function HRViewAppraisals() {
   const summaryRows = useMemo(() => {
     let filtered = [...allSummaryRows];
 
+    // Filter by status
     if (filterStatus !== "all") {
       filtered = filtered.filter((row) => {
-        return row.status && row.status.toLowerCase() === filterStatus;
+        const status = (row.status || "").toLowerCase();
+        if (filterStatus === "completed") return status === "completed";
+        if (filterStatus === "pending") return status.startsWith("pending");
+        return false;
       });
     }
+
+    // Filter by project
     if (filterProject !== "all") {
       filtered = filtered.filter((row) => row.projectName === filterProject);
     }
+
+    // Search filter (employee name only for precision)
     if (searchTerm.trim() !== "") {
-      const search = searchTerm.toLowerCase();
+      const search = searchTerm.trim().toLowerCase();
       filtered = filtered.filter((row) =>
-        row.employeeName.toLowerCase().includes(search)
+        (row.employeeName || "").toLowerCase().includes(search)
       );
     }
+
     return filtered;
   }, [allSummaryRows, filterStatus, filterProject, searchTerm]);
 
-  // Pagination calculations
+  // Pagination
   const totalPages = Math.ceil(summaryRows.length / rowsPerPage);
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
@@ -195,19 +190,11 @@ function HRViewAppraisals() {
       }
     } else {
       if (currentPage <= 3) {
-        pages.push(1, 2, 3, '...', totalPages);
+        pages.push(1, 2, 3, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
-        pages.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
       } else {
-        pages.push(
-          1,
-          '...',
-          currentPage - 1,
-          currentPage,
-          currentPage + 1,
-          '...',
-          totalPages
-        );
+        pages.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages);
       }
     }
     return pages;
@@ -264,61 +251,68 @@ function HRViewAppraisals() {
 
   return (
     <div className="fld-root">
-      {/* Breadcrumbs */}
-      <div style={{
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  marginBottom: "2rem" // space below this whole bar
-}}>
-  <nav className="cg-breadcrumbs" style={{ background: "transparent" }} aria-label="breadcrumb">
-    <ol className="cg-breadcrumb" style={{ margin: 0 }}>
-      <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard")}>
-        <i className="bi bi-house-door"></i>
-      </li>
-      <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")}>
-        Performance
-      </li>
-      <li className="cg-breadcrumb-item active" aria-current="page">
-        Form Status
-      </li>
-    </ol>
-  </nav>
-  <button
-    className="hrview-btn-export"
-    onClick={() => exportToCsv("appraisals.csv", csvData)}
-  >
-    <i className="bi bi-download"></i> Export CSV
-  </button>
-</div>
-
-
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "2rem",
+        }}
+      >
+        <nav className="cg-breadcrumbs" style={{ background: "transparent" }} aria-label="breadcrumb">
+          <ol className="cg-breadcrumb" style={{ margin: 0 }}>
+            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard")} style={{ cursor: "pointer" }}>
+              <i className="bi bi-house-door"></i>
+            </li>
+            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")} style={{ cursor: "pointer" }}>
+              Performance
+            </li>
+            <li className="cg-breadcrumb-item active" aria-current="page">
+              Form Status
+            </li>
+          </ol>
+        </nav>
+        <button className="hrview-btn-export" onClick={() => exportToCsv("appraisals.csv", csvData)}>
+          <i className="bi bi-download"></i> Export CSV
+        </button>
+      </div>
 
       <div className="hrview-container">
-        {/* Analytics Cards */}
-       
-
-        {/* Export & Filters */}
-       
         <div className="hrview-filters">
+          <div className="hrview-filter-group">
+            <label>Search Employee Name</label>
+            <input
+              type="search"
+              placeholder="Type to search..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
           <div className="hrview-filter-group">
             <label>Filter by Status</label>
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setCurrentPage(1);
+              }}
             >
-              {uniqueStatuses.map((s) => (
-                <option key={s} value={s}>
-                  {s === "all" ? "All Statuses" : s.charAt(0).toUpperCase() + s.slice(1)}
-                </option>
-              ))}
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
             </select>
           </div>
           <div className="hrview-filter-group">
             <label>Filter by Project</label>
             <select
               value={filterProject}
-              onChange={(e) => setFilterProject(e.target.value)}
+              onChange={(e) => {
+                setFilterProject(e.target.value);
+                setCurrentPage(1);
+              }}
             >
               {uniqueProjects.map((p) => (
                 <option key={p} value={p}>
@@ -327,17 +321,9 @@ function HRViewAppraisals() {
               ))}
             </select>
           </div>
-          <div className="hrview-filter-group">
-            <label>Search Employee Name</label>
-            <input
-              type="search"
-              placeholder="Type to search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+          
         </div>
-        {/* Table */}
+
         <div className="fld-table-card">
           <div className="fld-table-wrapper">
             <table className="fld-table">
@@ -375,11 +361,7 @@ function HRViewAppraisals() {
                       <td>{statusBadge(row.status)}</td>
                       <td>
                         <div className="fld-action-buttons">
-                          <button
-                            className="fld-action-btn fld-btn-view"
-                            title="View Details"
-                            onClick={() => setModalRow(row)}
-                          >
+                          <button className="fld-action-btn fld-btn-view" title="View Details" onClick={() => setModalRow(row)}>
                             <i className="bi bi-eye"></i>
                           </button>
                         </div>
@@ -390,7 +372,7 @@ function HRViewAppraisals() {
               </tbody>
             </table>
           </div>
-          {/* Pagination */}
+
           <div className="fld-pagination-container">
             <div className="fld-pagination-info">
               <span className="fld-pagination-label">Show</span>
@@ -409,32 +391,24 @@ function HRViewAppraisals() {
               <span className="fld-pagination-label">entries</span>
             </div>
             <div className="fld-pagination-status">
-              Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to{" "}
-              {Math.min(indexOfLastItem, summaryRows.length)} of {summaryRows.length} entries
+              Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, summaryRows.length)} of{" "}
+              {summaryRows.length} entries
             </div>
             <nav className="fld-pagination-nav">
               <ul className="fld-pagination">
                 <li className={`fld-page-item${currentPage === 1 ? " fld-disabled" : ""}`}>
-                  <button
-                    className="fld-page-link"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
+                  <button className="fld-page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
                 {getPageNumbers().map((page, idx) => (
                   <li
                     key={idx}
-                    className={`fld-page-item${
-                      page === currentPage ? " fld-active" : ""
-                    } ${typeof page !== "number" ? " fld-disabled" : ""}`}
+                    className={`fld-page-item${page === currentPage ? " fld-active" : ""} ${
+                      typeof page !== "number" ? " fld-disabled" : ""
+                    }`}
                   >
-                    <button
-                      className="fld-page-link"
-                      onClick={() => typeof page === "number" && setCurrentPage(page)}
-                      disabled={typeof page !== "number"}
-                    >
+                    <button className="fld-page-link" onClick={() => typeof page === "number" && setCurrentPage(page)} disabled={typeof page !== "number"}>
                       {page}
                     </button>
                   </li>
