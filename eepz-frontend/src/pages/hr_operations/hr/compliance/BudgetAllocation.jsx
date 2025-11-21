@@ -4,6 +4,7 @@ import budgetAllocationService from "../../../../services/hr_operations/hr/budge
 import CreateBudgetModal from "../../../../components/hr_operations/modals/CreateBudgetModal";
 import EditBudgetModal from "../../../../components/hr_operations/modals/EditBudgetModal";
 import ViewBudgetDetailsModal from "../../../../components/hr_operations/modals/ViewBudgetDetailsModal";
+import Breadcrumb from "../../../../components/common/Breadcrumb";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
@@ -13,25 +14,21 @@ const BudgetAllocation = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
 
-  // View & Pagination States
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Filter States
   const [filters, setFilters] = useState({
     search: "",
     year: "all",
     department: "",
   });
 
-  // Filter Options
   const [filterOptions, setFilterOptions] = useState({
     years: [],
     departments: [],
@@ -42,7 +39,7 @@ const BudgetAllocation = () => {
   const isLeadership = userRole === "Leadership";
 
   useEffect(() => {
-    console.log(" Current User Role:", userRole);
+    console.log("Current User Role:", userRole);
   }, [userRole]);
 
   useEffect(() => {
@@ -58,15 +55,15 @@ const BudgetAllocation = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log(" Fetching all department budgets...");
+      console.log("Fetching all department budgets...");
       const response = await budgetAllocationService.getAllDepartmentBudgets();
-      console.log(" Budgets fetched:", response.data);
+      console.log("Budgets fetched:", response.data);
       const data = response.data || [];
       setBudgets(data);
       setFilteredBudgets(data);
       generateFilterOptions(data);
     } catch (err) {
-      console.error(" Error fetching budgets:", err);
+      console.error("Error fetching budgets:", err);
       setError(err.message || "Failed to fetch budgets");
       showToast("Error", err.message || "Failed to fetch budgets", "danger");
     } finally {
@@ -91,7 +88,6 @@ const BudgetAllocation = () => {
   const applyFilters = () => {
     let filtered = budgets;
 
-    // Search filter
     if (filters.search.trim()) {
       const query = filters.search.toLowerCase();
       filtered = filtered.filter((b) => {
@@ -100,14 +96,12 @@ const BudgetAllocation = () => {
       });
     }
 
-    // Year filter
     if (filters.year !== "all") {
       filtered = filtered.filter(
         (b) => b.fiscalYear === parseInt(filters.year)
       );
     }
 
-    // Department filter
     if (filters.department) {
       filtered = filtered.filter(
         (b) => b.departmentName === filters.department
@@ -151,7 +145,6 @@ const BudgetAllocation = () => {
     }
   };
 
-  // PAGINATION LOGIC
   const totalPages = Math.ceil(filteredBudgets.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -187,12 +180,12 @@ const BudgetAllocation = () => {
     }
 
     try {
-      console.log(" Deleting budget:", budgetId);
+      console.log("Deleting budget:", budgetId);
       await budgetAllocationService.deleteDepartmentBudget(budgetId);
       fetchBudgets();
       showToast("Success", "Department budget deleted successfully", "success");
     } catch (err) {
-      console.error(" Error deleting budget:", err);
+      console.error("Error deleting budget:", err);
       showToast("Error", err.message || "Failed to delete budget", "danger");
     }
   };
@@ -232,8 +225,42 @@ const BudgetAllocation = () => {
     return "#3b82f6";
   };
 
+  const summaryStats = {
+    totalBudget: filteredBudgets.reduce(
+      (sum, b) => sum + (b.totalBudget || 0),
+      0
+    ),
+    totalAllocated: filteredBudgets.reduce(
+      (sum, b) => sum + (b.allocatedAmount || 0),
+      0
+    ),
+    totalUtilized: filteredBudgets.reduce(
+      (sum, b) => sum + (b.utilizedAmount || 0),
+      0
+    ),
+  };
+
+  if (loading) {
+    return (
+      <div className="budget-loading-container">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading department budgets...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="budget-root">
+      <Breadcrumb
+        items={[
+          {
+            label: "Department Budget Allocation",
+          },
+        ]}
+      />
+
       {error && (
         <div className="alert alert-danger budget-alert" role="alert">
           <i className="bi bi-exclamation-triangle-fill me-2"></i>
@@ -241,128 +268,106 @@ const BudgetAllocation = () => {
         </div>
       )}
 
-      {/* HEADER WITH BUTTON */}
-      <div className="budget-header">
-        <div className="budget-header-left">
-          <h4 className="budget-title">
-            <i className="bi bi-cash-coin"></i>
-            Department Budget Management
-          </h4>
-          <p className="budget-subtitle">
-            Manage departmental budgets, allocations, and utilization tracking
-          </p>
-        </div>
+      {filteredBudgets.length > 0 && (
+        <div className="budget-summary-cards">
+          <div className="budget-summary-card total">
+            <div className="summary-card-icon">
+              <i className="bi bi-wallet2"></i>
+            </div>
+            <div className="summary-card-content">
+              <div className="summary-card-value">
+                {formatCurrency(summaryStats.totalBudget)}
+              </div>
+              <div className="summary-card-label">Total Budget</div>
+            </div>
+          </div>
 
-        {/* SHOW BUTTON ONLY FOR LEADERSHIP */}
-        {isLeadership && (
-          <button className="budget-btn-create" onClick={handleCreateBudget}>
-            <i className="bi bi-plus-circle"></i>
-            Add Department Budget
+          <div className="budget-summary-card allocated">
+            <div className="summary-card-icon">
+              <i className="bi bi-cash-stack"></i>
+            </div>
+            <div className="summary-card-content">
+              <div className="summary-card-value">
+                {formatCurrency(summaryStats.totalAllocated)}
+              </div>
+              <div className="summary-card-label">Total Allocated</div>
+            </div>
+          </div>
+
+          <div className="budget-summary-card utilized">
+            <div className="summary-card-icon">
+              <i className="bi bi-graph-up-arrow"></i>
+            </div>
+            <div className="summary-card-content">
+              <div className="summary-card-value">
+                {formatCurrency(summaryStats.totalUtilized)}
+              </div>
+              <div className="summary-card-label">Total Utilized</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="budget-filter-section">
+        <div className="budget-filter-row-single">
+          <div className="budget-search-input-wrapper">
+            <i className="bi bi-search budget-search-icon"></i>
+            <input
+              type="text"
+              name="search"
+              placeholder="Search by department..."
+              value={filters.search}
+              onChange={handleSearchChange}
+              className="budget-filter-search"
+            />
+          </div>
+
+          <select
+            name="year"
+            value={filters.year}
+            onChange={handleFilterChange}
+            className="budget-filter-select"
+          >
+            <option value="all">All Years</option>
+            {filterOptions.years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="department"
+            value={filters.department}
+            onChange={handleFilterChange}
+            className="budget-filter-select"
+          >
+            <option value="">All Departments</option>
+            {filterOptions.departments.map((dept) => (
+              <option key={dept} value={dept}>
+                {dept}
+              </option>
+            ))}
+          </select>
+
+          <button className="budget-clear-btn" onClick={clearFilters}>
+            Clear Filters
           </button>
-        )}
-      </div>
 
-      {/* FILTER BAR WITH TOGGLES */}
-      <div className="budget-filters-container">
-        <div className="filters-header">
-          <h5 className="filters-title">
-            <i className="bi bi-funnel"></i>
-            Filters
-          </h5>
-          <div className="filters-right-section">
-            {/* VIEW TOGGLE BUTTONS */}
-            <div className="budget-view-toggle">
-              <button
-                className={`toggle-btn ${viewType === "card" ? "active" : ""}`}
-                onClick={() => setViewType("card")}
-                title="Card View"
-              >
-                <i className="bi bi-grid-3x2-gap"></i>
-              </button>
-              <button
-                className={`toggle-btn ${viewType === "table" ? "active" : ""}`}
-                onClick={() => setViewType("table")}
-                title="Table View"
-              >
-                <i className="bi bi-list-ul"></i>
-              </button>
-            </div>
+          <div className="budget-results-count-inline">
+            Showing {currentPageData.length} of {filteredBudgets.length} budgets
+          </div>
 
-            {/* CLEAR BUTTON */}
-            <button
-              className="btn-clear-filters"
-              onClick={clearFilters}
-              title="Clear all filters"
-            >
-              <i className="bi bi-x-circle"></i> Clear
+          {isLeadership && (
+            <button className="budget-btn-create" onClick={handleCreateBudget}>
+              <i className="bi bi-plus-circle"></i>
+              Add Budget
             </button>
-          </div>
-        </div>
-
-        <div className="filters-grid">
-          {/* SEARCH */}
-          <div className="filter-group">
-            <label className="filter-label">Search</label>
-            <div className="search-wrapper">
-              <i className="bi bi-search"></i>
-              <input
-                type="text"
-                name="search"
-                placeholder="Search by department..."
-                value={filters.search}
-                onChange={handleSearchChange}
-                className="filter-search"
-              />
-            </div>
-          </div>
-
-          {/* YEAR FILTER */}
-          <div className="filter-group">
-            <label className="filter-label">Fiscal Year</label>
-            <select
-              name="year"
-              value={filters.year}
-              onChange={handleFilterChange}
-              className="filter-select"
-            >
-              <option value="all">All Years</option>
-              {filterOptions.years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* DEPARTMENT FILTER */}
-          <div className="filter-group">
-            <label className="filter-label">Department</label>
-            <select
-              name="department"
-              value={filters.department}
-              onChange={handleFilterChange}
-              className="filter-select"
-            >
-              <option value="">All Departments</option>
-              {filterOptions.departments.map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* CONTENT */}
-      {loading ? (
-        <div className="budget-loading-container">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p>Loading department budgets...</p>
-        </div>
-      ) : filteredBudgets.length === 0 ? (
+      {filteredBudgets.length === 0 ? (
         <div className="budget-alert-empty">
           <i className="bi bi-inbox"></i>
           <p>
@@ -373,11 +378,9 @@ const BudgetAllocation = () => {
         </div>
       ) : viewType === "card" ? (
         <>
-          {/* CARD VIEW */}
           <div className="budget-cards-grid">
             {currentPageData.map((budget) => (
               <div key={budget.budgetId} className="budget-card">
-                {/* CARD HEADER */}
                 <div className="budget-card-header">
                   <div className="budget-card-avatar">
                     {budget.departmentName?.substring(0, 2).toUpperCase()}
@@ -390,7 +393,6 @@ const BudgetAllocation = () => {
                   </div>
                 </div>
 
-                {/* CARD BODY */}
                 <div className="budget-card-body">
                   <div className="budget-card-row">
                     <span className="budget-card-label">Total Budget</span>
@@ -435,7 +437,6 @@ const BudgetAllocation = () => {
                   </div>
                 </div>
 
-                {/* CARD ACTIONS */}
                 {isLeadership && (
                   <div className="budget-card-actions">
                     <button
@@ -465,72 +466,112 @@ const BudgetAllocation = () => {
             ))}
           </div>
 
-          {/* PAGINATION */}
-          <div className="pagination-container">
-            <div className="pagination-left">
-              <label className="pagination-label">Records per page:</label>
-              <select
-                value={itemsPerPage}
-                onChange={handleItemsPerPageChange}
-                className="pagination-select"
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-            </div>
-
-            <div className="pagination-center">
-              <span className="pagination-info">
-                Page {currentPage} of {totalPages} | Showing{" "}
-                {Math.min(startIndex + 1, filteredBudgets.length)}-
-                {Math.min(endIndex, filteredBudgets.length)} of{" "}
-                {filteredBudgets.length}
-              </span>
-            </div>
-
-            <div className="pagination-right">
-              <button
-                className="pagination-btn"
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <i className="bi bi-chevron-left"></i> Prev
-              </button>
-
-              <div className="pagination-numbers">
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .slice(
-                    Math.max(0, currentPage - 2),
-                    Math.min(totalPages, currentPage + 1)
-                  )
-                  .map((page) => (
-                    <button
-                      key={page}
-                      className={`pagination-number ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                      onClick={() => goToPage(page)}
-                    >
-                      {page}
-                    </button>
-                  ))}
+          {totalPages > 1 && (
+            <div className="pagination-container">
+              <div className="pagination-info">
+                <span className="pagination-label">Show</span>
+                <select
+                  className="pagination-select"
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+                <span className="pagination-label">entries</span>
               </div>
 
-              <button
-                className="pagination-btn"
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next <i className="bi bi-chevron-right"></i>
-              </button>
+              <div className="pagination-status">
+                Showing {Math.min(startIndex + 1, filteredBudgets.length)}-
+                {Math.min(endIndex, filteredBudgets.length)} of{" "}
+                {filteredBudgets.length} entries
+              </div>
+
+              <nav className="pagination-nav">
+                <ul className="pagination">
+                  <li
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <i className="bi bi-chevron-left"></i>
+                    </button>
+                  </li>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((page) => {
+                      if (totalPages <= 7) return true;
+                      if (page === 1 || page === totalPages) return true;
+                      if (page >= currentPage - 1 && page <= currentPage + 1)
+                        return true;
+                      return false;
+                    })
+                    .map((page, index, array) => {
+                      if (index > 0 && page - array[index - 1] > 1) {
+                        return (
+                          <React.Fragment key={`ellipsis-${page}`}>
+                            <li className="page-item disabled">
+                              <button className="page-link">...</button>
+                            </li>
+                            <li
+                              className={`page-item ${
+                                currentPage === page ? "active" : ""
+                              }`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => goToPage(page)}
+                              >
+                                {page}
+                              </button>
+                            </li>
+                          </React.Fragment>
+                        );
+                      }
+                      return (
+                        <li
+                          key={page}
+                          className={`page-item ${
+                            currentPage === page ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => goToPage(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      );
+                    })}
+
+                  <li
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <i className="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
             </div>
-          </div>
+          )}
         </>
       ) : (
         <>
-          {/* TABLE VIEW */}
           <div className="budget-table-container">
             <table className="budget-table">
               <thead>
@@ -540,11 +581,13 @@ const BudgetAllocation = () => {
                   <th>Total Budget</th>
                   <th>Allocated</th>
                   <th>Utilized</th>
-                  <th>Utilization %</th>
+                  <th>Utilization</th>
                   <th>Headcount</th>
                   <th>Avg Cost/Employee</th>
                   {isLeadership && (
-                    <th className="budget-actions-header">Actions</th>
+                    <th className="budget-text-center budget-actions-header">
+                      Actions
+                    </th>
                   )}
                 </tr>
               </thead>
@@ -563,7 +606,10 @@ const BudgetAllocation = () => {
                         <div
                           className="budget-progress-bar"
                           style={{
-                            width: `${budget.utilizationPercentage || 0}%`,
+                            width: `${Math.min(
+                              budget.utilizationPercentage || 0,
+                              100
+                            )}%`,
                             backgroundColor: getUtilizationColor(
                               budget.utilizationPercentage
                             ),
@@ -580,23 +626,23 @@ const BudgetAllocation = () => {
                     <td>{formatCurrency(budget.avgCostPerEmployee)}</td>
                     {isLeadership && (
                       <td>
-                        <div className="budget-actions">
+                        <div className="action-buttons">
                           <button
-                            className="budget-btn-view"
+                            className="action-btn action-btn-edit"
                             onClick={() => handleViewDetails(budget)}
                             title="View Details"
                           >
                             <i className="bi bi-eye"></i>
                           </button>
                           <button
-                            className="budget-btn-edit"
+                            className="action-btn action-btn-warning"
                             onClick={() => handleEditClick(budget)}
                             title="Edit"
                           >
                             <i className="bi bi-pencil"></i>
                           </button>
                           <button
-                            className="budget-btn-delete"
+                            className="action-btn action-btn-delete"
                             onClick={() => handleDeleteClick(budget.budgetId)}
                             title="Delete"
                           >
@@ -611,72 +657,112 @@ const BudgetAllocation = () => {
             </table>
           </div>
 
-          {/* PAGINATION */}
-          <div className="pagination-container">
-            <div className="pagination-left">
-              <label className="pagination-label">Records per page:</label>
-              <select
-                value={itemsPerPage}
-                onChange={handleItemsPerPageChange}
-                className="pagination-select"
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-            </div>
-
-            <div className="pagination-center">
-              <span className="pagination-info">
-                Page {currentPage} of {totalPages} | Showing{" "}
-                {Math.min(startIndex + 1, filteredBudgets.length)}-
-                {Math.min(endIndex, filteredBudgets.length)} of{" "}
-                {filteredBudgets.length}
-              </span>
-            </div>
-
-            <div className="pagination-right">
-              <button
-                className="pagination-btn"
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <i className="bi bi-chevron-left"></i> Prev
-              </button>
-
-              <div className="pagination-numbers">
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .slice(
-                    Math.max(0, currentPage - 2),
-                    Math.min(totalPages, currentPage + 1)
-                  )
-                  .map((page) => (
-                    <button
-                      key={page}
-                      className={`pagination-number ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                      onClick={() => goToPage(page)}
-                    >
-                      {page}
-                    </button>
-                  ))}
+          {totalPages > 1 && (
+            <div className="pagination-container">
+              <div className="pagination-info">
+                <span className="pagination-label">Show</span>
+                <select
+                  className="pagination-select"
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                </select>
+                <span className="pagination-label">entries</span>
               </div>
 
-              <button
-                className="pagination-btn"
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next <i className="bi bi-chevron-right"></i>
-              </button>
+              <div className="pagination-status">
+                Showing {Math.min(startIndex + 1, filteredBudgets.length)}-
+                {Math.min(endIndex, filteredBudgets.length)} of{" "}
+                {filteredBudgets.length} entries
+              </div>
+
+              <nav className="pagination-nav">
+                <ul className="pagination">
+                  <li
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <i className="bi bi-chevron-left"></i>
+                    </button>
+                  </li>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((page) => {
+                      if (totalPages <= 7) return true;
+                      if (page === 1 || page === totalPages) return true;
+                      if (page >= currentPage - 1 && page <= currentPage + 1)
+                        return true;
+                      return false;
+                    })
+                    .map((page, index, array) => {
+                      if (index > 0 && page - array[index - 1] > 1) {
+                        return (
+                          <React.Fragment key={`ellipsis-${page}`}>
+                            <li className="page-item disabled">
+                              <button className="page-link">...</button>
+                            </li>
+                            <li
+                              className={`page-item ${
+                                currentPage === page ? "active" : ""
+                              }`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => goToPage(page)}
+                              >
+                                {page}
+                              </button>
+                            </li>
+                          </React.Fragment>
+                        );
+                      }
+                      return (
+                        <li
+                          key={page}
+                          className={`page-item ${
+                            currentPage === page ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => goToPage(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      );
+                    })}
+
+                  <li
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <i className="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
             </div>
-          </div>
+          )}
         </>
       )}
 
-      {/* MODALS */}
       {showCreateModal && (
         <CreateBudgetModal
           show={showCreateModal}
@@ -708,7 +794,6 @@ const BudgetAllocation = () => {
         />
       )}
 
-      {/* BLUR BACKDROP */}
       <div
         className="budget-blur-backdrop"
         style={{

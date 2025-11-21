@@ -75,9 +75,16 @@ const UserList = () => {
     }
   };
 
+  //  FIXED: Filter out Admin users from display
+  const getNonAdminUsers = () => {
+    return users.filter((user) => user.roleName !== "Admin");
+  };
+
   // Filters
   const filterUsers = () => {
-    let filtered = [...users];
+    //  Start with non-admin users only
+    let filtered = getNonAdminUsers();
+
     if (searchTerm) {
       filtered = filtered.filter(
         (user) =>
@@ -191,21 +198,20 @@ const UserList = () => {
       {/* NEW BREADCRUMB COMPONENT */}
       <Breadcrumb
         items={[
-          
           {
             label: "User Management",
           },
         ]}
       />
 
-      {/* STATISTICS CARDS */}
+      {/* STATISTICS CARDS -  EXCLUDE ADMIN USERS */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-people-fill"></i>
           </div>
           <div className="stat-content">
-            <h3 className="stat-value">{users.length}</h3>
+            <h3 className="stat-value">{getNonAdminUsers().length}</h3>
             <p className="stat-label">Total Users</p>
           </div>
         </div>
@@ -215,7 +221,7 @@ const UserList = () => {
           </div>
           <div className="stat-content">
             <h3 className="stat-value">
-              {users.filter((u) => u.isActive).length}
+              {getNonAdminUsers().filter((u) => u.isActive).length}
             </h3>
             <p className="stat-label">Active Users</p>
           </div>
@@ -226,7 +232,7 @@ const UserList = () => {
           </div>
           <div className="stat-content">
             <h3 className="stat-value">
-              {users.filter((u) => !u.isActive).length}
+              {getNonAdminUsers().filter((u) => !u.isActive).length}
             </h3>
             <p className="stat-label">Inactive Users</p>
           </div>
@@ -238,7 +244,7 @@ const UserList = () => {
           <div className="stat-content">
             <h3 className="stat-value">
               {
-                users.filter((u) => {
+                getNonAdminUsers().filter((u) => {
                   const joinDate = new Date(u.joiningDate);
                   const thirtyDaysAgo = new Date();
                   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -266,18 +272,20 @@ const UserList = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            {/* Role Filter */}
+            {/* Role Filter -  EXCLUDE ADMIN ROLE */}
             <select
               className="filter-select"
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
             >
               <option value="">All Roles</option>
-              {roles.map((role) => (
-                <option key={role.roleId} value={role.roleName}>
-                  {role.roleName}
-                </option>
-              ))}
+              {roles
+                .filter((role) => role.roleName !== "Admin")
+                .map((role) => (
+                  <option key={role.roleId} value={role.roleName}>
+                    {role.roleName}
+                  </option>
+                ))}
             </select>
             {/* Status Filter */}
             <select

@@ -13,9 +13,11 @@ const Breadcrumb = ({ items }) => {
 
   const getRoleBasePath = () => {
     const role = user?.role;
+    if (role === "Admin") return "/admin";
+    if (role === "HR") return "/HR";
     if (role === "Employee") return "/employee";
     if (role === "Leadership" || role === "Leadership") return "/leadership";
-    if (role === "Department Head") return "/manager";
+    if (role === "Department Head") return "/department-head";
     return "/manager";
   };
 

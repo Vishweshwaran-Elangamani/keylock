@@ -7,6 +7,7 @@ import UpdatePeriodAllocationModal from "../../../../components/hr_operations/mo
 import AllocateFromPeriodModal from "../../../../components/hr_operations/modals/AllocateFromPeriodModal";
 import ViewPeriodDetailsModal from "../../../../components/hr_operations/modals/ViewPeriodDetailsModal";
 import DeleteConfirmationModal from "../../../../components/hr_operations/modals/DeleteConfirmationModal";
+import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import "../../../../styles/hr_operations/hr/periodAllocation.css";
 
@@ -400,6 +401,8 @@ const PeriodAllocationManagement = () => {
 
   return (
     <div className="period-root">
+      
+
       {error && (
         <div className="alert alert-danger period-alert" role="alert">
           <i className="bi bi-exclamation-triangle-fill me-2"></i>
@@ -407,199 +410,154 @@ const PeriodAllocationManagement = () => {
         </div>
       )}
 
-      {/* HEADER WITH BUTTON */}
-      <div className="period-header">
-        <div className="period-header-left">
-          <h4 className="period-title">
-            <i className="bi bi-calendar3-range"></i>
-            Period Budget Allocation Management
-          </h4>
-          <p className="period-subtitle">
-            Manage and distribute departmental budgets across fiscal periods
-          </p>
+      {/* SUMMARY STATISTICS CARDS - COMPACT LEFT-ALIGNED */}
+      {filteredPeriods.length > 0 && (
+        <div className="period-summary-cards">
+          <div className="period-summary-card total">
+            <div className="summary-card-icon">
+              <i className="bi bi-wallet2"></i>
+            </div>
+            <div className="summary-card-content">
+              <div className="summary-card-value">{formatCurrency(summaryStats.totalAllocated)}</div>
+              <div className="summary-card-label">Total Allocated</div>
+            </div>
+          </div>
+
+          <div className="period-summary-card utilized">
+            <div className="summary-card-icon">
+              <i className="bi bi-graph-up-arrow"></i>
+            </div>
+            <div className="summary-card-content">
+              <div className="summary-card-value">{formatCurrency(summaryStats.totalUtilized)}</div>
+              <div className="summary-card-label">Total Utilized</div>
+            </div>
+          </div>
+
+          <div className="period-summary-card remaining">
+            <div className="summary-card-icon">
+              <i className="bi bi-piggy-bank"></i>
+            </div>
+            <div className="summary-card-content">
+              <div className="summary-card-value">{formatCurrency(summaryStats.totalRemaining)}</div>
+              <div className="summary-card-label">Total Remaining</div>
+            </div>
+          </div>
+
+          <div className="period-summary-card average">
+            <div className="summary-card-icon">
+              <i className="bi bi-percent"></i>
+            </div>
+            <div className="summary-card-content">
+              <div className="summary-card-value">{summaryStats.avgUtilization.toFixed(1)}%</div>
+              <div className="summary-card-label">Avg Utilization</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* INTEGRATED FILTER BAR - TWO ROW LAYOUT */}
+      <div className="period-filter-section">
+        {/* First Row - Budget Selector, Export, Add Period */}
+        <div className="period-filter-row-top">
+          <select
+            className="period-filter-select period-budget-dropdown"
+            value={selectedBudget?.budgetId || ""}
+            onChange={(e) => {
+              const budget = budgets.find((b) => b.budgetId === parseInt(e.target.value));
+              setSelectedBudget(budget);
+            }}
+          >
+            {budgets.length === 0 ? (
+              <option value="">No budgets available</option>
+            ) : (
+              budgets.map((budget) => (
+                <option key={budget.budgetId} value={budget.budgetId}>
+                  {budget.departmentName} - FY {budget.fiscalYear} ({formatCurrency(budget.totalBudget)})
+                </option>
+              ))
+            )}
+          </select>
+
+          <div className="period-filter-actions-right">
+            <button className="period-btn-export" onClick={exportToCSV}>
+              <i className="bi bi-download"></i>
+              Export
+            </button>
+
+            <button className="period-btn-create" onClick={handleCreatePeriod}>
+              <i className="bi bi-plus-circle"></i>
+              Add Period
+            </button>
+          </div>
         </div>
 
-        <div className="period-header-actions">
-          <button className="period-btn-export" onClick={exportToCSV} title="Export to CSV">
-            <i className="bi bi-download"></i>
-            Export
-          </button>
+        {/* Second Row - Search and Filters */}
+        <div className="period-filter-row-bottom">
+          <div className="period-search-input-wrapper">
+            <i className="bi bi-search period-search-icon"></i>
+            <input
+              type="text"
+              name="search"
+              placeholder="Search by period..."
+              value={filters.search}
+              onChange={handleSearchChange}
+              className="period-filter-search"
+            />
+          </div>
 
-          <button className="period-btn-create" onClick={handleCreatePeriod}>
-            <i className="bi bi-plus-circle"></i>
-            Add Period Allocation
-          </button>
-        </div>
-      </div>
-
-      {/* BUDGET SELECTOR */}
-      <div className="period-budget-selector">
-        <label className="budget-selector-label">
-          <i className="bi bi-building"></i>
-          Select Department Budget:
-        </label>
-        <select
-          className="budget-selector-dropdown"
-          value={selectedBudget?.budgetId || ""}
-          onChange={(e) => {
-            const budget = budgets.find((b) => b.budgetId === parseInt(e.target.value));
-            setSelectedBudget(budget);
-          }}
-        >
-          {budgets.length === 0 ? (
-            <option value="">No budgets available</option>
-          ) : (
-            budgets.map((budget) => (
-              <option key={budget.budgetId} value={budget.budgetId}>
-                {budget.departmentName} - FY {budget.fiscalYear} ({formatCurrency(budget.totalBudget)})
+          <select
+            name="year"
+            value={filters.year}
+            onChange={handleFilterChange}
+            className="period-filter-select"
+          >
+            <option value="all">All Years</option>
+            {filterOptions.years.map((year) => (
+              <option key={year} value={year}>
+                {year}
               </option>
-            ))
-          )}
-        </select>
+            ))}
+          </select>
+
+          <select
+            name="period"
+            value={filters.period}
+            onChange={handleFilterChange}
+            className="period-filter-select"
+          >
+            <option value="">All Periods</option>
+            {filterOptions.periods.map((period) => (
+              <option key={period} value={period}>
+                {period}
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="utilizationRange"
+            value={filters.utilizationRange}
+            onChange={handleFilterChange}
+            className="period-filter-select"
+          >
+            <option value="all">All Ranges</option>
+            <option value="low">Low (&lt; 50%)</option>
+            <option value="medium">Medium (50-75%)</option>
+            <option value="high">High (75-90%)</option>
+            <option value="critical">Critical (≥ 90%)</option>
+          </select>
+
+          <button className="period-clear-btn" onClick={clearFilters}>
+            Clear Filters
+          </button>
+
+          <div className="period-results-count-inline">
+            Showing {currentPageData.length} of {filteredPeriods.length} periods
+          </div>
+        </div>
       </div>
 
       {selectedBudget && (
         <>
-          {/* SUMMARY STATISTICS */}
-          {filteredPeriods.length > 0 && (
-            <div className="period-summary-cards">
-              <div className="period-summary-card total">
-                <div className="summary-card-icon">
-                  <i className="bi bi-cash-stack"></i>
-                </div>
-                <div className="summary-card-content">
-                  <span className="summary-card-label">Total Allocated</span>
-                  <span className="summary-card-value">{formatCurrency(summaryStats.totalAllocated)}</span>
-                </div>
-              </div>
-
-              <div className="period-summary-card utilized">
-                <div className="summary-card-icon">
-                  <i className="bi bi-graph-down"></i>
-                </div>
-                <div className="summary-card-content">
-                  <span className="summary-card-label">Total Utilized</span>
-                  <span className="summary-card-value">{formatCurrency(summaryStats.totalUtilized)}</span>
-                </div>
-              </div>
-
-              <div className="period-summary-card remaining">
-                <div className="summary-card-icon">
-                  <i className="bi bi-wallet2"></i>
-                </div>
-                <div className="summary-card-content">
-                  <span className="summary-card-label">Total Remaining</span>
-                  <span className="summary-card-value">{formatCurrency(summaryStats.totalRemaining)}</span>
-                </div>
-              </div>
-
-              <div className="period-summary-card average">
-                <div className="summary-card-icon">
-                  <i className="bi bi-speedometer2"></i>
-                </div>
-                <div className="summary-card-content">
-                  <span className="summary-card-label">Avg Utilization</span>
-                  <span className="summary-card-value">{summaryStats.avgUtilization.toFixed(1)}%</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* FILTER BAR WITH TOGGLES */}
-          <div className="period-filters-container">
-            <div className="filters-header">
-              <h5 className="filters-title">
-                <i className="bi bi-funnel"></i>
-                Filters
-              </h5>
-              <div className="filters-right-section">
-                {/* VIEW TOGGLE BUTTONS */}
-                <div className="period-view-toggle">
-                  <button
-                    className={`toggle-btn ${viewType === "card" ? "active" : ""}`}
-                    onClick={() => setViewType("card")}
-                    title="Card View"
-                  >
-                    <i className="bi bi-grid-3x2-gap"></i>
-                  </button>
-                  <button
-                    className={`toggle-btn ${viewType === "table" ? "active" : ""}`}
-                    onClick={() => setViewType("table")}
-                    title="Table View"
-                  >
-                    <i className="bi bi-list-ul"></i>
-                  </button>
-                </div>
-
-                {/* CLEAR BUTTON */}
-                <button className="btn-clear-filters" onClick={clearFilters} title="Clear all filters">
-                  <i className="bi bi-x-circle"></i> Clear
-                </button>
-              </div>
-            </div>
-
-            <div className="filters-grid">
-              {/* SEARCH */}
-              <div className="filter-group">
-                <label className="filter-label">Search</label>
-                <div className="search-wrapper">
-                  <i className="bi bi-search"></i>
-                  <input
-                    type="text"
-                    name="search"
-                    placeholder="Search by period..."
-                    value={filters.search}
-                    onChange={handleSearchChange}
-                    className="filter-search"
-                  />
-                </div>
-              </div>
-
-              {/* YEAR FILTER */}
-              <div className="filter-group">
-                <label className="filter-label">Period Year</label>
-                <select name="year" value={filters.year} onChange={handleFilterChange} className="filter-select">
-                  <option value="all">All Years</option>
-                  {filterOptions.years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* PERIOD FILTER */}
-              <div className="filter-group">
-                <label className="filter-label">Period</label>
-                <select name="period" value={filters.period} onChange={handleFilterChange} className="filter-select">
-                  <option value="">All Periods</option>
-                  {filterOptions.periods.map((period) => (
-                    <option key={period} value={period}>
-                      {period}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* UTILIZATION RANGE FILTER */}
-              <div className="filter-group">
-                <label className="filter-label">Utilization Range</label>
-                <select
-                  name="utilizationRange"
-                  value={filters.utilizationRange}
-                  onChange={handleFilterChange}
-                  className="filter-select"
-                >
-                  <option value="all">All Ranges</option>
-                  <option value="low">Low (&lt; 50%)</option>
-                  <option value="medium">Medium (50-75%)</option>
-                  <option value="high">High (75-90%)</option>
-                  <option value="critical">Critical (≥ 90%)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
           {/* CONTENT */}
           {filteredPeriods.length === 0 ? (
             <div className="period-alert-empty">
@@ -704,62 +662,83 @@ const PeriodAllocationManagement = () => {
                 ))}
               </div>
 
-              {/* PAGINATION */}
+              {/* PAGINATION FOR CARD VIEW */}
               {totalPages > 1 && (
                 <div className="pagination-container">
-                  <div className="pagination-left">
-                    <label className="pagination-label">Records per page:</label>
+                  <div className="pagination-info">
+                    <span className="pagination-label">Show</span>
                     <select
+                      className="pagination-select"
                       value={itemsPerPage}
                       onChange={handleItemsPerPageChange}
-                      className="pagination-select"
                     >
                       <option value="5">5</option>
                       <option value="10">10</option>
                       <option value="25">25</option>
                       <option value="50">50</option>
                     </select>
+                    <span className="pagination-label">entries</span>
                   </div>
 
-                  <div className="pagination-center">
-                    <span className="pagination-info">
-                      Page {currentPage} of {totalPages} | Showing{" "}
-                      {Math.min(startIndex + 1, filteredPeriods.length)}-
-                      {Math.min(endIndex, filteredPeriods.length)} of {filteredPeriods.length}
-                    </span>
+                  <div className="pagination-status">
+                    Showing {Math.min(startIndex + 1, filteredPeriods.length)}-
+                    {Math.min(endIndex, filteredPeriods.length)} of {filteredPeriods.length} entries
                   </div>
 
-                  <div className="pagination-right">
-                    <button
-                      className="pagination-btn"
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <i className="bi bi-chevron-left"></i> Prev
-                    </button>
+                  <nav className="pagination-nav">
+                    <ul className="pagination">
+                      <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                        <button
+                          className="page-link"
+                          onClick={() => goToPage(currentPage - 1)}
+                          disabled={currentPage === 1}
+                        >
+                          <i className="bi bi-chevron-left"></i>
+                        </button>
+                      </li>
 
-                    <div className="pagination-numbers">
                       {Array.from({ length: totalPages }, (_, i) => i + 1)
-                        .slice(Math.max(0, currentPage - 2), Math.min(totalPages, currentPage + 1))
-                        .map((page) => (
-                          <button
-                            key={page}
-                            className={`pagination-number ${currentPage === page ? "active" : ""}`}
-                            onClick={() => goToPage(page)}
-                          >
-                            {page}
-                          </button>
-                        ))}
-                    </div>
+                        .filter((page) => {
+                          if (totalPages <= 7) return true;
+                          if (page === 1 || page === totalPages) return true;
+                          if (page >= currentPage - 1 && page <= currentPage + 1) return true;
+                          return false;
+                        })
+                        .map((page, index, array) => {
+                          if (index > 0 && page - array[index - 1] > 1) {
+                            return (
+                              <React.Fragment key={`ellipsis-${page}`}>
+                                <li className="page-item disabled">
+                                  <button className="page-link">...</button>
+                                </li>
+                                <li className={`page-item ${currentPage === page ? "active" : ""}`}>
+                                  <button className="page-link" onClick={() => goToPage(page)}>
+                                    {page}
+                                  </button>
+                                </li>
+                              </React.Fragment>
+                            );
+                          }
+                          return (
+                            <li key={page} className={`page-item ${currentPage === page ? "active" : ""}`}>
+                              <button className="page-link" onClick={() => goToPage(page)}>
+                                {page}
+                              </button>
+                            </li>
+                          );
+                        })}
 
-                    <button
-                      className="pagination-btn"
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next <i className="bi bi-chevron-right"></i>
-                    </button>
-                  </div>
+                      <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                        <button
+                          className="page-link"
+                          onClick={() => goToPage(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                        >
+                          <i className="bi bi-chevron-right"></i>
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
                 </div>
               )}
             </>
@@ -786,12 +765,12 @@ const PeriodAllocationManagement = () => {
                         Remaining {getSortIcon("remainingAmount")}
                       </th>
                       <th onClick={() => handleSort("utilizationPercentage")} className="period-sortable-header">
-                        Utilization % {getSortIcon("utilizationPercentage")}
+                        Utilization {getSortIcon("utilizationPercentage")}
                       </th>
                       <th onClick={() => handleSort("subAllocationCount")} className="period-sortable-header">
                         Sub-Allocations {getSortIcon("subAllocationCount")}
                       </th>
-                      <th className="period-actions-header">Actions</th>
+                      <th className="period-text-center period-actions-header">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -809,7 +788,7 @@ const PeriodAllocationManagement = () => {
                             <div
                               className="period-progress-bar"
                               style={{
-                                width: `${period.utilizationPercentage || 0}%`,
+                                width: `${Math.min(period.utilizationPercentage || 0, 100)}%`,
                                 backgroundColor: getUtilizationColor(period.utilizationPercentage),
                               }}
                             ></div>
@@ -818,23 +797,23 @@ const PeriodAllocationManagement = () => {
                         </td>
                         <td className="period-text-center">{period.subAllocationCount || 0}</td>
                         <td>
-                          <div className="period-actions">
+                          <div className="action-buttons">
                             <button
-                              className="period-btn-view"
+                              className="action-btn action-btn-edit"
                               onClick={() => handleViewDetails(period)}
                               title="View Details"
                             >
                               <i className="bi bi-eye"></i>
                             </button>
                             <button
-                              className="period-btn-edit"
+                              className="action-btn action-btn-warning"
                               onClick={() => handleUpdatePeriod(period)}
                               title="Edit"
                             >
                               <i className="bi bi-pencil"></i>
                             </button>
                             <button
-                              className="period-btn-allocate"
+                              className="action-btn action-btn-success"
                               onClick={() => handleAllocateFromPeriod(period)}
                               title="Sub-Allocate"
                               disabled={period.remainingAmount <= 0}
@@ -842,7 +821,7 @@ const PeriodAllocationManagement = () => {
                               <i className="bi bi-diagram-3"></i>
                             </button>
                             <button
-                              className="period-btn-delete"
+                              className="action-btn action-btn-delete"
                               onClick={() => handleDeletePeriod(period)}
                               title="Delete"
                             >
@@ -856,62 +835,83 @@ const PeriodAllocationManagement = () => {
                 </table>
               </div>
 
-              {/* PAGINATION */}
+              {/* PAGINATION FOR TABLE VIEW */}
               {totalPages > 1 && (
                 <div className="pagination-container">
-                  <div className="pagination-left">
-                    <label className="pagination-label">Records per page:</label>
+                  <div className="pagination-info">
+                    <span className="pagination-label">Show</span>
                     <select
+                      className="pagination-select"
                       value={itemsPerPage}
                       onChange={handleItemsPerPageChange}
-                      className="pagination-select"
                     >
                       <option value="5">5</option>
                       <option value="10">10</option>
                       <option value="25">25</option>
                       <option value="50">50</option>
                     </select>
+                    <span className="pagination-label">entries</span>
                   </div>
 
-                  <div className="pagination-center">
-                    <span className="pagination-info">
-                      Page {currentPage} of {totalPages} | Showing{" "}
-                      {Math.min(startIndex + 1, filteredPeriods.length)}-
-                      {Math.min(endIndex, filteredPeriods.length)} of {filteredPeriods.length}
-                    </span>
+                  <div className="pagination-status">
+                    Showing {Math.min(startIndex + 1, filteredPeriods.length)}-
+                    {Math.min(endIndex, filteredPeriods.length)} of {filteredPeriods.length} entries
                   </div>
 
-                  <div className="pagination-right">
-                    <button
-                      className="pagination-btn"
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <i className="bi bi-chevron-left"></i> Prev
-                    </button>
+                  <nav className="pagination-nav">
+                    <ul className="pagination">
+                      <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                        <button
+                          className="page-link"
+                          onClick={() => goToPage(currentPage - 1)}
+                          disabled={currentPage === 1}
+                        >
+                          <i className="bi bi-chevron-left"></i>
+                        </button>
+                      </li>
 
-                    <div className="pagination-numbers">
                       {Array.from({ length: totalPages }, (_, i) => i + 1)
-                        .slice(Math.max(0, currentPage - 2), Math.min(totalPages, currentPage + 1))
-                        .map((page) => (
-                          <button
-                            key={page}
-                            className={`pagination-number ${currentPage === page ? "active" : ""}`}
-                            onClick={() => goToPage(page)}
-                          >
-                            {page}
-                          </button>
-                        ))}
-                    </div>
+                        .filter((page) => {
+                          if (totalPages <= 7) return true;
+                          if (page === 1 || page === totalPages) return true;
+                          if (page >= currentPage - 1 && page <= currentPage + 1) return true;
+                          return false;
+                        })
+                        .map((page, index, array) => {
+                          if (index > 0 && page - array[index - 1] > 1) {
+                            return (
+                              <React.Fragment key={`ellipsis-${page}`}>
+                                <li className="page-item disabled">
+                                  <button className="page-link">...</button>
+                                </li>
+                                <li className={`page-item ${currentPage === page ? "active" : ""}`}>
+                                  <button className="page-link" onClick={() => goToPage(page)}>
+                                    {page}
+                                  </button>
+                                </li>
+                              </React.Fragment>
+                            );
+                          }
+                          return (
+                            <li key={page} className={`page-item ${currentPage === page ? "active" : ""}`}>
+                              <button className="page-link" onClick={() => goToPage(page)}>
+                                {page}
+                              </button>
+                            </li>
+                          );
+                        })}
 
-                    <button
-                      className="pagination-btn"
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next <i className="bi bi-chevron-right"></i>
-                    </button>
-                  </div>
+                      <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                        <button
+                          className="page-link"
+                          onClick={() => goToPage(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                        >
+                          <i className="bi bi-chevron-right"></i>
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
                 </div>
               )}
             </>

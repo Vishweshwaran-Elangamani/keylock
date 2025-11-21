@@ -1,71 +1,174 @@
-/* Employee Policy View - Complete with Dark Blue Theme #27235C */
+/* Employee Policy View - Updated Design */
 
-.ep-container {
-  padding: 1.5rem 2rem;
+.ep-root {
+  padding: 20px 24px 64px 24px;
   max-width: 1600px;
   margin: 0 auto;
-  background: #ffffff;
+  background: #f8f9fc;
   min-height: 100vh;
 }
 
 /* ========================================
-   HEADER
+   SUMMARY CARDS
 ======================================== */
-.ep-header {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
+.ep-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 1rem;
 }
 
-.ep-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 0.375rem;
+.ep-summary-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(44, 39, 98, 0.08);
+  text-align: left;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #27235c;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 12px 16px;
+  min-height: 95px;
+  gap: 12px;
+}
+
+.ep-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.ep-summary-card:hover::before {
+  opacity: 1;
+}
+
+.ep-summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #0d6efd;
+}
+
+.summary-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
+  font-size: 22px;
+  flex-shrink: 0;
 }
 
-.ep-title i {
-  font-size: 2rem;
-  color: #27235C;
+.ep-summary-card.total .summary-card-icon {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
 }
 
-.ep-subtitle {
+.ep-summary-card.published .summary-card-icon {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+}
+
+.ep-summary-card.categories .summary-card-icon {
+  background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+  color: #be185d;
+}
+
+.summary-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  align-items: flex-start;
+}
+
+.summary-card-label {
+  font-size: 10px;
   color: #64748b;
-  margin: 0;
-  font-size: 0.9375rem;
-  font-weight: 400;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.summary-card-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
 }
 
 /* ========================================
-   FILTERS
+   FILTER SECTION
 ======================================== */
-.ep-filter-wrapper {
-  max-width: 100%;
-  margin-bottom: 1.5rem;
+.ep-filter-section {
+  padding: 1rem 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.ep-filter-row-single {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .ep-filter-select {
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  padding: 0.625rem 1rem;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: #334155;
-  background-color: #ffffff;
-  transition: all 0.2s ease;
+  min-width: 180px;
+  max-width: 220px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #ffffff;
+  color: #212529;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .ep-filter-select:focus {
-  border-color: #27235C;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
   outline: none;
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
+.ep-clear-btn {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #212529;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ep-clear-btn:hover {
+  background: #f8f9fa;
+  border-color: #6c757d;
+}
+
+.ep-results-count-inline {
+  font-size: 0.875rem;
+  color: #6c757d;
+  white-space: nowrap;
+  margin-left: auto;
+  font-weight: 500;
 }
 
 /* ========================================
@@ -74,26 +177,28 @@
 .ep-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
+  gap: 1.25rem;
+  animation: fadeIn 0.3s ease-out;
+  margin-bottom: 1.25rem;
 }
 
 /* ========================================
    POLICY CARD
 ======================================== */
 .ep-card {
-  border: 1px solid #e5e7eb;
+  background: #fff;
   border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   height: 100%;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
 }
 
 .ep-card:hover {
-  box-shadow: 0 8px 20px rgba(39, 35, 92, 0.15);
-  transform: translateY(-4px);
-  border-color: #27235C;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  border-color: #27235c;
 }
 
 .ep-card .card-body {
@@ -103,7 +208,6 @@
   gap: 0.875rem;
 }
 
-/* Card Header */
 .ep-card-header {
   display: flex;
   justify-content: space-between;
@@ -113,15 +217,14 @@
 }
 
 .ep-card-title {
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #27235c;
   margin: 0;
   line-height: 1.4;
   flex: 1;
 }
 
-/* Badge - Dark Blue */
 .ep-badge {
   font-size: 0.6875rem;
   font-weight: 600;
@@ -129,14 +232,13 @@
   border-radius: 14px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  background: #27235C;
+  background: #27235c;
   color: #ffffff;
   border: none;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* Description */
 .ep-card-description {
   color: #64748b;
   font-size: 0.875rem;
@@ -146,7 +248,6 @@
   min-height: 50px;
 }
 
-/* Document Badge */
 .ep-document-badge {
   display: inline-flex;
   align-items: center;
@@ -164,7 +265,6 @@
   font-size: 0.9375rem;
 }
 
-/* Card Footer */
 .ep-card-footer {
   display: flex;
   justify-content: space-between;
@@ -181,65 +281,82 @@
 }
 
 /* ========================================
-   BUTTONS - DARK BLUE THEME #27235C
+   BUTTONS
 ======================================== */
-
-/* View Details Button (In Cards) - Dark Blue Solid */
 .ep-btn-view {
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #ffffff;
+  border: none;
   padding: 0.4375rem 1rem;
   border-radius: 6px;
-  font-size: 0.875rem;
   font-weight: 600;
-  border: none;
-  background-color: #27235C;
-  color: #ffffff;
+  font-size: 0.875rem;
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
   cursor: pointer;
-  pointer-events: auto;
-  /* user-select: none; */
-  transition: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
 }
 
-.ep-btn-view:hover,
-.ep-btn-view:focus,
-.ep-btn-view:active {
-  background-color: #27235C;
+.ep-btn-view:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.35);
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #ffffff;
-  border: none;
-  outline: none;
-  box-shadow: none;
 }
 
 .ep-btn-view i {
   font-size: 0.875rem;
 }
 
-/* View/Download Button (In Modal) - Dark Blue Solid */
 .ep-btn-download {
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
   padding: 0.5rem 1rem !important;
   border-radius: 6px !important;
-  font-size: 0.875rem !important;
   font-weight: 600 !important;
-  border: none !important;
-  background-color: #27235C !important;
-  color: #ffffff !important;
+  font-size: 0.875rem !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 0.375rem !important;
   cursor: pointer !important;
-  transition: none !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25) !important;
 }
 
-.ep-btn-download:hover,
-.ep-btn-download:focus,
-.ep-btn-download:active {
-  background-color: #27235C !important;
+.ep-btn-download:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.35) !important;
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%) !important;
   color: #ffffff !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+}
+
+/* ========================================
+   EMPTY STATE
+======================================== */
+.ep-alert-empty {
+  background: #ffffff;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  grid-column: 1 / -1;
+}
+
+.ep-alert-empty i {
+  font-size: 3rem;
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.ep-alert-empty p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
 }
 
 /* ========================================
@@ -252,60 +369,35 @@
   justify-content: center;
   min-height: 400px;
   gap: 1rem;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 2rem;
 }
 
 .ep-loading-container p {
   color: #64748b;
-  font-size: 0.9375rem;
-  font-weight: 500;
+  font-size: 1rem;
   margin: 0;
 }
 
 .ep-loading-container .spinner-border {
   width: 2.5rem;
   height: 2.5rem;
-  color: #27235C;
-}
-
-/* ========================================
-   EMPTY STATE
-======================================== */
-.ep-empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 4rem 2rem;
-  background: #ffffff;
-  border-radius: 12px;
-  border: 2px dashed #cbd5e1;
-}
-
-.ep-empty i {
-  font-size: 3.5rem;
-  color: #cbd5e1;
-  margin-bottom: 1rem;
-  display: block;
-}
-
-.ep-empty p {
-  font-size: 1.0625rem;
-  color: #64748b;
-  font-weight: 500;
-  margin: 0;
+  color: #27235c;
 }
 
 /* ========================================
    MODAL STYLING
 ======================================== */
+.ep-modal .modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
 .ep-modal .modal-header {
-  background: #27235C;
+  background: linear-gradient(135deg, #27235c 0%, #1a1842 100%);
   color: #ffffff;
   border-bottom: none;
+  border-radius: 12px 12px 0 0;
   padding: 1.25rem 1.5rem;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
 }
 
 .ep-modal .modal-header .modal-title {
@@ -323,12 +415,6 @@
 .ep-modal .modal-header .btn-close {
   filter: brightness(0) invert(1);
   opacity: 1;
-}
-
-.ep-modal .modal-content {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .ep-modal .modal-body {
@@ -357,18 +443,18 @@
 }
 
 .ep-doc-download {
-  padding: 1rem;
-  background: #e0f2fe;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
+  padding: 1rem;
   margin-top: 1rem;
 }
 
 .ep-modal .modal-footer {
-  padding: 1rem 1.5rem;
   border-top: 1px solid #e5e7eb;
+  padding: 1rem 1.5rem;
   background: #f8fafc;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
+  border-radius: 0 0 12px 12px;
 }
 
 .ep-modal .modal-footer .btn-secondary {
@@ -387,25 +473,59 @@
 }
 
 /* ========================================
+   ANIMATIONS
+======================================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
    RESPONSIVE DESIGN
 ======================================== */
 @media (max-width: 1200px) {
+  .ep-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ep-filter-row-single {
+    flex-wrap: wrap;
+  }
+
   .ep-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .ep-container {
-    padding: 1rem;
+  .ep-root {
+    padding: 16px;
   }
 
-  .ep-header {
-    margin-bottom: 1rem;
+  .ep-summary-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .ep-title {
-    font-size: 1.5rem;
+  .ep-filter-row-single {
+    flex-direction: column;
+  }
+
+  .ep-filter-select {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ep-results-count-inline {
+    margin-left: 0;
+    text-align: center;
+    width: 100%;
   }
 
   .ep-grid {
@@ -425,38 +545,39 @@
   }
 }
 
-@media (max-width: 576px) {
-  .ep-container {
-    padding: 0.75rem;
+@media (max-width: 480px) {
+  .ep-root {
+    padding: 12px;
   }
 
-  .ep-header {
-    margin-bottom: 0.875rem;
+  .ep-summary-card {
+    min-height: 85px;
+    padding: 10px 12px;
   }
 
-  .ep-title {
-    font-size: 1.375rem;
-    flex-direction: column;
-    gap: 0.5rem;
+  .summary-card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
   }
 
-  .ep-title i {
-    font-size: 1.75rem;
+  .summary-card-value {
+    font-size: 18px;
   }
 
-  .ep-subtitle {
-    font-size: 0.875rem;
+  .summary-card-label {
+    font-size: 9px;
   }
 
   .ep-card .card-body {
     padding: 1.25rem;
   }
 
-  .ep-empty {
+  .ep-alert-empty {
     padding: 2.5rem 1.5rem;
   }
 
-  .ep-empty i {
-    font-size: 3rem;
+  .ep-alert-empty i {
+    font-size: 2.5rem;
   }
 }

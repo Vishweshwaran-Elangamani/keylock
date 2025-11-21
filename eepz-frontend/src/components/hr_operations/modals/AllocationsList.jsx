@@ -68,7 +68,7 @@ const AllocationsList = ({
                   <th>Amount</th>
                   <th>Utilized</th>
                   <th>Utilized %</th>
-                  {isDeptHead && <th>Actions</th>}
+                  
                 </tr>
               </thead>
               <tbody>
@@ -124,29 +124,7 @@ const AllocationsList = ({
                         </div>
                       </td>
                       {/*  SHOW UPDATE BUTTON ONLY FOR DEPARTMENT HEAD */}
-                      {isDeptHead && (
-                        <td>
-                          <button
-                            className="btn btn-sm btn-primary"
-                            onClick={() => {
-                              setSelectedAllocation(alloc);
-                              setShowUpdateModal(true);
-                            }}
-                            style={{
-                              padding: "4px 12px",
-                              fontSize: "0.85rem",
-                              background: "#3b82f6",
-                              border: "none",
-                              borderRadius: "4px",
-                              color: "#fff",
-                              cursor: "pointer",
-                            }}
-                            title="Update Utilization"
-                          >
-                            <i className="bi bi-pencil"></i> Update
-                          </button>
-                        </td>
-                      )}
+                      
                     </tr>
                   );
                 })}

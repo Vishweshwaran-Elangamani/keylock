@@ -41,7 +41,7 @@ const Breadcrumb = ({ items }) => {
             gap: '0.5rem'
           }}
         >
-          <ChevronRight size={14} style={{ flexShrink: 0 }} />
+          /
           {item.path ? (
             <span
               onClick={() => navigate(item.path)}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../../services/hr_operations/hr/budgetAllocationService";
 import AllocationsList from "../../../../components/hr_operations/modals/AllocationsList";
+import Breadcrumb from "../../../../components/common/Breadcrumb";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import "../../../../styles/hr_operations/hr/allocationsList.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
@@ -10,19 +11,16 @@ const DepartmentHeadBudgetView = () => {
   const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedBudgetForAllocations, setSelectedBudgetForAllocations] =
-    useState(null);
+  const [selectedBudgetForAllocations, setSelectedBudgetForAllocations] = useState(null);
 
-  //  UPDATED: Use department name instead of ID
-  const userDepartmentName = localStorage.getItem("departmentName");
-  const userName = `${localStorage.getItem("firstName")} ${localStorage.getItem(
-    "lastName"
-  )}`;
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userDepartmentName = user.departmentName || "";
+  const userName = ((user.firstName || "") + " " + (user.lastName || "")).trim();
 
   useEffect(() => {
-    console.log(" Department Head logged in:");
-    console.log("   - Department Name:", userDepartmentName);
-    console.log("   - User Name:", userName);
+    console.log("Department Head logged in:");
+    console.log("  - Department Name:", userDepartmentName);
+    console.log("  - User Name:", userName);
 
     if (!userDepartmentName) {
       setError("Department information not found. Please log in again.");
@@ -38,20 +36,17 @@ const DepartmentHeadBudgetView = () => {
     setError(null);
 
     try {
-      console.log(" Fetching all department budgets...");
+      console.log("Fetching all department budgets...");
       const response = await budgetAllocationService.getAllDepartmentBudgets();
 
-      console.log(" All budgets from backend:", response.data);
+      console.log("All budgets from backend:", response.data);
 
       if (!response.success || !response.data) {
         throw new Error(response.message || "Failed to fetch budgets");
       }
 
-      //  UPDATED: Filter by department name instead of ID
       const departmentBudgets = response.data.filter((budget) => {
-        console.log(`   Checking budget: DeptName="${budget.departmentName}"`);
-
-        // Case-insensitive comparison and trim whitespace
+        console.log(`Checking budget: DeptName="${budget.departmentName}"`);
         return (
           budget.departmentName?.trim().toLowerCase() ===
           userDepartmentName?.trim().toLowerCase()
@@ -59,26 +54,23 @@ const DepartmentHeadBudgetView = () => {
       });
 
       console.log(
-        ` Filtered budgets for department "${userDepartmentName}":`,
+        `Filtered budgets for department "${userDepartmentName}":`,
         departmentBudgets
       );
 
       setBudgets(departmentBudgets);
 
-      //  IMPROVED: Better error handling
       if (departmentBudgets.length === 0) {
-        console.warn(` No budget found for department "${userDepartmentName}"`);
-
-        // Show available departments for debugging
+        console.warn(`No budget found for department "${userDepartmentName}"`);
         const availableDepts = response.data.map((b) => b.departmentName);
-        console.log(" Available departments:", availableDepts);
+        console.log("Available departments:", availableDepts);
 
         setError(
           `No budget allocated for ${userDepartmentName} department yet. Contact HR or Leadership to create a budget.`
         );
       }
     } catch (err) {
-      console.error(" Error fetching budgets:", err);
+      console.error("Error fetching budgets:", err);
       setError(err.message || "Failed to fetch budgets");
       toast.error(err.message || "Failed to fetch budgets");
     } finally {
@@ -87,18 +79,17 @@ const DepartmentHeadBudgetView = () => {
   };
 
   const handleShowAllocations = async (budget) => {
-    console.log(" Viewing allocations for budget:", budget.budgetId);
+    console.log("Viewing allocations for budget:", budget.budgetId);
 
     try {
       setLoading(true);
 
-      console.log(" Fetching allocations from backend...");
-      const response =
-        await budgetAllocationService.getBudgetAllocationsByBudget(
-          budget.budgetId
-        );
+      console.log("Fetching allocations from backend...");
+      const response = await budgetAllocationService.getBudgetAllocationsByBudget(
+        budget.budgetId
+      );
 
-      console.log(" Backend response:", response);
+      console.log("Backend response:", response);
 
       let budgetAllocations = [];
       if (response && response.success) {
@@ -111,7 +102,7 @@ const DepartmentHeadBudgetView = () => {
           : [];
       }
 
-      console.log(" Fetched allocations:", budgetAllocations);
+      console.log("Fetched allocations:", budgetAllocations);
 
       setSelectedBudgetForAllocations({
         ...budget,
@@ -120,14 +111,14 @@ const DepartmentHeadBudgetView = () => {
 
       setLoading(false);
     } catch (err) {
-      console.error(" Error fetching allocations:", err);
+      console.error("Error fetching allocations:", err);
       toast.error("Failed to fetch allocations");
       setLoading(false);
     }
   };
 
   const handleBackToList = () => {
-    console.log(" Back to budget list");
+    console.log("Back to budget list");
     setSelectedBudgetForAllocations(null);
     fetchBudgets();
   };
@@ -148,43 +139,83 @@ const DepartmentHeadBudgetView = () => {
     return { text: "Low", color: "#3b82f6" };
   };
 
+  const summaryStats = budgets.length > 0 ? {
+    totalBudget: budgets.reduce((sum, b) => sum + (b.totalBudget || 0), 0),
+    totalAllocated: budgets.reduce((sum, b) => sum + (b.allocatedAmount || 0), 0),
+    totalUtilized: budgets.reduce((sum, b) => sum + (b.utilizedAmount || 0), 0),
+  } : {
+    totalBudget: 0,
+    totalAllocated: 0,
+    totalUtilized: 0,
+  };
+
+  if (loading) {
+    return (
+      <div className="budget-loading-container">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading budget data...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="budget-root">
-      {!selectedBudgetForAllocations && (
-        <>
-          <div style={{ marginBottom: "1.5rem" }}>
-            <h2 style={{ color: "#27235c", marginBottom: "0.5rem" }}>
-              Budget Utilization - {userDepartmentName}
-            </h2>
-            <p style={{ color: "#6c757d", fontSize: "0.95rem" }}>
-              View and update budget utilization for your department
-            </p>
-          </div>
-        </>
-      )}
-
-      {error && (
-        <div className="alert alert-warning" role="alert">
-          <i className="bi bi-exclamation-triangle-fill me-2"></i>
-          {error}
-        </div>
-      )}
-
       {!selectedBudgetForAllocations ? (
         <>
-          {loading ? (
-            <div className="budget-loading-container">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-              <p>Loading budget data...</p>
+          <Breadcrumb
+            items={[
+              {
+                label: `${userDepartmentName} Department Budget`,
+              },
+            ]}
+          />
+
+          {error && (
+            <div className="alert alert-warning budget-alert" role="alert">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
             </div>
-          ) : budgets.length === 0 ? (
+          )}
+
+          {budgets.length > 0 && (
+            <div className="budget-summary-cards">
+              <div className="budget-summary-card total">
+                <div className="summary-card-icon">
+                  <i className="bi bi-wallet2"></i>
+                </div>
+                <div className="summary-card-content">
+                  <div className="summary-card-value">{formatCurrency(summaryStats.totalBudget)}</div>
+                  <div className="summary-card-label">Total Budget</div>
+                </div>
+              </div>
+
+              <div className="budget-summary-card allocated">
+                <div className="summary-card-icon">
+                  <i className="bi bi-cash-stack"></i>
+                </div>
+                <div className="summary-card-content">
+                  <div className="summary-card-value">{formatCurrency(summaryStats.totalAllocated)}</div>
+                  <div className="summary-card-label">Total Allocated</div>
+                </div>
+              </div>
+
+              <div className="budget-summary-card utilized">
+                <div className="summary-card-icon">
+                  <i className="bi bi-graph-up-arrow"></i>
+                </div>
+                <div className="summary-card-content">
+                  <div className="summary-card-value">{formatCurrency(summaryStats.totalUtilized)}</div>
+                  <div className="summary-card-label">Total Utilized</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {budgets.length === 0 ? (
             <div className="budget-alert-empty">
-              <i
-                className="bi bi-inbox"
-                style={{ fontSize: "48px", color: "#cbd5e1" }}
-              ></i>
+              <i className="bi bi-inbox"></i>
               <h4 style={{ marginTop: "16px", color: "#64748b" }}>
                 No Budget Allocated
               </h4>
@@ -207,9 +238,9 @@ const DepartmentHeadBudgetView = () => {
                     <th>Allocated</th>
                     <th>Utilized</th>
                     <th>Remaining</th>
-                    <th>Utilization %</th>
+                    <th>Utilization</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th className="budget-text-center budget-actions-header">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -242,7 +273,7 @@ const DepartmentHeadBudgetView = () => {
                             <div
                               className="budget-progress-bar"
                               style={{
-                                width: `${budget.utilizationPercentage || 0}%`,
+                                width: `${Math.min(budget.utilizationPercentage || 0, 100)}%`,
                                 backgroundColor: getUtilizationColor(
                                   budget.utilizationPercentage
                                 ),
@@ -269,14 +300,15 @@ const DepartmentHeadBudgetView = () => {
                           </span>
                         </td>
                         <td>
-                          <button
-                            className="budget-btn-edit"
-                            onClick={() => handleShowAllocations(budget)}
-                            title="View & Update Allocations"
-                            style={{ background: "#8b5cf6", color: "#ffffff" }}
-                          >
-                            <i className="bi bi-eye"></i> View & Update
-                          </button>
+                          <div className="action-buttons">
+                            <button
+                              className="action-btn action-btn-edit"
+                              onClick={() => handleShowAllocations(budget)}
+                              title="View & Update Allocations"
+                            >
+                              <i className="bi bi-eye"></i>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

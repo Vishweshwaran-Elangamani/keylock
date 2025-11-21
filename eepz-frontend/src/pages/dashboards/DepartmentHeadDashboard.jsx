@@ -9,13 +9,6 @@ const DepartmentHeadDashboard = () => {
   };
   const cards = [
     {
-      title: "Nomination Reviews",
-      description: "Approve or reject employee nominations",
-      icon: "bi-clipboard-check",
-      gradient: "gradient-green",
-      path: "/internal/nominations",
-    },
-    {
       title: "Budget Utilization",
       description: "View and update budget utilization for your department",
       icon: "bi bi-pie-chart",
@@ -36,7 +29,7 @@ const DepartmentHeadDashboard = () => {
       gradient: "gradient-blue",
       path: "/department-head/dashboard/performance",
     },
-    
+
     {
       title: "SLA Management",
       description: "Service Level Agreement",

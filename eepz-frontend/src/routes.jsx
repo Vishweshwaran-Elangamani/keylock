@@ -684,8 +684,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      //endregion INTERNAL OPPORTUNITIES MANAGER //region INTERNAL OPPORTUNITIES
-      EMPLOYEE
+      //endregion INTERNAL OPPORTUNITIES MANAGER
+      //region INTERNAL OPPORTUNITIES EMPLOYEE
       <Route
         path="/employee/dashboard"
         element={

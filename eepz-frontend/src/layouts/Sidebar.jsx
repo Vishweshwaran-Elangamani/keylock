@@ -77,6 +77,11 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         path: "/leadership/dashboard",
       },
       {
+        icon: "bi-cash-coin",
+        label: "Budget Management",
+        path: "/leadership/budget-management",
+      },
+      {
         icon: "bi-shield-check",
         label: "Company Policies",
         path: "/leadership/policies",
@@ -103,11 +108,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Dashboard",
         path: "/department-head/dashboard",
       },
-      {
-        icon: "bi-clipboard-check",
-        label: "Nominations",
-        path: "/internal/nominations",
-      },
+      
       {
         icon: "bi-pie-chart",
         label: "Budget Utilization",

@@ -272,8 +272,6 @@ const PolicyManagement = () => {
             <i className="bi bi-plus-circle"></i>
             Add Policy
           </button>
-
-          
         </div>
       </div>
 
@@ -296,12 +294,6 @@ const PolicyManagement = () => {
                   <td colSpan="5" className="empty-state">
                     <i className="bi bi-inbox"></i>
                     <p>No policies found matching your filters</p>
-                    <button
-                      className="pm-btn-add-small"
-                      onClick={() => setShowAddModal(true)}
-                    >
-                      Create Your First Policy
-                    </button>
                   </td>
                 </tr>
               ) : (

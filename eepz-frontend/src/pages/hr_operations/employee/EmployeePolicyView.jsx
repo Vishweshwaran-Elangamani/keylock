@@ -4,12 +4,10 @@ import {
   Button,
   Badge,
   Spinner,
-  Form,
-  Row,
-  Col,
   Modal,
 } from "react-bootstrap";
 import employeePolicyService from "../../../services/hr_operations/employee/employeePolicyService";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../styles/hr_operations/employee/employeePolicy.css";
 
 const EmployeePolicyView = () => {
@@ -21,7 +19,6 @@ const EmployeePolicyView = () => {
   const [selectedPolicy, setSelectedPolicy] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
 
-  // Categories
   const categories = [
     "All",
     "Security",
@@ -37,7 +34,6 @@ const EmployeePolicyView = () => {
     "Compliance",
   ];
 
-  // Date filters
   const dateFilters = [
     { value: "All", label: "All Dates" },
     { value: "Today", label: "Today" },
@@ -97,12 +93,10 @@ const EmployeePolicyView = () => {
   const filterPolicies = () => {
     let filtered = policies;
 
-    // Filter by category
     if (selectedCategory !== "All") {
       filtered = filtered.filter((p) => p.category === selectedCategory);
     }
 
-    // Filter by date
     filtered = filtered.filter((p) => isWithinDateRange(p.publishedAt));
 
     setFilteredPolicies(filtered);
@@ -118,6 +112,11 @@ const EmployeePolicyView = () => {
     window.open(fullUrl, "_blank");
   };
 
+  const clearFilters = () => {
+    setSelectedCategory("All");
+    setSelectedDateFilter("All");
+  };
+
   if (loading) {
     return (
       <div className="ep-loading-container">
@@ -128,54 +127,88 @@ const EmployeePolicyView = () => {
   }
 
   return (
-    <div className="ep-container">
-      <div className="ep-header">
-        <h2 className="ep-title">
-          <i className="bi bi-shield-check"></i>
-          Company Policies
-        </h2>
-        <p className="ep-subtitle">
-          View and download published organizational policies
-        </p>
+    <div className="ep-root">
+      <Breadcrumb
+        items={[
+          {
+            label: "Company Policies",
+          },
+        ]}
+      />
+
+      <div className="ep-summary-cards">
+        <div className="ep-summary-card total">
+          <div className="summary-card-icon">
+            <i className="bi bi-shield-check"></i>
+          </div>
+          <div className="summary-card-content">
+            <div className="summary-card-value">{policies.length}</div>
+            <div className="summary-card-label">Total Policies</div>
+          </div>
+        </div>
+
+        <div className="ep-summary-card published">
+          <div className="summary-card-icon">
+            <i className="bi bi-check-circle"></i>
+          </div>
+          <div className="summary-card-content">
+            <div className="summary-card-value">{filteredPolicies.length}</div>
+            <div className="summary-card-label">Filtered Results</div>
+          </div>
+        </div>
+
+        <div className="ep-summary-card categories">
+          <div className="summary-card-icon">
+            <i className="bi bi-folder"></i>
+          </div>
+          <div className="summary-card-content">
+            <div className="summary-card-value">{categories.length - 1}</div>
+            <div className="summary-card-label">Categories</div>
+          </div>
+        </div>
       </div>
 
-      {/* Filters - Category and Date */}
-      <div className="ep-filter-wrapper">
-        <Row className="g-3">
-          <Col md={6}>
-            <Form.Select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="ep-filter-select"
-            >
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </Form.Select>
-          </Col>
-          <Col md={6}>
-            <Form.Select
-              value={selectedDateFilter}
-              onChange={(e) => setSelectedDateFilter(e.target.value)}
-              className="ep-filter-select"
-            >
-              {dateFilters.map((filter) => (
-                <option key={filter.value} value={filter.value}>
-                  {filter.label}
-                </option>
-              ))}
-            </Form.Select>
-          </Col>
-        </Row>
+      <div className="ep-filter-section">
+        <div className="ep-filter-row-single">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="ep-filter-select"
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedDateFilter}
+            onChange={(e) => setSelectedDateFilter(e.target.value)}
+            className="ep-filter-select"
+          >
+            {dateFilters.map((filter) => (
+              <option key={filter.value} value={filter.value}>
+                {filter.label}
+              </option>
+            ))}
+          </select>
+
+          <button className="ep-clear-btn" onClick={clearFilters}>
+            Clear Filters
+          </button>
+
+          <div className="ep-results-count-inline">
+            Showing {filteredPolicies.length} of {policies.length} policies
+          </div>
+        </div>
       </div>
 
       <div className="ep-grid">
         {filteredPolicies.length === 0 ? (
-          <div className="ep-empty">
+          <div className="ep-alert-empty">
             <i className="bi bi-inbox"></i>
-            <p>No policies found</p>
+            <p>No policies found matching your filters</p>
           </div>
         ) : (
           filteredPolicies.map((policy) => (
@@ -200,8 +233,7 @@ const EmployeePolicyView = () => {
 
                 <div className="ep-card-footer">
                   <small className="ep-publish-date">
-                    Published:{" "}
-                    {new Date(policy.publishedAt).toLocaleDateString()}
+                    Published: {new Date(policy.publishedAt).toLocaleDateString()}
                   </small>
                   <Button
                     size="sm"
@@ -209,7 +241,7 @@ const EmployeePolicyView = () => {
                     onClick={() => handleViewDetails(policy)}
                   >
                     <i className="bi bi-eye me-1"></i>
-                    View Details
+                    View
                   </Button>
                 </div>
               </Card.Body>
@@ -218,7 +250,6 @@ const EmployeePolicyView = () => {
         )}
       </div>
 
-      {/* Modal */}
       {selectedPolicy && (
         <Modal
           show={showDetailModal}
@@ -269,9 +300,7 @@ const EmployeePolicyView = () => {
                   <Button
                     size="sm"
                     className="ep-btn-download"
-                    onClick={() =>
-                      handleViewDocument(selectedPolicy.documentUrl)
-                    }
+                    onClick={() => handleViewDocument(selectedPolicy.documentUrl)}
                   >
                     <i className="bi bi-download me-1"></i>
                     View/Download
@@ -282,16 +311,12 @@ const EmployeePolicyView = () => {
 
             <div className="mt-4">
               <small className="text-muted">
-                Published on:{" "}
-                {new Date(selectedPolicy.publishedAt).toLocaleString()}
+                Published on: {new Date(selectedPolicy.publishedAt).toLocaleString()}
               </small>
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => setShowDetailModal(false)}
-            >
+            <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
               Close
             </Button>
           </Modal.Footer>
