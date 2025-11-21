@@ -1,5 +1,5 @@
 import hrApi from "./hrApi";
-
+ 
 const budgetAllocationService = {
   // LEADERSHIP: Create Department Budget
   createDepartmentBudget: async (budgetData) => {
@@ -25,7 +25,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // LEADERSHIP: Update Department Budget
   updateDepartmentBudget: async (budgetData) => {
     try {
@@ -51,7 +51,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // LEADERSHIP: Delete Department Budget
   deleteDepartmentBudget: async (budgetId) => {
     try {
@@ -70,7 +70,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // GET: All Department Budgets
   getAllDepartmentBudgets: async () => {
     try {
@@ -89,7 +89,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // GET: Department Budget by ID
   getDepartmentBudgetById: async (budgetId) => {
     try {
@@ -106,7 +106,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // GET: Department Budgets by Department
   getDepartmentBudgetsByDepartment: async (departmentId) => {
     try {
@@ -125,7 +125,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // HR/DEPTHEAD: Create Budget Allocation
   createBudgetAllocation: async (allocationData) => {
     try {
@@ -150,7 +150,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // HR/DEPTHEAD: Update Budget Allocation
   updateBudgetAllocation: async (allocationData) => {
     try {
@@ -172,7 +172,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // HR/DEPTHEAD: Delete Budget Allocation
   deleteBudgetAllocation: async (allocationId) => {
     try {
@@ -190,11 +190,11 @@ const budgetAllocationService = {
     }
   },
   // Add to existing budgetAllocationService.js after line 180
-
+ 
   // ========== HR: CREATE SUB-ALLOCATION FROM PERIOD ==========
   createFundAllocationFromPeriod: async (allocationData) => {
     try {
-      console.log(" Creating fund allocation from period:", allocationData);
+      console.log("📊 Creating fund allocation from period:", allocationData);
       const response = await hrApi.post("/FundAllocation/create", {
         budgetId: allocationData.budgetId,
         departmentId: allocationData.departmentId,
@@ -203,13 +203,13 @@ const budgetAllocationService = {
         goalStatus: allocationData.goalStatus || "Approved",
         notes: allocationData.notes || "",
         allocatedByUserId: allocationData.allocatedByUserId,
-        period: allocationData.period, //  NEW
-        periodYear: allocationData.periodYear, //  NEW
+        period: allocationData.period,  // ✅ NEW
+        periodYear: allocationData.periodYear,  // ✅ NEW
       });
-      console.log(" Fund allocation created:", response.data);
+      console.log("✅ Fund allocation created:", response.data);
       return response.data;
     } catch (error) {
-      console.error(" Error creating fund allocation:", error);
+      console.error("❌ Error creating fund allocation:", error);
       throw (
         error.response?.data || {
           message: "Failed to create fund allocation",
@@ -217,7 +217,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // HR/DEPTHEAD: Update Utilized Amount
   updateUtilizedAmount: async (budgetData) => {
     try {
@@ -238,38 +238,36 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // GET: Budget Allocations by Budget ID
   // In budgetAllocationService.js
-  getBudgetAllocationsByBudget: async (budgetId) => {
-    try {
-      console.log("Fetching allocations for budget:", budgetId);
-      const response = await hrApi.get(`/FundAllocation/by-budget/${budgetId}`);
-      console.log("Budget allocations:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching budget allocations:", error);
-      throw (
-        error.response?.data || {
-          message: "Failed to fetch budget allocations",
-        }
-      );
-    }
-  },
-
-  // Add this method to budgetAllocationService.js
-
+getBudgetAllocationsByBudget: async (budgetId) => {
+  try {
+    console.log("Fetching allocations for budget:", budgetId);
+    const response = await hrApi.get(`/FundAllocation/by-budget/${budgetId}`);
+    console.log("Budget allocations:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching budget allocations:", error);
+    throw (
+      error.response?.data || {
+        message: "Failed to fetch budget allocations",
+      }
+    );
+  }
+},
+ 
+// Add this method to budgetAllocationService.js
+ 
   // ========== GET FUND ALLOCATIONS BY DEPARTMENT ==========
   getFundAllocationsByDepartment: async (departmentId) => {
     try {
-      console.log(" Fetching fund allocations for department:", departmentId);
-      const response = await hrApi.get(
-        `/FundAllocation/by-department/${departmentId}`
-      );
-      console.log(" Fund allocations by department:", response.data);
+      console.log("📊 Fetching fund allocations for department:", departmentId);
+      const response = await hrApi.get(`/FundAllocation/by-department/${departmentId}`);
+      console.log("✅ Fund allocations by department:", response.data);
       return response.data;
     } catch (error) {
-      console.error(" Error fetching fund allocations by department:", error);
+      console.error("❌ Error fetching fund allocations by department:", error);
       throw (
         error.response?.data || {
           message: "Failed to fetch fund allocations by department",
@@ -277,7 +275,9 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
+ 
+ 
   // GET: Budget Allocations by Type
   getBudgetAllocationsByType: async (type) => {
     try {
@@ -294,7 +294,7 @@ const budgetAllocationService = {
       );
     }
   },
-
+ 
   // GET: All Departments
   getAllDepartments: async () => {
     try {
@@ -307,7 +307,7 @@ const budgetAllocationService = {
       throw error.response?.data || { message: "Failed to fetch departments" };
     }
   },
-
+ 
   // NEW: DEPT HEAD - Update Utilization for Allocation
   updateUtilization: async (data) => {
     try {
@@ -331,5 +331,7 @@ const budgetAllocationService = {
     }
   },
 };
-
+ 
 export default budgetAllocationService;
+ 
+ 

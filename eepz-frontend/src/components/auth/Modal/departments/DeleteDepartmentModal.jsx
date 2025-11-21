@@ -45,7 +45,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: "95%",
-          maxWidth: "390px",
+          maxWidth: "490px",
           zIndex: 1050,
         }}
       >
@@ -246,6 +246,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 gap: 6,
                 opacity: loading ? 0.7 : 1,
                 transition: "all 0.2s ease",
+                textAlign: "center"
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
@@ -258,7 +259,7 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
                 }
               }}
             >
-              <i className="bi bi-arrow-left"></i>
+              <i></i>
               Cancel
             </button>
 

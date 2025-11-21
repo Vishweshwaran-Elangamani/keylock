@@ -1,63 +1,17 @@
-/**
- * EditRoleModal Component
- *
- * A modal component for editing existing roles in the system.
- * Features:
- * - Form validation for role name, code, and description
- * - Real-time validation feedback
- * - Character counter for description field
- * - System role warning for protected roles
- * - Toast notifications using Sonner for success/error feedback
- * - Loading state during API operations
- * - Two-column layout for form fields
- *
- * @param {boolean} show - Controls modal visibility
- * @param {Object} role - Role object containing current role details
- * @param {function} onClose - Callback to close the modal
- * @param {function} onSuccess - Callback after successful role update
- */
-
 import { useState, useEffect } from "react";
 import roleService from "../../../../services/auth/roleService";
 import { toast } from "sonner";
-import "../../../../styles/auth/roles/EditRoleModal.css";
 
 const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-
-  /**
-   * Form data state - stores all editable role fields
-   * Pre-populated with role's current data when modal opens
-   */
   const [formData, setFormData] = useState({
     roleId: "",
     roleName: "",
     roleCode: "",
     description: "",
   });
-
-  /**
-   * Loading state - tracks form submission status
-   * Used to disable buttons and show loading indicator
-   */
   const [loading, setLoading] = useState(false);
-
-  /**
-   * Errors state - stores validation error messages for each field
-   * Key = field name, Value = error message
-   */
   const [errors, setErrors] = useState({});
 
-  // ========================
-  // EFFECTS
-  // ========================
-
-  /**
-   * Effect: Populate form data when role prop changes
-   * Runs when modal opens with a new role or role data updates
-   */
   useEffect(() => {
     if (role) {
       setFormData({
@@ -66,30 +20,16 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
         roleCode: role.roleCode || "",
         description: role.description || "",
       });
+      setErrors({});
     }
   }, [role]);
 
-  // ========================
-  // EVENT HANDLERS
-  // ========================
-
-  /**
-   * Handles input field changes
-   * Updates form data and clears field-specific errors
-   * Provides immediate feedback by removing errors when user starts correcting
-   *
-   * @param {Event} e - Input change event
-   */
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Update form data with new value
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    // Clear error for this specific field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -98,316 +38,437 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
     }
   };
 
-  // ========================
-  // FORM VALIDATION
-  // ========================
-
-  /**
-   * Validates all form fields before submission
-   * Applies comprehensive validation rules for each field
-   *
-   * Validation Rules:
-   * - Role Name: Required, minimum 3 characters
-   * - Role Code: Required, minimum 2 characters, alphanumeric only
-   * - Description: Required, minimum 10 characters
-   *
-   * @returns {boolean} - True if form is valid, false otherwise
-   */
   const validateForm = () => {
     const newErrors = {};
-
-    // -------- Role Name Validation --------
     if (!formData.roleName.trim()) {
       newErrors.roleName = "Role name is required";
     } else if (formData.roleName.trim().length < 3) {
       newErrors.roleName = "Role name must be at least 3 characters";
     }
-
-    // -------- Role Code Validation --------
     if (!formData.roleCode.trim()) {
       newErrors.roleCode = "Role code is required";
     } else if (formData.roleCode.trim().length < 2) {
       newErrors.roleCode = "Role code must be at least 2 characters";
     } else if (!/^[a-zA-Z0-9]+$/.test(formData.roleCode.trim())) {
-      // Only allow letters and numbers, no special characters or spaces
       newErrors.roleCode = "Role code must contain only letters and numbers";
     }
-
-    // -------- Description Validation --------
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
     } else if (formData.description.trim().length < 10) {
       newErrors.description = "Description must be at least 10 characters";
     }
-
-    // Update errors state with all validation errors
     setErrors(newErrors);
-
-    // Return true if no errors found, false otherwise
     return Object.keys(newErrors).length === 0;
   };
 
-  // ========================
-  // FORM SUBMISSION
-  // ========================
-
-  /**
-   * Handles form submission
-   * Validates form, formats payload, and calls API to update role
-   * Shows Sonner toast notifications for user feedback
-   *
-   * @param {Event} e - Form submit event
-   */
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-
-    // Validate form before submission
+    e.preventDefault();
     if (!validateForm()) {
       toast.error("Enter Valid Details!");
       return;
     }
-
     try {
-      // Set loading state to disable form and show loading indicator
       setLoading(true);
-
-      // Show loading toast
       toast.loading("Updating role...");
-
-      // -------- Format Payload --------
-      // Prepare data according to backend API requirements
       const payload = {
         roleId: formData.roleId,
         roleName: formData.roleName.trim() || null,
         roleCode: formData.roleCode.trim() || null,
         description: formData.description.trim() || null,
       };
-
-      // -------- API Call --------
-      // Call role service to update role
       const response = await roleService.updateRole(payload);
-
-      // -------- Handle Success Response --------
       if (response.success) {
         toast.dismiss();
         toast.success("Role updated successfully");
-
-        // Trigger success callback to refresh role list
         onSuccess();
-
-        // CRITICAL: Delay closing the modal to allow toast to render
-        // Without this delay, modal unmounts before toast displays
         setTimeout(() => {
           onClose();
-        }, 500); // 500ms delay
+        }, 500);
       } else {
-        // -------- Handle Failure Response --------
         toast.dismiss();
         toast.error(response.message || "Failed to update role");
       }
     } catch (error) {
-      // -------- Handle Exception --------
-      console.error("Error updating role:", error);
       toast.dismiss();
       toast.error(error.message || "Error updating role");
     } finally {
-      // -------- Cleanup --------
-      // Always reset loading state regardless of success or failure
       setLoading(false);
     }
   };
 
-  // ========================
-  // RENDER LOGIC
-  // ========================
-
-  // Don't render modal if show prop is false
   if (!show) return null;
 
   return (
     <>
-      {/* Modal Backdrop - Darkens background */}
-      <div className="modal-backdrop-custom"></div>
+      {/* Backdrop */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(39,35,92,0.4)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          zIndex: 1040,
+        }}
+        onClick={onClose}
+      />
 
-      {/* Modal Wrapper - Centers modal on screen */}
-      <div className="modal-wrapper-custom">
-        <div className="modal-dialog-custom">
-          <div className="modal-content-custom">
-            {/* ======================== */}
-            {/* MODAL HEADER */}
-            {/* ======================== */}
-            <div className="modal-header-custom">
-              <h5 className="modal-title-custom">
-                <i className="bi bi-pencil-square"></i>
-                Edit Role
-              </h5>
-              {/* Close Button - Disabled during loading to prevent interruption */}
+      {/* Centered Modal */}
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "95%",
+          maxWidth: "590px",
+          zIndex: 1050,
+        }}
+      >
+        <div
+          style={{
+            borderRadius: "0.5rem",
+            background: "#fff",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
+            overflow: "hidden",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {/* HEADER */}
+          <div
+            style={{
+              background: "#27235C",
+              color: "#fff",
+              padding: "13px 15px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: "15px",
+              fontWeight: 600,
+              borderRadius: "0.5rem 0.5rem 0 0",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#fff",
+                fontSize: "15px",
+                fontWeight: 600,
+              }}
+            >
+              <i className="bi bi-pencil-square"></i>
+              Edit Role
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              aria-label="Close"
+              style={{
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: 18,
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
+
+          {/* BODY/FORM */}
+          <form onSubmit={handleSubmit} style={{ margin: 0 }}>
+            <div style={{ padding: "16px 15px 6px 15px", background: "#fff" }}>
+              {role?.isSystemRole && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 8,
+                    background: "#fef3c7",
+                    color: "#dc973a",
+                    padding: "6px 8px",
+                    borderRadius: 4,
+                    fontSize: 13,
+                    gap: 7,
+                  }}
+                >
+                  <i className="bi bi-exclamation-triangle-fill"></i>
+                  <div>
+                    <strong>Warning:</strong>{" "}
+                    This is a system role. Changes may affect core functionality.
+                  </div>
+                </div>
+              )}
+
+              {/* 2 column layout */}
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 12,
+                }}
+              >
+                {/* LEFT COLUMN */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    <label
+                      style={{
+                        fontWeight: 600,
+                        fontSize: 13,
+                        color: "#334155",
+                        marginBottom: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      Role Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="roleName"
+                      placeholder="Enter role name (e.g., Admin, Manager)"
+                      value={formData.roleName}
+                      onChange={handleChange}
+                      maxLength={50}
+                      disabled={loading}
+                      style={{
+                        border: errors.roleName
+                          ? "1px solid #dc3545"
+                          : "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        padding: "8px 10px",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
+                      }}
+                    />
+                    {errors.roleName && (
+                      <div style={{ color: "#dc3545", fontSize: 11, marginTop: 2 }}>
+                        {errors.roleName}
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 3, marginTop: 6 }}>
+                    <label
+                      style={{
+                        fontWeight: 600,
+                        fontSize: 13,
+                        color: "#334155",
+                        marginBottom: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      Role Code <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="roleCode"
+                      placeholder="Enter role code (e.g., admin123, mgr01)"
+                      value={formData.roleCode}
+                      onChange={handleChange}
+                      maxLength={20}
+                      disabled={loading}
+                      style={{
+                        border: errors.roleCode
+                          ? "1px solid #dc3545"
+                          : "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        padding: "8px 10px",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
+                      }}
+                    />
+                    {errors.roleCode && (
+                      <div style={{ color: "#dc3545", fontSize: 11, marginTop: 2 }}>
+                        {errors.roleCode}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* RIGHT COLUMN */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                    <label
+                      style={{
+                        fontWeight: 600,
+                        fontSize: 13,
+                        color: "#334155",
+                        marginBottom: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
+                      Description <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    </label>
+                    <textarea
+                      name="description"
+                      placeholder="Enter role description (minimum 10 characters)"
+                      value={formData.description}
+                      onChange={handleChange}
+                      rows={8}
+                      maxLength={255}
+                      disabled={loading}
+                      style={{
+                        border: errors.description
+                          ? "1px solid #dc3545"
+                          : "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        padding: "8px 10px",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
+                        resize: "vertical",
+                        minHeight: 90,
+                        maxHeight: 130,
+                        fontFamily: "inherit",
+                        lineHeight: 1.4,
+                        marginBottom: 3,
+                      }}
+                    />
+                    {errors.description && (
+                      <div style={{ color: "#dc3545", fontSize: 11, marginBottom: 3 }}>
+                        {errors.description}
+                      </div>
+                    )}
+                    <small style={{ color: "#64748b", fontSize: 11 }}>
+                      {formData.description.length}/255 characters
+                    </small>
+                  </div>
+                </div>
+              </div>
+              {/* Info Alert */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  background: "#f1f5f9",
+                  color: "#64748b",
+                  borderRadius: 4,
+                  fontSize: 12,
+                  padding: "5px 8px",
+                  gap: 5,
+                  marginTop: 10,
+                }}
+              >
+                <i className="bi bi-info-circle"></i>
+                <small>All fields are required for updating the role</small>
+              </div>
+            </div>
+            {/* FOOTER */}
+            <div
+              style={{
+                padding: "10px 15px",
+                borderTop: "1px solid #e2e8f0",
+                background: "#fff",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: 8,
+                borderBottomLeftRadius: "0.5rem",
+                borderBottomRightRadius: "0.5rem",
+              }}
+            >
+              {/* Cancel Button */}
               <button
                 type="button"
-                className="modal-close-btn"
                 onClick={onClose}
                 disabled={loading}
-                aria-label="Close"
+                style={{
+                  background: "#6c757d",
+                  border: "none",
+                  color: "#fff",
+                  fontWeight: 600,
+                  padding: "7px 12px",
+                  fontSize: 12,
+                  borderRadius: 5,
+                  cursor: loading ? "not-allowed" : "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  opacity: loading ? 0.7 : 1,
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={e => {
+                  if (!loading) e.target.style.background = "#5a6268";
+                }}
+                onMouseLeave={e => {
+                  if (!loading) e.target.style.background = "#6c757d";
+                }}
               >
-                <i className="bi bi-x-lg"></i>
+                <i className="bi bi-x-circle"></i>
+                Cancel
+              </button>
+              {/* Update Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  border: "none",
+                  color: "#fff",
+                  fontWeight: 600,
+                  padding: "7px 12px",
+                  fontSize: 12,
+                  borderRadius: 5,
+                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.85 : 1,
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={e => {
+                  if (!loading) e.target.style.opacity = 0.93;
+                }}
+                onMouseLeave={e => {
+                  if (!loading) e.target.style.opacity = 1;
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span
+                      style={{
+                        width: 14,
+                        height: 14,
+                        border: "2px solid #fff",
+                        borderTop: "2px solid #E01950",
+                        borderRadius: "50%",
+                        animation: "spin 0.7s linear infinite",
+                        display: "inline-block",
+                        marginRight: 6,
+                      }}
+                    />
+                    Updating...
+                    <style>{`
+                      @keyframes spin {
+                        0% { transform: rotate(0deg);}
+                        100% { transform: rotate(360deg);}
+                      }
+                    `}</style>
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle"></i>
+                    Update Role
+                  </>
+                )}
               </button>
             </div>
-
-            {/* ======================== */}
-            {/* MODAL BODY - FORM */}
-            {/* ======================== */}
-            <form onSubmit={handleSubmit}>
-              <div className="modal-body-custom">
-                {/* -------- System Role Warning -------- */}
-                {/* Only shown for system roles */}
-                {role?.isSystemRole && (
-                  <div className="warning-alert-custom">
-                    <i className="bi bi-exclamation-triangle-fill"></i>
-                    <div>
-                      <strong>Warning:</strong> This is a system role. Changes
-                      may affect core functionality.
-                    </div>
-                  </div>
-                )}
-
-                {/* -------- Form Grid - Two-column layout -------- */}
-                <div className="form-grid">
-                  {/* -------- LEFT COLUMN -------- */}
-                  <div className="form-column-custom">
-                    {/* Role ID (Disabled) */}
-                    <div className="form-group-custom">
-                      <label className="form-label-custom">Role ID</label>
-                      <input
-                        type="text"
-                        className="form-input-custom form-input-disabled"
-                        value={formData.roleId}
-                        disabled
-                      />
-                    </div>
-
-                    {/* Role Name */}
-                    <div className="form-group-custom">
-                      <label className="form-label-custom">
-                        Role Name <span className="required-mark">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`form-input-custom ${
-                          errors.roleName ? "is-invalid" : ""
-                        }`}
-                        name="roleName"
-                        value={formData.roleName}
-                        onChange={handleChange}
-                        placeholder="Enter role name (e.g., Admin, Manager)"
-                        maxLength={50}
-                        disabled={loading}
-                      />
-                      {/* Show validation error if exists */}
-                      {errors.roleName && (
-                        <div className="error-message">{errors.roleName}</div>
-                      )}
-                    </div>
-
-                    {/* Role Code */}
-                    <div className="form-group-custom">
-                      <label className="form-label-custom">
-                        Role Code <span className="required-mark">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`form-input-custom ${
-                          errors.roleCode ? "is-invalid" : ""
-                        }`}
-                        name="roleCode"
-                        value={formData.roleCode}
-                        onChange={handleChange}
-                        placeholder="Enter role code (e.g., admin123, mgr01)"
-                        maxLength={20}
-                        disabled={loading}
-                      />
-                      {/* Show validation error if exists */}
-                      {errors.roleCode && (
-                        <div className="error-message">{errors.roleCode}</div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* -------- RIGHT COLUMN -------- */}
-                  <div className="form-column-custom">
-                    {/* Description */}
-                    <div className="form-group-custom form-group-full-height">
-                      <label className="form-label-custom">
-                        Description <span className="required-mark">*</span>
-                      </label>
-                      <textarea
-                        className={`form-textarea-custom form-textarea-full-height ${
-                          errors.description ? "is-invalid" : ""
-                        }`}
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        placeholder="Enter role description (minimum 10 characters)"
-                        rows={8}
-                        maxLength={255}
-                        disabled={loading}
-                      ></textarea>
-                      {/* Show validation error if exists */}
-                      {errors.description && (
-                        <div className="error-message">
-                          {errors.description}
-                        </div>
-                      )}
-                      {/* Character counter helper text */}
-                      <small className="helper-text">
-                        {formData.description.length}/255 characters
-                      </small>
-                    </div>
-                  </div>
-                </div>
-
-                {/* -------- Info Alert -------- */}
-                {/* Reminds users all fields are required */}
-                <div className="info-alert">
-                  <i className="bi bi-info-circle"></i>
-                  <small>All fields are required for updating the role</small>
-                </div>
-              </div>
-
-              {/* ======================== */}
-              {/* MODAL FOOTER - ACTION BUTTONS */}
-              {/* ======================== */}
-              <div className="modal-footer-custom">
-                {/* Cancel Button - Closes modal without saving */}
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  onClick={onClose}
-                  disabled={loading}
-                >
-                  <i className="bi bi-x-circle"></i>
-                  Cancel
-                </button>
-
-                {/* Submit Button - Updates role */}
-                {/* Disabled during loading to prevent duplicate requests */}
-                <button type="submit" className="btn-submit" disabled={loading}>
-                  {loading ? (
-                    // Show loading state with spinner and text
-                    <>
-                      <span className="spinner-custom"></span>
-                      Updating...
-                    </>
-                  ) : (
-                    // Show normal state with action text
-                    <>
-                      <i className="bi bi-check-circle"></i>
-                      Update Role
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+          </form>
         </div>
       </div>
     </>

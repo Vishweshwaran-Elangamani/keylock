@@ -1,229 +1,304 @@
-/**
- * DeleteRoleModal Component
- *
- * A confirmation modal for permanently deleting roles from the system.
- * Features:
- * - Critical warning message to prevent accidental deletions
- * - Clear explanation of consequences
- * - Loading state during API call
- * - Toast notifications using Sonner for success/error feedback
- * - Protection for system roles (cannot be deleted)
- * - Cannot be reversed once executed
- *
- * @param {boolean} show - Controls modal visibility
- * @param {Object} role - Role object containing role details to be deleted
- * @param {function} onClose - Callback to close the modal
- * @param {function} onConfirm - Callback function that performs the deletion
- */
-
 import { useState } from "react";
 import { toast } from "sonner";
-import "../../../../styles/auth/roles/DeleteRoleModal.css";
 
 const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-
-  /**
-   * Loading state - tracks deletion operation status
-   * Used to disable buttons and show loading indicator during API call
-   */
   const [loading, setLoading] = useState(false);
 
-  // ========================
-  // EVENT HANDLERS
-  // ========================
-
-  /**
-   * Handles role deletion
-   * Calls the parent's onConfirm callback to delete the role
-   * Shows success/error notifications using Sonner toast
-   * This action is PERMANENT and cannot be reversed
-   */
   const handleDelete = async () => {
     try {
-      // Set loading state to disable buttons and show spinner
       setLoading(true);
-
-      // Show loading toast
       toast.loading("Deleting role...");
-
-      // -------- API Call (via parent callback) --------
-      // Call parent's confirm handler which contains the actual delete logic
       await onConfirm();
-
-      // Note: Parent component (RoleList) handles success/error toasts
-      // and closes the modal after successful deletion
     } catch (error) {
-      // -------- Handle Exception --------
       console.error("Error deleting role:", error);
       toast.dismiss();
       toast.error(error.message || "Failed to delete role");
     } finally {
-      // -------- Cleanup --------
-      // Always reset loading state regardless of success or failure
       setLoading(false);
     }
   };
 
-  // ========================
-  // RENDER LOGIC
-  // ========================
-
-  // Don't render modal if show prop is false
   if (!show) return null;
 
   return (
     <>
-      {/* Modal Backdrop - Darkens background */}
-      <div className="modal-backdrop-delete-role"></div>
+      {/* Blurred Blue Backdrop */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(39, 35, 92, 0.4)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          zIndex: 1040,
+        }}
+        onClick={onClose}
+      />
 
-      {/* Modal Wrapper - Centers modal on screen */}
-      <div className="modal-wrapper-delete-role">
-        <div className="modal-dialog-delete-role">
-          <div className="modal-content-delete-role">
-            {/* ======================== */}
-            {/* MODAL HEADER */}
-            {/* ======================== */}
-            <div className="modal-header-delete-role">
-              <h5 className="modal-title-delete-role">
-                <i className="bi bi-trash-fill"></i>
-                Delete Role Permanently
-              </h5>
-              {/* Close Button - Disabled during loading to prevent interruption */}
-              <button
-                type="button"
-                className="modal-close-btn-delete-role"
-                onClick={onClose}
-                disabled={loading}
-                aria-label="Close"
-              >
-                <i className="bi bi-x-lg"></i>
-              </button>
+      {/* Centered Modal */}
+      <div
+        style={{
+          position: "fixed",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "95%",
+          maxWidth: "490px",
+          zIndex: 1050,
+        }}
+      >
+        <div
+          style={{
+            borderRadius: "0.5rem",
+            background: "#fff",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
+            overflow: "hidden",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {/* HEADER */}
+          <div
+            style={{
+              background: "#27235C",
+              color: "#fff",
+              padding: "13px 15px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: 15,
+              fontWeight: 600,
+              borderRadius: "0.5rem 0.5rem 0 0",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 600,
+              }}
+            >
+              <i className="bi bi-trash-fill"></i>
+              Delete Role Permanently
             </div>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              aria-label="Close"
+              style={{
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: 18,
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
 
-            {/* ======================== */}
-            {/* MODAL BODY */}
-            {/* ======================== */}
-            <div className="modal-body-delete-role">
-              {/* -------- Confirmation Question -------- */}
-              {/* Displays role name and code for confirmation */}
-              <p className="delete-question-delete-role">
-                Are you sure you want to permanently delete the role{" "}
-                <strong className="role-name-highlight-delete-role">
-                  {role?.roleName}
-                </strong>
-                ?
+          {/* BODY */}
+          <div style={{ padding: "16px 15px 4px 15px", background: "#fff" }}>
+            {/* Confirmation */}
+            <p
+              style={{
+                color: "#22223b",
+                textAlign: "center",
+                fontSize: 13,
+                marginBottom: 10,
+              }}
+            >
+              Are you sure you want to permanently delete the role{" "}
+              <strong
+                style={{
+                  color: "#b91c1c",
+                  background: "#fee2e2",
+                  borderRadius: 5,
+                  padding: "2px 6px",
+                  fontWeight: 700,
+                  fontSize: 13,
+                }}
+              >
+                {role?.roleName}
+              </strong>
+              ?
+            </p>
+
+
+            {/* WARNING BOX */}
+            <div
+              style={{
+                background: "#fef9c3",
+                border: "1px solid #facc15",
+                borderRadius: 5,
+                padding: "8px 10px",
+                marginBottom: 9,
+                textAlign: "left", // important: left align
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  color: "#b45309",
+                  fontWeight: 700,
+                  fontSize: 13,
+                  marginBottom: 3,
+                }}
+              >
+                <i className="bi bi-exclamation-triangle-fill"></i>
+                <span>Critical Warning</span>
+              </div>
+              <p
+                style={{
+                  color: "#a16207",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  margin: 0,
+                  marginBottom: 2,
+                }}
+              >
+                This action is <span style={{ fontWeight: 900 }}>PERMANENT</span> and{" "}
+                <span style={{ fontWeight: 900 }}>CANNOT be reversed!</span>
               </p>
-
-              {/* -------- Role Information Box -------- */}
-              {/* Shows role details for verification */}
-              <div className="role-info-box-delete-role">
-                <div className="role-info-item-delete-role">
-                  <span className="role-info-label-delete-role">
-                    Role Name:
-                  </span>
-                  <strong className="role-info-value-delete-role">
-                    {role?.roleName}
-                  </strong>
-                </div>
-                <div className="role-info-item-delete-role">
-                  <span className="role-info-label-delete-role">
-                    Role Code:
-                  </span>
-                  <code className="role-code-badge-delete-role">
-                    {role?.roleCode}
-                  </code>
-                </div>
-                {role?.description && (
-                  <div className="role-info-item-delete-role">
-                    <span className="role-info-label-delete-role">
-                      Description:
-                    </span>
-                    <span className="role-info-value-delete-role">
-                      {role.description}
-                    </span>
-                  </div>
-                )}
+              <div style={{ color: "#a16207", fontSize: 12, marginBottom: 3 }}>
+                Once deleted, this role will:
               </div>
-
-              {/* -------- Critical Warning Box -------- */}
-              {/* Prominently displays the severity and consequences of this action */}
-              <div className="warning-box-delete-role">
-                {/* Warning Header with Icon */}
-                <div className="warning-header-delete-role">
-                  <i className="bi bi-exclamation-triangle-fill"></i>
-                  <span>Critical Warning</span>
-                </div>
-
-                {/* Warning Text - Emphasizes permanence */}
-                <p className="warning-text-delete-role">
-                  <strong>
-                    This action is PERMANENT and CANNOT be reversed!
-                  </strong>
-                  <br />
-                  Once deleted, this role will:
-                </p>
-
-                {/* Warning List - Details all consequences */}
-                <ul className="warning-list-delete-role">
-                  <li>Be permanently removed from the system</li>
-                  <li>Require all users with this role to be reassigned</li>
-                  <li>Cannot be recovered or restored</li>
-                </ul>
-              </div>
-
-              {/* -------- Info Alert -------- */}
-              {/* Additional reminder to ensure correct action */}
-              <div className="info-alert-delete-role">
-                <i className="bi bi-info-circle"></i>
-                <small>
-                  <strong>Note:</strong> Please ensure this is the correct
-                  action before proceeding. System roles are protected and
-                  cannot be deleted.
-                </small>
-              </div>
+              <ul style={{ margin: 0, paddingLeft: 19, color: "#a16207", fontSize: 12 }}>
+                <li>Be permanently removed from the system</li>
+                <li>Require all users with this role to be reassigned</li>
+                <li>Cannot be recovered or restored</li>
+              </ul>
             </div>
 
-            {/* ======================== */}
-            {/* MODAL FOOTER - ACTION BUTTONS */}
-            {/* ======================== */}
-            <div className="modal-footer-delete-role">
-              {/* Cancel Button - Closes modal without deleting */}
-              <button
-                type="button"
-                className="btn-cancel-delete-role"
-                onClick={onClose}
-                disabled={loading}
-              >
-                <i className="bi bi-arrow-left"></i>
-                Cancel
-              </button>
-
-              {/* Delete Button - Executes permanent deletion */}
-              {/* Disabled during loading to prevent duplicate requests */}
-              <button
-                type="button"
-                className="btn-submit-delete-role"
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                {loading ? (
-                  // Show loading state with spinner and text
-                  <>
-                    <span className="spinner-delete-role"></span>
-                    Deleting...
-                  </>
-                ) : (
-                  // Show normal state with clear action text
-                  <>
-                    <i className="bi bi-trash-fill"></i>
-                    Yes, Delete Permanently
-                  </>
-                )}
-              </button>
+            {/* Info Alert */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                background: "#f1f5f9",
+                color: "#64748b",
+                borderRadius: 4,
+                fontSize: 12,
+                padding: "5px 8px",
+                gap: 5,
+              }}
+            >
+              <i className="bi bi-info-circle"></i>
+              <small>
+                <strong>Note:</strong> Please ensure this is the correct action before proceeding. System roles are protected and cannot be deleted.
+              </small>
             </div>
+          </div>
+
+          {/* FOOTER */}
+          <div
+            style={{
+              padding: "10px 15px",
+              borderTop: "1px solid #e2e8f0",
+              background: "#fff",
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 8,
+              borderBottomLeftRadius: "0.5rem",
+              borderBottomRightRadius: "0.5rem",
+            }}
+          >
+            {/* CANCEL */}
+            <button
+              type="button"
+              disabled={loading}
+              onClick={onClose}
+              style={{
+                background: "#6c757d",
+                border: "none",
+                color: "#fff",
+                fontWeight: 600,
+                padding: "7px 12px",
+                fontSize: 12,
+                borderRadius: 5,
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                opacity: loading ? 0.7 : 1,
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={e => {
+                if (!loading) e.target.style.background = "#5a6268";
+              }}
+              onMouseLeave={e => {
+                if (!loading) e.target.style.background = "#6c757d";
+              }}
+            >
+              <i className="bi bi-arrow-left"></i>
+              Cancel
+            </button>
+            {/* DELETE */}
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleDelete}
+              style={{
+                background: "linear-gradient(90deg, #ea3e44 0%, #e01950 100%)",
+                border: "none",
+                color: "#fff",
+                fontWeight: 600,
+                padding: "7px 12px",
+                fontSize: 12,
+                borderRadius: 5,
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                opacity: loading ? 0.85 : 1,
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={e => {
+                if (!loading) e.target.style.opacity = 0.93;
+              }}
+              onMouseLeave={e => {
+                if (!loading) e.target.style.opacity = 1;
+              }}
+            >
+              {loading ? (
+                <>
+                  <span
+                    style={{
+                      width: 14,
+                      height: 14,
+                      border: "2px solid #fff",
+                      borderTop: "2px solid #e01950",
+                      borderRadius: "50%",
+                      animation: "spin 0.7s linear infinite",
+                      display: "inline-block",
+                      marginRight: 6,
+                    }}
+                  />
+                  Deleting...
+                  <style>{`
+                    @keyframes spin {
+                      0% { transform: rotate(0deg);}
+                      100% { transform: rotate(360deg);}
+                    }
+                  `}</style>
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-trash-fill"></i>
+                  Yes, Delete Permanently
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

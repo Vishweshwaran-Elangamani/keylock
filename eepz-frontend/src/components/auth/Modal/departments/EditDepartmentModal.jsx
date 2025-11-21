@@ -116,7 +116,7 @@ const EditDepartmentModal = ({ show, department, onClose, onSuccess }) => {
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: "95%",
-          maxWidth: "390px",
+          maxWidth: "490px",
           zIndex: 1050,
         }}
       >
