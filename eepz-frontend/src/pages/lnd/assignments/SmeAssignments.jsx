@@ -167,10 +167,8 @@ const SmeAssignments = () => {
     <div>
       <Breadcrumb
         items={[
-          {
-            label: "Learning & Development",
-            path: `${rolePrefix}/lnd/dashboard`,
-          },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
           { label: "SME Assignments" },
         ]}
       />

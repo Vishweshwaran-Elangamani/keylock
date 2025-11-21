@@ -147,8 +147,9 @@ const OrganizationAssignments = () => {
     <div>
       <Breadcrumb
         items={[
-          { label: "Learning & Development", path: "/hr/lnd/dashboard" },
-          { label: "Organization Assignments" },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
+          { label: "Organizational Assignments"},
         ]}
       />
 

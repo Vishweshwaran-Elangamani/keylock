@@ -87,7 +87,7 @@ const MyAssignments = () => {
     setSearchInput(e.target.value);
   };
 
-  const handleSearchSubmit = (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
     setSearchTerm(searchInput);
     setCurrentPage(1);
@@ -95,8 +95,14 @@ const MyAssignments = () => {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      handleSearchSubmit(e);
+      handleSearch(e);
     }
+  };
+
+  const handleCancelSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    setCurrentPage(1);
   };
 
   const handlePageChange = (page) => {
@@ -141,33 +147,33 @@ const MyAssignments = () => {
   const renderSortIcon = (field) => {
     if (sortField !== field) {
       return (
-        <ChevronUp 
-          size={14} 
-          style={{ 
-            marginLeft: 4, 
+        <ChevronUp
+          size={14}
+          style={{
+            marginLeft: 4,
             opacity: 0.5,
-            color: 'white'
-          }} 
+            color: "white",
+          }}
         />
       );
     }
     return sortOrderAsc ? (
-      <ChevronUp 
-        size={14} 
-        style={{ 
+      <ChevronUp
+        size={14}
+        style={{
           marginLeft: 4,
-          color: 'lightpink',
-          fontWeight: 'bold'
-        }} 
+          color: "lightpink",
+          fontWeight: "bold",
+        }}
       />
     ) : (
-      <ChevronDown 
-        size={14} 
-        style={{ 
+      <ChevronDown
+        size={14}
+        style={{
           marginLeft: 4,
-          color: 'lightpink',
-          fontWeight: 'bold'
-        }} 
+          color: "lightpink",
+          fontWeight: "bold",
+        }}
       />
     );
   };
@@ -186,10 +192,8 @@ const MyAssignments = () => {
     <div>
       <Breadcrumb
         items={[
-          {
-            label: "Learning & Development",
-            path: `${rolePrefix}/lnd/dashboard`,
-          },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
           { label: "My Assignments" },
         ]}
       />
@@ -205,7 +209,7 @@ const MyAssignments = () => {
         }}
       >
         <form
-          onSubmit={handleSearchSubmit}
+          onSubmit={handleSearch}
           style={{
             display: "flex",
             gap: "0.5rem",
@@ -213,43 +217,30 @@ const MyAssignments = () => {
             minWidth: 250,
           }}
         >
-          <div style={{ position: "relative", flexGrow: 1 }}>
+          <div className="input-group">
             <input
               type="text"
-              placeholder="Search assignments... (Press Enter)"
+              className="form-control"
+              placeholder="Search assignments..."
               value={searchInput}
               onChange={handleSearchInputChange}
               onKeyPress={handleKeyPress}
-              style={{
-                padding: "0.625rem 1rem",
-                paddingRight: "2.5rem",
-                border: "1px solid #e5e7eb",
-                borderRadius: 8,
-                fontSize: "0.875rem",
-                outline: "none",
-                width: "100%",
-              }}
+              style={{ minHeight: "35.7px" }}
             />
-            <button
-              type="submit"
-              style={{
-                position: "absolute",
-                right: "0.5rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#6c757d",
-              }}
-              title="Search"
-            >
-              <Search size={18} />
-            </button>
+            {searchTerm ? (
+              <button
+                className="btn btn-outline-secondary"
+                onClick={handleCancelSearch}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={handleSearch}>
+                <i className="bi bi-search me-1"></i>
+                Search
+              </button>
+            )}
           </div>
         </form>
         <select
@@ -289,225 +280,241 @@ const MyAssignments = () => {
         />
       ) : (
         <>
-        <div style={{ minHeight: "65vh" }}>
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "12px",
-              overflow: "hidden",
-              minWidth: 0,
-            }}
-          >
-            {/* Table Header */}
+          <div style={{ minHeight: "65vh" }}>
             <div
               style={{
-                display: "grid",
-                gridTemplateColumns:
-                  "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.7fr 1fr",
+                background: "#fff",
+                borderRadius: "12px",
+                overflow: "hidden",
+                minWidth: 0,
+              }}
+            >
+              {/* Table Header */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.7fr 1fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
                   color: "white",
                   fontSize: "14px",
-                padding: "1rem 1.5rem",
-                textTransform: "uppercase",
-                letterSpacing: "0.025em",
-              }}
-            >
-              {[
-                { label: "Skill Name", field: "skillName", align: "left" },
-                { label: "SME Assigned", field: "smeName", align: "left" },
-                { label: "Assignment Status", field: "status", align: "center" },
-                { label: "Start Date", field: "createdOn", align: "left" },
-                { label: "Due Date", field: "deadline", align: "left" },
-                { label: "Score", field: "completionRating", align: "center" },
-                { label: "Proof", field: null, align: "center" },
-                { label: "Request ack", field: null, align: "center" },
-              ].map(({ label, field, align }) => (
+                  padding: "1rem 1.5rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.025em",
+                }}
+              >
+                {[
+                  { label: "Skill Name", field: "skillName", align: "left" },
+                  { label: "SME Assigned", field: "smeName", align: "left" },
+                  {
+                    label: "Assignment Status",
+                    field: "status",
+                    align: "center",
+                  },
+                  { label: "Start Date", field: "createdOn", align: "left" },
+                  { label: "Due Date", field: "deadline", align: "left" },
+                  {
+                    label: "Score",
+                    field: "completionRating",
+                    align: "center",
+                  },
+                  { label: "Proof", field: null, align: "center" },
+                  { label: "Request ack", field: null, align: "center" },
+                ].map(({ label, field, align }) => (
+                  <div
+                    key={field || label}
+                    onClick={() => field && onSortClick(field)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent:
+                        align === "center" ? "center" : "flex-start",
+                      gap: 4,
+                      userSelect: "none",
+                      cursor: field ? "pointer" : "default",
+                      textAlign: align || "left",
+                      transition: "color 0.2s",
+                      color: "white",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (field) e.currentTarget.style.color = "lightpink";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (field && sortField !== field) {
+                        e.currentTarget.style.color = "white";
+                      }
+                    }}
+                  >
+                    {label}
+                    {field && renderSortIcon(field)}
+                  </div>
+                ))}
+              </div>
+              {/* Table Rows */}
+              {assignments.map((assignment, idx) => (
                 <div
-                  key={field || label}
-                  onClick={() => field && onSortClick(field)}
+                  key={assignment.assignmentId}
                   style={{
-                    display: "flex",
+                    display: "grid",
+                    gridTemplateColumns:
+                      "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.7fr 1fr",
                     alignItems: "center",
-                    justifyContent:
-                      align === "center" ? "center" : "flex-start",
-                    gap: 4,
-                    userSelect: "none",
-                    cursor: field ? "pointer" : "default",
-                    textAlign: align || "left",
-                    transition: "color 0.2s",
-                    color: "white",
+                    fontSize: "0.875rem",
+                    color: "#212529",
+                    padding: "1rem 1.5rem",
+                    borderBottom:
+                      idx < assignments.length - 1
+                        ? "1px solid #f3f4f6"
+                        : "none",
+                    background: "#fff",
+                    transition: "background 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    if (field) e.currentTarget.style.color = "lightpink";
+                    e.currentTarget.style.background = "#f9fafb";
                   }}
                   onMouseLeave={(e) => {
-                    if (field && sortField !== field) {
-                      e.currentTarget.style.color = "white";
-                    }
+                    e.currentTarget.style.background = "#fff";
                   }}
                 >
-                  {label}
-                  {field && renderSortIcon(field)}
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textAlign: "left",
+                    }}
+                    title={assignment.skillName}
+                  >
+                    {assignment.skillName}
+                  </div>
+                  <div
+                    style={{
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      textAlign: "left",
+                      color: "#6b7280",
+                      fontWeight: 500,
+                    }}
+                    title={assignment.smeName}
+                  >
+                    {assignment.smeName}
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <StatusBadge status={assignment.status} />
+                  </div>
+                  <div style={{ textAlign: "left", color: "#6b7280" }}>
+                    {assignment.createdOn ? (
+                      new Date(assignment.createdOn).toLocaleDateString()
+                    ) : (
+                      <span style={{ color: "#9ca3af" }}>None</span>
+                    )}
+                  </div>
+                  <div style={{ textAlign: "left", color: "#6b7280" }}>
+                    {assignment.deadline ? (
+                      new Date(assignment.deadline).toLocaleDateString()
+                    ) : (
+                      <span style={{ color: "#9ca3af" }}>None</span>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      color: "#198754",
+                      textAlign: "center",
+                    }}
+                  >
+                    {assignment.completionRating ? (
+                      `${assignment.completionRating}/10`
+                    ) : (
+                      <span style={{ color: "#9ca3af" }}>None</span>
+                    )}
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    {assignment.proofFilePath ? (
+                      <button
+                        onClick={() => handleDownloadProof(assignment)}
+                        title="Download Proof"
+                        style={{
+                          padding: "0.4rem 0.75rem",
+                          background: "#fff",
+                          border: "1px solid #97247E",
+                          color: "#97247E",
+                          borderRadius: "8px",
+                          fontSize: "0.85rem",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.25rem",
+                          transition: "all 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = "white";
+                          e.currentTarget.style.backgroundColor =
+                            "rgb(39, 35, 92)";
+                          e.currentTarget.style.color = "white";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = "#97247E";
+                          e.currentTarget.style.backgroundColor = "white";
+                          e.currentTarget.style.color = "#97247E";
+                        }}
+                      >
+                        <Download size={14} />
+                      </button>
+                    ) : (
+                      <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>
+                        None
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    {assignment.status === ASSIGNMENT_STATUS.IN_PROGRESS ? (
+                      <button
+                        onClick={() => handleUploadProof(assignment)}
+                        style={{
+                          padding: "0.5rem 1rem",
+                          background:
+                            "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: "8px",
+                          fontWeight: 600,
+                          fontSize: "0.85rem",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.375rem",
+                          whiteSpace: "nowrap",
+                          boxShadow: "0 2px 6px rgba(151, 36, 126, 0.25)",
+                          transition: "all 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 10px rgba(151, 36, 126, 0.35)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow =
+                            "0 2px 6px rgba(151, 36, 126, 0.25)";
+                        }}
+                      >
+                        <Upload size={14} /> Upload
+                      </button>
+                    ) : (
+                      <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>
+                        None
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
-            {/* Table Rows */}
-            {assignments.map((assignment, idx) => (
-              <div
-                key={assignment.assignmentId}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.7fr 1fr",
-                  alignItems: "center",
-                  fontSize: "0.875rem",
-                  color: "#212529",
-                  padding: "1rem 1.5rem",
-                  borderBottom:
-                    idx < assignments.length - 1 ? "1px solid #f3f4f6" : "none",
-                  background: "#fff",
-                  transition: "background 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#f9fafb";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#fff";
-                }}
-              >
-                <div
-                  style={{
-                    fontWeight: 600,
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textAlign: "left",
-                  }}
-                  title={assignment.skillName}
-                >
-                  {assignment.skillName}
-                </div>
-                <div
-                  style={{
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    textAlign: "left",
-                    color: "#6b7280",
-                    fontWeight: 500,
-                  }}
-                  title={assignment.smeName}
-                >
-                  {assignment.smeName}
-                </div>
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <StatusBadge status={assignment.status} />
-                </div>
-                <div style={{ textAlign: "left", color: "#6b7280" }}>
-                  {assignment.createdOn ? (
-                    new Date(assignment.createdOn).toLocaleDateString()
-                  ) : (
-                    <span style={{ color: "#9ca3af" }}>None</span>
-                  )}
-                </div>
-                <div style={{ textAlign: "left", color: "#6b7280" }}>
-                  {assignment.deadline ? (
-                    new Date(assignment.deadline).toLocaleDateString()
-                  ) : (
-                    <span style={{ color: "#9ca3af" }}>None</span>
-                  )}
-                </div>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    color: "#198754",
-                    textAlign: "center",
-                  }}
-                >
-                  {assignment.completionRating ? (
-                    `${assignment.completionRating}/10`
-                  ) : (
-                    <span style={{ color: "#9ca3af" }}>None</span>
-                  )}
-                </div>
-                <div style={{ textAlign: "center" }}>
-                  {assignment.proofFilePath ? (
-                    <button
-                      onClick={() => handleDownloadProof(assignment)}
-                      title="Download Proof"
-                      style={{
-                        padding: "0.4rem 0.75rem",
-                        background: "#fff",
-                        border: "1px solid #97247E",
-                        color: "#97247E",
-                        borderRadius: "8px",
-                        fontSize: "0.85rem",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.25rem",
-                        transition: "all 0.2s",
-                      }}
-                      onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = "white";
-                            e.currentTarget.style.backgroundColor =
-                              "rgb(39, 35, 92)";
-                            e.currentTarget.style.color = "white";
-                      }}
-                      onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = "#97247E";
-                            e.currentTarget.style.backgroundColor = "white";
-                            e.currentTarget.style.color = "#97247E";
-                      }}
-                    >
-                      <Download size={14} />
-                    </button>
-                  ) : (
-                    <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>None</span>
-                  )}
-                </div>
-                <div style={{ textAlign: "center" }}>
-                  {assignment.status === ASSIGNMENT_STATUS.IN_PROGRESS ? (
-                    <button
-                      onClick={() => handleUploadProof(assignment)}
-                      style={{
-                        padding: "0.5rem 1rem",
-                        background:
-                          "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontWeight: 600,
-                        fontSize: "0.85rem",
-                        cursor: "pointer",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "0.375rem",
-                        whiteSpace: "nowrap",
-                        boxShadow: "0 2px 6px rgba(151, 36, 126, 0.25)",
-                        transition: "all 0.2s",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                        e.currentTarget.style.boxShadow = "0 4px 10px rgba(151, 36, 126, 0.35)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "0 2px 6px rgba(151, 36, 126, 0.25)";
-                      }}
-                    >
-                      <Upload size={14} /> Upload
-                    </button>
-                  ) : (
-                    <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>None</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
           </div>
 
           {/*Pagination*/}

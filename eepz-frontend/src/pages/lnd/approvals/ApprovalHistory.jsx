@@ -105,6 +105,12 @@ const ApprovalHistory = () => {
     }
   };
 
+  const handleCancelSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -200,11 +206,9 @@ const ApprovalHistory = () => {
     <div>
       <Breadcrumb
         items={[
-          {
-            label: "Learning & Development",
-            path: `${rolePrefix}/lnd/dashboard`,
-          },
-          { label: "Approvals History" },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
+          { label: "Approval History" },
         ]}
       />
 
@@ -227,43 +231,30 @@ const ApprovalHistory = () => {
             minWidth: 250,
           }}
         >
-          <div style={{ position: "relative", flexGrow: 1 }}>
+          <div className="input-group">
             <input
               type="text"
-              placeholder="Search approvals... (Press Enter)"
+              className="form-control"
+              placeholder="Search approvals..."
               value={searchInput}
               onChange={handleSearchInputChange}
               onKeyPress={handleKeyPress}
-              style={{
-                padding: "0.625rem 1rem",
-                paddingRight: "2.5rem",
-                border: "1px solid #e5e7eb",
-                borderRadius: 8,
-                fontSize: "0.875rem",
-                outline: "none",
-                width: "100%",
-              }}
+              style={{ minHeight: "35.7px" }}
             />
-            <button
-              type="submit"
-              style={{
-                position: "absolute",
-                right: "0.5rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#6c757d",
-              }}
-              title="Search"
-            >
-              <Search size={18} />
-            </button>
+            {searchTerm ? (
+              <button
+                className="btn btn-outline-secondary"
+                onClick={handleCancelSearch}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={handleSearchSubmit}>
+                <i className="bi bi-search me-1"></i>
+                Search
+              </button>
+            )}
           </div>
         </form>
         <select

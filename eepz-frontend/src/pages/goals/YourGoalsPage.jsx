@@ -202,15 +202,14 @@ const YourGoalsPage = () => {
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/dashboard/goals", icon: "house-door" },
-          { label: "Your Goals", path: null },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
+          { label: "Your Goals", path: null, icon: "" },
         ]}
       />
 
       {/* Header */}
       <div className="d-flex justify-content-end align-items-center mb-4">
-        
-
         <button
           className="btn btn-primary"
           onClick={() => setShowCreateModal(true)}
@@ -247,7 +246,7 @@ const YourGoalsPage = () => {
                 setCurrentPage(1);
               }}
               style={{
-                minHeight: "2.5em"
+                minHeight: "2.5em",
               }}
             />
             {searchTerm && (
@@ -352,22 +351,13 @@ const YourGoalsPage = () => {
               ? "Try adjusting your search or filters"
               : "Start by creating your first goal"}
           </p>
-          {activeFilterCount > 0 ? (
+          {activeFilterCount > 0 && (
             <button
               className="btn btn-outline-secondary"
               onClick={() => setShowFiltersModal(true)}
               style={{ maxWidth: "200px", margin: "0 auto" }}
             >
               Adjust Filters
-            </button>
-          ) : (
-            <button
-              className="btn btn-primary"
-              onClick={() => setShowCreateModal(true)}
-              style={{ maxWidth: "200px", margin: "0 auto" }}
-            >
-              <i className="bi bi-plus-circle me-2"></i>
-              Create Goal
             </button>
           )}
         </div>

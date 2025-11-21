@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -190,7 +189,12 @@ const LnDDashboard = () => {
 
   return (
     <div>
-      <Breadcrumb items={[{ label: "Learning & Development" }]} />
+      <Breadcrumb
+        items={[
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard" },
+        ]}
+      />
 
       <div style={{ marginBottom: "2rem" }}>
         <h2
@@ -228,7 +232,7 @@ const LnDDashboard = () => {
                   background: "#fff",
                   borderRadius: "12px",
                   padding: "1.5rem",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid rgba(39, 35, 92, 0.56)",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
                   boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
@@ -244,7 +248,7 @@ const LnDDashboard = () => {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.borderColor = "rgba(39, 35, 92, 0.56)";
                 }}
               >
                 <div

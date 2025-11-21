@@ -177,11 +177,9 @@ const PendingApprovals = () => {
     <div>
       <Breadcrumb
         items={[
-          {
-            label: "Learning & Development",
-            path: `${rolePrefix}/lnd/dashboard`,
-          },
-          { label: "Pending Approvals" },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
+          { label: "Pending Approval" },
         ]}
       />
 

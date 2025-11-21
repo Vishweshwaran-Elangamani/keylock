@@ -121,17 +121,21 @@ const MySkills = () => {
     setSearchInput(e.target.value);
   };
 
-  const handleSearchSubmit = (e) => {
-    if (e.key === "Enter") {
-      setSearchTerm(searchInput);
-      setCurrentPage(1);
-    }
+  const handleSearch = () => {
+    setSearchTerm(searchInput);
+    setCurrentPage(1);
   };
 
-  const handleClearSearch = () => {
+  const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   };
 
   const handlePageChange = (page) => {
@@ -213,80 +217,42 @@ const MySkills = () => {
     <div>
       <Breadcrumb
         items={[
-          {
-            label: "Learning & Development",
-            path: `${rolePrefix}/lnd/dashboard`,
-          },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
           { label: "My Skills" },
         ]}
       />
 
-      {/* Inline Search Bar */}
-      <div className="mt-4" style={{ marginBottom: "1.5rem" }}>
-        <div style={{ position: "relative", width: "100%", maxWidth: "400px" }}>
-          <Search
-            size={18}
-            style={{
-              position: "absolute",
-              left: "0.75rem",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#6c757d",
-              pointerEvents: "none",
-            }}
-          />
-          <input
-            type="text"
-            value={searchInput}
-            onChange={handleSearchChange}
-            onKeyDown={handleSearchSubmit}
-            placeholder="Search skills... (Press Enter)"
-            style={{
-              width: "100%",
-              padding: "0.625rem 2.5rem 0.625rem 2.5rem",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              outline: "none",
-              transition: "all 0.2s",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = "#97247E";
-              e.target.style.boxShadow = "0 0 0 3px rgba(151, 36, 126, 0.1)";
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = "#e5e7eb";
-              e.target.style.boxShadow = "none";
-            }}
-          />
-          {searchInput && (
-            <button
-              onClick={handleClearSearch}
-              style={{
-                position: "absolute",
-                right: "0.75rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-                color: "#6c757d",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#212529")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#6c757d")}
-              title="Clear search"
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-      </div>
+      <div className="row g-3 mb-4">
+  <div className="col-md-6">
+    <div className="input-group">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Search skills..."
+        value={searchInput}
+        onChange={handleSearchChange}
+        onKeyPress={handleSearchKeyPress}
+        style={{ minHeight: "35.7px" }}
+      />
+      {searchTerm ? (
+        <button
+          className="btn btn-outline-secondary"
+          onClick={handleCancelSearch}
+        >
+          <i className="bi bi-x-lg me-1"></i>
+          Cancel
+        </button>
+      ) : (
+        <button className="btn btn-primary" onClick={handleSearch}>
+          <i className="bi bi-search me-1"></i>
+          Search
+        </button>
+      )}
+    </div>
+  </div>
+</div>
 
-      {/* Skills List - Table View */}
       {skills.length === 0 ? (
         <EmptyState
           icon={Search}
@@ -307,11 +273,10 @@ const MySkills = () => {
                 overflow: "hidden",
               }}
             >
-              {/* Table Header */}
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "2fr 1.5fr 1fr 1fr 1fr",
+                  gridTemplateColumns: "2fr 1.5fr 1fr 1.5fr",
                   padding: "1rem 1.5rem",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
@@ -327,7 +292,6 @@ const MySkills = () => {
                   { label: "Last Updated", field: "updatedOn", align: "left" },
                   { label: "Proficiency", field: "rating", align: "center" },
                   { label: "SME Status", align: "center" },
-                  { label: "Apply", align: "center" },
                 ].map(({ label, field, align }) => (
                   <div
                     key={field || label}
@@ -358,13 +322,12 @@ const MySkills = () => {
                 ))}
               </div>
 
-              {/* Table Rows */}
               {skills.map((skill, index) => (
                 <div
                   key={skill.mapperId}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "2fr 1.5fr 1fr 1fr 1fr",
+                    gridTemplateColumns: "2fr 1.5fr 1fr 1.5fr",
                     padding: "1rem 1.5rem",
                     borderBottom:
                       index < skills.length - 1 ? "1px solid #f3f4f6" : "none",
@@ -378,7 +341,6 @@ const MySkills = () => {
                     e.currentTarget.style.background = "#fff";
                   }}
                 >
-                  {/* Skill Name */}
                   <div style={{ textAlign: "left" }}>
                     <p
                       style={{
@@ -392,7 +354,6 @@ const MySkills = () => {
                     </p>
                   </div>
 
-                  {/* Last Updated */}
                   <div style={{ textAlign: "left" }}>
                     <p
                       style={{
@@ -405,7 +366,6 @@ const MySkills = () => {
                     </p>
                   </div>
 
-                  {/* Rating */}
                   <div
                     style={{
                       display: "flex",
@@ -442,7 +402,6 @@ const MySkills = () => {
                     </div>
                   </div>
 
-                  {/* Status */}
                   <div
                     style={{
                       textAlign: "center",
@@ -469,46 +428,6 @@ const MySkills = () => {
                         SME
                       </span>
                     ) : skill.canBecomeSme ? (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "0.375rem 0.75rem",
-                          borderRadius: "12px",
-                          fontSize: "0.75rem",
-                          fontWeight: "600",
-                          background: "#fef3c7",
-                          color: "#92400e",
-                          border: "1px solid #92400e20",
-                        }}
-                      >
-                        Eligible
-                      </span>
-                    ) : (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "0.375rem 0.75rem",
-                          borderRadius: "12px",
-                          fontSize: "0.75rem",
-                          fontWeight: "600",
-                          background: "#f3f4f6",
-                          color: "#6c757d",
-                        }}
-                      >
-                        Not Eligible
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Apply SME */}
-                  <div
-                    style={{
-                      textAlign: "center",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {skill.canBecomeSme && !skill.isSme ? (
                       hasPendingSmeRequest(skill.skillId) ? (
                         <button
                           disabled
@@ -572,11 +491,16 @@ const MySkills = () => {
                     ) : (
                       <span
                         style={{
+                          display: "inline-block",
+                          padding: "0.375rem 0.75rem",
+                          borderRadius: "12px",
                           fontSize: "0.75rem",
-                          color: "#9ca3af",
+                          fontWeight: "600",
+                          background: "#f3f4f6",
+                          color: "#6c757d",
                         }}
                       >
-                        None
+                        Not Eligible
                       </span>
                     )}
                   </div>
@@ -585,12 +509,10 @@ const MySkills = () => {
             </div>
           </div>
 
-          {/* Pagination */}
           <Pagination pagination={pagination} onPageChange={handlePageChange} />
         </>
       )}
 
-      {/* Become SME Modal */}
       {showSmeModal && (
         <BecomeSmeModal
           skill={selectedSkill}
