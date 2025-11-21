@@ -6,6 +6,7 @@ import AddUserModal from "../../../../components/auth/Modal/users/AddUserModal";
 import EditUserModal from "../../../../components/auth/Modal/users/EditUserModal";
 import DeactivateUserModal from "../../../../components/auth/Modal/users/DeactivateUserModal";
 import BulkOperationsModal from "../../../../components/auth/Modal/bulk_operations/BulkOperationsModal";
+import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../../../styles/auth/user/UserList.css";
 
@@ -50,7 +51,7 @@ const UserList = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      toast.loading("Loading users and data...");
+      // toast.loading("Loading users and data...");
       const [usersResponse, rolesResponse, departmentsResponse] =
         await Promise.all([
           userService.getAllUsers(),
@@ -59,7 +60,7 @@ const UserList = () => {
         ]);
       if (usersResponse.success) {
         setUsers(usersResponse.data || []);
-        toast.success("Users loaded!");
+        // toast.success("Users loaded!");
       }
       if (rolesResponse.success) setRoles(rolesResponse.data || []);
       if (departmentsResponse.success)
@@ -187,20 +188,17 @@ const UserList = () => {
 
   return (
     <div className="user-list-page">
-      {/* Breadcrumbs */}
-      <nav className="breadcrumb-nav" aria-label="breadcrumb">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <i className="bi bi-house-door"></i>
-            <span>Dashboard</span>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            User Management
-          </li>
-        </ol>
-      </nav>
+      {/* NEW BREADCRUMB COMPONENT */}
+      <Breadcrumb
+        items={[
+          
+          {
+            label: "User Management",
+          },
+        ]}
+      />
 
-      {/* Statistics Cards */}
+      {/* STATISTICS CARDS */}
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-icon-primary">
@@ -253,7 +251,7 @@ const UserList = () => {
         </div>
       </div>
 
-      {/* Filters and Actions */}
+      {/* FILTERS AND ACTIONS */}
       <div className="filters-card">
         <div className="filters-content">
           <div className="filters-left">
@@ -315,19 +313,19 @@ const UserList = () => {
         </div>
       </div>
 
-      {/* Table Card */}
+      {/* TABLE CARD */}
       <div className="table-card">
         <div className="table-wrapper">
           <table className="user-table">
             <thead>
               <tr>
                 <th>Full Name</th>
-                <th style={{ textAlign: "left" }}>Email</th>
+                <th>Email</th>
                 <th>Employee Company Id</th>
                 <th>Status</th>
                 <th>Designation</th>
                 <th>Joined Date</th>
-                <th className="text-center">Actions</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -349,7 +347,7 @@ const UserList = () => {
                         <span className="user-name">{`${user.firstName} ${user.lastName}`}</span>
                       </div>
                     </td>
-                    <td style={{ textAlign: "left" }}>{user.email}</td>
+                    <td>{user.email}</td>
                     <td className="text-muted">{user.employeeCompanyId}</td>
                     <td>
                       <span
@@ -407,7 +405,7 @@ const UserList = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* PAGINATION */}
         {filteredUsers.length > 0 && (
           <div className="pagination-container">
             <div className="pagination-info">
@@ -485,7 +483,7 @@ const UserList = () => {
         )}
       </div>
 
-      {/* Modals */}
+      {/* MODALS */}
       {showAddModal && (
         <AddUserModal
           show={showAddModal}

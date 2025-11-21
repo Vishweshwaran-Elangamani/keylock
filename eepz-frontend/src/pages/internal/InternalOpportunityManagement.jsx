@@ -334,6 +334,10 @@ const InternalOpportunityManagement = () => {
           <button className="btn-clear" onClick={clearFilters}>
             Clear Filters
           </button>
+          <div className="results-count-inline">
+            Showing {getPaginatedOpportunities().length} of{" "}
+            {filteredOpportunities.length} opportunities
+          </div>
 
           {/* ONLY HR CAN CREATE */}
           {isHR && (
@@ -343,10 +347,7 @@ const InternalOpportunityManagement = () => {
             </button>
           )}
 
-          <div className="results-count-inline">
-            Showing {getPaginatedOpportunities().length} of{" "}
-            {filteredOpportunities.length} opportunities
-          </div>
+          
         </div>
       </div>
 

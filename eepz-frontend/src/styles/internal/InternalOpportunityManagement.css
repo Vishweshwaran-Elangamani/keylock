@@ -32,7 +32,7 @@
   border-radius: 10px;
   padding: 12px 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #27235c;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -219,6 +219,24 @@
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
   white-space: nowrap;
   height: 38px;
+}
+.btn-graph{
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.12s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
+  white-space: nowrap;
+  height: 38px;
+
 }
 
 .btn-add:hover {
@@ -440,12 +458,14 @@
   opacity: 0.5;
   margin-bottom: 1rem;
   display: block;
+  text-align: center;
 }
 
 .empty-state p {
   color: #6c757d;
   margin: 0;
   font-size: 1rem;
+  text-align: center;
 }
 
 /* PAGINATION */

@@ -4,6 +4,7 @@ import departmentService from "../../../../services/auth/departmentService";
 import AddDepartmentModal from "../../../../components/auth/Modal/departments/AddDepartmentModal";
 import EditDepartmentModal from "../../../../components/auth/Modal/departments/EditDepartmentModal";
 import DeleteDepartmentModal from "../../../../components/auth/Modal/departments/DeleteDepartmentModal";
+import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../../../styles/auth/department/DepartmentList.css";
 
@@ -27,16 +28,16 @@ const DepartmentList = () => {
   const fetchDepartments = async () => {
     try {
       setLoading(true);
-      toast.loading("Loading departments...");
+      // toast.loading("Loading departments...");
 
       const response = await departmentService.getAllDepartments();
 
       if (response.success) {
         setDepartments(response.data || []);
         toast.dismiss();
-        toast.success(
-          `Loaded ${response.data?.length || 0} departments successfully`
-        );
+        // toast.success(
+        //   `Loaded ${response.data?.length || 0} departments successfully`
+        // );
       } else {
         toast.dismiss();
         toast.error(response.message || "Failed to load departments");
@@ -181,21 +182,40 @@ const DepartmentList = () => {
 
   return (
     <div className="department-management-page">
-      <nav className="breadcrumb-nav-dept" aria-label="breadcrumb">
-        <ol className="breadcrumb-dept">
-          <li
-            className="breadcrumb-item-dept clickable"
-            onClick={() => navigate("/admin/dashboard")}
-          >
-            <i className="bi bi-house-door"></i>
-            <span>Dashboard</span>
-          </li>
-          <li className="breadcrumb-item-dept active" aria-current="page">
-            Department Management
-          </li>
-        </ol>
-      </nav>
+      {/* NEW BREADCRUMB COMPONENT */}
+      <Breadcrumb
+        items={[
+          
+          {
+            label: "Department Management",
+          },
+        ]}
+      />
 
+      {/* COMPACT STATISTICS CARDS
+      <div className="stats-cards-dept">
+        <div className="stat-card-dept stat-total-dept">
+          <div className="stat-icon-dept">
+            <i className="bi bi-building-fill"></i>
+          </div>
+          <div className="stat-content-dept">
+            <div className="stat-value-dept">{stats.totalDepartments}</div>
+            <div className="stat-label-dept">Total Departments</div>
+          </div>
+        </div>
+
+        <div className="stat-card-dept stat-active-dept">
+          <div className="stat-icon-dept">
+            <i className="bi bi-check-circle-fill"></i>
+          </div>
+          <div className="stat-content-dept">
+            <div className="stat-value-dept">{departments.length}</div>
+            <div className="stat-label-dept">Active</div>
+          </div>
+        </div>
+      </div> */}
+
+      {/* CONTROLS BAR */}
       <div className="controls-bar-dept">
         <div className="search-section-dept">
           <div className="search-input-wrapper-dept">
@@ -237,6 +257,13 @@ const DepartmentList = () => {
             <i className="bi bi-table"></i>
           </button>
         </div>
+        <div className="results-count-inline-dept">
+          Showing{" "}
+          {viewMode === "table"
+            ? currentItems.length
+            : filteredDepartments.length}{" "}
+          of {filteredDepartments.length} departments
+        </div>
 
         <button
           className="btn-create-dept"
@@ -246,15 +273,10 @@ const DepartmentList = () => {
           Create Department
         </button>
 
-        <div className="results-count-inline-dept">
-          Showing{" "}
-          {viewMode === "table"
-            ? currentItems.length
-            : filteredDepartments.length}{" "}
-          of {filteredDepartments.length} departments
-        </div>
+        
       </div>
 
+      {/* EMPTY STATE */}
       {filteredDepartments.length === 0 ? (
         <div className="empty-state-dept">
           <div className="empty-icon-dept">
@@ -265,6 +287,7 @@ const DepartmentList = () => {
         </div>
       ) : (
         <>
+          {/* GRID VIEW */}
           {viewMode === "grid" && (
             <div className="departments-grid-dept">
               {filteredDepartments.map((dept) => (
@@ -310,6 +333,7 @@ const DepartmentList = () => {
             </div>
           )}
 
+          {/* TABLE VIEW */}
           {viewMode === "table" && (
             <>
               <div className="table-card-dept">
@@ -360,6 +384,7 @@ const DepartmentList = () => {
                   </table>
                 </div>
 
+                {/* PAGINATION */}
                 {filteredDepartments.length > 0 && (
                   <div className="pagination-container">
                     <div className="pagination-info">
@@ -449,6 +474,7 @@ const DepartmentList = () => {
         </>
       )}
 
+      {/* MODALS */}
       {showAddModal && (
         <AddDepartmentModal
           show={showAddModal}

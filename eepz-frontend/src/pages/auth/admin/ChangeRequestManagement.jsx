@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
 
@@ -46,9 +47,9 @@ const ChangeRequestManagement = () => {
     try {
       setLoading(true);
 
-      if (!silent) {
-        toast.loading("Loading email change requests...");
-      }
+      // if (!silent) {
+      //   toast.loading("Loading email change requests...");
+      // }
 
       // ALWAYS FETCH ALL REQUESTS
       const response = await ChangeRequestService.getAllChangeRequests();
@@ -59,11 +60,11 @@ const ChangeRequestManagement = () => {
 
         if (!silent) {
           toast.dismiss();
-          toast.success(
-            `Loaded ${
-              response.data?.length || 0
-            } email change requests successfully`
-          );
+          // toast.success(
+          //   `Loaded ${
+          //     response.data?.length || 0
+          //   } email change requests successfully`
+          // );
         }
       } else {
         toast.dismiss();
@@ -496,18 +497,14 @@ const ChangeRequestManagement = () => {
 
   return (
     <div className="crm-change-request-page">
-      {/* BREADCRUMB */}
-      <nav className="crm-breadcrumb-nav" aria-label="breadcrumb">
-        <ol className="crm-breadcrumb">
-          <li className="crm-breadcrumb-item">
-            <i className="bi bi-house-door"></i>
-            <span>Dashboard</span>
-          </li>
-          <li className="crm-breadcrumb-item active" aria-current="page">
-            Email Change Request Management
-          </li>
-        </ol>
-      </nav>
+      {/* NEW BREADCRUMB COMPONENT */}
+      <Breadcrumb
+        items={[
+          {
+            label: "Email Change Request Management",
+          },
+        ]}
+      />
 
       {/* COMPACT STATISTICS CARDS - LEFT ALIGNED */}
       <div className="crm-stats-grid">

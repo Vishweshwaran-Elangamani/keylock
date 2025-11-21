@@ -316,12 +316,14 @@
   opacity: 0.5;
   margin-bottom: 1rem;
   display: block;
+  text-align: center;
 }
 
 .empty-state p {
   color: #6c757d;
   margin: 0 0 1rem 0;
   font-size: 1rem;
+  text-align: center;
 }
 
 .pm-btn-add-small {

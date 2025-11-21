@@ -264,15 +264,16 @@ const PolicyManagement = () => {
           >
             Clear Filters
           </Button>
+          <div className="pm-results-count-inline">
+            Showing {currentItems.length} of {filteredPolicies.length} policies
+          </div>
 
           <button className="pm-btn-add" onClick={() => setShowAddModal(true)}>
             <i className="bi bi-plus-circle"></i>
             Add Policy
           </button>
 
-          <div className="pm-results-count-inline">
-            Showing {currentItems.length} of {filteredPolicies.length} policies
-          </div>
+          
         </div>
       </div>
 

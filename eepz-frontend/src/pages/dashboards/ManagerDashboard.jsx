@@ -22,13 +22,13 @@ const ManagerDashboard = () => {
       gradient: "gradient-green",
       path: "/internal/nominations",
     },
-    {
-      title: "Career Progression",
-      description: "Create and manage employee promotion proposals",
-      icon: "bi bi-arrow-up-circle",
-      gradient: "gradient-green",
-      path: "/hr/operations/promotions",
-    },
+    // {
+    //   title: "Career Progression",
+    //   description: "Create and manage employee promotion proposals",
+    //   icon: "bi bi-arrow-up-circle",
+    //   gradient: "gradient-green",
+    //   path: "/hr/operations/promotions",
+    // },
     {
       title: "Company Policies",
       description: "View organizational policies",

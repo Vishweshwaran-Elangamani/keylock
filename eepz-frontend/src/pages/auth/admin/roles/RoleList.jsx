@@ -4,6 +4,7 @@ import roleService from "../../../../services/auth/roleService";
 import AddRoleModal from "../../../../components/auth/Modal/roles/AddRoleModal";
 import EditRoleModal from "../../../../components/auth/Modal/roles/EditRoleModal";
 import DeleteRoleModal from "../../../../components/auth/Modal/roles/DeleteRoleModal";
+import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../../../styles/auth/roles/RoleList.css";
 
@@ -27,16 +28,16 @@ const RoleList = () => {
   const fetchRoles = async () => {
     try {
       setLoading(true);
-      toast.loading("Loading roles...");
+      // toast.loading("Loading roles...");
 
       const response = await roleService.getAllRoles();
 
       if (response.success) {
         setRoles(response.data || []);
         toast.dismiss();
-        toast.success(
-          `Loaded ${response.data?.length || 0} roles successfully`
-        );
+        // toast.success(
+        //   `Loaded ${response.data?.length || 0} roles successfully`
+        // );
       } else {
         toast.dismiss();
         toast.error(response.message || "Failed to load roles");
@@ -177,21 +178,17 @@ const RoleList = () => {
 
   return (
     <div className="role-management-page">
-      <nav className="breadcrumb-nav-rl" aria-label="breadcrumb">
-        <ol className="breadcrumb-rl">
-          <li
-            className="breadcrumb-item-rl clickable"
-            onClick={() => navigate("/admin/dashboard")}
-          >
-            <i className="bi bi-house-door"></i>
-            <span>Dashboard</span>
-          </li>
-          <li className="breadcrumb-item-rl active" aria-current="page">
-            Role Management
-          </li>
-        </ol>
-      </nav>
+      {/* NEW BREADCRUMB COMPONENT */}
+      <Breadcrumb
+        items={[
+         
+          {
+            label: "Role Management",
+          },
+        ]}
+      />
 
+      {/* COMPACT STATISTICS CARDS */}
       <div className="stats-cards-rl">
         <div className="stat-card-rl stat-total-rl">
           <div className="stat-icon-rl">
@@ -224,6 +221,7 @@ const RoleList = () => {
         </div>
       </div>
 
+      {/* CONTROLS BAR */}
       <div className="controls-bar-rl">
         <div className="search-section-rl">
           <div className="search-input-wrapper-rl">
@@ -265,19 +263,21 @@ const RoleList = () => {
             <i className="bi bi-table"></i>
           </button>
         </div>
+        <div className="results-count-inline-rl">
+          Showing{" "}
+          {viewMode === "table" ? currentItems.length : filteredRoles.length} of{" "}
+          {filteredRoles.length} roles
+        </div>
 
         <button className="btn-create-rl" onClick={() => setShowAddModal(true)}>
           <i className="bi bi-plus-circle"></i>
           Create Role
         </button>
 
-        <div className="results-count-inline-rl">
-          Showing{" "}
-          {viewMode === "table" ? currentItems.length : filteredRoles.length} of{" "}
-          {filteredRoles.length} roles
-        </div>
+        
       </div>
 
+      {/* EMPTY STATE */}
       {filteredRoles.length === 0 ? (
         <div className="empty-state-rl">
           <div className="empty-icon-rl">
@@ -288,6 +288,7 @@ const RoleList = () => {
         </div>
       ) : (
         <>
+          {/* GRID VIEW */}
           {viewMode === "grid" && (
             <div className="roles-grid-rl">
               {filteredRoles.map((role) => (
@@ -344,6 +345,7 @@ const RoleList = () => {
             </div>
           )}
 
+          {/* TABLE VIEW */}
           {viewMode === "table" && (
             <>
               <div className="table-card-rl">
@@ -411,6 +413,7 @@ const RoleList = () => {
                   </table>
                 </div>
 
+                {/* PAGINATION */}
                 {filteredRoles.length > 0 && (
                   <div className="pagination-container">
                     <div className="pagination-info">
@@ -500,6 +503,7 @@ const RoleList = () => {
         </>
       )}
 
+      {/* MODALS */}
       {showAddModal && (
         <AddRoleModal
           show={showAddModal}

@@ -524,12 +524,12 @@
 .crm-admin-remarks-tooltip:hover {
   color: #27235c;
 }
-
 /* EMPTY STATE */
 .crm-empty-state {
   text-align: center;
   padding: 3rem 1rem !important;
 }
+
 
 .crm-empty-state i {
   font-size: 3rem;
@@ -537,12 +537,14 @@
   opacity: 0.5;
   margin-bottom: 1rem;
   display: block;
+  text-align: center;
 }
 
 .crm-empty-state p {
   color: #6c757d;
   margin: 0;
   font-size: 1rem;
+  text-align: center;
 }
 
 /* PAGINATION */
