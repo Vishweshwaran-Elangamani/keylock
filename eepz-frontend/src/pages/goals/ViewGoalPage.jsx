@@ -165,20 +165,12 @@ const ViewGoalPage = () => {
       {/* Breadcrumb */}
       {goal && (
         <Breadcrumb
-          items={[
-            {
-              label: "Dashboard",
-              path: "/dashboard/goals",
-              icon: "house-door",
-            },
-            {
-              label: "Your Goals",
-              path: "/goals/your-goals",
-              icon: "list-task",
-            },
-            { label: goal.title || "Goal Details", path: null },
-          ]}
-        />
+        items={[
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
+          { label: goal.title || "Goal Details", path: null, icon: "" },
+        ]}
+      />
       )}
 
       {alert && (

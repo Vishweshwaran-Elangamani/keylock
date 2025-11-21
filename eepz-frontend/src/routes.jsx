@@ -469,7 +469,7 @@ const AppRoutes = () => {
         }
       />
       {/*  PROMOTIONS - HR creates from approved nominations, Leadership approves/rejects */}
-      <Route
+      {/* <Route
         path="/internal/promotions"
         element={
           <ProtectedRoute allowedRoles={["HR", "Leadership"]}>
@@ -478,7 +478,7 @@ const AppRoutes = () => {
             </DashboardLayout>
           </ProtectedRoute>
         }
-      />
+      /> */}
       //region INTERNAL OPPORTUNITIES LEADERSHIP
       <Route
         path="/leadership/dashboard"
@@ -490,7 +490,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route
+      {/* <Route
         path="/leadership/promotions"
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
@@ -499,7 +499,7 @@ const AppRoutes = () => {
             </DashboardLayout>
           </ProtectedRoute>
         }
-      />
+      /> */}
       <Route
         path="/leadership/budget-management"
         element={

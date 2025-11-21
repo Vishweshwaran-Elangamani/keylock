@@ -679,6 +679,11 @@
   }
 }
 
+.auth-invalid-input{
+  color: red;
+  text-align: left;
+}
+
 /* Input States */
 .form-control.is-valid {
   border-color: #198754;

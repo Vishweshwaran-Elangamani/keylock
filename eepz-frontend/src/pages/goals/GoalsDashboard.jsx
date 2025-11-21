@@ -10,6 +10,7 @@ import QuickCommentModal from "../../components/goals/modals/QuickCommentModal";
 import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
+import Breadcrumb from "../../components/goals/common/Breadcrumb";
 import { GOAL_TYPES } from "../../constants/goals/goalConstants";
 
 const GoalsDashboard = () => {
@@ -146,6 +147,13 @@ const GoalsDashboard = () => {
 
   return (
     <div className="container-fluid p-4">
+      <Breadcrumb
+        items={[
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" }
+        ]}
+      />
+
       {/* Header */}
       <div className="d-flex justify-content-end align-items-center mb-4">
         <div className="d-flex gap-2">

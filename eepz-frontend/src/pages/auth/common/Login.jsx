@@ -424,7 +424,7 @@ const Login = () => {
                   </div>
                   {/* Email error message */}
                   {errors.email && touched.email && (
-                    <div className="invalid-feedback d-block">
+                    <div className="auth-invalid-input d-block">
                       <i className="bi bi-info-circle me-1"></i>
                       {errors.email}
                     </div>
@@ -462,16 +462,11 @@ const Login = () => {
                       tabIndex="-1"
                       title={showPassword ? "Hide password" : "Show password"}
                     >
-                      <i
-                        className={`bi ${
-                          showPassword ? "bi-eye-slash-fill" : "bi-eye-fill"
-                        }`}
-                      ></i>
                     </button>
                   </div>
                   {/* Password error message */}
                   {errors.password && touched.password && (
-                    <div className="invalid-feedback d-block">
+                    <div className="auth-invalid-input d-block">
                       <i className="bi bi-info-circle me-1"></i>
                       {errors.password}
                     </div>
@@ -496,7 +491,7 @@ const Login = () => {
                   <a
                     href="/reset-password"
                     className="text-decoration-none fw-semibold eepz-forgot-link"
-                    style={{ color: "#5a9fd4" }}
+                    style={{ color: "#27235c" }}
                     onClick={(e) => {
                       e.preventDefault();
                       navigate("/reset-password");
@@ -513,7 +508,7 @@ const Login = () => {
                   style={{
                     background: loading
                       ? "#6c757d"
-                      : "linear-gradient(135deg, #5a9fd4 0%, #4a8fc7 100%)",
+                      : "#27235c",
                     border: "none",
                     transition: "all 0.3s ease",
                   }}

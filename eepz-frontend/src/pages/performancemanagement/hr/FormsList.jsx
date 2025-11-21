@@ -1,18 +1,17 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { toast } from "sonner";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import api from "../../../services/performancemanagement/hr/api";
 import "../../../styles/performancemanagement/hr/FormList.css";
- 
-// Import modals
+
 import ViewFormDetailsModal from "../../../components/performance_management/modals/FormsList/ViewFormDetailsModal";
 import DeadlineModal from "../../../components/performance_management/modals/FormsList/DeadlineModal";
- 
+
 function FormsList() {
   const location = useLocation();
   const navigate = useNavigate();
- 
+
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
@@ -25,14 +24,25 @@ function FormsList() {
   const [pendingAction, setPendingAction] = useState(null);
   const [viewFormDetails, setViewFormDetails] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
- 
+
+  const [formsPage, setFormsPage] = useState(1);
+  const [usersPage, setUsersPage] = useState(1);
+  const [formsPerPage, setFormsPerPage] = useState(8);
+  const [usersPerPage, setUsersPerPage] = useState(9);
+
   const [formSearchQuery, setFormSearchQuery] = useState("");
   const [formTypeFilter, setFormTypeFilter] = useState("All");
+  const [formDeliveryFilter, setFormDeliveryFilter] = useState("All");
   const [userSearchQuery, setUserSearchQuery] = useState("");
- 
-  const formTypes = ["All", ...new Set(rows.map(f => f.type).filter(Boolean))];
- 
-  // Load current user on mount
+  const [userRoleFilter, setUserRoleFilter] = useState("All");
+
+  const formTypes = useMemo(() => ["All", ...new Set(rows.map(f => f.type).filter(Boolean))], [rows]);
+  const formDeliveryOptions = ["All", "Delivery", "Enablement", "Delivery and Enablement"];
+  const userRoles = useMemo(() => {
+    const roles = new Set(users.map(u => (u.role || u.Role || "").toUpperCase()));
+    return ["All", ...[...roles].filter(r => r !== "")];
+  }, [users]);
+
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -55,8 +65,7 @@ function FormsList() {
     };
     fetchCurrentUser();
   }, []);
- 
-  // Load all forms
+
   useEffect(() => {
     let mounted = true;
     api
@@ -70,8 +79,7 @@ function FormsList() {
       .finally(() => mounted && setLoading(false));
     return () => (mounted = false);
   }, []);
- 
-  // Fetch assigned users for selected form
+
   const fetchAssignedUsers = useCallback(async (formId) => {
     try {
       const response = await api.get(`/AppraisalProcess/form/${formId}`);
@@ -85,8 +93,7 @@ function FormsList() {
       return [];
     }
   }, []);
- 
-  // Load users based on form type and filter
+
   useEffect(() => {
     if (!selectedFormId) {
       setUsers([]);
@@ -98,49 +105,103 @@ function FormsList() {
         const selectedForm = rows.find(f => f.formId === selectedFormId);
         if (!selectedForm) return;
         const creatorId = selectedForm?.createdBy;
-       
-        // Fetch assigned users from backend
+
         const assignedIds = await fetchAssignedUsers(selectedFormId);
         setAssignedUserIds(assignedIds);
- 
-        let filteredUsers = [];
+
+        let filteredUsersData = [];
         if (selectedForm.type === "Manager") {
           const managersRes = await api.get("/AppraisalProcess/all-managers");
-          filteredUsers = Array.isArray(managersRes.data?.data)
-            ? managersRes.data.data
-            : [];
+          filteredUsersData = Array.isArray(managersRes.data?.data) ? managersRes.data.data : [];
         } else {
           const usersRes = await api.get("/AppraisalProcess/upcoming-eligible");
-          filteredUsers = Array.isArray(usersRes.data?.data)
-            ? usersRes.data.data
-            : [];
+          filteredUsersData = Array.isArray(usersRes.data?.data) ? usersRes.data.data : [];
         }
- 
-        // Filter out HR/Admin roles
-        filteredUsers = filteredUsers.filter(u => {
+
+        filteredUsersData = filteredUsersData.filter(u => {
           const role = (u.role || u.Role || u.roleCode || u.RoleCode || "").toUpperCase();
+          if (userRoleFilter !== "All") {
+            return role === userRoleFilter.toUpperCase();
+          }
           return role !== "HR" && role !== "ADMIN";
         });
- 
-        // Filter out creator and already assigned users
-        filteredUsers = filteredUsers.filter(
-          u =>
-            u.userId !== creatorId &&
-            !assignedIds.map(String).includes(String(u.userId))
+
+        filteredUsersData = filteredUsersData.filter(
+          u => u.userId !== creatorId && !assignedIds.map(String).includes(String(u.userId))
         );
-        setUsers(filteredUsers);
+
+        if (userSearchQuery.trim() !== "") {
+          const query = userSearchQuery.toLowerCase();
+          filteredUsersData = filteredUsersData.filter(
+            u =>
+              (u.firstName?.toLowerCase().includes(query)) ||
+              (u.lastName?.toLowerCase().includes(query))
+          );
+        }
+
+        setUsers(filteredUsersData);
+        setUsersPage(1);
       } catch {
         toast.error("Failed to load eligible users");
       }
     };
     fetchUsersBasedOnFormType();
-  }, [selectedFormId, rows, fetchAssignedUsers]);
- 
+  }, [selectedFormId, rows, fetchAssignedUsers, userSearchQuery, userRoleFilter]);
+
+  const filteredForms = useMemo(() => {
+    return rows.filter(form => {
+      if (formSearchQuery.trim() !== "") {
+        const query = formSearchQuery.toLowerCase();
+        if (!(form.name?.toLowerCase().includes(query) || form.type?.toLowerCase().includes(query))) return false;
+      }
+      if (formTypeFilter !== "All" && form.type !== formTypeFilter) return false;
+      if (formDeliveryFilter !== "All") {
+        if (formDeliveryFilter === "Delivery and Enablement") {
+          if (form.deliveryEnablement !== undefined) {
+            const val = form.deliveryEnablement.toLowerCase();
+            if (!(val === "deliveryandenablement" || val === "both" || (val.includes("delivery") && val.includes("enablement")))) {
+              return false;
+            }
+          } else {
+            return false;
+          }
+        } else {
+          if (form.deliveryEnablement !== formDeliveryFilter) return false;
+        }
+      }
+      return true;
+    });
+  }, [rows, formSearchQuery, formTypeFilter, formDeliveryFilter]);
+
+  const formsCount = filteredForms.length;
+  const formsTotalPages = Math.ceil(formsCount / formsPerPage);
+  const pagedForms = filteredForms.slice((formsPage - 1) * formsPerPage, formsPage * formsPerPage);
+
+  const usersCount = users.length;
+  const usersTotalPages = Math.ceil(usersCount / usersPerPage);
+  const pagedUsers = users.slice((usersPage - 1) * usersPerPage, usersPage * usersPerPage);
+
+  const eligibleUsers = users.filter(u => !assignedUserIds.includes(u.userId));
+  const allEligibleSelected = eligibleUsers.length > 0 && eligibleUsers.every(u => selectedUserIds.includes(u.userId));
+
+  const onFormsPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= formsTotalPages) {
+      setFormsPage(newPage);
+    }
+  };
+
+  const onUsersPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= usersTotalPages) {
+      setUsersPage(newPage);
+    }
+  };
+
   const handleFormSelect = (formId) => {
     setSelectedFormId(formId);
     setSelectedUserIds([]);
+    setUsersPage(1);
   };
- 
+
   const toggleUser = userId => {
     if (assignedUserIds.map(String).includes(String(userId))) {
       toast.error("This user has already been assigned this form!");
@@ -150,31 +211,21 @@ function FormsList() {
       prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
     );
   };
- 
-  // Check if all eligible users are selected
-  const eligibleUsers = users.filter(u => !assignedUserIds.includes(u.userId));
-  const allEligibleSelected = eligibleUsers.length > 0 && 
-    eligibleUsers.every(u => selectedUserIds.includes(u.userId));
 
-  // Toggle Select All / Deselect All
   const handleSelectAll = () => {
     const eligibleUsers = users.filter(
       u => !assignedUserIds.includes(u.userId)
     );
-    
     const allSelected = eligibleUsers.every(u => selectedUserIds.includes(u.userId));
-    
     if (allSelected) {
-      // Deselect all
       setSelectedUserIds([]);
       toast.success("All users deselected");
     } else {
-      // Select all
       setSelectedUserIds(eligibleUsers.map(u => u.userId));
       toast.success(`Selected ${eligibleUsers.length} users`);
     }
   };
- 
+
   const openDeadlineModal = action => {
     if (!selectedFormId) {
       toast.error("Please select a form first.");
@@ -193,12 +244,12 @@ function FormsList() {
     setPendingAction(action);
     setShowDeadlineModal(true);
   };
- 
+
   const confirmShare = async () => {
     setShowDeadlineModal(false);
     await shareFormToUsers(pendingAction);
   };
- 
+
   const shareFormToUsers = async (actionType = "Send") => {
     if (!currentUserId) {
       toast.error(
@@ -206,14 +257,13 @@ function FormsList() {
       );
       return;
     }
- 
     setSharing(true);
     const loadingToast = toast.loading(
       actionType === "Send"
         ? "Sharing form to users..."
         : "Saving as draft..."
     );
- 
+
     try {
       const payload = {
         formId: selectedFormId,
@@ -222,35 +272,32 @@ function FormsList() {
         action: actionType,
         deadlineInDays: deadlineInDays || 7,
       };
- 
+
       const { data } = await api.post("/AppraisalProcess/initiate", payload);
- 
-      // Handle successful response
+
       if (data?.success) {
         const appraisals = data.data || [];
         const skipped = data.skipped || [];
         const successfulUserIds = appraisals
           .map(a => a.userId || a.UserId || a.employeeId || a.EmployeeId)
           .filter(Boolean);
-       
+
         const alreadyAssignedIds = Array.isArray(skipped)
           ? skipped
               .filter(s => s.Reason === "Already Assigned")
               .map(s => s.UserId || s.userId || s.EmployeeId || s.employeeId)
               .filter(Boolean)
           : [];
- 
+
         const allProcessedUserIds = [
           ...successfulUserIds,
           ...alreadyAssignedIds,
         ];
- 
-        // Update assigned users permanently
+
         setAssignedUserIds(prev => [
           ...new Set([...prev, ...allProcessedUserIds]),
         ]);
- 
-        // Remove from available users list
+
         setUsers(prevUsers =>
           prevUsers.filter(
             u =>
@@ -259,14 +306,12 @@ function FormsList() {
                 .includes(String(u.userId))
           )
         );
- 
+
         setSelectedUserIds([]);
- 
+
         if (appraisals.length > 0) {
           toast.success(
-            `Successfully ${
-              actionType === "Send" ? "shared" : "saved"
-            } form to ${appraisals.length} user(s)!`,
+            `Successfully ${actionType === "Send" ? "shared" : "saved"} form to ${appraisals.length} user(s)!`,
             { id: loadingToast }
           );
         }
@@ -277,71 +322,82 @@ function FormsList() {
           toast.info(`Some users were skipped: ${skippedInfo}`);
         }
         if (appraisals.length === 0 && skipped.length > 0) {
-          toast.info(
-            `Selected user(s) already have this form assigned.`,
-            { id: loadingToast }
-          );
+          toast.info(`Selected user(s) already have this form assigned.`, { id: loadingToast });
         }
         if (appraisals.length === 0 && skipped.length === 0) {
           toast.error("No appraisals were assigned.", { id: loadingToast });
         }
       } else {
-        toast.error("Failed to share form. (Unexpected API result)", {
-          id: loadingToast,
-        });
+        toast.error("Failed to share form. (Unexpected API result)", { id: loadingToast });
       }
     } catch (e) {
-      const errorMsg =
-        e?.response?.data?.message ||
-        e?.response?.data?.title ||
-        (actionType === "Send"
-          ? "Failed to share form."
-          : "Failed to save draft.");
+      const errorMsg = e?.response?.data?.message || e?.response?.data?.title ||
+        (actionType === "Send" ? "Failed to share form." : "Failed to save draft.");
       toast.error(errorMsg, { id: loadingToast });
       console.error("❌ Error details:", e.response?.data);
     } finally {
       setSharing(false);
     }
   };
- 
+
   const handleView = form => {
     setViewFormDetails(form);
   };
- 
-  const filteredForms = rows.filter(form => {
-    if (formSearchQuery) {
-      const query = formSearchQuery.toLowerCase();
-      if (
-        !(
-          form.name?.toLowerCase().includes(query) ||
-          form.type?.toLowerCase().includes(query)
-        )
-      )
-        return false;
-    }
-    if (formTypeFilter !== "All" && form.type !== formTypeFilter) return false;
-    return true;
-  });
- 
-  const filteredUsers = users.filter(user => {
-    if (!userSearchQuery) return true;
-    const query = userSearchQuery.toLowerCase();
-    return (
-      user.firstName?.toLowerCase().includes(query) ||
-      user.lastName?.toLowerCase().includes(query)
-    );
-  });
- 
+
+  const analytics = useMemo(() => {
+    const totalForms = rows.length;
+    const managerForms = rows.filter(f => f.type === "Manager").length;
+    const deliveryForms = rows.filter(f => f.deliveryEnablement === "Delivery").length;
+    const enablementForms = rows.filter(f => f.deliveryEnablement === "Enablement").length;
+    const assignedUsersCount = assignedUserIds.length;
+    return {
+      totalForms,
+      managerForms,
+      deliveryForms,
+      enablementForms,
+      assignedUsersCount,
+    };
+  }, [rows, assignedUserIds]);
+
   return (
     <>
-      <div className="hrformlist-page-container">
-        {/* View Form Details Modal */}
+      <div className="fld-root">
+        <nav className="fld-breadcrumbs" aria-label="breadcrumb">
+          <ol>
+            <li><Link to="/hr/dashboard">Dashboard</Link></li>
+            <li><Link to="/hr/dashboard/performance">Performance</Link></li>
+            <li aria-current="page">Forms List</li>
+          </ol>
+        </nav>
+
+        <div className="fld-analytics-cards">
+          <div className="fld-analytics-card">
+            <h4>Total Forms</h4>
+            <p>{analytics.totalForms}</p>
+          </div>
+          <div className="fld-analytics-card">
+            <h4>Manager Forms</h4>
+            <p>{analytics.managerForms}</p>
+          </div>
+          <div className="fld-analytics-card">
+            <h4>Delivery Forms</h4>
+            <p>{analytics.deliveryForms}</p>
+          </div>
+          <div className="fld-analytics-card">
+            <h4>Enablement Forms</h4>
+            <p>{analytics.enablementForms}</p>
+          </div>
+          <div className="fld-analytics-card">
+            <h4>Assigned Users</h4>
+            <p>{analytics.assignedUsersCount}</p>
+          </div>
+        </div>
+
         <ViewFormDetailsModal
           formDetails={viewFormDetails}
           onClose={() => setViewFormDetails(null)}
         />
- 
-        {/* Deadline Modal */}
+
         <DeadlineModal
           isOpen={showDeadlineModal}
           onClose={() => setShowDeadlineModal(false)}
@@ -350,33 +406,38 @@ function FormsList() {
           onConfirm={confirmShare}
           pendingAction={pendingAction}
         />
- 
-        {/* Main Content */}
-        <div className="hrformlist-main-area">
-          {/* Forms Section */}
-          <div className="hrformlist-forms-section">
-            <div className="hrformlist-section-header">
-              <div className="hrformlist-header-left">
+
+        <div className="fld-main-area">
+          <div className="fld-forms-section">
+            <div className="fld-section-header">
+              <div className="fld-header-left">
                 <h3>
                   <i className="bi bi-list-ul"></i> Available Forms
                 </h3>
-                <span className="hrformlist-count-badge">
-                  {filteredForms.length} forms
+                <span className="fld-count-badge">
+                  {filteredForms.length}
                 </span>
               </div>
-              <div className="hrformlist-header-right">
-                <div className="hrformlist-search-box">
-                  <i className="bi bi-search hrformlist-search-icon"></i>
+              <div className="fld-header-right">
+                <div className="fld-search-box">
+                  <i className="bi bi-search fld-search-icon"></i>
                   <input
                     type="text"
                     placeholder="Search forms..."
                     value={formSearchQuery}
-                    onChange={e => setFormSearchQuery(e.target.value)}
+                    onChange={e => {
+                      setFormSearchQuery(e.target.value);
+                      setFormsPage(1);
+                    }}
                   />
                 </div>
                 <select
+                  className="fld-filter-select"
                   value={formTypeFilter}
-                  onChange={e => setFormTypeFilter(e.target.value)}
+                  onChange={e => {
+                    setFormTypeFilter(e.target.value);
+                    setFormsPage(1);
+                  }}
                 >
                   {formTypes.map(type => (
                     <option key={type} value={type}>
@@ -384,138 +445,212 @@ function FormsList() {
                     </option>
                   ))}
                 </select>
+                <select
+                  className="fld-filter-select"
+                  value={formDeliveryFilter}
+                  onChange={e => {
+                    setFormDeliveryFilter(e.target.value);
+                    setFormsPage(1);
+                  }}
+                >
+                  {formDeliveryOptions.map(option => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-            <div className="hrformlist-table-scroll">
-              <table className="hrformlist-table">
-                <thead>
-                  <tr>
-                    <th>NAME</th>
-                    <th>TYPE</th>
-                    <th>DELIVERY/ENABLEMENT</th>
-                    <th>ACTIONS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredForms.map(f => (
-                    <tr
-                      key={f.formId}
-                      className={
-                        selectedFormId === f.formId ? "hrformlist-selected" : ""
-                      }
-                    >
-                      <td>
-                        <strong>{f.name}</strong>
-                      </td>
-                      <td>
-                        <span className="hrformlist-type-pill">{f.type}</span>
-                      </td>
-                      <td>
-                        {f.deliveryEnablement === "Delivery"
-                          ? "Delivery"
-                          : f.deliveryEnablement === "Enablement"
-                            ? "Enablement"
-                            : "Delivery and Enablement"}
-                      </td>
-                      <td className="hrformlist-actions-cell">
-                        <button onClick={() => handleView(f)}>
-                          <i className="bi bi-eye-fill"></i> View
-                        </button>
-                        <button
-                          onClick={() =>
-                            navigate(
-                              `/hr/dashboard/performance/create/${f.formId}`
-                            )
-                          }
-                        >
-                          <i className="bi bi-pencil-square"></i> Edit
-                        </button>
-                        <button
-                          onClick={() => handleFormSelect(f.formId)}
-                          className={
-                            selectedFormId === f.formId ? "hrformlist-active" : ""
-                          }
-                        >
-                          <i className="bi bi-hand-index"></i> Choose
-                        </button>
-                      </td>
+
+            <div className="fld-table-card">
+              <div className="fld-table-wrapper">
+                <table className="fld-table">
+                  <thead>
+                    <tr>
+                      <th>NAME</th>
+                      <th>TYPE</th>
+                      <th>DELIVERY/ENABLEMENT</th>
+                      <th className="text-center">ACTIONS</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={4} className="fld-empty-state">
+                          <i className="bi bi-hourglass-split"></i>
+                          <p>Loading forms...</p>
+                        </td>
+                      </tr>
+                    ) : pagedForms.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="fld-empty-state">
+                          <i className="bi bi-inbox"></i>
+                          <p>No forms found matching the criteria!</p>
+                        </td>
+                      </tr>
+                    ) : (
+                      pagedForms.map(f => (
+                        <tr
+                          key={f.formId}
+                          className={
+                            selectedFormId === f.formId ? "fld-selected-row" : ""
+                          }
+                        >
+                          <td>
+                            <strong>{f.name}</strong>
+                          </td>
+                          <td>
+                            <span className="fld-type-badge">{f.type}</span>
+                          </td>
+                          <td>
+                            {f.deliveryEnablement === "Delivery"
+                              ? "Delivery"
+                              : f.deliveryEnablement === "Enablement"
+                                ? "Enablement"
+                                : "Delivery and Enablement"}
+                          </td>
+                          <td>
+                            <div className="fld-action-buttons">
+                              <button
+                                className="fld-action-btn fld-btn-view"
+                                onClick={() => handleView(f)}
+                                title="View Form"
+                              >
+                                <i className="bi bi-eye-fill"></i>
+                              </button>
+                              <button
+                                className="fld-action-btn fld-btn-edit"
+                                onClick={() =>
+                                  navigate(
+                                    `/hr/dashboard/performance/create/${f.formId}`
+                                  )
+                                }
+                                title="Edit Form"
+                              >
+                                <i className="bi bi-pencil-square"></i>
+                              </button>
+                              <button
+                                className={`fld-action-btn fld-btn-choose ${
+                                  selectedFormId === f.formId ? "fld-active" : ""
+                                }`}
+                                onClick={() => handleFormSelect(f.formId)}
+                                title="Choose Form"
+                              >
+                                <i className="bi bi-hand-index"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="fld-pagination-container">
+                <div className="fld-pagination-info">
+                  <span className="fld-pagination-label">Rows per page:</span>
+                  <select
+                    className="fld-pagination-select"
+                    value={formsPerPage}
+                    onChange={(e) => {
+                      setFormsPerPage(Number(e.target.value));
+                      setFormsPage(1);
+                    }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={8}>8</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                    <option value={20}>20</option>
+                  </select>
+                </div>
+
+                <nav className="fld-pagination-nav">
+                  <ul className="fld-pagination">
+                    <li className={`fld-page-item ${formsPage === 1 ? "fld-disabled" : ""}`}>
+                      <button className="fld-page-link" onClick={() => onFormsPageChange(formsPage - 1)}>&laquo;</button>
+                    </li>
+                    {Array.from({ length: formsTotalPages }, (_, i) => (
+                      <li key={i + 1} className={`fld-page-item ${formsPage === i + 1 ? "fld-active" : ""}`}>
+                        <button className="fld-page-link" onClick={() => onFormsPageChange(i + 1)}>{i + 1}</button>
+                      </li>
+                    ))}
+                    <li className={`fld-page-item ${formsPage === formsTotalPages ? "fld-disabled" : ""}`}>
+                      <button className="fld-page-link" onClick={() => onFormsPageChange(formsPage + 1)}>&raquo;</button>
+                    </li>
+                  </ul>
+                </nav>
+
+                <div className="fld-pagination-status">
+                  {formsCount === 0
+                    ? "No forms to display"
+                    : `Showing ${Math.min((formsPage - 1) * formsPerPage + 1, formsCount)}-${Math.min(formsPage * formsPerPage, formsCount)} of ${formsCount} forms`}
+                </div>
+              </div>
             </div>
           </div>
- 
-          {/* Users Panel */}
-          <div className="hrformlist-users-panel">
-            <div className="hrformlist-users-panel-header">
+
+          <div className="fld-users-panel">
+            <div className="fld-panel-header">
               <h3>
                 <i className="bi bi-people-fill"></i> Select Users
-                {selectedFormId ? ` #${selectedFormId}` : ""}
               </h3>
+              {selectedFormId && (
+                <div className="fld-users-filters">
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={userSearchQuery}
+                    onChange={e => {
+                      setUserSearchQuery(e.target.value);
+                      setUsersPage(1);
+                    }}
+                    className="fld-user-search-input"
+                  />
+                  <button
+                    onClick={handleSelectAll}
+                    className="fld-btn-select-all"
+                    style={{
+                      background: allEligibleSelected ? "#AC5098" : "#27235C",
+                    }}
+                    title={allEligibleSelected ? "Deselect All" : "Select All"}
+                  >
+                    <i className={allEligibleSelected ? "bi bi-x-circle" : "bi bi-check2-all"}></i>
+                    {allEligibleSelected ? "Deselect All" : "Select All"}
+                  </button>
+                </div>
+              )}
             </div>
-            {selectedFormId && users.length > 0 && (
-              <div className="hrformlist-user-search-container">
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  value={userSearchQuery}
-                  onChange={e => setUserSearchQuery(e.target.value)}
-                  className="hrformlist-user-search-input"
-                />
-               <button 
-  onClick={handleSelectAll} 
-  className="hrformlist-btn-select-all"
-  style={{
-    background: allEligibleSelected ? " #AC5098" : "#27235C",
-    color: "#fff",
-    border: "none",
-    transition: "all 0.2s"
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.opacity = "0.9";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.opacity = "1";
-  }}
+
+            <div
+  className="fld-panel-body"
+  style={{ overflowY: "auto", maxHeight: "700px", minHeight: "400px" }}
 >
-  <i className={allEligibleSelected ? "bi bi-x-circle" : "bi bi-check2-all"}></i> 
-  {allEligibleSelected ? "Deselect All" : "Select All"}
-</button>
-
-              </div>
-
-            )}
-            <div className="hrformlist-users-panel-body">
               {!selectedFormId ? (
-                <div className="hrformlist-empty-box">
+                <div className="fld-empty-box">
                   <i className="bi bi-hand-index"></i>
                   <p>Please choose a form to select users</p>
                 </div>
-              ) : filteredUsers.length === 0 ? (
-                <div className="hrformlist-empty-box">
+              ) : pagedUsers.length === 0 ? (
+                <div className="fld-empty-box">
                   <i className="bi bi-inbox"></i>
                   <p>No users available</p>
                 </div>
               ) : (
                 <>
-                  <div className="hrformlist-selected-count">
+                  <div className="fld-selected-count">
                     <i className="bi bi-check-circle-fill"></i>
-                    <strong>{selectedUserIds.length}</strong> user(s)
-                    selected
+                    <strong>{selectedUserIds.length}</strong> user(s) selected
                   </div>
-                  {filteredUsers.map(user => {
+                  {pagedUsers.map(user => {
                     const isAssigned = assignedUserIds.map(String).includes(String(user.userId));
                     const isSelected = selectedUserIds.includes(user.userId);
                     return (
                       <div
                         key={user.userId}
-                        className={`hrformlist-user-card ${isSelected ? "hrformlist-selected" : ""} ${
-                          isAssigned ? "hrformlist-disabled" : ""
-                        }`}
-                        onClick={() =>
-                          !isAssigned && toggleUser(user.userId)
-                        }
+                        className={`fld-user-card ${isSelected ? "fld-selected" : ""} ${isAssigned ? "fld-disabled" : ""}`}
+                        onClick={() => !isAssigned && toggleUser(user.userId)}
                       >
                         <input
                           type="checkbox"
@@ -523,12 +658,10 @@ function FormsList() {
                           readOnly
                           disabled={isAssigned}
                         />
-                        <div className="hrformlist-user-info">
-                          <strong>
-                            {user.firstName} {user.lastName}
-                          </strong>
+                        <div className="fld-user-info">
+                          <strong>{user.firstName} {user.lastName}</strong>
                           {isAssigned && (
-                            <span className="hrformlist-assigned-tag">
+                            <span className="fld-assigned-tag">
                               <i className="bi bi-lock-fill"></i> Assigned
                             </span>
                           )}
@@ -539,24 +672,59 @@ function FormsList() {
                 </>
               )}
             </div>
-            <div className="hrformlist-users-panel-footer">
+
+            {usersTotalPages > 0 && (
+              <div className="fld-pagination-container">
+                <div className="fld-pagination-info">
+                  <span className="fld-pagination-label">Rows per page:</span>
+                  <select
+                    className="fld-pagination-select"
+                    value={usersPerPage}
+                    onChange={(e) => {
+                      setUsersPerPage(Number(e.target.value));
+                      setUsersPage(1);
+                    }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={9}>9</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                    <option value={20}>20</option>
+                  </select>
+                </div>
+
+                <nav className="fld-pagination-nav">
+                  <ul className="fld-pagination">
+                    <li className={`fld-page-item ${usersPage === 1 ? "fld-disabled" : ""}`}>
+                      <button className="fld-page-link" onClick={() => onUsersPageChange(usersPage - 1)}>&laquo;</button>
+                    </li>
+                    {Array.from({ length: usersTotalPages }, (_, i) => (
+                      <li key={i + 1} className={`fld-page-item ${usersPage === i + 1 ? "fld-active" : ""}`}>
+                        <button className="fld-page-link" onClick={() => onUsersPageChange(i + 1)}>{i + 1}</button>
+                      </li>
+                    ))}
+                    <li className={`fld-page-item ${usersPage === usersTotalPages ? "fld-disabled" : ""}`}>
+                      <button className="fld-page-link" onClick={() => onUsersPageChange(usersPage + 1)}>&raquo;</button>
+                    </li>
+                  </ul>
+                </nav>
+
+              
+              </div>
+            )}
+
+            <div className="fld-panel-footer">
               <button
+                className="fld-btn-share"
                 onClick={() => openDeadlineModal("Send")}
-                disabled={
-                  !selectedFormId ||
-                  selectedUserIds.length === 0 ||
-                  !currentUserId
-                }
+                disabled={!selectedFormId || selectedUserIds.length === 0 || !currentUserId}
               >
                 <i className="bi bi-send-fill"></i> Share
               </button>
               <button
+                className="fld-btn-draft"
                 onClick={() => openDeadlineModal("Save as Draft")}
-                disabled={
-                  !selectedFormId ||
-                  selectedUserIds.length === 0 ||
-                  !currentUserId
-                }
+                disabled={!selectedFormId || selectedUserIds.length === 0 || !currentUserId}
               >
                 <i className="bi bi-save-fill"></i> Save Draft
               </button>
@@ -567,5 +735,5 @@ function FormsList() {
     </>
   );
 }
- 
+
 export default FormsList;

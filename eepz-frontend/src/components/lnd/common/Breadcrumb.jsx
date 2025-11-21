@@ -1,73 +1,92 @@
-import { ChevronRight, Home } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/auth/AuthContext";
 
 const Breadcrumb = ({ items }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const handleHomeClick = () => {
-    // If there's a previous item in the breadcrumb, go to it
-    if (items.length > 1 && items[items.length - 2].path) {
-      navigate(items[items.length - 2].path);
-    } else {
-      navigate(-1);
+  const handleNavigate = (path) => {
+    if (path) {
+      navigate(path);
     }
   };
 
+  const getRoleBasePath = () => {
+    const role = user?.role;
+    if (role === "Employee") return "/employee";
+    if (role === "Leadership" || role === "Leadership") return "/leadership";
+    if (role === "Department Head") return "/manager";
+    return "/manager";
+  };
+
+  const basePath = getRoleBasePath();
+
   return (
-    <nav
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        marginBottom: '1.5rem',
-        fontSize: '0.875rem',
-        color: '#6c757d',
-        flexWrap: 'wrap'
-      }}
-    >
-      <Home
-        size={16}
-        style={{ cursor: 'pointer', color: '#97247E', flexShrink: 0 }}
-        onClick={handleHomeClick}
-        title="Go Back"
-      />
-      
-      {items.map((item, index) => (
-        <div
-          key={index}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}
-        >
-          <ChevronRight size={14} style={{ flexShrink: 0 }} />
-          {item.path ? (
-            <span
-              onClick={() => navigate(item.path)}
-              style={{
-                cursor: 'pointer',
-                color: '#97247E',
-                fontWeight: index === items.length - 1 ? '600' : '400',
-                transition: 'color 0.2s'
-              }}
-              onMouseEnter={(e) => (e.target.style.textDecoration = 'underline')}
-              onMouseLeave={(e) => (e.target.style.textDecoration = 'none')}
+    <nav aria-label="breadcrumb" style={{ marginBottom: "1rem" }}>
+      <ol
+        className="breadcrumb"
+        style={{
+          backgroundColor: "#f8f9fa",
+          color: "#97247E",
+          padding: "0.75rem 1rem",
+          borderRadius: "0.5rem",
+          marginBottom: 0,
+        }}
+      >
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
+          // Build full path correctly
+          const fullPath = basePath + item.path;
+
+          return (
+            <li
+              key={index}
+              className={`breadcrumb-item ${isLast ? "active" : ""}`}
+              aria-current={isLast ? "page" : undefined}
+              style={{ fontSize: "0.95rem" }}
             >
-              {item.label}
-            </span>
-          ) : (
-            <span
-              style={{
-                fontWeight: '600',
-                color: '#212529'
-              }}
-            >
-              {item.label}
-            </span>
-          )}
-        </div>
-      ))}
+              {!isLast && fullPath ? (
+                <button
+                  onClick={() => handleNavigate(fullPath)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.textDecoration = "underline")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.textDecoration = "none")
+                  }
+                >
+                  {item.icon && <i className={`bi bi-${item.icon}`}></i>}
+                  {item.label}
+                </button>
+              ) : (
+                <span
+                  style={{
+                    color: isLast ? "#97247E" : "#212529",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    fontWeight: isLast ? 500 : 400,
+                  }}
+                >
+                  {item.icon && <i className={`bi bi-${item.icon}`}></i>}
+                  {item.label}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
     </nav>
   );
 };

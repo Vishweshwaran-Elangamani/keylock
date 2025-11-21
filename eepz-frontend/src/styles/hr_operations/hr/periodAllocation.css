@@ -116,64 +116,7 @@
   gap: 8px;
   transition: all 0.2s ease;
   cursor: pointer;
-}
- 
-.period-btn-export:hover {
-  background: #27235c;
-  color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.25);
-}
- 
-.period-btn-export i {
-  font-size: 16px;
-}
- 
-.period-btn-create {
-  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
-  color: #ffffff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.25);
-}
- 
-.period-btn-create:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.35);
-}
- 
-.period-btn-create i {
-  font-size: 16px;
-}
- 
-/* ========================================
-   BUDGET SELECTOR
-======================================== */
- 
-.period-budget-selector {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 24px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
-  margin-bottom: 24px;
-}
- 
-.budget-selector-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #27235c;
   display: flex;
   align-items: center;
   gap: 8px;

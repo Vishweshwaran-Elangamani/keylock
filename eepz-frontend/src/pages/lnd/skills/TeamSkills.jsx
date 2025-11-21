@@ -80,7 +80,7 @@ const TeamSkills = () => {
     }
   };
 
-  const handleClearSearch = () => {
+  const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
@@ -114,76 +114,40 @@ const TeamSkills = () => {
     <div>
       <Breadcrumb
         items={[
-          {
-            label: "Learning & Development",
-            path: `${rolePrefix}/lnd/dashboard`,
-          },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
           { label: "Team Skills" },
         ]}
       />
 
       {/* Search Bar */}
       <div style={{ marginBottom: "1.5rem" }}>
-        <div style={{ position: "relative", width: "100%", maxWidth: "400px" }}>
-          <Search
-            size={18}
-            style={{
-              position: "absolute",
-              left: "0.75rem",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#6c757d",
-              pointerEvents: "none",
-            }}
-          />
-          <input
-            type="text"
-            value={searchInput}
-            onChange={handleSearchChange}
-            onKeyDown={handleSearchSubmit}
-            placeholder="Search employees... (Press Enter)"
-            style={{
-              width: "100%",
-              padding: "0.625rem 2.5rem 0.625rem 2.5rem",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              outline: "none",
-              transition: "all 0.2s",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = "#97247E";
-              e.target.style.boxShadow = "0 0 0 3px rgba(151, 36, 126, 0.1)";
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = "#e5e7eb";
-              e.target.style.boxShadow = "none";
-            }}
-          />
-          {searchInput && (
-            <button
-              onClick={handleClearSearch}
-              style={{
-                position: "absolute",
-                right: "0.75rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-                color: "#6c757d",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#212529")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#6c757d")}
-              title="Clear search"
-            >
-              <X size={16} />
-            </button>
-          )}
+        <div style={{ width: "100%", maxWidth: "400px" }}>
+          <div className="input-group">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search employees..."
+              value={searchInput}
+              onChange={handleSearchChange}
+              onKeyPress={handleSearchSubmit}
+              style={{ minHeight: "35.7px" }}
+            />
+            {searchTerm ? (
+              <button
+                className="btn btn-outline-secondary"
+                onClick={handleCancelSearch}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={handleSearchSubmit}>
+                <i className="bi bi-search me-1"></i>
+                Search
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

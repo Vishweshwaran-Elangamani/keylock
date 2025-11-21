@@ -48,8 +48,8 @@ const GoalTypeToggle = ({
               borderRight: "1px solid rgba(0, 0, 0, 0.1)",
               transition: "all 0.2s ease",
               position: "relative",
-              backgroundColor: isActive ? "#0d6efd" : "#fff",
-              color: isActive ? "#fff" : "#0d6efd",
+              backgroundColor: isActive ? "rgb(39, 35, 92)" : "#fff",
+              color: isActive ? "#fff" : "rgb(39, 35, 92)",
             }}
             onMouseEnter={(e) => {
               if (!isActive && !disabled) {

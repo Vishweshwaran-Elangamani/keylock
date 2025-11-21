@@ -15,13 +15,13 @@ const LeadershipDashboard = () => {
       gradient: "gradient-red",
       path: "/leadership/budget-management",
     },
-    {
-      title: "Career Progression",
-      description: "Approve promotions submitted by HR with salary details",
-      icon: "bi-check-circle",
-      gradient: "gradient-blue",
-      path: "/leadership/promotions",
-    },
+    // {
+    //   title: "Career Progression",
+    //   description: "Approve promotions submitted by HR with salary details",
+    //   icon: "bi-check-circle",
+    //   gradient: "gradient-blue",
+    //   path: "/leadership/promotions",
+    // },
     {
       title: "Company Policies",
       description: "View organizational policies",

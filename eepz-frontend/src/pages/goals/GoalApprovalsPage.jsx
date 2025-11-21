@@ -5,7 +5,7 @@ import ApprovalReviewModal from "../../components/goals/modals/ApprovalReviewMod
 import ConfirmationModal from "../../components/goals/modals/ConfirmationModal";
 import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
-import Pagination from "../../components/goals/common/Pagination"; // ✅ Import Pagination
+import Pagination from "../../components/goals/common/Pagination";
 import { APPROVAL_TYPE_LABELS } from "../../constants/goals/goalConstants";
 import Breadcrumb from "../../components/goals/common/Breadcrumb";
 
@@ -16,20 +16,18 @@ const GoalApprovalsPage = () => {
   const [allApprovals, setAllApprovals] = useState([]);
   const [viewMode, setViewMode] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterDate, setFilterDate] = useState("");
 
-  // Modals
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [pendingDecision, setPendingDecision] = useState(null);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const approvalsPerPage = 10;
 
-  // Role checks
   const canApprove = ["Manager", "Department Head", "Leadership"].includes(
     user.role
   );
@@ -39,7 +37,6 @@ const GoalApprovalsPage = () => {
     loadApprovals();
   }, []);
 
-  // MINIMAL: Only remove exact duplicates
   const deduplicateApprovals = (approvals) => {
     if (!approvals || approvals.length === 0) return [];
 
@@ -122,13 +119,28 @@ const GoalApprovalsPage = () => {
     }
   };
 
-  // ✅ Pagination handler
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Filter by view mode
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+    setCurrentPage(1);
+  };
+
+  const handleCancelSearch = () => {
+    setSearchTerm("");
+    setActiveSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   const approvalsByMode = allApprovals.filter((approval) => {
     if (viewMode === "pending") {
       return approval.approvalStatus === "pending";
@@ -137,10 +149,9 @@ const GoalApprovalsPage = () => {
     }
   });
 
-  // Apply search and filters
   const filteredApprovals = approvalsByMode.filter((approval) => {
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
+    if (activeSearchTerm) {
+      const searchLower = activeSearchTerm.toLowerCase();
       const matchesSearch =
         approval.goalTitle?.toLowerCase().includes(searchLower) ||
         approval.requestedByName?.toLowerCase().includes(searchLower);
@@ -174,7 +185,6 @@ const GoalApprovalsPage = () => {
     return true;
   });
 
-  // Pagination
   const indexOfLastApproval = currentPage * approvalsPerPage;
   const indexOfFirstApproval = indexOfLastApproval - approvalsPerPage;
   const currentApprovals = filteredApprovals.slice(
@@ -183,7 +193,6 @@ const GoalApprovalsPage = () => {
   );
   const totalPages = Math.ceil(filteredApprovals.length / approvalsPerPage);
 
-  // Counts
   const pendingCount = allApprovals.filter(
     (a) => a.approvalStatus === "pending"
   ).length;
@@ -209,15 +218,14 @@ const GoalApprovalsPage = () => {
 
   return (
     <div className="container-fluid p-4">
-      {/* Breadcrumb */}
       <Breadcrumb
         items={[
-          { label: "Dashboard", path: "/dashboard/goals", icon: "house-door" },
-          { label: "Approvals", path: null, icon: "clipboard-check" },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
+          { label: "Approvals", path: null, icon: "" },
         ]}
       />
 
-      {/* Alert */}
       {alert && (
         <Alert
           type={alert.type}
@@ -226,7 +234,6 @@ const GoalApprovalsPage = () => {
         />
       )}
 
-      {/* View Mode Toggle */}
       <div
         className="btn-group mb-4 w-100"
         role="group"
@@ -260,27 +267,30 @@ const GoalApprovalsPage = () => {
         </button>
       </div>
 
-      {/* Search & Filters */}
       <div className="row g-3 mb-4">
         <div className="col-md-6">
           <div className="input-group">
-            <span className="input-group-text">
-              <i className="bi bi-search"></i>
-            </span>
             <input
               type="text"
               className="form-control"
               placeholder="Search by goal title or requester..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ minHeight: "2.5em" }}
+              onKeyPress={handleSearchKeyPress}
+              style={{ minHeight: "35.7px" }}
             />
-            {searchTerm && (
+            {activeSearchTerm ? (
               <button
                 className="btn btn-outline-secondary"
-                onClick={() => setSearchTerm("")}
+                onClick={handleCancelSearch}
               >
-                <i className="bi bi-x-lg"></i>
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={handleSearch}>
+                <i className="bi bi-search me-1"></i>
+                Search
               </button>
             )}
           </div>
@@ -315,15 +325,7 @@ const GoalApprovalsPage = () => {
         </div>
       </div>
 
-      {/* Results Summary */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <span style={{ fontWeight: 600, fontSize: "1rem", color: "#212529" }}>
-            {filteredApprovals.length} Result
-            {filteredApprovals.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-
         {totalPages > 1 && (
           <div className="text-muted" style={{ fontSize: "0.9rem" }}>
             Page {currentPage} of {totalPages}
@@ -331,7 +333,6 @@ const GoalApprovalsPage = () => {
         )}
       </div>
 
-      {/* Loading State */}
       {loading ? (
         <LoadingSpinner text="Loading approvals..." />
       ) : currentApprovals.length === 0 ? (
@@ -354,8 +355,13 @@ const GoalApprovalsPage = () => {
         </div>
       ) : (
         <>
-          {/* Table View */}
-          <div className="table-responsive">
+          <div
+            className="table-responsive"
+            style={{
+              borderRadius: "1.5rem 1.5rem 0rem 0rem",
+              border: "1px solid rgba(39, 35, 92, 0.24)",
+            }}
+          >
             <table className="table table-hover align-start mb-0">
               <thead
                 style={{
@@ -367,17 +373,16 @@ const GoalApprovalsPage = () => {
                 <tr>
                   <th
                     style={{
-                      width: "20%",
+                      width: "25%",
                       color: "white",
                       backgroundColor: "rgb(39, 35, 92)",
-                      borderRadius: "1.5rem 0rem 0rem 0rem",
                     }}
                   >
                     TITLE
                   </th>
                   <th
                     style={{
-                      width: "15%",
+                      width: "20%",
                       color: "white",
                       backgroundColor: "rgb(39, 35, 92)",
                     }}
@@ -386,7 +391,7 @@ const GoalApprovalsPage = () => {
                   </th>
                   <th
                     style={{
-                      width: "15%",
+                      width: "20%",
                       color: "white",
                       backgroundColor: "rgb(39, 35, 92)",
                     }}
@@ -395,7 +400,7 @@ const GoalApprovalsPage = () => {
                   </th>
                   <th
                     style={{
-                      width: "10%",
+                      width: "15%",
                       color: "white",
                       backgroundColor: "rgb(39, 35, 92)",
                     }}
@@ -404,31 +409,12 @@ const GoalApprovalsPage = () => {
                   </th>
                   <th
                     style={{
-                      width: "13%",
+                      width: "20%",
                       color: "white",
                       backgroundColor: "rgb(39, 35, 92)",
                     }}
                   >
                     REQUESTED ON
-                  </th>
-                  <th
-                    style={{
-                      width: "15%",
-                      color: "white",
-                      backgroundColor: "rgb(39, 35, 92)",
-                    }}
-                  >
-                    DESCISION
-                  </th>
-                  <th
-                    style={{
-                      width: "10%",
-                      color: "white",
-                      backgroundColor: "rgb(39, 35, 92)",
-                      borderRadius: "0rem 1.5rem 0rem 0rem",
-                    }}
-                  >
-                    REVIEW
                   </th>
                 </tr>
               </thead>
@@ -440,9 +426,18 @@ const GoalApprovalsPage = () => {
                       approval.requestedByEmployeeMasterId;
 
                   return (
-                    <tr key={approval.approvalId}>
-                      {/* Goal Title */}
-                      <td>
+                    <tr
+                      key={approval.approvalId}
+                      onClick={() => handleReviewClick(approval)}
+                      style={{ cursor: "pointer", height: "60px" }}
+                    >
+                      <td
+                        style={{
+                          fontSize: "14px",
+                          paddingTop: "20px",
+                          paddingBottom: "20px",
+                        }}
+                      >
                         <div
                           style={{
                             fontWeight: 500,
@@ -454,69 +449,47 @@ const GoalApprovalsPage = () => {
                         </div>
                       </td>
 
-                      {/* Type */}
-                      <td style={{ paddingLeft: "50px", textAlign: "left" }}>
+                      <td
+                        style={{
+                          paddingLeft: "50px",
+                          textAlign: "left",
+                          paddingTop: "20px",
+                          paddingBottom: "20px",
+                        }}
+                      >
                         <span
                           className="text-muted"
-                          style={{ fontSize: "0.9rem" }}
+                          style={{ fontSize: "14px" }}
                         >
                           {APPROVAL_TYPE_LABELS[approval.approvalType] ||
                             approval.approvalType}
                         </span>
                       </td>
 
-                      {/* Status */}
-                      <td>{getStatusBadge(approval.approvalStatus)}</td>
+                      <td style={{ paddingTop: "20px", paddingBottom: "20px" }}>
+                        {getStatusBadge(approval.approvalStatus)}
+                      </td>
 
-                      {/* Requested By */}
-                      <td style={{ paddingLeft: "30px", textAlign: "left" }}>
-                        <span style={{ fontSize: "0.9rem" }}>
+                      <td
+                        style={{
+                          paddingLeft: "30px",
+                          textAlign: "left",
+                          paddingTop: "20px",
+                          paddingBottom: "20px",
+                        }}
+                      >
+                        <span style={{ fontSize: "14px" }}>
                           {approval.requestedByName}
                         </span>
                       </td>
 
-                      {/* Requested On */}
-                      <td>
+                      <td style={{ paddingTop: "20px", paddingBottom: "20px" }}>
                         <span
                           className="text-muted"
-                          style={{ fontSize: "0.875rem" }}
+                          style={{ fontSize: "14px" }}
                         >
                           {new Date(approval.requestedOn).toLocaleDateString()}
                         </span>
-                      </td>
-
-                      {/* Decided */}
-                      <td>
-                        {approval.approvedOn ? (
-                          <div style={{ fontSize: "0.875rem" }}>
-                            <div className="text-muted">
-                              {new Date(
-                                approval.approvedOn
-                              ).toLocaleDateString()}
-                            </div>
-                            {approval.approverName && (
-                              <div
-                                className="text-muted"
-                                style={{ fontSize: "0.8rem" }}
-                              >
-                                by {approval.approverName}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-muted">—</span>
-                        )}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="text-center">
-                        <button
-                          className="btn btn-outline-primary btn-sm"
-                          onClick={() => handleReviewClick(approval)}
-                          title="View Details"
-                        >
-                          <i className="bi bi-eye"></i>
-                        </button>
                       </td>
                     </tr>
                   );
@@ -538,7 +511,6 @@ const GoalApprovalsPage = () => {
         </>
       )}
 
-      {/* Review Modal */}
       {selectedApproval && (
         <ApprovalReviewModal
           isOpen={showReviewModal}
@@ -558,7 +530,6 @@ const GoalApprovalsPage = () => {
         />
       )}
 
-      {/* Confirmation Modal */}
       {showConfirmModal && pendingDecision && (
         <ConfirmationModal
           isOpen={showConfirmModal}

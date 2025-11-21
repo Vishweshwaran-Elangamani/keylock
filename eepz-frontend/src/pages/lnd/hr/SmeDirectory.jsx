@@ -80,7 +80,8 @@ const SmeDirectory = () => {
     <div>
       <Breadcrumb
         items={[
-          { label: "Learning & Development", path: "/hr/lnd/dashboard" },
+          { label: "", path: "/dashboard", icon: "house-door" },
+          { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
           { label: "SME Directory" },
         ]}
       />

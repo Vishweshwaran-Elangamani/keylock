@@ -590,7 +590,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   borderRadius: "0.5rem",
                   cursor: "pointer",
                   color: "white",
-                  fontSize: "1.5rem",
+                  fontSize: "16px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -638,7 +638,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label">
+                        <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
                           Goal Type <span className="text-danger">*</span>
                         </label>
                         <select
@@ -669,7 +669,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       </div>
 
                       <div className="mb-3">
-                        <label className="form-label">
+                        <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
                           Title <span className="text-danger">*</span>
                         </label>
                         <input
@@ -702,7 +702,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                     <div className="col-md-6">
                       {/* Disable project for org goals */}
                       <div className="mb-3">
-                        <label className="form-label">
+                        <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
                           Project
                           {formData.type === GOAL_TYPES.TEAM && (
                             <span className="text-danger">*</span>
@@ -755,7 +755,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       </div>
 
                       <div className="mb-3">
-                        <label className="form-label">
+                        <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
                           Deadline <span className="text-danger">*</span>
                         </label>
                         <input
@@ -798,7 +798,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>Description</label>
                     <textarea
                       className="form-control"
                       rows="3"
@@ -815,7 +815,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
                   {formData.type === GOAL_TYPES.TEAM && (
                     <div className="mb-3" ref={assigneeDropdownRef}>
-                      <label className="form-label">
+                      <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
                         Team Members <span className="text-danger">*</span>
                       </label>
                       {!formData.projectId && !isEdit ? (
@@ -864,7 +864,11 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           {showAssigneeDropdown && !isEdit && (
                             <div
                               className="card mt-2"
-                              style={{ maxHeight: "200px", overflowY: "auto" }}
+                              style={{
+                                maxHeight: "200px",
+                                overflowY: "auto",
+                                textAlign: "left",
+                              }}
                             >
                               <div className="list-group list-group-flush">
                                 {loadingEmployees ? (
@@ -905,7 +909,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                             )
                                           }
                                         />
-                                        <label className="form-check-label">
+                                        <label
+                                          className="form-check-label"
+                                          style={{ paddingLeft: "20px", fontSize: "14px", fontWeight: 700 }}
+                                        >
                                           {emp.fullName}
                                         </label>
                                       </div>
@@ -956,14 +963,14 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
                   {/* Checklist section */}
                   <div className="mb-3">
-                    <h6 className="mb-3">
+                    <h5 className="mb-3">
                       Checklist Items
                       {formData.type === GOAL_TYPES.TEAM && (
                         <small className="text-muted ms-2">
                           (Each team member will have their own tasks)
                         </small>
                       )}
-                    </h6>
+                    </h5>
 
                     {formData.type === GOAL_TYPES.TEAM &&
                     formData.assignees.length === 0 &&
@@ -988,7 +995,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           return (
                             <div key={assigneeId} className="mb-4">
                               <div className="d-flex justify-content-between align-items-center mb-2">
-                                <label className="form-label mb-0">
+                                <label className="form-label mb-0" style={{fontSize: "14px", fontWeight: 700}}>
                                   <i className="bi bi-person-badge me-2"></i>
                                   {assigneeName}
                                 </label>
@@ -999,8 +1006,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                     className="btn btn-sm btn-outline-primary"
                                     onClick={() => addChecklistItem(assigneeId)}
                                     disabled={loading}
+                                    style={{ fontSize: "15px" }}
+                                    title="Add checklist item"
                                   >
-                                    <i className="bi bi-plus-circle me-1"></i>
+                                    <i className="bi bi-clipboard2-plus m-1"></i>
                                   </button>
                                 )}
                               </div>
@@ -1037,38 +1046,11 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                         </div>
                                       )}
 
-                                      <div className="d-flex justify-content-end mb-2">
-                                        <button
-                                          type="button"
-                                          className="btn btn-sm btn-outline-danger"
-                                          onClick={() =>
-                                            removeChecklistItem(
-                                              assigneeId,
-                                              index
-                                            )
-                                          }
-                                          disabled={
-                                            loading ||
-                                            isItemCompleted ||
-                                            items.length === 1
-                                          }
-                                          title={
-                                            isItemCompleted
-                                              ? "Cannot remove completed items"
-                                              : items.length === 1
-                                              ? "At least one item required"
-                                              : "Remove item"
-                                          }
-                                        >
-                                          <i className="bi bi-trash"></i>
-                                        </button>
-                                      </div>
-
                                       <div className="mb-2">
                                         <label
                                           style={{
-                                            fontSize: "0.875rem",
-                                            fontWeight: 500,
+                                            fontSize: "14px",
+                                            fontWeight: 700,
                                             display: "block",
                                             textAlign: "left",
                                             marginBottom: "0.25rem",
@@ -1079,56 +1061,88 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                             *
                                           </span>
                                         </label>
-                                        <input
-                                          type="text"
-                                          className="form-control form-control-sm"
-                                          placeholder="Enter task title"
-                                          value={item.title}
-                                          onChange={(e) =>
-                                            updateChecklistItem(
-                                              assigneeId,
-                                              index,
-                                              "title",
-                                              e.target.value
-                                            )
-                                          }
-                                          // Disable title editing for existing items in edit mode
-                                          disabled={
-                                            loading ||
-                                            isItemCompleted ||
-                                            (isEdit && isExistingItem)
-                                          }
-                                          required
-                                          maxLength={200}
+                                        <div
                                           style={{
-                                            backgroundColor:
-                                              isItemCompleted ||
-                                              (isEdit && isExistingItem)
-                                                ? "#e9ecef"
-                                                : "#fff",
-                                            cursor:
-                                              isItemCompleted ||
-                                              (isEdit && isExistingItem)
-                                                ? "not-allowed"
-                                                : "text",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "8px",
                                           }}
-                                        />
-                                        {/* Show info message for locked titles */}
-                                        {isEdit &&
-                                          isExistingItem &&
-                                          !isItemCompleted && (
-                                            <small className="text-muted d-block mt-1">
-                                              <i className="bi bi-lock-fill me-1"></i>
-                                              Title cannot be edited
-                                            </small>
-                                          )}
+                                        >
+                                          <input
+                                            type="text"
+                                            className="form-control form-control-sm"
+                                            placeholder="Enter task title"
+                                            value={item.title}
+                                            onChange={(e) =>
+                                              updateChecklistItem(
+                                                assigneeId,
+                                                index,
+                                                "title",
+                                                e.target.value
+                                              )
+                                            }
+                                            // Disable title editing for existing items in edit mode
+                                            disabled={
+                                              loading ||
+                                              isItemCompleted ||
+                                              (isEdit && isExistingItem)
+                                            }
+                                            required
+                                            maxLength={200}
+                                            style={{
+                                              backgroundColor:
+                                                isItemCompleted ||
+                                                (isEdit && isExistingItem)
+                                                  ? "#e9ecef"
+                                                  : "#fff",
+                                              cursor:
+                                                isItemCompleted ||
+                                                (isEdit && isExistingItem)
+                                                  ? "not-allowed"
+                                                  : "text",
+                                            }}
+                                          />
+                                          {/* Show info message for locked titles */}
+                                          {isEdit &&
+                                            isExistingItem &&
+                                            !isItemCompleted && (
+                                              <small className="text-muted d-block mt-1">
+                                                <i className="bi bi-lock-fill me-1"></i>
+                                                Title cannot be edited
+                                              </small>
+                                            )}
+                                          <button
+                                            type="button"
+                                            className="btn btn-sm btn-outline-danger"
+                                            onClick={() =>
+                                              removeChecklistItem(
+                                                assigneeId,
+                                                index
+                                              )
+                                            }
+                                            disabled={
+                                              loading ||
+                                              isItemCompleted ||
+                                              items.length === 1
+                                            }
+                                            title={
+                                              isItemCompleted
+                                                ? "Cannot remove completed items"
+                                                : items.length === 1
+                                                ? "At least one item required"
+                                                : "Remove item"
+                                            }
+                                          >
+                                            <i className="bi bi-trash"></i>
+                                          </button>
+                                        </div>
                                       </div>
 
                                       <div>
                                         <label
                                           style={{
-                                            fontSize: "0.875rem",
-                                            fontWeight: 500,
+                                            fontSize: "14px",
+                                            fontWeight: 700,
                                             display: "block",
                                             textAlign: "left",
                                             marginBottom: "0.25rem",
