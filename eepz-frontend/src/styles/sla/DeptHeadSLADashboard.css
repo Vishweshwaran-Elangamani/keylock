@@ -1,0 +1,172 @@
+/* ============= TABLE STYLES ============= */
+.escalations-table {
+  margin-bottom: 0;
+}
+
+.escalations-table thead {
+  background-color: #3d416d !important;
+}
+
+.escalations-table thead th {
+  color: white !important;
+  border-color: #3d416d !important;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 0.75rem 1rem !important;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.escalations-table tbody {
+  background-color: white;
+}
+
+.escalations-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s ease;
+}
+
+.escalations-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.escalations-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.escalations-table tbody td {
+  vertical-align: middle !important;
+  padding: 1rem !important;
+  color: #333;
+}
+
+/* Employee Column Styling */
+.employee-cell strong {
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.employee-cell small {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* Manager Column */
+.manager-cell {
+  font-weight: 500;
+  color: #424242;
+}
+
+/* Reason Column */
+.reason-cell strong {
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.reason-cell small {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* Status Badge - Simple Bootstrap Style */
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-pending {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.status-resolved {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Days Left Styling */
+.days-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.days-overdue {
+  color: #dc3545;
+}
+
+.days-due-soon {
+  color: #ffc107;
+}
+
+.days-normal {
+  color: #0d6efd;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.action-btn {
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-view {
+  background-color: transparent;
+  border: 2px solid #0d6efd;
+  color: #0d6efd;
+}
+
+.btn-view:hover {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.btn-approve {
+  background-color: #28a745;
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+}
+
+.btn-approve:hover {
+  background-color: #218838;
+}
+
+/* Table Card Wrapper */
+.table-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.table-responsive {
+  border-radius: 0 0 12px 12px;
+}
