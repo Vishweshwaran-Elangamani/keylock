@@ -64,7 +64,6 @@ const GoalTracker = ({ summary }) => {
           <div
             className="card h-100"
             style={{
-              border: "none",
               borderRadius: "0.75rem",
               border: `1px solid ${card.bgColor}`,
               transition: "all 0.2s ease",

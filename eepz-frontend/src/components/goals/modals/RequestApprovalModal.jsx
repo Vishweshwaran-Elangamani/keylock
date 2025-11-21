@@ -531,7 +531,7 @@ const RequestApprovalModal = ({
                       style={{
                         borderRadius: "0.5rem",
                         padding: "0.5rem 1rem",
-                        marginLeft: "25rem",
+                        marginLeft: "300px",
                       }}
                     >
                       <i className="bi bi-trash-fill"></i>
