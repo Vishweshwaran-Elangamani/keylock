@@ -199,6 +199,7 @@ const EditRoleModal = ({ show, role, onClose, onSuccess }) => {
                     borderRadius: 4,
                     fontSize: 13,
                     gap: 7,
+                    textAlign: "center"
                   }}
                 >
                   <i className="bi bi-exclamation-triangle-fill"></i>

@@ -152,13 +152,13 @@ const DeleteDepartmentModal = ({ show, department, onClose, onConfirm }) => {
             >
               <div
                 style={{
-                  display: "flex",
+                  textAlign: "center",
                   alignItems: "center",
-                  gap: 6,
+                  gap: 12,
                   color: "#b45309",
                   fontWeight: 700,
                   fontSize: 13,
-                  marginBottom: 3,
+                  marginBottom: 4
                 }}
               >
                 <i className="bi bi-exclamation-triangle-fill"></i>

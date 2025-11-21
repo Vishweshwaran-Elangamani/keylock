@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
-
+ 
 const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -11,7 +11,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     mobileNumber: "",
     dateOfBirthOfficial: "",
     gender: "",
-    employmentType: "Permanent",
+    employmentType: "",
     employmentStatus: "Active",
     joiningDate: new Date().toISOString().split("T")[0],
     employeeType: "FullTime",
@@ -20,7 +20,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-
+ 
   useEffect(() => {
     const fetchNextEmployeeId = async () => {
       try {
@@ -34,13 +34,13 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       } catch (error) {
         setFormData(prev => ({
           ...prev,
-          employeeCompanyId: "12560"
+          employeeCompanyId: ""
         }));
       }
     };
     if (show) fetchNextEmployeeId();
   }, [show]);
-
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "employeeCompanyId") {
@@ -52,17 +52,21 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     }
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
-
+ 
   const validateForm = () => {
     const newErrors = {};
+   
+    // First Name validation
     if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
     else if (formData.firstName.trim().length < 2) newErrors.firstName = "First name must be at least 2 characters";
     else if (!/^[a-zA-Z\s]+$/.test(formData.firstName.trim())) newErrors.firstName = "First name must contain only letters";
-
+ 
+    // Last Name validation
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
     else if (formData.lastName.trim().length < 2) newErrors.lastName = "Last name must be at least 2 characters";
     else if (!/^[a-zA-Z\s]+$/.test(formData.lastName.trim())) newErrors.lastName = "Last name must contain only letters";
-
+ 
+    // Employee Company ID validation
     if (!formData.employeeCompanyId.trim()) newErrors.employeeCompanyId = "Employee Company ID is required";
     else if (!/^\d+$/.test(formData.employeeCompanyId.trim())) newErrors.employeeCompanyId = "Employee Company ID must contain only numbers";
     else {
@@ -70,16 +74,22 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       if (idNumber < 12560) newErrors.employeeCompanyId = "Employee Company ID must start from 12560 or higher";
       else if (idNumber > 999999) newErrors.employeeCompanyId = "Employee Company ID must be less than 1000000";
     }
-
+ 
+    // Email validation
     if (!formData.email.trim()) newErrors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) newErrors.email = "Please enter a valid email address";
-
-    if (formData.mobileNumber.trim()) {
-      if (!/^[6-9][0-9]{9}$/.test(formData.mobileNumber.trim()))
-        newErrors.mobileNumber = "Phone number must start with 6-9 and be exactly 10 digits";
+ 
+    // Mobile Number validation - NOW REQUIRED
+    if (!formData.mobileNumber.trim()) {
+      newErrors.mobileNumber = "Mobile number is required";
+    } else if (!/^[6-9][0-9]{9}$/.test(formData.mobileNumber.trim())) {
+      newErrors.mobileNumber = "Phone number must start with 6-9 and be exactly 10 digits";
     }
-
-    if (formData.dateOfBirthOfficial) {
+ 
+    // Date of Birth validation - NOW REQUIRED
+    if (!formData.dateOfBirthOfficial) {
+      newErrors.dateOfBirthOfficial = "Date of birth is required";
+    } else {
       const dob = new Date(formData.dateOfBirthOfficial);
       const today = new Date();
       const age = today.getFullYear() - dob.getFullYear();
@@ -87,13 +97,23 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       else if (age < 18) newErrors.dateOfBirthOfficial = "User must be at least 18 years old";
       else if (age > 100) newErrors.dateOfBirthOfficial = "Please enter a valid date of birth";
     }
-
+ 
+    // Gender validation - NOW REQUIRED
+    if (!formData.gender) newErrors.gender = "Gender is required";
+ 
+    // Employment Type validation - NOW REQUIRED
+    if (!formData.employmentType) newErrors.employmentType = "Employment type is required";
+ 
+    // Role validation
     if (!formData.roleId) newErrors.roleId = "Role is required";
+   
+    // Department validation
     if (!formData.departmentId) newErrors.departmentId = "Department is required";
+   
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -140,7 +160,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
           mobileNumber: "",
           dateOfBirthOfficial: "",
           gender: "",
-          employmentType: "Permanent",
+          employmentType: "",
           employmentStatus: "Active",
           joiningDate: new Date().toISOString().split("T")[0],
           employeeType: "FullTime",
@@ -162,9 +182,9 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
       setLoading(false);
     }
   };
-
+ 
   if (!show) return null;
-
+ 
   return (
     <>
       {/* Blurred Blue Backdrop */}
@@ -253,6 +273,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <input
                     type="text"
                     name="firstName"
+                    placeholder="Enter first name"
                     value={formData.firstName}
                     onChange={handleChange}
                     maxLength={100}
@@ -278,6 +299,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <input
                     type="text"
                     name="lastName"
+                    placeholder="Enter last name"
                     value={formData.lastName}
                     onChange={handleChange}
                     maxLength={100}
@@ -303,6 +325,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <input
                     type="text"
                     name="employeeCompanyId"
+                    placeholder="e.g., 12560"
                     value={formData.employeeCompanyId}
                     onChange={handleChange}
                     maxLength={6}
@@ -331,6 +354,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <input
                     type="email"
                     name="email"
+                    placeholder="Enter email ID"
                     value={formData.email}
                     onChange={handleChange}
                     maxLength={255}
@@ -346,12 +370,12 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   />
                   {errors.email && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.email}</div>}
                 </div>
-                {/* Mobile Number */}
+                {/* Mobile Number - NOW REQUIRED */}
                 <div style={{ flex: 1, minWidth: "47%" }}>
                   <label style={{
                     fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
                   }}>
-                    Mobile
+                    Mobile <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
                   </label>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <span style={{
@@ -363,13 +387,14 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     <input
                       type="tel"
                       name="mobileNumber"
+                      placeholder="Enter mobile number"
                       value={formData.mobileNumber}
                       onChange={handleChange}
                       maxLength={10}
                       style={{
-                        borderTop: "1px solid #cbd5e1",
-                        borderRight: "1px solid #cbd5e1",
-                        borderBottom: "1px solid #cbd5e1",
+                        borderTop: errors.mobileNumber ? "1px solid #dc3545" : "1px solid #cbd5e1",
+                        borderRight: errors.mobileNumber ? "1px solid #dc3545" : "1px solid #cbd5e1",
+                        borderBottom: errors.mobileNumber ? "1px solid #dc3545" : "1px solid #cbd5e1",
                         borderLeft: "none",
                         borderRadius: "0 6px 6px 0",
                         fontSize: 13,
@@ -381,18 +406,19 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     />
                   </div>
                   {errors.mobileNumber && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.mobileNumber}</div>}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>Optional, must start with 6-9 (10 digits)</small>
+                  <small style={{ color: "#64748b", fontSize: 11 }}>Must start with 6-9 (10 digits)</small>
                 </div>
-                {/* Date of Birth */}
+                {/* Date of Birth - NOW REQUIRED */}
                 <div style={{ flex: 1, minWidth: "47%" }}>
                   <label style={{
                     fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
                   }}>
-                    Date of Birth
+                    Date of Birth <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
                   </label>
                   <input
                     type="date"
                     name="dateOfBirthOfficial"
+                    placeholder="dd/mm/yyyy"
                     value={formData.dateOfBirthOfficial}
                     onChange={handleChange}
                     style={{
@@ -406,14 +432,14 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     }}
                   />
                   {errors.dateOfBirthOfficial && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.dateOfBirthOfficial}</div>}
-                  <small style={{ color: "#64748b", fontSize: 11 }}>Optional, must be 18+ years old</small>
+                  <small style={{ color: "#64748b", fontSize: 11 }}>Must be 18+ years old</small>
                 </div>
-                {/* Gender */}
+                {/* Gender - NOW REQUIRED */}
                 <div style={{ flex: 1, minWidth: "47%" }}>
                   <label style={{
                     fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
                   }}>
-                    Gender
+                    Gender <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
                   </label>
                   <select
                     name="gender"
@@ -421,20 +447,21 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     onChange={handleChange}
                     style={{
                       width: "100%",
-                      border: "1px solid #cbd5e1",
+                      border: errors.gender ? "1px solid #dc3545" : "1px solid #cbd5e1",
                       borderRadius: 6,
                       fontSize: 13,
                       background: "#fff",
                       color: "#22223b",
                       padding: "8px 9px"
                     }}>
-                    <option value="">Select Gender</option>
+                    <option value="" disabled>Select Gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="PreferNotToSay">Prefer not to say</option>
                   </select>
+                  {errors.gender && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.gender}</div>}
                 </div>
-                {/* Employment Type */}
+                {/* Employment Type - NOW REQUIRED */}
                 <div style={{ flex: 1, minWidth: "47%" }}>
                   <label style={{
                     fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
@@ -447,21 +474,23 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                     onChange={handleChange}
                     style={{
                       width: "100%",
-                      border: "1px solid #cbd5e1",
+                      border: errors.employmentType ? "1px solid #dc3545" : "1px solid #cbd5e1",
                       borderRadius: 6,
                       fontSize: 13,
                       background: "#fff",
                       color: "#22223b",
                       padding: "8px 9px"
                     }}>
+                    <option value="" disabled>Select Employment Type</option>
                     <option value="Permanent">Permanent</option>
                     <option value="Contract">Contract</option>
                     <option value="Temporary">Temporary</option>
                     <option value="Intern">Intern</option>
                     <option value="Probation">Probation</option>
                   </select>
+                  {errors.employmentType && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.employmentType}</div>}
                 </div>
-                {/* Role */}
+                {/* Role - ✅ ADMIN ROLE EXCLUDED */}
                 <div style={{ flex: 1, minWidth: "47%" }}>
                   <label style={{
                     fontWeight: 600, fontSize: 13, color: "#334155", marginBottom: 2, display: "block"
@@ -481,8 +510,8 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       color: "#22223b",
                       padding: "8px 9px",
                     }}>
-                    <option value="">Select Role</option>
-                    {roles.map((role) => (
+                    <option value="" disabled>Select Role</option>
+                    {roles.filter(role => role.roleName !== "Admin").map((role) => (
                       <option key={role.roleId} value={role.roleId}>
                         {role.roleName}
                       </option>
@@ -510,7 +539,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                       color: "#22223b",
                       padding: "8px 9px",
                     }}>
-                    <option value="">Select Department</option>
+                    <option value="" disabled>Select Department</option>
                     {departments.map((dept) => (
                       <option key={dept.departmentId} value={dept.departmentId}>
                         {dept.departmentName}
@@ -627,5 +656,5 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     </>
   );
 };
-
+ 
 export default AddUserModal;

@@ -1,209 +1,337 @@
-/**
- * DeactivateUserModal Component
- *
- * A confirmation modal for permanently deactivating users from the system.
- * Features:
- * - Critical warning message to prevent accidental deactivations
- * - Clear explanation of consequences
- * - Loading state during API call
- * - Toast notifications using Sonner for success/error feedback
- * - Cannot be reversed once executed
- *
- * @param {boolean} show - Controls modal visibility
- * @param {function} onHide - Callback to close the modal
- * @param {function} onUserDeactivated - Callback after successful deactivation
- * @param {Object} user - User object containing user details to be deactivated
- */
-
 import { useState } from "react";
 import userService from "../../../../services/auth/userService";
 import { toast } from "sonner";
-import "../../../../styles/auth/user/DeactivateUserModal.css";
 
 const DeactivateUserModal = ({ show, onHide, onUserDeactivated, user }) => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-
-  /**
-   * Loading state - tracks deactivation operation status
-   * Used to disable buttons and show loading indicator during API call
-   */
   const [loading, setLoading] = useState(false);
 
-  // ========================
-  // EVENT HANDLERS
-  // ========================
-
-  /**
-   * Handles user deactivation
-   * Makes API call to permanently deactivate the user
-   * Shows success/error notifications using Sonner toast
-   * This action is PERMANENT and cannot be reversed
-   */
   const handleDeactivate = async () => {
     try {
-      // Set loading state to disable buttons and show spinner
       setLoading(true);
-
-      // -------- API Call --------
-      // Call user service to permanently deactivate the user
       const response = await userService.deactivateUser(user.userId);
 
-      // -------- Handle Success Response --------
       if (response.success) {
-        // Show success notification using Sonner toast
         toast.success("User deactivated permanently!");
-
-        // Trigger parent callback to refresh user list
         onUserDeactivated();
-
-        // CRITICAL: Delay closing the modal to allow toast to render
-        // Without this delay, modal unmounts before toast displays
         setTimeout(() => {
           onHide();
-        }, 500); // 500ms delay
+        }, 500);
       } else {
-        // -------- Handle Failure Response --------
-        // Show error notification with API error message
         toast.error(response.message || "Failed to deactivate user");
       }
     } catch (error) {
-      // -------- Handle Exception --------
-      // Show error notification with error message
       toast.error(error.message || "Failed to deactivate user");
     } finally {
-      // -------- Cleanup --------
-      // Always reset loading state regardless of success or failure
       setLoading(false);
     }
   };
 
-  // ========================
-  // RENDER LOGIC
-  // ========================
-
-  // Don't render modal if show prop is false
   if (!show) return null;
 
   return (
     <>
-      {/* Modal Backdrop - Darkens background */}
-      <div className="modal-backdrop-deactivate"></div>
+      {/* Blurred Backdrop */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(39,35,92,0.4)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          zIndex: 1040,
+        }}
+        onClick={onHide}
+      />
 
-      {/* Modal Wrapper - Centers modal on screen */}
-      <div className="modal-wrapper-deactivate">
-        <div className="modal-dialog-deactivate">
-          <div className="modal-content-deactivate">
-            {/* ======================== */}
-            {/* MODAL HEADER */}
-            {/* ======================== */}
-            <div className="modal-header-deactivate">
-              <h5 className="modal-title-deactivate">
-                <i className="bi bi-x-circle-fill"></i>
-                Deactivate User Permanently
-              </h5>
-              {/* Close Button - Disabled during loading to prevent interruption */}
-              <button
-                type="button"
-                className="modal-close-btn-deactivate"
-                onClick={onHide}
-                disabled={loading}
-                aria-label="Close"
-              >
-                <i className="bi bi-x-lg"></i>
-              </button>
+      {/* Modal Container */}
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "95%",
+          maxWidth: "550px",
+          zIndex: 1050,
+        }}
+      >
+        <div
+          style={{
+            borderRadius: "0.5rem",
+            background: "#fff",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
+            overflow: "hidden",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {/* MODAL HEADER */}
+          <div
+            style={{
+              background: "#27235C",
+              color: "#fff",
+              padding: "13px 15px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: "15px",
+              fontWeight: 600,
+              borderRadius: "0.5rem 0.5rem 0 0",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 600,
+              }}
+            >
+              <i className="bi bi-x-circle-fill"></i>
+              Deactivate User Permanently
             </div>
+            <button
+              type="button"
+              onClick={onHide}
+              disabled={loading}
+              aria-label="Close"
+              style={{
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: 18,
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.7 : 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
 
-            {/* ======================== */}
-            {/* MODAL BODY */}
-            {/* ======================== */}
-            <div className="modal-body-deactivate">
-              {/* -------- Confirmation Question -------- */}
-              {/* Displays user's full name for confirmation */}
-              <p className="delete-question-deactivate">
-                Are you sure you want to permanently deactivate{" "}
-                <strong className="user-name-highlight-deactivate">
-                  {user?.firstName} {user?.lastName}
-                </strong>
-                ?
+          {/* MODAL BODY */}
+          <div
+            style={{
+              padding: "20px 15px",
+              background: "#fff",
+              textAlign: "left",
+            }}
+          >
+            {/* Confirmation Question */}
+            <p
+              style={{
+                fontSize: 15,
+                color: "#334155",
+                marginBottom: 16,
+                lineHeight: 1.6,
+                textAlign: "center"
+              }}
+            >
+              Are you sure you want to permanently deactivate{" "}
+              <strong
+                style={{
+                  color: "#dc2626",
+                  fontWeight: 700,
+                }}
+              >
+                {user?.firstName} {user?.lastName}
+              </strong>
+              ?
+            </p>
+
+            {/* Critical Warning Box */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)",
+                border: "2px solid #dc2626",
+                borderRadius: 8,
+                padding: 14,
+                marginBottom: 14,
+                textAlign: "center"
+              }}
+            >
+              {/* Warning Header with Icon */}
+              <div
+                style={{
+                  alignItems: "center",
+                  gap: 8,
+                  color: "#dc2626",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  marginBottom: 10
+                }}
+              >
+                <i
+                  className="bi bi-exclamation-triangle-fill"
+                  style={{ fontSize: 18}}
+                ></i>
+                <span>Critical Warning</span>
+              </div>
+
+              {/* Warning Text */}
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "#7f1d1d",
+                  marginBottom: 8,
+                  lineHeight: 1.5,
+                }}
+              >
+                <strong>This action is PERMANENT and CANNOT be reversed!</strong>
+                <br />
               </p>
 
-              {/* -------- Critical Warning Box -------- */}
-              {/* Prominently displays the severity and consequences of this action */}
-              <div className="warning-box-deactivate">
-                {/* Warning Header with Icon */}
-                <div className="warning-header-deactivate">
-                  <i className="bi bi-exclamation-triangle-fill"></i>
-                  <span>Critical Warning</span>
-                </div>
-
-                {/* Warning Text - Emphasizes permanence */}
-                <p className="warning-text-deactivate">
-                  <strong>
-                    This action is PERMANENT and CANNOT be reversed!
-                  </strong>
-                  <br />
-                  Once deactivated, this user will:
-                </p>
-
-                {/* Warning List - Details all consequences */}
-                <ul className="warning-list-deactivate">
-                  <li>Lose all access to the system immediately</li>
-                  <li>Be unable to log in</li>
-                  <li>Not be able to be reactivated</li>
-                </ul>
-              </div>
-
-              {/* -------- Info Alert -------- */}
-              {/* Additional reminder to ensure correct action */}
-              <div className="info-alert-deactivate">
-                <i className="bi bi-info-circle"></i>
-                <small>
-                  <strong>Note:</strong> Please ensure this is the correct
-                  action before proceeding.
-                </small>
-              </div>
+              {/* Warning List */}
+              <ul
+                style={{
+                  fontSize: 13,
+                  color: "#991b1b",
+                  marginLeft: 20,
+                  marginBottom: 0,
+                  paddingLeft: 0,
+                  lineHeight: 1.7,
+                  textAlign: "left"
+                }}
+              >
+                <strong>Once deactivated, this user will:</strong>
+                <li>Lose all access to the system immediately</li>
+                <li>Be unable to log in</li>
+                <li>Not be able to be reactivated</li>
+              </ul>
             </div>
 
-            {/* ======================== */}
-            {/* MODAL FOOTER - ACTION BUTTONS */}
-            {/* ======================== */}
-            <div className="modal-footer-deactivate">
-              {/* Cancel Button - Closes modal without deactivating */}
-              <button
-                type="button"
-                className="btn-cancel-deactivate"
-                onClick={onHide}
-                disabled={loading}
-              >
-                <i className="bi bi-arrow-left"></i>
-                Cancel
-              </button>
-
-              {/* Deactivate Button - Executes permanent deactivation */}
-              {/* Disabled during loading to prevent duplicate requests */}
-              <button
-                type="button"
-                className="btn-submit-deactivate"
-                onClick={handleDeactivate}
-                disabled={loading}
-              >
-                {loading ? (
-                  // Show loading state with spinner and text
-                  <>
-                    <span className="spinner-deactivate"></span>
-                    Deactivating...
-                  </>
-                ) : (
-                  // Show normal state with clear action text
-                  <>
-                    <i className="bi bi-x-circle-fill"></i>
-                    Yes, Deactivate Permanently
-                  </>
-                )}
-              </button>
+            {/* Info Alert */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                background: "#f1f5f9",
+                color: "#64748b",
+                borderRadius: 4,
+                fontSize: 12,
+                padding: "8px 10px",
+                gap: 6,
+                alignContent: "center"
+              }}
+            >
+              <i className="bi bi-info-circle"></i>
+              <small>
+                <strong>Note:</strong> Please ensure this is the correct action
+                before proceeding.
+              </small>
             </div>
+          </div>
+
+          {/* MODAL FOOTER - ACTION BUTTONS */}
+          <div
+            style={{
+              padding: "10px 15px",
+              borderTop: "1px solid #e2e8f0",
+              background: "#fff",
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 8,
+              borderBottomLeftRadius: "0.5rem",
+              borderBottomRightRadius: "0.5rem",
+            }}
+          >
+            {/* Cancel Button */}
+            <button
+              type="button"
+              onClick={onHide}
+              disabled={loading}
+              style={{
+                background: "#6c757d",
+                border: "none",
+                color: "#fff",
+                fontWeight: 600,
+                padding: "7px 12px",
+                fontSize: 12,
+                borderRadius: 5,
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                opacity: loading ? 0.7 : 1,
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) e.target.style.background = "#5a6268";
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) e.target.style.background = "#6c757d";
+              }}
+            >
+              <i className="bi bi-arrow-left"></i> Cancel
+            </button>
+
+            {/* Deactivate Button - NEW RED COLOR FROM IMAGE */}
+            <button
+              type="button"
+              onClick={handleDeactivate}
+              disabled={loading}
+              style={{
+                background: loading
+                  ? "#e63946"
+                  : "linear-gradient(90deg, #e63946 0%, #d62828 100%)",
+                border: "none",
+                color: "#fff",
+                fontWeight: 600,
+                padding: "7px 12px",
+                fontSize: 12,
+                borderRadius: 5,
+                boxShadow: "0 2px 8px rgba(230,57,70,0.25)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.85 : 1,
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) e.target.style.opacity = 0.93;
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) e.target.style.opacity = 1;
+              }}
+            >
+              {loading ? (
+                <>
+                  <span
+                    style={{
+                      width: 14,
+                      height: 14,
+                      border: "2px solid #fff",
+                      borderTop: "2px solid #d62828",
+                      borderRadius: "50%",
+                      animation: "spin 0.7s linear infinite",
+                      display: "inline-block",
+                      marginRight: 6,
+                    }}
+                  />
+                  Deactivating...
+                  <style>{`
+                    @keyframes spin {
+                      0% { transform: rotate(0deg);}
+                      100% { transform: rotate(360deg);}
+                    }
+                  `}</style>
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-x-circle-fill"></i>
+                  Yes, Delete Permanently
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

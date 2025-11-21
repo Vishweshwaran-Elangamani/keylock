@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { toast } from "sonner";
+import ApproveEmailChangeModal from "../../../components/auth/Modal/changerequest/ApproveEmailChangeModal";
+import RejectEmailChangeModal from "../../../components/auth/Modal/changerequest/RejectEmailChangeModal";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
 
 const ChangeRequestManagement = () => {
@@ -20,11 +22,10 @@ const ChangeRequestManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Modal States
-  const [showProcessModal, setShowProcessModal] = useState(false);
+  // Modal States - Updated for Separate Modals
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [processAction, setProcessAction] = useState("");
-  const [adminRemarks, setAdminRemarks] = useState("");
   const [processing, setProcessing] = useState(false);
 
   // FETCH ALL REQUESTS ONLY ONCE ON MOUNT
@@ -36,7 +37,7 @@ const ChangeRequestManagement = () => {
     }, 30000000);
 
     return () => clearInterval(refreshInterval);
-  }, []); // No dependency on activeTab
+  }, []);
 
   // APPLY FILTERS WHEN TAB CHANGES OR FILTER VALUES CHANGE
   useEffect(() => {
@@ -47,11 +48,6 @@ const ChangeRequestManagement = () => {
     try {
       setLoading(true);
 
-      // if (!silent) {
-      //   toast.loading("Loading email change requests...");
-      // }
-
-      // ALWAYS FETCH ALL REQUESTS
       const response = await ChangeRequestService.getAllChangeRequests();
 
       if (response.success) {
@@ -60,11 +56,6 @@ const ChangeRequestManagement = () => {
 
         if (!silent) {
           toast.dismiss();
-          // toast.success(
-          //   `Loaded ${
-          //     response.data?.length || 0
-          //   } email change requests successfully`
-          // );
         }
       } else {
         toast.dismiss();
@@ -126,88 +117,94 @@ const ChangeRequestManagement = () => {
   // TAB SWITCHING HANDLER
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    // Clear status filter when switching to pending tab
     if (tab === "pending") {
       setFilterStatus("");
     }
   };
 
+  // Updated Process Click Handler
   const handleProcessClick = (request, action) => {
     setSelectedRequest(request);
-    setProcessAction(action);
-    setAdminRemarks("");
-    setShowProcessModal(true);
+    if (action === "Approved") {
+      setShowApproveModal(true);
+    } else {
+      setShowRejectModal(true);
+    }
     toast.info(`Processing email change request #${request.requestId}`);
   };
 
-  const handleProcessSubmit = async () => {
-    if (!selectedRequest) return;
-
-    if (processAction === "Rejected" && !adminRemarks.trim()) {
-      toast.error("Please provide remarks for rejection");
-      return;
-    }
-
-    if (adminRemarks.trim() && adminRemarks.trim().length < 5) {
-      toast.error("Remarks must be at least 5 characters");
-      return;
-    }
-
+  // Approve Handler
+  const handleApprove = async (adminRemarks) => {
     try {
       setProcessing(true);
-
-      toast.loading(
-        `${
-          processAction === "Approved" ? "Approving" : "Rejecting"
-        } email change request...`
-      );
+      toast.loading("Approving email change request...");
 
       const processData = {
         RequestId: selectedRequest.requestId,
-        Status: processAction,
+        Status: "Approved",
         AdminRemarks: adminRemarks.trim() || null,
       };
 
-      const response = await ChangeRequestService.processChangeRequest(
-        processData
-      );
+      const response = await ChangeRequestService.processChangeRequest(processData);
 
       if (response.success) {
         toast.dismiss();
-        toast.success(
-          response.message ||
-            `Email change request ${processAction.toLowerCase()} successfully!`
-        );
-
-        setShowProcessModal(false);
+        toast.success(response.message || "Email change request approved successfully!");
+        setShowApproveModal(false);
         setSelectedRequest(null);
-        setAdminRemarks("");
-
         fetchRequests(true);
       } else {
         toast.dismiss();
-        toast.error(
-          response.message || "Failed to process email change request"
-        );
+        toast.error(response.message || "Failed to approve email change request");
       }
     } catch (error) {
-      console.error("Error processing email change request:", error);
+      console.error("Error approving email change request:", error);
       toast.dismiss();
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "Failed to process email change request"
+          "Failed to approve email change request"
       );
     } finally {
       setProcessing(false);
     }
   };
 
-  const handleModalClose = () => {
-    setShowProcessModal(false);
-    setSelectedRequest(null);
-    setAdminRemarks("");
-    setProcessAction("");
+  // Reject Handler
+  const handleReject = async (adminRemarks) => {
+    try {
+      setProcessing(true);
+      toast.loading("Rejecting email change request...");
+
+      const processData = {
+        RequestId: selectedRequest.requestId,
+        Status: "Rejected",
+        AdminRemarks: adminRemarks.trim(),
+      };
+
+      const response = await ChangeRequestService.processChangeRequest(processData);
+
+      if (response.success) {
+        toast.dismiss();
+        toast.success(response.message || "Email change request rejected successfully!");
+        setShowRejectModal(false);
+        setSelectedRequest(null);
+        fetchRequests(true);
+      } else {
+        toast.dismiss();
+        toast.error(response.message || "Failed to reject email change request");
+      }
+    } catch (error) {
+      console.error("Error rejecting email change request:", error);
+      toast.dismiss();
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to reject email change request"
+      );
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -230,15 +227,6 @@ const ChangeRequestManagement = () => {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    });
-  };
-
-  const formatTime = (date) => {
-    if (!date) return "";
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
     });
   };
 
@@ -290,201 +278,6 @@ const ChangeRequestManagement = () => {
     return pages;
   };
 
-  const renderProcessModal = () => {
-    if (!showProcessModal || !selectedRequest) return null;
-
-    return (
-      <>
-        <div className="crm-modal-backdrop-process"></div>
-
-        <div className="crm-modal-wrapper-process">
-          <div className="crm-modal-dialog-process">
-            <div
-              className={`crm-modal-header-process ${
-                processAction === "Approved"
-                  ? "crm-modal-header-success"
-                  : "crm-modal-header-danger"
-              }`}
-            >
-              <h5 className="crm-modal-title-process">
-                <i
-                  className={`bi ${
-                    processAction === "Approved"
-                      ? "bi-check-circle-fill"
-                      : "bi-x-circle-fill"
-                  }`}
-                ></i>
-                {processAction === "Approved"
-                  ? "Approve Email Change Request"
-                  : "Reject Email Change Request"}
-              </h5>
-              <button
-                type="button"
-                className="crm-modal-close-btn-process"
-                onClick={handleModalClose}
-                disabled={processing}
-                aria-label="Close"
-              >
-                <i className="bi bi-x-lg"></i>
-              </button>
-            </div>
-
-            <div className="crm-modal-body-process">
-              <div className="crm-request-details-box">
-                <h6 className="crm-details-title">
-                  <i className="bi bi-info-circle me-2"></i>
-                  Request Details
-                </h6>
-
-                <div className="crm-details-grid-horizontal">
-                  <div className="crm-detail-row">
-                    <div className="crm-detail-label">Request ID:</div>
-                    <div className="crm-detail-value">
-                      #{selectedRequest.requestId}
-                    </div>
-                  </div>
-
-                  <div className="crm-detail-row">
-                    <div className="crm-detail-label">Employee:</div>
-                    <div className="crm-detail-value">
-                      <strong>{selectedRequest.employeeName}</strong>
-                      <small className="text-muted d-block">
-                        @{selectedRequest.employeeCompanyId}
-                      </small>
-                    </div>
-                  </div>
-
-                  <div className="crm-detail-row">
-                    <div className="crm-detail-label">Current Email:</div>
-                    <div className="crm-detail-value">
-                      <code className="crm-value-code crm-current-value">
-                        {selectedRequest.currentValue || "Not set"}
-                      </code>
-                    </div>
-                  </div>
-
-                  <div className="crm-detail-row">
-                    <div className="crm-detail-label">New Email:</div>
-                    <div className="crm-detail-value">
-                      <code className="crm-value-code crm-new-value">
-                        {selectedRequest.newValue}
-                      </code>
-                    </div>
-                  </div>
-
-                  <div className="crm-detail-row">
-                    <div className="crm-detail-label">Requested At:</div>
-                    <div className="crm-detail-value">
-                      {formatDate(selectedRequest.requestedAt)}
-                    </div>
-                  </div>
-
-                  {selectedRequest.reason && (
-                    <div className="crm-detail-row crm-full-width">
-                      <div className="crm-detail-label">Employee Reason:</div>
-                      <div className="crm-detail-value">
-                        <div className="crm-reason-box">
-                          {selectedRequest.reason}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="crm-form-group-process">
-                <label className="crm-form-label-process">
-                  Admin Remarks{" "}
-                  {processAction === "Rejected" && (
-                    <span className="crm-required-mark">*</span>
-                  )}
-                </label>
-                <textarea
-                  className="crm-form-textarea-process"
-                  rows="4"
-                  value={adminRemarks}
-                  onChange={(e) => setAdminRemarks(e.target.value)}
-                  placeholder={
-                    processAction === "Approved"
-                      ? "Optional: Add remarks for approval (e.g., Email change approved as requested)"
-                      : "Required: Provide detailed reason for rejection"
-                  }
-                  disabled={processing}
-                  maxLength={500}
-                ></textarea>
-                <small className="crm-helper-text-process">
-                  {adminRemarks.length}/500 characters
-                </small>
-              </div>
-
-              {processAction === "Approved" && (
-                <div className="crm-info-alert-process">
-                  <i className="bi bi-info-circle"></i>
-                  <div>
-                    <strong>Note:</strong> The email will be updated
-                    automatically after approval. The employee will be notified
-                    via email.
-                  </div>
-                </div>
-              )}
-
-              {processAction === "Rejected" && (
-                <div className="crm-warning-alert-process">
-                  <i className="bi bi-exclamation-triangle"></i>
-                  <div>
-                    <strong>Warning:</strong> Please provide a clear reason for
-                    rejection. The employee will be able to see your remarks.
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="crm-modal-footer-process">
-              <button
-                type="button"
-                className="crm-btn-cancel-process"
-                onClick={handleModalClose}
-                disabled={processing}
-              >
-                <i className="bi bi-x-circle"></i>
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                className={`crm-btn-submit-process ${
-                  processAction === "Approved"
-                    ? "crm-btn-success-process"
-                    : "crm-btn-danger-process"
-                }`}
-                onClick={handleProcessSubmit}
-                disabled={processing}
-              >
-                {processing ? (
-                  <>
-                    <span className="crm-spinner-process"></span>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <i
-                      className={`bi ${
-                        processAction === "Approved"
-                          ? "bi-check-circle"
-                          : "bi-x-circle"
-                      }`}
-                    ></i>
-                    {processAction === "Approved" ? "Approve" : "Reject"}
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  };
-
   if (loading) {
     return (
       <div className="crm-loading-container">
@@ -497,7 +290,7 @@ const ChangeRequestManagement = () => {
 
   return (
     <div className="crm-change-request-page">
-      {/* NEW BREADCRUMB COMPONENT */}
+      {/* BREADCRUMB */}
       <Breadcrumb
         items={[
           {
@@ -506,7 +299,7 @@ const ChangeRequestManagement = () => {
         ]}
       />
 
-      {/* COMPACT STATISTICS CARDS - LEFT ALIGNED */}
+      {/* STATISTICS CARDS */}
       <div className="crm-stats-grid">
         <div className="crm-stat-card">
           <div className="crm-stat-icon crm-stat-icon-primary">
@@ -565,7 +358,6 @@ const ChangeRequestManagement = () => {
           Pending Requests
           {requests.filter((r) => r.status === "Pending").length > 0 && (
             <span className="badge bg-warning ms-2">
-              {requests.filter((r) => r.status === "Pending").length}
             </span>
           )}
         </button>
@@ -625,7 +417,7 @@ const ChangeRequestManagement = () => {
         </div>
       </div>
 
-      {/* TABLE CARD - ONLY THIS SECTION UPDATES ON TAB CHANGE */}
+      {/* TABLE CARD */}
       <div className="crm-table-card">
         <div className="crm-table-wrapper">
           <table className="crm-request-table">
@@ -824,7 +616,22 @@ const ChangeRequestManagement = () => {
         )}
       </div>
 
-      {renderProcessModal()}
+      {/* MODALS */}
+      <ApproveEmailChangeModal
+        show={showApproveModal}
+        request={selectedRequest}
+        onHide={() => setShowApproveModal(false)}
+        onApprove={handleApprove}
+        processing={processing}
+      />
+
+      <RejectEmailChangeModal
+        show={showRejectModal}
+        request={selectedRequest}
+        onHide={() => setShowRejectModal(false)}
+        onReject={handleReject}
+        processing={processing}
+      />
     </div>
   );
 };

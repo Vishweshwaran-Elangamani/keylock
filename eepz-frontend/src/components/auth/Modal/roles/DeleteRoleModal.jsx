@@ -171,7 +171,7 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
                 <span style={{ fontWeight: 900 }}>CANNOT be reversed!</span>
               </p>
               <div style={{ color: "#a16207", fontSize: 12, marginBottom: 3 }}>
-                Once deleted, this role will:
+                <strong>Once deleted, this role will:</strong>
               </div>
               <ul style={{ margin: 0, paddingLeft: 19, color: "#a16207", fontSize: 12 }}>
                 <li>Be permanently removed from the system</li>
