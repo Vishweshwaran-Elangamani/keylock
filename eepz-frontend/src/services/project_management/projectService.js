@@ -302,6 +302,19 @@ const projectService = {
       throw error.response?.data || { message: 'Failed to fetch initial stage employees' };
     }
   },
+
+  getPrimaryProjects: async (employeeIds) => {
+    try {
+      const response = await apiClient.get(
+        '/ProjectManagement/employees/primary-projects',
+        { employeeIds }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching primary projects:', error);
+      throw error.response?.data || { message: 'Failed to fetch primary projects' };
+    }
+  },
  
   /**
    * ✅ Map employees to resource pool (org.rz.resourcepool)
@@ -362,4 +375,5 @@ const projectService = {
   },
 };
  
+
 export default projectService;

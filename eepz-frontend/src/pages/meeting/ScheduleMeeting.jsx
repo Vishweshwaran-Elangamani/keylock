@@ -43,10 +43,17 @@ const ScheduleMeeting = () => {
 
   useEffect(() => {
     if (formData.meetingType === "One-on-One" && employeeOptions.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
-        participantEmployeeIds: [employeeOptions[0].employeeId],
-      }));
+      // Filter to get only employees with "Employee" role
+      const employeesOnly = employeeOptions.filter(
+        (emp) => emp.roleName?.toLowerCase() === "employee"
+      );
+      
+      if (employeesOnly.length > 0) {
+        setFormData((prev) => ({
+          ...prev,
+          participantEmployeeIds: [employeesOnly[0].employeeId],
+        }));
+      }
     } else if (formData.meetingType !== "One-on-One") {
       setFormData((prev) => ({
         ...prev,
@@ -144,9 +151,19 @@ const ScheduleMeeting = () => {
     }
   };
 
+  // Filter employees based on meeting type and search term
   const filteredEmployees = employeeOptions.filter((emp) => {
     const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
-    return fullName.includes(searchTerm.toLowerCase());
+    const matchesSearch = fullName.includes(searchTerm.toLowerCase());
+    
+    // For One-on-One meetings, only show employees with "Employee" role
+    if (formData.meetingType === "One-on-One") {
+      const isEmployee = emp.roleName?.toLowerCase() === "employee";
+      return matchesSearch && isEmployee;
+    }
+    
+    // For other meeting types, show all employees
+    return matchesSearch;
   });
 
   return (
@@ -165,14 +182,14 @@ const ScheduleMeeting = () => {
             >
               <ArrowLeft size={20} />
             </button>
-            <div>
+            <div className="text-start">
               <h2
                 className="fw-bold mb-1"
                 style={{ color: "#1e293b", fontSize: "1.75rem" }}
               >
                 Schedule Meeting
               </h2>
-              <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
+              <p className="text-muted mb-0 text-start" style={{ fontSize: "0.95rem" }}>
                 Create and schedule a new meeting with your team
               </p>
             </div>
@@ -184,7 +201,7 @@ const ScheduleMeeting = () => {
               <form onSubmit={handleSubmit}>
                 {/* Meeting Type */}
                 <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
                     <Users size={18} />
                     Meeting Type
                   </label>
@@ -192,7 +209,7 @@ const ScheduleMeeting = () => {
                     name="meetingType"
                     value={formData.meetingType}
                     onChange={handleInputChange}
-                    className="form-select"
+                    className="form-select text-start"
                   >
                     <option value="One-on-One">One-on-One</option>
                     <option value="Team Meeting">Team Meeting</option>
@@ -203,7 +220,7 @@ const ScheduleMeeting = () => {
 
                 {/* Meeting Title */}
                 <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
                     <FileText size={18} />
                     Meeting Title
                     <span className="text-danger">*</span>
@@ -213,7 +230,7 @@ const ScheduleMeeting = () => {
                     name="meetingTitle"
                     value={formData.meetingTitle}
                     onChange={handleInputChange}
-                    className="form-control"
+                    className="form-control text-start"
                     placeholder="Enter meeting title..."
                     required
                   />
@@ -221,7 +238,7 @@ const ScheduleMeeting = () => {
 
                 {/* Participant Selection */}
                 <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
                     <Users size={18} />
                     Select Participant
                     {formData.meetingType !== "One-on-One" ? "s" : ""}
@@ -235,7 +252,7 @@ const ScheduleMeeting = () => {
                     </span>
                     <input
                       type="text"
-                      className="form-control border-start-0 ps-0"
+                      className="form-control border-start-0 ps-0 text-start"
                       placeholder="Search employees..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -248,7 +265,7 @@ const ScheduleMeeting = () => {
                       value={formData.participantEmployeeIds[0] || ""}
                       onChange={handleOneOnOneChange}
                       required
-                      className="form-select"
+                      className="form-select text-start"
                     >
                       <option value="">Select an employee</option>
                       {filteredEmployees.map((emp) => (
@@ -269,9 +286,9 @@ const ScheduleMeeting = () => {
                             style={{ position: "sticky", top: 0, zIndex: 1 }}
                           >
                             <tr>
-                              <th style={{ width: "60px" }}>Select</th>
-                              <th>Name</th>
-                              <th>Role</th>
+                              <th style={{ width: "60px" }} className="text-start">Select</th>
+                              <th className="text-start">Name</th>
+                              <th className="text-start">Role</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -293,7 +310,7 @@ const ScheduleMeeting = () => {
                                   }
                                   style={{ cursor: "pointer" }}
                                 >
-                                  <td>
+                                  <td className="text-start">
                                     <div className="form-check">
                                       <input
                                         className="form-check-input"
@@ -308,10 +325,10 @@ const ScheduleMeeting = () => {
                                       />
                                     </div>
                                   </td>
-                                  <td>
+                                  <td className="text-start">
                                     {emp.firstName} {emp.lastName}
                                   </td>
-                                  <td>
+                                  <td className="text-start">
                                     <span className="badge bg-light text-dark border">
                                       {emp.roleName}
                                     </span>
@@ -322,7 +339,7 @@ const ScheduleMeeting = () => {
                           </tbody>
                         </table>
                       </div>
-                      <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2">
+                      <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 text-start">
                         <Check size={18} />
                         <span>
                           <strong>
@@ -342,7 +359,7 @@ const ScheduleMeeting = () => {
                 {/* Date and Time Row */}
                 <div className="row mb-4">
                   <div className="col-md-6 mb-3 mb-md-0">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
                       <Calendar size={18} />
                       Meeting Date
                       <span className="text-danger">*</span>
@@ -352,12 +369,12 @@ const ScheduleMeeting = () => {
                       name="meetingDate"
                       value={formData.meetingDate}
                       onChange={handleInputChange}
-                      className="form-control"
+                      className="form-control text-start"
                       required
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
                       <Clock size={18} />
                       Meeting Time
                       <span className="text-danger">*</span>
@@ -367,7 +384,7 @@ const ScheduleMeeting = () => {
                       name="meetingTime"
                       value={formData.meetingTime}
                       onChange={handleInputChange}
-                      className="form-control"
+                      className="form-control text-start"
                       required
                     />
                   </div>
@@ -375,7 +392,7 @@ const ScheduleMeeting = () => {
 
                 {/* Duration */}
                 <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
                     <Clock size={18} />
                     Duration
                   </label>
@@ -383,7 +400,7 @@ const ScheduleMeeting = () => {
                     name="duration"
                     value={formData.duration}
                     onChange={handleInputChange}
-                    className="form-select"
+                    className="form-select text-start"
                   >
                     <option value="0.5">30 minutes</option>
                     <option value="1">1 hour</option>
@@ -395,7 +412,7 @@ const ScheduleMeeting = () => {
 
                 {/* Meeting Link */}
                 <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
                     <Video size={18} />
                     Meeting Link
                   </label>
@@ -405,7 +422,7 @@ const ScheduleMeeting = () => {
                       name="meetingLink"
                       value={formData.meetingLink}
                       onChange={handleInputChange}
-                      className="form-control"
+                      className="form-control text-start"
                       placeholder="Enter meeting link or generate one..."
                     />
                     <button
@@ -421,7 +438,7 @@ const ScheduleMeeting = () => {
 
                 {/* Agenda */}
                 <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
                     <FileText size={18} />
                     Agenda
                   </label>
@@ -429,7 +446,7 @@ const ScheduleMeeting = () => {
                     name="agenda"
                     value={formData.agenda}
                     onChange={handleInputChange}
-                    className="form-control"
+                    className="form-control text-start"
                     rows="4"
                     placeholder="Enter meeting agenda and topics to discuss..."
                   />
@@ -438,10 +455,10 @@ const ScheduleMeeting = () => {
                 {/* Additional Options */}
                 <div className="card bg-light border-0 mb-4">
                   <div className="card-body">
-                    <h6 className="fw-semibold mb-3">Additional Options</h6>
+                    <h6 className="fw-semibold mb-3 text-start">Additional Options</h6>
 
                     {/* Send Calendar Invite */}
-                    <div className="form-check mb-3">
+                    <div className="form-check mb-3 text-start">
                       <input
                         className="form-check-input"
                         type="checkbox"
@@ -461,7 +478,7 @@ const ScheduleMeeting = () => {
 
                     {/* Reminder */}
                     <div>
-                      <label className="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
+                      <label className="form-label fw-semibold d-flex align-items-center gap-2 mb-2 text-start">
                         <Bell size={18} />
                         Reminder
                       </label>
@@ -469,7 +486,7 @@ const ScheduleMeeting = () => {
                         name="reminder"
                         value={formData.reminder}
                         onChange={handleInputChange}
-                        className="form-select"
+                        className="form-select text-start"
                       >
                         <option value="0">None</option>
                         <option value="1">1 day before</option>
@@ -520,12 +537,12 @@ const ScheduleMeeting = () => {
           {/* Quick Tips Card */}
           <div className="card border-0 shadow-sm mt-4">
             <div className="card-body">
-              <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
+              <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2 text-start">
                 <FileText size={18} />
                 Quick Tips
               </h6>
               <ul
-                className="mb-0 ps-3"
+                className="mb-0 ps-3 text-start"
                 style={{ fontSize: "0.9rem", color: "#64748b" }}
               >
                 <li className="mb-2">

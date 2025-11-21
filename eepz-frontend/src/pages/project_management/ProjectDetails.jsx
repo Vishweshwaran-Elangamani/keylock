@@ -23,6 +23,7 @@ const ProjectDetails = () => {
   const { projectId } = useParams();
 
   const [project, setProject] = useState(null);
+  const [primaryProjectsMap, setPrimaryProjectsMap] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -38,6 +39,11 @@ const ProjectDetails = () => {
       if (response.success && response.data) {
         setProject(response.data);
         console.log("Project details:", response.data);
+
+        // Fetch primary projects for all mapped employees
+        if (response.data.mappedEmployees && response.data.mappedEmployees.length > 0) {
+          await fetchPrimaryProjects(response.data.mappedEmployees);
+        }
       } else {
         setError("Failed to load project details");
       }
@@ -46,6 +52,23 @@ const ProjectDetails = () => {
       setError("Failed to load project details. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchPrimaryProjects = async (employees) => {
+    try {
+      const employeeIds = employees.map((emp) => emp.employeeMasterId);
+      console.log("Fetching primary projects for employees:", employeeIds);
+
+      const response = await projectService.getPrimaryProjects(employeeIds);
+      
+      if (response.success && response.data) {
+        console.log("Primary projects response:", response.data);
+        setPrimaryProjectsMap(response.data);
+      }
+    } catch (err) {
+      console.error("Error fetching primary projects:", err);
+      // Don't fail the whole page if this fails - just log it
     }
   };
 
@@ -78,6 +101,21 @@ const ProjectDetails = () => {
         {status}
       </span>
     );
+  };
+
+  // Check if employee is primary for THIS project
+  const isEmployeePrimaryForThisProject = (employee) => {
+    const employeeId = employee.employeeMasterId;
+    const primaryProjectInfo = primaryProjectsMap[employeeId];
+    
+    // If no primary project info, fall back to isPrimary field
+    if (!primaryProjectInfo) {
+      return employee.isPrimary === 1 || employee.isPrimary === "1";
+    }
+    
+    // Check if the primary project matches THIS project
+    return primaryProjectInfo && 
+           primaryProjectInfo.projectId === parseInt(projectId);
   };
 
   if (isLoading) {
@@ -224,7 +262,6 @@ const ProjectDetails = () => {
                     </div>
                   </div>
 
-                  {/* CLIENT NAME FIELD */}
                   <div className="col-md-6">
                     <div className="d-flex align-items-start gap-3">
                       <div className="bg-secondary-subtle rounded p-2">
@@ -381,83 +418,95 @@ const ProjectDetails = () => {
                 {project.mappedEmployees &&
                 project.mappedEmployees.length > 0 ? (
                   <div className="row g-3">
-                    {project.mappedEmployees.map((employee) => (
-                      <div key={employee.employeeMasterId} className="col-md-6">
-                        <div
-                          className={`border rounded p-3 h-100 position-relative ${
-                            employee.isPrimary ? "border-primary border-2" : ""
-                          }`}
-                          style={{
-                            transition: "all 0.2s ease-in-out",
-                          }}
-                        >
-                          {/* Primary Badge - Top Right */}
-                          {employee.isPrimary && (
+                    {project.mappedEmployees.map((employee) => {
+                      // ✅ NEW: Check primary status from API response
+                      const isPrimaryEmployee = isEmployeePrimaryForThisProject(employee);
+                      const employeeId = employee.employeeMasterId;
+                      const primaryProject = primaryProjectsMap[employeeId];
+                      
+                      return (
+                        <div key={employee.employeeMasterId} className="col-md-6">
+                          <div
+                            className={`border rounded p-3 h-100 position-relative ${
+                              isPrimaryEmployee ? "border-primary border-2" : ""
+                            }`}
+                            style={{
+                              transition: "all 0.2s ease-in-out",
+                            }}
+                          >
+                            {/* Primary/Secondary Badge - Top Right */}
                             <div
                               className="position-absolute top-0 end-0 mt-2 me-2"
                               style={{ zIndex: 1 }}
                             >
-                              <span className="badge bg-primary d-flex align-items-center gap-1">
-                                <CheckCircle size={12} />
-                                Primary
-                              </span>
-                            </div>
-                          )}
-
-                          <div className="d-flex align-items-center gap-3">
-                            {/* Avatar with Primary Styling */}
-                            <div
-                              className={`rounded-circle d-flex align-items-center justify-content-center ${
-                                employee.isPrimary
-                                  ? "bg-primary text-white"
-                                  : "bg-primary-subtle"
-                              }`}
-                              style={{
-                                width: "48px",
-                                height: "48px",
-                                transition: "all 0.2s ease-in-out",
-                              }}
-                            >
-                              <User
-                                size={24}
-                                className={
-                                  employee.isPrimary
-                                    ? "text-white"
-                                    : "text-primary"
-                                }
-                              />
-                            </div>
-
-                            {/* Employee Info */}
-                            <div className="flex-grow-1">
-                              <h6 className="mb-1 fw-semibold">
-                                {employee.firstName} {employee.lastName}
-                              </h6>
-                              <p className="mb-0 small text-muted d-flex align-items-center gap-2">
-                                <Briefcase size={14} />
-                                {employee.roleName}
-                              </p>
-                              <p className="mb-0 small text-muted d-flex align-items-center gap-2">
-                                <Building size={14} />
-                                {employee.departmentName}
-                              </p>
-                            </div>
-
-                            {/* Status Badges - Right Side */}
-                            <div className="d-flex flex-column align-items-end gap-1">
-                              <span className="badge bg-secondary">
-                                ID: {employee.employeeMasterId}
-                              </span>
-                              {!employee.isPrimary && (
-                                <span className="badge bg-light text-dark border">
+                              {isPrimaryEmployee ? (
+                                <span className="badge bg-primary d-flex align-items-center gap-1">
+                                  <CheckCircle size={12} />
+                                  Primary
+                                </span>
+                              ) : (
+                                <span className="badge bg-light text-dark border d-flex align-items-center gap-1">
                                   Secondary
                                 </span>
                               )}
                             </div>
+
+                            <div className="d-flex align-items-center gap-3">
+                              {/* Avatar with Primary Styling */}
+                              <div
+                                className={`rounded-circle d-flex align-items-center justify-content-center ${
+                                  isPrimaryEmployee
+                                    ? "bg-primary text-white"
+                                    : "bg-primary-subtle"
+                                }`}
+                                style={{
+                                  width: "48px",
+                                  height: "48px",
+                                  transition: "all 0.2s ease-in-out",
+                                }}
+                              >
+                                <User
+                                  size={24}
+                                  className={
+                                    isPrimaryEmployee
+                                      ? "text-white"
+                                      : "text-primary"
+                                  }
+                                />
+                              </div>
+
+                              {/* Employee Info */}
+                              <div className="flex-grow-1">
+                                <h6 className="mb-1 fw-semibold">
+                                  {employee.firstName} {employee.lastName}
+                                </h6>
+                                <p className="mb-0 small text-muted d-flex align-items-center gap-2">
+                                  <Briefcase size={14} />
+                                  {employee.roleName}
+                                </p>
+                                <p className="mb-0 small text-muted d-flex align-items-center gap-2">
+                                  <Building size={14} />
+                                  {employee.departmentName}
+                                </p>
+                                {/* ✅ NEW: Show primary project name if different */}
+                                {primaryProject && !isPrimaryEmployee && (
+                                  <p className="mb-0 small text-info mt-1">
+                                    Primary: {primaryProject.projectName}
+                                  </p>
+                                )}
+                              </div>
+
+                              {/* Status Badge - Right Side */}
+                              <div className="d-flex flex-column align-items-end gap-1">
+                                <span className="badge bg-secondary">
+                                  ID: {employee.employeeMasterId}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-center py-4 text-muted">
@@ -471,7 +520,6 @@ const ProjectDetails = () => {
 
           {/* Right Column - Reporting Managers */}
           <div className="col-lg-4">
-            {/* Reporting Managers Card */}
             <div
               className="card border-0 shadow-sm sticky-top"
               style={{ top: "20px" }}
