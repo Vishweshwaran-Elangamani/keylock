@@ -239,61 +239,91 @@ function RewardConfiguration() {
 
     return (
       <>
+        {/* Title, Badge, + Add Parameter all in one row */}
         <div style={{
-          fontWeight: 800,
-          fontSize: "22px",
-          color: RL_DARK,
-          letterSpacing: -.5,
-          fontFamily: "Montserrat, Nunito, sans-serif",
-          textAlign: "left"
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
         }}>
-          {selectedRewardType.rewardName}
-        </div>
-        <div style={{ textAlign: "left", marginTop: 8, marginBottom: 2 }}>
-          <span
+          <div style={{
+            fontWeight: 800,
+            fontSize: "22px",
+            color: RL_DARK,
+            fontFamily: "Montserrat, Nunito, sans-serif",
+            textAlign: "left",
+            minWidth: 0,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis"
+          }}>
+            {selectedRewardType.rewardName}
+          </div>
+          <span style={{
+            background: "#F3EBFA",
+            color: RL_PURPLE,
+            fontWeight: 700,
+            fontSize: "13px",
+            padding: "2px 10px",
+            borderRadius: 10,
+            marginLeft: 6,
+            display: "inline-block"
+          }}>Recognition</span>
+          <button onClick={openParameterModal}
             style={{
-              background: "#F3EBFA",
-              color: RL_PURPLE,
+              marginLeft: "auto",
+              padding: "7px 16px",
+              background: RL_DARK,
+              color: "#fff",
+              borderRadius: 7,
               fontWeight: 700,
-              fontSize: "13px",
-              padding: "4px 14px",
-              borderRadius: 10,
-              display: "inline-block"
+              cursor: "pointer",
+              border: "none",
+              fontSize: 14,
+              height: 32,
+              boxShadow: "0 1.5px 6px rgba(39,35,92,0.10)",
+              whiteSpace: "nowrap"
             }}>
-            Recognition
-          </span>
+            + Add Parameter
+          </button>
         </div>
+        {/* Description + Read More below */}
         <div style={{
           fontSize: "15px",
           color: "#8886b3",
-          marginTop: 14,
+          marginTop: 8,
           maxWidth: '100%',
           textAlign: "justify",
           lineHeight: 1.7,
           wordBreak: "break-word",
           whiteSpace: "pre-wrap",
-          minHeight: needsCollapse ? 90 : "auto"
+          minHeight: needsCollapse ? 90 : "auto",
+          display: "flex",
+          alignItems: "center",
+          gap: 8
         }}>
-          {visibleDesc}
-          {showReadMore && !descExpanded && <span style={{ color: RL_PURPLE }}>...</span>}
+          <span style={{ flex: 1 }}>
+            {visibleDesc}
+            {showReadMore && !descExpanded && <span style={{ color: RL_PURPLE }}>...</span>}
+          </span>
+          {showReadMore &&
+            <button
+              onClick={() => setDescExpanded(e => !e)}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: RL_PURPLE,
+                fontWeight: 600,
+                fontSize: 13,
+                cursor: "pointer",
+                outline: "none",
+                padding: 0,
+                whiteSpace: "nowrap",
+                flexShrink: 0
+              }}>
+              {descExpanded ? "Read Less" : "Read More"}
+            </button>
+          }
         </div>
-        {showReadMore &&
-          <button
-            onClick={() => setDescExpanded(e => !e)}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: RL_PURPLE,
-              fontWeight: 700,
-              cursor: "pointer",
-              paddingLeft: 0,
-              fontFamily: "inherit",
-              fontSize: "15px",
-              outline: "none",
-              margin: 0
-            }}>
-            {descExpanded ? "Read Less" : "Read More"}
-          </button>}
       </>
     );
   }
@@ -531,23 +561,7 @@ function RewardConfiguration() {
             alignItems: "flex-start"
           }}>
             <div style={{ flex: 1, minWidth: 0 }}></div>
-            {selectedRewardType && (
-              <button
-                onClick={openParameterModal}
-                style={{
-                  padding: "12px 28px",
-                  background: RL_DARK,
-                  color: "#fff",
-                  borderRadius: 10,
-                  fontWeight: "700",
-                  cursor: "pointer",
-                  border: "none",
-                  fontSize: "17px",
-                  boxShadow: "0 2px 8px rgba(39,35,92,0.08)"
-                }}>
-                + Add Parameter
-              </button>
-            )}
+           
           </div>
           {/* This container scrolls ALL content: description + table */}
           <div style={{

@@ -285,19 +285,7 @@ function FormCreate() {
 
       </div>
 
-      {/* Page Header */}
-      <div className="hrfcper-page-header">
-        <h2 className="hrfcper-page-title">
-          <i className="bi bi-file-earmark-plus"></i>
-          {isEditMode ? "Edit Form" : "Create New Form"}
-        </h2>
-        <p className="hrfcper-page-description">
-          {isEditMode 
-            ? "Update the performance evaluation form details and competencies"
-            : "Design a new performance evaluation form with competencies"
-          }
-        </p>
-      </div>
+    
 
       {/* FORM CONTAINER */}
       <form onSubmit={onSubmit} className="hrfcper-form-container">
@@ -433,7 +421,7 @@ function FormCreate() {
               onClick={addCompetency}
               disabled={busy}
             >
-              <i className="bi bi-plus-circle"></i>
+             
               Add Competency
             </button>
           </div>

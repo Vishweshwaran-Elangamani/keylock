@@ -265,12 +265,7 @@ function HRNominations() {
 
       <div className="container-fluid">
         <div className="mb-4">
-          <h1 className="display-5 fw-bold" style={{ color: THEME.primary, marginBottom: "8px" }}>
-            Nomination Management
-          </h1>
-          <p style={{ color: THEME.textLight, marginBottom: 0 }}>
-            Review and manage all nomination submissions
-          </p>
+         
         </div>
 
         {statsLoading ? (
