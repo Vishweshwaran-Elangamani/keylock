@@ -24,14 +24,6 @@ export default function HRHome() {
       path: "/hr/dashboard/performance/create"
     },
     {
-      title: "Drafts",
-      description: "Resume work on your saved drafts.",
-      icon: "bi-pencil-square",
-      color: "#F59E0B",
-      bg: "#FFF7E6",
-      path: "/hr/dashboard/performance/draftlists"
-    },
-    {
       title: "Form Status",
       description: "Check review form submissions and status.",
       icon: "bi-file-earmark-text",

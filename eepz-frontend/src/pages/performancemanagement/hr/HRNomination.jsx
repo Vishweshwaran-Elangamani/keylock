@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import * as api from "../../../services/performancemanagement/hr/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import ViewDetailsModal from "../../../components/performance_management/modals/Hrnomination/ViewDetailsModal";
+import ActionModal from "../../../components/performance_management/modals/Hrnomination/ActionModal";
+import "../../../styles/performancemanagement/hr/Hrnomination.css"
 
 function HRNominations() {
   const [nominations, setNominations] = useState([]);
@@ -18,6 +22,7 @@ function HRNominations() {
   const [actionType, setActionType] = useState("");
   const [actionNominationId, setActionNominationId] = useState(null);
   const [actionRemarks, setActionRemarks] = useState("");
+  const navigate = useNavigate();
 
   const [statistics, setStatistics] = useState({
     totalNominations: 0,
@@ -28,13 +33,13 @@ function HRNominations() {
   const [statsLoading, setStatsLoading] = useState(true);
 
   const THEME = {
-    primary: "#4C3F8F",
+    primary: "#27235c",
     secondary: "#2D5B8C",
     background: "#F8FAFC",
     card: "#FFFFFF",
     text: "#1A202C",
     textLight: "#718096",
-    border: "#E2E8F0",
+    border: "#27235c",
     success: "#10B981",
     danger: "#EF4444",
     warning: "#F59E0B",
@@ -224,22 +229,23 @@ function HRNominations() {
   };
 
   const StatCard = ({ title, value }) => (
-    <div className="col-md-3 mb-4">
+    <div className="col mb-3">
       <div
-        className="card border-0 shadow-sm"
         style={{
           height: "100%",
-          background: THEME.card,
-          borderTop: `4px solid ${THEME.primary}`,
+          background: "#fff",
+          border: "2px solid #27235c",
+          borderRadius: "12px",
+          padding: "20px",
+          textAlign: "center",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
         }}
       >
-        <div className="card-body text-center">
-          <h3 className="mb-2" style={{ fontSize: "32px", fontWeight: "700", color: THEME.primary }}>
-            {value}
-          </h3>
-          <p className="mb-0" style={{ fontSize: "14px", color: THEME.textLight, fontWeight: "500" }}>
-            {title}
-          </p>
+        <div style={{ fontSize: "15px", fontWeight: "600", color: "#64748b", marginBottom: "10px" }}>
+          {title}
+        </div>
+        <div style={{ fontSize: "36px", fontWeight: "700", color: "#97247E", margin: 0 }}>
+          {value}
         </div>
       </div>
     </div>
@@ -262,18 +268,65 @@ function HRNominations() {
   return (
     <div style={{ background: THEME.background, minHeight: "100vh", paddingTop: "20px", paddingBottom: "40px" }}>
       <ToastContainer position="top-right" autoClose={3000} />
+      <style>{`
+        .status-tabs {
+          background: #27235c;
+          border-radius: 999px;
+          display: flex;
+          padding: 7px;
+          border: 3px solid #27235c;
+          width: fit-content;
+        }
+        .status-tab {
+          background: transparent;
+          color: #fff;
+          font-weight: 700;
+          border: none;
+          outline: none;
+          font-size: 1.13rem;
+          border-radius: 999px;
+          padding: 13px 36px;
+          cursor: pointer;
+          margin: 0;
+          transition: background 0.18s, color 0.18s;
+        }
+        .status-tab.active {
+          background: #fff;
+          color: #27235c;
+          font-weight: 700;
+          box-shadow: 0 2px 8px rgba(39,35,92,0.07);
+        }
+      `}</style>
 
       <div className="container-fluid">
-        <div className="mb-4">
-         
-        </div>
+        {/* BREADCRUMB */}
+         <nav className="cg-breadcrumbs" aria-label="breadcrumb">
+  <ol className="cg-breadcrumb">
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard")}
+      style={{ cursor: "pointer" }}>
+      <i className="bi bi-house-door"></i>
+    </li>
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard/performance")}
+      style={{ cursor: "pointer" }}>
+      Performance
+    </li>
+    <li className="cg-breadcrumb-item active" aria-current="page">
+      Nominations
+    </li>
+  </ol>
+</nav>
 
+        {/* STAT CARDS - ONLY 4 CARDS */}
         {statsLoading ? (
           <div className="text-center mb-4">
             <div className="spinner-border spinner-border-sm" role="status"></div>
           </div>
         ) : (
-          <div className="row mb-4">
+          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 mb-4">
             <StatCard title="Total Nominations" value={statistics.totalNominations} />
             <StatCard title="Pending" value={statistics.pendingNominations} />
             <StatCard title="Approved" value={statistics.approvedNominations} />
@@ -281,169 +334,220 @@ function HRNominations() {
           </div>
         )}
 
-        <div className="card border-0 shadow-sm mb-4" style={{ background: THEME.card }}>
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-              <ul className="nav nav-pills" role="tablist">
-                {["Pending", "Approved", "Rejected"].map((tab) => (
-                  <li className="nav-item" key={tab}>
-                    <button
-                      className={`nav-link ${activeTab === tab ? "active" : ""}`}
-                      onClick={() => setActiveTab(tab)}
-                      style={{
-                        background: activeTab === tab ? THEME.primary : "transparent",
-                        color: activeTab === tab ? "#fff" : THEME.textLight,
-                        border: "none",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {tab}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+        {/* TABS (LEFT) + TABLE/GRID TOGGLE (RIGHT) */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "2rem 0 1.5rem 0", flexWrap: "wrap", gap: "1rem" }}>
+          <div className="status-tabs">
+            <button
+              className={`status-tab${activeTab === "Pending" ? " active" : ""}`}
+              onClick={() => setActiveTab("Pending")}
+            >
+              Pending 
+            </button>
+            <button
+              className={`status-tab${activeTab === "Approved" ? " active" : ""}`}
+              onClick={() => setActiveTab("Approved")}
+            >
+              Approved 
+            </button>
+            <button
+              className={`status-tab${activeTab === "Rejected" ? " active" : ""}`}
+              onClick={() => setActiveTab("Rejected")}
+            >
+              Rejected 
+            </button>
+          </div>
 
-              <div className="btn-group" role="group">
-                <button
-                  className="btn btn-sm"
-                  onClick={() => setViewMode("table")}
-                  style={{
-                    background: viewMode === "table" ? THEME.primary : THEME.background,
-                    color: viewMode === "table" ? "#fff" : THEME.text,
-                    border: `1px solid ${THEME.border}`,
-                    fontWeight: "600",
-                  }}
-                >
-                  Table
-                </button>
-                <button
-                  className="btn btn-sm"
-                  onClick={() => setViewMode("grid")}
-                  style={{
-                    background: viewMode === "grid" ? THEME.primary : THEME.background,
-                    color: viewMode === "grid" ? "#fff" : THEME.text,
-                    border: `1px solid ${THEME.border}`,
-                    fontWeight: "600",
-                  }}
-                >
-                  Grid
-                </button>
-              </div>
-            </div>
+          <div className="btn-group" role="group">
+           <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    minHeight: "42px",
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      border: "2px solid #27235c",
+      borderRadius: "10px",
+      overflow: "hidden",
+      background: "#fff",
+      height: "38px"
+    }}
+  >
+    <button
+      onClick={() => setViewMode("table")}
+      style={{
+        background: viewMode === "table" ? "#27235c" : "#fff",
+        color: viewMode === "table" ? "#fff" : "#27235c",
+        border: "none",
+        fontWeight: "700",
+        fontSize: "15px",
+        padding: "7px 26px",
+        minWidth: 90,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "38px",
+        transition: "all 0.12s",
+        outline: "none",
+        cursor: "pointer"
+      }}
+    >
+      Table View
+    </button>
+    <button
+      onClick={() => setViewMode("grid")}
+      style={{
+        background: viewMode === "grid" ? "#27235c" : "#fff",
+        color: viewMode === "grid" ? "#fff" : "#27235c",
+        border: "none",
+        fontWeight: "700",
+        fontSize: "15px",
+        padding: "7px 26px",
+        minWidth: 90,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "38px",
+        transition: "all 0.12s",
+        outline: "none",
+        cursor: "pointer"
+      }}
+    >
+      Grid View
+    </button>
+  </div>
+</div>
+
           </div>
         </div>
 
         {filteredNominations.length === 0 ? (
-          <div className="card border-0 shadow-sm text-center py-5" style={{ background: THEME.card }}>
-            <div className="card-body">
-              <h5 className="text-dark" style={{ fontSize: "18px", fontWeight: "600", marginBottom: "8px" }}>
-                No {activeTab.toLowerCase()} nominations
-              </h5>
-              <p style={{ fontSize: "14px", marginBottom: 0, color: THEME.textLight }}>
-                Check back later or switch to another tab
-              </p>
-            </div>
+          <div style={{ background: "#fff", border: "2px solid #27235c", borderRadius: "12px", padding: "60px 20px", textAlign: "center" }}>
+            <h5 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "8px", color: "#1A202C" }}>
+              No {activeTab.toLowerCase()} nominations
+            </h5>
+            <p style={{ fontSize: "14px", marginBottom: 0, color: "#718096" }}>
+              Check back later or switch to another tab
+            </p>
           </div>
         ) : viewMode === "table" ? (
           <>
-            <div className="card border-0 shadow-sm mb-4" style={{ background: THEME.card }}>
-              <div className="table-responsive">
-                <table className="table table-hover mb-0">
-                  <thead style={{ background: THEME.background, borderBottom: `2px solid ${THEME.border}` }}>
-                    <tr>
-                      <th style={{ fontWeight: "600", color: THEME.primary }}>Nominee</th>
-                      <th style={{ fontWeight: "600", color: THEME.primary }}>Department</th>
-                      <th style={{ fontWeight: "600", color: THEME.primary }}>Submitted Date</th>
-                      <th
-                        width={activeTab === "Pending" ? "200" : "100"}
-                        className="text-center"
-                        style={{ fontWeight: "600", color: THEME.primary }}
-                      >
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedNominations.map((nomination) => (
-                      <tr
-                        key={nomination.nominationId}
-                        style={{
-                          borderBottom: `1px solid ${THEME.border}`,
-                        }}
-                      >
-                        <td>
-                          <div style={{ fontWeight: "600", color: THEME.text, fontSize: "14px" }}>
-                            {nomination.nomineeName}
-                          </div>
-                          <div style={{ color: THEME.textLight, fontSize: "12px", marginTop: "4px" }}>
-                            {nomination.nomineeEmail}
-                          </div>
-                        </td>
-                        <td style={{ color: THEME.text, fontSize: "14px", verticalAlign: "middle" }}>
-                          {nomination.nomineeDepartmentName}
-                        </td>
-                        <td style={{ color: THEME.textLight, fontSize: "14px", verticalAlign: "middle" }}>
-                          {new Date(nomination.submittedAt).toLocaleDateString()}
-                        </td>
-                        <td className="text-center" style={{ verticalAlign: "middle" }}>
-                          <div className="d-flex gap-2 justify-content-center">
-                            <button
-                              className="btn btn-sm"
-                              style={{
-                                background: THEME.primary,
-                                color: "#fff",
-                                border: "none",
-                                fontWeight: "600",
-                                fontSize: "11px",
-                                padding: "4px 8px",
+            <div style={{ background: "#fff", border: "2px solid #27235c", borderRadius: "12px", overflow: "hidden", marginBottom: "2rem" }}>
+             <table style={{ width: "100%", borderCollapse: "collapse", margin: 0 }}>
+  <thead style={{ background: "#27235c" }}>
+    <tr>
+      <th style={{ fontWeight: "700", color: "#fff", padding: "16px", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.5px", textAlign: "left" }}>
+        Nominee
+      </th>
+      <th style={{ fontWeight: "700", color: "#fff", padding: "16px", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.5px", textAlign: "left" }}>
+        Department
+      </th>
+      <th style={{ fontWeight: "700", color: "#fff", padding: "16px", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.5px", textAlign: "left" }}>
+        Submitted Date
+      </th>
+      {/* Actions column only in Pending */}
+      {activeTab === "Pending" && (
+        <th style={{ fontWeight: "700", color: "#fff", padding: "16px", fontSize: "14px", textTransform: "uppercase", letterSpacing: "0.5px", textAlign: "left" }}>
+          Actions
+        </th>
+      )}
+    </tr>
+  </thead>
+  <tbody>
+    {paginatedNominations.map((nomination, index) => (
+      <tr
+        key={nomination.nominationId}
+        style={{
+          borderBottom: index < paginatedNominations.length - 1 ? "1px solid #e5e7eb" : "none",
+        }}
+      >
+        <td style={{ padding: "16px", verticalAlign: "middle", textAlign: "left" }}>
+          <div style={{ fontWeight: "600", color: "#1A202C", fontSize: "14px" }}>
+            {nomination.nomineeName}
+          </div>
+          <div style={{ color: "#718096", fontSize: "12px", marginTop: "4px" }}>
+            {nomination.nomineeEmail}
+          </div>
+        </td>
+        <td style={{ color: "#1A202C", fontSize: "14px", verticalAlign: "middle", padding: "16px", fontWeight: "500", textAlign: "left" }}>
+          {nomination.nomineeDepartmentName}
+        </td>
+        <td style={{ color: "#718096", fontSize: "14px", verticalAlign: "middle", padding: "16px", textAlign: "left" }}>
+          {new Date(nomination.submittedAt).toLocaleDateString()}
+        </td>
+        {/* Actions cell only in Pending tab */}
+        {activeTab === "Pending" && (
+         <td style={{ verticalAlign: "middle", padding: "16px", textAlign: "left" }}>
+  <div style={{ display: "flex", gap: "8px" }}>
+    {/* View */}
+    <button
+      onClick={() => viewDetails(nomination.nominationId)}
+      title="View"
+      style={{
+        padding: "7px 10px",
+        background: "#fff",
+        color: "#4a73e8",
+        border: "1.4px solid #4a73e8",
+        borderRadius: "8px",
+        fontSize: "17px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <i className="bi bi-eye" />
+    </button>
+    {/* Approve */}
+    <button
+      onClick={() => openApproveModal(nomination.nominationId)}
+      title="Approve"
+      style={{
+        padding: "7px 10px",
+        background: "#fff",
+        color: "#10B981",
+        border: "1.4px solid #10B981",
+        borderRadius: "8px",
+        fontSize: "17px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <i className="bi bi-check-circle" />
+    </button>
+    {/* Reject */}
+    <button
+      onClick={() => openRejectModal(nomination.nominationId)}
+      title="Reject"
+      style={{
+        padding: "7px 10px",
+        background: "#fff",
+        color: "#EF4444",
+        border: "1.4px solid #EF4444",
+        borderRadius: "8px",
+        fontSize: "17px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <i className="bi bi-x-circle" />
+    </button>
+  </div>
+</td>
 
-                              }}
-                              onClick={() => viewDetails(nomination.nominationId)}
-                              title="View Details"
-                            >
-                              View
-                            </button>
-                            {activeTab === "Pending" && (
-                              <>
-                                <button
-                                  className="btn btn-sm"
-                                  style={{
-                                    background: THEME.success,
-                                    color: "#fff",
-                                    border: "none",
-                                    fontWeight: "600",
-                                    fontSize: "11px",
-                                    padding: "4px 8px",
-                                  }}
-                                  onClick={() => openApproveModal(nomination.nominationId)}
-                                  title="Approve Nomination"
-                                >
-                                  Approve
-                                </button>
-                                <button
-                                  className="btn btn-sm"
-                                  style={{
-                                    background: THEME.danger,
-                                    color: "#fff",
-                                    border: "none",
-                                    fontWeight: "600",
-                                    fontSize: "11px",
-                                    padding: "4px 8px",
-                                  }}
-                                  onClick={() => openRejectModal(nomination.nominationId)}
-                                  title="Reject Nomination"
-                                >
-                                  Reject
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+        )}
+      </tr>
+    ))}
+  </tbody>
+</table>
+
             </div>
 
             {totalPages > 1 && (
@@ -454,7 +558,7 @@ function HRNominations() {
                       className="page-link"
                       onClick={() => setCurrentPage(1)}
                       disabled={currentPage === 1}
-                      style={{ color: THEME.primary }}
+                      style={{ color: "#27235c", fontWeight: "600" }}
                     >
                       First
                     </button>
@@ -467,9 +571,10 @@ function HRNominations() {
                           className="page-link"
                           onClick={() => setCurrentPage(pageNum)}
                           style={{
-                            background: currentPage === pageNum ? THEME.primary : "transparent",
-                            color: currentPage === pageNum ? "#fff" : THEME.primary,
-                            border: `1px solid ${THEME.border}`,
+                            background: currentPage === pageNum ? "#27235c" : "transparent",
+                            color: currentPage === pageNum ? "#fff" : "#27235c",
+                            border: "1px solid #27235c",
+                            fontWeight: "600",
                           }}
                         >
                           {pageNum}
@@ -482,7 +587,7 @@ function HRNominations() {
                       className="page-link"
                       onClick={() => setCurrentPage(totalPages)}
                       disabled={currentPage === totalPages}
-                      style={{ color: THEME.primary }}
+                      style={{ color: "#27235c", fontWeight: "600" }}
                     >
                       Last
                     </button>
@@ -497,81 +602,97 @@ function HRNominations() {
               {paginatedNominations.map((nomination) => (
                 <div key={nomination.nominationId} className="col-md-6 col-lg-4">
                   <div
-                    className="card border-0 shadow-sm h-100"
                     style={{
-                      background: THEME.card,
-                      borderTop: `3px solid ${THEME.primary}`,
+                      background: "#fff",
+                      border: "2px solid #27235c",
+                      borderRadius: "14px",
+                      padding: "24px",
+                      transition: "transform 0.2s, box-shadow 0.2s",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.boxShadow = "0 8px 20px rgba(39,35,92,0.15)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.05)";
                     }}
                   >
-                    <div className="card-body">
-                      <div className="mb-3">
-                        <h6 className="card-title mb-1" style={{ color: THEME.text, fontWeight: "600" }}>
-                          {nomination.nomineeName}
-                        </h6>
-                        <small style={{ fontSize: "12px", color: THEME.textLight }}>
-                          ID: {nomination.nomineeEmail}
-                        </small>
-                      </div>
-                      <p className="mb-2" style={{ fontSize: "13px" }}>
-                        <span style={{ color: THEME.textLight }}>Department:</span>
+                    <div style={{ marginBottom: "16px" }}>
+                      <h6 style={{ color: "#27235c", fontWeight: "700", fontSize: "16px", marginBottom: "4px" }}>
+                        {nomination.nomineeName}
+                      </h6>
+                    </div>
+                    <div style={{ background: "#f8f9fc", padding: "14px", borderRadius: "8px", marginBottom: "16px" }}>
+                      <p style={{ fontSize: "13px", marginBottom: "8px" }}>
+                        <span style={{ color: "#718096", fontWeight: "600" }}>Department:</span>
                         <br />
-                        <span style={{ color: THEME.text, fontWeight: "500" }}>
+                        <span style={{ color: "#1A202C", fontWeight: "600", fontSize: "14px" }}>
                           {nomination.nomineeDepartmentName}
                         </span>
                       </p>
-                      <p className="mb-3" style={{ fontSize: "13px" }}>
-                        <span style={{ color: THEME.textLight }}>Submitted:</span>
+                      <p style={{ fontSize: "13px", margin: 0 }}>
+                        <span style={{ color: "#718096", fontWeight: "600" }}>Submitted:</span>
                         <br />
-                        <span style={{ color: THEME.text }}>
+                        <span style={{ color: "#1A202C", fontWeight: "500" }}>
                           {new Date(nomination.submittedAt).toLocaleDateString()}
                         </span>
                       </p>
-                      <div className="d-flex gap-2">
-                        <button
-                          className="btn btn-sm flex-grow-1"
-                          style={{
-                            background: THEME.primary,
-                            color: "#fff",
-                            border: "none",
-                            fontWeight: "600",
-                          }}
-                          onClick={() => viewDetails(nomination.nominationId)}
-                        >
-                          View
-                        </button>
-                        {activeTab === "Pending" && (
-                          <>
-                            <button
-                              className="btn btn-sm"
-                              style={{
-                                background: THEME.success,
-                                color: "#fff",
-                                border: "none",
-                                fontWeight: "600",
-                                padding: "6px 10px",
-                              }}
-                              onClick={() => openApproveModal(nomination.nominationId)}
-                              title="Approve"
-                            >
-                              ✓
-                            </button>
-                            <button
-                              className="btn btn-sm"
-                              style={{
-                                background: THEME.danger,
-                                color: "#fff",
-                                border: "none",
-                                fontWeight: "600",
-                                padding: "6px 10px",
-                              }}
-                              onClick={() => openRejectModal(nomination.nominationId)}
-                              title="Reject"
-                            >
-                              ✗
-                            </button>
-                          </>
-                        )}
-                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button
+                        style={{
+                          flex: 1,
+                          background: "#27235c",
+                          color: "#fff",
+                          border: "none",
+                          fontWeight: "700",
+                          fontSize: "13px",
+                          padding: "10px",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => viewDetails(nomination.nominationId)}
+                      >
+                        View Details
+                      </button>
+                      {activeTab === "Pending" && (
+                        <>
+                          <button
+                            style={{
+                              background: "#10B981",
+                              color: "#fff",
+                              border: "none",
+                              fontWeight: "700",
+                              padding: "10px 14px",
+                              fontSize: "16px",
+                              borderRadius: "8px",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => openApproveModal(nomination.nominationId)}
+                            title="Approve"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            style={{
+                              background: "#EF4444",
+                              color: "#fff",
+                              border: "none",
+                              fontWeight: "700",
+                              padding: "10px 14px",
+                              fontSize: "16px",
+                              borderRadius: "8px",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => openRejectModal(nomination.nominationId)}
+                            title="Reject"
+                          >
+                            ✗
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -582,12 +703,7 @@ function HRNominations() {
               <nav aria-label="Page navigation">
                 <ul className="pagination justify-content-center">
                   <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => setCurrentPage(1)}
-                      disabled={currentPage === 1}
-                      style={{ color: THEME.primary }}
-                    >
+                    <button className="page-link" onClick={() => setCurrentPage(1)} disabled={currentPage === 1} style={{ color: "#27235c", fontWeight: "600" }}>
                       First
                     </button>
                   </li>
@@ -599,8 +715,9 @@ function HRNominations() {
                           className="page-link"
                           onClick={() => setCurrentPage(pageNum)}
                           style={{
-                            background: currentPage === pageNum ? THEME.primary : "transparent",
-                            color: currentPage === pageNum ? "#fff" : THEME.primary,
+                            background: currentPage === pageNum ? "#27235c" : "transparent",
+                            color: currentPage === pageNum ? "#fff" : "#27235c",
+                            fontWeight: "600",
                           }}
                         >
                           {pageNum}
@@ -609,12 +726,7 @@ function HRNominations() {
                     ) : null;
                   })}
                   <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => setCurrentPage(totalPages)}
-                      disabled={currentPage === totalPages}
-                      style={{ color: THEME.primary }}
-                    >
+                    <button className="page-link" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} style={{ color: "#27235c", fontWeight: "600" }}>
                       Last
                     </button>
                   </li>
@@ -625,453 +737,24 @@ function HRNominations() {
         )}
       </div>
 
-      {/* ACTION MODAL - THEMED */}
-      {showActionModal && (
-        <>
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(39, 35, 92, 0.4)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-              zIndex: 1040,
-              textAlign:"left",
-            }}
-            onClick={() => setShowActionModal(false)}
-          />
-          <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 1050,
-              width: "95vw",
-              maxWidth: 420,
-              textAlign:"left",
-            }}
-          >
-            <div
-              style={{
-                borderRadius: "0.75rem",
-                overflow: "hidden",
-                boxShadow: "0 10px 40px rgba(0, 0, 0, 0.26)",
-                border: "none",
-                background: "#fff",
-                textAlign:"left",
-              }}
-            >
-              <div
-                style={{
-                  background: "#27235C",
-                  color: "#fff",
-                  padding: "16px 20px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  textAlign:"left",
-                }}
-              >
-                <div style={{ fontWeight: 600, fontSize: 17 }}>
-                  {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
-                </div>
-                <button
-                  onClick={() => setShowActionModal(false)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#fff",
-                    fontSize: 24,
-                    padding: "0 6px",
-                    cursor: "pointer",
-                    textAlign:"left",
-                  }}
-                  aria-label="Close"
-                >
-                  ×
-                </button>
-              </div>
-              <div style={{ padding: 20, background: "#FFF" }}>
-                <label
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 13,
-                    color: "#334155",
-                    marginBottom: 6,
-                    display: "block",
-                    textAlign:"left",
-                  }}
-                >
-                  {actionType === "approve" ? "Enter approval justification:" : "Enter rejection reason:"}
-                </label>
-                <textarea
-                  className="form-control"
-                  rows={4}
-                  value={actionRemarks}
-                  onChange={(e) => setActionRemarks(e.target.value)}
-                  placeholder={
-                    actionType === "approve"
-                      ? "Why are you approving this nomination?"
-                      : "Why are you rejecting this nomination?"
-                  }
-                  style={{
-                    border: "1px solid #cbd5e1",
-                    borderRadius: 6,
-                    padding: "10px",
-                    fontSize: 13,
-                    marginBottom: 4,
-                    minHeight: 90,
-                    resize: "vertical",
-                    textAlign:"left",
-                  }}
-                />
-              </div>
-              <div
-                style={{
-                  borderTop: "1px solid #e2e8f0",
-                  background: "#FFF",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: 12,
-                  padding: "14px 20px",
-                  textAlign:"left",
-                }}
-              >
-                <button
-                  onClick={() => setShowActionModal(false)}
-                  style={{
-                    background: "#6c757d",
-                    color: "#fff",
-                    border: "none",
-                    fontWeight: 600,
-                    padding: "8px 20px",
-                    fontSize: 13,
-                    borderRadius: 6,
-                    marginRight: 2,
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={submitAction}
-                  style={{
-                    background:
-                      actionType === "approve"
-                        ? "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
-                        : "linear-gradient(90deg, #E01950 0%, #97247E 100%)",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 6,
-                    fontWeight: 600,
-                    fontSize: 13,
-                    padding: "8px 20px",
-                    cursor: "pointer",
-                    boxShadow: "0 2px 8px rgba(151, 36, 126, 0.18)",
-                    textAlign:"left",
-                  }}
-                >
-                  {actionType === "approve" ? "Approve" : "Reject"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      {/* USE YOUR EXISTING MODALS */}
+      <ViewDetailsModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        detailsLoading={detailsLoading}
+        selectedNominationDetails={selectedNominationDetails}
+        THEME={THEME}
+      />
 
-      {/* DETAILS MODAL - THEMED */}
-      {showModal && (
-        <>
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(39, 35, 92, 0.4)",
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-              zIndex: 1040,
-              textAlign:"left",
-            }}
-            onClick={() => setShowModal(false)}
-          />
-          <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 1050,
-              width: "97vw",
-              maxWidth: 760,
-              textAlign:"left",
-            }}
-
-          >
-            <div
-              style={{
-                borderRadius: "0.85rem",
-                overflow: "hidden",
-                boxShadow: "0 10px 42px rgba(39,35,92,0.20)",
-                border: "none",
-                background: "#fff",
-                textAlign:"left",
-              }}
-            >
-              <div
-                style={{
-                  background: "#27235C",
-                  color: "#fff",
-                  padding: "20px 28px 16px 28px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  textAlign:"left",
-                }}
-              >
-                <div style={{ fontWeight: 700, fontSize: 19 }}>Nomination Details</div>
-                <button
-                  onClick={() => setShowModal(false)}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#fff",
-                    fontSize: 25,
-                    padding: "0 6px",
-                    cursor: "pointer",
-                  }}
-                  aria-label="Close"
-                >
-                  ×
-                </button>
-              </div>
-              <div
-                style={{
-                  background: "#fff",
-                  padding: "26px 28px 18px 28px",
-                  overflowY: "auto",
-                  maxHeight: "calc(92vh - 140px)",
-                }}
-              >
-                {detailsLoading ? (
-                  <div style={{ textAlign: "left", padding: "38px 0", color: "#6b7280" }}>
-                    <div
-                      style={{
-                        border: "3px solid #f3f4f6",
-                        borderTop: "3px solid #27235C",
-                        borderRadius: "50%",
-                        width: 40,
-                        height: 40,
-                        margin: "0 auto 16px",
-                        animation: "spin 0.8s linear infinite",
-                      }}
-                    />
-                    Loading details...
-                  </div>
-                ) : selectedNominationDetails ? (
-                  <div>
-                    <div className="row mb-4">
-                      <div className="col-md-6">
-                        <label style={{ fontSize: 12, fontWeight: 600, color: THEME.textLight, marginBottom: 8 }}>
-                          NOMINEE NAME
-                        </label>
-                        <p style={{ fontSize: 14, color: THEME.text, fontWeight: 500, margin: 0 }}>
-                          {selectedNominationDetails.nomineeName ||
-                            (selectedNominationDetails.nominee?.firstName
-                              ? `${selectedNominationDetails.nominee.firstName} ${selectedNominationDetails.nominee.lastName}`
-                              : "N/A")}
-                        </p>
-                      </div>
-                      <div className="col-md-6">
-                        <label style={{ fontSize: 12, fontWeight: 600, color: THEME.textLight, marginBottom: 8 }}>
-                          EMPLOYEE ID
-                        </label>
-                        <p style={{ fontSize: 14, color: THEME.text, fontWeight: 500, margin: 0 }}>
-                          {selectedNominationDetails.nomineeEmployeeId ||
-                            selectedNominationDetails.nominee?.employeeId ||
-                            "N/A"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="row mb-4">
-                      <div className="col-md-6">
-                        <label style={{ fontSize: 12, fontWeight: 600, color: THEME.textLight, marginBottom: 8 }}>
-                          OPPORTUNITY
-                        </label>
-                        <p style={{ fontSize: 14, color: THEME.text, fontWeight: 500, margin: 0 }}>
-                          {selectedNominationDetails.opportunityName ||
-                            selectedNominationDetails.opportunity?.opportunityName ||
-                            "N/A"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mb-4">
-                      <label
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 600,
-                          color: THEME.textLight,
-                          marginBottom: 8,
-                          display: "block",
-                        }}
-                      >
-                        JUSTIFICATION
-                      </label>
-                      <div
-                        style={{
-                          background: THEME.background,
-                          padding: 12,
-                          borderRadius: 6,
-                          fontSize: 14,
-                          color: THEME.text,
-                          minHeight: 80,
-                        }}
-                      >
-                        {selectedNominationDetails.justification || "No justification provided"}
-                      </div>
-                    </div>
-
-                    {selectedNominationDetails.parameterValues &&
-                      selectedNominationDetails.parameterValues.length > 0 && (
-                        <div className="mb-4">
-                          <label
-                            style={{
-                              fontSize: 12,
-                              fontWeight: 600,
-                              color: THEME.textLight,
-                              marginBottom: 12,
-                              display: "block",
-                            }}
-                          >
-                            NOMINATION PARAMETERS
-                          </label>
-                          <div
-                            style={{
-                              background: THEME.background,
-                              padding: 16,
-                              borderRadius: 6,
-                              border: `1px solid ${THEME.border}`,
-                            }}
-                          >
-                            {selectedNominationDetails.parameterValues.map((param, index) => (
-                              <div
-                                key={param.parameterId || index}
-                                style={{
-                                  marginBottom:
-                                    index < selectedNominationDetails.parameterValues.length - 1 ? 16 : 0,
-                                  paddingBottom:
-                                    index < selectedNominationDetails.parameterValues.length - 1 ? 16 : 0,
-                                  borderBottom:
-                                    index < selectedNominationDetails.parameterValues.length - 1
-                                      ? `1px solid ${THEME.border}`
-                                      : "none",
-                                }}
-                              >
-                                <div className="row">
-                                  <div className="col-md-5">
-                                    <p style={{ fontSize: 13, fontWeight: 600, color: THEME.text, margin: 0 }}>
-                                      {param.parameterName}
-                                      {param.isRequired && (
-                                        <span style={{ color: THEME.danger, marginLeft: 4 }}>*</span>
-                                      )}
-                                    </p>
-                                    <p style={{ fontSize: 11, color: THEME.textLight, margin: "4px 0 0 0" }}>
-                                      Type: {param.parameterType}
-                                    </p>
-                                  </div>
-                                  <div className="col-md-7">
-                                    <div
-                                      style={{
-                                        background: THEME.card,
-                                        padding: "8px 12px",
-                                        borderRadius: 4,
-                                        border: `1px solid ${THEME.border}`,
-                                      }}
-                                    >
-                                      <p style={{ fontSize: 14, color: THEME.text, margin: 0, fontWeight: 500 }}>
-                                        {param.parameterType === "Rating" && (
-                                          <span>
-                                            {"⭐".repeat(parseInt(param.parameterValue) || 0)}{" "}
-                                            <span style={{ color: THEME.textLight }}>
-                                              ({param.parameterValue}/5)
-                                            </span>
-                                          </span>
-                                        )}
-                                        {param.parameterType !== "Rating" && param.parameterValue}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                    <div className="row">
-                      <div className="col-md-6">
-                        <label style={{ fontSize: 12, fontWeight: 600, color: THEME.textLight, marginBottom: 8 }}>
-                          SUBMITTED DATE
-                        </label>
-                        <p style={{ fontSize: 14, color: THEME.text, fontWeight: 500, margin: 0 }}>
-                          {selectedNominationDetails.submittedAt
-                            ? new Date(selectedNominationDetails.submittedAt).toLocaleString()
-                            : "N/A"}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p style={{ textAlign: "left", color: "#9ca3af", fontSize: 15, padding: "40px 0" }}>
-                    No details available
-                  </p>
-                )}
-              </div>
-              <div
-                style={{
-                  background: "#F5F5F7",
-                  borderTop: "1px solid #e5e7eb",
-                  padding: "18px 28px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <button
-                  onClick={() => setShowModal(false)}
-                  style={{
-                    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                    color: "#fff",
-                    fontWeight: 700,
-                    border: "none",
-                    fontSize: 15,
-                    borderRadius: 8,
-                    padding: "9px 34px",
-                    cursor: "pointer",
-                    boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
-                    textAlign:"left",
-                  }}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
-        </>
-      )}
+      <ActionModal
+        show={showActionModal}
+        onClose={() => setShowActionModal(false)}
+        actionType={actionType}
+        actionRemarks={actionRemarks}
+        setActionRemarks={setActionRemarks}
+        onSubmit={submitAction}
+        THEME={THEME}
+      />
     </div>
   );
 }

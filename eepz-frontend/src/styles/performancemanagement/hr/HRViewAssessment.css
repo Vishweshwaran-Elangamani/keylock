@@ -8,7 +8,7 @@
   --brand-accent: #10b981;
   --brand-bg: #f8f9fc;
   --brand-card: #fff;
-  --brand-border: #e5e7eb;
+  --brand-border: #27235c; /* CHANGED TO DARK BLUE */
   --brand-gray: #64748b;
 }
 
@@ -41,8 +41,6 @@ body, html {
   justify-content: space-between;
   align-items: center;
   padding: 1.3rem 1.5rem;
-  border-bottom: 1.5px solid var(--brand-border);
-  background: var(--brand-card);
 }
 .hrview-page-title {
   font-size: 1.4rem;
@@ -55,7 +53,7 @@ body, html {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--brand-indigo);
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -67,7 +65,7 @@ body, html {
   transition: all 0.15s;
 }
 .hrview-btn-export:hover {
-  background: var(--brand-purple);
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
   color: #fff;
   transform: translateY(-1.5px);
   box-shadow: 0 6px 14px rgba(151,36,126,0.09);
@@ -80,7 +78,7 @@ body, html {
   gap: 1.07rem;
   padding: 1.15rem 1.5rem;
   background: var(--brand-card);
-  border-bottom: 1.5px solid var(--brand-border);
+  border-bottom: 1.5px solid var(--brand-indigo); /* DARK BLUE */
 }
 .hrview-stat-card {
   border: 1.7px solid var(--brand-indigo);
@@ -129,7 +127,7 @@ body, html {
   gap: 1rem;
   padding: 1rem 1.5rem;
   background: #fff;
-  border-bottom: 1.3px solid var(--brand-border);
+  border-bottom: 1.3px solid var(--brand-indigo); /* DARK BLUE */
   flex-wrap: wrap;
 }
 .hrview-filter-group {
@@ -148,7 +146,7 @@ body, html {
   padding: 0.55rem 0.8rem;
   font-size: 1rem;
   border-radius: 8px;
-  border: 1.2px solid var(--brand-border);
+  border: 1.2px solid var(--brand-indigo); /* DARK BLUE */
   background: #fff;
   color: var(--brand-indigo);
   transition: all 0.1s;
@@ -186,7 +184,7 @@ body, html {
   font-size: 0.94rem;
 }
 .hrview-table tbody tr {
-  border-bottom: 1.2px solid var(--brand-border);
+  border-bottom: 1.2px solid var(--brand-indigo); /* DARK BLUE */
   transition: background 0.11s;
 }
 .hrview-table tbody tr:hover {
@@ -345,7 +343,7 @@ body, html {
 .hrview-comp-card {
   margin: 18px 0 0 0;
   padding: 15px;
-  border: 1px solid var(--brand-border);
+  border: 1px solid var(--brand-indigo); /* DARK BLUE */
   border-radius: 11px;
   background: #F7F9FA;
   font-size: 14px;
@@ -357,7 +355,7 @@ body, html {
 }
 .hrview-comp-card hr {
   border: none;
-  border-top: 1px solid var(--brand-border);
+  border-top: 1px solid var(--brand-indigo); /* DARK BLUE */
   margin: 10px 0;
 }
 

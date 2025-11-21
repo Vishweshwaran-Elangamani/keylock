@@ -258,21 +258,18 @@ function FormCreate() {
     <div className="hrfcper-page">
       {/* Top Bar */}
       <div className="hrfcper-top-bar">
-        <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
-          <ol className="hrfcper-breadcrumb">
-            <li className="hrfcper-breadcrumb-item" onClick={() => navigate("/dashboard")}>
-              <i className="bi bi-house-door"></i>
-              <span>Dashboard</span>
-            </li>
-            <li className="hrfcper-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance/formslist")}>
-  <span>Forms</span>
-</li>
+       <ol className="hrfcper-breadcrumb">
+  <li className="hrfcper-breadcrumb-item" onClick={() => navigate("/dashboard")}>
+    <i className="bi bi-house-door"></i>
+  </li>
+  <li className="hrfcper-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")}>
+    <span>Performance</span>
+  </li>
+  <li className="hrfcper-breadcrumb-item active" aria-current="page">
+    {isEditMode ? "Edit Form" : "Create Form"}
+  </li>
+</ol>
 
-            <li className="hrfcper-breadcrumb-item active" aria-current="page">
-              {isEditMode ? "Edit Form" : "Create Form"}
-            </li>
-          </ol>
-        </nav>
         <button
   type="button"
   className="hrfcper-btn-back"

@@ -11,217 +11,226 @@ const ViewDetailsModal = ({
 
   return (
     <div
-      className={`modal fade show`}
+      className="modal fade show"
       style={{
         display: "block",
-        backgroundColor: "rgba(0,0,0,0.5)",
+        backgroundColor: "rgba(39, 35, 92, 0.4)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        zIndex: 1050,
       }}
       tabIndex="-1"
     >
-      <div className="modal-dialog modal-lg">
-        <div className="modal-content border-0 shadow-lg" style={{ background: THEME.card }}>
+      <div className="modal-dialog modal-lg" style={{ marginTop: 36, marginBottom: 36, maxWidth: 700 }}>
+        <div className="modal-content border-0 shadow-lg" style={{ background: THEME.card, borderRadius: 18 }}>
+          {/* HEADER */}
           <div
             className="modal-header"
             style={{
               background: THEME.primary,
               color: "#fff",
               borderBottom: "none",
-              paddingBottom: "24px",
+              padding: "24px 36px 15px 36px",
+              borderTopLeftRadius: 18,
+              borderTopRightRadius: 18,
+              alignItems: "center",
+              minHeight: 60,
             }}
           >
-            <h5 className="modal-title" style={{ fontWeight: "600", fontSize: "18px" }}>
+            <h5 className="modal-title" style={{ fontWeight: "700", fontSize: 21, color: "#fff", margin: 0 }}>
               Nomination Details
             </h5>
-            <button
-              type="button"
-              className="btn-close btn-close-white"
-              onClick={() => setShowModal(false)}
-            ></button>
           </div>
-          <div className="modal-body" style={{ paddingTop: "24px" }}>
+          {/* BODY */}
+          <div className="modal-body" style={{ padding: "28px 38px 18px 38px" }}>
             {detailsLoading ? (
-              <div className="text-center">
-                <div className="spinner-border" role="status" style={{ color: THEME.primary }}></div>
-                <p className="text-muted mt-2">Loading details...</p>
+              <div className="text-center my-5">
+                <div className="spinner-border" role="status" style={{ color: THEME.primary, width: 38, height: 38 }}></div>
+                <p className="text-muted mt-3" style={{ fontSize: 16 }}>Loading details...</p>
               </div>
             ) : selectedNominationDetails ? (
               <div>
-                {/* Basic Details */}
+                {/* NOMINEE INFO */}
                 <div className="row mb-4">
-                  <div className="col-md-6">
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        color: THEME.textLight,
-                        marginBottom: "8px",
-                      }}
-                    >
-                      NOMINEE NAME
-                    </label>
-                    <p style={{ fontSize: "14px", color: THEME.text, fontWeight: "500", margin: 0 }}>
+                  <div className="col-md-6 mb-3 mb-md-0">
+                    <div style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: THEME.textLight,
+                      marginBottom: 3,
+                      letterSpacing: "0.1px",
+                    }}>
+                      Nominee Name
+                    </div>
+                    <div style={{
+                      fontSize: 16,
+                      color: THEME.text,
+                      fontWeight: 700,
+                    }}>
                       {selectedNominationDetails.nomineeName ||
                         (selectedNominationDetails.nominee?.firstName
                           ? `${selectedNominationDetails.nominee.firstName} ${selectedNominationDetails.nominee.lastName}`
                           : "N/A")}
-                    </p>
+                    </div>
                   </div>
                   <div className="col-md-6">
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        color: THEME.textLight,
-                        marginBottom: "8px",
-                      }}
-                    >
-                      EMPLOYEE ID
-                    </label>
-                    <p style={{ fontSize: "14px", color: THEME.text, fontWeight: "500", margin: 0 }}>
+                    <div style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: THEME.textLight,
+                      marginBottom: 3,
+                      letterSpacing: "0.1px"
+                    }}>
+                      Employee ID
+                    </div>
+                    <div style={{ fontSize: 16, color: THEME.text, fontWeight: 700 }}>
                       {selectedNominationDetails.nomineeEmployeeId ||
                         selectedNominationDetails.nominee?.employeeId ||
                         "N/A"}
-                    </p>
+                    </div>
                   </div>
                 </div>
-
                 <div className="row mb-4">
-                  <div className="col-md-6">
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        color: THEME.textLight,
-                        marginBottom: "8px",
-                      }}
-                    >
-                      OPPORTUNITY
-                    </label>
-                    <p style={{ fontSize: "14px", color: THEME.text, fontWeight: "500", margin: 0 }}>
+                  <div className="col-md-7 mb-3 mb-md-0">
+                    <div style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: THEME.textLight,
+                      marginBottom: 3,
+                      letterSpacing: "0.1px"
+                    }}>
+                      Opportunity
+                    </div>
+                    <div style={{ fontSize: 16, color: THEME.text, fontWeight: 700 }}>
                       {selectedNominationDetails.opportunityName ||
                         selectedNominationDetails.opportunity?.opportunityName ||
                         "N/A"}
-                    </p>
+                    </div>
+                  </div>
+                  <div className="col-md-5">
+                    <div style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: THEME.textLight,
+                      marginBottom: 3,
+                      letterSpacing: "0.1px"
+                    }}>
+                      Submitted Date
+                    </div>
+                    <div style={{ fontSize: 15, color: THEME.text, fontWeight: 600 }}>
+                      {selectedNominationDetails.submittedAt
+                        ? new Date(selectedNominationDetails.submittedAt).toLocaleString()
+                        : "N/A"}
+                    </div>
                   </div>
                 </div>
+                {/* Divider */}
+                <hr style={{ borderColor: "#e4e7eb", margin: "2px 0 22px 0" }} />
 
-                {/* Justification */}
+                {/* JUSTIFICATION */}
                 <div className="mb-4">
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      color: THEME.textLight,
-                      marginBottom: "8px",
-                      display: "block",
-                    }}
-                  >
-                    JUSTIFICATION
-                  </label>
+                  <div style={{
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: THEME.textLight,
+                    marginBottom: 7,
+                    textTransform: "uppercase",
+                    letterSpacing: ".11em"
+                  }}>
+                    Justification
+                  </div>
                   <div
                     style={{
                       background: THEME.background,
-                      padding: "12px",
-                      borderRadius: "6px",
-                      fontSize: "14px",
+                      padding: 16,
+                      borderRadius: 8,
+                      fontSize: 15,
                       color: THEME.text,
-                      minHeight: "80px",
+                      minHeight: "54px",
+                      fontWeight: 500,
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.037)",
+                      border: `1.3px solid ${THEME.border}22`,
                     }}
                   >
                     {selectedNominationDetails.justification || "No justification provided"}
                   </div>
                 </div>
-
-                {/* Parameter Values Section */}
+                {/* PARAMETERS */}
                 {selectedNominationDetails.parameterValues &&
                   selectedNominationDetails.parameterValues.length > 0 && (
-                    <div className="mb-4">
-                      <label
-                        style={{
-                          fontSize: "12px",
-                          fontWeight: "600",
-                          color: THEME.textLight,
-                          marginBottom: "12px",
-                          display: "block",
-                        }}
-                      >
-                        NOMINATION PARAMETERS
-                      </label>
-                      <div
-                        style={{
-                          background: THEME.background,
-                          padding: "16px",
-                          borderRadius: "6px",
-                          border: `1px solid ${THEME.border}`,
-                        }}
-                      >
+                    <div className="mb-3">
+                      <div style={{
+                        fontSize: 13,
+                        fontWeight: 800,
+                        color: THEME.textLight,
+                        marginBottom: 7,
+                        textTransform: "uppercase",
+                        letterSpacing: ".11em"
+                      }}>
+                        Nomination Parameters
+                      </div>
+                      <div style={{
+                        borderRadius: 7,
+                        overflow: "hidden",
+                        border: `1.3px solid ${THEME.border}19`,
+                        background: "#fafbfc",
+                        marginBottom: 2
+                      }}>
                         {selectedNominationDetails.parameterValues.map((param, index) => (
                           <div
                             key={param.parameterId || index}
                             style={{
-                              marginBottom:
-                                index < selectedNominationDetails.parameterValues.length - 1 ? "16px" : "0",
-                              paddingBottom:
-                                index < selectedNominationDetails.parameterValues.length - 1 ? "16px" : "0",
+                              display: "flex",
+                              alignItems: "flex-start",
+                              padding: "11px 13px",
                               borderBottom:
                                 index < selectedNominationDetails.parameterValues.length - 1
-                                  ? `1px solid ${THEME.border}`
+                                  ? `1px solid #e3e9ef`
                                   : "none",
                             }}
                           >
-                            <div className="row">
-                              <div className="col-md-5">
-                                <p
-                                  style={{
-                                    fontSize: "13px",
-                                    fontWeight: "600",
-                                    color: THEME.text,
-                                    margin: 0,
-                                  }}
-                                >
-                                  {param.parameterName}
-                                  {param.isRequired && (
-                                    <span style={{ color: THEME.danger, marginLeft: "4px" }}>*</span>
-                                  )}
-                                </p>
-                                <p
-                                  style={{
-                                    fontSize: "11px",
-                                    color: THEME.textLight,
-                                    margin: "4px 0 0 0",
-                                  }}
-                                >
-                                  Type: {param.parameterType}
-                                </p>
+                            <div style={{ minWidth: 110, flex: "0 0 150px", marginTop: 2 }}>
+                              <div style={{
+                                fontSize: 13,
+                                fontWeight: 600,
+                                color: THEME.text,
+                                marginBottom: 2
+                              }}>
+                                {param.parameterName}
+                                {param.isRequired && (
+                                  <span style={{ color: THEME.danger, marginLeft: 3 }}>*</span>
+                                )}
                               </div>
-                              <div className="col-md-7">
-                                <div
-                                  style={{
-                                    background: THEME.card,
-                                    padding: "8px 12px",
-                                    borderRadius: "4px",
-                                    border: `1px solid ${THEME.border}`,
-                                  }}
-                                >
-                                  <p
-                                    style={{
-                                      fontSize: "14px",
-                                      color: THEME.text,
-                                      margin: 0,
-                                      fontWeight: "500",
-                                    }}
-                                  >
-                                    {param.parameterType === "Rating" && (
-                                      <span>
-                                        {"⭐".repeat(parseInt(param.parameterValue) || 0)}{" "}
-                                        <span style={{ color: THEME.textLight }}>
-                                          ({param.parameterValue}/5)
-                                        </span>
-                                      </span>
-                                    )}
-                                    {param.parameterType !== "Rating" && param.parameterValue}
-                                  </p>
-                                </div>
+                              <span style={{
+                                display: "inline-block",
+                                fontSize: 11.2,
+                                color: THEME.textLight,
+                                margin: "3px 0 0 0"
+                              }}>
+                                Type: {param.parameterType}
+                              </span>
+                            </div>
+                            <div style={{ flex: 1, paddingLeft: 10, marginTop: 2 }}>
+                              <div
+                                style={{
+                                  background: "#fff",
+                                  borderRadius: 3,
+                                  border: `1px solid ${THEME.border}19`,
+                                  padding: "7px 11px",
+                                  fontSize: 15,
+                                  fontWeight: 500,
+                                  color: THEME.text,
+                                  minHeight: 28
+                                }}
+                              >
+                                {param.parameterType === "Rating" ? (
+                                  <>
+                                    {"⭐".repeat(parseInt(param.parameterValue) || 0)}
+                                    <span style={{ color: THEME.textLight }}>&nbsp;({param.parameterValue}/5)</span>
+                                  </>
+                                ) : (
+                                  param.parameterValue
+                                )}
                               </div>
                             </div>
                           </div>
@@ -229,42 +238,33 @@ const ViewDetailsModal = ({
                       </div>
                     </div>
                   )}
-
-                {/* Submission Details */}
-                <div className="row">
-                  <div className="col-md-6">
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        color: THEME.textLight,
-                        marginBottom: "8px",
-                      }}
-                    >
-                      SUBMITTED DATE
-                    </label>
-                    <p style={{ fontSize: "14px", color: THEME.text, fontWeight: "500", margin: 0 }}>
-                      {selectedNominationDetails.submittedAt
-                        ? new Date(selectedNominationDetails.submittedAt).toLocaleString()
-                        : "N/A"}
-                    </p>
-                  </div>
-                </div>
               </div>
             ) : (
-              <p className="text-center text-muted">No details available</p>
+              <p className="text-center text-muted" style={{ fontSize: 16, padding: "22px 0" }}>No details available</p>
             )}
           </div>
-          <div className="modal-footer" style={{ borderTop: `1px solid ${THEME.border}` }}>
+          {/* FOOTER */}
+          <div className="modal-footer" style={{
+            borderTop: `1px solid ${THEME.border}`,
+            justifyContent: "flex-end",
+            padding: "16px 38px",
+            borderBottomLeftRadius: 18,
+            borderBottomRightRadius: 18,
+          }}>
             <button
               type="button"
               className="btn"
               onClick={() => setShowModal(false)}
               style={{
-                background: THEME.primary,
+                background: "#52525B",
                 color: "#fff",
-                fontWeight: "600",
+                fontWeight: "700",
                 border: "none",
+                borderRadius: 8,
+                padding: "9px 32px",
+                fontSize: 15.5,
+                boxShadow: "0 2px 5px rgba(0,0,0,0.07)",
+                letterSpacing: ".025em",
               }}
             >
               Close

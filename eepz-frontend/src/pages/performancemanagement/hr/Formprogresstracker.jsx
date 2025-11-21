@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../../services/performancemanagement/hr/api";
 import "../../../styles/performancemanagement/hr/FormProgressTracker.css";
 
@@ -8,7 +9,8 @@ export default function FormProgressTrackerPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const [itemsPerPage, setItemsPerPage] = useState(8);
+    const navigate = useNavigate();
 
   useEffect(() => {
     fetchTrackers();
@@ -87,19 +89,32 @@ export default function FormProgressTrackerPage() {
 
   return (
     <div className="fld-root">
-      {/* Breadcrumbs */}
-      <nav className="fld-breadcrumbs" aria-label="breadcrumb">
-        <ol>
-          <li><Link to="/hr/dashboard">Dashboard</Link></li>
-          <li><Link to="/hr/dashboard/performance">Performance</Link></li>
-          <li aria-current="page">Form Progress Tracker</li>
-        </ol>
-      </nav>
-      <div className="fld-header-row">
-        <h2 className="fld-page-title">Form Progress Tracker</h2>
-        <button className="fld-btn-export" onClick={handleExportCSV}>
-          <i className="bi bi-download"></i> Export CSV
-        </button>
+      <div className="fld-header-wrapper d-flex justify-content-between align-items-center">
+        {/* Breadcrumbs */}
+         <nav className="cg-breadcrumbs" aria-label="breadcrumb">
+  <ol className="cg-breadcrumb">
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard")}
+      style={{ cursor: "pointer" }}>
+      <i className="bi bi-house-door"></i>
+    </li>
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard/performance")}
+      style={{ cursor: "pointer" }}>
+      Performance
+    </li>
+    <li className="cg-breadcrumb-item active" aria-current="page">
+      Initiate Form
+    </li>
+  </ol>
+</nav>
+        <div className="fld-header-row d-flex justify-content-end align-items-center">
+          <button className="fld-btn-export" onClick={handleExportCSV}>
+            <i className="bi bi-download"></i> Export CSV
+          </button>
+        </div>
       </div>
 
       {loading && <div className="fld-loading"><div>Loading...</div></div>}
@@ -115,8 +130,6 @@ export default function FormProgressTrackerPage() {
             <table className="fld-table">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Assign</th>
                   <th>Employee</th>
                   <th>L1</th>
                   <th>L2</th>
@@ -127,14 +140,11 @@ export default function FormProgressTrackerPage() {
                   <th>Mgr Done</th>
                   <th>Dept Head</th>
                   <th>Emp Ack</th>
-                  <th>Updated</th>
                 </tr>
               </thead>
               <tbody>
                 {currentTrackers.map(tracker => (
                   <tr key={tracker.trackerId}>
-                    <td><span className="fld-badge fld-badge-id">{tracker.trackerId}</span></td>
-                    <td><span className="fld-badge fld-badge-assign">{tracker.assignmentId}</span></td>
                     <td style={{ textAlign: "left" }}>{tracker.employeeName}</td>
                     <td>{tracker.l1Name}</td>
                     <td>{tracker.l2Name}</td>
@@ -145,32 +155,41 @@ export default function FormProgressTrackerPage() {
                     <td><BoolIcon value={tracker.managerCompleted} /></td>
                     <td><BoolIcon value={tracker.deptHeadApproved} /></td>
                     <td><BoolIcon value={tracker.empAcknowledged} /></td>
-                    <td style={{ fontSize: '0.98em', color: '#27235c', fontWeight: 500 }}>
-                      {tracker.lastUpdated ? new Date(tracker.lastUpdated).toLocaleString() : "N/A"}
-                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {totalPages > 1 && (
-            <div className="fld-pagination-container">
-              <div className="fld-pagination-info">
-                Showing {startIndex + 1} to {Math.min(endIndex, trackers.length)} of {trackers.length} entries
-              </div>
-              <div className="fld-pagination-controls">
-                <button onClick={goToPrev} disabled={currentPage === 1} className="fld-pagination-btn" aria-label="Previous page">{'‹'}</button>
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i+1}
-                    onClick={() => goToPage(i+1)}
-                    className={`fld-pagination-btn${currentPage === i+1 ? " fld-pagination-btn-active" : ""}`}
-                  >{i + 1}</button>
-                ))}
-                <button onClick={goToNext} disabled={currentPage === totalPages} className="fld-pagination-btn" aria-label="Next page">{'›'}</button>
-              </div>
+          <div className="fld-pagination-container">
+            <div className="fld-pagination-info">
+              <span className="fld-show-entries-label">Show&nbsp;</span>
+              <select
+                className="fld-pagination-select"
+                value={itemsPerPage}
+                onChange={e => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+              >
+                <option value="8">8</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span className="fld-show-entries-label">&nbsp;entries</span>
+              <span className="fld-pagination-status">
+                &nbsp;&nbsp;Showing {startIndex + 1} to {Math.min(endIndex, trackers.length)} of {trackers.length} entries
+              </span>
             </div>
-          )}
+            <div className="fld-pagination-controls">
+              <button onClick={goToPrev} disabled={currentPage === 1} className="fld-pagination-btn" aria-label="Previous page">{'‹'}</button>
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i+1}
+                  onClick={() => goToPage(i+1)}
+                  className={`fld-pagination-btn${currentPage === i+1 ? " fld-pagination-btn-active" : ""}`}
+                >{i + 1}</button>
+              ))}
+              <button onClick={goToNext} disabled={currentPage === totalPages} className="fld-pagination-btn" aria-label="Next page">{'›'}</button>
+            </div>
+          </div>
         </div>
       }
     </div>

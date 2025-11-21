@@ -5,6 +5,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import AppraisalDetailsModal from "../../../components/performance_management/modals/HRViewAssessment/AppraisalDetailsModal";
 import "../../../styles/performancemanagement/hr/HRViewAssessment.css";
 
+import { useNavigate } from "react-router-dom";
+
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
   const separator = ",";
@@ -73,6 +75,7 @@ function HRViewAppraisals() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterProject, setFilterProject] = useState("all");
   const [modalRow, setModalRow] = useState(null);
+  const navigate = useNavigate();
 
   // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
@@ -262,28 +265,41 @@ function HRViewAppraisals() {
   return (
     <div className="fld-root">
       {/* Breadcrumbs */}
-      <nav className="fld-breadcrumbs" aria-label="breadcrumb">
-        <ol>
-          <li><Link to="/hr/dashboard">Dashboard</Link></li>
-          <li><Link to="/hr/dashboard/performance">Performance</Link></li>
-          <li aria-current="page">Forms List</li>
-        </ol>
-      </nav>
+      <div style={{
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: "2rem" // space below this whole bar
+}}>
+  <nav className="cg-breadcrumbs" style={{ background: "transparent" }} aria-label="breadcrumb">
+    <ol className="cg-breadcrumb" style={{ margin: 0 }}>
+      <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard")}>
+        <i className="bi bi-house-door"></i>
+      </li>
+      <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")}>
+        Performance
+      </li>
+      <li className="cg-breadcrumb-item active" aria-current="page">
+        Form Status
+      </li>
+    </ol>
+  </nav>
+  <button
+    className="hrview-btn-export"
+    onClick={() => exportToCsv("appraisals.csv", csvData)}
+  >
+    <i className="bi bi-download"></i> Export CSV
+  </button>
+</div>
+
+
 
       <div className="hrview-container">
         {/* Analytics Cards */}
        
 
         {/* Export & Filters */}
-        <div className="hrview-header">
-          <h2 className="hrview-page-title">Appraisal Details</h2>
-          <button
-            className="hrview-btn-export"
-            onClick={() => exportToCsv("appraisals.csv", csvData)}
-          >
-            <i className="bi bi-download"></i> Export CSV
-          </button>
-        </div>
+       
         <div className="hrview-filters">
           <div className="hrview-filter-group">
             <label>Filter by Status</label>

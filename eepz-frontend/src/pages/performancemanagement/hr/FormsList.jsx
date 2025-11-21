@@ -362,13 +362,30 @@ function FormsList() {
   return (
     <>
       <div className="fld-root">
-        <nav className="fld-breadcrumbs" aria-label="breadcrumb">
-          <ol>
-            <li><Link to="/hr/dashboard">Dashboard</Link></li>
-            <li><Link to="/hr/dashboard/performance">Performance</Link></li>
-            <li aria-current="page">Forms List</li>
-          </ol>
-        </nav>
+       
+  <nav className="cg-breadcrumbs" aria-label="breadcrumb">
+  <ol className="cg-breadcrumb">
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard")}
+      style={{ cursor: "pointer" }}>
+      <i className="bi bi-house-door"></i>
+    </li>
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard/performance")}
+      style={{ cursor: "pointer" }}>
+      Performance
+    </li>
+    <li className="cg-breadcrumb-item active" aria-current="page">
+      Initiate Form
+    </li>
+  </ol>
+</nav>
+
+
+
+
 
         <div className="fld-analytics-cards">
           <div className="fld-analytics-card">
@@ -511,33 +528,31 @@ function FormsList() {
                           </td>
                           <td>
                             <div className="fld-action-buttons">
-                              <button
-                                className="fld-action-btn fld-btn-view"
-                                onClick={() => handleView(f)}
-                                title="View Form"
-                              >
-                                <i className="bi bi-eye-fill"></i>
-                              </button>
-                              <button
-                                className="fld-action-btn fld-btn-edit"
-                                onClick={() =>
-                                  navigate(
-                                    `/hr/dashboard/performance/create/${f.formId}`
-                                  )
-                                }
-                                title="Edit Form"
-                              >
-                                <i className="bi bi-pencil-square"></i>
-                              </button>
-                              <button
-                                className={`fld-action-btn fld-btn-choose ${
-                                  selectedFormId === f.formId ? "fld-active" : ""
-                                }`}
-                                onClick={() => handleFormSelect(f.formId)}
-                                title="Choose Form"
-                              >
-                                <i className="bi bi-hand-index"></i>
-                              </button>
+<button
+  className="themed-action-btn btn-view"
+  onClick={() => handleView(f)}
+  title="View Form"
+>
+  <i className="bi bi-eye" />
+</button>
+<button
+  className="themed-action-btn btn-edit"
+  onClick={() =>
+    navigate(`/hr/dashboard/performance/create/${f.formId}`)
+  }
+  title="Edit Form"
+>
+  <i className="bi bi-pencil" />
+</button>
+<button
+  className={`themed-action-btn btn-choose${selectedFormId === f.formId ? " btn-active" : ""}`}
+  onClick={() => handleFormSelect(f.formId)}
+  title="Choose Form"
+>
+  <i className="bi bi-hand-index" />
+</button>
+
+
                             </div>
                           </td>
                         </tr>
@@ -720,13 +735,6 @@ function FormsList() {
                 disabled={!selectedFormId || selectedUserIds.length === 0 || !currentUserId}
               >
                 <i className="bi bi-send-fill"></i> Share
-              </button>
-              <button
-                className="fld-btn-draft"
-                onClick={() => openDeadlineModal("Save as Draft")}
-                disabled={!selectedFormId || selectedUserIds.length === 0 || !currentUserId}
-              >
-                <i className="bi bi-save-fill"></i> Save Draft
               </button>
             </div>
           </div>

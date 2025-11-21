@@ -49,6 +49,7 @@
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
+  
 }
 
 .fld-analytics-card {
@@ -58,6 +59,7 @@
   min-width: 140px;
   padding: 1rem 1.5rem;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.15);
+  border: 1px solid #27235c;
   border-radius: 12px;
   text-align: center;
   user-select: none;
@@ -825,4 +827,177 @@
     justify-content: center;
     flex-wrap: wrap;
   }
+}
+
+.cg-breadcrumbs {
+ margin-bottom: 2.5rem;
+}
+.cg-breadcrumb {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1rem;
+}
+.cg-breadcrumb-item {
+  display: flex;
+  align-items: center;
+  color: #97247e;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  gap: 0.3em;
+  user-select: none;
+  transition: color 0.13s;
+}
+.cg-breadcrumb-item i {
+  font-size: 1.13em;
+  color: #97247e;
+  vertical-align: middle;
+}
+.cg-breadcrumb-item:not(:last-child) {
+  opacity: 1;
+}
+.cg-breadcrumb-item + .cg-breadcrumb-item:before {
+  content: ">";
+  margin: 0 0.7em;
+  color: #b687b6; /* light purple for chevron/separator */
+  font-weight: 700;
+  font-size: 1.07em;
+}
+.cg-breadcrumb-item.active,
+.cg-breadcrumb-item:last-child,
+.cg-breadcrumb-item[aria-current="page"] {
+  color: #97247e;
+  font-weight: 700;
+  cursor: default;
+}
+
+
+.themed-action-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #fff;
+  border: 2px solid #e6e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
+  transition: border 0.2s, box-shadow 0.15s, color 0.15s;
+  box-shadow: 0 1px 3px rgba(40,50,80,0.02);
+  padding: 0;
+  margin: 0;
+  outline: none;
+  cursor: pointer;
+}
+
+.themed-action-btn i {
+  transition: color 0.2s;
+}
+
+/* View: Blue Border/Icon */
+.btn-view {
+  border-color: #aec2f3;
+}
+.btn-view i {
+  color: #4a73e8;
+}
+
+/* Edit: Yellow/Orange Border/Icon */
+.btn-edit {
+  border-color: #edc981;
+}
+.btn-edit i {
+  color: #e6a814;
+}
+
+/* Choose/Select: Emerald/Green Border/Icon */
+.btn-choose {
+  border-color: #90dbbf;
+}
+.btn-choose i {
+  color: #1cb07a;
+}
+
+/* Choose active state (optional highlight) */
+.btn-choose.btn-active {
+  box-shadow: 0 0 0 2px #1cb07a44;
+}
+
+/* General hover/focus effect */
+.themed-action-btn:hover,
+.themed-action-btn:focus {
+  box-shadow: 0 4px 14px rgba(50,80,216,0.08);
+  border-width: 2.4px;
+}
+
+/* Optional: reduce shadow on click */
+.themed-action-btn:active {
+  box-shadow: none;
+  opacity: 0.93;
+}
+
+.themed-action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  background: #fff;
+  border: 1.6px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: border 0.18s, color 0.18s, box-shadow 0.16s;
+  margin-right: 10px;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+}
+
+.themed-action-btn:last-child {
+  margin-right: 0;
+}
+
+/* View: Blue border + icon */
+.btn-view {
+  border-color: #b6cdfc;
+}
+.btn-view i {
+  color: #477af2;
+}
+
+/* Edit: Yellow/Orange border + icon */
+.btn-edit {
+  border-color: #ffe0a6;
+}
+.btn-edit i {
+  color: #e6a814;
+}
+
+/* Choose: Green border + icon */
+.btn-choose {
+  border-color: #bcf3d9;
+}
+.btn-choose i {
+  color: #20b47a;
+}
+.btn-choose.btn-active {
+  border-color: #13ae69;
+  background: #f5fcf6;
+  box-shadow: 0 0 0 2px #13ae6940;
+}
+
+/* Optional: subtle hover/focus effect for all */
+.themed-action-btn:hover,
+.themed-action-btn:focus {
+  border-width: 2px;
+  box-shadow: 0 2px 10px rgba(34,86,200,0.07);
+  background: #fafbff;
+}
+
+.themed-action-btn:active {
+  opacity: 0.93;
+  box-shadow: none;
 }

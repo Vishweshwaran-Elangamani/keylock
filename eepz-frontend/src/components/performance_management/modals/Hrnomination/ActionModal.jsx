@@ -16,16 +16,14 @@ const ActionModal = ({
       <div
         style={{
           position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(0, 0, 0, 0.5)",
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(39, 35, 92, 0.32)",
+          backdropFilter: "blur(7px)",
+          WebkitBackdropFilter: "blur(7px)",
           zIndex: 1040,
         }}
         onClick={onClose}
       ></div>
-
       <div
         style={{
           position: "fixed",
@@ -33,48 +31,54 @@ const ActionModal = ({
           left: "50%",
           transform: "translate(-50%, -50%)",
           zIndex: 1050,
-          width: "90%",
-          maxWidth: "500px",
+          width: "95%",
+          maxWidth: 430,
         }}
       >
-        <div className="card border-0 shadow-lg" style={{ background: THEME.card }}>
+        <div
+          className="card border-0 shadow-lg"
+          style={{
+            background: THEME.card,
+            borderRadius: 18,
+            boxShadow: "0 8px 24px rgba(32, 30, 60, 0.13)",
+          }}
+        >
           <div
             className="card-header"
             style={{
               background: THEME.primary,
               color: "#fff",
               borderBottom: "none",
-              padding: "16px 20px",
+              borderTopLeftRadius: 18,
+              borderTopRightRadius: 18,
+              padding: "22px 26px 12px 26px",
             }}
           >
             <div className="d-flex justify-content-between align-items-center">
-              <h6 className="mb-0" style={{ fontWeight: "600" }}>
+              <h6 className="mb-0" style={{ fontWeight: 700, fontSize: 17, color : "white" }}>
                 {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
               </h6>
-              <button
-                type="button"
-                className="btn-close btn-close-white"
-                onClick={onClose}
-              ></button>
+            
             </div>
           </div>
-          <div className="card-body" style={{ padding: "20px" }}>
+          <div className="card-body" style={{ padding: "32px 26px 18px 26px" }}>
             <label
               style={{
-                fontSize: "13px",
-                fontWeight: "600",
+                fontSize: "14px",
+                fontWeight: 700,
                 color: THEME.textLight,
-                marginBottom: "8px",
-                display: "block",
+                marginBottom: "10px",
+                letterSpacing: "0.2px",
+                display: "block"
               }}
             >
               {actionType === "approve"
-                ? "Enter approval justification:"
-                : "Enter rejection reason:"}
+                ? "Enter your approval justification"
+                : "Enter your rejection reason"}
             </label>
             <textarea
               className="form-control"
-              rows="4"
+              rows={4}
               value={actionRemarks}
               onChange={(e) => setActionRemarks(e.target.value)}
               placeholder={
@@ -82,40 +86,65 @@ const ActionModal = ({
                   ? "Why are you approving this nomination?"
                   : "Why are you rejecting this nomination?"
               }
-              style={{ fontSize: "14px", borderColor: THEME.border }}
-            ></textarea>
+              style={{
+                fontSize: 15,
+                borderColor: THEME.border,
+                borderRadius: 7,
+                background: "#fff",
+                marginBottom: 0,
+                minHeight: 92,
+                padding: "13px",
+                boxShadow: "none",
+                outline: "none",
+                resize: "vertical"
+              }}
+            />
           </div>
           <div
             className="card-footer"
             style={{
               background: THEME.background,
               borderTop: `1px solid ${THEME.border}`,
-              padding: "12px 20px",
+              padding: "20px 26px",
+              borderBottomLeftRadius: 18,
+              borderBottomRightRadius: 18,
             }}
           >
-            <div className="d-flex gap-2 justify-content-end">
+            <div style={{ display: "flex", gap: 14, justifyContent: "flex-end" }}>
               <button
-                className="btn btn-sm"
+                className="btn"
                 onClick={onClose}
                 style={{
-                  background: "transparent",
-                  color: THEME.text,
-                  border: `1px solid ${THEME.border}`,
-                  fontWeight: "600",
-                  padding: "6px 16px",
+                  background: "grey",
+                  color: "white",
+                  border: `1.8px solid #d1d5db`,
+                  fontWeight: 600,
+                  fontSize: 15,
+                  padding: "8px 26px",
+                  borderRadius: 8,
+                  minWidth: 86,
+                  transition: "border 0.18s, box-shadow 0.14s",
+                  boxShadow: "0 1.5px 12px rgba(60,70,80,0.03)",
                 }}
               >
                 Cancel
               </button>
               <button
-                className="btn btn-sm"
+                className="btn"
                 onClick={onSubmit}
                 style={{
-                  background: actionType === "approve" ? THEME.success : THEME.danger,
+                  background: actionType === "approve"
+                    ? "linear-gradient(90deg, #1ab981 0%, #1bc381 95%)"
+                    : "linear-gradient(90deg, #ee4947 0%, #f16f6f 95%)",
                   color: "#fff",
                   border: "none",
-                  fontWeight: "600",
-                  padding: "6px 16px",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  padding: "8px 28px",
+                  borderRadius: 8,
+                  minWidth: 104,
+                  letterSpacing: "0.05em",
+                  boxShadow: "0 2px 8px rgba(29,100,216,0.09)",
                 }}
               >
                 {actionType === "approve" ? "✓ Approve" : "✗ Reject"}

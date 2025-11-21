@@ -198,3 +198,60 @@
   background-color: rgba(39, 35, 92, 0.3);
   border-radius: 4px;
 }
+
+.custom-action-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #fff;
+  border: 2px solid #e6e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  cursor: pointer;
+  transition: border 0.18s, box-shadow 0.18s, background 0.14s;
+}
+
+.custom-action-btn i {
+  transition: color 0.18s;
+}
+
+/* View Button - Blue */
+.custom-action-btn.action-view {
+  border-color: #aec2f3;
+}
+.custom-action-btn.action-view i {
+  color: #457cea;
+}
+
+/* Approve Button - Green */
+.custom-action-btn.action-approve {
+  border-color: #90dbbf;
+}
+.custom-action-btn.action-approve i {
+  color: #23b781;
+}
+
+/* Reject Button - Red */
+.custom-action-btn.action-reject {
+  border-color: #e6a3a0;
+}
+.custom-action-btn.action-reject i {
+  color: #f16355;
+}
+
+.custom-action-btn:hover,
+.custom-action-btn:focus {
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.08);
+  border-width: 2.5px;
+}
+
+/* Optional: active touch state */
+.custom-action-btn:active {
+  box-shadow: none;
+  opacity: 0.88;
+}
