@@ -205,7 +205,7 @@ const UserList = () => {
       />
 
       {/* STATISTICS CARDS -  EXCLUDE ADMIN USERS */}
-      <div className="stats-grid">
+      <div className="ad-stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-people-fill"></i>

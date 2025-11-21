@@ -200,7 +200,7 @@
 }
 
 /* Statistics Grid */
-.stats-grid {
+.ad-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.25rem;
@@ -572,7 +572,7 @@
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .stats-grid {
+  .ad-stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -606,7 +606,7 @@
     justify-content: center;
   }
 
-  .stats-grid {
+  .ad-stats-grid {
     grid-template-columns: 1fr;
   }
 
