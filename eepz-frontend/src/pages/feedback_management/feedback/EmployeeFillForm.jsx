@@ -432,8 +432,8 @@ export default function EmployeeFillForm() {
         console.log("Step 2 Complete - Response submitted:", submitResponse);
 
         if (submitResponse?.success || submitResponse?.data?.success) {
-          setSuccess("Form submitted successfully! Redirecting...");
-          setTimeout(() => navigate("/dashboard/feedback"), 2000);
+          setSuccess("Form submitted successfully!");
+      
         } else {
           setError(
             "Response saved as draft but failed to submit. Please contact support."

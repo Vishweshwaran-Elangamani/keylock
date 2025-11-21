@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { employeeApi, managerReviewApi } from "../../../services/feedbackmanagement/feedbackApi";
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -66,7 +67,8 @@ export default function ViewManagerReview() {
       // Fetch employee map
       let empMap = {};
       try {
-        const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
+        const empRes = await employeeApi.getAll();
+
         if (empRes.data?.success && Array.isArray(empRes.data.data)) {
           empRes.data.data.forEach((emp) => {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
@@ -78,7 +80,7 @@ export default function ViewManagerReview() {
       }
 
       // Fetch review details
-      const reviewRes = await axios.get(`${API_BASE}/ManagerReview/${id}`);
+      const reviewRes = await managerReviewApi.getById(id)
       if (reviewRes.data?.success && reviewRes.data.data) {
         const reviewData = {
           ...reviewRes.data.data,

@@ -7,10 +7,9 @@ import {
   FileText,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { managerReviewApi } from "../../../services/feedbackmanagement/feedbackApi";
+import { managerReviewApi, employeeApi} from "../../../services/feedbackmanagement/feedbackApi";
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
 
 const RATING_LABELS = {
   1: "Poor",
@@ -58,7 +57,7 @@ export default function CreateManagerReview() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/EmployeeManagement/all`);
+        const res = await employeeApi.getAll();
         if (res.data?.success && Array.isArray(res.data.data)) {
           setEmployees(res.data.data);
         }

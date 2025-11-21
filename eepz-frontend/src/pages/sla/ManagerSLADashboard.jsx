@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+// src/pages/sla/ManagerSLADashboard.jsx - FIXED WITH COMPLIANCE
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   RefreshCw,
   Eye,
@@ -16,12 +17,15 @@ import {
   TrendingUp,
   ChevronLeft,
   ChevronRight,
-} from "lucide-react";
-import slaService, { escalationHelpers } from "../../services/sla/slaService";
-import ManagerEscalationModal from "../../components/sla/modals/ManagerEscalationModal";
-import ResolveEscalationModal from "../../components/sla/modals/ResolveEscalationModal";
-import { formatDate } from "../../utils/sla/dateFormatter";
-import Breadcrumb from "../../components/sla/common/Breadcrumbs";
+  TrendingDown,
+  BarChart3,
+} from 'lucide-react';
+import slaService, { escalationHelpers } from '../../services/sla/slaService';
+import ManagerEscalationModal from '../../components/sla/modals/ManagerEscalationModal';
+import ResolveEscalationModal from '../../components/sla/modals/ResolveEscalationModal';
+import { formatDate } from '../../utils/sla/dateFormatter';
+import { getComplianceSummary, getComplianceRating } from '../../utils/sla/slaCalculations';
+import Breadcrumb from '../../components/sla/common/Breadcrumbs';
 
 const ManagerSLADashboard = () => {
   const navigate = useNavigate();
@@ -35,22 +39,20 @@ const ManagerSLADashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [complianceFilter, setComplianceFilter] = useState("All");
-  const [activeTab, setActiveTab] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [complianceFilter, setComplianceFilter] = useState('All');
+  const [activeTab, setActiveTab] = useState('all');
 
   const [showEscalationModal, setShowEscalationModal] = useState(false);
   const [showResolveModal, setShowResolveModal] = useState(false);
-  const [selectedSLAForEscalation, setSelectedSLAForEscalation] =
-    useState(null);
-  const [selectedEscalationForResolve, setSelectedEscalationForResolve] =
-    useState(null);
+  const [selectedSLAForEscalation, setSelectedSLAForEscalation] = useState(null);
+  const [selectedEscalationForResolve, setSelectedEscalationForResolve] = useState(null);
   const [deptHeads, setDeptHeads] = useState([]);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("user"));
+    const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     loadData();
   }, []);
@@ -70,6 +72,39 @@ const ManagerSLADashboard = () => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, complianceFilter, activeTab, itemsPerPage]);
 
+  // ✅ COMPLIANCE METRICS CALCULATION
+  const complianceMetrics = useMemo(() => {
+    if (managerSLAs.length === 0) {
+      return {
+        compliancePercentage: 0,
+        complianceRating: 'N/A',
+        onTimeSLAs: 0,
+        breachedSLAs: 0,
+        extendedSLAs: 0,
+        closedSLAs: 0,
+        openSLAs: 0,
+        ratingColor: '#94a3b8',
+      };
+    }
+
+    // Use getComplianceSummary (CLOSED SLAs ONLY for compliance %)
+    const summary = getComplianceSummary(managerSLAs);
+    const ratingObj = getComplianceRating(summary.compliancePercentage);
+
+    return {
+      compliancePercentage: summary.compliancePercentage,
+      complianceRating: summary.rating,
+      onTimeSLAs: summary.onTimeSLAs,
+      breachedSLAs: summary.breachedSLAs,
+      extendedSLAs: managerSLAs.filter(
+        (s) => s.status === 'Closed' && s.complianceStatus === 'Extended'
+      ).length,
+      closedSLAs: summary.closedSLAs,
+      openSLAs: summary.openSLAs,
+      ratingColor: ratingObj.color,
+    };
+  }, [managerSLAs]);
+
   const fetchDeptHeads = async (departmentId) => {
     try {
       const res = await slaService.getDepartmentHeads(departmentId);
@@ -80,7 +115,7 @@ const ManagerSLADashboard = () => {
         setDeptHeads([]);
       }
     } catch (err) {
-      console.error("Error fetching dept heads:", err.message);
+      console.error('Error fetching dept heads:', err.message);
       setDeptHeads([]);
     }
   };
@@ -95,7 +130,7 @@ const ManagerSLADashboard = () => {
         setManagerEscalations([]);
       }
     } catch (err) {
-      console.error("Error fetching escalations:", err.message);
+      console.error('Error fetching escalations:', err.message);
       setManagerEscalations([]);
     }
   };
@@ -105,10 +140,10 @@ const ManagerSLADashboard = () => {
     setError(null);
 
     try {
-      const userData = JSON.parse(localStorage.getItem("user"));
+      const userData = JSON.parse(localStorage.getItem('user'));
 
       if (!userData?.empId) {
-        setError("User not found in session");
+        setError('User not found in session');
         setLoading(false);
         return;
       }
@@ -131,11 +166,11 @@ const ManagerSLADashboard = () => {
       } else {
         setAllSLAs([]);
         setManagerSLAs([]);
-        setError("No data received from server");
+        setError('No data received from server');
       }
     } catch (err) {
-      console.error("Error loading data:", err);
-      setError(err.message || "Failed to load SLAs");
+      console.error('Error loading data:', err);
+      setError(err.message || 'Failed to load SLAs');
       setAllSLAs([]);
       setManagerSLAs([]);
     } finally {
@@ -145,13 +180,11 @@ const ManagerSLADashboard = () => {
 
   const getTabData = () => {
     switch (activeTab) {
-      case "open":
-        return managerSLAs.filter(
-          (s) => s.status === "Open" || s.status === "InProgress"
-        );
-      case "closed":
-        return managerSLAs.filter((s) => s.status === "Closed");
-      case "escalations":
+      case 'open':
+        return managerSLAs.filter((s) => s.status === 'Open' || s.status === 'InProgress');
+      case 'closed':
+        return managerSLAs.filter((s) => s.status === 'Closed');
+      case 'escalations':
         return managerEscalations;
       default:
         return managerSLAs;
@@ -161,7 +194,7 @@ const ManagerSLADashboard = () => {
   const applyFilters = () => {
     let result = getTabData();
 
-    if (activeTab !== "escalations") {
+    if (activeTab !== 'escalations') {
       if (searchTerm) {
         const term = searchTerm.toLowerCase();
         result = result.filter(
@@ -173,14 +206,12 @@ const ManagerSLADashboard = () => {
         );
       }
 
-      if (statusFilter !== "All") {
+      if (statusFilter !== 'All') {
         result = result.filter((sla) => sla.status === statusFilter);
       }
 
-      if (complianceFilter !== "All") {
-        result = result.filter(
-          (sla) => sla.complianceStatus === complianceFilter
-        );
+      if (complianceFilter !== 'All') {
+        result = result.filter((sla) => sla.complianceStatus === complianceFilter);
       }
     } else {
       if (searchTerm) {
@@ -193,7 +224,7 @@ const ManagerSLADashboard = () => {
         );
       }
 
-      if (statusFilter !== "All") {
+      if (statusFilter !== 'All') {
         result = result.filter((esc) => esc.escalationStatus === statusFilter);
       }
     }
@@ -204,27 +235,19 @@ const ManagerSLADashboard = () => {
   const calculateStats = () => {
     return {
       total: managerSLAs.length,
-      open: managerSLAs.filter(
-        (s) => s.status === "Open" || s.status === "InProgress"
-      ).length,
-      escalated: managerSLAs.filter((s) => s.status === "Escalated").length,
-      closed: managerSLAs.filter((s) => s.status === "Closed").length,
+      open: managerSLAs.filter((s) => s.status === 'Open' || s.status === 'InProgress').length,
+      escalated: managerSLAs.filter((s) => s.status === 'Escalated').length,
+      closed: managerSLAs.filter((s) => s.status === 'Closed').length,
       escalations: managerEscalations.length,
-      pending: managerEscalations.filter(
-        (e) => e.escalationStatus === "Pending"
-      ).length,
+      pending: managerEscalations.filter((e) => e.escalationStatus === 'Pending').length,
     };
   };
 
   const handleEscalateClick = (sla) => {
     if (!escalationHelpers.canEscalateToL2(sla, [sla])) {
-      const reason = escalationHelpers.getEscalationBlockReason(
-        sla,
-        [sla],
-        "L2"
-      );
-      toast.warning("Cannot Escalate", {
-        description: reason || "This SLA cannot be escalated at this time.",
+      const reason = escalationHelpers.getEscalationBlockReason(sla, [sla], 'L2');
+      toast.warning('Cannot Escalate', {
+        description: reason || 'This SLA cannot be escalated at this time.',
       });
       return;
     }
@@ -242,10 +265,10 @@ const ManagerSLADashboard = () => {
         setSelectedSLAForEscalation(null);
         loadData();
       } else {
-        throw new Error(res.message || "Failed to escalate");
+        throw new Error(res.message || 'Failed to escalate');
       }
     } catch (err) {
-      console.error("Escalation Error:", err);
+      console.error('Escalation Error:', err);
       throw err;
     }
   };
@@ -260,37 +283,37 @@ const ManagerSLADashboard = () => {
       const res = await slaService.resolveEscalation(payload);
 
       if (res.success) {
-        toast.success("Escalation Resolved!", {
-          description: "The escalation has been resolved successfully.",
+        toast.success('Escalation Resolved!', {
+          description: 'The escalation has been resolved successfully.',
         });
 
         setShowResolveModal(false);
         setSelectedEscalationForResolve(null);
         loadData();
       } else {
-        toast.error("Resolution Failed", {
-          description: res.message || "Failed to resolve escalation.",
+        toast.error('Resolution Failed', {
+          description: res.message || 'Failed to resolve escalation.',
         });
       }
     } catch (err) {
-      console.error("Resolve Error:", err);
-      toast.error("Resolution Error", {
-        description: err.message || "An error occurred while resolving.",
+      console.error('Resolve Error:', err);
+      toast.error('Resolution Error', {
+        description: err.message || 'An error occurred while resolving.',
       });
     }
   };
 
   const handleExport = () => {
     if (filteredSlas.length === 0) {
-      toast.warning("No Data to Export", {
-        description: "There are no records to export.",
+      toast.warning('No Data to Export', {
+        description: 'There are no records to export.',
       });
       return;
     }
 
     let csvData, filename;
 
-    if (activeTab === "escalations") {
+    if (activeTab === 'escalations') {
       csvData = filteredSlas.map((esc) => ({
         ID: esc.escalationId,
         Employee: esc.employeeName,
@@ -300,9 +323,7 @@ const ManagerSLADashboard = () => {
         SubmittedAt: formatDate(esc.submittedAt),
         Description: esc.description,
       }));
-      filename = `manager-escalations-${
-        new Date().toISOString().split("T")[0]
-      }.csv`;
+      filename = `manager-escalations-${new Date().toISOString().split('T')[0]}.csv`;
     } else {
       csvData = filteredSlas.map((sla) => ({
         ID: sla.slaid,
@@ -313,72 +334,71 @@ const ManagerSLADashboard = () => {
         Compliance: sla.complianceStatus,
         Deadline: formatDate(sla.deadline),
       }));
-      filename = `manager-slas-${new Date().toISOString().split("T")[0]}.csv`;
+      filename = `manager-slas-${new Date().toISOString().split('T')[0]}.csv`;
     }
 
     const csv = [
-      Object.keys(csvData[0]).join(","),
+      Object.keys(csvData[0]).join(','),
       ...csvData.map((row) =>
         Object.values(row)
           .map((v) => `"${String(v).replace(/"/g, '""')}"`)
-          .join(",")
+          .join(',')
       ),
-    ].join("\n");
+    ].join('\n');
 
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.click();
 
-    toast.success("Export Successful", {
+    toast.success('Export Successful', {
       description: `${csvData.length} records exported to ${filename}`,
     });
   };
 
   const clearFilters = () => {
-    setSearchTerm("");
-    setStatusFilter("All");
-    setComplianceFilter("All");
+    setSearchTerm('');
+    setStatusFilter('All');
+    setComplianceFilter('All');
   };
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      Open: "bg-primary",
-      Pending: "bg-warning text-dark",
-      Submitted: "bg-success",
-      InProgress: "bg-info",
-      Closed: "bg-success",
-      Escalated: "bg-danger",
+      Open: 'bg-primary',
+      Pending: 'bg-warning text-dark',
+      Submitted: 'bg-success',
+      InProgress: 'bg-info',
+      Closed: 'bg-success',
+      Escalated: 'bg-danger',
     };
-    return statusMap[status] || "bg-secondary";
+    return statusMap[status] || 'bg-secondary';
   };
 
   const getComplianceBadge = (compliance) => {
     const complianceMap = {
-      OnTime: "bg-success",
-      Breached: "bg-danger",
-      Extended: "bg-warning text-dark",
-      NotStarted: "bg-secondary",
+      OnTime: 'bg-success',
+      Breached: 'bg-danger',
+      Extended: 'bg-warning text-dark',
+      NotStarted: 'bg-secondary',
     };
-    return complianceMap[compliance] || "bg-secondary";
+    return complianceMap[compliance] || 'bg-secondary';
   };
 
   const getEscalationLevelColor = (level) => {
     switch (level) {
-      case "L1":
-        return "badge bg-info";
-      case "L2":
-        return "badge bg-warning text-dark";
-      case "L3":
-        return "badge bg-danger";
+      case 'L1':
+        return 'badge bg-info';
+      case 'L2':
+        return 'badge bg-warning text-dark';
+      case 'L3':
+        return 'badge bg-danger';
       default:
-        return "badge bg-secondary";
+        return 'badge bg-secondary';
     }
   };
 
-  // Pagination handlers
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -413,21 +433,21 @@ const ManagerSLADashboard = () => {
         for (let i = 1; i <= 4; i++) {
           pages.push(i);
         }
-        pages.push("...");
+        pages.push('...');
         pages.push(totalPages);
       } else if (currentPage >= totalPages - 2) {
         pages.push(1);
-        pages.push("...");
+        pages.push('...');
         for (let i = totalPages - 3; i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
         pages.push(1);
-        pages.push("...");
+        pages.push('...');
         for (let i = currentPage - 1; i <= currentPage + 1; i++) {
           pages.push(i);
         }
-        pages.push("...");
+        pages.push('...');
         pages.push(totalPages);
       }
     }
@@ -445,12 +465,12 @@ const ManagerSLADashboard = () => {
     return (
       <div
         className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "600px" }}
+        style={{ minHeight: '600px' }}
       >
         <div
           className="spinner-border text-primary"
           role="status"
-          style={{ width: "3rem", height: "3rem" }}
+          style={{ width: '3rem', height: '3rem' }}
         >
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -461,29 +481,28 @@ const ManagerSLADashboard = () => {
   return (
     <div
       style={{
-        padding: "1.25rem 1.75rem",
-        maxWidth: "100%",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
+        padding: '1.25rem 1.75rem',
+        maxWidth: '100%',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-        <Breadcrumb
-  items={[
-    { label: "SLA Management", path: "/hr/dashboard/sla" },
-    { label: "Manager" }
-  ]}
-/>
+      <Breadcrumb
+        items={[
+          { label: 'SLA Management', path: '/manager/dashboard/sla' },
+          { label: 'Manager' },
+        ]}
+      />
+
       {/* HEADER */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-      
         <div>
-
-          <p
-            className="mb-0"
-            style={{ color: "#64748b", fontSize: "0.875rem" }}
-          >
-            Track and manage all assigned SLAs
+          <h2 className="fw-bold mb-1" style={{ color: 'var(--color-primary-1)' }}>
+            Manager SLA Dashboard
+          </h2>
+          <p className="mb-0" style={{ color: '#64748b', fontSize: '0.875rem' }}>
+            Track and manage all assigned SLAs with compliance metrics
           </p>
         </div>
         <div className="d-flex gap-2">
@@ -491,12 +510,12 @@ const ManagerSLADashboard = () => {
             className="btn d-flex align-items-center gap-2"
             onClick={loadData}
             style={{
-              backgroundColor: "transparent",
-              border: "1.5px solid #0F62FE",
-              color: "#0F62FE",
-              borderRadius: "8px",
-              padding: "8px 16px",
-              fontSize: "0.875rem",
+              backgroundColor: 'transparent',
+              border: '1.5px solid #0F62FE',
+              color: '#0F62FE',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '0.875rem',
               fontWeight: 600,
             }}
           >
@@ -508,12 +527,12 @@ const ManagerSLADashboard = () => {
             onClick={handleExport}
             disabled={filteredSlas.length === 0}
             style={{
-              backgroundColor: "transparent",
-              border: "1.5px solid #24A148",
-              color: "#24A148",
-              borderRadius: "8px",
-              padding: "8px 16px",
-              fontSize: "0.875rem",
+              backgroundColor: 'transparent',
+              border: '1.5px solid #24A148',
+              color: '#24A148',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '0.875rem',
               fontWeight: 600,
             }}
           >
@@ -528,88 +547,242 @@ const ManagerSLADashboard = () => {
         <div
           className="alert alert-danger alert-dismissible fade show mb-3"
           role="alert"
-          style={{ borderRadius: "8px", padding: "0.75rem 1rem" }}
+          style={{ borderRadius: '8px', padding: '0.75rem 1rem' }}
         >
           <div className="d-flex align-items-start gap-2">
-            <AlertTriangle size={18} style={{ marginTop: "2px" }} />
+            <AlertTriangle size={18} style={{ marginTop: '2px' }} />
             <span style={{ flex: 1 }}>{error}</span>
           </div>
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setError(null)}
-          />
+          <button type="button" className="btn-close" onClick={() => setError(null)} />
         </div>
       )}
+
+      {/* ✅ COMPLIANCE METRICS CARD */}
+      <div className="card border-0 shadow-sm mb-3" style={{ borderRadius: '12px' }}>
+        <div className="card-body p-3">
+          <div className="row g-3 align-items-center">
+            <div className="col-lg-8">
+              <div className="row g-3">
+                <div className="col-md-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: `${complianceMetrics.ratingColor}20`,
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <BarChart3 size={20} color={complianceMetrics.ratingColor} />
+                    </div>
+                    <div>
+                      <h4 className="fw-bold mb-0" style={{ color: complianceMetrics.ratingColor }}>
+                        {complianceMetrics.compliancePercentage.toFixed(1)}%
+                      </h4>
+                      <small className="text-muted">Compliance</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: '#24A14820',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <TrendingUp size={20} color="#24A148" />
+                    </div>
+                    <div>
+                      <h4 className="fw-bold mb-0" style={{ color: '#24A148' }}>
+                        {complianceMetrics.onTimeSLAs}
+                      </h4>
+                      <small className="text-muted">On-Time</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: '#E0195020',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <TrendingDown size={20} color="#E01950" />
+                    </div>
+                    <div>
+                      <h4 className="fw-bold mb-0" style={{ color: '#E01950' }}>
+                        {complianceMetrics.breachedSLAs}
+                      </h4>
+                      <small className="text-muted">Breached</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <div
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: '#E2B93B20',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Clock size={20} color="#E2B93B" />
+                    </div>
+                    <div>
+                      <h4 className="fw-bold mb-0" style={{ color: '#E2B93B' }}>
+                        {complianceMetrics.extendedSLAs}
+                      </h4>
+                      <small className="text-muted">Extended</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-lg-4">
+              <div className="d-flex align-items-center justify-content-end gap-3">
+                <div className="text-end">
+                  <span
+                    className="badge"
+                    style={{
+                      backgroundColor: `${complianceMetrics.ratingColor}15`,
+                      color: complianceMetrics.ratingColor,
+                      border: `2px solid ${complianceMetrics.ratingColor}`,
+                      padding: '8px 16px',
+                      fontSize: '0.875rem',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {complianceMetrics.complianceRating}
+                  </span>
+                  <p className="text-muted mb-0 mt-2" style={{ fontSize: '0.75rem' }}>
+                    Based on {complianceMetrics.closedSLAs} Closed SLAs
+                  </p>
+                </div>
+                <div
+                  style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '50%',
+                    background: `conic-gradient(${complianceMetrics.ratingColor} ${complianceMetrics.compliancePercentage}%, #e5e7eb 0%)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '50%',
+                      backgroundColor: '#fff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                      color: complianceMetrics.ratingColor,
+                    }}
+                  >
+                    {complianceMetrics.compliancePercentage.toFixed(0)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* STATS CARDS */}
       <div className="row g-3 mb-3">
         {[
           {
-            label: "Total SLAs",
+            label: 'Total SLAs',
             value: stats.total,
             icon: Users,
-            bgColor: "#dbeafe",
-            iconColor: "#0F62FE",
+            bgColor: '#dbeafe',
+            iconColor: '#0F62FE',
           },
           {
-            label: "Open",
+            label: 'Open',
             value: stats.open,
             icon: Clock,
-            bgColor: "#e0e7ff",
-            iconColor: "#4f46e5",
+            bgColor: '#e0e7ff',
+            iconColor: '#4f46e5',
           },
           {
-            label: "Escalated",
+            label: 'Escalated',
             value: stats.escalated,
             icon: AlertTriangle,
-            bgColor: "#fee2e2",
-            iconColor: "#E01950",
+            bgColor: '#fee2e2',
+            iconColor: '#E01950',
           },
           {
-            label: "Closed",
+            label: 'Closed',
             value: stats.closed,
             icon: CheckCircle,
-            bgColor: "#dcfce7",
-            iconColor: "#24A148",
+            bgColor: '#dcfce7',
+            iconColor: '#24A148',
           },
           {
-            label: "Total Escalations",
+            label: 'Total Escalations',
             value: stats.escalations,
             icon: TrendingUp,
-            bgColor: "#fef3c7",
-            iconColor: "#E2B93B",
+            bgColor: '#fef3c7',
+            iconColor: '#E2B93B',
           },
           {
-            label: "Pending",
+            label: 'Pending',
             value: stats.pending,
             icon: Clock,
-            bgColor: "#fef3c7",
-            iconColor: "#D4941E",
+            bgColor: '#fef3c7',
+            iconColor: '#D4941E',
           },
         ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
           <div key={label} className="col-lg-2 col-md-4 col-6">
             <div
               className="card border-0 h-100"
               style={{
-                borderRadius: "10px",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+                borderRadius: '10px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
               }}
             >
               <div
                 className="card-body d-flex flex-column align-items-center justify-content-center text-center"
-                style={{ padding: "1rem 0.75rem" }}
+                style={{ padding: '1rem 0.75rem' }}
               >
                 <div
                   style={{
-                    width: "48px",
-                    height: "48px",
+                    width: '48px',
+                    height: '48px',
                     backgroundColor: bgColor,
-                    borderRadius: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: "0.75rem",
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '0.75rem',
                   }}
                 >
                   <Icon size={24} color={iconColor} strokeWidth={2.5} />
@@ -617,8 +790,8 @@ const ManagerSLADashboard = () => {
                 <h3
                   className="fw-bold mb-1"
                   style={{
-                    fontSize: "1.75rem",
-                    color: "#0f172a",
+                    fontSize: '1.75rem',
+                    color: '#0f172a',
                     lineHeight: 1,
                   }}
                 >
@@ -627,8 +800,8 @@ const ManagerSLADashboard = () => {
                 <p
                   className="mb-0"
                   style={{
-                    fontSize: "0.813rem",
-                    color: "#64748b",
+                    fontSize: '0.813rem',
+                    color: '#64748b',
                     fontWeight: 600,
                   }}
                 >
@@ -643,30 +816,30 @@ const ManagerSLADashboard = () => {
       {/* TABS */}
       <div
         style={{
-          backgroundColor: "#27235c",
-          borderRadius: "10px 10px 0 0",
-          padding: "0 1rem",
+          backgroundColor: '#27235c',
+          borderRadius: '10px 10px 0 0',
+          padding: '0 1rem',
           marginBottom: 0,
         }}
       >
         <ul className="nav nav-tabs border-0 m-0" role="tablist">
           {[
             {
-              key: "all",
-              label: "All",
+              key: 'all',
+              label: 'All',
               icon: Users,
               count: managerSLAs.length,
             },
-            { key: "open", label: "Open", icon: Clock, count: stats.open },
+            { key: 'open', label: 'Open', icon: Clock, count: stats.open },
             {
-              key: "closed",
-              label: "Closed",
+              key: 'closed',
+              label: 'Closed',
               icon: CheckCircle,
               count: stats.closed,
             },
             {
-              key: "escalations",
-              label: "Escalations",
+              key: 'escalations',
+              label: 'Escalations',
               icon: TrendingUp,
               count: stats.escalations,
             },
@@ -674,39 +847,36 @@ const ManagerSLADashboard = () => {
             <li key={key} className="nav-item">
               <button
                 className={`nav-link border-0 d-flex align-items-center gap-2 ${
-                  activeTab === key ? "active" : ""
+                  activeTab === key ? 'active' : ''
                 }`}
                 onClick={() => setActiveTab(key)}
                 style={{
-                  color: activeTab === key ? "#fff" : "rgba(255,255,255,0.7)",
+                  color: activeTab === key ? '#fff' : 'rgba(255,255,255,0.7)',
                   backgroundColor:
-                    activeTab === key ? "rgba(255,255,255,0.1)" : "transparent",
+                    activeTab === key ? 'rgba(255,255,255,0.1)' : 'transparent',
                   borderBottom:
-                    activeTab === key
-                      ? "3px solid #fff"
-                      : "3px solid transparent",
-                  padding: "1rem 1.25rem",
+                    activeTab === key ? '3px solid #fff' : '3px solid transparent',
+                  padding: '1rem 1.25rem',
                   fontWeight: 600,
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
+                  fontSize: '0.875rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
                   if (activeTab !== key) {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(255,255,255,0.05)";
-                    e.currentTarget.style.color = "#fff";
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                    e.currentTarget.style.color = '#fff';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (activeTab !== key) {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.7)";
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
                   }
                 }}
               >
                 <Icon size={16} />
-                {label} <span style={{ marginLeft: "4px" }}>({count})</span>
+                {label} <span style={{ marginLeft: '4px' }}>({count})</span>
               </button>
             </li>
           ))}
@@ -716,17 +886,17 @@ const ManagerSLADashboard = () => {
       {/* FILTERS */}
       <div
         className="card border-0 shadow-sm mb-3"
-        style={{ borderRadius: "0 0 10px 10px" }}
+        style={{ borderRadius: '0 0 10px 10px' }}
       >
-        <div className="card-body" style={{ padding: "1rem" }}>
+        <div className="card-body" style={{ padding: '1rem' }}>
           <div className="row g-3">
             <div className="col-md-5">
               <div className="input-group">
                 <span
                   className="input-group-text bg-white border-end-0"
                   style={{
-                    borderRadius: "8px 0 0 8px",
-                    borderColor: "#e2e8f0",
+                    borderRadius: '8px 0 0 8px',
+                    borderColor: '#e2e8f0',
                   }}
                 >
                   <Search size={16} className="text-muted" />
@@ -735,16 +905,16 @@ const ManagerSLADashboard = () => {
                   type="text"
                   className="form-control border-start-0"
                   placeholder={
-                    activeTab === "escalations"
-                      ? "Search by employee, reason, or description..."
-                      : "Search by employee, department, type, or SLA ID..."
+                    activeTab === 'escalations'
+                      ? 'Search by employee, reason, or description...'
+                      : 'Search by employee, department, type, or SLA ID...'
                   }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{
-                    borderRadius: "0 8px 8px 0",
-                    borderColor: "#e2e8f0",
-                    fontSize: "0.875rem",
+                    borderRadius: '0 8px 8px 0',
+                    borderColor: '#e2e8f0',
+                    fontSize: '0.875rem',
                   }}
                 />
               </div>
@@ -756,13 +926,13 @@ const ManagerSLADashboard = () => {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 style={{
-                  borderRadius: "8px",
-                  borderColor: "#e2e8f0",
-                  fontSize: "0.875rem",
+                  borderRadius: '8px',
+                  borderColor: '#e2e8f0',
+                  fontSize: '0.875rem',
                 }}
               >
                 <option value="All">All Status</option>
-                {activeTab === "escalations" ? (
+                {activeTab === 'escalations' ? (
                   <>
                     <option value="Pending">Pending</option>
                     <option value="Resolved">Resolved</option>
@@ -777,16 +947,16 @@ const ManagerSLADashboard = () => {
               </select>
             </div>
 
-            {activeTab !== "escalations" && (
+            {activeTab !== 'escalations' && (
               <div className="col-md-3">
                 <select
                   className="form-select"
                   value={complianceFilter}
                   onChange={(e) => setComplianceFilter(e.target.value)}
                   style={{
-                    borderRadius: "8px",
-                    borderColor: "#e2e8f0",
-                    fontSize: "0.875rem",
+                    borderRadius: '8px',
+                    borderColor: '#e2e8f0',
+                    fontSize: '0.875rem',
                   }}
                 >
                   <option value="All">All Compliance</option>
@@ -797,16 +967,14 @@ const ManagerSLADashboard = () => {
               </div>
             )}
 
-            <div
-              className={activeTab === "escalations" ? "col-md-4" : "col-md-1"}
-            >
+            <div className={activeTab === 'escalations' ? 'col-md-4' : 'col-md-1'}>
               <button
                 className="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center"
                 onClick={clearFilters}
                 style={{
-                  borderRadius: "8px",
-                  height: "38px",
-                  borderColor: "#e2e8f0",
+                  borderRadius: '8px',
+                  height: '38px',
+                  borderColor: '#e2e8f0',
                 }}
                 title="Clear all filters"
               >
@@ -817,194 +985,33 @@ const ManagerSLADashboard = () => {
         </div>
       </div>
 
-      {/* DATA TABLE - FIXED (NO SCROLL) */}
+      {/* DATA TABLE */}
       <div style={{ flex: 1 }}>
-        <div
-          className="card border-0 shadow-sm"
-          style={{ borderRadius: "10px" }}
-        >
+        <div className="card border-0 shadow-sm" style={{ borderRadius: '10px' }}>
           <div className="table-responsive">
             <table
               className="table table-hover align-middle mb-0"
-              style={{ fontSize: "0.875rem" }}
+              style={{ fontSize: '0.875rem' }}
             >
-              <thead style={{ backgroundColor: "#f8fafc" }}>
+              <thead style={{ backgroundColor: '#f8fafc' }}>
                 <tr>
-                  {activeTab === "escalations" ? (
+                  {activeTab === 'escalations' ? (
                     <>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Employee
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Reason
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Level
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Status
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Submitted At
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          textAlign: "center",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Actions
-                      </th>
+                      <th style={tableHeaderStyle}>Employee</th>
+                      <th style={tableHeaderStyle}>Reason</th>
+                      <th style={tableHeaderStyle}>Level</th>
+                      <th style={tableHeaderStyle}>Status</th>
+                      <th style={tableHeaderStyle}>Submitted At</th>
+                      <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>Actions</th>
                     </>
                   ) : (
                     <>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Employee
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        SLA's Department
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Deadline
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Status
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Compliance
-                      </th>
-                      <th
-                        style={{
-                          padding: "1rem",
-                          fontSize: "0.813rem",
-                          color: "#64748b",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.05em",
-                          borderBottom: "2px solid #e2e8f0",
-                          textAlign: "center",
-                          backgroundColor: "#f8fafc",
-                        }}
-                      >
-                        Actions
-                      </th>
+                      <th style={tableHeaderStyle}>Employee</th>
+                      <th style={tableHeaderStyle}>SLA's Department</th>
+                      <th style={tableHeaderStyle}>Deadline</th>
+                      <th style={tableHeaderStyle}>Status</th>
+                      <th style={tableHeaderStyle}>Compliance</th>
+                      <th style={{ ...tableHeaderStyle, textAlign: 'center' }}>Actions</th>
                     </>
                   )}
                 </tr>
@@ -1012,22 +1019,15 @@ const ManagerSLADashboard = () => {
               <tbody>
                 {paginatedData.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={6}
-                      className="text-center"
-                      style={{ padding: "3rem" }}
-                    >
-                      {activeTab === "escalations" ? (
+                    <td colSpan={6} className="text-center" style={{ padding: '3rem' }}>
+                      {activeTab === 'escalations' ? (
                         <>
                           <TrendingUp
                             size={56}
-                            style={{ color: "#cbd5e1", opacity: 0.5 }}
+                            style={{ color: '#cbd5e1', opacity: 0.5 }}
                             className="mb-3"
                           />
-                          <p
-                            className="text-muted mb-0"
-                            style={{ fontSize: "0.938rem" }}
-                          >
+                          <p className="text-muted mb-0" style={{ fontSize: '0.938rem' }}>
                             No escalations yet
                           </p>
                         </>
@@ -1035,129 +1035,96 @@ const ManagerSLADashboard = () => {
                         <>
                           <FileText
                             size={56}
-                            style={{ color: "#cbd5e1", opacity: 0.5 }}
+                            style={{ color: '#cbd5e1', opacity: 0.5 }}
                             className="mb-3"
                           />
                           <h6
                             className="fw-bold mb-2"
-                            style={{ color: "#64748b", fontSize: "1.125rem" }}
+                            style={{ color: '#64748b', fontSize: '1.125rem' }}
                           >
                             {managerSLAs.length === 0
-                              ? "No SLAs assigned to you"
-                              : "No SLAs match your filters"}
+                              ? 'No SLAs assigned to you'
+                              : 'No SLAs match your filters'}
                           </h6>
-                          {managerSLAs.length > 0 &&
-                            filteredSlas.length === 0 && (
-                              <button
-                                className="btn btn-sm btn-outline-primary mt-2"
-                                onClick={clearFilters}
-                                style={{ borderRadius: "6px" }}
-                              >
-                                Clear Filters
-                              </button>
-                            )}
+                          {managerSLAs.length > 0 && filteredSlas.length === 0 && (
+                            <button
+                              className="btn btn-sm btn-outline-primary mt-2"
+                              onClick={clearFilters}
+                              style={{ borderRadius: '6px' }}
+                            >
+                              Clear Filters
+                            </button>
+                          )}
                         </>
                       )}
                     </td>
                   </tr>
-                ) : activeTab === "escalations" ? (
+                ) : activeTab === 'escalations' ? (
                   paginatedData.map((esc) => (
-                    <tr
-                      key={esc.escalationId}
-                      style={{ borderBottom: "1px solid #f1f5f9" }}
-                    >
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
-                        <strong
-                          style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                        >
-                          {esc.employeeName || "—"}
+                    <tr key={esc.escalationId} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={tableCellStyle}>
+                        <strong style={{ fontSize: '0.875rem', color: '#0f172a' }}>
+                          {esc.employeeName || '—'}
                         </strong>
                       </td>
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
-                        <strong
-                          style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                        >
-                          {esc.reason || "—"}
+                      <td style={tableCellStyle}>
+                        <strong style={{ fontSize: '0.875rem', color: '#0f172a' }}>
+                          {esc.reason || '—'}
                         </strong>
                         <br />
-                        <small
-                          className="text-muted"
-                          style={{ fontSize: "0.813rem" }}
-                        >
-                          {esc.description || "—"}
+                        <small className="text-muted" style={{ fontSize: '0.813rem' }}>
+                          {esc.description || '—'}
                         </small>
                       </td>
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
+                      <td style={tableCellStyle}>
                         <span
-                          className={getEscalationLevelColor(
-                            esc.escalationLevel
-                          )}
+                          className={getEscalationLevelColor(esc.escalationLevel)}
                           style={{
-                            fontSize: "0.75rem",
-                            padding: "4px 10px",
-                            borderRadius: "6px",
+                            fontSize: '0.75rem',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
                           }}
                         >
                           {esc.escalationLevel}
                         </span>
                       </td>
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
+                      <td style={tableCellStyle}>
                         <span
                           className={`badge ${
-                            esc.escalationStatus === "Resolved"
-                              ? "bg-success"
-                              : "bg-warning text-dark"
+                            esc.escalationStatus === 'Resolved'
+                              ? 'bg-success'
+                              : 'bg-warning text-dark'
                           }`}
                           style={{
-                            fontSize: "0.75rem",
-                            padding: "4px 10px",
-                            borderRadius: "6px",
+                            fontSize: '0.75rem',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
                           }}
                         >
                           {esc.escalationStatus}
                         </span>
                       </td>
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
-                        <small
-                          style={{ fontSize: "0.813rem", color: "#475569" }}
-                        >
+                      <td style={tableCellStyle}>
+                        <small style={{ fontSize: '0.813rem', color: '#475569' }}>
                           {formatDate(esc.submittedAt)}
                         </small>
                       </td>
-                      <td
-                        style={{
-                          padding: "1rem",
-                          textAlign: "center",
-                          verticalAlign: "middle",
-                        }}
-                      >
+                      <td style={{ ...tableCellStyle, textAlign: 'center' }}>
                         <div className="d-flex gap-2 justify-content-center">
                           <button
                             className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
-                            onClick={() =>
-                              navigate(`/sla/manager/details/${esc.slaid}`)
-                            }
+                            onClick={() => navigate(`/sla/manager/details/${esc.slaid}`)}
                             title="View SLA details"
-                            style={{
-                              width: "32px",
-                              height: "32px",
-                              padding: 0,
-                              borderRadius: "6px",
-                            }}
+                            style={actionButtonStyle}
                           >
                             <Eye size={14} />
                           </button>
-                          {esc.escalationStatus === "Pending" && (
+                          {esc.escalationStatus === 'Pending' && (
                             <button
                               className="btn btn-sm btn-outline-success d-inline-flex align-items-center justify-content-center"
                               onClick={() => handleResolveClick(esc)}
                               title="Resolve escalation"
-                              style={{
-                                width: "32px",
-                                height: "32px",
-                                padding: 0,
-                                borderRadius: "6px",
-                              }}
+                              style={actionButtonStyle}
                             >
                               <CheckCircle size={14} />
                             </button>
@@ -1170,102 +1137,75 @@ const ManagerSLADashboard = () => {
                   paginatedData.map((sla) => (
                     <tr
                       key={`${sla.slaid}-${sla.employeeId}`}
-                      style={{ borderBottom: "1px solid #f1f5f9" }}
+                      style={{ borderBottom: '1px solid #f1f5f9' }}
                     >
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
-                        <strong
-                          style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                        >
-                          {sla.employeeName || "—"}
+                      <td style={tableCellStyle}>
+                        <strong style={{ fontSize: '0.875rem', color: '#0f172a' }}>
+                          {sla.employeeName || '—'}
                         </strong>
                         <br />
-                        <small
-                          className="text-muted"
-                          style={{ fontSize: "0.813rem" }}
-                        >
-                          {sla.employeeEmail || "—"}
+                        <small className="text-muted" style={{ fontSize: '0.813rem' }}>
+                          {sla.employeeEmail || '—'}
                         </small>
                       </td>
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
+                      <td style={tableCellStyle}>
                         <span
                           className="badge bg-light text-dark"
                           style={{
-                            fontSize: "0.75rem",
-                            padding: "4px 10px",
-                            borderRadius: "6px",
+                            fontSize: '0.75rem',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
                             fontWeight: 600,
                           }}
                         >
-                          {sla.departmentName || "—"}
+                          {sla.departmentName || '—'}
                         </span>
                       </td>
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
-                        <small
-                          style={{ fontSize: "0.813rem", color: "#475569" }}
-                        >
-                          {sla.deadline ? formatDate(sla.deadline) : "—"}
+                      <td style={tableCellStyle}>
+                        <small style={{ fontSize: '0.813rem', color: '#475569' }}>
+                          {sla.deadline ? formatDate(sla.deadline) : '—'}
                         </small>
                       </td>
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
+                      <td style={tableCellStyle}>
                         <span
                           className={`badge ${getStatusBadge(sla.status)}`}
                           style={{
-                            fontSize: "0.75rem",
-                            padding: "4px 10px",
-                            borderRadius: "6px",
+                            fontSize: '0.75rem',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
                           }}
                         >
-                          {sla.status || "—"}
+                          {sla.status || '—'}
                         </span>
                       </td>
-                      <td style={{ padding: "1rem", verticalAlign: "middle" }}>
+                      <td style={tableCellStyle}>
                         <span
-                          className={`badge ${getComplianceBadge(
-                            sla.complianceStatus
-                          )}`}
+                          className={`badge ${getComplianceBadge(sla.complianceStatus)}`}
                           style={{
-                            fontSize: "0.75rem",
-                            padding: "4px 10px",
-                            borderRadius: "6px",
+                            fontSize: '0.75rem',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
                           }}
                         >
-                          {sla.complianceStatus || "—"}
+                          {sla.complianceStatus || '—'}
                         </span>
                       </td>
-                      <td
-                        style={{
-                          padding: "1rem",
-                          textAlign: "center",
-                          verticalAlign: "middle",
-                        }}
-                      >
+                      <td style={{ ...tableCellStyle, textAlign: 'center' }}>
                         <div className="d-flex gap-2 justify-content-center">
                           <button
                             className="btn btn-sm btn-outline-primary d-inline-flex align-items-center justify-content-center"
-                            onClick={() =>
-                              navigate(`/sla/manager/details/${sla.slaid}`)
-                            }
+                            onClick={() => navigate(`/sla/manager/details/${sla.slaid}`)}
                             title="View details"
-                            style={{
-                              width: "32px",
-                              height: "32px",
-                              padding: 0,
-                              borderRadius: "6px",
-                            }}
+                            style={actionButtonStyle}
                           >
                             <Eye size={14} />
                           </button>
-                          {sla.status !== "Closed" && (
+                          {sla.status !== 'Closed' && (
                             <button
                               className="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center"
                               onClick={() => handleEscalateClick(sla)}
                               title="Escalate to Department Head"
-                              style={{
-                                width: "32px",
-                                height: "32px",
-                                padding: 0,
-                                borderRadius: "6px",
-                              }}
+                              style={actionButtonStyle}
                             >
                               <Send size={14} />
                             </button>
@@ -1283,14 +1223,13 @@ const ManagerSLADashboard = () => {
           {filteredSlas.length > 0 && (
             <div
               className="card-footer bg-white border-top"
-              style={{ padding: "1rem 1.5rem" }}
+              style={{ padding: '1rem 1.5rem' }}
             >
               <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                {/* Left: Rows per page selector */}
                 <div className="d-flex align-items-center gap-2">
                   <small
                     className="text-muted"
-                    style={{ fontSize: "0.875rem", whiteSpace: "nowrap" }}
+                    style={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}
                   >
                     Rows per page:
                   </small>
@@ -1299,11 +1238,11 @@ const ManagerSLADashboard = () => {
                     value={itemsPerPage}
                     onChange={handleItemsPerPageChange}
                     style={{
-                      width: "80px",
-                      borderRadius: "6px",
-                      borderColor: "#e2e8f0",
-                      fontSize: "0.875rem",
-                      padding: "0.25rem 0.5rem",
+                      width: '80px',
+                      borderRadius: '6px',
+                      borderColor: '#e2e8f0',
+                      fontSize: '0.875rem',
+                      padding: '0.25rem 0.5rem',
                     }}
                   >
                     <option value={5}>5</option>
@@ -1315,61 +1254,37 @@ const ManagerSLADashboard = () => {
                   </select>
                 </div>
 
-                {/* Center: Showing info */}
                 <div>
-                  <small
-                    className="text-muted"
-                    style={{ fontSize: "0.875rem" }}
-                  >
-                    Showing <strong>{startIndex + 1}</strong> to{" "}
-                    <strong>{Math.min(endIndex, filteredSlas.length)}</strong>{" "}
-                    of <strong>{filteredSlas.length}</strong> entries
+                  <small className="text-muted" style={{ fontSize: '0.875rem' }}>
+                    Showing <strong>{startIndex + 1}</strong> to{' '}
+                    <strong>{Math.min(endIndex, filteredSlas.length)}</strong> of{' '}
+                    <strong>{filteredSlas.length}</strong> entries
                   </small>
                 </div>
 
-                {/* Right: Pagination controls */}
                 {totalPages > 1 && (
                   <nav aria-label="Page navigation">
-                    <ul
-                      className="pagination pagination-sm mb-0"
-                      style={{ gap: "4px" }}
-                    >
-                      {/* Previous button */}
-                      <li
-                        className={`page-item ${
-                          currentPage === 1 ? "disabled" : ""
-                        }`}
-                      >
+                    <ul className="pagination pagination-sm mb-0" style={{ gap: '4px' }}>
+                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                         <button
                           className="page-link d-flex align-items-center justify-content-center"
                           onClick={handlePreviousPage}
                           disabled={currentPage === 1}
-                          style={{
-                            width: "32px",
-                            height: "32px",
-                            padding: 0,
-                            borderRadius: "6px",
-                            border: "1px solid #e2e8f0",
-                            color: currentPage === 1 ? "#cbd5e1" : "#0F62FE",
-                          }}
+                          style={paginationButtonStyle(currentPage === 1)}
                         >
                           <ChevronLeft size={16} />
                         </button>
                       </li>
 
-                      {/* Page numbers */}
                       {getPageNumbers().map((pageNum, index) =>
-                        pageNum === "..." ? (
-                          <li
-                            key={`ellipsis-${index}`}
-                            className="page-item disabled"
-                          >
+                        pageNum === '...' ? (
+                          <li key={`ellipsis-${index}`} className="page-item disabled">
                             <span
                               className="page-link"
                               style={{
-                                border: "none",
-                                background: "transparent",
-                                color: "#64748b",
+                                border: 'none',
+                                background: 'transparent',
+                                color: '#64748b',
                               }}
                             >
                               ...
@@ -1378,27 +1293,22 @@ const ManagerSLADashboard = () => {
                         ) : (
                           <li
                             key={pageNum}
-                            className={`page-item ${
-                              currentPage === pageNum ? "active" : ""
-                            }`}
+                            className={`page-item ${currentPage === pageNum ? 'active' : ''}`}
                           >
                             <button
                               className="page-link"
                               onClick={() => handlePageChange(pageNum)}
                               style={{
-                                width: "32px",
-                                height: "32px",
+                                width: '32px',
+                                height: '32px',
                                 padding: 0,
-                                borderRadius: "6px",
-                                border: "1px solid #e2e8f0",
+                                borderRadius: '6px',
+                                border: '1px solid #e2e8f0',
                                 backgroundColor:
-                                  currentPage === pageNum
-                                    ? "#0F62FE"
-                                    : "transparent",
-                                color:
-                                  currentPage === pageNum ? "#fff" : "#64748b",
+                                  currentPage === pageNum ? '#0F62FE' : 'transparent',
+                                color: currentPage === pageNum ? '#fff' : '#64748b',
                                 fontWeight: currentPage === pageNum ? 600 : 400,
-                                fontSize: "0.875rem",
+                                fontSize: '0.875rem',
                               }}
                             >
                               {pageNum}
@@ -1407,27 +1317,16 @@ const ManagerSLADashboard = () => {
                         )
                       )}
 
-                      {/* Next button */}
                       <li
                         className={`page-item ${
-                          currentPage === totalPages ? "disabled" : ""
+                          currentPage === totalPages ? 'disabled' : ''
                         }`}
                       >
                         <button
                           className="page-link d-flex align-items-center justify-content-center"
                           onClick={handleNextPage}
                           disabled={currentPage === totalPages}
-                          style={{
-                            width: "32px",
-                            height: "32px",
-                            padding: 0,
-                            borderRadius: "6px",
-                            border: "1px solid #e2e8f0",
-                            color:
-                              currentPage === totalPages
-                                ? "#cbd5e1"
-                                : "#0F62FE",
-                          }}
+                          style={paginationButtonStyle(currentPage === totalPages)}
                         >
                           <ChevronRight size={16} />
                         </button>
@@ -1468,5 +1367,38 @@ const ManagerSLADashboard = () => {
     </div>
   );
 };
+
+// Styles
+const tableHeaderStyle = {
+  padding: '1rem',
+  fontSize: '0.813rem',
+  color: '#64748b',
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+  borderBottom: '2px solid #e2e8f0',
+  backgroundColor: '#f8fafc',
+};
+
+const tableCellStyle = {
+  padding: '1rem',
+  verticalAlign: 'middle',
+};
+
+const actionButtonStyle = {
+  width: '32px',
+  height: '32px',
+  padding: 0,
+  borderRadius: '6px',
+};
+
+const paginationButtonStyle = (disabled) => ({
+  width: '32px',
+  height: '32px',
+  padding: 0,
+  borderRadius: '6px',
+  border: '1px solid #e2e8f0',
+  color: disabled ? '#cbd5e1' : '#0F62FE',
+});
 
 export default ManagerSLADashboard;

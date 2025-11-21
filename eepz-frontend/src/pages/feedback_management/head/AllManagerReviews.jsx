@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import {employeeApi, managerReviewApi} from '../../../services/feedbackmanagement/feedbackApi'
 
-const API_BASE = import.meta.env.VITE_API_BASE;
 
 const Badge = ({ text, color = "#525252" }) => (
   <span
@@ -53,7 +53,7 @@ export default function AllManagerReviews() {
 
   const fetchEmployeeMap = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/EmployeeManagement/all`);
+      const res = await employeeApi.getAll();
       if (res.data?.success && Array.isArray(res.data.data)) {
         const map = {};
         res.data.data.forEach((emp) => {
@@ -76,9 +76,11 @@ export default function AllManagerReviews() {
     setError("");
 
     try {
-      const res = await axios.get(`${API_BASE}/ManagerReview/all`);
+      const managerId = user?.empId || 1002;
+      const res = await managerReviewApi.getByManager(managerId);
 
       if (res.data?.success && Array.isArray(res.data.data)) {
+        console.log("Data Retrieved")
         const enriched = res.data.data.map((review) => ({
           ...review,
           managerName:

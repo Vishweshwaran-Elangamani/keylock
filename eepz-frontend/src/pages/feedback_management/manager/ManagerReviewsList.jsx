@@ -13,10 +13,10 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-// import { managerReviewApi } from '../../../services/feedbackmanagement/feedbackApi';
+import { employeeApi,managerReviewApi } from '../../../services/feedbackmanagement/feedbackApi';
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+
 
 const RATING_LABELS = {
   1: "Poor",
@@ -104,7 +104,7 @@ export default function ManagerReviewsList() {
       let empMap = {};
       let empList = [];
       try {
-        const empRes = await axios.get(`${API_BASE}/EmployeeManagement/all`);
+        const empRes = await employeeApi.getAll();
         if (empRes.data?.success && Array.isArray(empRes.data.data)) {
           empRes.data.data.forEach((emp) => {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
@@ -120,9 +120,7 @@ export default function ManagerReviewsList() {
 
       // STEP 2: Fetch reviews for current manager
       const managerId = user?.empId || 1002;
-      const res = await axios.get(
-        `${API_BASE}/ManagerReview/manager/${managerId}`
-      );
+      const res = await managerReviewApi.getByManager(managerId)
 
       if (res.data?.success && Array.isArray(res.data.data)) {
         const enriched = enrichReviews(res.data.data, empMap);

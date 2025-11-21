@@ -403,18 +403,7 @@ export default function FeedbackManagerDashboard() {
         <ul className="nav nav-tabs border-0 m-0" role="tablist">
           {[
             { key: "overview", label: "Quick Actions", icon: Briefcase },
-            {
-              key: "manager-actions",
-              label: "My Reviews",
-              icon: Star,
-              count: myReviews.length,
-            },
-            {
-              key: "peer-feedback",
-              label: "Peer Feedback",
-              icon: Users,
-              count: myPeerFeedback.length,
-            },
+            
           ].map(({ key, label, icon: Icon, count }) => (
             <li key={key} className="nav-item">
               <button

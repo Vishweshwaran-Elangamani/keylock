@@ -395,16 +395,37 @@ const slaService = {
   // ===== COMPLIANCE =====
   // ============================================
 
-  getDepartmentCompliance: async (deptId, period = null) => {
-    try {
-      console.log(` Fetching compliance for department ${deptId}`);
-      const params = period ? { period } : {};
-      return await slaApi.get(`/compliance/department/${deptId}`, { params });
-    } catch (error) {
-      console.error(' Error fetching compliance:', error);
-      throw error;
+  // Replace the getDepartmentCompliance function with this:
+
+getDepartmentCompliance: async (deptId, period = null) => {
+  try {
+    // ✅ CRITICAL FIX: Validate deptId before making API call
+    if (!deptId || deptId === 'null' || deptId === null || deptId === undefined) {
+      console.warn('⚠️ Cannot fetch compliance: departmentId is null/undefined');
+      return {
+        success: false,
+        data: null,
+        message: 'Department ID is required for compliance calculation',
+        count: 0
+      };
     }
-  },
+
+    console.log(`📊 Fetching compliance for department ${deptId}`);
+    const params = period ? { period } : {};
+    const response = await slaApi.get(`/compliance/department/${deptId}`, { params });
+    return response;
+  } catch (error) {
+    console.error('❌ Error fetching compliance:', error);
+    
+    // ✅ Return error object instead of throwing
+    return {
+      success: false,
+      data: null,
+      message: error.message || 'Failed to fetch compliance data',
+      count: 0
+    };
+  }
+},
 
   getAllCompliance: async (period = null) => {
     try {
@@ -516,30 +537,34 @@ const slaService = {
    * Endpoint: GET /api/EmployeeManagement/department-heads/{departmentId}
    */
   getDepartmentHeads: async (deptId) => {
-    try {
-      if (!deptId) {
-        console.warn(' No departmentId provided');
-        return { success: false, data: [], message: 'Department ID required' };
-      }
-
-      console.log(` Fetching department heads for department ${deptId}`);
-      const response = await employeeApi.get(`/department-heads/${deptId - 1}`);
-
-      if (response?.success && Array.isArray(response.data)) {
-        console.log(` Found ${response.data.length} dept head(s)`);
-        response.data.forEach(dh => {
-          console.log(`   → ${dh.firstName} ${dh.lastName} (${dh.departmentName})`);
-        });
-        return response;
-      }
-
-      console.warn(' No dept heads found');
-      return { success: false, data: [], message: 'No department heads found' };
-    } catch (error) {
-      console.error(' Error fetching dept heads:', error);
-      return { success: false, data: [], message: error.message };
+  try {
+    // ✅ Validate deptId
+    if (!deptId || deptId === 'null' || deptId === null || deptId === undefined) {
+      console.warn('⚠️ No departmentId provided');
+      return { success: false, data: [], message: 'Department ID required' };
     }
-  },
+
+    console.log(`👥 Fetching department heads for department ${deptId}`);
+    
+    // ✅ REMOVED THE "- 1" BUG - Use deptId directly
+    const response = await employeeApi.get(`/department-heads/${deptId}`);
+
+    if (response?.success && Array.isArray(response.data)) {
+      console.log(`✅ Found ${response.data.length} dept head(s)`);
+      response.data.forEach(dh => {
+        console.log(`   → ${dh.firstName} ${dh.lastName} (${dh.departmentName})`);
+      });
+      return response;
+    }
+
+    console.warn('⚠️ No dept heads found');
+    return { success: false, data: [], message: 'No department heads found' };
+  } catch (error) {
+    console.error('❌ Error fetching dept heads:', error);
+    return { success: false, data: [], message: error.message };
+  }
+},
+
 
   /**
    *  Get ALL department heads by ROLE ID = 3

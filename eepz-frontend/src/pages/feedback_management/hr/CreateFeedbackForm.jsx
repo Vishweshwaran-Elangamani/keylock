@@ -310,23 +310,7 @@ export default function CreateFeedbackForm() {
               </small>
             </div>
 
-            {/* INFO BOX */}
-            <div
-              className="alert alert-info mb-4"
-              style={{ borderRadius: "var(--radius-md)" }}
-            >
-              <div className="d-flex align-items-start gap-2">
-                <div>
-                  <strong>Visibility:</strong>
-                  <p className="mb-0 small mt-1">
-                    This form will be{" "}
-                    <strong>automatically visible to all employees</strong> once
-                    created. All employees will see this form in their assigned
-                    forms list.
-                  </p>
-                </div>
-              </div>
-            </div>
+           
 
             {/* SUBMIT BUTTON */}
             <div className="d-grid gap-2">
@@ -363,22 +347,7 @@ export default function CreateFeedbackForm() {
         </div>
       </div>
 
-      {/* FOOTER INFO */}
-      <div
-        className="alert alert-light mt-4"
-        style={{ border: "1px solid var(--border)" }}
-      >
-        <strong>How it works:</strong>
-        <ul className="mb-0 mt-2 ps-3">
-          <li>Create the form with name, description, type, and deadline</li>
-          <li>
-            Form is automatically set to <strong>Active</strong> status
-          </li>
-          <li>All employees automatically see the form in their dashboard</li>
-          <li>Employees can fill it out before the deadline</li>
-        </ul>
-      </div>
-
+      
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
