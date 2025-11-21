@@ -15,6 +15,7 @@ namespace Relevantz.EEPZ.Common.DTOs
 
     public class GoalQueryDto : PagedQueryDto
     {
+        public int? CurrentUserEmpMasterID { get; set; }
         public string? Type { get; set; }
         public string? Status { get; set; }
         public int? ProjectId { get; set; }
@@ -24,6 +25,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? AssignedToEmployeeMasterId { get; set; }
         public DateTime? CreatedAfter { get; set; }
         public DateTime? CreatedBefore { get; set; }
+        public string? CurrentUserRole { get; set; }
     }
 
     public class ApprovalQueryDto : PagedQueryDto

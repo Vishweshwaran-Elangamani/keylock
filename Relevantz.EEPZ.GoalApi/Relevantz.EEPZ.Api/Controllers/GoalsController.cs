@@ -74,7 +74,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                         result.Data,
                         userId
                     );
-                    return CreatedAtAction(nameof(GetById), new { id = result.Data }, result);
+                    return CreatedAtAction(nameof(GetGoalDetailsById), new { id = result.Data }, result);
                 }
 
                 _logger.LogWarning(
@@ -99,7 +99,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Get goal details by ID
         /// </summary>
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetGoalDetailsById(int id)
         {
             var userId = 0;
             try
@@ -156,7 +156,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         }
 
         [HttpGet("query")]
-        public async Task<IActionResult> Query([FromQuery] GoalQueryDto query)
+        public async Task<IActionResult> QueryGoals([FromQuery] GoalQueryDto query)
         {
             try
             {
@@ -203,7 +203,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// Update goal (title, description, deadline)
         /// </summary>
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateGoalDto dto)
+        public async Task<IActionResult> UpdateGoal(int id, [FromBody] UpdateGoalDto dto)
         {
             var userId = 0;
             try

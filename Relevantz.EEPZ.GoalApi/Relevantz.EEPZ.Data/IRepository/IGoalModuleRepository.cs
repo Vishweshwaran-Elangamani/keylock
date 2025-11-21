@@ -7,22 +7,7 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
     {
         // Goals
         Task<Goal?> GetGoalByIdAsync(int goalId);
-        Task<List<Goal>> QueryGoalsAsync(
-            int requesterEmployeeMasterId,
-            string? type,
-            string? status,
-            int? projectId,
-            DateTime? dueBefore,
-            DateTime? dueAfter,
-            string? search,
-            int? createdBy,
-            int? assignedTo,
-            DateTime? createdAfter,
-            DateTime? createdBefore,
-            int page,
-            int pageSize,
-            string? requesterRole = null 
-        );
+        Task<List<Goal>> QueryGoalsAsync(GoalQueryDto request);
         Task AddGoalAsync(Goal goal);
         Task UpdateGoalAsync(Goal goal);
 

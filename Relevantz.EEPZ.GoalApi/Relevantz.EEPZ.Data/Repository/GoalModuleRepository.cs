@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Interface;
 using Serilog;
@@ -40,32 +40,17 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        public async Task<List<Goal>> QueryGoalsAsync(
-            int requesterEmployeeMasterId,
-            string? type,
-            string? status,
-            int? projectId,
-            DateTime? dueBefore,
-            DateTime? dueAfter,
-            string? search,
-            int? createdBy,
-            int? assignedTo,
-            DateTime? createdAfter,
-            DateTime? createdBefore,
-            int page,
-            int pageSize,
-            string? requesterRole = null
-        )
+        public async Task<List<Goal>> QueryGoalsAsync(GoalQueryDto request)
         {
             try
             {
                 Log.Information(
                     "[QueryGoalsAsync] Starting query - Type: {Type}, Status: {Status}, RequesterID: {RequesterID}, Role: {Role}, Page: {Page}",
-                    type,
-                    status,
-                    requesterEmployeeMasterId,
-                    requesterRole,
-                    page
+                    request.Type,
+                    request.Status,
+                    request.CurrentUserEmpMasterID,
+                    request.CurrentUserRole,
+                    request.Page
                 );
 
                 var q = _db
@@ -73,13 +58,13 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .Include(g => g.Goalprogresslogs)
                     .AsQueryable();
 
-                if (!string.IsNullOrEmpty(type))
-                    q = q.Where(g => g.GoalType == type);
+                if (!string.IsNullOrEmpty(request.Type))
+                    q = q.Where(g => g.GoalType == request.Type);
 
                 // ROLE-BASED VISIBILITY LOGIC
-                if (type == GOAL_TYPE.TEAM)
+                if (request.Type == GOAL_TYPE.TEAM)
                 {
-                    if (requesterRole == USER_ROLE.LEADERSHIP)
+                    if (request.CurrentUserRole == USER_ROLE.LEADERSHIP)
                     {
                         Log.Information(
                             "[QueryGoalsAsync] Applying Leadership visibility - ALL team goals company-wide"
@@ -88,7 +73,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         // Leadership sees ALL team goals across all departments
                         q = q.Where(g => g.GoalType == GOAL_TYPE.TEAM);
                     }
-                    else if (requesterRole == USER_ROLE.DEPARTMENT_HEAD)
+                    else if (request.CurrentUserRole == USER_ROLE.DEPARTMENT_HEAD)
                     {
                         Log.Information(
                             "[QueryGoalsAsync] Applying DeptHead visibility for team goals"
@@ -98,16 +83,16 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         var deptHead = await _db
                             .Employeedetailsmasters.AsNoTracking()
                             .FirstOrDefaultAsync(e =>
-                                e.EmployeeMasterId == requesterEmployeeMasterId
+                                e.EmployeeMasterId == request.CurrentUserEmpMasterID
                             );
 
                         if (deptHead != null)
                         {
                             // DeptHeads see ALL team goals with assignees in their department
                             q = q.Where(g =>
-                                g.CreatedBy == requesterEmployeeMasterId
+                                g.CreatedBy == request.CurrentUserEmpMasterID
                                 || g.GoalAssignments.Any(a =>
-                                    a.AssignedTo == requesterEmployeeMasterId
+                                    a.AssignedTo == request.CurrentUserEmpMasterID
                                 )
                                 || (
                                     g.GoalType == GOAL_TYPE.TEAM
@@ -125,17 +110,17 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         {
                             Log.Warning(
                                 "[QueryGoalsAsync] DeptHead {ID} has no department assigned",
-                                requesterEmployeeMasterId
+                                request.CurrentUserEmpMasterID
                             );
                             q = q.Where(g =>
-                                g.CreatedBy == requesterEmployeeMasterId
+                                g.CreatedBy == request.CurrentUserEmpMasterID
                                 || g.GoalAssignments.Any(a =>
-                                    a.AssignedTo == requesterEmployeeMasterId
+                                    a.AssignedTo == request.CurrentUserEmpMasterID
                                 )
                             );
                         }
                     }
-                    else if (requesterRole == USER_ROLE.MANAGER)
+                    else if (request.CurrentUserRole == USER_ROLE.MANAGER)
                     {
                         Log.Information(
                             "[QueryGoalsAsync] Applying Manager visibility for team goals"
@@ -148,7 +133,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                                 == _db.Employees.Where(emp =>
                                         emp.EmployeeId
                                         == _db.Employeedetailsmasters.Where(edm =>
-                                                edm.EmployeeMasterId == requesterEmployeeMasterId
+                                                edm.EmployeeMasterId
+                                                == request.CurrentUserEmpMasterID
                                             )
                                             .Select(edm => edm.EmployeeId)
                                             .FirstOrDefault()
@@ -166,8 +152,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                             .ToListAsync();
 
                         q = q.Where(g =>
-                            g.CreatedBy == requesterEmployeeMasterId
-                            || g.GoalAssignments.Any(a => a.AssignedTo == requesterEmployeeMasterId)
+                            g.CreatedBy == request.CurrentUserEmpMasterID
+                            || g.GoalAssignments.Any(a =>
+                                a.AssignedTo == request.CurrentUserEmpMasterID
+                            )
                             || (
                                 g.GoalType == GOAL_TYPE.TEAM
                                 && g.GoalAssignments.Any(a =>
@@ -180,8 +168,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     {
                         // Regular users: only their own goals
                         q = q.Where(g =>
-                            g.CreatedBy == requesterEmployeeMasterId
-                            || g.GoalAssignments.Any(a => a.AssignedTo == requesterEmployeeMasterId)
+                            g.CreatedBy == request.CurrentUserEmpMasterID
+                            || g.GoalAssignments.Any(a =>
+                                a.AssignedTo == request.CurrentUserEmpMasterID
+                            )
                         );
                     }
                 }
@@ -189,50 +179,56 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 {
                     // For self/org goals - unchanged
                     q = q.Where(g =>
-                        g.CreatedBy == requesterEmployeeMasterId
-                        || g.GoalAssignments.Any(a => a.AssignedTo == requesterEmployeeMasterId)
+                        g.CreatedBy == request.CurrentUserEmpMasterID
+                        || g.GoalAssignments.Any(a =>
+                            a.AssignedTo == request.CurrentUserEmpMasterID
+                        )
                         || g.GoalType == GOAL_TYPE.ORG
                     );
                 }
 
                 // Apply other filters
-                if (!string.IsNullOrEmpty(status))
-                    q = q.Where(g => g.Goalstatus == status);
+                if (!string.IsNullOrEmpty(request.Status))
+                    q = q.Where(g => g.Goalstatus == request.Status);
 
-                if (projectId.HasValue)
-                    q = q.Where(g => g.ProjectId == projectId.Value);
+                if (request.ProjectId.HasValue)
+                    q = q.Where(g => g.ProjectId == request.ProjectId.Value);
 
-                if (dueBefore.HasValue)
-                    q = q.Where(g => g.Goalendat != null && g.Goalendat <= dueBefore.Value);
+                if (request.DueBefore.HasValue)
+                    q = q.Where(g => g.Goalendat != null && g.Goalendat <= request.DueBefore.Value);
 
-                if (dueAfter.HasValue)
-                    q = q.Where(g => g.Goalendat != null && g.Goalendat >= dueAfter.Value);
+                if (request.DueAfter.HasValue)
+                    q = q.Where(g => g.Goalendat != null && g.Goalendat >= request.DueAfter.Value);
 
-                if (createdAfter.HasValue)
+                if (request.CreatedAfter.HasValue)
                     q = q.Where(g =>
-                        g.Goalcreatedat != null && g.Goalcreatedat >= createdAfter.Value
+                        g.Goalcreatedat != null && g.Goalcreatedat >= request.CreatedAfter.Value
                     );
 
-                if (createdBefore.HasValue)
+                if (request.CreatedBefore.HasValue)
                     q = q.Where(g =>
-                        g.Goalcreatedat != null && g.Goalcreatedat <= createdBefore.Value
+                        g.Goalcreatedat != null && g.Goalcreatedat <= request.CreatedBefore.Value
                     );
 
-                if (createdBy.HasValue)
-                    q = q.Where(g => g.CreatedBy == createdBy.Value);
+                if (request.CreatedByEmployeeMasterId.HasValue)
+                    q = q.Where(g => g.CreatedBy == request.CreatedByEmployeeMasterId.Value);
 
-                if (assignedTo.HasValue)
-                    q = q.Where(g => g.GoalAssignments.Any(a => a.AssignedTo == assignedTo.Value));
-
-                if (!string.IsNullOrWhiteSpace(search))
+                if (request.AssignedToEmployeeMasterId.HasValue)
                     q = q.Where(g =>
-                        (g.GoalTitle ?? "").Contains(search)
-                        || (g.GoalDescription ?? "").Contains(search)
+                        g.GoalAssignments.Any(a =>
+                            a.AssignedTo == request.AssignedToEmployeeMasterId.Value
+                        )
+                    );
+
+                if (!string.IsNullOrWhiteSpace(request.Search))
+                    q = q.Where(g =>
+                        (g.GoalTitle ?? "").Contains(request.Search)
+                        || (g.GoalDescription ?? "").Contains(request.Search)
                     );
 
                 var result = await q.OrderByDescending(g => g.Goalcreatedat)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
+                    .Skip((request.Page - 1) * request.PageSize)
+                    .Take(request.PageSize)
                     .AsNoTracking()
                     .ToListAsync();
 

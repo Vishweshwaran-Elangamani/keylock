@@ -572,20 +572,23 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 );
 
                 var goals = await _repo.QueryGoalsAsync(
-                    currentUserEmployeeMasterId,
-                    query.Type,
-                    query.Status,
-                    query.ProjectId,
-                    query.DueBefore,
-                    query.DueAfter,
-                    query.Search,
-                    query.CreatedByEmployeeMasterId,
-                    query.AssignedToEmployeeMasterId,
-                    query.CreatedAfter,
-                    query.CreatedBefore,
-                    query.Page,
-                    query.PageSize,
-                    currentUserRole
+                    new GoalQueryDto
+                    {
+                        CurrentUserEmpMasterID = currentUserEmployeeMasterId,
+                        Type = query.Type,
+                        Status = query.Status,
+                        ProjectId = query.ProjectId,
+                        DueBefore = query.DueBefore,
+                        DueAfter = query.DueAfter,
+                        Search = query.Search,
+                        CreatedByEmployeeMasterId = query.CreatedByEmployeeMasterId,
+                        AssignedToEmployeeMasterId = query.AssignedToEmployeeMasterId,
+                        CreatedAfter = query.CreatedAfter,
+                        CreatedBefore = query.CreatedBefore,
+                        Page = query.Page,
+                        PageSize = query.PageSize,
+                        CurrentUserRole = currentUserRole,
+                    }
                 );
 
                 Log.Information(
@@ -3149,42 +3152,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         )
         {
             var completed = await _repo.QueryGoalsAsync(
-                currentUserEmployeeMasterId,
-                null,
-                "completed",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                1,
-                1_000_000
+                new GoalQueryDto
+                {
+                    CurrentUserEmpMasterID = currentUserEmployeeMasterId,
+                    Status = "completed",
+                    Page = 1,
+                    PageSize = 1_000_000,
+                }
             );
 
             var all = await _repo.QueryGoalsAsync(
-                currentUserEmployeeMasterId,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                1,
-                1_000_000
+                new GoalQueryDto { Page = 1, PageSize = 1_000_000 }
             );
 
             var pending = all.Where(g => g.Goalstatus == GOAL_STATUS.PENDING).ToList();
-            var ongoing = all.Where(g =>
-                g.Goalstatus == GOAL_STATUS.IN_PROGRESS
-                )
-                .ToList();
+            var ongoing = all.Where(g => g.Goalstatus == GOAL_STATUS.IN_PROGRESS).ToList();
             var overdue = all.Where(g =>
                     g.Goalendat.HasValue
                     && g.Goalendat.Value < DateTime.UtcNow
@@ -3213,19 +3195,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         )
         {
             var goals = await _repo.QueryGoalsAsync(
-                currentUserEmployeeMasterId,
-                type,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                1,
-                1_000_000
+                new GoalQueryDto { Page = 1, PageSize = 1_000_000 }
             );
 
             var ongoing = goals
