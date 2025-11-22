@@ -433,7 +433,7 @@ function FormCreate() {
               <div key={index} className="hrfcper-comp-card">
                 <div className="hrfcper-comp-header">
                   <div className="hrfcper-comp-left">
-                    <span className="hrfcper-comp-number">#{comp.displayOrder}</span>
+                    <span className="hrfcper-comp-number">{comp.displayOrder}</span>
                     <span className="hrfcper-comp-label">{comp.name || "Untitled Competency"}</span>
                   </div>
                   <div className="hrfcper-comp-actions">

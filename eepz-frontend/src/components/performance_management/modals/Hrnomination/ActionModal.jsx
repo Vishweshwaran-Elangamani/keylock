@@ -13,6 +13,7 @@ const ActionModal = ({
 
   return (
     <>
+      {/* Overlay */}
       <div
         style={{
           position: "fixed",
@@ -24,6 +25,8 @@ const ActionModal = ({
         }}
         onClick={onClose}
       ></div>
+
+      {/* Modal Container */}
       <div
         style={{
           position: "fixed",
@@ -36,32 +39,44 @@ const ActionModal = ({
         }}
       >
         <div
-          className="card border-0 shadow-lg"
           style={{
             background: THEME.card,
             borderRadius: 18,
             boxShadow: "0 8px 24px rgba(32, 30, 60, 0.13)",
+            overflow: "hidden", // Ensures no white border on header
           }}
         >
+          {/* Full-width Header */}
           <div
-            className="card-header"
             style={{
               background: THEME.primary,
               color: "#fff",
-              borderBottom: "none",
+              padding: "22px 26px 12px 26px",
               borderTopLeftRadius: 18,
               borderTopRightRadius: 18,
-              padding: "22px 26px 12px 26px",
+              minHeight: 40,
+              margin: 0,
+              width: "100%",
             }}
           >
-            <div className="d-flex justify-content-between align-items-center">
-              <h6 className="mb-0" style={{ fontWeight: 700, fontSize: 17, color : "white" }}>
-                {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
-              </h6>
-            
-            </div>
+            <h6
+              className="mb-0"
+              style={{
+                fontWeight: 700,
+                fontSize: 17,
+                color: "white",
+                margin: 0,
+                letterSpacing: "0.04em",
+              }}
+            >
+              {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
+            </h6>
           </div>
-          <div className="card-body" style={{ padding: "32px 26px 18px 26px" }}>
+
+          <div
+            className="card-body"
+            style={{ padding: "32px 26px 18px 26px", background: THEME.card }}
+          >
             <label
               style={{
                 fontSize: "14px",
@@ -69,7 +84,7 @@ const ActionModal = ({
                 color: THEME.textLight,
                 marginBottom: "10px",
                 letterSpacing: "0.2px",
-                display: "block"
+                display: "block",
               }}
             >
               {actionType === "approve"
@@ -91,12 +106,11 @@ const ActionModal = ({
                 borderColor: THEME.border,
                 borderRadius: 7,
                 background: "#fff",
-                marginBottom: 0,
                 minHeight: 92,
                 padding: "13px",
                 boxShadow: "none",
                 outline: "none",
-                resize: "vertical"
+                resize: "vertical",
               }}
             />
           </div>

@@ -127,13 +127,13 @@ export default function FormProgressTrackerPage() {
         <div className="fld-card">
           {/* Table */}
           <div className="fld-table-wrapper">
-            <table className="fld-table">
+            <table className="fld-table-formhrp">
               <thead>
                 <tr>
                   <th>Employee</th>
                   <th>L1</th>
                   <th>L2</th>
-                  <th>Init</th>
+                  <th>Initiated</th>
                   <th>Sent Emp</th>
                   <th>Emp Done</th>
                   <th>Sent Mgr</th>

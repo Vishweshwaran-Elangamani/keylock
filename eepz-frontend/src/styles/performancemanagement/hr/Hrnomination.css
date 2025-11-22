@@ -254,3 +254,51 @@
   box-shadow: none;
   opacity: 0.88;
 }
+
+.ad-stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+.ad-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+}
+.stat-icon-primary {
+  background: linear-gradient(135deg, #0d6efd 60%, #4582ec 100%);
+}
+.stat-icon-warning {
+  background: linear-gradient(135deg, #ffc107 60%, #ffe082 100%);
+}
+.stat-icon-success {
+  background: linear-gradient(135deg, #28a745 60%, #81c784 100%);
+}
+.stat-icon-danger {
+  background: linear-gradient(135deg, #dc3545 60%, #ef5350 100%);
+}
+.stat-content h3 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212529;
+}
+.stat-content p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.875rem;
+}

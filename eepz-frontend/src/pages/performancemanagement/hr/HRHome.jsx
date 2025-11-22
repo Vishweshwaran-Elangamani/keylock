@@ -60,6 +60,12 @@ export default function HRHome() {
   return (
     <div className="eepz-hrhome-bg">
       <div className="eepz-hrhome-container">
+      
+<h1 >
+  Performance & Nomination Management
+</h1>
+<p style={{ color : "gray",  paddingBottom: "10px" }}>Initiate , Review , Track the form and nominations </p>
+
         
         <div className="eepz-hrhome-card-grid">
           {cards.map((card, idx) => (

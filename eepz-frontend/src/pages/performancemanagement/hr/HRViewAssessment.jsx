@@ -36,7 +36,7 @@ function exportToCsv(filename, rows) {
 
 function average(values) {
   const arr = values.filter((v) => typeof v === "number");
-  if (!arr.length) return "-";
+  if (!arr.length) return "N/A";
   return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
 }
 
@@ -45,20 +45,20 @@ function statusBadge(status) {
   const s = status.toLowerCase();
   if (s === "completed")
     return (
-      <span className="hrview-badge hrview-badge-completed">
+      <span className="hrvasspm-badge hrvasspm-badge-completed">
         <i className="bi bi-check-circle-fill" style={{ marginRight: 6 }}></i>
         Completed
       </span>
     );
   if (s.startsWith("pending"))
     return (
-      <span className="hrview-badge hrview-badge-pending">
+      <span className="hrvasspm-badge hrvasspm-badge-pending">
         <i className="bi bi-hourglass-split" style={{ marginRight: 6 }}></i>
         Pending
       </span>
     );
   return (
-    <span className="hrview-badge hrview-badge-default">
+    <span className="hrvasspm-badge hrvasspm-badge-default">
       <i className="bi bi-dot" style={{ marginRight: 6 }}></i>
       {status}
     </span>
@@ -112,15 +112,15 @@ function HRViewAppraisals() {
       const empRatings = a.competencies
         .map((c) => c.employeeRating)
         .filter((r) => typeof r === "number");
-      const l1Name = a.competencies[0]?.l1ReviewerName || "-";
+      const l1Name = a.competencies[0]?.l1ReviewerName || "N/A";
       const l1Ratings = a.competencies
         .map((c) => c.l1Rating)
         .filter((r) => typeof r === "number");
-      const l2Name = a.competencies[0]?.l2ReviewerName || "-";
+      const l2Name = a.competencies[0]?.l2ReviewerName || "N/A";
       const l2Ratings = a.competencies
         .map((c) => c.l2Rating)
         .filter((r) => typeof r === "number");
-      let status = a.competencies[0]?.status ?? "-";
+      let status = a.competencies[0]?.status ?? "N/A";
       if (a.competencies.some((c) => c.status !== status)) status = "Mixed";
       return {
         key: `${a.employeeId}-${a.projectName}-${idx}`,
@@ -149,7 +149,6 @@ function HRViewAppraisals() {
   const summaryRows = useMemo(() => {
     let filtered = [...allSummaryRows];
 
-    // Filter by status
     if (filterStatus !== "all") {
       filtered = filtered.filter((row) => {
         const status = (row.status || "").toLowerCase();
@@ -159,12 +158,10 @@ function HRViewAppraisals() {
       });
     }
 
-    // Filter by project
     if (filterProject !== "all") {
       filtered = filtered.filter((row) => row.projectName === filterProject);
     }
 
-    // Search filter (employee name only for precision)
     if (searchTerm.trim() !== "") {
       const search = searchTerm.trim().toLowerCase();
       filtered = filtered.filter((row) =>
@@ -175,7 +172,6 @@ function HRViewAppraisals() {
     return filtered;
   }, [allSummaryRows, filterStatus, filterProject, searchTerm]);
 
-  // Pagination
   const totalPages = Math.ceil(summaryRows.length / rowsPerPage);
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
@@ -213,36 +209,25 @@ function HRViewAppraisals() {
     }));
   }, [summaryRows]);
 
-  const { completedCount, pendingCount } = useMemo(() => {
-    let completed = 0,
-      pending = 0;
-    allSummaryRows.forEach((r) => {
-      const s = (r.status || "").toLowerCase();
-      if (s === "completed") completed++;
-      else if (s.startsWith("pending")) pending++;
-    });
-    return { completedCount: completed, pendingCount: pending };
-  }, [allSummaryRows]);
-
   if (loading)
     return (
-      <div className="hrview-loading">
-        <div className="hrview-spinner"></div>
+      <div className="hrvasspm-loading">
+        <div className="hrvasspm-spinner"></div>
         <p>Loading appraisals...</p>
       </div>
     );
   if (error)
     return (
-      <div className="hrview-error">
+      <div className="hrvasspm-error">
         <i className="bi bi-exclamation-circle"></i>
         <p>{error}</p>
       </div>
     );
   if (!appraisals.length)
     return (
-      <div className="hrview-container">
-        <h2 className="hrview-page-title">Appraisal Details</h2>
-        <div className="hrview-alert">
+      <div className="hrvasspm-container">
+        <h2 className="hrvasspm-page-title">Appraisal Details</h2>
+        <div className="hrvasspm-alert">
           <i className="bi bi-info-circle"></i>
           No initiated appraisal forms found. Please initiate forms from the "Initiate Form" page.
         </div>
@@ -250,7 +235,7 @@ function HRViewAppraisals() {
     );
 
   return (
-    <div className="fld-root">
+    <div className="hrvasspm-page">
       <div
         style={{
           display: "flex",
@@ -272,14 +257,11 @@ function HRViewAppraisals() {
             </li>
           </ol>
         </nav>
-        <button className="hrview-btn-export" onClick={() => exportToCsv("appraisals.csv", csvData)}>
-          <i className="bi bi-download"></i> Export CSV
-        </button>
       </div>
 
-      <div className="hrview-container">
-        <div className="hrview-filters">
-          <div className="hrview-filter-group">
+      <div className="hrvasspm-container">
+        <div className="hrvasspm-filters">
+          <div className="hrvasspm-filter-group">
             <label>Search Employee Name</label>
             <input
               type="search"
@@ -291,7 +273,7 @@ function HRViewAppraisals() {
               }}
             />
           </div>
-          <div className="hrview-filter-group">
+          <div className="hrvasspm-filter-group">
             <label>Filter by Status</label>
             <select
               value={filterStatus}
@@ -305,7 +287,7 @@ function HRViewAppraisals() {
               <option value="completed">Completed</option>
             </select>
           </div>
-          <div className="hrview-filter-group">
+          <div className="hrvasspm-filter-group">
             <label>Filter by Project</label>
             <select
               value={filterProject}
@@ -321,12 +303,24 @@ function HRViewAppraisals() {
               ))}
             </select>
           </div>
-          
+
+          <div className="hrvasspm-filter-group">
+            <label style={{ visibility: "hidden" }}>Export</label>
+            
+<button
+  className="hrvasspm-btn-export"
+  onClick={() => exportToCsv("appraisals.csv", csvData)}
+  style={{ padding: "8px 60px" }} // top, right, bottom, left
+>
+  <i className="bi bi-download"></i> Export CSV
+</button>
+
+          </div>
         </div>
 
-        <div className="fld-table-card">
-          <div className="fld-table-wrapper">
-            <table className="fld-table">
+        <div className="hrvasspm-table-card">
+          <div className="hrvasspm-table-wrapper">
+            <table className="hrvasspm-table">
               <thead>
                 <tr>
                   <th>Employee Name</th>
@@ -343,7 +337,7 @@ function HRViewAppraisals() {
               <tbody>
                 {currentItems.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="fld-empty-state">
+                    <td colSpan={9} className="hrvasspm-empty-state">
                       <i className="bi bi-inbox"></i>
                       <p>No appraisals match your filters</p>
                     </td>
@@ -360,8 +354,8 @@ function HRViewAppraisals() {
                       <td style={{ textAlign: "center" }}>{row.l2Avg}</td>
                       <td>{statusBadge(row.status)}</td>
                       <td>
-                        <div className="fld-action-buttons">
-                          <button className="fld-action-btn fld-btn-view" title="View Details" onClick={() => setModalRow(row)}>
+                        <div className="hrvasspm-action-buttons">
+                          <button className="hrvasspm-action-btn hrvasspm-btn-view" title="View Details" onClick={() => setModalRow(row)}>
                             <i className="bi bi-eye"></i>
                           </button>
                         </div>
@@ -373,11 +367,12 @@ function HRViewAppraisals() {
             </table>
           </div>
 
-          <div className="fld-pagination-container">
-            <div className="fld-pagination-info">
-              <span className="fld-pagination-label">Show</span>
+          {/* PAGINATION - SINGLE ROW */}
+          <div className="hrvasspm-pagination-container">
+            <div className="hrvasspm-pagination-info">
+              <span className="hrvasspm-pagination-label">Show</span>
               <select
-                className="fld-pagination-select"
+                className="hrvasspm-pagination-select"
                 value={rowsPerPage}
                 onChange={(e) => {
                   setRowsPerPage(Number(e.target.value));
@@ -388,34 +383,34 @@ function HRViewAppraisals() {
                 <option value="25">25</option>
                 <option value="50">50</option>
               </select>
-              <span className="fld-pagination-label">entries</span>
+              <span className="hrvasspm-pagination-label">entries</span>
             </div>
-            <div className="fld-pagination-status">
+            <div className="hrvasspm-pagination-status">
               Showing {summaryRows.length === 0 ? 0 : indexOfFirstItem + 1} to {Math.min(indexOfLastItem, summaryRows.length)} of{" "}
               {summaryRows.length} entries
             </div>
-            <nav className="fld-pagination-nav">
-              <ul className="fld-pagination">
-                <li className={`fld-page-item${currentPage === 1 ? " fld-disabled" : ""}`}>
-                  <button className="fld-page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+            <nav className="hrvasspm-pagination-nav">
+              <ul className="hrvasspm-pagination">
+                <li className={`hrvasspm-page-item${currentPage === 1 ? " hrvasspm-disabled" : ""}`}>
+                  <button className="hrvasspm-page-link" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
                 {getPageNumbers().map((page, idx) => (
                   <li
                     key={idx}
-                    className={`fld-page-item${page === currentPage ? " fld-active" : ""} ${
-                      typeof page !== "number" ? " fld-disabled" : ""
+                    className={`hrvasspm-page-item${page === currentPage ? " hrvasspm-active" : ""} ${
+                      typeof page !== "number" ? " hrvasspm-disabled" : ""
                     }`}
                   >
-                    <button className="fld-page-link" onClick={() => typeof page === "number" && setCurrentPage(page)} disabled={typeof page !== "number"}>
+                    <button className="hrvasspm-page-link" onClick={() => typeof page === "number" && setCurrentPage(page)} disabled={typeof page !== "number"}>
                       {page}
                     </button>
                   </li>
                 ))}
-                <li className={`fld-page-item${currentPage === totalPages ? " fld-disabled" : ""}`}>
+                <li className={`hrvasspm-page-item${currentPage === totalPages ? " hrvasspm-disabled" : ""}`}>
                   <button
-                    className="fld-page-link"
+                    className="hrvasspm-page-link"
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                   >
