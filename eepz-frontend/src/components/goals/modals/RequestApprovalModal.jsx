@@ -52,7 +52,7 @@ const RequestApprovalModal = ({
       };
     if (isReactivation)
       return {
-        color: "blue",
+        color: "rgb(39, 35, 92)",
         bgGradient: "rgb(39, 35, 92)",
         icon: "bi-arrow-repeat",
         iconBg: "#fd7e14",
@@ -66,13 +66,13 @@ const RequestApprovalModal = ({
       };
     if (isLeadershipOrgCompletion)
       return {
-        color: "blue",
+        color: "rgb(39, 35, 92)",
         bgGradient: "rgb(39, 35, 92)",
         icon: "bi-check-circle",
         iconBg: "#198754",
       };
     return {
-      color: "blue",
+      color: "rgb(39, 35, 92)",
       bgGradient: "rgb(39, 35, 92)",
       icon: "bi-send-fill",
       iconBg: "#0d6efd",
@@ -310,7 +310,7 @@ const RequestApprovalModal = ({
               </h4>
             </div>
             <button
-              type="button"              
+              type="button"
               class="btn-close"
               onClick={handleClose}
               disabled={loading}
@@ -564,7 +564,7 @@ const RequestApprovalModal = ({
               fontWeight: 600,
               fontSize: "0.95rem",
               textAlign: "center",
-              alignContent: "center"
+              alignContent: "center",
             }}
           >
             Cancel
@@ -587,17 +587,17 @@ const RequestApprovalModal = ({
               color: "white",
             }}
             onMouseEnter={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.backgroundColor = `${theme.color}`;
-                  e.currentTarget.style.filter = 'brightness(85%)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) {
-                  e.currentTarget.style.backgroundColor = `${theme.color}`;
-                  e.currentTarget.style.filter = 'brightness(100%)'
-                }
-              }}
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = `${theme.color}`;
+                e.currentTarget.style.filter = "brightness(85%)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = `${theme.color}`;
+                e.currentTarget.style.filter = "brightness(100%)";
+              }
+            }}
           >
             {loading ? (
               <>

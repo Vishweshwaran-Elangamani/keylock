@@ -150,23 +150,9 @@ const GoalsDashboard = () => {
       <Breadcrumb
         items={[
           { label: "", path: "/dashboard", icon: "house-door" },
-          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" }
+          { label: "Goals Dashboard", path: "/dashboard/goals", icon: "" },
         ]}
       />
-
-      {/* Header */}
-      <div className="d-flex justify-content-end align-items-center mb-4">
-        <div className="d-flex gap-2">
-          <button className="btn btn-primary" onClick={handleCreateGoal}>
-            <i className="bi bi-plus-circle me-2"></i>
-            Create Goal
-          </button>
-          <button className="btn btn-outline-secondary" onClick={handleViewAll}>
-            <i className="bi bi-list-ul me-2"></i>
-            Your Goals
-          </button>
-        </div>
-      </div>
 
       {/* Alert */}
       {alert && (
@@ -182,10 +168,43 @@ const GoalsDashboard = () => {
         <LoadingSpinner text="Loading dashboard..." />
       ) : (
         <>
-          {/* Summary Cards */}
-          <GoalTracker summary={summary} />
-
-          <hr></hr>
+          {/* Summary Cards with Action Buttons */}
+          <div className="d-flex align-items-start gap-3 mb-4">
+            <div style={{ flex: 1 }}>
+              <GoalTracker summary={summary} />
+            </div>
+            <div
+              className="d-flex flex-column gap-2"
+              style={{ minWidth: "180px" }}
+            >
+              <button
+                className="btn btn-primary"
+                onClick={handleCreateGoal}
+                style={{
+                  background:
+                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  whiteSpace: "nowrap",
+                  height: "60px"
+                }}
+              >
+                <i className="bi bi-plus-circle me-2"></i>
+                Create Goal
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={handleViewAll}
+                style={{
+                  backgroundColor: "rgb(39, 35, 92)",
+                  color: "white",
+                  whiteSpace: "nowrap",
+                  height: "45px"
+                }}
+              >
+                <i className="bi bi-list-ul me-2"></i>
+                Your Goals
+              </button>
+            </div>
+          </div>
 
           {/* Goal Type Toggle */}
           <GoalTypeToggle
@@ -195,8 +214,6 @@ const GoalsDashboard = () => {
               setCurrentPage(1); // Reset to first page when changing type
             }}
           />
-
-          <hr></hr>
 
           {/* Ongoing Goals Section */}
           <div className="mb-4">
