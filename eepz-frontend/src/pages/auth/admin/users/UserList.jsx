@@ -29,7 +29,7 @@ const UserList = () => {
   const [selectedDate, setSelectedDate] = useState("");
 
   // Pagination
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Modal states
@@ -315,7 +315,7 @@ const UserList = () => {
             </button>
             <button className="btn-add" onClick={handleAddUser}>
               <i className="bi bi-plus-circle"></i>
-              Add User
+              Create User
             </button>
           </div>
         </div>
@@ -329,7 +329,7 @@ const UserList = () => {
               <tr>
                 <th>Full Name</th>
                 <th>Email</th>
-                <th>Employee Company Id</th>
+                <th>Employee Id</th>
                 <th>Status</th>
                 <th>Designation</th>
                 <th>Joined Date</th>
@@ -426,6 +426,7 @@ const UserList = () => {
                   setCurrentPage(1);
                 }}
               >
+                <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>

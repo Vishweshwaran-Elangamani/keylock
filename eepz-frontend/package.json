@@ -19,6 +19,7 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.10",
     "react-chartjs-2": "^5.3.1",
+    "react-countup": "^6.5.3",
     "react-datepicker": "^8.8.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.6.0",
@@ -26,7 +27,7 @@
     "react-router-dom": "^6.20.1",
     "react-toastify": "^11.0.5",
     "react-tooltip": "^5.30.0",
-    "recharts": "^3.3.0",
+    "recharts": "^3.4.1",
     "sonner": "^2.0.7",
     "toastr": "^2.1.4"
   },

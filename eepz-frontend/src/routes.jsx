@@ -201,7 +201,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/admin/change-requests"
+        path="/admin/change-requests/*"
         element={
           <ProtectedRoute allowedRoles={["Admin"]}>
             <DashboardLayout role="Admin">

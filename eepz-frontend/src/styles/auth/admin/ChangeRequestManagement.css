@@ -103,13 +103,14 @@
   background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 }
 
-/* LEFT ALIGNED STAT CONTENT */
+/* CENTERED STAT CONTENT */
 .crm-stat-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  text-align: left;
-  align-items: flex-start;
+  text-align: center;
+  align-items: center;
 }
 
 .crm-stat-value {
@@ -118,7 +119,7 @@
   color: #1e293b;
   line-height: 1;
   margin: 0;
-  text-align: left;
+  text-align: center;
 }
 
 .crm-stat-label {
@@ -129,8 +130,9 @@
   letter-spacing: 0.5px;
   margin: 0;
   line-height: 1.2;
-  text-align: left;
+  text-align: center;
 }
+
 
 /* REQUEST TABS */
 .crm-request-tabs {
@@ -563,6 +565,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding-left:20px ;
 }
 
 .pagination-label {
@@ -650,6 +653,15 @@
   background: rgba(0, 0, 0, 0.5);
   /* backdrop-filter: blur(4px); */
   z-index: 1040;
+}
+/* Tab content spacing */
+.tab-content-hr {
+  margin-top: 1.5rem;
+}
+
+/* Additional spacing after tab navigation */
+.tab-navigation-bar-hr {
+  margin-bottom: 0;
 }
 
 .crm-modal-wrapper-process {
@@ -1028,6 +1040,7 @@
     width: 100%;
     justify-content: center;
     text-align: center;
+    
   }
 
   .pagination-nav {

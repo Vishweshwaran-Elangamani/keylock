@@ -19,7 +19,7 @@ const RoleList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   useEffect(() => {
     fetchRoles();
@@ -144,16 +144,9 @@ const RoleList = () => {
       : "N/A";
   };
 
-  const getRoleIcon = (roleName) => {
-    const iconMap = {
-      Admin: "bi-shield-lock-fill",
-      HR: "bi-person-badge",
-      Manager: "bi-briefcase",
-      Employee: "bi-person",
-      "Department Head": "bi-building",
-      Leadership: "bi-award",
-    };
-    return iconMap[roleName] || "bi-shield";
+  // Updated function - Only 2 icons based on role type
+  const getRoleIcon = (isSystemRole) => {
+    return isSystemRole ? "bi-shield-lock-fill" : "bi-gear-fill";
   };
 
   const getRoleStats = () => {
@@ -181,7 +174,6 @@ const RoleList = () => {
       {/* NEW BREADCRUMB COMPONENT */}
       <Breadcrumb
         items={[
-         
           {
             label: "Role Management",
           },
@@ -273,8 +265,6 @@ const RoleList = () => {
           <i className="bi bi-plus-circle"></i>
           Create Role
         </button>
-
-        
       </div>
 
       {/* EMPTY STATE */}
@@ -294,8 +284,12 @@ const RoleList = () => {
               {filteredRoles.map((role) => (
                 <div key={role.roleId} className="role-card-item">
                   <div className="card-header-rl">
-                    <div className="role-icon-badge">
-                      <i className={`bi ${getRoleIcon(role.roleName)}`}></i>
+                    {/* Updated icon badge with blue background */}
+                    <div className="role-icon-badge" style={{ 
+                      background: '#27235c',
+                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+                    }}>
+                      <i className={`bi ${getRoleIcon(role.isSystemRole)}`}></i>
                     </div>
                     {role.isSystemRole && (
                       <span className="system-badge-rl">
@@ -365,10 +359,8 @@ const RoleList = () => {
                       {currentItems.map((role) => (
                         <tr key={role.roleId}>
                           <td>
+                            {/* Removed icon from table view */}
                             <div className="table-role-name">
-                              <i
-                                className={`bi ${getRoleIcon(role.roleName)}`}
-                              ></i>
                               <span>{role.roleName}</span>
                             </div>
                           </td>
@@ -426,6 +418,7 @@ const RoleList = () => {
                           setCurrentPage(1);
                         }}
                       >
+                        <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>

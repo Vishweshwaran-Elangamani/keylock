@@ -71,7 +71,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
     else if (!/^\d+$/.test(formData.employeeCompanyId.trim())) newErrors.employeeCompanyId = "Employee Company ID must contain only numbers";
     else {
       const idNumber = parseInt(formData.employeeCompanyId.trim());
-      if (idNumber < 12560) newErrors.employeeCompanyId = "Employee Company ID must start from 12560 or higher";
+      if (idNumber < 1000) newErrors.employeeCompanyId = "Employee Company ID must be ≥ 1000 and must be unique (i.e., not previously used)";
       else if (idNumber > 999999) newErrors.employeeCompanyId = "Employee Company ID must be less than 1000000";
     }
  
@@ -325,7 +325,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   <input
                     type="text"
                     name="employeeCompanyId"
-                    placeholder="e.g., 12560"
+                    placeholder="Enter Employee ID"
                     value={formData.employeeCompanyId}
                     onChange={handleChange}
                     maxLength={6}
@@ -341,7 +341,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   />
                   {errors.employeeCompanyId && <div style={{ color: "#dc3545", fontSize: 11 }}>{errors.employeeCompanyId}</div>}
                   <small style={{ color: "#64748b", fontSize: 11 }}>
-                    Must be numeric and start from 12560 or higher
+                    Must be numeric and start from 1000 or higher
                   </small>
                 </div>
                 {/* Email */}
@@ -645,7 +645,7 @@ const AddUserModal = ({ show, onHide, onUserAdded, roles, departments }) => {
                   </>
                 ) : (
                   <>
-                    <i className="bi bi-check-circle"></i> Add User
+                    <i className="bi bi-check-circle"></i> Create User
                   </>
                 )}
               </button>
