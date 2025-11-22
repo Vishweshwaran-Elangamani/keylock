@@ -28,7 +28,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
       { icon: "bi-speedometer2", label: "Dashboard", path: "/hr/dashboard" },
       {
         icon: "bi-briefcase",
-        label: "Internal Oppurtunities",
+        label: "Internal Opportunities",
         path: "/internal/opportunities",
       },
       {

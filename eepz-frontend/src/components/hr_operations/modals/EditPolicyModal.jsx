@@ -1,12 +1,4 @@
 import { useState, useEffect } from "react";
-import {
-  Modal,
-  Button,
-  Form,
-  Spinner,
-  Badge,
-  CloseButton,
-} from "react-bootstrap";
 import policyService from "../../../services/hr_operations/hr/policyService";
 
 const EditPolicyModal = ({
@@ -33,7 +25,6 @@ const EditPolicyModal = ({
   const [existingDocument, setExistingDocument] = useState(null);
 
   const [loading, setLoading] = useState(false);
-  const [publishing, setPublishing] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -184,23 +175,6 @@ const EditPolicyModal = ({
     }
   };
 
-  const handlePublish = async () => {
-    try {
-      setPublishing(true);
-      await policyService.publishPolicy(policy.policyId);
-      if (typeof onToast === "function")
-        onToast("success", "Policy published successfully!");
-      onSuccess();
-      onClose();
-    } catch (error) {
-      console.error("Error publishing policy:", error);
-      if (typeof onToast === "function")
-        onToast("danger", "Failed to publish policy");
-    } finally {
-      setPublishing(false);
-    }
-  };
-
   const handleUnpublish = async () => {
     try {
       setUnpublishing(true);
@@ -214,229 +188,242 @@ const EditPolicyModal = ({
     }
   };
 
-  const handleDeleteClick = () => {
-    onClose();
-    onDelete(policy.policyId, policy.policyName);
-  };
+  const isAnyActionLoading = loading || uploadingDoc || unpublishing;
 
-  const isAnyActionLoading =
-    loading || uploadingDoc || publishing || unpublishing;
+  if (!show) return null;
 
   return (
     <>
-      {/* Custom Backdrop with Blur Effect */}
-      {show && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(39, 35, 92, 0.4)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-            zIndex: 1040,
-            transition: "all 0.3s ease",
-          }}
-          onClick={onClose}
-        />
-      )}
-
-      <Modal
-        show={show}
-        onHide={onClose}
-        centered
-        size="lg"
-        backdrop={false}
+      <div
         style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(39,35,92,0.4)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          zIndex: 1040,
+        }}
+        onClick={onClose}
+      />
+
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "95%",
+          maxWidth: "800px",
+          maxHeight: "75vh",
           zIndex: 1050,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <div
           style={{
             borderRadius: "0.5rem",
+            background: "#fff",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
             overflow: "hidden",
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
-            border: "none",
+            width: "100%",
+            maxHeight: "85vh",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          {/* HEADER with White Close Button */}
           <div
             style={{
               background: "#27235C",
-              color: "#ffffff",
-              padding: "16px 20px",
+              color: "#fff",
+              padding: "13px 15px",
               display: "flex",
-              justifyContent: "space-between",
               alignItems: "center",
-              position: "relative",
+              justifyContent: "space-between",
+              fontSize: "15px",
+              fontWeight: 600,
+              borderRadius: "0.5rem 0.5rem 0 0",
+              flexShrink: 0,
             }}
           >
             <div
               style={{
-                fontSize: "16px",
-                fontWeight: "600",
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
-                color: "#ffffff",
+                gap: 8,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 600,
               }}
             >
               <i className="bi bi-pencil-square"></i>
               Edit Policy
               {policy?.isPublished ? (
-                <Badge
-                  bg="success"
+                <span
                   style={{
-                    marginLeft: "8px",
-                    fontSize: "11px",
-                    padding: "4px 8px",
-                    fontWeight: "500",
+                    marginLeft: 8,
+                    fontSize: 11,
+                    padding: "4px 10px",
+                    fontWeight: 600,
+                    background: "#10b981",
+                    color: "#fff",
+                    borderRadius: 4,
+                    textTransform: "capitalize",
                   }}
                 >
                   Published
-                </Badge>
+                </span>
               ) : (
-                <Badge
-                  bg="warning"
+                <span
                   style={{
-                    marginLeft: "8px",
-                    fontSize: "11px",
-                    padding: "4px 8px",
-                    fontWeight: "500",
+                    marginLeft: 8,
+                    fontSize: 11,
+                    padding: "4px 10px",
+                    fontWeight: 600,
+                    background: "#fbbf24",
+                    color: "#fff",
+                    borderRadius: 4,
+                    textTransform: "capitalize",
                   }}
                 >
                   Draft
-                </Badge>
+                </span>
               )}
             </div>
-            <CloseButton
+            <button
+              type="button"
               onClick={onClose}
-              variant="white"
+              disabled={isAnyActionLoading}
+              aria-label="Close"
               style={{
-                filter: "brightness(0) invert(1)",
-                opacity: 1,
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: 18,
+                cursor: isAnyActionLoading ? "not-allowed" : "pointer",
+                opacity: isAnyActionLoading ? 0.7 : 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-            />
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
 
-          {/* BODY */}
-          <Modal.Body
+          <form
+            onSubmit={handleSubmit}
             style={{
-              padding: "20px",
-              background: "#ffffff",
-              overflowY: "auto",
-              maxHeight: "calc(90vh - 140px)",
-              border: "none",
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              overflow: "hidden",
             }}
           >
-            <Form onSubmit={handleSubmit}>
+            <div
+              style={{
+                padding: "20px",
+                background: "#fff",
+                textAlign: "left",
+                overflowY: "auto",
+                flex: 1,
+              }}
+            >
               {errors.submit && (
                 <div
                   style={{
-                    borderRadius: "8px",
+                    borderRadius: 8,
                     padding: "10px 14px",
-                    marginBottom: "16px",
+                    marginBottom: 16,
                     display: "flex",
                     alignItems: "center",
-                    fontSize: "13px",
-                    backgroundColor: "#fee2e2",
-                    border: "1px solid #fecaca",
+                    fontSize: 13,
+                    background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
+                    border: "2px solid #ef4444",
                     color: "#991b1b",
                   }}
                 >
+                  <i className="bi bi-exclamation-triangle-fill" style={{ marginRight: 8, color: "#ef4444" }}></i>
                   {errors.submit}
                 </div>
               )}
 
-              {/* Two Column Grid */}
               <div
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
-                  gap: "20px",
+                  gap: 20,
                   marginBottom: 0,
                 }}
               >
-                {/* LEFT COLUMN */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
-                  }}
-                >
-                  {/* Policy Name */}
-                  <Form.Group>
-                    <Form.Label
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div>
+                    <label
                       style={{
-                        fontWeight: "600",
-                        fontSize: "13px",
+                        fontWeight: 600,
+                        fontSize: 13,
                         color: "#334155",
-                        marginBottom: "6px",
+                        marginBottom: 6,
                         display: "flex",
                         alignItems: "center",
-                        gap: "4px",
+                        gap: 4,
                       }}
                     >
-                      Policy Name{" "}
-                      <span style={{ color: "#ef4444", fontWeight: "700" }}>
-                        *
-                      </span>
-                    </Form.Label>
-                    <Form.Control
+                      Policy Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    </label>
+                    <input
                       type="text"
                       name="policyName"
                       placeholder="Enter policy name"
                       value={formData.policyName}
                       onChange={handleChange}
-                      isInvalid={!!errors.policyName}
                       style={{
-                        border: "1px solid #cbd5e1",
-                        borderRadius: "6px",
+                        width: "100%",
+                        border: errors.policyName ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                        borderRadius: 6,
                         padding: "8px 10px",
-                        fontSize: "13px",
-                        transition: "all 0.2s ease",
-                        backgroundColor: "#ffffff",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
                       }}
                     />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.policyName}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+                    {errors.policyName && (
+                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        {errors.policyName}
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Category */}
-                  <Form.Group>
-                    <Form.Label
+                  <div>
+                    <label
                       style={{
-                        fontWeight: "600",
-                        fontSize: "13px",
+                        fontWeight: 600,
+                        fontSize: 13,
                         color: "#334155",
-                        marginBottom: "6px",
+                        marginBottom: 6,
                         display: "flex",
                         alignItems: "center",
-                        gap: "4px",
+                        gap: 4,
                       }}
                     >
-                      Category{" "}
-                      <span style={{ color: "#ef4444", fontWeight: "700" }}>
-                        *
-                      </span>
-                    </Form.Label>
-                    <Form.Select
+                      Category <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    </label>
+                    <select
                       name="category"
                       value={formData.category}
                       onChange={handleChange}
-                      isInvalid={!!errors.category}
                       style={{
-                        border: "1px solid #cbd5e1",
-                        borderRadius: "6px",
+                        width: "100%",
+                        border: errors.category ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                        borderRadius: 6,
                         padding: "8px 10px",
-                        fontSize: "13px",
-                        transition: "all 0.2s ease",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
                         cursor: "pointer",
-                        backgroundColor: "#ffffff",
                       }}
                     >
                       <option value="">Select Category</option>
@@ -445,39 +432,39 @@ const EditPolicyModal = ({
                           {cat}
                         </option>
                       ))}
-                    </Form.Select>
-                    <Form.Control.Feedback type="invalid">
-                      {errors.category}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+                    </select>
+                    {errors.category && (
+                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        {errors.category}
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Status */}
-                  <Form.Group>
-                    <Form.Label
+                  <div>
+                    <label
                       style={{
-                        fontWeight: "600",
-                        fontSize: "13px",
+                        fontWeight: 600,
+                        fontSize: 13,
                         color: "#334155",
-                        marginBottom: "6px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "4px",
+                        marginBottom: 6,
+                        display: "block",
                       }}
                     >
                       Status
-                    </Form.Label>
-                    <Form.Select
+                    </label>
+                    <select
                       name="status"
                       value={formData.status}
                       onChange={handleChange}
                       style={{
+                        width: "100%",
                         border: "1px solid #cbd5e1",
-                        borderRadius: "6px",
+                        borderRadius: 6,
                         padding: "8px 10px",
-                        fontSize: "13px",
-                        transition: "all 0.2s ease",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
                         cursor: "pointer",
-                        backgroundColor: "#ffffff",
                       }}
                     >
                       {statuses.map((st) => (
@@ -485,139 +472,121 @@ const EditPolicyModal = ({
                           {st}
                         </option>
                       ))}
-                    </Form.Select>
-                  </Form.Group>
+                    </select>
+                  </div>
                 </div>
 
-                {/* RIGHT COLUMN */}
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
-                  }}
-                >
-                  {/* Description */}
-                  <Form.Group>
-                    <Form.Label
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div>
+                    <label
                       style={{
-                        fontWeight: "600",
-                        fontSize: "13px",
+                        fontWeight: 600,
+                        fontSize: 13,
                         color: "#334155",
-                        marginBottom: "6px",
+                        marginBottom: 6,
                         display: "flex",
                         alignItems: "center",
-                        gap: "4px",
+                        gap: 4,
                       }}
                     >
-                      Description{" "}
-                      <span style={{ color: "#ef4444", fontWeight: "700" }}>
-                        *
-                      </span>
-                    </Form.Label>
-                    <Form.Control
-                      as="textarea"
+                      Description <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                    </label>
+                    <textarea
                       rows={3}
                       name="description"
                       placeholder="Enter policy description"
                       value={formData.description}
                       onChange={handleChange}
-                      isInvalid={!!errors.description}
                       style={{
-                        border: "1px solid #cbd5e1",
-                        borderRadius: "6px",
+                        width: "100%",
+                        border: errors.description ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                        borderRadius: 6,
                         padding: "8px 10px",
-                        fontSize: "13px",
-                        transition: "all 0.2s ease",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
                         resize: "vertical",
-                        minHeight: "80px",
-                        maxHeight: "120px",
+                        minHeight: 80,
+                        maxHeight: 120,
                         fontFamily: "inherit",
-                        lineHeight: "1.4",
-                        backgroundColor: "#ffffff",
+                        lineHeight: 1.4,
                       }}
                     />
-                    <Form.Control.Feedback type="invalid">
-                      {errors.description}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+                    {errors.description && (
+                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        {errors.description}
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Compliance Guidance */}
-                  <Form.Group>
-                    <Form.Label
+                  <div>
+                    <label
                       style={{
-                        fontWeight: "600",
-                        fontSize: "13px",
+                        fontWeight: 600,
+                        fontSize: 13,
                         color: "#334155",
-                        marginBottom: "6px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "4px",
+                        marginBottom: 6,
+                        display: "block",
                       }}
                     >
                       Compliance Guidance
-                    </Form.Label>
-                    <Form.Control
-                      as="textarea"
+                    </label>
+                    <textarea
                       rows={3}
                       name="complianceGuidance"
                       placeholder="Enter compliance guidance (optional)"
                       value={formData.complianceGuidance}
                       onChange={handleChange}
                       style={{
+                        width: "100%",
                         border: "1px solid #cbd5e1",
-                        borderRadius: "6px",
+                        borderRadius: 6,
                         padding: "8px 10px",
-                        fontSize: "13px",
-                        transition: "all 0.2s ease",
+                        fontSize: 13,
+                        background: "#fff",
+                        color: "#22223b",
                         resize: "vertical",
-                        minHeight: "80px",
-                        maxHeight: "120px",
+                        minHeight: 80,
+                        maxHeight: 120,
                         fontFamily: "inherit",
-                        lineHeight: "1.4",
-                        backgroundColor: "#ffffff",
+                        lineHeight: 1.4,
                       }}
                     />
-                  </Form.Group>
+                  </div>
                 </div>
               </div>
 
-              {/* DOCUMENT SECTION */}
               <div
                 style={{
                   border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
+                  borderRadius: 8,
                   background: "#f9fafb",
                   padding: "1rem",
-                  marginTop: "20px",
+                  marginTop: 20,
                 }}
               >
-                <Form.Label
+                <label
                   style={{
-                    fontWeight: "600",
-                    marginBottom: "12px",
+                    fontWeight: 600,
+                    marginBottom: 12,
                     color: "#334155",
-                    fontSize: "13px",
+                    fontSize: 13,
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
+                    gap: 8,
                   }}
                 >
-                  <i
-                    className="bi bi-file-earmark-text"
-                    style={{ fontSize: "14px" }}
-                  ></i>
+                  <i className="bi bi-file-earmark-text" style={{ fontSize: 14 }}></i>
                   Policy Document
-                </Form.Label>
+                </label>
 
-                {/* Existing Document */}
                 {existingDocument && (
                   <div
                     style={{
-                      marginBottom: "12px",
-                      padding: "10px",
+                      marginBottom: 12,
+                      padding: 10,
                       background: "#e0f2fe",
-                      borderRadius: "6px",
+                      borderRadius: 6,
                       border: "1px solid #7dd3fc",
                     }}
                   >
@@ -628,20 +597,18 @@ const EditPolicyModal = ({
                         justifyContent: "space-between",
                       }}
                     >
-                      <div style={{ fontSize: "13px" }}>
+                      <div style={{ fontSize: 13 }}>
                         <i
                           className={`bi ${
                             existingDocument.type === "upload"
                               ? "bi-file-earmark-pdf"
                               : "bi-link-45deg"
                           }`}
-                          style={{ marginRight: "8px" }}
+                          style={{ marginRight: 8 }}
                         ></i>
                         <strong>{existingDocument.name}</strong>
                         {existingDocument.size && (
-                          <small
-                            style={{ color: "#64748b", marginLeft: "8px" }}
-                          >
+                          <small style={{ color: "#64748b", marginLeft: 8 }}>
                             ({existingDocument.size})
                           </small>
                         )}
@@ -652,15 +619,15 @@ const EditPolicyModal = ({
                         rel="noopener noreferrer"
                         style={{
                           padding: "4px 12px",
-                          fontSize: "12px",
-                          borderRadius: "4px",
+                          fontSize: 12,
+                          borderRadius: 4,
                           textDecoration: "none",
                           border: "1px solid #3b82f6",
                           color: "#3b82f6",
-                          backgroundColor: "#ffffff",
+                          background: "#fff",
                           display: "inline-flex",
                           alignItems: "center",
-                          gap: "4px",
+                          gap: 4,
                         }}
                       >
                         <i className="bi bi-eye"></i> View
@@ -669,16 +636,15 @@ const EditPolicyModal = ({
                   </div>
                 )}
 
-                {/* Three Button Group */}
                 <div
                   style={{
                     display: "flex",
                     width: "100%",
                     marginBottom: "1rem",
-                    borderRadius: "4px",
+                    borderRadius: 4,
                     overflow: "hidden",
                     border: "1px solid #cbd5e1",
-                    backgroundColor: "#ffffff",
+                    background: "#fff",
                   }}
                 >
                   <button
@@ -688,24 +654,20 @@ const EditPolicyModal = ({
                       flex: 1,
                       padding: "8px 12px",
                       border: "none",
-                      backgroundColor:
-                        documentType === "none" ? "#27235C" : "#ffffff",
+                      background: documentType === "none" ? "#27235C" : "#fff",
                       color: documentType === "none" ? "white" : "#6c757d",
-                      fontWeight: "500",
-                      fontSize: "13px",
+                      fontWeight: 500,
+                      fontSize: 13,
                       cursor: "pointer",
                       borderRight: "1px solid #cbd5e1",
                       transition: "all 0.2s",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: "4px",
+                      gap: 4,
                     }}
                   >
-                    <i
-                      className="bi bi-x-circle"
-                      style={{ fontSize: "13px" }}
-                    ></i>
+                    <i className="bi bi-x-circle" style={{ fontSize: 13 }}></i>
                     {existingDocument ? "Keep Existing" : "No Document"}
                   </button>
                   <button
@@ -715,25 +677,20 @@ const EditPolicyModal = ({
                       flex: 1,
                       padding: "8px 12px",
                       border: "none",
-                      backgroundColor:
-                        documentType === "upload" ? "#27235C" : "#ffffff",
+                      background: documentType === "upload" ? "#27235C" : "#fff",
                       color: documentType === "upload" ? "white" : "#6c757d",
-                      fontWeight: "500",
-                      fontSize: "13px",
+                      fontWeight: 500,
+                      fontSize: 13,
                       cursor: "pointer",
                       borderRight: "1px solid #cbd5e1",
                       transition: "all 0.2s",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: "4px",
+                      gap: 4,
                     }}
                   >
-                    <i
-                      className="bi bi-cloud-upload"
-                      style={{ fontSize: "13px" }}
-                    ></i>{" "}
-                    Upload New File
+                    <i className="bi bi-cloud-upload" style={{ fontSize: 13 }}></i> Upload New File
                   </button>
                   <button
                     type="button"
@@ -742,311 +699,209 @@ const EditPolicyModal = ({
                       flex: 1,
                       padding: "8px 12px",
                       border: "none",
-                      backgroundColor:
-                        documentType === "link" ? "#27235C" : "#ffffff",
+                      background: documentType === "link" ? "#27235C" : "#fff",
                       color: documentType === "link" ? "white" : "#6c757d",
-                      fontWeight: "500",
-                      fontSize: "13px",
+                      fontWeight: 500,
+                      fontSize: 13,
                       cursor: "pointer",
                       transition: "all 0.2s",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: "4px",
+                      gap: 4,
                     }}
                   >
-                    <i
-                      className="bi bi-link-45deg"
-                      style={{ fontSize: "14px" }}
-                    ></i>{" "}
-                    Add New Link
+                    <i className="bi bi-link-45deg" style={{ fontSize: 14 }}></i> Add New Link
                   </button>
                 </div>
 
                 {documentType === "upload" && (
-                  <div style={{ marginTop: "12px" }}>
-                    <Form.Group>
-                      <Form.Control
-                        type="file"
-                        accept=".pdf,.doc,.docx"
-                        onChange={handleFileChange}
-                        style={{
-                          border: "1px solid #cbd5e1",
-                          borderRadius: "6px",
-                          padding: "8px",
-                          fontSize: "13px",
-                          backgroundColor: "#ffffff",
-                          cursor: "pointer",
-                        }}
-                      />
-                      <Form.Text
-                        style={{
-                          fontSize: "11px",
-                          color: "#64748b",
-                          display: "block",
-                          marginTop: "6px",
-                        }}
-                      >
-                        Supported: PDF, DOC, DOCX (Max 5MB)
-                      </Form.Text>
-                    </Form.Group>
+                  <div style={{ marginTop: 12 }}>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleFileChange}
+                      style={{
+                        width: "100%",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        padding: 8,
+                        fontSize: 13,
+                        background: "#fff",
+                        cursor: "pointer",
+                      }}
+                    />
+                    <small
+                      style={{
+                        fontSize: 11,
+                        color: "#64748b",
+                        display: "block",
+                        marginTop: 6,
+                      }}
+                    >
+                      Supported: PDF, DOC, DOCX (Max 5MB)
+                    </small>
                     {selectedFile && (
-                      <Badge
-                        bg="success"
+                      <div
                         style={{
-                          marginTop: "12px",
+                          marginTop: 12,
                           padding: "6px 12px",
-                          fontSize: "12px",
-                          borderRadius: "4px",
+                          fontSize: 12,
+                          borderRadius: 4,
                           display: "inline-flex",
                           alignItems: "center",
-                          gap: "4px",
+                          gap: 4,
+                          background: "#dcfce7",
+                          color: "#166534",
+                          border: "1px solid #86efac",
                         }}
                       >
                         <i className="bi bi-check-circle"></i>
-                        {selectedFile.name} (
-                        {(selectedFile.size / 1024).toFixed(2)} KB)
-                      </Badge>
+                        {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                      </div>
                     )}
                   </div>
                 )}
 
                 {documentType === "link" && (
-                  <div style={{ marginTop: "12px" }}>
-                    <Form.Group style={{ marginBottom: "12px" }}>
-                      <Form.Label
+                  <div style={{ marginTop: 12 }}>
+                    <div style={{ marginBottom: 12 }}>
+                      <label
                         style={{
-                          fontWeight: "600",
-                          fontSize: "13px",
+                          fontWeight: 600,
+                          fontSize: 13,
                           color: "#334155",
-                          marginBottom: "6px",
+                          marginBottom: 6,
                           display: "flex",
                           alignItems: "center",
-                          gap: "4px",
+                          gap: 4,
                         }}
                       >
-                        Document URL{" "}
-                        <span style={{ color: "#ef4444", fontWeight: "700" }}>
-                          *
-                        </span>
-                      </Form.Label>
-                      <Form.Control
+                        Document URL <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                      </label>
+                      <input
                         type="url"
                         placeholder="https://drive.google.com/file/d/..."
                         value={documentLink}
                         onChange={(e) => setDocumentLink(e.target.value)}
-                        isInvalid={!!errors.documentLink}
                         style={{
-                          border: "1px solid #cbd5e1",
-                          borderRadius: "6px",
+                          width: "100%",
+                          border: errors.documentLink ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                          borderRadius: 6,
                           padding: "8px 10px",
-                          fontSize: "13px",
-                          transition: "all 0.2s ease",
-                          backgroundColor: "#ffffff",
+                          fontSize: 13,
+                          background: "#fff",
+                          color: "#22223b",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">
-                        {errors.documentLink}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group>
-                      <Form.Label
+                      {errors.documentLink && (
+                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                          {errors.documentLink}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label
                         style={{
-                          fontWeight: "600",
-                          fontSize: "13px",
+                          fontWeight: 600,
+                          fontSize: 13,
                           color: "#334155",
-                          marginBottom: "6px",
+                          marginBottom: 6,
                           display: "flex",
                           alignItems: "center",
-                          gap: "4px",
+                          gap: 4,
                         }}
                       >
-                        Document Name{" "}
-                        <span style={{ color: "#ef4444", fontWeight: "700" }}>
-                          *
-                        </span>
-                      </Form.Label>
-                      <Form.Control
+                        Document Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                      </label>
+                      <input
                         type="text"
                         placeholder="Policy Document.pdf"
                         value={documentName}
                         onChange={(e) => setDocumentName(e.target.value)}
-                        isInvalid={!!errors.documentName}
                         style={{
-                          border: "1px solid #cbd5e1",
-                          borderRadius: "6px",
+                          width: "100%",
+                          border: errors.documentName ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                          borderRadius: 6,
                           padding: "8px 10px",
-                          fontSize: "13px",
-                          transition: "all 0.2s ease",
-                          backgroundColor: "#ffffff",
+                          fontSize: 13,
+                          background: "#fff",
+                          color: "#22223b",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">
-                        {errors.documentName}
-                      </Form.Control.Feedback>
-                    </Form.Group>
+                      {errors.documentName && (
+                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                          {errors.documentName}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
-            </Form>
-          </Modal.Body>
+            </div>
 
-          {/* FOOTER */}
-          <div
-            style={{
-              padding: "12px 20px",
-              borderTop: "1px solid #e2e8f0",
-              background: "#ffffff",
-              flexShrink: 0,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              borderBottomLeftRadius: "12px",
-              borderBottomRightRadius: "12px",
-            }}
-          >
-            {/* Left Side - Delete Button */}
-            <button
-              type="button"
-              onClick={handleDeleteClick}
-              disabled={isAnyActionLoading}
+            <div
               style={{
-                background: "#dc3545",
-                borderColor: "#dc3545",
-                color: "#ffffff",
-                fontWeight: "600",
-                padding: "8px 16px",
-                fontSize: "13px",
-                borderRadius: "6px",
-                border: "none",
-                cursor: isAnyActionLoading ? "not-allowed" : "pointer",
-                opacity: isAnyActionLoading ? 0.65 : 1,
-                transition: "all 0.2s ease",
-                display: "inline-flex",
+                padding: "10px 15px",
+                borderTop: "1px solid #e2e8f0",
+                background: "#fff",
+                display: "flex",
+                justifyContent: "flex-end",
                 alignItems: "center",
-                gap: "6px",
-              }}
-              onMouseEnter={(e) => {
-                if (!isAnyActionLoading) {
-                  e.target.style.background = "#bb2d3b";
-                  e.target.style.borderColor = "#bb2d3b";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isAnyActionLoading) {
-                  e.target.style.background = "#dc3545";
-                  e.target.style.borderColor = "#dc3545";
-                }
+                gap: 8,
+                borderBottomLeftRadius: "0.5rem",
+                borderBottomRightRadius: "0.5rem",
+                flexShrink: 0,
               }}
             >
-              <i className="bi bi-trash"></i> Delete
-            </button>
-
-            {/* Right Side - Action Buttons */}
-            <div style={{ display: "flex", gap: "8px" }}>
-              {/* Publish Button */}
-              {!policy?.isPublished && (
-                <button
-                  type="button"
-                  onClick={handlePublish}
-                  disabled={isAnyActionLoading}
-                  style={{
-                    background: "#198754",
-                    borderColor: "#198754",
-                    color: "#ffffff",
-                    fontWeight: "600",
-                    padding: "8px 16px",
-                    fontSize: "13px",
-                    borderRadius: "6px",
-                    border: "none",
-                    cursor: isAnyActionLoading ? "not-allowed" : "pointer",
-                    opacity: isAnyActionLoading ? 0.65 : 1,
-                    transition: "all 0.2s ease",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isAnyActionLoading) {
-                      e.target.style.background = "#157347";
-                      e.target.style.borderColor = "#157347";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isAnyActionLoading) {
-                      e.target.style.background = "#198754";
-                      e.target.style.borderColor = "#198754";
-                    }
-                  }}
-                >
-                  {publishing ? (
-                    <>
-                      <Spinner
-                        animation="border"
-                        size="sm"
-                        style={{
-                          width: "14px",
-                          height: "14px",
-                          borderWidth: "2px",
-                        }}
-                      />
-                      Publishing...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-send"></i> Publish
-                    </>
-                  )}
-                </button>
-              )}
-
-              {/* Unpublish Button */}
               {policy?.isPublished && (
                 <button
                   type="button"
                   onClick={handleUnpublish}
                   disabled={isAnyActionLoading}
                   style={{
-                    background: "#ffc107",
-                    borderColor: "#ffc107",
-                    color: "#000000",
-                    fontWeight: "600",
-                    padding: "8px 16px",
-                    fontSize: "13px",
-                    borderRadius: "6px",
+                    background: "#fbbf24",
                     border: "none",
+                    color: "#fff",
+                    fontWeight: 600,
+                    padding: "7px 12px",
+                    fontSize: 12,
+                    borderRadius: 5,
                     cursor: isAnyActionLoading ? "not-allowed" : "pointer",
-                    opacity: isAnyActionLoading ? 0.65 : 1,
+                    opacity: isAnyActionLoading ? 0.7 : 1,
                     transition: "all 0.2s ease",
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "6px",
+                    gap: 6,
                   }}
                   onMouseEnter={(e) => {
-                    if (!isAnyActionLoading) {
-                      e.target.style.background = "#ffca2c";
-                      e.target.style.borderColor = "#ffca2c";
-                    }
+                    if (!isAnyActionLoading) e.target.style.background = "#f59e0b";
                   }}
                   onMouseLeave={(e) => {
-                    if (!isAnyActionLoading) {
-                      e.target.style.background = "#ffc107";
-                      e.target.style.borderColor = "#ffc107";
-                    }
+                    if (!isAnyActionLoading) e.target.style.background = "#fbbf24";
                   }}
                 >
                   {unpublishing ? (
                     <>
-                      <Spinner
-                        animation="border"
-                        size="sm"
+                      <span
                         style={{
-                          width: "14px",
-                          height: "14px",
-                          borderWidth: "2px",
+                          width: 14,
+                          height: 14,
+                          border: "2px solid #fff",
+                          borderTop: "2px solid #f59e0b",
+                          borderRadius: "50%",
+                          animation: "spin 0.7s linear infinite",
+                          display: "inline-block",
+                          marginRight: 6,
                         }}
                       />
                       Unpublishing...
+                      <style>{`
+                        @keyframes spin {
+                          0% { transform: rotate(0deg);}
+                          100% { transform: rotate(360deg);}
+                        }
+                      `}</style>
                     </>
                   ) : (
                     <>
@@ -1056,89 +911,89 @@ const EditPolicyModal = ({
                 </button>
               )}
 
-              {/* Cancel Button */}
-              {/* Cancel Button */}
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isAnyActionLoading}
                 style={{
                   background: "#6c757d",
-                  borderColor: "#6c757d",
-                  color: "#ffffff",
-                  fontWeight: "600",
-                  padding: "8px 16px",
-                  fontSize: "13px",
-                  borderRadius: "6px",
                   border: "none",
+                  color: "#fff",
+                  fontWeight: 600,
+                  padding: "7px 12px",
+                  fontSize: 12,
+                  borderRadius: 5,
                   cursor: isAnyActionLoading ? "not-allowed" : "pointer",
-                  opacity: isAnyActionLoading ? 0.65 : 1,
+                  opacity: isAnyActionLoading ? 0.7 : 1,
                   transition: "all 0.2s ease",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
+                  gap: 6,
                 }}
                 onMouseEnter={(e) => {
-                  if (!isAnyActionLoading) {
-                    e.target.style.background = "#27235C";
-                    e.target.style.borderColor = "#27235C";
-                  }
+                  if (!isAnyActionLoading) e.target.style.background = "#5a6268";
                 }}
                 onMouseLeave={(e) => {
-                  if (!isAnyActionLoading) {
-                    e.target.style.background = "#6c757d";
-                    e.target.style.borderColor = "#6c757d";
-                  }
+                  if (!isAnyActionLoading) e.target.style.background = "#6c757d";
                 }}
               >
                 Cancel
               </button>
 
-              {/* Update Button */}
               <button
                 type="submit"
-                onClick={handleSubmit}
                 disabled={isAnyActionLoading}
                 style={{
-                  background:
-                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                   border: "none",
-                  color: "#ffffff",
-                  padding: "8px 16px",
-                  fontWeight: "600",
-                  fontSize: "13px",
-                  borderRadius: "6px",
-                  transition: "all 0.12s ease",
-                  boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
-                  cursor: isAnyActionLoading ? "not-allowed" : "pointer",
-                  opacity: isAnyActionLoading ? 0.65 : 1,
+                  color: "#fff",
+                  fontWeight: 600,
+                  padding: "7px 12px",
+                  fontSize: 12,
+                  borderRadius: 5,
+                  boxShadow: "0 2px 8px rgba(151,36,126,0.25)",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "6px",
+                  gap: 6,
+                  cursor: isAnyActionLoading ? "not-allowed" : "pointer",
+                  opacity: isAnyActionLoading ? 0.85 : 1,
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isAnyActionLoading) e.target.style.opacity = 0.93;
+                }}
+                onMouseLeave={(e) => {
+                  if (!isAnyActionLoading) e.target.style.opacity = 1;
                 }}
               >
                 {uploadingDoc ? (
                   <>
-                    <Spinner
-                      animation="border"
-                      size="sm"
+                    <span
                       style={{
-                        width: "14px",
-                        height: "14px",
-                        borderWidth: "2px",
+                        width: 14,
+                        height: 14,
+                        border: "2px solid #fff",
+                        borderTop: "2px solid #E01950",
+                        borderRadius: "50%",
+                        animation: "spin 0.7s linear infinite",
+                        display: "inline-block",
+                        marginRight: 6,
                       }}
                     />
                     Uploading...
                   </>
                 ) : loading ? (
                   <>
-                    <Spinner
-                      animation="border"
-                      size="sm"
+                    <span
                       style={{
-                        width: "14px",
-                        height: "14px",
-                        borderWidth: "2px",
+                        width: 14,
+                        height: 14,
+                        border: "2px solid #fff",
+                        borderTop: "2px solid #E01950",
+                        borderRadius: "50%",
+                        animation: "spin 0.7s linear infinite",
+                        display: "inline-block",
+                        marginRight: 6,
                       }}
                     />
                     Updating...
@@ -1151,9 +1006,9 @@ const EditPolicyModal = ({
                 )}
               </button>
             </div>
-          </div>
+          </form>
         </div>
-      </Modal>
+      </div>
     </>
   );
 };

@@ -1,14 +1,8 @@
-import { Modal, Button, CloseButton, Spinner } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import policyService from "../../../services/hr_operations/hr/policyService";
 
-const ReminderEmailModal = ({
-  show,
-  onHide,
-  reminderTargetUser,
-  reminderResult,
-  sendingReminder,
-  onSendReminder,
-}) => {
-  if (!show) return null;
+const PublishPolicyModal = ({ show, policy, onHide, onPublish, publishing }) => {
+  if (!show || !policy) return null;
 
   return (
     <>
@@ -75,21 +69,21 @@ const ReminderEmailModal = ({
                 fontWeight: 600,
               }}
             >
-              <i className="bi bi-envelope-fill"></i>
-              Send Career Goals Reminder
+              <i className="bi bi-send-fill"></i>
+              Publish Policy
             </div>
             <button
               type="button"
               onClick={onHide}
-              disabled={sendingReminder}
+              disabled={publishing}
               aria-label="Close"
               style={{
                 background: "none",
                 border: "none",
                 color: "#fff",
                 fontSize: 18,
-                cursor: sendingReminder ? "not-allowed" : "pointer",
-                opacity: sendingReminder ? 0.7 : 1,
+                cursor: publishing ? "not-allowed" : "pointer",
+                opacity: publishing ? 0.7 : 1,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -107,73 +101,83 @@ const ReminderEmailModal = ({
               textAlign: "left",
             }}
           >
+            {/* Main Message */}
+            <p
+              style={{
+                fontSize: 14,
+                color: "#334155",
+                lineHeight: 1.6,
+                marginBottom: 12,
+              }}
+            >
+              You are about to publish the following policy:
+            </p>
+
+            {/* Policy Info Box */}
+            <div
+              style={{
+                background: "#f8fafc",
+                border: "1px solid #e2e8f0",
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 16,
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div>
+                  <strong style={{ fontSize: 15, color: "#1e293b" }}>
+                    {policy.policyName}
+                  </strong>
+                </div>
+                <div style={{ fontSize: 13, color: "#64748b" }}>
+                  <i className="bi bi-tag" style={{ marginRight: 6 }}></i>
+                  {policy.category || "General"}
+                </div>
+                {policy.description && (
+                  <div style={{ fontSize: 13, color: "#475569", marginTop: 4 }}>
+                    {policy.description.substring(0, 100)}
+                    {policy.description.length > 100 && "..."}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Info Message */}
             <p
               style={{
                 fontSize: 13,
                 color: "#475569",
                 lineHeight: 1.6,
-                marginBottom: 8,
+                marginBottom: 16,
               }}
             >
-              Send goal-setting reminder to:
+              Once published, this policy will be visible to all employees.
             </p>
+
+            {/* Success Info */}
             <div
               style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: "#1e293b",
-                marginBottom: 16,
-                padding: 12,
-                background: "#f1f5f9",
+                display: "flex",
+                alignItems: "flex-start",
+                background: "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)",
+                border: "2px solid #10b981",
+                color: "#166534",
                 borderRadius: 6,
-                border: "1px solid #e2e8f0",
+                fontSize: 12,
+                padding: "10px 12px",
+                gap: 8,
+                fontWeight: 500,
               }}
             >
-              {reminderTargetUser?.email ?? reminderTargetUser?.Email}
-            </div>
-
-            {/* Reminder Result */}
-            {reminderResult && (
-              <div
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: 8,
-                  marginTop: 16,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  fontSize: 13,
-                  fontWeight: 500,
-                  background:
-                    reminderResult.successful > 0
-                      ? "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)"
-                      : "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
-                  border:
-                    reminderResult.successful > 0
-                      ? "2px solid #10b981"
-                      : "2px solid #ef4444",
-                  color: reminderResult.successful > 0 ? "#166534" : "#991b1b",
-                }}
-              >
-                {reminderResult.successful > 0 ? (
-                  <>
-                    <i
-                      className="bi bi-check-circle-fill"
-                      style={{ fontSize: 16, color: "#10b981" }}
-                    ></i>
-                    <span>Reminder sent successfully!</span>
-                  </>
-                ) : (
-                  <>
-                    <i
-                      className="bi bi-x-circle-fill"
-                      style={{ fontSize: 16, color: "#ef4444" }}
-                    ></i>
-                    <span>Failed to send reminder</span>
-                  </>
-                )}
+              <i
+                className=""
+                style={{ fontSize: 16, marginTop: 2, color: "#10b981" }}
+              ></i>
+              <div>
+                <strong style={{ display: "block", marginBottom: 4 }}>Note:</strong>
+                Employees will be able to view and acknowledge this policy after publishing.
               </div>
-            )}
+            </div>
           </div>
 
           {/* FOOTER */}
@@ -192,7 +196,7 @@ const ReminderEmailModal = ({
             <button
               type="button"
               onClick={onHide}
-              disabled={sendingReminder}
+              disabled={publishing}
               style={{
                 background: "#6c757d",
                 border: "none",
@@ -201,27 +205,27 @@ const ReminderEmailModal = ({
                 padding: "7px 12px",
                 fontSize: 12,
                 borderRadius: 5,
-                cursor: sendingReminder ? "not-allowed" : "pointer",
+                cursor: publishing ? "not-allowed" : "pointer",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
-                opacity: sendingReminder ? 0.7 : 1,
+                opacity: publishing ? 0.7 : 1,
                 transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => {
-                if (!sendingReminder) e.target.style.background = "#5a6268";
+                if (!publishing) e.target.style.background = "#5a6268";
               }}
               onMouseLeave={(e) => {
-                if (!sendingReminder) e.target.style.background = "#6c757d";
+                if (!publishing) e.target.style.background = "#6c757d";
               }}
             >
-              Close
+              Cancel
             </button>
 
             <button
               type="button"
-              onClick={onSendReminder}
-              disabled={sendingReminder}
+              onClick={onPublish}
+              disabled={publishing}
               style={{
                 background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                 border: "none",
@@ -234,18 +238,20 @@ const ReminderEmailModal = ({
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 6,
-                cursor: sendingReminder ? "not-allowed" : "pointer",
-                opacity: sendingReminder ? 0.85 : 1,
+                cursor: publishing ? "not-allowed" : "pointer",
+                opacity: publishing ? 0.85 : 1,
                 transition: "all 0.2s ease",
+                minWidth: 120,
+                justifyContent: "center",
               }}
               onMouseEnter={(e) => {
-                if (!sendingReminder) e.target.style.opacity = 0.93;
+                if (!publishing) e.target.style.opacity = 0.93;
               }}
               onMouseLeave={(e) => {
-                if (!sendingReminder) e.target.style.opacity = 1;
+                if (!publishing) e.target.style.opacity = 1;
               }}
             >
-              {sendingReminder ? (
+              {publishing ? (
                 <>
                   <span
                     style={{
@@ -259,7 +265,7 @@ const ReminderEmailModal = ({
                       marginRight: 6,
                     }}
                   />
-                  Sending...
+                  Publishing...
                   <style>{`
                     @keyframes spin {
                       0% { transform: rotate(0deg);}
@@ -269,7 +275,8 @@ const ReminderEmailModal = ({
                 </>
               ) : (
                 <>
-                  <i className="bi bi-send"></i> Send Reminder
+                  <i className="bi bi-send-fill"></i>
+                  Publish Policy
                 </>
               )}
             </button>
@@ -280,4 +287,4 @@ const ReminderEmailModal = ({
   );
 };
 
-export default ReminderEmailModal;
+export default PublishPolicyModal;
