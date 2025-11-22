@@ -1,5 +1,4 @@
-// src/pages/sla/ManagerSLADashboard.jsx - PROPERLY STRUCTURED
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -17,8 +16,12 @@ import {
   TrendingUp,
   ChevronLeft,
   ChevronRight,
+  User,
+  LogOut,
+  Settings,
+  ChevronDown,
 } from 'lucide-react';
-import slaService, { escalationHelpers } from '../../services/sla/slaService';
+import slaService from '../../services/sla/slaService';
 import ManagerEscalationModal from '../../components/sla/modals/ManagerEscalationModal';
 import ResolveEscalationModal from '../../components/sla/modals/ResolveEscalationModal';
 import { formatDate } from '../../utils/sla/dateFormatter';
@@ -46,13 +49,52 @@ const ManagerSLADashboard = () => {
   const [selectedEscalationForResolve, setSelectedEscalationForResolve] = useState(null);
   const [deptHeads, setDeptHeads] = useState([]);
 
+  // User profile state
+  const [userData, setUserData] = useState(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
   useEffect(() => {
     loadData();
+    loadUserData();
   }, []);
 
   useEffect(() => {
     applyFilters();
   }, [managerSLAs, managerEscalations, searchTerm, statusFilter, complianceFilter, activeTab]);
+
+  const loadUserData = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      setUserData(user);
+    } catch (err) {
+      console.error('Error loading user data:', err);
+    }
+  };
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const getAvatarClass = (index) => {
+    const classes = [
+      'sla-mgr-avatar-pink',
+      'sla-mgr-avatar-purple',
+      'sla-mgr-avatar-indigo',
+      'sla-mgr-avatar-blue',
+      'sla-mgr-avatar-teal',
+      'sla-mgr-avatar-green',
+    ];
+    return classes[index % classes.length];
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+    toast.success('Logged out successfully');
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -65,7 +107,6 @@ const ManagerSLADashboard = () => {
         return;
       }
 
-      // Fetch department heads
       if (userData.departmentId) {
         const deptHeadRes = await slaService.getDepartmentHeads(userData.departmentId);
         if (deptHeadRes?.success && Array.isArray(deptHeadRes.data)) {
@@ -73,13 +114,11 @@ const ManagerSLADashboard = () => {
         }
       }
 
-      // Fetch escalations
       const escalationsRes = await slaService.getManagerEscalations(userData.empId);
       if (escalationsRes?.success && Array.isArray(escalationsRes.data)) {
         setManagerEscalations(escalationsRes.data);
       }
 
-      // Fetch SLAs
       const response = await slaService.getAllSLAs();
       if (response?.success && Array.isArray(response.data)) {
         const filtered = response.data.filter(
@@ -204,137 +243,93 @@ const ManagerSLADashboard = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
+      <div className="sla-mgr-loading-container">
         <div className="spinner-border text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="manager-dashboard">
-      {/* Header */}
-      <div className="dashboard-header">
+    <div className="sla-mgr-dashboard">
+      <Breadcrumb
+        items={[
+          { label: 'Dashboard' },
+          { label: 'SLA Management' },
+          { label: 'Manager' },
+        ]}
+      />
+
+      {/* Header with User Profile */}
+      <div className="sla-mgr-header">
         <div>
-          <Breadcrumb items={[{ label: 'Dashboard' }, { label: 'SLA Management' }, { label: 'Manager' }]} />
-          <h1 className="dashboard-title">Manager SLA Dashboard</h1>
-          <p className="dashboard-subtitle">Track and manage all assigned SLAs with compliance metrics</p>
+          <h1 className="sla-mgr-title">Manager SLA Dashboard</h1>
+          <p className="sla-mgr-subtitle">Track and manage all assigned SLAs</p>
         </div>
-        <div className="header-actions">
-          <button className="btn-refresh" onClick={loadData}>
+        <div className="sla-mgr-header-actions">
+          <button className="sla-mgr-btn sla-mgr-btn-refresh" onClick={loadData}>
             <RefreshCw size={16} />
             Refresh
           </button>
-          <button className="btn-export" onClick={() => toast.info('Export feature coming soon')}>
+          <button
+            className="sla-mgr-btn sla-mgr-btn-export"
+            onClick={() => toast.info('Export feature coming soon')}
+          >
             <Download size={16} />
             Export
           </button>
         </div>
       </div>
 
-      {/* Compliance Summary Bar */}
-      <div className="compliance-card">
-        <div className="compliance-metrics">
-          <div className="compliance-metric">
-            <div className="metric-icon icon-red">
-              <TrendingUp size={20} />
-            </div>
-            <div className="compliance-metric-content">
-              <h4>0.0%</h4>
-              <small>Compliance</small>
-            </div>
-          </div>
-
-          <div className="compliance-metric">
-            <div className="metric-icon icon-green">
-              <CheckCircle size={20} />
-            </div>
-            <div className="compliance-metric-content">
-              <h4>0</h4>
-              <small>On-Time</small>
-            </div>
-          </div>
-
-          <div className="compliance-metric">
-            <div className="metric-icon icon-pink">
-              <AlertTriangle size={20} />
-            </div>
-            <div className="compliance-metric-content">
-              <h4>0</h4>
-              <small>Breached</small>
-            </div>
-          </div>
-
-          <div className="compliance-metric">
-            <div className="metric-icon icon-yellow">
-              <Clock size={20} />
-            </div>
-            <div className="compliance-metric-content">
-              <h4>0</h4>
-              <small>Extended</small>
-            </div>
-          </div>
-        </div>
-
-        <div className="compliance-rating">
-          <span className="rating-badge critical">Critical</span>
-          <p className="rating-info">Based on 0 Closed SLAs</p>
-          <div className="rating-circle">
-            <div className="rating-circle-inner">0%</div>
-          </div>
-        </div>
-      </div>
-
       {/* Stats Grid */}
-      <div className="stats-grid">
+      <div className="sla-mgr-stats-grid">
         {[
-          { label: 'Total SLAs', value: stats.total, icon: Users, className: 'icon-blue' },
-          { label: 'Open', value: stats.open, icon: Clock, className: 'icon-light-blue' },
-          { label: 'Escalated', value: stats.escalated, icon: AlertTriangle, className: 'icon-red' },
-          { label: 'Closed', value: stats.closed, icon: CheckCircle, className: 'icon-green' },
-          { label: 'Total Escalations', value: stats.totalEscalations, icon: TrendingUp, className: 'icon-yellow' },
-          { label: 'Pending', value: stats.pending, icon: Clock, className: 'icon-orange' },
-        ].map(({ label, value, icon: Icon, className }) => (
-          <div key={label} className="stat-card">
-            <div className={`stat-icon ${className}`}>
-              <Icon size={24} />
+          { label: 'Total SLAs', value: stats.total, icon: Users, bg: '#EEF2FF', color: '#3B82F6' },
+          { label: 'Open', value: stats.open, icon: Clock, bg: '#E0E7FF', color: '#4F46E5' },
+          { label: 'Escalated', value: stats.escalated, icon: AlertTriangle, bg: '#FEE2E2', color: '#DC2626' },
+          { label: 'Closed', value: stats.closed, icon: CheckCircle, bg: '#DCFCE7', color: '#16A34A' },
+          { label: 'Total Escalations', value: stats.totalEscalations, icon: TrendingUp, bg: '#FEF3C7', color: '#D97706' },
+          { label: 'Pending', value: stats.pending, icon: Clock, bg: '#FFF7ED', color: '#EA580C' },
+        ].map(({ label, value, icon: Icon, bg, color }) => (
+          <div key={label} className="sla-mgr-stat-card">
+            <div className="sla-mgr-stat-icon" style={{ backgroundColor: bg }}>
+              <Icon size={22} color={color} strokeWidth={2.5} />
             </div>
-            <h3>{value}</h3>
-            <p>{label}</p>
+            <h3 className="sla-mgr-stat-value">{value}</h3>
+            <p className="sla-mgr-stat-label">{label}</p>
           </div>
         ))}
       </div>
 
-      {/* Tabs Container */}
-      <div className="tabs-container">
-        <div className="tabs-header">
+      {/* Pill-Style Tabs */}
+      <div className="sla-mgr-tabs-wrapper">
+        <div className="sla-mgr-tabs-container">
           {[
-            { key: 'all', label: 'All', icon: Users, count: stats.total },
-            { key: 'open', label: 'Open', icon: Clock, count: stats.open },
-            { key: 'closed', label: 'Closed', icon: CheckCircle, count: stats.closed },
-            { key: 'escalations', label: 'Escalations', icon: TrendingUp, count: stats.totalEscalations },
-          ].map(({ key, label, icon: Icon, count }) => (
+            { key: 'all', label: 'All' },
+            { key: 'open', label: 'Open' },
+            { key: 'closed', label: 'Closed' },
+            { key: 'escalations', label: 'Escalations' },
+          ].map(({ key, label }) => (
             <button
               key={key}
-              className={`tab-button ${activeTab === key ? 'active' : ''}`}
+              className={`sla-mgr-tab-pill ${activeTab === key ? 'active' : ''}`}
               onClick={() => setActiveTab(key)}
             >
-              <Icon size={16} />
-              {label} <span className="tab-count">({count})</span>
+              {label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Filters Section */}
-      <div className="filters-container">
-        <div className="search-input-wrapper">
-          <Search size={16} className="search-icon" />
+      {/* Filters */}
+      <div className="sla-mgr-filters">
+        <div className="sla-mgr-search-wrapper">
+          <Search size={16} className="sla-mgr-search-icon" />
           <input
             type="text"
-            className="form-control"
+            className="sla-mgr-search-input"
             placeholder={
               activeTab === 'escalations'
-                ? 'Search by employee, department, type, or SLA ID...'
+                ? 'Search by reason or employee...'
                 : 'Search by employee, department, type, or SLA ID...'
             }
             value={searchTerm}
@@ -342,7 +337,11 @@ const ManagerSLADashboard = () => {
           />
         </div>
 
-        <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+        <select
+          className="sla-mgr-select"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
           <option>All Status</option>
           {activeTab === 'escalations' ? (
             <>
@@ -358,7 +357,11 @@ const ManagerSLADashboard = () => {
         </select>
 
         {activeTab !== 'escalations' && (
-          <select className="filter-select" value={complianceFilter} onChange={(e) => setComplianceFilter(e.target.value)}>
+          <select
+            className="sla-mgr-select"
+            value={complianceFilter}
+            onChange={(e) => setComplianceFilter(e.target.value)}
+          >
             <option>All Compliance</option>
             <option>OnTime</option>
             <option>Breached</option>
@@ -366,34 +369,41 @@ const ManagerSLADashboard = () => {
           </select>
         )}
 
-        <button className="btn-filter-icon">
+        <button
+          className="sla-mgr-btn-filter"
+          onClick={() => {
+            setSearchTerm('');
+            setStatusFilter('All Status');
+            setComplianceFilter('All Compliance');
+          }}
+        >
           <Filter size={16} />
         </button>
       </div>
 
       {/* Table */}
-      <div className="table-card">
+      <div className="sla-mgr-table-wrapper">
         <div className="table-responsive">
-          <table className="sla-table">
+          <table className="sla-mgr-table">
             <thead>
               <tr>
                 {activeTab === 'escalations' ? (
                   <>
-                    <th>EMPLOYEE</th>
-                    <th>REASON</th>
-                    <th>LEVEL</th>
-                    <th>STATUS</th>
-                    <th>SUBMITTED</th>
-                    <th>ACTIONS</th>
+                    <th>Employee</th>
+                    <th>Reason</th>
+                    <th>Level</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                    <th>Actions</th>
                   </>
                 ) : (
                   <>
-                    <th>EMPLOYEE</th>
-                    <th>SLA'S DEPARTMENT</th>
-                    <th>DEADLINE</th>
-                    <th>STATUS</th>
-                    <th>COMPLIANCE</th>
-                    <th>ACTIONS</th>
+                    <th>Employee</th>
+                    <th>Department</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Compliance</th>
+                    <th>Actions</th>
                   </>
                 )}
               </tr>
@@ -401,28 +411,62 @@ const ManagerSLADashboard = () => {
             <tbody>
               {paginatedData.length === 0 ? (
                 <tr>
-                  <td colSpan="6">
-                    <div className="empty-state">
-                      <FileText size={56} className="empty-icon" />
-                      <h6>No SLAs found</h6>
-                    </div>
+                  <td colSpan="6" className="sla-mgr-empty">
+                    <FileText size={48} className="sla-mgr-empty-icon" />
+                    <p className="sla-mgr-empty-text">
+                      No {activeTab === 'escalations' ? 'escalations' : 'SLAs'} found
+                    </p>
                   </td>
                 </tr>
               ) : activeTab === 'escalations' ? (
-                paginatedData.map((esc) => (
+                paginatedData.map((esc, index) => (
                   <tr key={esc.escalationId}>
-                    <td><strong>{esc.employeeName || '—'}</strong></td>
+                    <td>
+                      <div className="sla-mgr-employee-cell">
+                        <div className={`sla-mgr-table-avatar ${getAvatarClass(index)}`}>
+                          {getInitials(esc.employeeName)}
+                        </div>
+                        <div className="sla-mgr-employee-info">
+                          <div className="sla-mgr-employee-name">
+                            {esc.employeeName || '—'}
+                          </div>
+                          <div className="sla-mgr-employee-email">
+                            {esc.employeeEmail || 'No email'}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
                     <td>{esc.reason || '—'}</td>
-                    <td><span className="badge">{esc.escalationLevel}</span></td>
-                    <td><span className={`badge ${esc.escalationStatus === 'Resolved' ? 'status-closed' : 'status-open'}`}>{esc.escalationStatus}</span></td>
+                    <td>
+                      <span className="sla-mgr-badge sla-mgr-badge-info">
+                        {esc.escalationLevel}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`sla-mgr-badge ${
+                          esc.escalationStatus === 'Resolved'
+                            ? 'sla-mgr-badge-success'
+                            : 'sla-mgr-badge-primary'
+                        }`}
+                      >
+                        {esc.escalationStatus}
+                      </span>
+                    </td>
                     <td>{formatDate(esc.submittedAt)}</td>
                     <td>
-                      <div className="action-buttons">
-                        <button className="action-btn btn-view" onClick={() => navigate(`/sla/manager/details/${esc.slaid}`)}>
+                      <div className="sla-mgr-actions">
+                        <button
+                          className="sla-mgr-action-btn sla-mgr-action-view"
+                          onClick={() => navigate(`/sla/manager/details/${esc.slaid}`)}
+                        >
                           <Eye size={14} />
                         </button>
                         {esc.escalationStatus === 'Pending' && (
-                          <button className="action-btn btn-approve" onClick={() => handleResolveClick(esc)}>
+                          <button
+                            className="sla-mgr-action-btn sla-mgr-action-approve"
+                            onClick={() => handleResolveClick(esc)}
+                          >
                             <CheckCircle size={14} />
                           </button>
                         )}
@@ -431,20 +475,50 @@ const ManagerSLADashboard = () => {
                   </tr>
                 ))
               ) : (
-                paginatedData.map((sla) => (
+                paginatedData.map((sla, index) => (
                   <tr key={sla.slaid}>
-                    <td><strong>{sla.employeeName || '—'}</strong></td>
+                    <td>
+                      <div className="sla-mgr-employee-cell">
+                        <div className={`sla-mgr-table-avatar ${getAvatarClass(index)}`}>
+                          {getInitials(sla.employeeName)}
+                        </div>
+                        <div className="sla-mgr-employee-info">
+                          <div className="sla-mgr-employee-name">
+                            {sla.employeeName || '—'}
+                          </div>
+                          <div className="sla-mgr-employee-email">
+                            {sla.employeeEmail || 'No email'}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
                     <td>{sla.departmentName || '—'}</td>
                     <td>{formatDate(sla.deadline)}</td>
-                    <td><span className={`badge status-${sla.status?.toLowerCase()}`}>{sla.status}</span></td>
-                    <td><span className={`badge compliance-${sla.complianceStatus?.toLowerCase()}`}>{sla.complianceStatus}</span></td>
                     <td>
-                      <div className="action-buttons">
-                        <button className="action-btn btn-view" onClick={() => navigate(`/sla/manager/details/${sla.slaid}`)}>
+                      <span className={`sla-mgr-badge sla-mgr-badge-${sla.status?.toLowerCase()}`}>
+                        {sla.status}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`sla-mgr-badge sla-mgr-badge-compliance-${sla.complianceStatus?.toLowerCase()}`}
+                      >
+                        {sla.complianceStatus}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="sla-mgr-actions">
+                        <button
+                          className="sla-mgr-action-btn sla-mgr-action-view"
+                          onClick={() => navigate(`/sla/manager/details/${sla.slaid}`)}
+                        >
                           <Eye size={14} />
                         </button>
                         {sla.status !== 'Closed' && (
-                          <button className="action-btn btn-escalate" onClick={() => handleEscalateClick(sla)}>
+                          <button
+                            className="sla-mgr-action-btn sla-mgr-action-escalate"
+                            onClick={() => handleEscalateClick(sla)}
+                          >
                             <Send size={14} />
                           </button>
                         )}
@@ -459,27 +533,39 @@ const ManagerSLADashboard = () => {
 
         {/* Pagination */}
         {filteredSlas.length > 0 && totalPages > 1 && (
-          <div className="pagination-container">
-            <div className="pagination-info">
-              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredSlas.length)} of {filteredSlas.length} entries
+          <div className="sla-mgr-pagination">
+            <div className="sla-mgr-pagination-info">
+              Showing {startIndex + 1} to{' '}
+              {Math.min(startIndex + itemsPerPage, filteredSlas.length)} of{' '}
+              {filteredSlas.length} entries
             </div>
-            <nav className="pagination-nav">
-              <button className="pagination-btn" onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
+            <div className="sla-mgr-pagination-nav">
+              <button
+                className="sla-mgr-pagination-btn"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+              >
                 <ChevronLeft size={16} />
               </button>
               {[...Array(totalPages)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className={`pagination-btn ${currentPage === i + 1 ? 'active' : ''}`}
+                  className={`sla-mgr-pagination-btn ${
+                    currentPage === i + 1 ? 'active' : ''
+                  }`}
                   onClick={() => setCurrentPage(i + 1)}
                 >
                   {i + 1}
                 </button>
               ))}
-              <button className="pagination-btn" onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
+              <button
+                className="sla-mgr-pagination-btn"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+              >
                 <ChevronRight size={16} />
               </button>
-            </nav>
+            </div>
           </div>
         )}
       </div>
