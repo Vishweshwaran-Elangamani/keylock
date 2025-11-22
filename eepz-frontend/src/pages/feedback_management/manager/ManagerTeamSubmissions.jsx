@@ -376,29 +376,7 @@ export default function ManageTeamSubmissions() {
               {departmentEmployees.length} employees)
             </p>
           </div>
-          <button
-            className="btn btn-outline-secondary d-flex align-items-center gap-2"
-            onClick={() => {
-              fetchEmployeeData();
-              fetchObjectives();
-              fetchData();
-            }}
-            disabled={refreshing || loading}
-            style={{
-              borderRadius: "8px",
-              padding: "10px 20px",
-              fontWeight: 600,
-              border: "2px solid #dee2e6",
-            }}
-          >
-            <RefreshCw
-              size={18}
-              style={{
-                animation: refreshing ? "spin 1s linear infinite" : "none",
-              }}
-            />
-            Refresh
-          </button>
+          
         </div>
 
         {/* ERROR ALERT */}
@@ -421,267 +399,185 @@ export default function ManageTeamSubmissions() {
           </div>
         )}
 
-        {/* TABS - CLEAN CARD STYLE */}
-        <div
-          style={{
-            background: "white",
-            border: "1px solid #e5e7eb",
-            borderRadius: "12px",
-            padding: "1.5rem",
-            marginBottom: "1.5rem",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          }}
-        >
-          <div className="row g-3">
-            {/* HR Forms Card */}
-            <div className="col-md-6 col-lg-3">
-              <button
-                type="button"
-                onClick={() => setTab("HRForms")}
-                style={{
-                  width: "100%",
-                  background: tab === "HRForms" ? "#97247E" : "white",
-                  border: `2px solid ${
-                    tab === "HRForms" ? "#97247E" : "#e5e7eb"
-                  }`,
-                  borderRadius: "10px",
-                  padding: "1.25rem",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  textAlign: "left",
-                }}
-              >
-                <div className="d-flex align-items-center gap-3">
-                  <div
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "10px",
-                      background:
-                        tab === "HRForms"
-                          ? "rgba(255,255,255,0.2)"
-                          : "#97247E15",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <FileText
-                      size={24}
-                      style={{ color: tab === "HRForms" ? "white" : "#97247E" }}
-                    />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        color: tab === "HRForms" ? "white" : "#6c757d",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      HR Forms
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: tab === "HRForms" ? "white" : "#212529",
-                      }}
-                    >
-                      {hrForms.length}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
+        {/* ENHANCED PILL-STYLE TOGGLE TABS WITH INCREASED SIZE */}
+        <div className="d-flex justify-content-center mb-4">
+          <div
+            className="toggle-container"
+            style={{
+              backgroundColor: "#27235c",
+              borderRadius: "60px",
+              padding: "8px",
+              display: "inline-flex",
+              gap: "4px",
+              boxShadow: "0 6px 16px rgba(39, 35, 92, 0.25)",
+              minHeight: "60px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setTab("HRForms")}
+              style={{
+                background: tab === "HRForms" ? "#ffffff" : "transparent",
+                color: tab === "HRForms" ? "#27235c" : "#ffffff",
+                border: "none",
+                borderRadius: "60px",
+                padding: "14px 36px",
+                fontSize: "0.938rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                whiteSpace: "nowrap",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              HR Forms
+              {hrForms.length > 0 && (
+                <span
+                  style={{
+                    marginLeft: "10px",
+                    backgroundColor:
+                      tab === "HRForms" ? "#27235c" : "rgba(255,255,255,0.3)",
+                    color: "#ffffff",
+                    padding: "3px 10px",
+                    borderRadius: "14px",
+                    fontSize: "0.813rem",
+                    fontWeight: 700,
+                    minWidth: "28px",
+                    textAlign: "center",
+                  }}
+                >
+                  {hrForms.length}
+                </span>
+              )}
+            </button>
 
-            {/* Goal Feedback Card */}
-            <div className="col-md-6 col-lg-3">
-              <button
-                type="button"
-                onClick={() => setTab("GoalFeedback")}
-                style={{
-                  width: "100%",
-                  background: tab === "GoalFeedback" ? "#97247E" : "white",
-                  border: `2px solid ${
-                    tab === "GoalFeedback" ? "#97247E" : "#e5e7eb"
-                  }`,
-                  borderRadius: "10px",
-                  padding: "1.25rem",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  textAlign: "left",
-                }}
-              >
-                <div className="d-flex align-items-center gap-3">
-                  <div
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "10px",
-                      background:
-                        tab === "GoalFeedback"
-                          ? "rgba(255,255,255,0.2)"
-                          : "#97247E15",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Target
-                      size={24}
-                      style={{
-                        color: tab === "GoalFeedback" ? "white" : "#97247E",
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        color: tab === "GoalFeedback" ? "white" : "#6c757d",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Goal Feedback
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: tab === "GoalFeedback" ? "white" : "#212529",
-                      }}
-                    >
-                      {goalFeedback.length}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setTab("GoalFeedback")}
+              style={{
+                background: tab === "GoalFeedback" ? "#ffffff" : "transparent",
+                color: tab === "GoalFeedback" ? "#27235c" : "#ffffff",
+                border: "none",
+                borderRadius: "60px",
+                padding: "14px 36px",
+                fontSize: "0.938rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                whiteSpace: "nowrap",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Goal Feedback
+              {goalFeedback.length > 0 && (
+                <span
+                  style={{
+                    marginLeft: "10px",
+                    backgroundColor:
+                      tab === "GoalFeedback"
+                        ? "#27235c"
+                        : "rgba(255,255,255,0.3)",
+                    color: "#ffffff",
+                    padding: "3px 10px",
+                    borderRadius: "14px",
+                    fontSize: "0.813rem",
+                    fontWeight: 700,
+                    minWidth: "28px",
+                    textAlign: "center",
+                  }}
+                >
+                  {goalFeedback.length}
+                </span>
+              )}
+            </button>
 
-            {/* Mentor Card */}
-            <div className="col-md-6 col-lg-3">
-              <button
-                type="button"
-                onClick={() => setTab("Mentor")}
-                style={{
-                  width: "100%",
-                  background: tab === "Mentor" ? "#97247E" : "white",
-                  border: `2px solid ${
-                    tab === "Mentor" ? "#97247E" : "#e5e7eb"
-                  }`,
-                  borderRadius: "10px",
-                  padding: "1.25rem",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  textAlign: "left",
-                }}
-              >
-                <div className="d-flex align-items-center gap-3">
-                  <div
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "10px",
-                      background:
-                        tab === "Mentor"
-                          ? "rgba(255,255,255,0.2)"
-                          : "#97247E15",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Send
-                      size={24}
-                      style={{ color: tab === "Mentor" ? "white" : "#97247E" }}
-                    />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        color: tab === "Mentor" ? "white" : "#6c757d",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Mentor
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: tab === "Mentor" ? "white" : "#212529",
-                      }}
-                    >
-                      {mentor.length}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setTab("Mentor")}
+              style={{
+                background: tab === "Mentor" ? "#ffffff" : "transparent",
+                color: tab === "Mentor" ? "#27235c" : "#ffffff",
+                border: "none",
+                borderRadius: "60px",
+                padding: "14px 36px",
+                fontSize: "0.938rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                whiteSpace: "nowrap",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Mentor
+              {mentor.length > 0 && (
+                <span
+                  style={{
+                    marginLeft: "10px",
+                    backgroundColor:
+                      tab === "Mentor" ? "#27235c" : "rgba(255,255,255,0.3)",
+                    color: "#ffffff",
+                    padding: "3px 10px",
+                    borderRadius: "14px",
+                    fontSize: "0.813rem",
+                    fontWeight: 700,
+                    minWidth: "28px",
+                    textAlign: "center",
+                  }}
+                >
+                  {mentor.length}
+                </span>
+              )}
+            </button>
 
-            {/* Peer Card */}
-            <div className="col-md-6 col-lg-3">
-              <button
-                type="button"
-                onClick={() => setTab("Peer")}
-                style={{
-                  width: "100%",
-                  background: tab === "Peer" ? "#97247E" : "white",
-                  border: `2px solid ${tab === "Peer" ? "#97247E" : "#e5e7eb"}`,
-                  borderRadius: "10px",
-                  padding: "1.25rem",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  textAlign: "left",
-                }}
-              >
-                <div className="d-flex align-items-center gap-3">
-                  <div
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "10px",
-                      background:
-                        tab === "Peer" ? "rgba(255,255,255,0.2)" : "#97247E15",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Users
-                      size={24}
-                      style={{ color: tab === "Peer" ? "white" : "#97247E" }}
-                    />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        color: tab === "Peer" ? "white" : "#6c757d",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      Peer
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: 700,
-                        color: tab === "Peer" ? "white" : "#212529",
-                      }}
-                    >
-                      {peer.length}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setTab("Peer")}
+              style={{
+                background: tab === "Peer" ? "#ffffff" : "transparent",
+                color: tab === "Peer" ? "#27235c" : "#ffffff",
+                border: "none",
+                borderRadius: "60px",
+                padding: "14px 36px",
+                fontSize: "0.938rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                whiteSpace: "nowrap",
+                minHeight: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Peer
+              {peer.length > 0 && (
+                <span
+                  style={{
+                    marginLeft: "10px",
+                    backgroundColor:
+                      tab === "Peer" ? "#27235c" : "rgba(255,255,255,0.3)",
+                    color: "#ffffff",
+                    padding: "3px 10px",
+                    borderRadius: "14px",
+                    fontSize: "0.813rem",
+                    fontWeight: 700,
+                    minWidth: "28px",
+                    textAlign: "center",
+                  }}
+                >
+                  {peer.length}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 
@@ -1184,7 +1080,17 @@ export default function ManageTeamSubmissions() {
         type={selectedType}
       />
 
-      <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
+      <style>{`
+        @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+        
+        .toggle-container button:hover {
+          opacity: 0.92;
+        }
+        
+        .toggle-container button:active {
+          transform: scale(0.98);
+        }
+      `}</style>
     </div>
   );
 }

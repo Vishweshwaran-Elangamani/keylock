@@ -340,6 +340,66 @@ export default function EmployeeFillForm() {
     5: "Excellent",
   };
 
+  // Helper function to safely parse dates from API
+  const parseDate = useCallback((dateValue) => {
+    if (!dateValue) return null;
+
+    try {
+      // Handle different date formats from API
+      let parsedDate;
+
+      if (typeof dateValue === "string") {
+        // Try parsing as ISO string
+        parsedDate = new Date(dateValue);
+      } else if (typeof dateValue === "number") {
+        // Handle timestamp (milliseconds or seconds)
+        parsedDate = dateValue > 10000000000 
+          ? new Date(dateValue) 
+          : new Date(dateValue * 1000);
+      } else {
+        parsedDate = new Date(dateValue);
+      }
+
+      // Check if date is valid
+      if (isNaN(parsedDate.getTime())) {
+        console.error("Invalid date parsed:", dateValue);
+        return null;
+      }
+
+      return parsedDate;
+    } catch (error) {
+      console.error("Error parsing date:", error, dateValue);
+      return null;
+    }
+  }, []);
+
+  // Helper function to calculate days remaining
+  const calculateDaysLeft = useCallback((deadlineDate) => {
+    if (!deadlineDate) return null;
+    
+    const deadline = parseDate(deadlineDate);
+    if (!deadline) return null;
+
+    const now = new Date();
+    const diffTime = deadline - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
+  }, [parseDate]);
+
+  // Helper function to format date for display
+  const formatDate = useCallback((dateValue) => {
+    const date = parseDate(dateValue);
+    if (!date) return "No deadline set";
+
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }, [parseDate]);
+
   // Fetch form details using service
   useEffect(() => {
     const fetchForm = async () => {
@@ -354,6 +414,7 @@ export default function EmployeeFillForm() {
           const enrichedForm = { ...formData, ...templateData };
           setForm(enrichedForm);
           console.log("Form loaded:", enrichedForm);
+          console.log("Deadline from API:", formData.deadline);
         } else {
           throw new Error("Invalid form data");
         }
@@ -427,13 +488,17 @@ export default function EmployeeFillForm() {
         console.log(`Step 2: Submitting response ID ${responseId}`);
 
         // STEP 2: Submit the response
-        const submitResponse = await hrFormApi.submitResponse(responseId, null);
+        const submitResponse = await hrFormApi.submitResponse(responseId);
 
         console.log("Step 2 Complete - Response submitted:", submitResponse);
 
         if (submitResponse?.success || submitResponse?.data?.success) {
           setSuccess("Form submitted successfully!");
-      
+          
+          // Redirect after 2 seconds
+          setTimeout(() => {
+            navigate("/feedback/assigned-forms");
+          }, 2000);
         } else {
           setError(
             "Response saved as draft but failed to submit. Please contact support."
@@ -462,13 +527,12 @@ export default function EmployeeFillForm() {
     }
   };
 
-  // Calculate progress
+  // Calculate progress and days left using helper functions
   const progress = form
     ? (Object.keys(responses).length / form.questions.length) * 100
     : 0;
-  const daysLeft = form
-    ? Math.ceil((new Date(form.deadline) - new Date()) / (1000 * 60 * 60 * 24))
-    : 0;
+  const daysLeft = form ? calculateDaysLeft(form.deadline) : null;
+  const formattedDeadline = form ? formatDate(form.deadline) : "";
 
   // Loading state
   if (loading) {
@@ -577,42 +641,48 @@ export default function EmployeeFillForm() {
       )}
 
       {/* DEADLINE INFO */}
-      <div
-        className={`alert mb-4 d-flex align-items-center gap-2`}
-        style={{
-          backgroundColor:
-            daysLeft > 3 ? "#e3f2fd" : daysLeft > 0 ? "#fff3cd" : "#f8d7da",
-          border:
-            daysLeft > 3
-              ? "1px solid #90caf9"
-              : daysLeft > 0
-              ? "1px solid #ffc107"
-              : "1px solid #f5c6cb",
-          borderRadius: "8px",
-        }}
-      >
-        <Clock
-          size={18}
+      {form.deadline && (
+        <div
+          className={`alert mb-4 d-flex align-items-center gap-2`}
           style={{
-            color:
-              daysLeft > 3 ? "#0F62FE" : daysLeft > 0 ? "#ff9800" : "#dc3545",
+            backgroundColor:
+              daysLeft === null ? "#f8f9fa" :
+              daysLeft > 3 ? "#e3f2fd" : 
+              daysLeft > 0 ? "#fff3cd" : "#f8d7da",
+            border:
+              daysLeft === null ? "1px solid #dee2e6" :
+              daysLeft > 3
+                ? "1px solid #90caf9"
+                : daysLeft > 0
+                ? "1px solid #ffc107"
+                : "1px solid #f5c6cb",
+            borderRadius: "8px",
           }}
-        />
-        <div style={{ flex: 1 }}>
-          <strong>Deadline: </strong>
-          {new Date(form.deadline).toLocaleDateString("en-US", {
-            weekday: "short",
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
-          <span className="ms-2 small">
-            {daysLeft > 0
-              ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} remaining`
-              : " OVERDUE"}
-          </span>
+        >
+          <Clock
+            size={18}
+            style={{
+              color:
+                daysLeft === null ? "#6c757d" :
+                daysLeft > 3 ? "#0F62FE" : 
+                daysLeft > 0 ? "#ff9800" : "#dc3545",
+            }}
+          />
+          <div style={{ flex: 1 }}>
+            <strong>Deadline: </strong>
+            {formattedDeadline}
+            {daysLeft !== null && (
+              <span className="ms-2 small">
+                {daysLeft > 0
+                  ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} remaining`
+                  : daysLeft === 0
+                  ? "Due today"
+                  : "OVERDUE"}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* PROGRESS BAR */}
       <div

@@ -400,72 +400,94 @@ export default function FeedbackEmployeeDashboard() {
         ))}
       </div>
 
-      {/* Tabs */}
+      {/* Centered Rounded Toggle Navigation */}
       <div
-        style={{
-          backgroundColor: "#27235c",
-          borderRadius: "10px 10px 0 0",
-          padding: "0 1rem",
-          marginBottom: 0,
-        }}
+        className="d-flex justify-content-center align-items-center mb-3"
+        style={{ width: "100%" }}
       >
-        <ul className="nav nav-tabs border-0 m-0" role="tablist">
-          {[
-            { key: "overview", label: "Quick Actions", icon: Zap },
-            {
-              key: "peer-feedback",
-              label: "Peer Feedback",
-              icon: Users,
-              count: myPeerFeedback.length,
-            },
-          ].map(({ key, label, icon: Icon, count }) => (
-            <li key={key} className="nav-item">
-              <button
-                className={`nav-link border-0 d-flex align-items-center gap-2 ${
-                  activeTab === key ? "active" : ""
-                }`}
-                onClick={() => setActiveTab(key)}
+        <div
+          className="toggle-tabs d-inline-flex"
+          style={{
+            backgroundColor: "#27235c",
+            borderRadius: "50px",
+            padding: "6px",
+            boxShadow: "0 4px 12px rgba(39, 35, 92, 0.2)",
+          }}
+        >
+          <button
+            className={`toggle-tab ${activeTab === "overview" ? "active" : ""}`}
+            onClick={() => setActiveTab("overview")}
+            style={{
+              border: "none",
+              backgroundColor:
+                activeTab === "overview" ? "#ffffff" : "transparent",
+              color: activeTab === "overview" ? "#27235c" : "#ffffff",
+              padding: "12px 32px",
+              borderRadius: "50px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <Zap size={16} />
+            Quick Actions
+          </button>
+          <button
+            className={`toggle-tab ${
+              activeTab === "peer-feedback" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("peer-feedback")}
+            style={{
+              border: "none",
+              backgroundColor:
+                activeTab === "peer-feedback" ? "#ffffff" : "transparent",
+              color: activeTab === "peer-feedback" ? "#27235c" : "#ffffff",
+              padding: "12px 32px",
+              borderRadius: "50px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+              position: "relative",
+            }}
+          >
+            <Users size={16} />
+            Peer Feedback
+            {myPeerFeedback.length > 0 && (
+              <span
                 style={{
-                  color: activeTab === key ? "#fff" : "rgba(255,255,255,0.7)",
                   backgroundColor:
-                    activeTab === key ? "rgba(255,255,255,0.1)" : "transparent",
-                  borderBottom:
-                    activeTab === key
-                      ? "3px solid #fff"
-                      : "3px solid transparent",
-                  padding: "1rem 1.25rem",
-                  fontWeight: 600,
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab !== key) {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(255,255,255,0.05)";
-                    e.currentTarget.style.color = "#fff";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab !== key) {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.7)";
-                  }
+                    activeTab === "peer-feedback" ? "#dc2626" : "#ef4444",
+                  color: "#ffffff",
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  minWidth: "20px",
+                  textAlign: "center",
                 }}
               >
-                <Icon size={16} />
-                {label} {count !== undefined && <span>({count})</span>}
-              </button>
-            </li>
-          ))}
-        </ul>
+                {myPeerFeedback.length}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Content Area */}
       <div
         style={{
           backgroundColor: "#fff",
-          borderRadius: "0 0 10px 10px",
+          borderRadius: "10px",
           boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
           padding: "1.5rem",
         }}
@@ -953,6 +975,14 @@ export default function FeedbackEmployeeDashboard() {
       <style>{`
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .toggle-tabs button:hover {
+          opacity: 0.95;
+        }
+        
+        .toggle-tabs button:active {
+          transform: scale(0.97);
+        }
       `}</style>
     </div>
   );

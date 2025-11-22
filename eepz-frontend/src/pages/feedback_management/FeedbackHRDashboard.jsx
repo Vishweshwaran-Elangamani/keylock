@@ -14,6 +14,9 @@ import {
   CheckCircle,
   Clock,
   Star,
+  Briefcase,
+  XCircle,
+  ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -24,48 +27,167 @@ import {
 } from "../../services/feedbackmanagement/feedbackApi";
 import FeedbackBreadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
 
-const StatCard = ({ label, value, Icon, color }) => (
+const StatCard = ({ label, value, Icon, color, bgColor }) => (
   <div
     style={{
       background: "white",
-      border: "1px solid #97247E",
-      borderRadius: "10px",
-      padding: "1.25rem",
-      boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-      textAlign: "center",
+      border: "none",
+      borderRadius: "12px",
+      padding: "1.5rem",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
       transition: "all 0.3s ease",
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "translateY(-2px)";
-      e.currentTarget.style.boxShadow = "0 8px 16px rgba(151, 36, 126, 0.15)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+      height: "100%",
     }}
   >
-    <div className="d-flex justify-content-center mb-2">
+    <div className="d-flex align-items-start justify-content-between">
       <div
         style={{
-          width: "48px",
-          height: "48px",
-          borderRadius: "10px",
-          background: `${color}15`,
+          width: "56px",
+          height: "56px",
+          borderRadius: "12px",
+          background: bgColor,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          flexShrink: 0,
         }}
       >
-        <Icon size={24} style={{ color }} />
+        <Icon size={28} style={{ color }} />
+      </div>
+      <div className="text-end">
+        <h2
+          className="fw-bold mb-0"
+          style={{
+            color: "#1F2937",
+            fontSize: "2rem",
+            lineHeight: 1,
+          }}
+        >
+          {value}
+        </h2>
+        <p
+          className="mb-0 mt-2"
+          style={{
+            fontSize: "0.813rem",
+            color: "#6B7280",
+            fontWeight: 500,
+            textTransform: "uppercase",
+            letterSpacing: "0.5px",
+          }}
+        >
+          {label}
+        </p>
       </div>
     </div>
-    <h3 className="fw-bold mb-1" style={{ color, fontSize: "1.75rem" }}>
-      {value}
-    </h3>
-    <p className="mb-0" style={{ fontSize: "0.813rem", color: "#6c757d" }}>
-      {label}
-    </p>
   </div>
+);
+
+const HeroActionCard = ({ title, description, icon: Icon, to, iconBg, iconColor }) => (
+  <Link
+    to={to}
+    style={{
+      textDecoration: "none",
+      display: "block",
+      height: "100%",
+    }}
+  >
+    <div
+      style={{
+        background: "white",
+        border: "1.5px solid #E5E7EB",
+        borderRadius: "12px",
+        padding: "1.5rem",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+        transition: "all 0.3s ease",
+        height: "100%",
+        cursor: "pointer",
+        position: "relative",
+        overflow: "hidden",
+        minHeight: "180px",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.12)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
+      }}
+    >
+      {/* Background Pattern */}
+      <div
+        style={{
+          position: "absolute",
+          top: "-30%",
+          right: "-15%",
+          width: "140px",
+          height: "140px",
+          background: "rgba(0,0,0,0.02)",
+          borderRadius: "50%",
+          zIndex: 0,
+        }}
+      />
+
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {/* Icon */}
+        <div
+          style={{
+            width: "48px",
+            height: "48px",
+            borderRadius: "12px",
+            background: iconBg,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "1rem",
+          }}
+        >
+          <Icon size={24} style={{ color: iconColor }} />
+        </div>
+
+        {/* Content */}
+        <h5
+          className="fw-bold mb-2"
+          style={{
+            color: "#1F2937",
+            fontSize: "1rem",
+          }}
+        >
+          {title}
+        </h5>
+        <p
+          className="mb-2"
+          style={{
+            color: "#6B7280",
+            fontSize: "0.813rem",
+            lineHeight: "1.5",
+          }}
+        >
+          {description}
+        </p>
+
+        {/* Arrow */}
+        <div className="d-flex align-items-center gap-2 mt-3">
+          <span
+            style={{
+              color: "#97247E",
+              fontSize: "0.813rem",
+              fontWeight: 600,
+            }}
+          >
+            Get Started
+          </span>
+          <ArrowRight
+            size={14}
+            style={{
+              color: "#97247E",
+              transition: "transform 0.3s",
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  </Link>
 );
 
 export default function FeedbackHRDashboard() {
@@ -82,7 +204,6 @@ export default function FeedbackHRDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
 
   // HR-specific data
   const [feedback, setFeedback] = useState([]);
@@ -231,30 +352,38 @@ export default function FeedbackHRDashboard() {
       (f) => !submittedFormIds.has(f.formId)
     ).length;
 
+    const closedFeedback = feedback.filter(
+      (f) => f.status === "Closed" || f.status === "Rejected"
+    ).length;
+
     return [
       {
         label: "Total Feedback",
         value: feedback.length,
-        Icon: FileText,
-        color: "#97247E",
+        Icon: Briefcase,
+        color: "#3B82F6",
+        bgColor: "#DBEAFE",
       },
       {
         label: "Active Forms",
         value: activeHrForms.length,
         Icon: CheckCircle,
-        color: "#24A148",
+        color: "#10B981",
+        bgColor: "#D1FAE5",
       },
       {
         label: "Pending Forms",
         value: pendingForms,
         Icon: Clock,
-        color: "#E2B93B",
+        color: "#F59E0B",
+        bgColor: "#FEF3C7",
       },
       {
         label: "Reviews Received",
         value: myReviews.length,
         Icon: Star,
-        color: "#0F62FE",
+        color: "#8B5CF6",
+        bgColor: "#EDE9FE",
       },
     ];
   }, [feedback, activeHrForms, submittedForms, myReviews]);
@@ -285,29 +414,20 @@ export default function FeedbackHRDashboard() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f8f9fa",
-        padding: "2rem 1rem",
+        background: "#F9FAFB",
+        padding: "1.5rem",
       }}
-      
     >
-
- <FeedbackBreadcrumb
-        items={[
-          { label: "Feedback Management" }
-        ]}
-      />
-
-      
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        {/* Header */}
-        
+        {/* Breadcrumb */}
+        <FeedbackBreadcrumb items={[{ label: "Feedback Management" }]} />
 
         {/* Error Alert */}
         {error && (
           <div
             className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-4"
             role="alert"
-            style={{ borderRadius: "8px" }}
+            style={{ borderRadius: "12px", border: "none" }}
           >
             <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
             <div className="flex-grow-1">
@@ -322,7 +442,7 @@ export default function FeedbackHRDashboard() {
           </div>
         )}
 
-        {/* Stats */}
+        {/* Stats Cards */}
         <div className="row g-3 mb-4">
           {stats.map((s, idx) => (
             <div key={idx} className="col-6 col-md-3">
@@ -331,380 +451,183 @@ export default function FeedbackHRDashboard() {
           ))}
         </div>
 
-        {/* Tabs */}
-        
+        {/* Hero Section Title */}
+        <div className="text-center mb-4">
+          <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
+            <Zap size={28} style={{ color: "#97247E" }} />
+            <h3 className="mb-0 fw-bold" style={{ color: "#1F2937", fontSize: "1.5rem" }}>
+              Quick Actions
+            </h3>
+          </div>
+          <p
+            style={{
+              color: "#6B7280",
+              fontSize: "0.938rem",
+              maxWidth: "600px",
+              margin: "0 auto",
+            }}
+          >
+            Manage feedback, create forms, and streamline your HR operations
+          </p>
+        </div>
 
-        {/* Overview Tab */}
-        {activeTab === "overview" && (
+        {/* Hero Action Cards - 3 Cards in One Row */}
+        <div className="row g-3 mb-4">
+          {/* All Feedback Card */}
+          <div className="col-12 col-md-4">
+            <HeroActionCard
+              title="View All Feedback"
+              description="Browse, search, and manage all feedback submissions from employees."
+              icon={Search}
+              to="/hr/dashboard/feedback/hrformlist"
+              iconBg="#EDE9FE"
+              iconColor="#8B5CF6"
+            />
+          </div>
+
+          {/* Create Form Card */}
+          <div className="col-12 col-md-4">
+            <HeroActionCard
+              title="Create New Form"
+              description="Design and publish custom feedback forms for performance reviews."
+              icon={Plus}
+              to="/hr/dashboard/feedback/create-form"
+              iconBg="#FECDD3"
+              iconColor="#E11D48"
+            />
+          </div>
+
+          {/* Mentor Feedback Card */}
+          <div className="col-12 col-md-4">
+            <HeroActionCard
+              title="Submit Mentor Feedback"
+              description="Provide valuable feedback and guidance to mentees and team members."
+              icon={Send}
+              to="/hr/dashboard/feedback/submit-mentor"
+              iconBg="#DBEAFE"
+              iconColor="#3B82F6"
+            />
+          </div>
+        </div>
+
+        {/* Peer Feedback Section */}
+        {myPeerFeedback.length > 0 && (
           <div
             style={{
               background: "white",
-              border: "1px solid #e5e7eb",
-              borderRadius: "0 0 12px 12px",
+              borderRadius: "12px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
               padding: "1.5rem",
+              marginTop: "1.5rem",
             }}
           >
-            {/* Quick Actions */}
-            <div className="mb-4">
-              <div className="d-flex align-items-center gap-2 mb-3">
-                <Zap size={20} style={{ color: "#97247E" }} />
-                <h5 className="mb-0 fw-bold">Quick Actions</h5>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 className="fw-bold mb-1" style={{ color: "#1F2937" }}>
+                  Peer Feedback Received
+                </h5>
+                <p className="mb-0" style={{ color: "#6B7280", fontSize: "0.875rem" }}>
+                  {myPeerFeedback.length} feedback{myPeerFeedback.length !== 1 ? "s" : ""} from your colleagues
+                </p>
               </div>
-
-              {/* HR-specific actions */}
-              <h6 className="small text-muted mb-2">HR Functions</h6>
-              <div className="row g-2 mb-3">
-                <div className="col-6 col-md-3">
-                  <Link
-                    to="/hr/dashboard/feedback/hrformlist"
-                    className="btn w-100 d-flex align-items-center justify-content-center gap-2"
-                    style={{
-                      background: "white",
-                      color: "rgb(39, 35, 92)",
-                      border: "2px solid ",
-                      borderRadius: "8px",
-                      padding: "10px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <Search size={16} />
-                    <span className="small" >All Feedback</span>
-                  </Link>
-                </div>
-                <div className="col-6 col-md-3">
-                  <Link
-                    to="/hr/dashboard/feedback/create-form"
-                    className="btn w-100 d-flex align-items-center justify-content-center gap-2"
-                    style={{
-                      background: "white",
-                      color: "#97247E",
-                      border: "2px solid #97247E",
-                      borderRadius: "8px",
-                      padding: "10px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <Plus size={16} />
-                    <span className="small">Create Form</span>
-                  </Link>
-                </div>
-              
-              </div>
-
-              {/* Employee-like actions */}
-              <h6 className="small text-muted mb-2">Submit Feedback</h6>
-              <div className="row g-2">
-                <div className="col-6 col-md-3">
-                  <Link
-                    to="/hr/dashboard/feedback/submit-mentor"
-                    className="btn w-100 d-flex align-items-center justify-content-center gap-2"
-                    style={{
-                      background: "white",
-                      color: "#97247E",
-                      border: "2px solid #97247E",
-                      borderRadius: "8px",
-                      padding: "10px",
-                      fontWeight: 600,
-                    }}
-                  >
-                    <Send size={16} />
-                    <span className="small">Mentor Feedback</span>
-                  </Link>
-                </div>
-               
-              </div>
+              <button
+                onClick={refresh}
+                disabled={refreshing}
+                className="btn btn-sm d-inline-flex align-items-center gap-2"
+                style={{
+                  background: "white",
+                  border: "1.5px solid #E5E7EB",
+                  borderRadius: "8px",
+                  color: "#374151",
+                  fontWeight: 600,
+                  padding: "6px 12px",
+                }}
+              >
+                <RefreshCw
+                  size={14}
+                  style={{
+                    animation: refreshing ? "spin 1s linear infinite" : "none",
+                  }}
+                />
+                {refreshing ? "Refreshing..." : "Refresh"}
+              </button>
             </div>
-          </div>
-        )}
 
-        {/* HR Operations Tab */}
-        {activeTab === "hr-operations" && (
-          <div
-            style={{
-              background: "white",
-              border: "1px solid #e5e7eb",
-              borderRadius: "0 0 12px 12px",
-              padding: "1.5rem",
-            }}
-          >
-            <h5 className="fw-bold mb-4" style={{ color: "#212529" }}>
-              Recent Feedback ({feedback.length})
-            </h5>
-
-            {feedback.length === 0 ? (
-              <div className="text-center py-5">
-                <FileText
-                  size={48}
-                  className="mb-3"
-                  style={{ color: "#cbd5e1" }}
-                />
-                <p className="text-muted mb-0">No feedback to review yet</p>
-              </div>
-            ) : (
-              <div className="table-responsive">
-                <table className="table table-hover mb-0">
-                  <thead>
-                    <tr style={{ borderBottom: "2px solid #e5e7eb" }}>
-                      <th
-                        style={{
-                          color: "#97247E",
-                          fontSize: "0.813rem",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          padding: "1rem",
-                        }}
-                      >
-                        From
-                      </th>
-                      <th
-                        style={{
-                          color: "#97247E",
-                          fontSize: "0.813rem",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          padding: "1rem",
-                        }}
-                      >
-                        To
-                      </th>
-                      <th
-                        style={{
-                          color: "#97247E",
-                          fontSize: "0.813rem",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          padding: "1rem",
-                        }}
-                      >
-                        Content
-                      </th>
-                      <th
-                        style={{
-                          color: "#97247E",
-                          fontSize: "0.813rem",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          padding: "1rem",
-                        }}
-                      >
-                        Status
-                      </th>
-                      <th
-                        style={{
-                          color: "#97247E",
-                          fontSize: "0.813rem",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          padding: "1rem",
-                        }}
-                      >
-                        Date
-                      </th>
-                      <th
-                        style={{
-                          color: "#97247E",
-                          fontSize: "0.813rem",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          padding: "1rem",
-                        }}
-                      >
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {feedback.slice(0, 10).map((item, index) => (
-                      <tr
-                        key={`feedback-${item.queueId || index}`}
-                        style={{ borderBottom: "1px solid #f1f5f9" }}
-                      >
-                        <td
-                          style={{
-                            padding: "1rem",
-                            fontSize: "0.875rem",
-                            fontWeight: 600,
-                          }}
-                        >
-                          {item.submitterName}
-                        </td>
-                        <td
-                          style={{
-                            padding: "1rem",
-                            fontSize: "0.875rem",
-                            fontWeight: 600,
-                          }}
-                        >
-                          {item.recipientName}
-                        </td>
-                        <td
-                          style={{
-                            padding: "1rem",
-                            fontSize: "0.875rem",
-                            maxWidth: "300px",
-                          }}
-                          className="text-truncate"
-                        >
-                          {item.feedbackContent || "No content"}
-                        </td>
-                        <td style={{ padding: "1rem" }}>
-                          <span
-                            className="badge"
-                            style={{
-                              backgroundColor:
-                                item.status === "Approved"
-                                  ? "#dcfce7"
-                                  : item.status === "Rejected"
-                                  ? "#fee2e2"
-                                  : "#fef3c7",
-                              color:
-                                item.status === "Approved"
-                                  ? "#24A148"
-                                  : item.status === "Rejected"
-                                  ? "#dc2626"
-                                  : "#d97706",
-                              padding: "4px 10px",
-                              fontSize: "0.75rem",
-                              borderRadius: "6px",
-                            }}
-                          >
-                            {item.status || "Pending"}
-                          </span>
-                        </td>
-                        <td
-                          style={{
-                            padding: "1rem",
-                            fontSize: "0.875rem",
-                            color: "#6c757d",
-                          }}
-                        >
-                          {item.createdAt
-                            ? new Date(item.createdAt).toLocaleDateString()
-                            : "N/A"}
-                        </td>
-                        <td style={{ padding: "1rem" }}>
-                          <Link
-                            to="/hr/review-queue"
-                            className="btn btn-sm d-inline-flex align-items-center gap-1"
-                            style={{
-                              background: "#97247E",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "6px",
-                              padding: "6px 12px",
-                              fontWeight: 600,
-                            }}
-                          >
-                            <Eye size={14} />
-                            View
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {feedback.length > 10 && (
-              <div className="text-center mt-3">
-                <Link
-                  to="/hr/dashboard/feedback/hrformlist"
-                  className="btn btn-outline-secondary"
-                  style={{ borderRadius: "8px" }}
+            <div className="row g-3">
+              {myPeerFeedback.map((feedbackItem) => (
+                <div
+                  className="col-12"
+                  key={feedbackItem.peerQueueId || feedbackItem.contextFeedbackId}
                 >
-                  View All Feedback
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Peer Feedback Tab */}
-        {activeTab === "peer-feedback" && (
-          <div
-            style={{
-              background: "white",
-              border: "1px solid #e5e7eb",
-              borderRadius: "0 0 12px 12px",
-              padding: "1.5rem",
-            }}
-          >
-            <h5 className="fw-bold mb-4" style={{ color: "#212529" }}>
-              Peer Feedback Received ({myPeerFeedback.length})
-            </h5>
-
-            {myPeerFeedback.length === 0 ? (
-              <div className="text-center py-5">
-                <Users
-                  size={48}
-                  className="mb-3"
-                  style={{ color: "#cbd5e1" }}
-                />
-                <p className="text-muted mb-0">No peer feedback received yet</p>
-              </div>
-            ) : (
-              <div className="row g-3">
-                {myPeerFeedback.map((feedbackItem) => (
                   <div
-                    className="col-12"
-                    key={
-                      feedbackItem.peerQueueId || feedbackItem.contextFeedbackId
-                    }
+                    style={{
+                      background: "#FAFBFC",
+                      border: "1px solid #E5E7EB",
+                      borderLeft: "4px solid #97247E",
+                      borderRadius: "10px",
+                      padding: "1.25rem",
+                      transition: "all 0.2s",
+                    }}
                   >
-                    <div
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <div>
+                        <h6
+                          className="fw-bold mb-1"
+                          style={{ color: "#1F2937", fontSize: "0.938rem" }}
+                        >
+                          {feedbackItem.submittedByName}
+                        </h6>
+                        <small style={{ color: "#6B7280", fontSize: "0.813rem" }}>
+                          {feedbackItem.submittedDate
+                            ? new Date(
+                                feedbackItem.submittedDate
+                              ).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })
+                            : new Date(
+                                feedbackItem.createdAt
+                              ).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
+                        </small>
+                      </div>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          backgroundColor: "#F3E8FF",
+                          color: "#8B5CF6",
+                          padding: "6px 12px",
+                          fontSize: "0.688rem",
+                          fontWeight: 700,
+                          borderRadius: "6px",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        Peer Feedback
+                      </span>
+                    </div>
+                    <p
+                      className="mb-0"
                       style={{
-                        background: "white",
-                        border: "1px solid #e5e7eb",
-                        borderLeft: "4px solid #97247E",
-                        borderRadius: "8px",
-                        padding: "1.25rem",
+                        lineHeight: "1.6",
+                        color: "#374151",
+                        fontSize: "0.875rem",
                       }}
                     >
-                      <div className="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                          <h6 className="fw-bold mb-1">
-                            {feedbackItem.submittedByName}
-                          </h6>
-                          <small className="text-muted">
-                            {feedbackItem.submittedDate
-                              ? new Date(
-                                  feedbackItem.submittedDate
-                                ).toLocaleDateString()
-                              : new Date(
-                                  feedbackItem.createdAt
-                                ).toLocaleDateString()}
-                          </small>
-                        </div>
-                        <span
-                          style={{
-                            display: "inline-block",
-                            backgroundColor: "#97247E15",
-                            color: "#97247E",
-                            padding: "6px 12px",
-                            fontSize: "0.75rem",
-                            fontWeight: 600,
-                            borderRadius: "6px",
-                            border: "1.5px solid #97247E40",
-                          }}
-                        >
-                          Peer Feedback
-                        </span>
-                      </div>
-                      <p
-                        className="mb-0"
-                        style={{ lineHeight: "1.6", color: "#495057" }}
-                      >
-                        {feedbackItem.feedbackContent ||
-                          feedbackItem.comment ||
-                          feedbackItem.feedbackComment ||
-                          "No comment provided"}
-                      </p>
-                    </div>
+                      {feedbackItem.feedbackContent ||
+                        feedbackItem.comment ||
+                        feedbackItem.feedbackComment ||
+                        "No comment provided"}
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -713,6 +636,15 @@ export default function FeedbackHRDashboard() {
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        
+        .btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        
+        .btn:active {
+          transform: translateY(0);
         }
       `}</style>
     </div>

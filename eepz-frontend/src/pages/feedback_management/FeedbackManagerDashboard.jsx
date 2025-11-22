@@ -323,30 +323,9 @@ export default function FeedbackManagerDashboard() {
               Manager Dashboard
             </h2>
           </div>
-          <p
-            className="mb-0"
-            style={{ color: "#64748b", fontSize: "0.875rem" }}
-          >
-            Welcome back, {user?.firstName} {user?.lastName}
-          </p>
+          
         </div>
-        <button
-          className="btn d-flex align-items-center gap-2"
-          onClick={refresh}
-          disabled={refreshing}
-          style={{
-            backgroundColor: "transparent",
-            border: "1.5px solid #0F62FE",
-            color: "#0F62FE",
-            borderRadius: "8px",
-            padding: "8px 16px",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-          }}
-        >
-          <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
-          Refresh
-        </button>
+        
       </div>
 
       {/* Error Alert */}
@@ -629,7 +608,7 @@ export default function FeedbackManagerDashboard() {
                     textAlign: "center",
                   }}
                 >
-                  Team Members
+                  Peer Feedback Recieved
                 </span>
               </Link>
             </div>

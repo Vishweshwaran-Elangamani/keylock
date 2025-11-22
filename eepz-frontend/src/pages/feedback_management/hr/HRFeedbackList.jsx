@@ -288,7 +288,7 @@ export default function HRFeedbackList() {
         <FeedbackBreadcrumb
           items={[
             { label: "Feedback Management", path: "/hr/dashboard/feedback" },
-            { label: "Feedback Forms List" }
+            { label: "Feedback Forms List" },
           ]}
         />
 
@@ -357,13 +357,13 @@ export default function HRFeedbackList() {
           style={{
             background: "white",
             border: "1px solid #e5e7eb",
-            borderRadius: "12px",
-            padding: "1.5rem",
+            borderRadius: "10px",
+            padding: "1rem",
             marginBottom: "1.5rem",
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
-          <div className="row g-3">
+          <div className="row g-2">
             {/* Mentor Card */}
             <div className="col-md-6">
               <button
@@ -371,51 +371,51 @@ export default function HRFeedbackList() {
                 onClick={() => setTab("Mentor")}
                 style={{
                   width: "100%",
-                  background: tab === "Mentor" ? "#97247E" : "white",
+                  background: tab === "Mentor" ? "#27235C" : "white",
                   border: `2px solid ${
-                    tab === "Mentor" ? "#97247E" : "#e5e7eb"
+                    tab === "Mentor" ? "#27235C" : "#e5e7eb"
                   }`,
-                  borderRadius: "10px",
-                  padding: "1.25rem",
+                  borderRadius: "8px",
+                  padding: "0.875rem",
                   cursor: "pointer",
                   transition: "all 0.2s",
                   textAlign: "left",
                 }}
               >
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-2">
                   <div
                     style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "10px",
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "8px",
                       background:
                         tab === "Mentor"
                           ? "rgba(255,255,255,0.2)"
-                          : "#97247E15",
+                          : "#27235C15",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
                     <Send
-                      size={24}
-                      style={{ color: tab === "Mentor" ? "white" : "#97247E" }}
+                      size={20}
+                      style={{ color: tab === "Mentor" ? "white" : "#27235C" }}
                     />
                   </div>
                   <div>
                     <div
                       style={{
-                        fontSize: "0.875rem",
+                        fontSize: "0.75rem",
                         fontWeight: 600,
                         color: tab === "Mentor" ? "white" : "#6c757d",
-                        marginBottom: "4px",
+                        marginBottom: "2px",
                       }}
                     >
                       Mentor Feedback
                     </div>
                     <div
                       style={{
-                        fontSize: "1.5rem",
+                        fontSize: "1.25rem",
                         fontWeight: 700,
                         color: tab === "Mentor" ? "white" : "#212529",
                       }}
@@ -434,47 +434,47 @@ export default function HRFeedbackList() {
                 onClick={() => setTab("Peer")}
                 style={{
                   width: "100%",
-                  background: tab === "Peer" ? "#97247E" : "white",
-                  border: `2px solid ${tab === "Peer" ? "#97247E" : "#e5e7eb"}`,
-                  borderRadius: "10px",
-                  padding: "1.25rem",
+                  background: tab === "Peer" ? "#27235C" : "white",
+                  border: `2px solid ${tab === "Peer" ? "#27235C" : "#e5e7eb"}`,
+                  borderRadius: "8px",
+                  padding: "0.875rem",
                   cursor: "pointer",
                   transition: "all 0.2s",
                   textAlign: "left",
                 }}
               >
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-2">
                   <div
                     style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "10px",
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "8px",
                       background:
-                        tab === "Peer" ? "rgba(255,255,255,0.2)" : "#97247E15",
+                        tab === "Peer" ? "rgba(255,255,255,0.2)" : "#27235C15",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
                     <Users
-                      size={24}
-                      style={{ color: tab === "Peer" ? "white" : "#97247E" }}
+                      size={20}
+                      style={{ color: tab === "Peer" ? "white" : "#27235C" }}
                     />
                   </div>
                   <div>
                     <div
                       style={{
-                        fontSize: "0.875rem",
+                        fontSize: "0.75rem",
                         fontWeight: 600,
                         color: tab === "Peer" ? "white" : "#6c757d",
-                        marginBottom: "4px",
+                        marginBottom: "2px",
                       }}
                     >
                       Peer Feedback
                     </div>
                     <div
                       style={{
-                        fontSize: "1.5rem",
+                        fontSize: "1.25rem",
                         fontWeight: 700,
                         color: tab === "Peer" ? "white" : "#212529",
                       }}
@@ -496,7 +496,7 @@ export default function HRFeedbackList() {
               style={{
                 width: "3rem",
                 height: "3rem",
-                color: "#97247E",
+                color: "#27235C",
                 borderWidth: "3px",
               }}
               role="status"
@@ -541,53 +541,59 @@ export default function HRFeedbackList() {
                         style={{
                           background: "white",
                           border: "1px solid #e5e7eb",
-                          borderLeft: "4px solid #97247E",
+                          borderLeft: "4px solid #27235C",
                           borderRadius: "10px",
                           padding: "1.25rem",
                           height: "100%",
                           transition: "box-shadow 0.2s",
                           cursor: "pointer",
+                          textAlign: "left",
                         }}
                         onMouseEnter={(e) =>
                           (e.currentTarget.style.boxShadow =
-                            "0 4px 12px rgba(151, 36, 126, 0.2)")
+                            "0 4px 12px rgba(39, 35, 92, 0.2)")
                         }
                         onMouseLeave={(e) =>
                           (e.currentTarget.style.boxShadow = "none")
                         }
                       >
                         <div className="d-flex justify-content-between align-items-start mb-3">
-                          <div>
+                          <div style={{ textAlign: "left" }}>
                             <div
                               style={{
                                 fontSize: "0.75rem",
                                 color: "#6c757d",
                                 marginBottom: "4px",
                                 fontWeight: 600,
+                                textAlign: "left",
                               }}
                             >
                               Mentor
                             </div>
-                            <div className="d-flex align-items-center gap-1">
-                              <User size={14} style={{ color: "#97247E" }} />
+                            <div
+                              className="d-flex align-items-center gap-1"
+                              style={{ textAlign: "left" }}
+                            >
+                              <User size={14} style={{ color: "#27235C" }} />
                               <h6
                                 className="mb-0 fw-bold"
                                 style={{
                                   fontSize: "0.938rem",
                                   color: "#212529",
+                                  textAlign: "left",
                                 }}
                               >
                                 {getMentorName(m)}
                               </h6>
                             </div>
                           </div>
-                          <Badge text={`${m.rating || 0}/5`} color="#97247E" />
+                          <Badge text={`${m.rating || 0}/5`} color="#27235C" />
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-3" style={{ textAlign: "left" }}>
                           <div
                             className="d-flex align-items-center gap-2 text-muted"
-                            style={{ fontSize: "0.813rem" }}
+                            style={{ fontSize: "0.813rem", textAlign: "left" }}
                           >
                             <Clock size={14} />
                             <span>
@@ -605,11 +611,16 @@ export default function HRFeedbackList() {
                             padding: "0.75rem",
                             borderRadius: "6px",
                             minHeight: "60px",
+                            textAlign: "left",
                           }}
                         >
                           <p
                             className="mb-0"
-                            style={{ fontSize: "0.813rem", color: "#495057" }}
+                            style={{
+                              fontSize: "0.813rem",
+                              color: "#495057",
+                              textAlign: "left",
+                            }}
                           >
                             {m.feedbackComments
                               ? m.feedbackComments.substring(0, 80) + "..."
@@ -625,7 +636,7 @@ export default function HRFeedbackList() {
                               borderRadius: "6px",
                               padding: "8px",
                               fontWeight: 600,
-                              background: "#97247E",
+                              background: "#27235C",
                               color: "white",
                               border: "none",
                             }}
@@ -682,7 +693,7 @@ export default function HRFeedbackList() {
                         ? "#198754"
                         : p.status === "Rejected"
                         ? "#dc3545"
-                        : "#97247E";
+                        : "#27235C";
 
                     return (
                       <div
@@ -699,34 +710,40 @@ export default function HRFeedbackList() {
                             height: "100%",
                             transition: "box-shadow 0.2s",
                             cursor: "pointer",
+                            textAlign: "left",
                           }}
                           onMouseEnter={(e) =>
                             (e.currentTarget.style.boxShadow =
-                              "0 4px 12px rgba(151, 36, 126, 0.2)")
+                              "0 4px 12px rgba(39, 35, 92, 0.2)")
                           }
                           onMouseLeave={(e) =>
                             (e.currentTarget.style.boxShadow = "none")
                           }
                         >
                           <div className="d-flex justify-content-between align-items-start mb-3">
-                            <div style={{ flex: 1 }}>
+                            <div style={{ flex: 1, textAlign: "left" }}>
                               <div
                                 style={{
                                   fontSize: "0.75rem",
                                   color: "#6c757d",
                                   marginBottom: "4px",
                                   fontWeight: 600,
+                                  textAlign: "left",
                                 }}
                               >
                                 From
                               </div>
-                              <div className="d-flex align-items-center gap-1 mb-2">
+                              <div
+                                className="d-flex align-items-center gap-1 mb-2"
+                                style={{ textAlign: "left" }}
+                              >
                                 <User size={14} style={{ color: "#6c757d" }} />
                                 <h6
                                   className="mb-0 fw-semibold"
                                   style={{
                                     fontSize: "0.875rem",
                                     color: "#212529",
+                                    textAlign: "left",
                                   }}
                                 >
                                   {getSubmitterName(p)}
@@ -738,17 +755,22 @@ export default function HRFeedbackList() {
                                   color: "#6c757d",
                                   marginBottom: "4px",
                                   fontWeight: 600,
+                                  textAlign: "left",
                                 }}
                               >
                                 To
                               </div>
-                              <div className="d-flex align-items-center gap-1">
-                                <User size={14} style={{ color: "#97247E" }} />
+                              <div
+                                className="d-flex align-items-center gap-1"
+                                style={{ textAlign: "left" }}
+                              >
+                                <User size={14} style={{ color: "#27235C" }} />
                                 <h6
                                   className="mb-0 fw-bold"
                                   style={{
                                     fontSize: "0.938rem",
                                     color: "#212529",
+                                    textAlign: "left",
                                   }}
                                 >
                                   {getRecipientName(p)}
@@ -761,10 +783,13 @@ export default function HRFeedbackList() {
                             />
                           </div>
 
-                          <div className="mb-3">
+                          <div className="mb-3" style={{ textAlign: "left" }}>
                             <div
                               className="d-flex align-items-center gap-2 text-muted"
-                              style={{ fontSize: "0.813rem" }}
+                              style={{
+                                fontSize: "0.813rem",
+                                textAlign: "left",
+                              }}
                             >
                               <Clock size={14} />
                               <span>
@@ -778,7 +803,11 @@ export default function HRFeedbackList() {
                           {p.isAnonymous && (
                             <div
                               className="mb-2"
-                              style={{ fontSize: "0.813rem", color: "#6c757d" }}
+                              style={{
+                                fontSize: "0.813rem",
+                                color: "#6c757d",
+                                textAlign: "left",
+                              }}
                             >
                               <Lock
                                 size={12}
@@ -796,11 +825,16 @@ export default function HRFeedbackList() {
                               padding: "0.75rem",
                               borderRadius: "6px",
                               minHeight: "60px",
+                              textAlign: "left",
                             }}
                           >
                             <p
                               className="mb-0"
-                              style={{ fontSize: "0.813rem", color: "#495057" }}
+                              style={{
+                                fontSize: "0.813rem",
+                                color: "#495057",
+                                textAlign: "left",
+                              }}
                             >
                               {p.feedbackContent
                                 ? p.feedbackContent.substring(0, 80) + "..."
@@ -816,7 +850,7 @@ export default function HRFeedbackList() {
                                 borderRadius: "6px",
                                 padding: "8px",
                                 fontWeight: 600,
-                                background: "#97247E",
+                                background: "#27235C",
                                 color: "white",
                                 border: "none",
                               }}

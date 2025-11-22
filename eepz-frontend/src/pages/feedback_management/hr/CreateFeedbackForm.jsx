@@ -129,7 +129,7 @@ export default function CreateFeedbackForm() {
       <FeedbackBreadcrumb
         items={[
           { label: "Feedback Management", path: "/hr/dashboard/feedback" },
-          { label: "Create Feedback Form" }
+          { label: "Create Feedback Form" },
         ]}
       />
 
@@ -310,14 +310,34 @@ export default function CreateFeedbackForm() {
               </small>
             </div>
 
-           
-
             {/* SUBMIT BUTTON */}
             <div className="d-grid gap-2">
               <button
                 type="submit"
-                className="btn btn-primary btn-lg fw-bold"
+                className="btn btn-lg fw-bold"
                 disabled={loading}
+                style={{
+                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "var(--radius-md)",
+                  padding: "0.75rem 1.5rem",
+                  fontSize: "1rem",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(151, 36, 126, 0.3)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 2px 8px rgba(151, 36, 126, 0.2)";
+                }}
               >
                 {loading ? (
                   <>
@@ -347,7 +367,6 @@ export default function CreateFeedbackForm() {
         </div>
       </div>
 
-      
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }

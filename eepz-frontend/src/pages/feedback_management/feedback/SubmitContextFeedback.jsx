@@ -316,608 +316,662 @@ export default function SubmitContextFeedback() {
   return (
     <div
       style={{
-        padding: "1.25rem 1.75rem",
-        maxWidth: "100%",
         minHeight: "100vh",
         backgroundColor: "#f8f9fa",
+        display: "flex",
+        justifyContent: "center",
+        padding: "1.25rem 1rem",
       }}
     >
-      {/* Header with back button */}
-      <div className="d-flex align-items-center gap-3 mb-3">
-        <button
-          className="btn d-flex align-items-center justify-content-center"
-          onClick={() => navigate(-1)}
-          style={{
-            width: "40px",
-            height: "40px",
-            padding: 0,
-            backgroundColor: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: "8px",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#f8fafc";
-            e.currentTarget.style.borderColor = "#cbd5e1";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#fff";
-            e.currentTarget.style.borderColor = "#e2e8f0";
-          }}
-        >
-          <ArrowLeft size={18} style={{ color: "#64748b" }} />
-        </button>
-        <div>
-          <h2
-            className="fw-bold mb-0"
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "900px",
+        }}
+      >
+        {/* Header with back button */}
+        <div className="d-flex align-items-center gap-3 mb-3">
+          <button
+            className="btn d-flex align-items-center justify-content-center"
+            onClick={() => navigate(-1)}
             style={{
-              color: "#27235c",
-              fontSize: "1.5rem",
-              letterSpacing: "-0.025em",
+              width: "40px",
+              height: "40px",
+              padding: 0,
+              backgroundColor: "#fff",
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#f8fafc";
+              e.currentTarget.style.borderColor = "#cbd5e1";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#fff";
+              e.currentTarget.style.borderColor = "#e2e8f0";
             }}
           >
-            Submit Feedback
-          </h2>
-          <p
-            className="mb-0"
-            style={{ color: "#64748b", fontSize: "0.875rem" }}
-          >
-            Provide goal or context-based feedback
-          </p>
-        </div>
-      </div>
-
-      {/* Error alert */}
-      {error && (
-        <div
-          className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-          style={{
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#fee2e2",
-            padding: "0.75rem 1rem",
-            maxWidth: "900px",
-          }}
-        >
-          <AlertTriangle
-            size={16}
-            className="flex-shrink-0"
-            style={{ marginTop: "2px", color: "#dc2626" }}
-          />
-          <div className="flex-grow-1">
-            <p
-              className="mb-0"
-              style={{ fontSize: "0.875rem", color: "#991b1b" }}
-            >
-              {error}
-            </p>
-          </div>
-          <button
-            type="button"
-            className="btn-close"
-            style={{ fontSize: "0.75rem" }}
-            onClick={() => setError("")}
-          />
-        </div>
-      )}
-
-      {/* Success alert */}
-      {successMsg && (
-        <div
-          className="alert alert-success d-flex align-items-center gap-2 mb-3"
-          style={{
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#dcfce7",
-            padding: "0.75rem 1rem",
-            maxWidth: "900px",
-          }}
-        >
-          <CheckCircle
-            size={16}
-            className="flex-shrink-0"
-            style={{ color: "#16a34a" }}
-          />
-          <p
-            className="mb-0 flex-grow-1"
-            style={{ fontSize: "0.875rem", color: "#166534" }}
-          >
-            {successMsg}
-          </p>
-          <button
-            type="button"
-            className="btn-close"
-            style={{ fontSize: "0.75rem" }}
-            onClick={() => setSuccessMsg("")}
-          />
-        </div>
-      )}
-
-      {/* Tab selector */}
-      <div className="d-flex gap-2 mb-3" style={{ maxWidth: "900px" }}>
-        <button
-          type="button"
-          className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-          onClick={() => setActiveTab("goal")}
-          style={{
-            borderRadius: "8px",
-            padding: "0.875rem",
-            backgroundColor: activeTab === "goal" ? "#0f62fe" : "#fff",
-            color: activeTab === "goal" ? "#fff" : "#64748b",
-            border: activeTab === "goal" ? "none" : "1px solid #e2e8f0",
-            fontWeight: 600,
-            fontSize: "0.875rem",
-            transition: "all 0.2s",
-          }}
-        >
-          <Target size={18} />
-          Goal Feedback
-        </button>
-
-        <button
-          type="button"
-          className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-          onClick={() => setActiveTab("context")}
-          style={{
-            borderRadius: "8px",
-            padding: "0.875rem",
-            backgroundColor: activeTab === "context" ? "#0f62fe" : "#fff",
-            color: activeTab === "context" ? "#fff" : "#64748b",
-            border: activeTab === "context" ? "none" : "1px solid #e2e8f0",
-            fontWeight: 600,
-            fontSize: "0.875rem",
-            transition: "all 0.2s",
-          }}
-        >
-          <Users size={18} />
-          Context Feedback
-        </button>
-      </div>
-
-      {/* Loading state */}
-      {loadingData && (
-        <div
-          className="card border-0 shadow-sm"
-          style={{ borderRadius: "10px", maxWidth: "900px" }}
-        >
-          <div className="card-body text-center py-5">
-            <Loader
-              size={40}
-              className="mb-3 animate-spin"
-              style={{ color: "#0f62fe" }}
-            />
-            <p
+            <ArrowLeft size={18} style={{ color: "#64748b" }} />
+          </button>
+          <div>
+            <h2
+              className="fw-bold mb-0"
               style={{
-                fontSize: "0.875rem",
-                color: "#64748b",
-                marginBottom: 0,
+                color: "#27235c",
+                fontSize: "1.5rem",
+                letterSpacing: "-0.025em",
               }}
             >
-              Loading data...
+              Submit Feedback
+            </h2>
+            <p
+              className="mb-0"
+              style={{ color: "#64748b", fontSize: "0.875rem" }}
+            >
+              Provide goal or context-based feedback
             </p>
           </div>
         </div>
-      )}
 
-      {/* Goal feedback form */}
-      {!loadingData && activeTab === "goal" && (
+        {/* Error alert */}
+        {error && (
+          <div
+            className="alert alert-danger d-flex align-items-start gap-2 mb-3"
+            style={{
+              borderRadius: "8px",
+              border: "none",
+              backgroundColor: "#fee2e2",
+              padding: "0.75rem 1rem",
+            }}
+          >
+            <AlertTriangle
+              size={16}
+              className="flex-shrink-0"
+              style={{ marginTop: "2px", color: "#dc2626" }}
+            />
+            <div className="flex-grow-1">
+              <p
+                className="mb-0"
+                style={{ fontSize: "0.875rem", color: "#991b1b" }}
+              >
+                {error}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn-close"
+              style={{ fontSize: "0.75rem" }}
+              onClick={() => setError("")}
+            />
+          </div>
+        )}
+
+        {/* Success alert */}
+        {successMsg && (
+          <div
+            className="alert alert-success d-flex align-items-center gap-2 mb-3"
+            style={{
+              borderRadius: "8px",
+              border: "none",
+              backgroundColor: "#dcfce7",
+              padding: "0.75rem 1rem",
+            }}
+          >
+            <CheckCircle
+              size={16}
+              className="flex-shrink-0"
+              style={{ color: "#16a34a" }}
+            />
+            <p
+              className="mb-0 flex-grow-1"
+              style={{ fontSize: "0.875rem", color: "#166534" }}
+            >
+              {successMsg}
+            </p>
+            <button
+              type="button"
+              className="btn-close"
+              style={{ fontSize: "0.75rem" }}
+              onClick={() => setSuccessMsg("")}
+            />
+          </div>
+        )}
+
+        {/* Tab selector - NEW DESIGN */}
         <div
-          className="card border-0 shadow-sm"
-          style={{ borderRadius: "10px", maxWidth: "900px" }}
+          style={{
+            background: "#27235C",
+            borderRadius: "30px",
+            padding: "4px",
+            display: "inline-flex",
+            gap: "4px",
+            marginBottom: "1.5rem",
+            boxShadow: "0 2px 8px rgba(39, 35, 92, 0.15)",
+          }}
         >
-          <div className="card-body" style={{ padding: "1.5rem" }}>
-            <form onSubmit={submitGoal}>
-              <div className="mb-4">
-                <label
-                  className="form-label fw-semibold mb-2"
-                  style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                >
-                  Select Organization Goal <span className="text-danger">*</span>
-                </label>
-                <select
-                  className="form-select"
-                  value={goalForm.organizationObjectiveId}
-                  onChange={handleObjectiveChange}
-                  required
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    fontSize: "0.875rem",
-                    padding: "0.625rem 0.875rem",
-                  }}
-                >
-                  <option value="">Choose a goal...</option>
-                  {objectives.map((obj) => {
-                    const objId = obj.goalId || obj.objectiveId || obj.id;
-                    const objName = getGoalDisplayName(obj);
-                    return (
-                      <option key={objId} value={objId}>
-                        {objName}
-                      </option>
-                    );
-                  })}
-                </select>
-                {objectives.length === 0 && (
-                  <small className="text-muted d-block mt-1">
-                    No organization goals available
-                  </small>
-                )}
-              </div>
+          <button
+            type="button"
+            onClick={() => setActiveTab("goal")}
+            style={{
+              background: activeTab === "goal" ? "#fff" : "transparent",
+              color: activeTab === "goal" ? "#27235C" : "#fff",
+              border: "none",
+              borderRadius: "26px",
+              padding: "10px 24px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <Target size={16} />
+            Goal Feedback
+          </button>
 
-              {selectedObjective && (
-                <div
-                  className="mb-4 p-3"
-                  style={{
-                    backgroundColor: "#f8fafc",
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                  }}
-                >
+          <button
+            type="button"
+            onClick={() => setActiveTab("context")}
+            style={{
+              background: activeTab === "context" ? "#fff" : "transparent",
+              color: activeTab === "context" ? "#27235C" : "#fff",
+              border: "none",
+              borderRadius: "26px",
+              padding: "10px 24px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <Users size={16} />
+            Context Feedback
+          </button>
+        </div>
+
+        {/* Loading state */}
+        {loadingData && (
+          <div
+            className="card border-0 shadow-sm"
+            style={{ borderRadius: "10px" }}
+          >
+            <div className="card-body text-center py-5">
+              <Loader
+                size={40}
+                className="mb-3 animate-spin"
+                style={{ color: "#27235C" }}
+              />
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  color: "#64748b",
+                  marginBottom: 0,
+                }}
+              >
+                Loading data...
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Goal feedback form */}
+        {!loadingData && activeTab === "goal" && (
+          <div
+            className="card border-0 shadow-sm"
+            style={{ borderRadius: "10px" }}
+          >
+            <div className="card-body" style={{ padding: "1.5rem" }}>
+              <form onSubmit={submitGoal}>
+                <div className="mb-4">
+                  <label
+                    className="form-label fw-semibold mb-2"
+                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                  >
+                    Select Organization Goal <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    className="form-select"
+                    value={goalForm.organizationObjectiveId}
+                    onChange={handleObjectiveChange}
+                    required
+                    style={{
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      fontSize: "0.875rem",
+                      padding: "0.625rem 0.875rem",
+                    }}
+                  >
+                    <option value="">Choose a goal...</option>
+                    {objectives.map((obj) => {
+                      const objId = obj.goalId || obj.objectiveId || obj.id;
+                      const objName = getGoalDisplayName(obj);
+                      return (
+                        <option key={objId} value={objId}>
+                          {objName}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {objectives.length === 0 && (
+                    <small className="text-muted d-block mt-1">
+                      No organization goals available
+                    </small>
+                  )}
+                </div>
+
+                {selectedObjective && (
                   <div
+                    className="mb-4 p-3"
                     style={{
-                      fontSize: "0.75rem",
-                      color: "#64748b",
-                      marginBottom: "0.25rem",
+                      backgroundColor: "#f8fafc",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
                     }}
                   >
-                    Goal Description
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#64748b",
+                        marginBottom: "0.25rem",
+                      }}
+                    >
+                      Goal Description
+                    </div>
+                    <p
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "#0f172a",
+                        marginBottom: 0,
+                      }}
+                    >
+                      {selectedObjective.description || 
+                       selectedObjective.goalDescription || 
+                       selectedObjective.objectiveDescription ||
+                       "No description available"}
+                    </p>
                   </div>
-                  <p
+                )}
+
+                <div className="mb-4">
+                  <label
+                    className="form-label fw-semibold mb-2"
+                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                  >
+                    Rating <span className="text-danger">*</span>
+                  </label>
+                  <div
+                    className="d-flex align-items-center gap-3 p-3"
                     style={{
-                      fontSize: "0.875rem",
-                      color: "#0f172a",
-                      marginBottom: 0,
+                      backgroundColor: "#f8fafc",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
                     }}
                   >
-                    {selectedObjective.description || 
-                     selectedObjective.goalDescription || 
-                     selectedObjective.objectiveDescription ||
-                     "No description available"}
-                  </p>
+                    <div className="d-flex gap-1">{renderStars(goalForm.rating)}</div>
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: "#27235C",
+                      }}
+                    >
+                      {goalForm.rating}/5
+                    </span>
+                  </div>
                 </div>
-              )}
 
-              <div className="mb-4">
-                <label
-                  className="form-label fw-semibold mb-2"
-                  style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                >
-                  Rating <span className="text-danger">*</span>
-                </label>
-                <div
-                  className="d-flex align-items-center gap-3 p-3"
-                  style={{
-                    backgroundColor: "#f8fafc",
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                  }}
-                >
-                  <div className="d-flex gap-1">{renderStars(goalForm.rating)}</div>
-                  <span
-                    style={{
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                      color: "#0f62fe",
-                    }}
+                <div className="mb-4">
+                  <label
+                    className="form-label fw-semibold mb-2"
+                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
                   >
-                    {goalForm.rating}/5
-                  </span>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="form-label fw-semibold mb-2"
-                  style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                >
-                  Feedback Comments <span className="text-danger">*</span>
-                </label>
-                <textarea
-                  className="form-control"
-                  rows={5}
-                  value={goalForm.feedbackComments}
-                  onChange={(e) =>
-                    setGoalForm({
-                      ...goalForm,
-                      feedbackComments: e.target.value,
-                    })
-                  }
-                  placeholder="Provide your detailed feedback on this goal..."
-                  required
-                  maxLength={1000}
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    fontSize: "0.875rem",
-                    resize: "vertical",
-                    minHeight: "120px",
-                  }}
-                />
-                <div
-                  className="d-flex justify-content-between"
-                  style={{ marginTop: "0.5rem" }}
-                >
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                    Be specific and constructive
-                  </span>
-                  <span
-                    style={{
-                      fontSize: "0.75rem",
-                      color:
-                        goalForm.feedbackComments.length > 900
-                          ? "#dc2626"
-                          : "#64748b",
-                    }}
-                  >
-                    {goalForm.feedbackComments.length}/1000
-                  </span>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="goalAnon"
-                    checked={goalForm.isAnonymous}
+                    Feedback Comments <span className="text-danger">*</span>
+                  </label>
+                  <textarea
+                    className="form-control"
+                    rows={5}
+                    value={goalForm.feedbackComments}
                     onChange={(e) =>
                       setGoalForm({
                         ...goalForm,
-                        isAnonymous: e.target.checked,
+                        feedbackComments: e.target.value,
                       })
                     }
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="goalAnon"
-                    style={{ fontSize: "0.875rem" }}
-                  >
-                    Submit anonymously
-                  </label>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
-                disabled={loading || !goalForm.organizationObjectiveId}
-                style={{
-                  borderRadius: "8px",
-                  padding: "0.75rem",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  backgroundColor: "#0f62fe",
-                  border: "none",
-                }}
-              >
-                {loading ? (
-                  <>
-                    <Loader size={16} className="animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Send size={16} />
-                    Submit Feedback
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Context feedback form */}
-      {!loadingData && activeTab === "context" && (
-        <div
-          className="card border-0 shadow-sm"
-          style={{ borderRadius: "10px", maxWidth: "900px" }}
-        >
-          <div className="card-body" style={{ padding: "1.5rem" }}>
-            <form onSubmit={submitContext}>
-              <div className="mb-4">
-                <label
-                  className="form-label fw-semibold mb-2"
-                  style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                >
-                  Select Recipient <span className="text-danger">*</span>
-                </label>
-                <select
-                  className="form-select"
-                  value={contextForm.recipientEmployeeId}
-                  onChange={handleEmployeeChange}
-                  required
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    fontSize: "0.875rem",
-                    padding: "0.625rem 0.875rem",
-                  }}
-                >
-                  <option value="">Choose a team member...</option>
-                  {employees.map((emp) => (
-                    <option key={emp.employeeId} value={emp.employeeId}>
-                      {emp.firstName} {emp.lastName} ({emp.email})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {selectedEmployee && (
-                <div
-                  className="mb-4 p-3"
-                  style={{
-                    backgroundColor: "#f8fafc",
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                  }}
-                >
-                  <div
+                    placeholder="Provide your detailed feedback on this goal..."
+                    required
+                    maxLength={1000}
                     style={{
-                      fontSize: "0.75rem",
-                      color: "#64748b",
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    Feedback for
-                  </div>
-                  <div
-                    style={{
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
                       fontSize: "0.875rem",
-                      fontWeight: 600,
-                      color: "#0f172a",
+                      resize: "vertical",
+                      minHeight: "120px",
                     }}
+                  />
+                  <div
+                    className="d-flex justify-content-between"
+                    style={{ marginTop: "0.5rem" }}
                   >
-                    {selectedEmployee.firstName} {selectedEmployee.lastName}
+                    <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                      Be specific and constructive
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        color:
+                          goalForm.feedbackComments.length > 900
+                            ? "#dc2626"
+                            : "#64748b",
+                      }}
+                    >
+                      {goalForm.feedbackComments.length}/1000
+                    </span>
                   </div>
-                  <small style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                    {selectedEmployee.email}
-                  </small>
                 </div>
-              )}
 
-              <div className="mb-4">
-                <label
-                  className="form-label fw-semibold mb-2"
-                  style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                >
-                  Project Context <span className="text-danger">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={contextForm.projectContext}
-                  onChange={(e) =>
-                    setContextForm({
-                      ...contextForm,
-                      projectContext: e.target.value,
-                    })
-                  }
-                  placeholder="e.g., AI Platform Project, Q4 Sprint"
-                  required
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
-                    fontSize: "0.875rem",
-                    padding: "0.625rem 0.875rem",
-                  }}
-                />
-              </div>
+                <div className="mb-4">
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="goalAnon"
+                      checked={goalForm.isAnonymous}
+                      onChange={(e) =>
+                        setGoalForm({
+                          ...goalForm,
+                          isAnonymous: e.target.checked,
+                        })
+                      }
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="goalAnon"
+                      style={{ fontSize: "0.875rem" }}
+                    >
+                      Submit anonymously
+                    </label>
+                  </div>
+                </div>
 
-              <div className="mb-4">
-                <label
-                  className="form-label fw-semibold mb-2"
-                  style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                >
-                  Feedback Content <span className="text-danger">*</span>
-                </label>
-                <textarea
-                  className="form-control"
-                  rows={5}
-                  value={contextForm.feedbackContent}
-                  onChange={(e) =>
-                    setContextForm({
-                      ...contextForm,
-                      feedbackContent: e.target.value,
-                    })
-                  }
-                  placeholder="Provide constructive feedback on their work, collaboration, or skills..."
-                  required
-                  maxLength={1000}
+                <button
+                  type="submit"
+                  className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                  disabled={loading || !goalForm.organizationObjectiveId}
                   style={{
+                    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                    color: "white",
+                    border: "none",
                     borderRadius: "8px",
-                    border: "1px solid #e2e8f0",
+                    padding: "0.75rem",
                     fontSize: "0.875rem",
-                    resize: "vertical",
-                    minHeight: "120px",
+                    fontWeight: 600,
+                    transition: "all 0.3s ease",
+                    boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
                   }}
-                />
-                <div
-                  className="d-flex justify-content-between"
-                  style={{ marginTop: "0.5rem" }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 4px 12px rgba(151, 36, 126, 0.3)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(151, 36, 126, 0.2)";
+                  }}
                 >
-                  <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                    Be specific and constructive
-                  </span>
-                  <span
+                  {loading ? (
+                    <>
+                      <Loader size={16} className="animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      Submit Feedback
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Context feedback form */}
+        {!loadingData && activeTab === "context" && (
+          <div
+            className="card border-0 shadow-sm"
+            style={{ borderRadius: "10px" }}
+          >
+            <div className="card-body" style={{ padding: "1.5rem" }}>
+              <form onSubmit={submitContext}>
+                <div className="mb-4">
+                  <label
+                    className="form-label fw-semibold mb-2"
+                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                  >
+                    Select Recipient <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    className="form-select"
+                    value={contextForm.recipientEmployeeId}
+                    onChange={handleEmployeeChange}
+                    required
                     style={{
-                      fontSize: "0.75rem",
-                      color:
-                        contextForm.feedbackContent.length > 900
-                          ? "#dc2626"
-                          : "#64748b",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      fontSize: "0.875rem",
+                      padding: "0.625rem 0.875rem",
                     }}
                   >
-                    {contextForm.feedbackContent.length}/1000
-                  </span>
+                    <option value="">Choose a team member...</option>
+                    {employees.map((emp) => (
+                      <option key={emp.employeeId} value={emp.employeeId}>
+                        {emp.firstName} {emp.lastName} ({emp.email})
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              </div>
 
-              <div className="mb-4">
-                <div className="form-check">
+                {selectedEmployee && (
+                  <div
+                    className="mb-4 p-3"
+                    style={{
+                      backgroundColor: "#f8fafc",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#64748b",
+                        marginBottom: "0.25rem",
+                      }}
+                    >
+                      Feedback for
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                        color: "#0f172a",
+                      }}
+                    >
+                      {selectedEmployee.firstName} {selectedEmployee.lastName}
+                    </div>
+                    <small style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                      {selectedEmployee.email}
+                    </small>
+                  </div>
+                )}
+
+                <div className="mb-4">
+                  <label
+                    className="form-label fw-semibold mb-2"
+                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                  >
+                    Project Context <span className="text-danger">*</span>
+                  </label>
                   <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="contextAnon"
-                    checked={contextForm.isAnonymous}
+                    type="text"
+                    className="form-control"
+                    value={contextForm.projectContext}
                     onChange={(e) =>
                       setContextForm({
                         ...contextForm,
-                        isAnonymous: e.target.checked,
+                        projectContext: e.target.value,
                       })
                     }
+                    placeholder="e.g., AI Platform Project, Q4 Sprint"
+                    required
+                    style={{
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      fontSize: "0.875rem",
+                      padding: "0.625rem 0.875rem",
+                    }}
                   />
-                  <label
-                    className="form-check-label"
-                    htmlFor="contextAnon"
-                    style={{ fontSize: "0.875rem" }}
-                  >
-                    Submit anonymously
-                  </label>
                 </div>
-              </div>
 
-              <button
-                type="submit"
-                className="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
-                disabled={
-                  loading ||
-                  !contextForm.recipientEmployeeId ||
-                  !contextForm.projectContext
-                }
-                style={{
-                  borderRadius: "8px",
-                  padding: "0.75rem",
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  backgroundColor: "#0f62fe",
-                  border: "none",
-                }}
-              >
-                {loading ? (
-                  <>
-                    <Loader size={16} className="animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Send size={16} />
-                    Submit Feedback
-                  </>
-                )}
-              </button>
-            </form>
+                <div className="mb-4">
+                  <label
+                    className="form-label fw-semibold mb-2"
+                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
+                  >
+                    Feedback Content <span className="text-danger">*</span>
+                  </label>
+                  <textarea
+                    className="form-control"
+                    rows={5}
+                    value={contextForm.feedbackContent}
+                    onChange={(e) =>
+                      setContextForm({
+                        ...contextForm,
+                        feedbackContent: e.target.value,
+                      })
+                    }
+                    placeholder="Provide constructive feedback on their work, collaboration, or skills..."
+                    required
+                    maxLength={1000}
+                    style={{
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                      fontSize: "0.875rem",
+                      resize: "vertical",
+                      minHeight: "120px",
+                    }}
+                  />
+                  <div
+                    className="d-flex justify-content-between"
+                    style={{ marginTop: "0.5rem" }}
+                  >
+                    <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                      Be specific and constructive
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        color:
+                          contextForm.feedbackContent.length > 900
+                            ? "#dc2626"
+                            : "#64748b",
+                      }}
+                    >
+                      {contextForm.feedbackContent.length}/1000
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="contextAnon"
+                      checked={contextForm.isAnonymous}
+                      onChange={(e) =>
+                        setContextForm({
+                          ...contextForm,
+                          isAnonymous: e.target.checked,
+                        })
+                      }
+                    />
+                    <label
+                      className="form-check-label"
+                      htmlFor="contextAnon"
+                      style={{ fontSize: "0.875rem" }}
+                    >
+                      Submit anonymously
+                    </label>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                  disabled={
+                    loading ||
+                    !contextForm.recipientEmployeeId ||
+                    !contextForm.projectContext
+                  }
+                  style={{
+                    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    padding: "0.75rem",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                    transition: "all 0.3s ease",
+                    boxShadow: "0 2px 8px rgba(151, 36, 126, 0.2)",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 4px 12px rgba(151, 36, 126, 0.3)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(151, 36, 126, 0.2)";
+                  }}
+                >
+                  {loading ? (
+                    <>
+                      <Loader size={16} className="animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      Submit Feedback
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <style>{`
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .form-control:focus, .form-select:focus {
-          border-color: #0f62fe;
-          box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.1);
+          border-color: #27235C;
+          box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
         }
       `}</style>
     </div>
