@@ -1,0 +1,1039 @@
+/* ========================================
+   EMPLOYEE SLA DASHBOARD
+   Fixed Card Layout & Improved Hover
+   ======================================== */
+
+/* Container */
+.emp-sla-dashboard {
+  padding: 1.25rem 1.5rem;
+  background-color: #F9FAFB;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loading */
+.emp-sla-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 600px;
+  gap: 1rem;
+}
+
+.emp-sla-loading-text {
+  color: #6B7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Spin Animation */
+.emp-sla-spin {
+  animation: emp-sla-spin-animation 1s linear infinite;
+}
+
+@keyframes emp-sla-spin-animation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+.emp-sla-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.125rem;
+}
+
+.emp-sla-title {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.125rem;
+  line-height: 1.2;
+}
+
+.emp-sla-subtitle {
+  font-size: 0.875rem;
+  color: #6B7280;
+  margin: 0;
+  font-weight: 500;
+}
+
+.emp-sla-header-actions {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.emp-sla-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 7px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.emp-sla-btn-refresh {
+  background: #FFFFFF;
+  color: #0F62FE;
+  border: 1.5px solid #0F62FE;
+}
+
+.emp-sla-btn-refresh:hover:not(:disabled) {
+  background: #0F62FE;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.emp-sla-btn-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.emp-sla-btn-export {
+  background: #FFFFFF;
+  color: #16A34A;
+  border: 1.5px solid #16A34A;
+}
+
+.emp-sla-btn-export:hover {
+  background: #16A34A;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   USER PROFILE
+   ======================================== */
+
+.emp-sla-profile-wrapper {
+  position: relative;
+}
+
+.emp-sla-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.375rem 0.75rem;
+  background: #FFFFFF;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emp-sla-profile-trigger:hover {
+  border-color: #27235C;
+  box-shadow: 0 2px 8px rgba(39, 35, 92, 0.1);
+}
+
+.emp-sla-profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.emp-sla-profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.emp-sla-profile-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.emp-sla-profile-role {
+  font-size: 0.75rem;
+  color: #6B7280;
+  line-height: 1.2;
+}
+
+.emp-sla-profile-chevron {
+  color: #6B7280;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.emp-sla-profile-trigger:hover .emp-sla-profile-chevron {
+  transform: translateY(2px);
+}
+
+.emp-sla-profile-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+}
+
+.emp-sla-profile-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 280px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid #E5E7EB;
+  z-index: 1000;
+  overflow: hidden;
+  animation: emp-sla-dropdown-fade 0.2s ease;
+}
+
+@keyframes emp-sla-dropdown-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.emp-sla-profile-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.emp-sla-profile-dropdown-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 1.125rem;
+  text-transform: uppercase;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.emp-sla-profile-dropdown-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 0.125rem;
+}
+
+.emp-sla-profile-dropdown-email {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.emp-sla-profile-dropdown-divider {
+  height: 1px;
+  background: #E5E7EB;
+  margin: 0.25rem 0;
+}
+
+.emp-sla-profile-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.emp-sla-profile-dropdown-item:hover {
+  background: #F9FAFB;
+}
+
+.emp-sla-profile-dropdown-item svg {
+  color: #6B7280;
+}
+
+.emp-sla-profile-dropdown-logout {
+  color: #DC2626;
+}
+
+.emp-sla-profile-dropdown-logout:hover {
+  background: #FEF2F2;
+}
+
+.emp-sla-profile-dropdown-logout svg {
+  color: #DC2626;
+}
+
+/* ========================================
+   ALERTS
+   ======================================== */
+
+.emp-sla-alert-error {
+  background: #FEF2F2;
+  border: 1px solid #FEE2E2;
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  align-items: start;
+  gap: 0.625rem;
+  margin-bottom: 1.125rem;
+}
+
+.emp-sla-alert-icon {
+  flex-shrink: 0;
+  color: #DC2626;
+  margin-top: 2px;
+}
+
+.emp-sla-alert-content {
+  flex: 1;
+  font-size: 0.8125rem;
+  color: #991B1B;
+}
+
+.emp-sla-alert-content strong {
+  font-weight: 600;
+}
+
+.emp-sla-alert-close {
+  background: none;
+  border: none;
+  font-size: 1.375rem;
+  color: #991B1B;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.emp-sla-alert-overdue {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.125rem;
+}
+
+.emp-sla-alert-overdue-icon {
+  width: 40px;
+  height: 40px;
+  background: #FEE2E2;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #DC2626;
+  flex-shrink: 0;
+}
+
+.emp-sla-alert-overdue-title {
+  color: #991B1B;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin: 0 0 0.125rem;
+}
+
+.emp-sla-alert-overdue-text {
+  color: #7F1D1D;
+  font-size: 0.8125rem;
+  margin: 0;
+}
+
+/* ========================================
+   STATS GRID
+   ======================================== */
+
+.emp-sla-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.875rem;
+  margin-bottom: 1.125rem;
+}
+
+.emp-sla-stat-card {
+  background: #FFFFFF;
+  border-radius: 10px;
+  padding: 1.125rem 1rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 2px solid #27235C;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 135px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.emp-sla-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(15, 98, 254, 0.2);
+  border-color: #0F62FE;
+}
+
+.emp-sla-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.emp-sla-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.375rem;
+  line-height: 1;
+}
+
+.emp-sla-stat-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ========================================
+   PILL-STYLE TABS - FULL WIDTH
+   ======================================== */
+
+.emp-sla-tabs-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.emp-sla-tabs-container {
+  display: flex;
+  background: #27235C;
+  padding: 0.375rem;
+  border-radius: 50px;
+  gap: 0.375rem;
+  box-shadow: 0 2px 8px rgba(39, 35, 92, 0.2);
+  flex: 1;
+  max-width: calc(100% - 100px);
+}
+
+.emp-sla-tab-pill {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  border: none;
+  background: transparent;
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.emp-sla-tab-pill:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+}
+
+.emp-sla-tab-pill.active {
+  background: #FFFFFF;
+  color: #27235C;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 50px;
+}
+
+.emp-sla-view-toggle {
+  display: flex;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.emp-sla-view-btn {
+  padding: 0.5rem 0.75rem;
+  background: #FFFFFF;
+  border: none;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emp-sla-view-btn:hover {
+  background: #F9FAFB;
+}
+
+.emp-sla-view-btn.active {
+  background: #0F62FE;
+  color: #FFFFFF;
+}
+
+/* ========================================
+   CONTENT
+   ======================================== */
+
+.emp-sla-content {
+  flex: 1;
+  overflow: visible;
+}
+
+/* Empty State */
+.emp-sla-empty {
+  background: #FFFFFF;
+  border: 1px solid #F3F4F6;
+  border-radius: 12px;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.emp-sla-empty-icon {
+  color: #CBD5E1;
+  opacity: 0.4;
+  margin-bottom: 1rem;
+}
+
+.emp-sla-empty-title {
+  color: #111827;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.emp-sla-empty-text {
+  color: #6B7280;
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+/* ========================================
+   TABLE VIEW
+   ======================================== */
+
+.emp-sla-table-wrapper {
+  background: #FFFFFF;
+  border: 1px solid #F3F4F6;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.emp-sla-table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+.emp-sla-table thead {
+  background: #27235C;
+}
+
+.emp-sla-table thead th {
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-align: left;
+  color: #FFFFFF;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.emp-sla-table thead th:last-child {
+  text-align: center;
+}
+
+.emp-sla-table tbody tr {
+  border-bottom: 1px solid #F1F5F9;
+  transition: background-color 0.15s ease;
+}
+
+.emp-sla-table tbody tr:hover {
+  background-color: #F9FAFB;
+}
+
+.emp-sla-table tbody td {
+  padding: 0.875rem 1rem;
+  font-size: 0.8125rem;
+  color: #111827;
+  vertical-align: middle;
+}
+
+.emp-sla-table tbody td:last-child {
+  text-align: center;
+}
+
+.emp-sla-table-type {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.emp-sla-table-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.emp-sla-table-type-text {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.emp-sla-table-text {
+  color: #475569;
+}
+
+/* ========================================
+   CARD VIEW - TITLE LEFT, BADGE RIGHT
+   ======================================== */
+
+.emp-sla-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.emp-sla-card {
+  background: #FFFFFF;
+  border: 2px solid #27235C;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.emp-sla-card:hover {
+  border-color: #0F62FE;
+  box-shadow: 0 8px 24px rgba(15, 98, 254, 0.18);
+  transform: translateY(-4px);
+}
+
+/* Card Header - Modified for Left/Right Layout */
+.emp-sla-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.125rem;
+  border-bottom: 1px solid #F3F4F6;
+  background: #FAFBFC;
+}
+
+.emp-sla-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.emp-sla-card:hover .emp-sla-card-icon {
+  transform: scale(1.1);
+}
+
+.emp-sla-card-header-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.emp-sla-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+}
+
+.emp-sla-card-badge {
+  display: inline-block;
+  padding: 0.3125rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+/* Card Body */
+.emp-sla-card-body {
+  padding: 1.125rem;
+  flex: 1;
+}
+
+.emp-sla-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #F9FAFB;
+}
+
+.emp-sla-card-row:last-child {
+  border-bottom: none;
+}
+
+.emp-sla-card-label {
+  font-size: 0.8125rem;
+  color: #6B7280;
+  font-weight: 600;
+}
+
+.emp-sla-card-value {
+  font-size: 0.8125rem;
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+.emp-sla-truncate {
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emp-sla-text-danger {
+  color: #DC2626 !important;
+}
+
+.emp-sla-text-success {
+  color: #16A34A !important;
+}
+
+/* Card Footer */
+.emp-sla-card-footer {
+  padding: 1rem 1.125rem;
+  border-top: 1px solid #F3F4F6;
+  background: #FAFBFC;
+}
+
+.emp-sla-card-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #FFFFFF;
+  color: #27235C;
+  border: 1.5px solid #27235C;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emp-sla-card-btn:hover {
+  background: #27235C;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
+}
+
+/* ========================================
+   BADGES & STATUS
+   ======================================== */
+
+.emp-sla-badge {
+  display: inline-block;
+  padding: 0.3125rem 0.625rem;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.emp-sla-status-open,
+.emp-sla-badge.emp-sla-status-open {
+  background: #DBEAFE;
+  color: #0F62FE;
+}
+
+.emp-sla-table-icon.emp-sla-status-open,
+.emp-sla-card-icon.emp-sla-status-open {
+  background: #DBEAFE;
+  color: #0F62FE;
+}
+
+.emp-sla-status-progress,
+.emp-sla-badge.emp-sla-status-progress {
+  background: #FEF3C7;
+  color: #D4941E;
+}
+
+.emp-sla-table-icon.emp-sla-status-progress,
+.emp-sla-card-icon.emp-sla-status-progress {
+  background: #FEF3C7;
+  color: #D4941E;
+}
+
+.emp-sla-status-closed,
+.emp-sla-badge.emp-sla-status-closed {
+  background: #DCFCE7;
+  color: #24A148;
+}
+
+.emp-sla-table-icon.emp-sla-status-closed,
+.emp-sla-card-icon.emp-sla-status-closed {
+  background: #DCFCE7;
+  color: #24A148;
+}
+
+.emp-sla-status-overdue,
+.emp-sla-badge-overdue {
+  background: #FEE2E2;
+  color: #E01950;
+}
+
+.emp-sla-table-icon.emp-sla-status-overdue,
+.emp-sla-card-icon.emp-sla-status-overdue {
+  background: #FEE2E2;
+  color: #E01950;
+}
+
+.emp-sla-badge-compliance-ontime {
+  background: #D1FAE5;
+  color: #047857;
+}
+
+.emp-sla-badge-compliance-breached {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.emp-sla-badge-compliance-extended {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+/* Days Indicators */
+.emp-sla-days {
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.emp-sla-days-overdue {
+  color: #DC2626;
+}
+
+.emp-sla-days-warning {
+  color: #E2B93B;
+}
+
+.emp-sla-days-ok {
+  color: #24A148;
+}
+
+/* ========================================
+   ACTION BUTTONS
+   ======================================== */
+
+.emp-sla-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: transparent;
+  color: #0F62FE;
+  border: 1.5px solid #0F62FE;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.emp-sla-action-btn:hover {
+  background: #0F62FE;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(15, 98, 254, 0.25);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1200px) {
+  .emp-sla-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .emp-sla-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .emp-sla-dashboard {
+    padding: 1rem;
+  }
+
+  .emp-sla-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.875rem;
+  }
+
+  .emp-sla-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .emp-sla-profile-trigger {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .emp-sla-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emp-sla-tabs-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .emp-sla-tabs-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .emp-sla-tab-pill {
+    flex: 0 0 auto;
+    min-width: 100px;
+  }
+
+  .emp-sla-view-toggle {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .emp-sla-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .emp-sla-card-header-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .emp-sla-card-title {
+    max-width: 100%;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .emp-sla-table {
+    min-width: 700px;
+  }
+}
+
+/* ========================================
+   SCROLLBAR
+   ======================================== */
+
+.emp-sla-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.emp-sla-content::-webkit-scrollbar-track {
+  background: #F1F5F9;
+  border-radius: 4px;
+}
+
+.emp-sla-content::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+.emp-sla-content::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}

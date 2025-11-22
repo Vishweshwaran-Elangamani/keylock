@@ -1,0 +1,577 @@
+/* ========================================
+   EMPLOYEE ASSIGNED FORMS - CLEAN DESIGN
+   ======================================== */
+
+/* Container */
+.employee-forms-container {
+  padding: 1.5rem 1.75rem;
+  background-color: #F9FAFB;
+  min-height: 100vh;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+.employee-forms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.employee-forms-header-left {
+  flex: 1;
+}
+
+.employee-forms-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #27235C;
+  margin: 0;
+  line-height: 1.2;
+  font-style: normal;
+}
+
+.employee-forms-subtitle {
+  font-size: 0.875rem;
+  color: #6B7280;
+  margin: 0.25rem 0 0;
+  font-weight: 500;
+  line-height: 1.2;
+  font-style: normal;
+}
+
+.employee-forms-last-update {
+  font-style: normal;
+}
+
+.employee-forms-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.employee-forms-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-style: normal;
+  text-decoration: none;
+}
+
+.employee-forms-btn-refresh {
+  background: #FFFFFF;
+  color: #0F62FE;
+  border: 1.5px solid #0F62FE;
+}
+
+.employee-forms-btn-refresh:hover:not(:disabled) {
+  background: #0F62FE;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.employee-forms-btn-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.employee-forms-btn-export {
+  background: #FFFFFF;
+  color: #16A34A;
+  border: 1.5px solid #16A34A;
+}
+
+.employee-forms-btn-export:hover {
+  background: #16A34A;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.employee-forms-btn-primary {
+  background: #FFFFFF;
+  color: #27235C;
+  border: 1.5px solid #27235C;
+}
+
+.employee-forms-btn-primary:hover {
+  background: #27235C;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+/* Spin Animation */
+.employee-forms-spin {
+  animation: employee-forms-spin-animation 1s linear infinite;
+}
+
+@keyframes employee-forms-spin-animation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   ALERTS
+   ======================================== */
+
+.employee-forms-alert-error {
+  background: #FEF2F2;
+  border: 1px solid #FEE2E2;
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.employee-forms-alert-icon {
+  flex-shrink: 0;
+  color: #DC2626;
+  margin-top: 2px;
+}
+
+.employee-forms-alert-content {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #991B1B;
+  font-style: normal;
+}
+
+.employee-forms-alert-content strong {
+  font-weight: 600;
+}
+
+.employee-forms-alert-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #991B1B;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ========================================
+   STATS GRID
+   ======================================== */
+
+.employee-forms-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.employee-forms-stat-card {
+  background: #FFFFFF;
+  border-radius: 10px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #27235C;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 135px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.employee-forms-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(15, 98, 254, 0.2);
+  border-color: #0F62FE;
+}
+
+.employee-forms-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.employee-forms-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.375rem;
+  line-height: 1;
+  font-style: normal;
+}
+
+.employee-forms-stat-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.2;
+  font-style: normal;
+}
+
+/* ========================================
+   LOADING & EMPTY STATES
+   ======================================== */
+
+.employee-forms-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.employee-forms-loading-spinner {
+  color: #0F62FE;
+  animation: employee-forms-spin-animation 1s linear infinite;
+}
+
+.employee-forms-loading-text {
+  color: #6B7280;
+  font-size: 0.875rem;
+  margin: 0;
+  font-style: normal;
+}
+
+.employee-forms-empty {
+  background: #FFFFFF;
+  border: 1px solid #F3F4F6;
+  border-radius: 12px;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.employee-forms-empty-icon {
+  color: #CBD5E1;
+  opacity: 0.4;
+  margin-bottom: 1rem;
+}
+
+.employee-forms-empty-title {
+  color: #111827;
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  font-style: normal;
+}
+
+.employee-forms-empty-text {
+  color: #6B7280;
+  font-size: 0.9375rem;
+  margin: 0 0 1.5rem;
+  font-style: normal;
+}
+
+/* ========================================
+   FORMS GRID
+   ======================================== */
+
+.employee-forms-content {
+  flex: 1;
+}
+
+.employee-forms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+
+/* ========================================
+   FORM CARDS - CLEAN MINIMAL DESIGN
+   ======================================== */
+
+.employee-forms-card {
+  background: #FFFFFF;
+  border: 2px solid #27235C;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.employee-forms-card:hover {
+  border-color: #0F62FE;
+  box-shadow: 0 8px 24px rgba(15, 98, 254, 0.18);
+  transform: translateY(-4px);
+}
+
+/* Card Header - Clean Design */
+.employee-forms-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.125rem;
+  border-bottom: 1px solid #F3F4F6;
+  background: #FAFBFC;
+}
+
+.employee-forms-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  background: #EEF2FF;
+  color: #0F62FE;
+}
+
+.employee-forms-card:hover .employee-forms-card-icon {
+  transform: scale(1.1);
+}
+
+.employee-forms-card-header-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.employee-forms-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
+  font-style: normal;
+}
+
+/* Card Body - Simple Clean Rows */
+.employee-forms-card-body {
+  padding: 1.125rem;
+  flex: 1;
+}
+
+.employee-forms-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #F9FAFB;
+}
+
+.employee-forms-card-row:last-child {
+  border-bottom: none;
+}
+
+.employee-forms-card-label {
+  font-size: 0.8125rem;
+  color: #6B7280;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.employee-forms-card-value {
+  font-size: 0.8125rem;
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+  font-style: normal;
+}
+
+.employee-forms-card-description {
+  font-size: 0.8125rem;
+  color: #6B7280;
+  font-weight: 600;
+  text-align: right;
+  font-style: normal;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.employee-forms-card-deadline-value {
+  font-size: 0.8125rem;
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+  font-style: normal;
+}
+
+/* Utility Classes */
+.employee-forms-text-success {
+  color: #16A34A !important;
+}
+
+.employee-forms-text-danger {
+  color: #DC2626 !important;
+}
+
+.employee-forms-text-warning {
+  color: #F59E0B !important;
+}
+
+.employee-forms-truncate {
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Card Footer - Clean Design */
+.employee-forms-card-footer {
+  padding: 1rem 1.125rem;
+  border-top: 1px solid #F3F4F6;
+  background: #FAFBFC;
+}
+
+.employee-forms-card-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  border: none;
+  font-style: normal;
+}
+
+.employee-forms-card-btn-primary {
+  background: #FFFFFF;
+  color: #27235C;
+  border: 1.5px solid #27235C;
+}
+
+.employee-forms-card-btn-primary:hover {
+  background: #27235C;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
+}
+
+.employee-forms-card-btn-disabled {
+  background: #F3F4F6;
+  color: #9CA3AF;
+  border: 1.5px solid #E5E7EB;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   BADGES - CLEAN DESIGN
+   ======================================== */
+
+.employee-forms-badge {
+  display: inline-block;
+  padding: 0.3125rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  font-style: normal;
+}
+
+.employee-forms-badge-submitted {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.employee-forms-badge-pending {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 1024px) {
+  .employee-forms-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .employee-forms-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-forms-container {
+    padding: 1.25rem;
+  }
+
+  .employee-forms-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .employee-forms-actions {
+    width: 100%;
+  }
+
+  .employee-forms-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-forms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .employee-forms-card-header-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .employee-forms-card-title {
+    max-width: 100%;
+  }
+}
+
+/* ========================================
+   GLOBAL OVERRIDE - NO ITALIC
+   ======================================== */
+
+.employee-forms-container * {
+  font-style: normal !important;
+}

@@ -1,5 +1,3 @@
-// src/pages/feedback_management/feedback/EmployeeAssignedForms.jsx
-
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   RefreshCw,
@@ -9,9 +7,12 @@ import {
   Calendar,
   Loader,
   Lock,
+  Download,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { hrFormApi, dateHelpers } from "../../../services/feedbackmanagement/feedbackApi";
+import Breadcrumb from "../../../components/sla/common/Breadcrumbs";
+import "../../../styles/feedback/EmployeeAssignedForms.css";
 
 export default function EmployeeAssignedForms() {
   const user = useMemo(
@@ -25,7 +26,7 @@ export default function EmployeeAssignedForms() {
   const [error, setError] = useState("");
   const [lastFetchTime, setLastFetchTime] = useState(null);
 
-  // Fetch ALL forms using existing hrFormApi
+  // Fetch ALL forms using hrFormApi.getAllForms()
   const fetchForms = useCallback(
     async (retryCount = 0) => {
       if (!user?.empId) {
@@ -83,8 +84,6 @@ export default function EmployeeAssignedForms() {
   const fetchSubmittedForms = useCallback(async () => {
     if (!user?.empId) return;
     try {
-      // Assuming you have a byEmployee endpoint similar to byForm
-      // If not, you may need to add this to your hrFormApi
       const response = await hrFormApi.byEmployee?.(user.empId);
       
       if (response?.data?.data && Array.isArray(response.data.data)) {
@@ -143,260 +142,202 @@ export default function EmployeeAssignedForms() {
   }, [fetchForms, fetchSubmittedForms]);
 
   return (
-    <div className="container-fluid py-4" style={{ maxWidth: "1200px" }}>
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-start mb-4">
-        <div>
-          <h3
-            className="fw-bold mb-1"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            📋 All Forms
-          </h3>
-          <p className="mb-0 small text-muted">
-            Every form is listed here regardless of its status
-            {lastFetchTime && (
-              <span className="ms-2">(Last updated: {lastFetchTime})</span>
-            )}
-          </p>
-        </div>
-        <button
-          className="btn btn-outline-secondary"
-          onClick={handleRefresh}
-          disabled={loading}
-          title="Refresh forms"
-        >
-          <RefreshCw
-            size={18}
-            style={{ animation: loading ? "spin 1s linear infinite" : "none" }}
-          />
-        </button>
-      </div>
+    <div className="employee-forms-container">
+      <Breadcrumb items={[{ label: "Assigned Forms" }]} />
 
+     
       {/* Error Alert */}
       {error && (
-        <div
-          className="alert alert-warning alert-dismissible fade show mb-4"
-          role="alert"
-        >
-          <AlertTriangle
-            size={16}
-            className="me-2"
-            style={{ display: "inline" }}
-          />
-          {error}
+        <div className="employee-forms-alert-error">
+          <AlertTriangle size={18} className="employee-forms-alert-icon" />
+          <div className="employee-forms-alert-content">
+            <strong>Error:</strong> {error}
+          </div>
           <button
-            type="button"
-            className="btn-close"
+            className="employee-forms-alert-close"
             onClick={() => setError("")}
-            aria-label="Close"
-          />
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* Stats Cards */}
-      <div className="row g-3 mb-4">
-        <div className="col-6 col-md-4">
+      {/* Stats Grid */}
+      <div className="employee-forms-stats-grid">
+        <div className="employee-forms-stat-card">
           <div
-            className="card border-0 text-center"
-            style={{ border: "1px solid var(--border)" }}
+            className="employee-forms-stat-icon"
+            style={{ backgroundColor: "#EEF2FF" }}
           >
-            <div className="card-body">
-              <h5 className="fw-bold text-primary">{stats.total}</h5>
-              <small className="text-muted">Total Forms</small>
-            </div>
+            <FileText size={22} color="#3B82F6" strokeWidth={2.5} />
           </div>
+          <h3 className="employee-forms-stat-value">{stats.total}</h3>
+          <p className="employee-forms-stat-label">Total Forms</p>
         </div>
-        <div className="col-6 col-md-4">
+
+        <div className="employee-forms-stat-card">
           <div
-            className="card border-0 text-center"
-            style={{ border: "1px solid var(--border)" }}
+            className="employee-forms-stat-icon"
+            style={{ backgroundColor: "#DCFCE7" }}
           >
-            <div className="card-body">
-              <h5 className="fw-bold" style={{ color: "#24A148" }}>
-                {stats.submitted}
-              </h5>
-              <small className="text-muted">Submitted by You</small>
-            </div>
+            <Eye size={22} color="#16A34A" strokeWidth={2.5} />
           </div>
+          <h3 className="employee-forms-stat-value">{stats.submitted}</h3>
+          <p className="employee-forms-stat-label">Submitted by You</p>
         </div>
-        <div className="col-6 col-md-4">
+
+        <div className="employee-forms-stat-card">
           <div
-            className="card border-0 text-center"
-            style={{ border: "1px solid var(--border)" }}
+            className="employee-forms-stat-icon"
+            style={{ backgroundColor: "#E0E7FF" }}
           >
-            <div className="card-body">
-              <h5 className="fw-bold" style={{ color: "#0F62FE" }}>
-                {stats.remaining}
-              </h5>
-              <small className="text-muted">Not Yet Submitted</small>
-            </div>
+            <Calendar size={22} color="#4F46E5" strokeWidth={2.5} />
           </div>
+          <h3 className="employee-forms-stat-value">{stats.remaining}</h3>
+          <p className="employee-forms-stat-label">Not Yet Submitted</p>
         </div>
       </div>
 
-      {/* Loading State */}
-      {loading ? (
-        <div className="text-center py-5">
-          <Loader
-            size={32}
-            className="mb-3 text-primary"
-            style={{ animation: "spin 1s linear infinite", display: "block" }}
-          />
-          <p className="text-muted">Loading forms...</p>
-        </div>
-      ) : allForms.length === 0 ? (
-        <div
-          className="card border-0"
-          style={{ border: "1px solid var(--border)" }}
-        >
-          <div className="card-body text-center py-5">
-            <FileText
-              size={48}
-              className="text-muted mb-3"
-              style={{ opacity: 0.3 }}
-            />
-            <h5 className="text-muted">No Forms Available</h5>
-            <p className="text-muted small">
+      {/* Content Area */}
+      <div className="employee-forms-content">
+        {loading ? (
+          <div className="employee-forms-loading">
+            <Loader size={48} className="employee-forms-loading-spinner" />
+            <p className="employee-forms-loading-text">Loading forms...</p>
+          </div>
+        ) : allForms.length === 0 ? (
+          <div className="employee-forms-empty">
+            <FileText size={56} className="employee-forms-empty-icon" />
+            <h5 className="employee-forms-empty-title">No Forms Available</h5>
+            <p className="employee-forms-empty-text">
               There are currently no forms to display.
             </p>
             <button
-              className="btn btn-outline-primary btn-sm mt-2"
+              className="employee-forms-btn employee-forms-btn-primary"
               onClick={handleRefresh}
             >
+              <RefreshCw size={16} />
               Refresh
             </button>
           </div>
-        </div>
-      ) : (
-        <div className="row g-4">
-          {allForms.map((form) => {
-            const isSubmitted = submittedFormIds.has(form.formId);
-            const deadlineStr = form.deadline
-              ? new Date(form.deadline).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })
-              : "—";
-            
-            // Use your existing dateHelpers for urgency
-            const urgencyInfo = form.deadline 
-              ? dateHelpers.urgency(form.deadline) 
-              : null;
+        ) : (
+          <div className="employee-forms-grid">
+            {allForms.map((form) => {
+              const isSubmitted = submittedFormIds.has(form.formId);
+              const deadlineStr = form.deadline
+                ? new Date(form.deadline).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                : "—";
 
-            return (
-              <div key={form.formId} className="col-md-6 col-lg-4">
-                <div
-                  className="card border-0 h-100"
-                  style={{
-                    border: "1px solid var(--border)",
-                    boxShadow: "var(--shadow)",
-                    borderRadius: "var(--radius-lg)",
-                    transition: "transform 0.2s",
-                    opacity: isSubmitted ? 0.85 : 1,
-                  }}
-                  onMouseEnter={(e) =>
-                    !isSubmitted &&
-                    (e.currentTarget.style.transform = "translateY(-4px)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.transform = "translateY(0)")
-                  }
-                >
-                  <div className="card-body d-flex flex-column">
-                    {/* Title */}
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <h6
-                        className="fw-bold mb-0"
-                        style={{ flex: 1, marginRight: 8 }}
-                      >
+              // Use dateHelpers for urgency if available
+              const urgencyInfo = form.deadline
+                ? dateHelpers.urgency?.(form.deadline)
+                : null;
+
+              return (
+                <div key={form.formId} className="employee-forms-card">
+                  {/* Card Header - Icon, Title (Left), Badge (Right) */}
+                  <div className="employee-forms-card-header">
+                    <div className="employee-forms-card-icon">
+                      <FileText size={20} strokeWidth={2} />
+                    </div>
+                    <div className="employee-forms-card-header-text">
+                      <h6 className="employee-forms-card-title">
                         {form.formName}
                       </h6>
-                      {urgencyInfo && (
+                      <span
+                        className={`employee-forms-badge ${
+                          isSubmitted
+                            ? "employee-forms-badge-submitted"
+                            : "employee-forms-badge-pending"
+                        }`}
+                      >
+                        {isSubmitted ? "Submitted" : "Pending"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card Body - Simple Rows */}
+                  <div className="employee-forms-card-body">
+                    <div className="employee-forms-card-row">
+                      <span className="employee-forms-card-label">
+                        Description
+                      </span>
+                      <span
+                        className="employee-forms-card-description"
+                        title={form.formDescription}
+                      >
+                        {form.formDescription || "No description"}
+                      </span>
+                    </div>
+
+                    <div className="employee-forms-card-row">
+                      <span className="employee-forms-card-label">
+                        Form Type
+                      </span>
+                      <span className="employee-forms-card-value">
+                        {getFormTypeLabel(form.formType)}
+                      </span>
+                    </div>
+
+                    <div className="employee-forms-card-row">
+                      <span className="employee-forms-card-label">
+                        Deadline
+                      </span>
+                      <span className="employee-forms-card-deadline-value">
+                        {deadlineStr}
+                      </span>
+                    </div>
+
+                    {urgencyInfo && (
+                      <div className="employee-forms-card-row">
+                        <span className="employee-forms-card-label">
+                          Urgency
+                        </span>
                         <span
-                          className="badge"
-                          style={{
-                            backgroundColor: urgencyInfo.color,
-                            color: "#fff",
-                            fontSize: "0.7rem",
-                          }}
+                          className={`employee-forms-card-value ${
+                            urgencyInfo.status === "Overdue"
+                              ? "employee-forms-text-danger"
+                              : urgencyInfo.status === "Critical"
+                              ? "employee-forms-text-danger"
+                              : "employee-forms-text-success"
+                          }`}
                         >
                           {urgencyInfo.icon} {urgencyInfo.status}
                         </span>
-                      )}
-                    </div>
-
-                    {/* Description */}
-                    <p className="small text-muted mb-3" style={{ flex: 1 }}>
-                      {form.formDescription}
-                    </p>
-
-                    {/* Form Type */}
-                    <div className="mb-3">
-                      <small className="text-muted d-block">Form Type</small>
-                      <div className="fw-600 small">
-                        {getFormTypeLabel(form.formType)}
                       </div>
-                    </div>
+                    )}
+                  </div>
 
-                    {/* Deadline */}
-                    <div
-                      className="mb-3 p-2 rounded"
-                      style={{ backgroundColor: "#f9f9fa" }}
-                    >
-                      <div className="d-flex align-items-center gap-2 mb-1">
-                        <Calendar size={14} className="text-muted" />
-                        <small className="text-muted fw-600">Deadline</small>
-                      </div>
-                      <div className="fw-bold small">{deadlineStr}</div>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="d-grid">
-                      {isSubmitted ? (
-                        <button
-                          className="btn btn-secondary btn-sm fw-600"
-                          style={{
-                            borderRadius: "var(--radius-md)",
-                            cursor: "not-allowed",
-                          }}
-                          disabled
-                        >
-                          <Lock
-                            size={16}
-                            className="me-1"
-                            style={{ display: "inline" }}
-                          />
-                          Already Submitted
-                        </button>
-                      ) : (
-                        <Link
-                          to={`/dashboard/feedback/fillform/${form.formId}`}
-                          className="btn btn-primary btn-sm fw-600"
-                          style={{ borderRadius: "var(--radius-md)" }}
-                        >
-                          <Eye
-                            size={16}
-                            className="me-1"
-                            style={{ display: "inline" }}
-                          />
-                          Fill Form
-                        </Link>
-                      )}
-                    </div>
+                  {/* Card Footer */}
+                  <div className="employee-forms-card-footer">
+                    {isSubmitted ? (
+                      <button
+                        className="employee-forms-card-btn employee-forms-card-btn-disabled"
+                        disabled
+                      >
+                        <Lock size={16} />
+                        Already Submitted
+                      </button>
+                    ) : (
+                      <Link
+                        to={`/dashboard/feedback/fillform/${form.formId}`}
+                        className="employee-forms-card-btn employee-forms-card-btn-primary"
+                      >
+                        <Eye size={16} />
+                        Fill Form
+                      </Link>
+                    )}
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .fw-600 { font-weight: 600; }
-      `}</style>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

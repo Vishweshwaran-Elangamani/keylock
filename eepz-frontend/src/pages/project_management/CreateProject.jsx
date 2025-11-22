@@ -18,6 +18,7 @@ import {
   Home,
 } from "lucide-react";
 import projectService from "../../services/project_management/projectService";
+import "../../styles/projectmanagement/CreateProject.css";
 
 const CreateProject = () => {
   const navigate = useNavigate();
@@ -65,8 +66,7 @@ const CreateProject = () => {
     "Retainer",
   ];
 
-  const PROJECT_NAME_REGEX =
-    /^ORG\.[A-Za-z][A-Za-z0-9-]*\.[A-Za-z][A-Za-z0-9-]*$/;
+  const PROJECT_NAME_REGEX = /^ORG\.[A-Za-z][A-Za-z0-9-]*\.[A-Za-z][A-Za-z0-9-]*$/;
 
   useEffect(() => {
     fetchDropdownData();
@@ -79,12 +79,11 @@ const CreateProject = () => {
   const fetchDropdownData = async () => {
     setIsLoadingData(true);
     try {
-      const [employeesRes, departmentsRes, businessUnitsRes] =
-        await Promise.all([
-          projectService.getAllEmployees(),
-          projectService.getAllDepartments(),
-          projectService.getAllBusinessUnits(),
-        ]);
+      const [employeesRes, departmentsRes, businessUnitsRes] = await Promise.all([
+        projectService.getAllEmployees(),
+        projectService.getAllDepartments(),
+        projectService.getAllBusinessUnits(),
+      ]);
 
       if (employeesRes.success) setEmployees(employeesRes.data);
       if (departmentsRes.success) setDepartments(departmentsRes.data);
@@ -121,8 +120,7 @@ const CreateProject = () => {
     if (!formData.projectName.trim()) {
       newErrors.projectName = "Project name is required";
     } else if (!PROJECT_NAME_REGEX.test(formData.projectName.trim())) {
-      newErrors.projectName =
-        "Format must be ORG.(Dept).(Project), e.g., ORG.IT.INTRANET";
+      newErrors.projectName = "Format must be ORG.(Dept).(Project), e.g., ORG.IT.INTRANET";
     }
 
     if (!formData.clientName.trim()) {
@@ -132,12 +130,9 @@ const CreateProject = () => {
     }
 
     if (!formData.startDate) newErrors.startDate = "Start date is required";
-    if (!formData.businessUnit.trim())
-      newErrors.businessUnit = "Business unit is required";
-    if (!formData.department.trim())
-      newErrors.department = "Department is required";
-    if (!formData.engagementModel)
-      newErrors.engagementModel = "Engagement model is required";
+    if (!formData.businessUnit.trim()) newErrors.businessUnit = "Business unit is required";
+    if (!formData.department.trim()) newErrors.department = "Department is required";
+    if (!formData.engagementModel) newErrors.engagementModel = "Engagement model is required";
 
     if (formData.startDate && formData.endDate) {
       if (new Date(formData.endDate) < new Date(formData.startDate)) {
@@ -167,11 +162,8 @@ const CreateProject = () => {
       const projectData = {
         ...formData,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: formData.endDate
-          ? new Date(formData.endDate).toISOString()
-          : null,
-        resourceOwnerEmployeeId:
-          selectedResourceOwner?.employeeMasterId || null,
+        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
+        resourceOwnerEmployeeId: selectedResourceOwner?.employeeMasterId || null,
         l1ApproverEmployeeId: selectedL1Approver?.employeeMasterId || null,
         l2ApproverEmployeeId: selectedL2Approver?.employeeMasterId || null,
       };
@@ -245,11 +237,8 @@ const CreateProject = () => {
           .toLowerCase()
           .includes(managerSearchTerm.toLowerCase());
 
-      const roleMatch =
-        managerFilterRole === "All" || emp.roleName === managerFilterRole;
-      const deptMatch =
-        managerFilterDepartment === "All" ||
-        emp.departmentName === managerFilterDepartment;
+      const roleMatch = managerFilterRole === "All" || emp.roleName === managerFilterRole;
+      const deptMatch = managerFilterDepartment === "All" || emp.departmentName === managerFilterDepartment;
 
       return searchMatch && roleMatch && deptMatch;
     });
@@ -266,15 +255,10 @@ const CreateProject = () => {
   };
 
   const filteredManagers = getFilteredManagers();
-  const managerTotalPages = Math.ceil(
-    filteredManagers.length / managerItemsPerPage
-  );
+  const managerTotalPages = Math.ceil(filteredManagers.length / managerItemsPerPage);
   const managerStartIndex = (managerCurrentPage - 1) * managerItemsPerPage;
   const managerEndIndex = managerStartIndex + managerItemsPerPage;
-  const paginatedManagers = filteredManagers.slice(
-    managerStartIndex,
-    managerEndIndex
-  );
+  const paginatedManagers = filteredManagers.slice(managerStartIndex, managerEndIndex);
 
   const goToManagerPage = (page) => {
     setManagerCurrentPage(Math.max(1, Math.min(page, managerTotalPages)));
@@ -294,13 +278,11 @@ const CreateProject = () => {
       } else if (managerCurrentPage >= managerTotalPages - 2) {
         pages.push(1);
         pages.push("...");
-        for (let i = managerTotalPages - 3; i <= managerTotalPages; i++)
-          pages.push(i);
+        for (let i = managerTotalPages - 3; i <= managerTotalPages; i++) pages.push(i);
       } else {
         pages.push(1);
         pages.push("...");
-        for (let i = managerCurrentPage - 1; i <= managerCurrentPage + 1; i++)
-          pages.push(i);
+        for (let i = managerCurrentPage - 1; i <= managerCurrentPage + 1; i++) pages.push(i);
         pages.push("...");
         pages.push(managerTotalPages);
       }
@@ -308,99 +290,47 @@ const CreateProject = () => {
     return pages;
   };
 
-  const CustomSelect = ({
-    label,
-    name,
-    value,
-    onChange,
-    options,
-    error,
-    required,
-    placeholder,
-  }) => (
+  const getCurrentSelectedManager = () => {
+    if (activeManagerTab === "resource") return selectedResourceOwner;
+    if (activeManagerTab === "l1") return selectedL1Approver;
+    return selectedL2Approver;
+  };
+
+  const CustomSelect = ({ label, name, value, onChange, options, error, required, placeholder }) => (
     <div className="mb-3">
       <label
-        className="form-label d-flex align-items-center gap-2 text-start"
-        style={{
-          color: "var(--color-primary-2)",
-          fontWeight: "500",
-          fontSize: "0.9rem",
-          marginBottom: "0.5rem",
-        }}
+        className="prj-form-label d-flex align-items-center gap-2 text-start"
       >
         {label}
-        {required && <span style={{ color: "#E01950" }}>*</span>}
+        {required && <span className="prj-required">*</span>}
       </label>
-      <div style={{ position: "relative" }}>
+      <div className="prj-select-wrapper">
         <select
           name={name}
           value={value}
           onChange={onChange}
-          className={`form-select text-start ${error ? "is-invalid" : ""}`}
-          style={{
-            borderColor: error ? "#E01950" : "var(--border)",
-            borderRadius: "8px",
-            color: value ? "var(--color-primary-2)" : "var(--muted)",
-            fontSize: "0.95rem",
-            fontWeight: "500",
-            padding: "0.65rem 2.5rem 0.65rem 0.75rem",
-            appearance: "none",
-            backgroundImage: "none",
-            transition: "all 0.2s ease",
-            cursor: "pointer",
-          }}
+          className={`form-select text-start prj-custom-select ${error ? "is-invalid" : ""}`}
         >
-          <option value="" style={{ color: "var(--muted)" }}>
+          <option value="" className="prj-select-placeholder">
             {placeholder}
           </option>
           {options.map((opt, idx) => (
-            <option
-              key={idx}
-              value={opt.value || opt}
-              style={{ color: "var(--color-primary-2)" }}
-            >
+            <option key={idx} value={opt.value || opt} className="prj-select-option">
               {opt.label || opt}
             </option>
           ))}
         </select>
-        <ChevronDown
-          size={18}
-          style={{
-            position: "absolute",
-            right: "12px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: "var(--color-primary-3)",
-            pointerEvents: "none",
-          }}
-        />
+        <ChevronDown size={18} className="prj-select-icon" />
       </div>
-      {error && (
-        <div
-          className="text-start"
-          style={{
-            color: "#E01950",
-            fontSize: "0.85rem",
-            marginTop: "0.25rem",
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {error && <div className="prj-error-text text-start">{error}</div>}
     </div>
   );
 
   return (
-    <div className="h-100 d-flex flex-column">
+    <div className="prj-create-wrapper h-100 d-flex flex-column">
       {/* Breadcrumbs */}
       <nav aria-label="breadcrumb" className="mb-3">
-        <ol
-          className="breadcrumb mb-0 p-3 rounded text-start"
-          style={{
-            backgroundColor: "rgba(151, 36, 126, 0.05)",
-            fontSize: "0.875rem",
-          }}
-        >
+        <ol className="prj-breadcrumb-list">
           <li className="breadcrumb-item">
             <a
               href="#"
@@ -408,132 +338,60 @@ const CreateProject = () => {
                 e.preventDefault();
                 navigate("/hr/dashboard/projectmgmt");
               }}
-              style={{
-                color: "var(--color-primary-3)",
-                textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.25rem",
-              }}
+              className="prj-breadcrumb-link"
             >
               <Home size={14} />
               Dashboard
             </a>
           </li>
           <li className="breadcrumb-item active" aria-current="page">
-            <span style={{ color: "var(--color-primary-1)", fontWeight: 600 }}>
-              Create Project
-            </span>
+            <span className="prj-breadcrumb-active">Create Project</span>
           </li>
         </ol>
       </nav>
 
       {/* Header */}
-      <div className="d-flex align-items-center justify-content-between mb-4">
-        <div className="d-flex align-items-center gap-3">
-          <button
-            className="btn btn-link text-decoration-none p-0"
-            onClick={() => navigate("/hr/dashboard/projectmgmt")}
-            style={{ color: "var(--color-primary-3)" }}
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <FolderPlus size={36} style={{ color: "#97247E" }} />
-          <div className="text-start">
-            <h2
-              className="mb-0 fw-bold"
-              style={{ color: "var(--color-primary-1)" }}
-            >
-              Create New Project
-            </h2>
-            <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-              Initialize new project with details
-            </p>
+      <div className="prj-page-header">
+        <div className="prj-header-left">
+          
+          <FolderPlus size={36} className="prj-header-icon" />
+          <div className="prj-header-text">
+            <h2 className="prj-page-title">Create New Project</h2>
+            <p className="prj-page-subtitle">Initialize new project with details</p>
           </div>
         </div>
       </div>
 
       {/* Alert Messages */}
       {submitStatus && (
-        <div
-          className="alert alert-dismissible fade show"
-          role="alert"
-          style={{
-            backgroundColor:
-              submitStatus.type === "success"
-                ? "rgba(36, 161, 72, 0.1)"
-                : "rgba(224, 25, 80, 0.1)",
-            border: `1px solid ${
-              submitStatus.type === "success" ? "#24A148" : "#E01950"
-            }`,
-            color: submitStatus.type === "success" ? "#24A148" : "#E01950",
-            borderRadius: "8px",
-            marginBottom: "1.5rem",
-          }}
-        >
-          <div className="d-flex align-items-center gap-2">
-            {submitStatus.type === "success" ? (
-              <CheckCircle size={20} />
-            ) : (
-              <AlertCircle size={20} />
-            )}
-            <span style={{ fontWeight: "500" }}>{submitStatus.message}</span>
+        <div className={`prj-alert prj-alert-${submitStatus.type}`}>
+          <div className="prj-alert-content">
+            {submitStatus.type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+            <span>{submitStatus.message}</span>
           </div>
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setSubmitStatus(null)}
-          ></button>
+          <button type="button" className="prj-alert-close" onClick={() => setSubmitStatus(null)}>
+            <X size={16} />
+          </button>
         </div>
       )}
 
       {/* Form Card with 2x2 Grid Layout */}
-      <div
-        className="card border-0 flex-grow-1"
-        style={{
-          boxShadow: "var(--shadow)",
-          borderRadius: "8px",
-          border: "1px solid var(--border)",
-          overflow: "hidden",
-        }}
-      >
-        <div className="card-body p-4 overflow-auto">
+      <div className="prj-main-card">
+        <div className="prj-card-content">
           <form onSubmit={handleSubmit} className="h-100 d-flex flex-column">
             <div className="flex-grow-1">
               {/* 2x2 GRID LAYOUT */}
               <div className="row g-4">
                 {/* TOP LEFT: Basic Information */}
                 <div className="col-md-6">
-                  <div
-                    className="card h-100"
-                    style={{
-                      border: "1px solid var(--border)",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div
-                      className="card-header bg-white"
-                      style={{ borderBottom: "2px solid var(--border)" }}
-                    >
-                      <h5
-                        className="mb-0 fw-bold text-start"
-                        style={{ color: "var(--color-white)" }}
-                      >
-                        Basic Information
-                      </h5>
+                  <div className="prj-section-card h-100">
+                    <div className="prj-section-header">
+                      <h5 className="prj-section-title">Basic Information</h5>
                     </div>
-                    <div className="card-body">
+                    <div className="prj-section-body">
                       <div className="mb-3">
-                        <label
-                          className="form-label text-start"
-                          style={{
-                            color: "var(--color-primary-2)",
-                            fontWeight: "500",
-                            fontSize: "0.9rem",
-                          }}
-                        >
-                          Project Name{" "}
-                          <span style={{ color: "#E01950" }}>*</span>
+                        <label className="prj-form-label text-start">
+                          Project Name <span className="prj-required">*</span>
                         </label>
                         <input
                           type="text"
@@ -541,49 +399,17 @@ const CreateProject = () => {
                           value={formData.projectName}
                           onChange={handleChange}
                           placeholder="Example: ORG.IT.INTRANET"
-                          className={`form-control text-start ${
-                            errors.projectName ? "is-invalid" : ""
-                          }`}
-                          style={{
-                            borderColor: errors.projectName
-                              ? "#E01950"
-                              : "var(--border)",
-                            borderRadius: "8px",
-                            padding: "0.65rem 0.75rem",
-                            fontSize: "0.95rem",
-                          }}
+                          className={`form-control text-start prj-input-field ${errors.projectName ? "is-invalid" : ""}`}
                         />
-                        <div
-                          className="form-text text-start"
-                          style={{ fontSize: "0.8rem" }}
-                        >
+                        <div className="prj-input-hint text-start">
                           Format: <strong>ORG.(Dept).(Project)</strong>
                         </div>
-                        {errors.projectName && (
-                          <div
-                            className="text-start"
-                            style={{
-                              color: "#E01950",
-                              fontSize: "0.85rem",
-                              marginTop: "0.25rem",
-                            }}
-                          >
-                            {errors.projectName}
-                          </div>
-                        )}
+                        {errors.projectName && <div className="prj-error-text text-start">{errors.projectName}</div>}
                       </div>
 
                       <div className="mb-3">
-                        <label
-                          className="form-label text-start"
-                          style={{
-                            color: "var(--color-primary-2)",
-                            fontWeight: "500",
-                            fontSize: "0.9rem",
-                          }}
-                        >
-                          Client Name{" "}
-                          <span style={{ color: "#E01950" }}>*</span>
+                        <label className="prj-form-label text-start">
+                          Client Name <span className="prj-required">*</span>
                         </label>
                         <input
                           type="text"
@@ -591,30 +417,9 @@ const CreateProject = () => {
                           value={formData.clientName}
                           onChange={handleChange}
                           placeholder="Example: ACME CORPORATION"
-                          className={`form-control text-start ${
-                            errors.clientName ? "is-invalid" : ""
-                          }`}
-                          style={{
-                            borderColor: errors.clientName
-                              ? "#E01950"
-                              : "var(--border)",
-                            borderRadius: "8px",
-                            padding: "0.65rem 0.75rem",
-                            fontSize: "0.95rem",
-                          }}
+                          className={`form-control text-start prj-input-field ${errors.clientName ? "is-invalid" : ""}`}
                         />
-                        {errors.clientName && (
-                          <div
-                            className="text-start"
-                            style={{
-                              color: "#E01950",
-                              fontSize: "0.85rem",
-                              marginTop: "0.25rem",
-                            }}
-                          >
-                            {errors.clientName}
-                          </div>
-                        )}
+                        {errors.clientName && <div className="prj-error-text text-start">{errors.clientName}</div>}
                       </div>
 
                       <CustomSelect
@@ -628,29 +433,14 @@ const CreateProject = () => {
                       />
 
                       <div className="mb-0">
-                        <label
-                          className="form-label text-start"
-                          style={{
-                            color: "var(--color-primary-2)",
-                            fontWeight: "500",
-                            fontSize: "0.9rem",
-                          }}
-                        >
-                          Description
-                        </label>
+                        <label className="prj-form-label text-start">Description</label>
                         <textarea
                           name="description"
                           value={formData.description}
                           onChange={handleChange}
                           placeholder="Enter project description"
                           rows="3"
-                          className="form-control text-start"
-                          style={{
-                            borderColor: "var(--border)",
-                            borderRadius: "8px",
-                            padding: "0.65rem 0.75rem",
-                            fontSize: "0.95rem",
-                          }}
+                          className="form-control text-start prj-textarea-field"
                         />
                       </div>
                     </div>
@@ -659,35 +449,16 @@ const CreateProject = () => {
 
                 {/* TOP RIGHT: Organization Details */}
                 <div className="col-md-6">
-                  <div
-                    className="card h-100"
-                    style={{
-                      border: "1px solid var(--border)",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div
-                      className="card-header bg-white"
-                      style={{ borderBottom: "2px solid var(--border)" }}
-                    >
-                      <h5
-                        className="mb-0 fw-bold d-flex align-items-center gap-2 text-start"
-                        style={{ color: "var(--color-White)" }}
-                      >
-                        <Building size={20} style={{ color: "White" }} />
-                        Organization Details
-                      </h5>
+                  <div className="prj-section-card h-100">
+                    <div className="prj-section-header">
+                      <Building size={20} className="prj-section-icon" />
+                      <h5 className="prj-section-title">Organization Details</h5>
                     </div>
-                    <div className="card-body">
+                    <div className="prj-section-body">
                       {isLoadingData ? (
-                        <div className="text-center py-5">
-                          <div
-                            className="spinner-border"
-                            style={{ color: "var(--color-primary-3)" }}
-                          />
-                          <p className="mt-2" style={{ color: "var(--muted)" }}>
-                            Loading data...
-                          </p>
+                        <div className="prj-loading-state">
+                          <div className="spinner-border prj-spinner" />
+                          <p className="prj-loading-text">Loading data...</p>
                         </div>
                       ) : (
                         <>
@@ -734,37 +505,15 @@ const CreateProject = () => {
 
                 {/* BOTTOM LEFT: Project Timeline */}
                 <div className="col-md-6">
-                  <div
-                    className="card h-100"
-                    style={{
-                      border: "1px solid var(--border)",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div
-                      className="card-header bg-white"
-                      style={{ borderBottom: "2px solid var(--border)" }}
-                    >
-                      <h5
-                        className="mb-0 fw-bold d-flex align-items-center gap-2 text-start"
-                        style={{ color: "var(--color-White)" }}
-                      >
-                        <Calendar size={20} style={{ color: "White" }} />
-                        Project Timeline
-                      </h5>
+                  <div className="prj-section-card h-100">
+                    <div className="prj-section-header">
+                      <Calendar size={20} className="prj-section-icon" />
+                      <h5 className="prj-section-title">Project Timeline</h5>
                     </div>
-                    <div className="card-body">
+                    <div className="prj-section-body">
                       <div className="mb-3">
-                        <label
-                          className="form-label text-start"
-                          style={{
-                            color: "var(--color-primary-2)",
-                            fontWeight: "500",
-                            fontSize: "0.9rem",
-                          }}
-                        >
-                          Start Date{" "}
-                          <span style={{ color: "#E01950" }}>*</span>
+                        <label className="prj-form-label text-start">
+                          Start Date <span className="prj-required">*</span>
                         </label>
                         <input
                           type="date"
@@ -772,44 +521,14 @@ const CreateProject = () => {
                           value={formData.startDate}
                           onChange={handleChange}
                           min={today}
-                          className={`form-control text-start ${
-                            errors.startDate ? "is-invalid" : ""
-                          }`}
-                          style={{
-                            borderColor: errors.startDate
-                              ? "#E01950"
-                              : "var(--border)",
-                            borderRadius: "8px",
-                            padding: "0.65rem 0.75rem",
-                          }}
+                          className={`form-control text-start prj-input-field ${errors.startDate ? "is-invalid" : ""}`}
                         />
-                        {errors.startDate && (
-                          <div
-                            className="text-start"
-                            style={{
-                              color: "#E01950",
-                              fontSize: "0.85rem",
-                              marginTop: "0.25rem",
-                            }}
-                          >
-                            {errors.startDate}
-                          </div>
-                        )}
+                        {errors.startDate && <div className="prj-error-text text-start">{errors.startDate}</div>}
                       </div>
 
                       <div className="mb-0">
-                        <label
-                          className="form-label text-start"
-                          style={{
-                            color: "var(--color-primary-2)",
-                            fontWeight: "500",
-                            fontSize: "0.9rem",
-                          }}
-                        >
-                          End Date{" "}
-                          <span style={{ color: "var(--muted)" }}>
-                            (Optional)
-                          </span>
+                        <label className="prj-form-label text-start">
+                          End Date <span className="prj-optional">(Optional)</span>
                         </label>
                         <input
                           type="date"
@@ -817,29 +536,9 @@ const CreateProject = () => {
                           value={formData.endDate}
                           onChange={handleChange}
                           min={formData.startDate || today}
-                          className={`form-control text-start ${
-                            errors.endDate ? "is-invalid" : ""
-                          }`}
-                          style={{
-                            borderColor: errors.endDate
-                              ? "#E01950"
-                              : "var(--border)",
-                            borderRadius: "8px",
-                            padding: "0.65rem 0.75rem",
-                          }}
+                          className={`form-control text-start prj-input-field ${errors.endDate ? "is-invalid" : ""}`}
                         />
-                        {errors.endDate && (
-                          <div
-                            className="text-start"
-                            style={{
-                              color: "#E01950",
-                              fontSize: "0.85rem",
-                              marginTop: "0.25rem",
-                            }}
-                          >
-                            {errors.endDate}
-                          </div>
-                        )}
+                        {errors.endDate && <div className="prj-error-text text-start">{errors.endDate}</div>}
                       </div>
                     </div>
                   </div>
@@ -847,70 +546,33 @@ const CreateProject = () => {
 
                 {/* BOTTOM RIGHT: Reporting Managers */}
                 <div className="col-md-6">
-                  <div
-                    className="card h-100"
-                    style={{
-                      border: "1px solid var(--border)",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div
-                      className="card-header bg-white"
-                      style={{ borderBottom: "2px solid var(--border)" }}
-                    >
-                      <h5
-                        className="mb-0 fw-bold d-flex align-items-center gap-2 text-start"
-                        style={{ color: "var(--color-White)" }}
-                      >
-                        <Users size={20} style={{ color: "White" }} />
-                        Reporting Managers
-                      </h5>
+                  <div className="prj-section-card h-100">
+                    <div className="prj-section-header">
+                      <Users size={20} className="prj-section-icon" />
+                      <h5 className="prj-section-title">Reporting Managers</h5>
                     </div>
-                    <div className="card-body">
+                    <div className="prj-section-body">
                       {isLoadingData ? (
-                        <div className="text-center py-5">
-                          <div
-                            className="spinner-border"
-                            style={{ color: "var(--color-primary-3)" }}
-                          />
+                        <div className="prj-loading-state">
+                          <div className="spinner-border prj-spinner" />
                         </div>
                       ) : (
                         <>
                           <div className="mb-3">
-                            <label
-                              className="form-label text-start"
-                              style={{
-                                color: "var(--color-primary-2)",
-                                fontWeight: "500",
-                                fontSize: "0.9rem",
-                              }}
-                            >
-                              Resource Owner
-                            </label>
+                            <label className="prj-form-label text-start">Resource Owner</label>
                             <div
-                              className="p-3 border rounded text-start"
-                              style={{
-                                cursor: "pointer",
-                                borderColor: "var(--border)",
-                                backgroundColor: selectedResourceOwner
-                                  ? "rgba(151, 36, 126, 0.05)"
-                                  : "transparent",
-                                transition: "all 0.2s",
-                              }}
+                              className="prj-manager-select-box"
                               onClick={() => handleOpenManagerModal("resource")}
                             >
                               {selectedResourceOwner ? (
                                 <div>
-                                  <div className="fw-semibold">
-                                    {selectedResourceOwner.firstName}{" "}
-                                    {selectedResourceOwner.lastName}
+                                  <div className="prj-manager-name">
+                                    {selectedResourceOwner.firstName} {selectedResourceOwner.lastName}
                                   </div>
-                                  <small className="text-muted">
-                                    {selectedResourceOwner.roleName}
-                                  </small>
+                                  <small className="prj-manager-role">{selectedResourceOwner.roleName}</small>
                                 </div>
                               ) : (
-                                <div className="text-muted d-flex align-items-center gap-2">
+                                <div className="prj-manager-placeholder">
                                   <UserCog size={16} />
                                   Click to select
                                 </div>
@@ -919,40 +581,20 @@ const CreateProject = () => {
                           </div>
 
                           <div className="mb-3">
-                            <label
-                              className="form-label text-start"
-                              style={{
-                                color: "var(--color-primary-2)",
-                                fontWeight: "500",
-                                fontSize: "0.9rem",
-                              }}
-                            >
-                              L1 Approver
-                            </label>
+                            <label className="prj-form-label text-start">L1 Approver</label>
                             <div
-                              className="p-3 border rounded text-start"
-                              style={{
-                                cursor: "pointer",
-                                borderColor: "var(--border)",
-                                backgroundColor: selectedL1Approver
-                                  ? "rgba(151, 36, 126, 0.05)"
-                                  : "transparent",
-                                transition: "all 0.2s",
-                              }}
+                              className="prj-manager-select-box"
                               onClick={() => handleOpenManagerModal("l1")}
                             >
                               {selectedL1Approver ? (
                                 <div>
-                                  <div className="fw-semibold">
-                                    {selectedL1Approver.firstName}{" "}
-                                    {selectedL1Approver.lastName}
+                                  <div className="prj-manager-name">
+                                    {selectedL1Approver.firstName} {selectedL1Approver.lastName}
                                   </div>
-                                  <small className="text-muted">
-                                    {selectedL1Approver.roleName}
-                                  </small>
+                                  <small className="prj-manager-role">{selectedL1Approver.roleName}</small>
                                 </div>
                               ) : (
-                                <div className="text-muted d-flex align-items-center gap-2">
+                                <div className="prj-manager-placeholder">
                                   <UserCog size={16} />
                                   Click to select
                                 </div>
@@ -961,40 +603,20 @@ const CreateProject = () => {
                           </div>
 
                           <div className="mb-0">
-                            <label
-                              className="form-label text-start"
-                              style={{
-                                color: "var(--color-primary-2)",
-                                fontWeight: "500",
-                                fontSize: "0.9rem",
-                              }}
-                            >
-                              L2 Approver
-                            </label>
+                            <label className="prj-form-label text-start">L2 Approver</label>
                             <div
-                              className="p-3 border rounded text-start"
-                              style={{
-                                cursor: "pointer",
-                                borderColor: "var(--border)",
-                                backgroundColor: selectedL2Approver
-                                  ? "rgba(151, 36, 126, 0.05)"
-                                  : "transparent",
-                                transition: "all 0.2s",
-                              }}
+                              className="prj-manager-select-box"
                               onClick={() => handleOpenManagerModal("l2")}
                             >
                               {selectedL2Approver ? (
                                 <div>
-                                  <div className="fw-semibold">
-                                    {selectedL2Approver.firstName}{" "}
-                                    {selectedL2Approver.lastName}
+                                  <div className="prj-manager-name">
+                                    {selectedL2Approver.firstName} {selectedL2Approver.lastName}
                                   </div>
-                                  <small className="text-muted">
-                                    {selectedL2Approver.roleName}
-                                  </small>
+                                  <small className="prj-manager-role">{selectedL2Approver.roleName}</small>
                                 </div>
                               ) : (
-                                <div className="text-muted d-flex align-items-center gap-2">
+                                <div className="prj-manager-placeholder">
                                   <UserCog size={16} />
                                   Click to select
                                 </div>
@@ -1010,51 +632,17 @@ const CreateProject = () => {
             </div>
 
             {/* Form Actions */}
-            <div
-              className="d-flex gap-3 justify-content-end pt-3 mt-4"
-              style={{ borderTop: "1px solid var(--border)" }}
-            >
+            <div className="prj-form-actions">
               <button
                 type="button"
                 onClick={handleReset}
                 disabled={isSubmitting}
-                className="btn d-flex align-items-center gap-2"
-                style={{
-                  backgroundColor: "transparent",
-                  border: "1px solid var(--border)",
-                  color: "black",
-                  borderRadius: "8px",
-                  padding: "0.6rem 1rem",
-                  fontWeight: "600",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "crimson";
-                  e.currentTarget.style.color = "white";
-                  e.currentTarget.style.borderColor = "var(--color-primary-3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "black";
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.borderColor = "var(--border)";
-                }}
+                className="prj-btn prj-btn-reset"
               >
                 <X size={18} />
                 Reset
               </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn d-flex align-items-center gap-2 px-4"
-                style={{
-                  background: "rgb(39, 35, 92)",
-                  border: "none",
-                  color: "white",
-                  borderRadius: "8px",
-                  padding: "0.6rem 1.5rem",
-                  fontWeight: "600",
-                  boxShadow: "var(--shadow)",
-                }}
-              >
+              <button type="submit" disabled={isSubmitting} className="prj-btn prj-btn-submit">
                 {isSubmitting ? (
                   <>
                     <span className="spinner-border spinner-border-sm" />
@@ -1072,103 +660,118 @@ const CreateProject = () => {
         </div>
       </div>
 
-      {/* Manager Selection Modal */}
+      {/* Manager Selection Modal - STYLED LIKE IMAGE */}
       {showManagerModal && (
-        <div
-          className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-          tabIndex="-1"
-        >
-          <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title d-flex align-items-center gap-2">
-                  <UserCog size={24} />
-                  Select{" "}
-                  {activeManagerTab === "resource"
-                    ? "Resource Owner"
-                    : activeManagerTab === "l1"
-                    ? "L1 Approver"
-                    : "L2 Approver"}
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowManagerModal(false)}
-                ></button>
+        <>
+          <div className="prj-modal-backdrop" onClick={() => setShowManagerModal(false)} />
+          <div className="prj-modal-overlay">
+            <div className="prj-modal-container">
+              {/* Purple Header */}
+              <div className="prj-modal-header">
+                <div className="prj-modal-header-content">
+                  <UserCog size={20} />
+                  <h5 className="prj-modal-title">
+                    Edit Reporting Managers - {formData.projectName || "ORG.R2DC.EEPZ"}
+                  </h5>
+                </div>
+                <button className="prj-modal-close-btn" onClick={() => setShowManagerModal(false)}>
+                  <X size={20} />
+                </button>
               </div>
-              <div className="modal-body">
-                {/* Filters */}
-                <div className="row g-3 mb-3">
-                  <div className="col-md-6">
-                    <div className="input-group">
-                      <span className="input-group-text bg-white">
-                        <Search size={18} />
-                      </span>
-                      <input
-                        type="text"
-                        className="form-control text-start"
-                        placeholder="Search by name..."
-                        value={managerSearchTerm}
-                        onChange={(e) => setManagerSearchTerm(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-3">
-                    <select
-                      className="form-select text-start"
-                      value={managerFilterRole}
-                      onChange={(e) => setManagerFilterRole(e.target.value)}
-                    >
-                      <option value="All">All Roles</option>
-                      {getUniqueManagerRoles().map((role, idx) => (
-                        <option key={idx} value={role}>
-                          {role}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-md-3">
-                    <select
-                      className="form-select text-start"
-                      value={managerFilterDepartment}
-                      onChange={(e) =>
-                        setManagerFilterDepartment(e.target.value)
-                      }
-                    >
-                      <option value="All">All Departments</option>
-                      {getUniqueManagerDepartments().map((dept, idx) => (
-                        <option key={idx} value={dept}>
-                          {dept}
-                        </option>
-                      ))}
-                    </select>
+
+              {/* Tabs */}
+              <div className="prj-modal-tabs">
+                <button
+                  className={`prj-modal-tab ${activeManagerTab === "resource" ? "active" : ""}`}
+                  onClick={() => setActiveManagerTab("resource")}
+                >
+                  Resource Owner
+                  {selectedResourceOwner && <CheckCircle size={16} className="prj-tab-check" />}
+                </button>
+                <button
+                  className={`prj-modal-tab ${activeManagerTab === "l1" ? "active" : ""}`}
+                  onClick={() => setActiveManagerTab("l1")}
+                >
+                  L1 Approver
+                  {selectedL1Approver && <CheckCircle size={16} className="prj-tab-check" />}
+                </button>
+                <button
+                  className={`prj-modal-tab ${activeManagerTab === "l2" ? "active" : ""}`}
+                  onClick={() => setActiveManagerTab("l2")}
+                >
+                  L2 Approver
+                  {selectedL2Approver && <CheckCircle size={16} className="prj-tab-check" />}
+                </button>
+              </div>
+
+              {/* Current Selection */}
+              {getCurrentSelectedManager() && (
+                <div className="prj-modal-current-selection">
+                  <div className="prj-selection-icon">ℹ️</div>
+                  <div className="prj-selection-content">
+                    <strong className="prj-selection-label">Current Selection:</strong>
+                    <span className="prj-selection-badge">
+                      {getCurrentSelectedManager().firstName} {getCurrentSelectedManager().lastName} -{" "}
+                      {getCurrentSelectedManager().roleName}
+                    </span>
                   </div>
                 </div>
+              )}
 
-                {/* Manager List Table */}
-                <div
-                  className="table-responsive"
-                  style={{ minHeight: "350px" }}
+              {/* Filters */}
+              <div className="prj-modal-filters">
+                <div className="prj-filter-search">
+                  <Search size={16} className="prj-search-icon" />
+                  <input
+                    type="text"
+                    className="prj-search-input"
+                    placeholder="Search by name..."
+                    value={managerSearchTerm}
+                    onChange={(e) => setManagerSearchTerm(e.target.value)}
+                  />
+                </div>
+                <select
+                  className="prj-filter-select"
+                  value={managerFilterRole}
+                  onChange={(e) => setManagerFilterRole(e.target.value)}
                 >
-                  <table className="table table-sm table-hover">
-                    <thead className="table-light sticky-top">
+                  <option value="All">All Roles</option>
+                  {getUniqueManagerRoles().map((role) => (
+                    <option key={role} value={role}>
+                      {role}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className="prj-filter-select"
+                  value={managerFilterDepartment}
+                  onChange={(e) => setManagerFilterDepartment(e.target.value)}
+                >
+                  <option value="All">All Departments</option>
+                  {getUniqueManagerDepartments().map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Table */}
+              <div className="prj-modal-body">
+                <div className="prj-modal-table-wrapper">
+                  <table className="prj-modal-table">
+                    <thead>
                       <tr>
-                        <th style={{ width: "50px" }} className="text-start">
-                          Select
-                        </th>
-                        <th className="text-start">Employee Name</th>
-                        <th className="text-start">Role</th>
-                        <th className="text-start">Department</th>
+                        <th style={{ width: "60px" }}>Select</th>
+                        <th>Employee Name</th>
+                        <th>Role</th>
+                        <th>Department</th>
                       </tr>
                     </thead>
                     <tbody>
                       {paginatedManagers.length === 0 ? (
                         <tr>
-                          <td
-                            colSpan="4"
-                            className="text-center py-4 text-muted"
-                          >
+                          <td colSpan="4" className="prj-table-empty">
                             No employees found
                           </td>
                         </tr>
@@ -1176,41 +779,32 @@ const CreateProject = () => {
                         paginatedManagers.map((emp) => {
                           let isSelected = false;
                           if (activeManagerTab === "resource")
-                            isSelected =
-                              selectedResourceOwner?.employeeMasterId ===
-                              emp.employeeMasterId;
+                            isSelected = selectedResourceOwner?.employeeMasterId === emp.employeeMasterId;
                           else if (activeManagerTab === "l1")
-                            isSelected =
-                              selectedL1Approver?.employeeMasterId ===
-                              emp.employeeMasterId;
+                            isSelected = selectedL1Approver?.employeeMasterId === emp.employeeMasterId;
                           else if (activeManagerTab === "l2")
-                            isSelected =
-                              selectedL2Approver?.employeeMasterId ===
-                              emp.employeeMasterId;
+                            isSelected = selectedL2Approver?.employeeMasterId === emp.employeeMasterId;
 
                           return (
                             <tr
                               key={emp.employeeMasterId}
-                              className={isSelected ? "table-active" : ""}
-                              style={{ cursor: "pointer" }}
+                              className={`prj-table-row ${isSelected ? "selected" : ""}`}
                               onClick={() => handleManagerSelect(emp)}
                             >
-                              <td className="text-start">
+                              <td>
                                 <input
-                                  type="checkbox"
-                                  className="form-check-input"
+                                  type="radio"
+                                  name="manager-radio"
                                   checked={isSelected}
                                   onChange={() => handleManagerSelect(emp)}
-                                  onClick={(e) => e.stopPropagation()}
+                                  className="prj-radio-input"
                                 />
                               </td>
-                              <td className="text-start">
+                              <td>
                                 {emp.firstName} {emp.lastName}
                               </td>
-                              <td className="text-start">{emp.roleName}</td>
-                              <td className="text-start">
-                                {emp.departmentName}
-                              </td>
+                              <td className="prj-table-muted">{emp.roleName}</td>
+                              <td className="prj-table-muted">{emp.departmentName}</td>
                             </tr>
                           );
                         })
@@ -1221,97 +815,56 @@ const CreateProject = () => {
 
                 {/* Pagination */}
                 {managerTotalPages > 1 && (
-                  <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                    <div className="text-muted small">
-                      Showing {managerStartIndex + 1} to{" "}
-                      {Math.min(managerEndIndex, filteredManagers.length)} of{" "}
-                      {filteredManagers.length} employees
-                    </div>
-                    <nav>
-                      <ul className="pagination pagination-sm mb-0">
-                        <li
-                          className={`page-item ${
-                            managerCurrentPage === 1 ? "disabled" : ""
-                          }`}
+                  <div className="prj-modal-pagination">
+                    <button
+                      className="prj-page-btn"
+                      onClick={() => goToManagerPage(managerCurrentPage - 1)}
+                      disabled={managerCurrentPage === 1}
+                    >
+                      <ChevronLeftIcon size={16} />
+                    </button>
+                    {getManagerPageNumbers().map((page, idx) => {
+                      if (page === "...") {
+                        return (
+                          <span key={`ellipsis-${idx}`} className="prj-page-ellipsis">
+                            ...
+                          </span>
+                        );
+                      }
+                      return (
+                        <button
+                          key={page}
+                          className={`prj-page-btn ${page === managerCurrentPage ? "active" : ""}`}
+                          onClick={() => goToManagerPage(page)}
                         >
-                          <button
-                            className="page-link"
-                            onClick={() =>
-                              setManagerCurrentPage(managerCurrentPage - 1)
-                            }
-                            disabled={managerCurrentPage === 1}
-                          >
-                            <ChevronLeftIcon size={14} />
-                          </button>
-                        </li>
-                        {getManagerPageNumbers().map((page, index) =>
-                          page === "..." ? (
-                            <li
-                              key={`mgr-ellipsis-${index}`}
-                              className="page-item disabled"
-                            >
-                              <span className="page-link">...</span>
-                            </li>
-                          ) : (
-                            <li
-                              key={`mgr-${page}`}
-                              className={`page-item ${
-                                managerCurrentPage === page ? "active" : ""
-                              }`}
-                            >
-                              <button
-                                className="page-link"
-                                onClick={() => goToManagerPage(page)}
-                              >
-                                {page}
-                              </button>
-                            </li>
-                          )
-                        )}
-                        <li
-                          className={`page-item ${
-                            managerCurrentPage === managerTotalPages
-                              ? "disabled"
-                              : ""
-                          }`}
-                        >
-                          <button
-                            className="page-link"
-                            onClick={() =>
-                              setManagerCurrentPage(managerCurrentPage + 1)
-                            }
-                            disabled={managerCurrentPage === managerTotalPages}
-                          >
-                            <ChevronRight size={14} />
-                          </button>
-                        </li>
-                      </ul>
-                    </nav>
-                    <div className="text-muted small">
-                      Page {managerCurrentPage} of {managerTotalPages}
-                    </div>
+                          {page}
+                        </button>
+                      );
+                    })}
+                    <button
+                      className="prj-page-btn"
+                      onClick={() => goToManagerPage(managerCurrentPage + 1)}
+                      disabled={managerCurrentPage === managerTotalPages}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
                   </div>
                 )}
               </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowManagerModal(false)}
-                >
+
+              {/* Footer */}
+              <div className="prj-modal-footer">
+                <button type="button" className="prj-modal-btn prj-btn-cancel" onClick={() => setShowManagerModal(false)}>
                   Cancel
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleConfirmSelection}
-                >
-                  Confirm Selection
+                <button type="button" className="prj-modal-btn prj-btn-confirm" onClick={handleConfirmSelection}>
+                  <CheckCircle size={18} />
+                  Update Managers
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

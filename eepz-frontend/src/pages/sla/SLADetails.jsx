@@ -10,6 +10,7 @@ import {
   History,
   Loader,
   X,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import SLAHistoryTimeline from "../../components/sla/common/SLAHistoryTimeline";
@@ -20,6 +21,7 @@ import slaService, {
   dateHelpers,
 } from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
+
 
 // Helper function to get role-based dashboard path
 const getSLADashboardPath = (roleName) => {
@@ -125,7 +127,7 @@ const SLADetails = () => {
         updateEscalationStatus(slaResponse.data, [], userData);
       }
     } catch (err) {
-      console.error("❌ Error fetching SLA details:", err);
+      console.error("Error fetching SLA details:", err);
       setError(err.message || "Failed to fetch SLA details");
     } finally {
       setLoading(false);
@@ -689,45 +691,74 @@ const SLADetails = () => {
         />
       )}
 
-      {/* ========== CLOSE CONFIRMATION MODAL ========== */}
+      {/* ========== REDESIGNED CLOSE CONFIRMATION MODAL - LEFT ALIGNED ========== */}
       {showCloseConfirmation && (
-        <div
-          className="modal show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1055 }}
-        >
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content" style={{ borderRadius: "12px" }}>
-              <div className="modal-header border-0">
-                <h5 className="modal-title fw-bold d-flex align-items-center gap-2">
-                  <AlertTriangle size={20} color="#E2B93B" />
-                  Close SLA Confirmation
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowCloseConfirmation(false)}
-                  disabled={refreshing}
-                />
+        <>
+          <div
+            className="sla-modal-backdrop"
+            onClick={() => !refreshing && setShowCloseConfirmation(false)}
+          />
+          <div className="sla-modal-wrapper">
+            <div className="sla-modal-container">
+              {/* Close Button */}
+              <button
+                type="button"
+                className="sla-modal-close-btn"
+                onClick={() => setShowCloseConfirmation(false)}
+                disabled={refreshing}
+              >
+                <X size={20} />
+              </button>
+
+              {/* Icon & Title Section */}
+              <div className="sla-modal-header">
+                <div className="sla-modal-icon-wrapper">
+                  <CheckCircle size={32} />
+                </div>
+                <h3 className="sla-modal-title">Close This SLA?</h3>
+                <p className="sla-modal-description">
+                  You're about to mark this SLA as completed and closed.
+                </p>
               </div>
 
-              <div className="modal-body">
-                <p className="mb-3">Are you sure you want to close this SLA?</p>
-                <div
-                  className="alert alert-warning d-flex align-items-start gap-2"
-                  style={{ borderRadius: "8px" }}
-                >
-                  <AlertTriangle size={18} className="flex-shrink-0 mt-1" />
-                  <small>
-                    This action will mark the SLA as closed. You can reopen it
-                    later if needed.
-                  </small>
+              {/* Info Box */}
+              <div className="sla-modal-info-box">
+                <div className="sla-modal-info-icon">
+                  <Info size={18} />
+                </div>
+                <div className="sla-modal-info-content">
+                  <p className="sla-modal-info-title">What happens next?</p>
+                  <ul className="sla-modal-info-list">
+                    <li>The SLA status will be changed to "Closed"</li>
+                    <li>This action will be recorded in the SLA history</li>
+                    <li>You can reopen this SLA later if needed</li>
+                  </ul>
                 </div>
               </div>
 
-              <div className="modal-footer border-0">
+              {/* SLA Details Summary */}
+              <div className="sla-modal-summary">
+                <div className="sla-modal-summary-row">
+                  <span className="sla-modal-summary-label">SLA Type:</span>
+                  <span className="sla-modal-summary-value">{sla.slatype}</span>
+                </div>
+                <div className="sla-modal-summary-row">
+                  <span className="sla-modal-summary-label">Employee:</span>
+                  <span className="sla-modal-summary-value">{sla.employeeName}</span>
+                </div>
+                <div className="sla-modal-summary-row">
+                  <span className="sla-modal-summary-label">Current Status:</span>
+                  <span className="sla-modal-badge sla-modal-badge-open">
+                    {sla.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="sla-modal-actions">
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="sla-modal-btn sla-modal-btn-secondary"
                   onClick={() => setShowCloseConfirmation(false)}
                   disabled={refreshing}
                 >
@@ -735,26 +766,26 @@ const SLADetails = () => {
                 </button>
                 <button
                   type="button"
-                  className="btn btn-success d-flex align-items-center gap-2"
+                  className="sla-modal-btn sla-modal-btn-primary"
                   onClick={handleCloseSLA}
                   disabled={refreshing}
                 >
                   {refreshing ? (
                     <>
-                      <span className="spinner-border spinner-border-sm" />
-                      <span>Closing...</span>
+                      <span className="sla-modal-spinner" />
+                      Closing...
                     </>
                   ) : (
                     <>
-                      <CheckCircle size={16} />
-                      <span>Close SLA</span>
+                      <CheckCircle size={18} />
+                      Yes, Close SLA
                     </>
                   )}
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* ========== INTERNAL STYLES ========== */}
@@ -873,13 +904,19 @@ const SLADetails = () => {
           background: #FFFFFF;
           border-radius: 12px;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          border: 1px solid #F3F4F6;
+          border: 2px solid #27235C;
           overflow: hidden;
         }
 
         .sla-details-card-body {
           padding: 1.5rem;
           text-align: left;
+          
+
+         
+
+
+
         }
 
         /* Status Header */
@@ -915,9 +952,10 @@ const SLADetails = () => {
           font-weight: 600;
           color: #6B7280;
           margin-bottom: 0.5rem;
-          text-transform: uppercase;
+          font-style:normal;
+
+  
           letter-spacing: 0.5px;
-          font-style: italic;
         }
 
         .sla-details-value {
@@ -1007,11 +1045,12 @@ const SLADetails = () => {
         .sla-details-escalation-item {
           margin-bottom: 1rem;
           padding-bottom: 1rem;
+          
         }
 
         .sla-details-escalation-content {
           background: #F9FAFB;
-          border: 1px solid #E5E7EB;
+          border: 1px solid #27235C;
           border-radius: 8px;
           padding: 1rem;
         }
@@ -1030,6 +1069,7 @@ const SLADetails = () => {
           border-radius: 50px;
           gap: 0.375rem;
           box-shadow: 0 2px 8px rgba(39, 35, 92, 0.2);
+          te
         }
 
         .sla-details-tab-pill {
@@ -1056,7 +1096,6 @@ const SLADetails = () => {
           background: #FFFFFF;
           color: #27235C;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          border-radius: 50px;
         }
 
         /* Empty State */
@@ -1083,7 +1122,7 @@ const SLADetails = () => {
           background: #FFFFFF;
           border-radius: 12px;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          border: 1px solid #F3F4F6;
+          border: 3px solid #25235c;
           position: sticky;
           top: 20px;
         }
@@ -1126,7 +1165,6 @@ const SLADetails = () => {
           font-weight: 600;
           color: #1E40AF;
           margin-bottom: 0.5rem;
-          font-style: italic;
           text-transform: uppercase;
         }
 
@@ -1135,6 +1173,282 @@ const SLADetails = () => {
           font-weight: 700;
           color: #1E40AF;
           line-height: 1;
+        }
+
+        /* ========================================
+           REDESIGNED MODAL - LEFT ALIGNED
+           ======================================== */
+
+        .sla-modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          z-index: 1050;
+          animation: sla-modal-fade-in 0.2s ease;
+        }
+
+        @keyframes sla-modal-fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .sla-modal-wrapper {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1055;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          animation: sla-modal-slide-up 0.3s ease;
+        }
+
+        @keyframes sla-modal-slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .sla-modal-container {
+          background: #FFFFFF;
+          border-radius: 16px;
+          max-width: 500px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          position: relative;
+          padding: 2rem;
+          text-align: left;
+        }
+
+        .sla-modal-close-btn {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          border: none;
+          background: #F3F4F6;
+          color: #6B7280;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .sla-modal-close-btn:hover:not(:disabled) {
+          background: #E5E7EB;
+          color: #111827;
+        }
+
+        .sla-modal-close-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .sla-modal-header {
+          margin-bottom: 1.5rem;
+        }
+
+        .sla-modal-icon-wrapper {
+          width: 64px;
+          height: 64px;
+          background: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%);
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #16A34A;
+          margin-bottom: 1.25rem;
+        }
+
+        .sla-modal-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #111827;
+          margin: 0 0 0.75rem;
+          line-height: 1.2;
+        }
+
+        .sla-modal-description {
+          font-size: 0.9375rem;
+          color: #6B7280;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        .sla-modal-info-box {
+          background: #EFF6FF;
+          border: 1px solid #BFDBFE;
+          border-radius: 12px;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+          display: flex;
+          gap: 0.75rem;
+          align-items: start;
+        }
+
+        .sla-modal-info-icon {
+          width: 36px;
+          height: 36px;
+          background: #DBEAFE;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #2563EB;
+          flex-shrink: 0;
+        }
+
+        .sla-modal-info-content {
+          flex: 1;
+        }
+
+        .sla-modal-info-title {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #1E40AF;
+          margin: 0 0 0.5rem;
+        }
+
+        .sla-modal-info-list {
+          margin: 0;
+          padding-left: 1.25rem;
+          font-size: 0.8125rem;
+          color: #475569;
+          line-height: 1.6;
+        }
+
+        .sla-modal-info-list li {
+          margin-bottom: 0.25rem;
+        }
+
+        .sla-modal-summary {
+          background: #F9FAFB;
+          border: 1px solid #E5E7EB;
+          border-radius: 10px;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .sla-modal-summary-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+          border-bottom: 1px solid #E5E7EB;
+        }
+
+        .sla-modal-summary-row:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        .sla-modal-summary-label {
+          font-size: 0.8125rem;
+          color: #6B7280;
+          font-weight: 600;
+        }
+
+        .sla-modal-summary-value {
+          font-size: 0.875rem;
+          color: #111827;
+          font-weight: 600;
+          text-align: right;
+        }
+
+        .sla-modal-badge {
+          display: inline-flex;
+          padding: 0.25rem 0.625rem;
+          border-radius: 5px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .sla-modal-badge-open {
+          background: #DBEAFE;
+          color: #1E40AF;
+        }
+
+        .sla-modal-actions {
+          display: flex;
+          gap: 0.75rem;
+          justify-content: flex-end;
+        }
+
+        .sla-modal-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1.5rem;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        .sla-modal-btn-secondary {
+          background: #FFFFFF;
+          color: #6B7280;
+          border: 1.5px solid #E5E7EB;
+        }
+
+        .sla-modal-btn-secondary:hover:not(:disabled) {
+          background: #F9FAFB;
+          border-color: #D1D5DB;
+          color: #111827;
+        }
+
+        .sla-modal-btn-primary {
+          background: linear-gradient(90deg, #16A34A 0%, #059669 100%);
+          color: #FFFFFF;
+          box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+        }
+
+        .sla-modal-btn-primary:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+        }
+
+        .sla-modal-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .sla-modal-spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-top-color: #FFFFFF;
+          border-radius: 50%;
+          animation: sla-modal-spin 0.6s linear infinite;
+        }
+
+        @keyframes sla-modal-spin {
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         /* Animation */
@@ -1170,6 +1484,18 @@ const SLADetails = () => {
           .sla-details-sidebar {
             position: relative;
             top: 0;
+          }
+
+          .sla-modal-container {
+            padding: 1.5rem;
+          }
+
+          .sla-modal-actions {
+            flex-direction: column;
+          }
+
+          .sla-modal-btn {
+            width: 100%;
           }
         }
       `}</style>

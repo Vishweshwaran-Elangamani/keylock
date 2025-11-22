@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Send, AlertCircle, Info } from "lucide-react";
+import { X, Send, AlertCircle, AlertTriangle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
 
@@ -74,7 +74,6 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
     });
   };
 
-  // Handle Ctrl+Enter shortcut
   const handleKeyDown = (e) => {
     if (
       e.ctrlKey &&
@@ -90,389 +89,606 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
   const isValid = formData.reason && formData.description.trim().length >= 10;
 
   return (
-    <div
-      className="modal fade show d-block"
-      style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1055 }}
-      onClick={onClose}
-    >
+    <>
       <div
-        className="modal-dialog modal-dialog-centered"
-        style={{ maxWidth: "500px" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          className="modal-content"
-          style={{
-            borderRadius: "16px",
-            border: "none",
-            overflow: "hidden",
-            boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
-          }}
-        >
-          {/* Header - Dark Purple Theme */}
-          <div
-            style={{
-              background: "#3E3A64",
-              padding: "1.25rem 1.5rem",
-              borderBottom: "none",
-            }}
+        className="escalation-modal-backdrop"
+        onClick={() => !loading && onClose()}
+      />
+      <div className="escalation-modal-wrapper">
+        <div className="escalation-modal-container">
+          {/* Close Button */}
+          <button
+            type="button"
+            className="escalation-modal-close-btn"
+            onClick={onClose}
+            disabled={loading}
           >
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center gap-2">
-                <div
-                  style={{
-                    width: "28px",
-                    height: "28px",
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.15)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    style={{ color: "#fff" }}
-                  >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                </div>
-                <h5
-                  className="mb-0 fw-bold"
-                  style={{
-                    color: "#fff",
-                    fontSize: "1rem",
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  Add Escalation
-                </h5>
+            <X size={20} />
+          </button>
+
+          {/* Header Section */}
+          <div className="escalation-modal-header">
+            <div className="escalation-modal-icon-wrapper">
+              <AlertTriangle size={32} />
+            </div>
+            <h3 className="escalation-modal-title">Escalate SLA</h3>
+            <p className="escalation-modal-description">
+              Submit this SLA to your manager for immediate review and action.
+            </p>
+          </div>
+
+          {/* Error Alert */}
+          {error && (
+            <div className="escalation-alert-error">
+              <AlertCircle size={18} className="escalation-alert-icon" />
+              <div className="escalation-alert-content">
+                <strong>Error:</strong> {error}
               </div>
-              <button
-                onClick={onClose}
-                disabled={loading}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "4px",
-                  opacity: 0.8,
-                  transition: "opacity 0.2s",
-                  borderRadius: "4px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.opacity = "1";
-                  e.currentTarget.style.background = "rgba(255,255,255,0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = "0.8";
-                  e.currentTarget.style.background = "transparent";
-                }}
-              >
-                <X size={20} color="#fff" />
-              </button>
+            </div>
+          )}
+
+          {/* SLA Details Card */}
+          <div className="escalation-sla-card">
+            <div className="escalation-sla-card-header">
+              <FileText size={18} />
+              <span>SLA Details</span>
+            </div>
+            <div className="escalation-sla-card-body">
+              <div className="escalation-sla-detail-row">
+                <span className="escalation-sla-detail-label">SLA Type:</span>
+                <span className="escalation-sla-detail-value">
+                  {sla?.slatype || "N/A"}
+                </span>
+              </div>
+              <div className="escalation-sla-detail-row">
+                <span className="escalation-sla-detail-label">Employee:</span>
+                <span className="escalation-sla-detail-value">
+                  {sla?.employeeName || "N/A"}
+                </span>
+              </div>
+              <div className="escalation-sla-detail-row">
+                <span className="escalation-sla-detail-label">Deadline:</span>
+                <span className="escalation-sla-detail-value escalation-deadline">
+                  {formatDate(sla?.deadline)}
+                </span>
+              </div>
+              <div className="escalation-sla-detail-row">
+                <span className="escalation-sla-detail-label">
+                  Escalation Level:
+                </span>
+                <span className="escalation-badge-l1">L1 - Manager</span>
+              </div>
             </div>
           </div>
 
-          {/* Body */}
-          <form onSubmit={handleSubmit}>
-            <div style={{ padding: "1.5rem" }}>
-              {error && (
-                <div
-                  className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-                  style={{ borderRadius: "8px" }}
-                >
-                  <AlertCircle size={18} className="flex-shrink-0 mt-1" />
-                  <small>{error}</small>
-                </div>
-              )}
-
-              {/* Goal Section */}
-              <div
-                className="mb-3"
-                style={{
-                  background: "#F3F4F6",
-                  padding: "0.75rem 1rem",
-                  borderRadius: "8px",
-                  border: "1px solid #E5E7EB",
-                }}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="escalation-form">
+            {/* Reason Field */}
+            <div className="escalation-form-group">
+              <label htmlFor="reason" className="escalation-form-label">
+                Escalation Reason
+                <span className="escalation-required">*</span>
+              </label>
+              <select
+                id="reason"
+                className="escalation-form-select"
+                value={formData.reason}
+                onChange={(e) =>
+                  setFormData({ ...formData, reason: e.target.value })
+                }
+                disabled={loading}
+                required
               >
-                <label
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    color: "#6B7280",
-                    marginBottom: "0.25rem",
-                    display: "block",
-                  }}
-                >
-                  Goal:
-                </label>
-                <div
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "#1F2937",
-                    fontWeight: 500,
-                  }}
-                >
-                  {sla?.slatype || "N/A"}
-                </div>
-              </div>
+                <option value="">Select a reason</option>
+                {reasons.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              {/* Deadline */}
-              <div className="mb-3">
-                <small
-                  style={{
-                    fontSize: "0.813rem",
-                    color: "#DC2626",
-                    fontWeight: 500,
-                  }}
-                >
-                  Deadline: {formatDate(sla?.deadline)}
+            {/* Description Field */}
+            <div className="escalation-form-group">
+              <label htmlFor="description" className="escalation-form-label">
+                Detailed Description
+                <span className="escalation-required">*</span>
+              </label>
+              <textarea
+                id="description"
+                className="escalation-form-textarea"
+                rows={4}
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                onKeyDown={handleKeyDown}
+                placeholder="Provide detailed context for this escalation..."
+                disabled={loading}
+                maxLength={500}
+                required
+              />
+              <div className="escalation-form-footer">
+                <small className="escalation-form-hint">
+                  💡 Press Ctrl+Enter to submit
+                </small>
+                <small className="escalation-form-counter">
+                  {formData.description.length}/500
                 </small>
               </div>
+            </div>
 
-              {/* Reason */}
-              <div className="mb-3">
-                <label
-                  htmlFor="reason"
-                  style={{
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: "0.5rem",
-                    display: "block",
-                  }}
-                >
-                  Reason <span style={{ color: "#DC2626" }}>*</span>
-                </label>
-                <select
-                  id="reason"
-                  className="form-select"
-                  value={formData.reason}
-                  onChange={(e) =>
-                    setFormData({ ...formData, reason: e.target.value })
-                  }
-                  disabled={loading}
-                  required
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #D1D5DB",
-                    padding: "0.625rem 0.875rem",
-                    fontSize: "0.875rem",
-                    color: formData.reason ? "#1F2937" : "#9CA3AF",
-                    outline: "none",
-                    transition: "all 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#3B82F6";
-                    e.currentTarget.style.boxShadow =
-                      "0 0 0 3px rgba(59,130,246,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#D1D5DB";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                >
-                  <option value="">-- Select --</option>
-                  {reasons.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
+            {/* Info Box */}
+            <div className="escalation-info-box">
+              <div className="escalation-info-icon">⚠️</div>
+              <div className="escalation-info-content">
+                <p className="escalation-info-title">Important</p>
+                <p className="escalation-info-text">
+                  This will notify your manager immediately. They will review and
+                  take appropriate action on this SLA.
+                </p>
               </div>
+            </div>
 
-              {/* Your Comment */}
-              <div className="mb-2">
-                <label
-                  htmlFor="description"
-                  style={{
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    color: "#374151",
-                    marginBottom: "0.5rem",
-                    display: "block",
-                  }}
-                >
-                  Your Comment <span style={{ color: "#DC2626" }}>*</span>
-                </label>
-                <textarea
-                  id="description"
-                  className="form-control"
-                  rows={3}
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  onKeyDown={handleKeyDown}
-                  placeholder="Write your comment here..."
-                  disabled={loading}
-                  maxLength={500}
-                  required
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #D1D5DB",
-                    padding: "0.625rem 0.875rem",
-                    fontSize: "0.875rem",
-                    resize: "none",
-                    outline: "none",
-                    transition: "all 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#3B82F6";
-                    e.currentTarget.style.boxShadow =
-                      "0 0 0 3px rgba(59,130,246,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#D1D5DB";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                />
-                <div className="d-flex justify-content-between align-items-center mt-1">
-                  <small
-                    style={{
-                      color: "#9CA3AF",
-                      fontSize: "0.75rem",
-                      fontStyle: "italic",
-                    }}
-                  >
-                    ⓘ Press Ctrl+Enter to submit quickly
-                  </small>
-                  <small
-                    style={{
-                      color: "#9CA3AF",
-                      fontSize: "0.75rem",
-                    }}
-                  >
-                    {formData.description.length}/500
-                  </small>
-                </div>
-              </div>
-
-              {/* Info Alert */}
-              <div
-                style={{
-                  background: "#DBEAFE",
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  marginTop: "1rem",
-                  display: "flex",
-                  alignItems: "start",
-                  gap: "0.5rem",
-                  border: "1px solid #BFDBFE",
-                }}
+            {/* Action Buttons */}
+            <div className="escalation-modal-actions">
+              <button
+                type="button"
+                className="escalation-btn escalation-btn-secondary"
+                onClick={onClose}
+                disabled={loading}
               >
-                <Info
-                  size={16}
-                  color="#2563EB"
-                  style={{ marginTop: "2px", flexShrink: 0 }}
-                />
-                <small
-                  style={{
-                    color: "#1E40AF",
-                    fontSize: "0.813rem",
-                    lineHeight: "1.4",
-                  }}
-                >
-                  <strong>Level 1 (L1)</strong> escalation to your manager for
-                  immediate review.
-                </small>
-              </div>
-
-              {/* Buttons */}
-              <div
-                style={{
-                  marginTop: "1.25rem",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "0.75rem",
-                }}
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="escalation-btn escalation-btn-primary"
+                disabled={loading || !isValid}
               >
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={onClose}
-                  disabled={loading}
-                  style={{
-                    borderRadius: "8px",
-                    padding: "0.5rem 1.25rem",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    border: "1px solid #D1D5DB",
-                    background: "#fff",
-                    color: "#6B7280",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading) {
-                      e.currentTarget.style.borderColor = "#9CA3AF";
-                      e.currentTarget.style.color = "#374151";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loading) {
-                      e.currentTarget.style.borderColor = "#D1D5DB";
-                      e.currentTarget.style.color = "#6B7280";
-                    }
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn d-flex align-items-center gap-2"
-                  disabled={loading || !isValid}
-                  style={{
-                    borderRadius: "8px",
-                    padding: "0.5rem 1.5rem",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    background: "#C2185B",
-                    color: "#fff",
-                    border: "none",
-                    transition: "all 0.2s",
-                    opacity: loading || !isValid ? 0.6 : 1,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!loading && isValid) {
-                      e.currentTarget.style.background = "#AD1457";
-                      e.currentTarget.style.transform = "translateY(-1px)";
-                      e.currentTarget.style.boxShadow =
-                        "0 4px 12px rgba(194,24,91,0.25)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!loading && isValid) {
-                      e.currentTarget.style.background = "#C2185B";
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }
-                  }}
-                >
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm" />
-                      <span>Posting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send size={14} />
-                      <span>Post Escalation</span>
-                    </>
-                  )}
-                </button>
-              </div>
+                {loading ? (
+                  <>
+                    <span className="escalation-spinner" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} />
+                    Submit Escalation
+                  </>
+                )}
+              </button>
             </div>
           </form>
         </div>
       </div>
-    </div>
+
+      {/* Styles */}
+      <style>{`
+        /* ========================================
+           ESCALATION MODAL - REDESIGNED
+           ======================================== */
+
+        .escalation-modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          z-index: 1050;
+          animation: escalation-fade-in 0.2s ease;
+        }
+
+        @keyframes escalation-fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .escalation-modal-wrapper {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1055;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          overflow-y: auto;
+          animation: escalation-slide-up 0.3s ease;
+        }
+
+        @keyframes escalation-slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .escalation-modal-container {
+          background: #FFFFFF;
+          border-radius: 16px;
+          max-width: 540px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          position: relative;
+          padding: 2rem;
+          text-align: left;
+          margin: auto;
+        }
+
+        /* Close Button */
+        .escalation-modal-close-btn {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          border: none;
+          background: #F3F4F6;
+          color: #6B7280;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          z-index: 1;
+        }
+
+        .escalation-modal-close-btn:hover:not(:disabled) {
+          background: #E5E7EB;
+          color: #111827;
+        }
+
+        .escalation-modal-close-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        /* Header */
+        .escalation-modal-header {
+          margin-bottom: 1.5rem;
+        }
+
+        .escalation-modal-icon-wrapper {
+          width: 64px;
+          height: 64px;
+          background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #D97706;
+          margin-bottom: 1.25rem;
+        }
+
+        .escalation-modal-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #111827;
+          margin: 0 0 0.75rem;
+          line-height: 1.2;
+        }
+
+        .escalation-modal-description {
+          font-size: 0.9375rem;
+          color: #6B7280;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        /* Error Alert */
+        .escalation-alert-error {
+          background: #FEF2F2;
+          border: 1px solid #FEE2E2;
+          border-radius: 10px;
+          padding: 0.875rem;
+          display: flex;
+          align-items: start;
+          gap: 0.625rem;
+          margin-bottom: 1.25rem;
+        }
+
+        .escalation-alert-icon {
+          flex-shrink: 0;
+          color: #DC2626;
+          margin-top: 2px;
+        }
+
+        .escalation-alert-content {
+          flex: 1;
+          font-size: 0.8125rem;
+          color: #991B1B;
+        }
+
+        .escalation-alert-content strong {
+          font-weight: 600;
+        }
+
+        /* SLA Details Card */
+        .escalation-sla-card {
+          background: #F9FAFB;
+          border: 1px solid #E5E7EB;
+          border-radius: 12px;
+          margin-bottom: 1.5rem;
+          overflow: hidden;
+        }
+
+        .escalation-sla-card-header {
+          background: #27235C;
+          color: #FFFFFF;
+          padding: 0.75rem 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+          font-weight: 600;
+        }
+
+        .escalation-sla-card-body {
+          padding: 1rem;
+        }
+
+        .escalation-sla-detail-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.625rem 0;
+          border-bottom: 1px solid #E5E7EB;
+        }
+
+        .escalation-sla-detail-row:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        .escalation-sla-detail-label {
+          font-size: 0.8125rem;
+          color: #6B7280;
+          font-weight: 600;
+        }
+
+        .escalation-sla-detail-value {
+          font-size: 0.875rem;
+          color: #111827;
+          font-weight: 600;
+          text-align: right;
+        }
+
+        .escalation-deadline {
+          color: #DC2626;
+        }
+
+        .escalation-badge-l1 {
+          display: inline-flex;
+          padding: 0.25rem 0.625rem;
+          border-radius: 5px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          background: #DBEAFE;
+          color: #1E40AF;
+        }
+
+        /* Form */
+        .escalation-form {
+          margin-top: 1.5rem;
+        }
+
+        .escalation-form-group {
+          margin-bottom: 1.25rem;
+        }
+
+        .escalation-form-label {
+          display: block;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #374151;
+          margin-bottom: 0.5rem;
+        }
+
+        .escalation-required {
+          color: #DC2626;
+          margin-left: 0.25rem;
+        }
+
+        .escalation-form-select,
+        .escalation-form-textarea {
+          width: 100%;
+          border-radius: 8px;
+          border: 1.5px solid #E5E7EB;
+          padding: 0.75rem;
+          font-size: 0.875rem;
+          color: #111827;
+          outline: none;
+          transition: all 0.2s;
+          background: #FFFFFF;
+        }
+
+        .escalation-form-select:focus,
+        .escalation-form-textarea:focus {
+          border-color: #0F62FE;
+          box-shadow: 0 0 0 3px rgba(15, 98, 254, 0.1);
+        }
+
+        .escalation-form-select:disabled,
+        .escalation-form-textarea:disabled {
+          background: #F9FAFB;
+          color: #9CA3AF;
+          cursor: not-allowed;
+        }
+
+        .escalation-form-select {
+          cursor: pointer;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 0.75rem center;
+          padding-right: 2.5rem;
+        }
+
+        .escalation-form-textarea {
+          resize: vertical;
+          min-height: 100px;
+        }
+
+        .escalation-form-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 0.5rem;
+        }
+
+        .escalation-form-hint {
+          color: #9CA3AF;
+          font-size: 0.75rem;
+          font-style: italic;
+        }
+
+        .escalation-form-counter {
+          color: #9CA3AF;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+
+        /* Info Box */
+        .escalation-info-box {
+          background: #FEF3C7;
+          border: 1px solid #FDE68A;
+          border-radius: 10px;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+          display: flex;
+          gap: 0.75rem;
+          align-items: start;
+        }
+
+        .escalation-info-icon {
+          font-size: 1.25rem;
+          flex-shrink: 0;
+        }
+
+        .escalation-info-content {
+          flex: 1;
+        }
+
+        .escalation-info-title {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #92400E;
+          margin: 0 0 0.375rem;
+        }
+
+        .escalation-info-text {
+          font-size: 0.8125rem;
+          color: #78350F;
+          margin: 0;
+          line-height: 1.5;
+        }
+
+        /* Action Buttons */
+        .escalation-modal-actions {
+          display: flex;
+          gap: 0.75rem;
+          justify-content: flex-end;
+          margin-top: 1.5rem;
+        }
+
+        .escalation-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1.5rem;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        .escalation-btn-secondary {
+          background: #FFFFFF;
+          color: #6B7280;
+          border: 1.5px solid #E5E7EB;
+        }
+
+        .escalation-btn-secondary:hover:not(:disabled) {
+          background: #F9FAFB;
+          border-color: #D1D5DB;
+          color: #111827;
+        }
+
+        .escalation-btn-primary {
+          background: linear-gradient(90deg, #F59E0B 0%, #D97706 100%);
+          color: #FFFFFF;
+          box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .escalation-btn-primary:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .escalation-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none !important;
+        }
+
+        .escalation-spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-top-color: #FFFFFF;
+          border-radius: 50%;
+          animation: escalation-spin 0.6s linear infinite;
+        }
+
+        @keyframes escalation-spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+          .escalation-modal-container {
+            padding: 1.5rem;
+          }
+
+          .escalation-modal-actions {
+            flex-direction: column;
+          }
+
+          .escalation-btn {
+            width: 100%;
+          }
+
+          .escalation-sla-detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+          }
+
+          .escalation-sla-detail-value {
+            text-align: left;
+          }
+        }
+      `}</style>
+    </>
   );
 };
 

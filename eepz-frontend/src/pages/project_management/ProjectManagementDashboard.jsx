@@ -62,11 +62,11 @@ const ProjectManagementDashboard = () => {
         {/* Total Projects Card */}
         <div className="col-md-6 col-lg-3">
           <div
-            className="card border-0"
+            className="card border-2"
             style={{
               boxShadow: "var(--shadow)",
               borderRadius: "var(--radius-lg)",
-              border: "1px solid var(--border)",
+              border: "2px solid #27235C",
             }}
           >
             <div className="card-body">
@@ -106,11 +106,11 @@ const ProjectManagementDashboard = () => {
         {/* Active Projects Card */}
         <div className="col-md-6 col-lg-3">
           <div
-            className="card border-0"
+            className="card border-2"
             style={{
               boxShadow: "var(--shadow)",
               borderRadius: "var(--radius-lg)",
-              border: "1px solid var(--border)",
+              border: "2px solid #27235C",
             }}
           >
             <div className="card-body">
@@ -150,11 +150,11 @@ const ProjectManagementDashboard = () => {
         {/* Total Employees Card */}
         <div className="col-md-6 col-lg-3">
           <div
-            className="card border-0"
+            className="card border-2"
             style={{
               boxShadow: "var(--shadow)",
               borderRadius: "var(--radius-lg)",
-              border: "1px solid var(--border)",
+              border: "2px solid #27235C",
             }}
           >
             <div className="card-body">
@@ -191,11 +191,11 @@ const ProjectManagementDashboard = () => {
         {/* Managed Projects Card */}
         <div className="col-md-6 col-lg-3">
           <div
-            className="card border-0"
+            className="card border-2"
             style={{
               boxShadow: "var(--shadow)",
               borderRadius: "var(--radius-lg)",
-              border: "1px solid var(--border)",
+              border: "2px solid #27235C",
             }}
           >
             <div className="card-body">
@@ -239,7 +239,7 @@ const ProjectManagementDashboard = () => {
         style={{
           boxShadow: "var(--shadow)",
           borderRadius: "var(--radius-lg)",
-          border: "1px solid var(--border)",
+          border: "2px solid #27235C",
         }}
       >
         <div className="card-body d-flex flex-column align-items-center justify-content-center text-center p-5">
@@ -257,7 +257,7 @@ const ProjectManagementDashboard = () => {
           >
             Project Management
           </h4>
-          <p className="mb-4 " style={{ color: "var(--muted)" }}>
+          <p className="mb-4" style={{ color: "var(--muted)" }}>
             Create new projects, assign managers, map employees, and manage all
             project activities
           </p>
@@ -290,7 +290,7 @@ const ProjectManagementDashboard = () => {
               onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
               style={{
                 backgroundColor: "transparent",
-                border: "1px solid var(--border)",
+                border: "2px solid #27235C",
                 color: "var(--color-primary-3)",
                 borderRadius: "var(--radius-md)",
                 padding: "0.6rem 1.2rem",
@@ -300,11 +300,11 @@ const ProjectManagementDashboard = () => {
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor =
                   "var(--color-primary-5)";
-                e.currentTarget.style.borderColor = "var(--color-primary-3)";
+                e.currentTarget.style.borderColor = "#27235C";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.borderColor = "var(--border)";
+                e.currentTarget.style.borderColor = "#27235C";
               }}
             >
               <FolderKanban size={20} />

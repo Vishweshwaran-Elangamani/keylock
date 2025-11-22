@@ -772,9 +772,7 @@ const ProjectList = () => {
                 </select>
               </div>
             </div>
-            <div className="col-md-3 d-flex align-items-center justify-content-end">
-              <span className="text-muted small"><strong>{filteredProjects.length}</strong> of <strong>{projects.length}</strong> projects</span>
-            </div>
+            
           </div>
         </div>
       </div>
