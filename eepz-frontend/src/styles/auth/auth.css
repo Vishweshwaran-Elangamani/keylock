@@ -122,6 +122,18 @@
   align-items: center;
 }
 
+.eepz-password-input-wrapper .form-control.is-invalid ~ .eepz-password-toggle-btn {
+
+  right: 45px;
+
+}
+ 
+.eepz-password-input-wrapper .form-control.is-valid ~ .eepz-password-toggle-btn {
+
+  right: 45px;
+
+}
+
 .eepz-email-validation-icon {
   position: absolute;
   right: 15px;

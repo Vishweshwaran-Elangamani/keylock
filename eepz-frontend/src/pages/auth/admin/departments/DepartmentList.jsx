@@ -19,7 +19,7 @@ const DepartmentList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   useEffect(() => {
     fetchDepartments();
@@ -143,23 +143,8 @@ const DepartmentList = () => {
       : "N/A";
   };
 
-  const getDepartmentIcon = (name) => {
-    const iconMap = {
-      IT: "bi-laptop",
-      HR: "bi-people",
-      Finance: "bi-cash-coin",
-      Marketing: "bi-megaphone",
-      Sales: "bi-graph-up-arrow",
-      Operations: "bi-gear",
-      Engineering: "bi-tools",
-      Support: "bi-headset",
-    };
-
-    for (const [key, icon] of Object.entries(iconMap)) {
-      if (name?.toLowerCase().includes(key.toLowerCase())) {
-        return icon;
-      }
-    }
+  // Simplified - Single icon for all departments
+  const getDepartmentIcon = () => {
     return "bi-building";
   };
 
@@ -185,7 +170,6 @@ const DepartmentList = () => {
       {/* NEW BREADCRUMB COMPONENT */}
       <Breadcrumb
         items={[
-          
           {
             label: "Department Management",
           },
@@ -272,8 +256,6 @@ const DepartmentList = () => {
           <i className="bi bi-plus-circle"></i>
           Create Department
         </button>
-
-        
       </div>
 
       {/* EMPTY STATE */}
@@ -293,12 +275,16 @@ const DepartmentList = () => {
               {filteredDepartments.map((dept) => (
                 <div key={dept.departmentId} className="department-card-item">
                   <div className="card-header-dept">
-                    <div className="dept-icon-badge">
-                      <i
-                        className={`bi ${getDepartmentIcon(
-                          dept.departmentName
-                        )}`}
-                      ></i>
+                    {/* Updated icon badge with blue background */}
+                    <div
+                      className="dept-icon-badge"
+                      style={{
+                        background:
+                          "#27235c",
+                        boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
+                      }}
+                    >
+                      <i className={`bi ${getDepartmentIcon()}`}></i>
                     </div>
                   </div>
 
@@ -333,29 +319,25 @@ const DepartmentList = () => {
             </div>
           )}
 
-          {/* TABLE VIEW */}
+          {/* TABLE VIEW - COMPACT VERSION */}
           {viewMode === "table" && (
             <>
-              <div className="table-card-dept">
+              <div className="table-card-dept" style={{ maxWidth: "1200px", margin: "0 auto" }}>
                 <div className="table-wrapper-dept">
                   <table className="table-dept">
                     <thead>
                       <tr>
-                        <th>Department Name</th>
-                        <th>Created At</th>
-                        <th className="text-center">Actions</th>
+                        <th style={{ width: "40%" }}>Department Name</th>
+                        <th style={{ width: "30%" }}>Created At</th>
+                        <th className="text-center" style={{ width: "30%" }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {currentItems.map((dept) => (
                         <tr key={dept.departmentId}>
                           <td>
+                            {/* Removed icon from table view */}
                             <div className="table-dept-name">
-                              <i
-                                className={`bi ${getDepartmentIcon(
-                                  dept.departmentName
-                                )}`}
-                              ></i>
                               <span>{dept.departmentName}</span>
                             </div>
                           </td>
@@ -397,6 +379,7 @@ const DepartmentList = () => {
                           setCurrentPage(1);
                         }}
                       >
+                        <option value="5">5</option>
                         <option value="10">10</option>
                         <option value="25">25</option>
                         <option value="50">50</option>

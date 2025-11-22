@@ -9,6 +9,8 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
   const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
+  const [exportingUsers, setExportingUsers] = useState(false);
+  const [exportingAll, setExportingAll] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -53,7 +55,11 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
 
   const handleExport = async (type) => {
     try {
-      setLoading(true);
+      if (type === "users") {
+        setExportingUsers(true);
+      } else if (type === "all") {
+        setExportingAll(true);
+      }
 
       switch (type) {
         case "roles":
@@ -78,7 +84,11 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
     } catch (error) {
       toast.error(error.message || "Export failed");
     } finally {
-      setLoading(false);
+      if (type === "users") {
+        setExportingUsers(false);
+      } else if (type === "all") {
+        setExportingAll(false);
+      }
     }
   };
 
@@ -419,14 +429,8 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                     marginBottom: '32px'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '8px' }}>
-                    <i className="bi bi-file-earmark-spreadsheet" style={{ fontSize: '24px', color: '#27235C' }}></i>
-                    <h6 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: 0 }}>
-                      Export to Excel
-                    </h6>
-                  </div>
                   <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
-                    Download data in Excel format for backup or analysis
+                  <i className="bi bi-file-earmark-spreadsheet" style={{ fontSize: '24px', color: '#27235C' }}></i>Download data in Excel format for backup or analysis
                   </p>
                 </div>
 
@@ -480,8 +484,8 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       Export all users and their information
                     </p>
                     <button
-                      onClick={() => handleExport("all")}
-                      disabled={loading}
+                      onClick={() => handleExport("users")}
+                      disabled={exportingUsers}
                       style={{
                         width: '100%',
                         padding: '12px 20px',
@@ -491,7 +495,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                         border: 'none',
                         background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
                         color: '#ffffff',
-                        cursor: loading ? 'not-allowed' : 'pointer',
+                        cursor: exportingUsers ? 'not-allowed' : 'pointer',
                         transition: 'all 0.2s ease',
                         display: 'flex',
                         alignItems: 'center',
@@ -500,7 +504,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                         boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)'
                       }}
                     >
-                      {loading ? (
+                      {exportingUsers ? (
                         <span
                           style={{
                             width: '16px',
@@ -561,7 +565,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                     </p>
                     <button
                       onClick={() => handleExport("all")}
-                      disabled={loading}
+                      disabled={exportingAll}
                       style={{
                         width: '100%',
                         padding: '12px 20px',
@@ -571,7 +575,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                         border: 'none',
                         background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
                         color: '#ffffff',
-                        cursor: loading ? 'not-allowed' : 'pointer',
+                        cursor: exportingAll ? 'not-allowed' : 'pointer',
                         transition: 'all 0.2s ease',
                         display: 'flex',
                         alignItems: 'center',
@@ -580,7 +584,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                         boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)'
                       }}
                     >
-                      {loading ? (
+                      {exportingAll ? (
                         <span
                           style={{
                             width: '16px',
@@ -605,21 +609,6 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
             {/* IMPORT TAB */}
             {activeTab === "import" && (
               <div>
-                {/* Section Header - CENTERED */}
-                <div
-                  style={{
-                    textAlign: 'center',
-                    marginBottom: '24px'
-                  }}
-                >
-                  <h6 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: '0 0 8px 0' }}>
-                    Bulk Import Users
-                  </h6>
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
-                    Upload an Excel file to create multiple users at once
-                  </p>
-                </div>
-
                 {/* Template Download Section */}
                 <div
                   style={{
