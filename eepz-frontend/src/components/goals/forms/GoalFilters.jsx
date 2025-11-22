@@ -118,7 +118,7 @@ const GoalFilters = ({ isOpen, onClose, filters, onApply, projects = [] }) => {
             {/* Header */}
             <div
               className="modal-header"
-              style={{ borderBottom: "2px solid #dee2e6" }}
+              style={{ borderBottom: "2px solid #dee2e6", backgroundColor: "rgb(39, 35, 92)" }}
             >
               <h5 className="modal-title" style={{ fontWeight: 600 }}>
                 <i className="bi bi-funnel me-2" />
@@ -250,6 +250,9 @@ const GoalFilters = ({ isOpen, onClose, filters, onApply, projects = [] }) => {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleApply}
+                style={{
+                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+                }}
               >
                 <i className="bi bi-check-circle me-2" />
                 Apply Filters

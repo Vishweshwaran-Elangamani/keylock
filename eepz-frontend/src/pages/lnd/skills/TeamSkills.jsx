@@ -76,8 +76,13 @@ const TeamSkills = () => {
   const handleSearchSubmit = (e) => {
     if (e.key === "Enter") {
       setSearchTerm(searchInput);
-      setCurrentPage(1); // Reset to first page on new search
+      setCurrentPage(1);
     }
+  };
+
+  const handleSearch = () => {
+    setSearchTerm(searchInput);
+    setCurrentPage(1);
   };
 
   const handleCancelSearch = () => {
@@ -142,7 +147,7 @@ const TeamSkills = () => {
                 Cancel
               </button>
             ) : (
-              <button className="btn btn-primary" onClick={handleSearchSubmit}>
+              <button className="btn btn-primary" onClick={handleSearch}>
                 <i className="bi bi-search me-1"></i>
                 Search
               </button>

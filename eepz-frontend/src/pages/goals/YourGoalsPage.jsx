@@ -193,6 +193,22 @@ const YourGoalsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleSearch = () => {
+    setSearchTerm(searchTerm);
+    setCurrentPage(1);
+  };
+
+  const handleCancelSearch = () => {
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   const activeFilterCount =
     Object.values(filters).filter((v) => v !== "" && v !== null).length +
     (searchTerm ? 1 : 0);
@@ -208,56 +224,42 @@ const YourGoalsPage = () => {
         ]}
       />
 
-      {/* Header */}
-      <div className="d-flex justify-content-end align-items-center mb-4">
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <i className="bi bi-plus-circle me-2"></i>
-          Create Goal
-        </button>
-      </div>
-
-      {/* Alert */}
-      {alert && (
-        <Alert
-          type={alert.type}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-        />
-      )}
+      {/* Goal Type Toggle */}
+      <GoalTypeToggle
+        selectedType={selectedType}
+        onTypeChange={(type) => {
+          setSelectedType(type);
+          setCurrentPage(1);
+        }}
+        counts={typeCounts}
+      />
 
       {/* Search & Filter Button Row */}
       <div className="d-flex gap-3 mb-3 align-items-center">
         {/* Search Bar */}
-        <div style={{ flex: "1" }}>
+        <div className="col-md-10">
           <div className="input-group">
-            <span className="input-group-text">
-              <i className="bi bi-search"></i>
-            </span>
             <input
               type="text"
               className="form-control"
-              placeholder="Search goals by title or description"
+              placeholder="Search by goal title or requester..."
               value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              style={{
-                minHeight: "2.5em",
-              }}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
+              style={{ minHeight: "35.7px" }}
             />
-            {searchTerm && (
+            {searchTerm ? (
               <button
                 className="btn btn-outline-secondary"
-                onClick={() => {
-                  setSearchTerm("");
-                  setCurrentPage(1);
-                }}
+                onClick={handleCancelSearch}
               >
-                <i className="bi bi-x-lg"></i>
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={handleSearch}>
+                <i className="bi bi-search me-1"></i>
+                Search
               </button>
             )}
           </div>
@@ -267,7 +269,11 @@ const YourGoalsPage = () => {
         <button
           className="btn btn-outline-secondary"
           onClick={() => setShowFiltersModal(true)}
-          style={{ borderRadius: "8px", padding: "0.5rem 1rem" }}
+          style={{
+            borderRadius: "8px",
+            padding: "0.5rem 1rem",
+            width: "200px",
+          }}
         >
           <i className="bi bi-funnel me-2"></i>
           Filters
@@ -281,43 +287,18 @@ const YourGoalsPage = () => {
           )}
         </button>
 
-        {/* Clear Filters Button - Only show when filters are active */}
-        {activeFilterCount > 0 && (
-          <button
-            className="btn btn-outline-danger"
-            onClick={() => {
-              setFilters({
-                status: "",
-                projectId: "",
-                dateRange: "",
-                dateFrom: "",
-                dateTo: "",
-              });
-              setSearchTerm("");
-              setCurrentPage(1);
-            }}
-            style={{ borderRadius: "8px", padding: "0.5rem 1rem" }}
-            title="Clear all filters"
-          >
-            <i className="bi bi-x-circle me-2"></i>
-            Clear
-          </button>
-        )}
+        {/*Create Button*/}
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowCreateModal(true)}
+          style={{
+            background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+          }}
+        >
+          <i className="bi bi-plus-circle me-2"></i>
+          Create Goal
+        </button>
       </div>
-
-      <hr></hr>
-
-      {/* Goal Type Toggle */}
-      <GoalTypeToggle
-        selectedType={selectedType}
-        onTypeChange={(type) => {
-          setSelectedType(type);
-          setCurrentPage(1);
-        }}
-        counts={typeCounts}
-      />
-
-      <hr></hr>
 
       {/* Results Summary */}
       <div className="mb-3">

@@ -5,6 +5,8 @@ import { FaSearch } from "react-icons/fa";
 import policyService from "../../../../services/hr_operations/hr/policyService";
 import AddPolicyModal from "../../../../components/hr_operations/modals/AddPolicyModal";
 import EditPolicyModal from "../../../../components/hr_operations/modals/EditPolicyModal";
+import PublishPolicyModal from "../../../../components/hr_operations/modals/PublishPolicyModal";
+import UnpublishPolicyModal from "../../../../components/hr_operations/modals/UnpublishPolicyModal";
 import { Alert, Spinner } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/policyManagement.css";
 
@@ -14,7 +16,11 @@ const PolicyManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [showUnpublishModal, setShowUnpublishModal] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState(null);
+  const [publishing, setPublishing] = useState(false);
+  const [unpublishing, setUnpublishing] = useState(false);
   const [alert, setAlert] = useState(null);
 
   // Filter states
@@ -175,25 +181,49 @@ const PolicyManagement = () => {
     }
   };
 
-  const handlePublish = async (policyId) => {
+  const handlePublishClick = (policy) => {
+    setSelectedPolicy(policy);
+    setShowPublishModal(true);
+  };
+
+  const handlePublishConfirm = async () => {
+    if (!selectedPolicy) return;
+
     try {
-      await policyService.publishPolicy(policyId);
+      setPublishing(true);
+      await policyService.publishPolicy(selectedPolicy.policyId);
       enqueueToast("success", "Policy published successfully!");
+      setShowPublishModal(false);
+      setSelectedPolicy(null);
       fetchPolicies();
     } catch (error) {
       console.error("Error publishing policy:", error);
       enqueueToast("danger", "Failed to publish policy");
+    } finally {
+      setPublishing(false);
     }
   };
 
-  const handleUnpublish = async (policyId) => {
+  const handleUnpublishClick = (policy) => {
+    setSelectedPolicy(policy);
+    setShowUnpublishModal(true);
+  };
+
+  const handleUnpublishConfirm = async () => {
+    if (!selectedPolicy) return;
+
     try {
-      await policyService.unpublishPolicy(policyId);
+      setUnpublishing(true);
+      await policyService.unpublishPolicy(selectedPolicy.policyId);
       enqueueToast("warning", "Policy unpublished - Now hidden from employees");
+      setShowUnpublishModal(false);
+      setSelectedPolicy(null);
       fetchPolicies();
     } catch (error) {
       console.error("Error unpublishing policy:", error);
       enqueueToast("danger", "Failed to unpublish policy");
+    } finally {
+      setUnpublishing(false);
     }
   };
 
@@ -276,7 +306,7 @@ const PolicyManagement = () => {
       </div>
 
       {/* Policies Table */}
-      <div className="table-card">
+      <div className="pm-table-card">
         <div className="table-wrapper">
           <table className="pm-table">
             <thead>
@@ -329,7 +359,7 @@ const PolicyManagement = () => {
                         {!policy.isPublished && (
                           <button
                             className="action-btn action-btn-publish"
-                            onClick={() => handlePublish(policy.policyId)}
+                            onClick={() => handlePublishClick(policy)}
                             title="Publish Policy"
                           >
                             <i className="bi bi-send"></i>
@@ -339,7 +369,7 @@ const PolicyManagement = () => {
                         {policy.isPublished && (
                           <button
                             className="action-btn action-btn-unpublish"
-                            onClick={() => handleUnpublish(policy.policyId)}
+                            onClick={() => handleUnpublishClick(policy)}
                             title="Unpublish Policy"
                           >
                             <i className="bi bi-eye-slash"></i>
@@ -352,14 +382,6 @@ const PolicyManagement = () => {
                           title="View/Edit Policy"
                         >
                           <i className="bi bi-pencil"></i>
-                        </button>
-
-                        <button
-                          className="action-btn action-btn-delete"
-                          onClick={() => handleDelete(policy.policyId)}
-                          title="Delete Policy"
-                        >
-                          <i className="bi bi-trash"></i>
                         </button>
                       </div>
                     </td>
@@ -453,7 +475,7 @@ const PolicyManagement = () => {
       </div>
 
       {/* Blur overlay when modal is open */}
-      {(showAddModal || showEditModal) && (
+      {(showAddModal || showEditModal || showPublishModal || showUnpublishModal) && (
         <div className="pm-blur-backdrop"></div>
       )}
 
@@ -479,6 +501,34 @@ const PolicyManagement = () => {
           onSuccess={handleEditSuccess}
           onDelete={handleDelete}
           onToast={enqueueToast}
+        />
+      )}
+
+      {/* Publish Policy Modal */}
+      {showPublishModal && selectedPolicy && (
+        <PublishPolicyModal
+          show={showPublishModal}
+          policy={selectedPolicy}
+          onHide={() => {
+            setShowPublishModal(false);
+            setSelectedPolicy(null);
+          }}
+          onPublish={handlePublishConfirm}
+          publishing={publishing}
+        />
+      )}
+
+      {/* Unpublish Policy Modal */}
+      {showUnpublishModal && selectedPolicy && (
+        <UnpublishPolicyModal
+          show={showUnpublishModal}
+          policy={selectedPolicy}
+          onHide={() => {
+            setShowUnpublishModal(false);
+            setSelectedPolicy(null);
+          }}
+          onUnpublish={handleUnpublishConfirm}
+          unpublishing={unpublishing}
         />
       )}
     </div>

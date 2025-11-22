@@ -42,7 +42,7 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
           ? parseInt(value)
           : value,
     }));
-    
+
     // Clear error for this field
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -406,7 +406,8 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
               {formData.totalBudget && (
                 <div
                   style={{
-                    background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+                    background:
+                      "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
                     border: "2px solid #10b981",
                     borderRadius: 8,
                     padding: 14,
@@ -424,14 +425,18 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                       marginBottom: 10,
                     }}
                   >
-                    <i className="bi bi-cash-stack" style={{ fontSize: 18 }}></i>
+                    <i
+                      className="bi bi-cash-stack"
+                      style={{ fontSize: 18 }}
+                    ></i>
                     <span>Budget Summary</span>
                   </div>
 
                   <div
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                      gridTemplateColumns:
+                        "repeat(auto-fit, minmax(200px, 1fr))",
                       gap: 10,
                     }}
                   >
@@ -457,7 +462,9 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                         color: "#047857",
                       }}
                     >
-                      <label style={{ fontWeight: 600 }}>Allocated Amount:</label>
+                      <label style={{ fontWeight: 600 }}>
+                        Allocated Amount:
+                      </label>
                       <span style={{ fontWeight: 700 }}>
                         {formatCurrency(
                           formData.allocatedAmount || formData.totalBudget
@@ -477,7 +484,9 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                       <span style={{ fontWeight: 700 }}>
                         {formatCurrency(
                           (formData.totalBudget || 0) -
-                            (formData.allocatedAmount || formData.totalBudget || 0)
+                            (formData.allocatedAmount ||
+                              formData.totalBudget ||
+                              0)
                         )}
                       </span>
                     </div>
@@ -499,21 +508,7 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                   gap: 8,
                   marginTop: 12,
                 }}
-              >
-                <div>
-                  <i className="bi bi-info-circle" style={{ fontSize: 16 }}>
-                  </i>
-                  <strong style={{margin: 6, marginBottom: 25, fontSize: 17, gap: 3 }}>
-                          Budget Creation:
-                  </strong>
-                  <ul style={{ margin: 5, paddingLeft: 18, lineHeight: 1.6 }}>
-                    <li>Set the total budget for the department</li>
-                    <li>Optionally set allocated amount for initial spending limit</li>
-                    <li>HR/DeptHead will break this down by allocation type</li>
-                    <li>This cannot be edited after creation</li>
-                  </ul>
-                </div>
-              </div>
+              ></div>
             </div>
 
             {/* FOOTER */}

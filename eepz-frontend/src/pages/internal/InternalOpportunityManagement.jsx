@@ -5,6 +5,7 @@ import departmentService from "../../services/auth/departmentService";
 import CreateOpportunityModal from "../../components/internal/OpportunityModals/CreateOpportunityModal";
 import EditOpportunityModal from "../../components/internal/OpportunityModals/EditOpportunityModal";
 import DeleteOpportunityModal from "../../components/internal/OpportunityModals/DeleteOpportunityModal";
+import ViewOpportunityModal from "../../components/internal/OpportunityModals/ViewOpportunityModal";
 import SelfNominateModal from "../../components/internal/NominationModals/SelfNominateModal";
 import ManagerNominateModal from "../../components/internal/NominationModals/ManagerNominateModal";
 import Breadcrumb from "../../components/common/Breadcrumb";
@@ -31,6 +32,7 @@ const InternalOpportunityManagement = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
   const [showManagerNominateModal, setShowManagerNominateModal] =
     useState(false);
@@ -135,6 +137,11 @@ const InternalOpportunityManagement = () => {
   const handleDeleteOpportunity = (opportunity) => {
     setSelectedOpportunity(opportunity);
     setShowDeleteModal(true);
+  };
+
+  const handleViewOpportunity = (opportunity) => {
+    setSelectedOpportunity(opportunity);
+    setShowViewModal(true);
   };
 
   const handleSelfNominate = (opportunity) => {
@@ -256,7 +263,7 @@ const InternalOpportunityManagement = () => {
       />
 
       {/* Statistics Cards - Compact */}
-      <div className="stats-grid">
+      <div className="int-stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-briefcase-fill"></i>
@@ -346,8 +353,6 @@ const InternalOpportunityManagement = () => {
               Create Opportunity
             </button>
           )}
-
-          
         </div>
       </div>
 
@@ -463,11 +468,7 @@ const InternalOpportunityManagement = () => {
                         {/* View Details for all */}
                         <button
                           className="action-btn action-btn-view"
-                          onClick={() =>
-                            toast.info(
-                              `${opportunity.opportunityName} - Posted by ${opportunity.postedByName}`
-                            )
-                          }
+                          onClick={() => handleViewOpportunity(opportunity)}
                           title="View Details"
                         >
                           <i className="bi bi-eye"></i>
@@ -592,6 +593,17 @@ const InternalOpportunityManagement = () => {
           onHide={() => setShowDeleteModal(false)}
           onOpportunityDeleted={handleOpportunityDeleted}
           opportunity={selectedOpportunity}
+        />
+      )}
+
+      {showViewModal && selectedOpportunity && (
+        <ViewOpportunityModal
+          show={showViewModal}
+          opportunity={selectedOpportunity}
+          onClose={() => {
+            setShowViewModal(false);
+            setSelectedOpportunity(null);
+          }}
         />
       )}
 

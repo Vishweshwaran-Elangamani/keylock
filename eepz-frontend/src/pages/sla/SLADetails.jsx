@@ -143,8 +143,6 @@ const SLADetails = () => {
         escalationsCount: escalationsData.length,
       });
 
-      // ✅ FIXED: Check L1 escalation capability for Employees/Managers
-      // L1 = Employee/Manager → Their Manager
       const canEscalateL1 = escalationHelpers.canEscalateToL1(
         slaData,
         escalationsData
@@ -167,7 +165,7 @@ const SLADetails = () => {
         const reason = escalationHelpers.getEscalationBlockReason(
           slaData,
           escalationsData,
-          "L1" // Check L1 block reason
+          "L1"
         );
         setEscalationBlockReason(reason);
         console.log("⚠️ Escalation blocked:", reason);
@@ -289,7 +287,7 @@ const SLADetails = () => {
     : "/employee/dashboard/sla";
 
   return (
-    <div className="container-fluid" style={{ padding: "1.5rem" }}>
+    <div className="sla-details-container">
       {/* ========== BREADCRUMB ========== */}
       <Breadcrumb
         items={[
@@ -304,50 +302,30 @@ const SLADetails = () => {
       />
 
       {/* ========== HEADER ========== */}
-      <div
-        className="d-flex justify-content-between align-items-center mb-4 gap-3"
-        style={{ flexWrap: "wrap" }}
-      >
-        <div className="d-flex align-items-center gap-3 flex-grow-1">
+      <div className="sla-details-header">
+        <div className="sla-details-header-left">
           <button
             onClick={() => navigate(-1)}
-            className="btn btn-outline-secondary d-flex align-items-center justify-content-center"
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "8px",
-              padding: 0,
-            }}
+            className="sla-details-back-btn"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h2
-              className="mb-1 fw-bold"
-              style={{ color: "#27235c", fontSize: "1.75rem" }}
-            >
-              SLA Details
-            </h2>
-            <p className="text-muted mb-0" style={{ fontSize: "0.875rem" }}>
+            <h2 className="sla-details-title">SLA Details</h2>
+            <p className="sla-details-subtitle">
               SLA #{sla.slaid} - {sla.slatype}
             </p>
           </div>
         </div>
 
         {/* ACTION BUTTONS */}
-        <div className="d-flex gap-2 flex-wrap justify-content-end">
-          {/* ✅ UPDATED: Show escalate button for Employee/Manager on non-closed SLAs */}
+        <div className="sla-details-actions">
           {sla.status !== "Closed" &&
             (user?.roleName === "Employee" || user?.roleName === "Manager") &&
             (canEscalate ? (
               <button
                 onClick={handleEscalateClick}
-                className="btn btn-warning d-flex align-items-center gap-2"
-                style={{
-                  borderRadius: "8px",
-                  padding: "8px 16px",
-                  fontWeight: 500,
-                }}
+                className="sla-details-btn sla-details-btn-warning"
               >
                 <AlertTriangle size={16} />
                 Escalate
@@ -355,13 +333,8 @@ const SLADetails = () => {
             ) : (
               <button
                 disabled
-                className="btn btn-secondary d-flex align-items-center gap-2"
+                className="sla-details-btn sla-details-btn-disabled"
                 title={escalationBlockReason || "Cannot escalate"}
-                style={{
-                  borderRadius: "8px",
-                  padding: "8px 16px",
-                  fontWeight: 500,
-                }}
               >
                 <AlertTriangle size={16} />
                 Escalated
@@ -371,12 +344,7 @@ const SLADetails = () => {
           {canReopen && sla.status === "Closed" && (
             <button
               onClick={() => setShowReopenForm(true)}
-              className="btn btn-warning d-flex align-items-center gap-2"
-              style={{
-                borderRadius: "8px",
-                padding: "8px 16px",
-                fontWeight: 500,
-              }}
+              className="sla-details-btn sla-details-btn-warning"
             >
               <RotateCcw size={16} />
               Reopen
@@ -387,12 +355,7 @@ const SLADetails = () => {
             <button
               onClick={() => setShowCloseConfirmation(true)}
               disabled={refreshing}
-              className="btn btn-success d-flex align-items-center gap-2"
-              style={{
-                borderRadius: "8px",
-                padding: "8px 16px",
-                fontWeight: 500,
-              }}
+              className="sla-details-btn sla-details-btn-success"
             >
               <CheckCircle size={16} />
               Close SLA
@@ -406,65 +369,28 @@ const SLADetails = () => {
         {/* LEFT COLUMN */}
         <div className="col-lg-8">
           {/* STATUS CARD */}
-          <div
-            className="card border-0 shadow-sm mb-4"
-            style={{ borderRadius: "12px" }}
-          >
-            <div
-              className="card-body"
-              style={{ padding: "1.5rem", textAlign: "left" }}
-            >
-              <div className="d-flex gap-3 mb-4 align-items-start">
-                <div
-                  className="d-flex align-items-center justify-content-center"
-                  style={{
-                    width: "56px",
-                    height: "56px",
-                    backgroundColor: "#e0f2fe",
-                    borderRadius: "12px",
-                    flexShrink: 0,
-                  }}
-                >
+          <div className="sla-details-card mb-4">
+            <div className="sla-details-card-body">
+              <div className="sla-details-status-header">
+                <div className="sla-details-icon-wrapper">
                   <FileText size={28} className="text-primary" />
                 </div>
                 <div className="flex-grow-1">
-                  <h4
-                    className="mb-2 fw-bold"
-                    style={{ color: "#0f172a", textAlign: "left" }}
-                  >
-                    {sla.slatype}
-                  </h4>
-                  <div
-                    className="d-flex gap-2 flex-wrap"
-                    style={{ justifyContent: "flex-start" }}
-                  >
+                  <h4 className="sla-details-type-title">{sla.slatype}</h4>
+                  <div className="sla-details-badges">
                     <span
-                      className={`badge ${
+                      className={`sla-details-badge ${
                         sla.status === "Closed"
-                          ? "bg-success"
+                          ? "sla-details-badge-closed"
                           : sla.status === "Escalated"
-                          ? "bg-danger"
-                          : "bg-primary"
+                          ? "sla-details-badge-escalated"
+                          : "sla-details-badge-open"
                       }`}
-                      style={{
-                        padding: "0.375rem 0.75rem",
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        borderRadius: "6px",
-                      }}
                     >
                       {sla.status}
                     </span>
                     {hasEscalations && (
-                      <span
-                        className="badge bg-warning text-dark d-flex align-items-center gap-1"
-                        style={{
-                          padding: "0.375rem 0.75rem",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          borderRadius: "6px",
-                        }}
-                      >
+                      <span className="sla-details-badge sla-details-badge-warning">
                         <AlertTriangle size={12} />
                         Escalated
                       </span>
@@ -474,70 +400,33 @@ const SLADetails = () => {
               </div>
 
               {/* DETAILS GRID */}
-              <div className="row g-4" style={{ textAlign: "left" }}>
+              <div className="row g-4">
                 <div className="col-md-6">
-                  <small
-                    className="text-muted d-block mb-2"
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    Employee
-                  </small>
-                  <strong style={{ color: "#0f172a", fontSize: "0.938rem" }}>
+                  <small className="sla-details-label">Employee</small>
+                  <strong className="sla-details-value">
                     {sla.employeeName || "—"}
                   </strong>
                 </div>
                 <div className="col-md-6">
-                  <small
-                    className="text-muted d-block mb-2"
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    SLA Created By
-                  </small>
-                  <strong style={{ color: "#0f172a", fontSize: "0.938rem" }}>
+                  <small className="sla-details-label">SLA Created By</small>
+                  <strong className="sla-details-value">
                     {sla.departmentName || "—"}
                   </strong>
                 </div>
                 <div className="col-md-6">
-                  <small
-                    className="text-muted d-block mb-2"
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    Deadline
-                  </small>
-                  <strong style={{ color: "#0f172a", fontSize: "0.938rem" }}>
+                  <small className="sla-details-label">Deadline</small>
+                  <strong className="sla-details-value">
                     {dateHelpers.formatDeadline(sla.deadline)}
                   </strong>
                 </div>
                 <div className="col-md-6">
-                  <small
-                    className="text-muted d-block mb-2"
-                    style={{
-                      fontSize: "0.75rem",
-                      fontWeight: 600,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    Compliance Status
-                  </small>
+                  <small className="sla-details-label">Compliance Status</small>
                   <strong
-                    className={
+                    className={`sla-details-value ${
                       sla.complianceStatus === "OnTime"
                         ? "text-success"
                         : "text-danger"
-                    }
-                    style={{ fontSize: "0.938rem" }}
+                    }`}
                   >
                     {sla.complianceStatus || "—"}
                   </strong>
@@ -546,31 +435,13 @@ const SLADetails = () => {
 
               {/* REOPEN ALERT */}
               {sla.reopenedAt && (
-                <div
-                  className="alert alert-warning mt-4 d-flex gap-3 align-items-start"
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #fbbf24",
-                    backgroundColor: "#fef3c7",
-                    textAlign: "left",
-                  }}
-                >
-                  <RotateCcw
-                    size={20}
-                    className="flex-shrink-0"
-                    style={{ marginTop: "2px" }}
-                  />
+                <div className="sla-details-alert">
+                  <RotateCcw size={20} className="flex-shrink-0" />
                   <div>
-                    <strong
-                      className="d-block mb-1"
-                      style={{ color: "#92400e" }}
-                    >
+                    <strong className="d-block mb-1">
                       This SLA was reopened
                     </strong>
-                    <small
-                      className="text-muted d-block"
-                      style={{ color: "#78350f" }}
-                    >
+                    <small className="text-muted d-block">
                       Reopened on {dateHelpers.formatDeadline(sla.reopenedAt)}{" "}
                       with {sla.reopenExtensionDays || 0} day extension
                       {sla.reopenReason && (
@@ -588,18 +459,9 @@ const SLADetails = () => {
 
           {/* ESCALATION CHAIN */}
           {hasEscalations && (
-            <div
-              className="card border-0 shadow-sm mb-4"
-              style={{ borderRadius: "12px" }}
-            >
-              <div
-                className="card-body"
-                style={{ padding: "1.5rem", textAlign: "left" }}
-              >
-                <h5
-                  className="mb-3 fw-bold d-flex align-items-center gap-2"
-                  style={{ color: "#0f172a" }}
-                >
+            <div className="sla-details-card mb-4">
+              <div className="sla-details-card-body">
+                <h5 className="sla-details-section-title">
                   <AlertTriangle size={20} className="text-danger" />
                   Escalation Chain ({escalations.length})
                 </h5>
@@ -607,46 +469,30 @@ const SLADetails = () => {
                 {escalations.map((esc, idx) => (
                   <div
                     key={esc.escalationId}
-                    className="mb-3 pb-3"
+                    className="sla-details-escalation-item"
                     style={{
                       borderBottom:
                         idx < escalations.length - 1
                           ? "1px solid #e2e8f0"
                           : "none",
-                      textAlign: "left",
                     }}
                   >
-                    <div
-                      className="d-flex gap-2 mb-2 flex-wrap"
-                      style={{ justifyContent: "flex-start" }}
-                    >
+                    <div className="sla-details-badges mb-2">
                       <span
-                        className={`badge ${
+                        className={`sla-details-badge ${
                           esc.escalationLevel === "L2"
-                            ? "bg-warning text-dark"
-                            : "bg-info"
+                            ? "sla-details-badge-warning"
+                            : "sla-details-badge-info"
                         }`}
-                        style={{
-                          padding: "0.375rem 0.75rem",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          borderRadius: "6px",
-                        }}
                       >
                         {esc.escalationLevel}
                       </span>
                       <span
-                        className={`badge d-flex align-items-center gap-1 ${
+                        className={`sla-details-badge ${
                           esc.escalationStatus === "Resolved"
-                            ? "bg-success"
-                            : "bg-warning text-dark"
+                            ? "sla-details-badge-success"
+                            : "sla-details-badge-pending"
                         }`}
-                        style={{
-                          padding: "0.375rem 0.75rem",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          borderRadius: "6px",
-                        }}
                       >
                         {esc.escalationStatus === "Resolved" ? (
                           <>
@@ -662,67 +508,35 @@ const SLADetails = () => {
                       </span>
                     </div>
 
-                    <div
-                      className="p-3"
-                      style={{
-                        backgroundColor: "#f8fafc",
-                        borderRadius: "8px",
-                        border: "1px solid #e2e8f0",
-                        textAlign: "left",
-                      }}
-                    >
+                    <div className="sla-details-escalation-content">
                       <div className="row g-3 mb-2">
                         <div className="col-md-6">
-                          <small
-                            className="text-muted d-block mb-1"
-                            style={{
-                              fontSize: "0.75rem",
-                              fontWeight: 600,
-                              fontStyle: "italic",
-                            }}
-                          >
+                          <small className="sla-details-label">
                             Escalated By
                           </small>
-                          <strong
-                            style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                          >
+                          <strong className="sla-details-value">
                             {esc.submittedByName ||
                               `User ${esc.submittedByEmployeeId}`}
                           </strong>
                         </div>
                         <div className="col-md-6">
-                          <small
-                            className="text-muted d-block mb-1"
-                            style={{
-                              fontSize: "0.75rem",
-                              fontWeight: 600,
-                              fontStyle: "italic",
-                            }}
-                          >
+                          <small className="sla-details-label">
                             Escalated To
                           </small>
-                          <strong
-                            style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                          >
+                          <strong className="sla-details-value">
                             {esc.escalatedToName ||
                               `User ${esc.escalatedToEmployeeId}`}
                           </strong>
                         </div>
                       </div>
                       <div className="mb-1">
-                        <small
-                          className="text-muted d-block"
-                          style={{ fontSize: "0.813rem" }}
-                        >
+                        <small className="text-muted">
                           <span className="fw-semibold">Reason:</span>{" "}
                           {esc.reason || "—"}
                         </small>
                       </div>
                       {esc.description && (
-                        <small
-                          className="text-muted d-block"
-                          style={{ fontSize: "0.813rem" }}
-                        >
+                        <small className="text-muted">
                           <span className="fw-semibold">Description:</span>{" "}
                           {esc.description}
                         </small>
@@ -734,125 +548,47 @@ const SLADetails = () => {
             </div>
           )}
 
-          {/* TABS */}
-          <div
-            className="card border-0 shadow-sm"
-            style={{ borderRadius: "12px", overflow: "hidden" }}
-          >
-            <div
-              style={{
-                backgroundColor: "#27235c",
-                borderBottom: "2px solid #1e1b4d",
-              }}
-            >
-              <ul
-                className="nav nav-tabs border-0 m-0"
-                role="tablist"
-                style={{ padding: "0 1rem" }}
+          {/* PILL-STYLE TABS */}
+          <div className="sla-details-tabs-wrapper">
+            <div className="sla-details-tabs-container">
+              <button
+                className={`sla-details-tab-pill ${
+                  activeTab === "details" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("details")}
               >
-                <li className="nav-item">
-                  <button
-                    className={`nav-link border-0 d-flex align-items-center gap-2 ${
-                      activeTab === "details" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveTab("details")}
-                    style={{
-                      color:
-                        activeTab === "details"
-                          ? "#fff"
-                          : "rgba(255,255,255,0.7)",
-                      backgroundColor:
-                        activeTab === "details"
-                          ? "rgba(255,255,255,0.1)"
-                          : "transparent",
-                      borderBottom:
-                        activeTab === "details"
-                          ? "3px solid #fff"
-                          : "3px solid transparent",
-                      padding: "1rem 1.25rem",
-                      fontWeight: 600,
-                      fontSize: "0.875rem",
-                      transition: "all 0.2s ease",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <FileText size={16} />
-                    Details
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button
-                    className={`nav-link border-0 d-flex align-items-center gap-2 ${
-                      activeTab === "history" ? "active" : ""
-                    }`}
-                    onClick={() => setActiveTab("history")}
-                    style={{
-                      color:
-                        activeTab === "history"
-                          ? "#fff"
-                          : "rgba(255,255,255,0.7)",
-                      backgroundColor:
-                        activeTab === "history"
-                          ? "rgba(255,255,255,0.1)"
-                          : "transparent",
-                      borderBottom:
-                        activeTab === "history"
-                          ? "3px solid #fff"
-                          : "3px solid transparent",
-                      padding: "1rem 1.25rem",
-                      fontWeight: 600,
-                      fontSize: "0.875rem",
-                      transition: "all 0.2s ease",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <History size={16} />
-                    History ({history.length})
-                  </button>
-                </li>
-              </ul>
+                <FileText size={16} />
+                Details
+              </button>
+              <button
+                className={`sla-details-tab-pill ${
+                  activeTab === "history" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("history")}
+              >
+                <History size={16} />
+                History ({history.length})
+              </button>
             </div>
+          </div>
 
-            <div
-              className="card-body"
-              style={{ padding: "1.5rem", textAlign: "left" }}
-            >
+          {/* TAB CONTENT */}
+          <div className="sla-details-card">
+            <div className="sla-details-card-body">
               {activeTab === "details" && (
                 <div className="row g-4">
                   {sla.createdAt && (
                     <div className="col-md-6">
-                      <small
-                        className="text-muted d-block mb-2"
-                        style={{
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          fontStyle: "italic",
-                        }}
-                      >
-                        Created At
-                      </small>
-                      <strong
-                        style={{ color: "#0f172a", fontSize: "0.938rem" }}
-                      >
+                      <small className="sla-details-label">Created At</small>
+                      <strong className="sla-details-value">
                         {new Date(sla.createdAt).toLocaleString()}
                       </strong>
                     </div>
                   )}
                   {sla.updatedAt && (
                     <div className="col-md-6">
-                      <small
-                        className="text-muted d-block mb-2"
-                        style={{
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          fontStyle: "italic",
-                        }}
-                      >
-                        Last Updated
-                      </small>
-                      <strong
-                        style={{ color: "#0f172a", fontSize: "0.938rem" }}
-                      >
+                      <small className="sla-details-label">Last Updated</small>
+                      <strong className="sla-details-value">
                         {new Date(sla.updatedAt).toLocaleString()}
                       </strong>
                     </div>
@@ -863,19 +599,9 @@ const SLADetails = () => {
               {activeTab === "history" && (
                 <div>
                   {history.length === 0 ? (
-                    <div
-                      className="text-center"
-                      style={{ padding: "3rem 1rem" }}
-                    >
-                      <History
-                        size={48}
-                        className="text-muted mb-3"
-                        style={{ opacity: 0.3 }}
-                      />
-                      <p
-                        className="text-muted mb-0"
-                        style={{ fontSize: "0.938rem", fontWeight: 500 }}
-                      >
+                    <div className="sla-details-empty">
+                      <History size={48} className="sla-details-empty-icon" />
+                      <p className="sla-details-empty-text">
                         No history available
                       </p>
                     </div>
@@ -890,133 +616,51 @@ const SLADetails = () => {
 
         {/* RIGHT SIDEBAR */}
         <div className="col-lg-4">
-          <div
-            className="card border-0 shadow-sm sticky-top"
-            style={{ top: "20px", borderRadius: "12px" }}
-          >
-            <div
-              className="card-body"
-              style={{ padding: "1.5rem", textAlign: "left" }}
-            >
-              <h5 className="mb-4 fw-bold" style={{ color: "#0f172a" }}>
-                Status Summary
-              </h5>
+          <div className="sla-details-sidebar">
+            <div className="sla-details-card-body">
+              <h5 className="sla-details-sidebar-title">Status Summary</h5>
 
-              <div
-                className="mb-4 pb-3"
-                style={{ borderBottom: "1px solid #e2e8f0" }}
-              >
-                <small
-                  className="text-muted d-block mb-2"
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    fontStyle: "italic",
-                  }}
-                >
-                  Total Escalations
-                </small>
-                <div
-                  className="fw-bold text-primary"
-                  style={{ fontSize: "2rem", lineHeight: 1 }}
-                >
+              <div className="sla-details-sidebar-item">
+                <small className="sla-details-label">Total Escalations</small>
+                <div className="sla-details-sidebar-value text-primary">
                   {escalations.length}
                 </div>
               </div>
 
-              <div
-                className="mb-4 pb-3"
-                style={{ borderBottom: "1px solid #e2e8f0" }}
-              >
-                <small
-                  className="text-muted d-block mb-2"
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    fontStyle: "italic",
-                  }}
-                >
-                  Status
-                </small>
+              <div className="sla-details-sidebar-item">
+                <small className="sla-details-label">Status</small>
                 <span
-                  className={`badge ${
+                  className={`sla-details-badge ${
                     sla.status === "Closed"
-                      ? "bg-success"
+                      ? "sla-details-badge-closed"
                       : sla.status === "Escalated"
-                      ? "bg-danger"
-                      : "bg-primary"
+                      ? "sla-details-badge-escalated"
+                      : "sla-details-badge-open"
                   }`}
-                  style={{
-                    padding: "0.5rem 1rem",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    borderRadius: "6px",
-                  }}
                 >
                   {sla.status}
                 </span>
               </div>
 
-              <div
-                className="mb-4 pb-3"
-                style={{ borderBottom: "1px solid #e2e8f0" }}
-              >
-                <small
-                  className="text-muted d-block mb-2"
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    fontStyle: "italic",
-                  }}
-                >
-                  Days Until Deadline
-                </small>
+              <div className="sla-details-sidebar-item">
+                <small className="sla-details-label">Days Until Deadline</small>
                 <div
-                  className={`fw-bold ${
+                  className={`sla-details-sidebar-value ${
                     daysRemaining < 0 ? "text-danger" : "text-success"
                   }`}
-                  style={{ fontSize: "1.75rem", lineHeight: 1.2 }}
                 >
                   {Math.abs(daysRemaining)} days
-                  <small
-                    className="d-block text-muted"
-                    style={{
-                      fontSize: "0.875rem",
-                      marginTop: "4px",
-                      fontWeight: 500,
-                    }}
-                  >
+                  <small className="d-block text-muted sla-details-sidebar-subtitle">
                     {daysRemaining < 0 ? "OVERDUE" : "remaining"}
                   </small>
                 </div>
               </div>
 
-              <div
-                className="p-3"
-                style={{
-                  backgroundColor: "#eff6ff",
-                  borderRadius: "8px",
-                  border: "1px solid #bfdbfe",
-                }}
-              >
-                <small
-                  className="d-block fw-bold mb-2"
-                  style={{
-                    color: "#1e40af",
-                    fontSize: "0.75rem",
-                    fontStyle: "italic",
-                  }}
-                >
+              <div className="sla-details-sidebar-highlight">
+                <small className="sla-details-sidebar-highlight-label">
                   Pending Escalations
                 </small>
-                <div
-                  className="fw-bold"
-                  style={{
-                    fontSize: "1.75rem",
-                    color: "#1e40af",
-                    lineHeight: 1,
-                  }}
-                >
+                <div className="sla-details-sidebar-highlight-value">
                   {
                     escalations.filter((e) => e.escalationStatus === "Pending")
                       .length
@@ -1113,10 +757,420 @@ const SLADetails = () => {
         </div>
       )}
 
+      {/* ========== INTERNAL STYLES ========== */}
       <style>{`
+        /* Container */
+        .sla-details-container {
+          padding: 1.5rem 1.75rem;
+          background-color: #F9FAFB;
+          min-height: 100vh;
+        }
+
+        /* Header */
+        .sla-details-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+
+        .sla-details-header-left {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-grow: 1;
+        }
+
+        .sla-details-back-btn {
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
+          border: 1.5px solid #E5E7EB;
+          background: #FFFFFF;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          color: #6B7280;
+        }
+
+        .sla-details-back-btn:hover {
+          background: #F9FAFB;
+          border-color: #D1D5DB;
+          color: #111827;
+        }
+
+        .sla-details-title {
+          font-size: 1.75rem;
+          font-weight: 700;
+          color: #27235C;
+          margin: 0 0 0.25rem;
+          line-height: 1.2;
+        }
+
+        .sla-details-subtitle {
+          font-size: 0.875rem;
+          color: #6B7280;
+          margin: 0;
+        }
+
+        .sla-details-actions {
+          display: flex;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
+        /* Buttons */
+        .sla-details-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.625rem 1.25rem;
+          font-size: 0.875rem;
+          font-weight: 600;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          white-space: nowrap;
+        }
+
+        .sla-details-btn-warning {
+          background: #FFFFFF;
+          color: #F59E0B;
+          border: 1.5px solid #F59E0B;
+        }
+
+        .sla-details-btn-warning:hover {
+          background: #F59E0B;
+          color: #FFFFFF;
+          transform: translateY(-1px);
+        }
+
+        .sla-details-btn-success {
+          background: linear-gradient(90deg, #16A34A 0%, #059669 100%);
+          color: #FFFFFF;
+        }
+
+        .sla-details-btn-success:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
+        .sla-details-btn-disabled {
+          background: #F3F4F6;
+          color: #9CA3AF;
+          border: 1.5px solid #E5E7EB;
+          cursor: not-allowed;
+        }
+
+        /* Card */
+        .sla-details-card {
+          background: #FFFFFF;
+          border-radius: 12px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          border: 1px solid #F3F4F6;
+          overflow: hidden;
+        }
+
+        .sla-details-card-body {
+          padding: 1.5rem;
+          text-align: left;
+        }
+
+        /* Status Header */
+        .sla-details-status-header {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+          align-items: start;
+        }
+
+        .sla-details-icon-wrapper {
+          width: 56px;
+          height: 56px;
+          background: #EEF2FF;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .sla-details-type-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #111827;
+          margin: 0 0 0.5rem;
+        }
+
+        /* Labels & Values */
+        .sla-details-label {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #6B7280;
+          margin-bottom: 0.5rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-style: italic;
+        }
+
+        .sla-details-value {
+          font-size: 0.9375rem;
+          color: #111827;
+          font-weight: 500;
+          display: block;
+        }
+
+        /* Badges */
+        .sla-details-badges {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+        }
+
+        .sla-details-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
+          padding: 0.375rem 0.75rem;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .sla-details-badge-open {
+          background: #DBEAFE;
+          color: #1E40AF;
+        }
+
+        .sla-details-badge-closed {
+          background: #DCFCE7;
+          color: #15803D;
+        }
+
+        .sla-details-badge-escalated {
+          background: #FEE2E2;
+          color: #B91C1C;
+        }
+
+        .sla-details-badge-warning {
+          background: #FEF3C7;
+          color: #92400E;
+        }
+
+        .sla-details-badge-info {
+          background: #E0E7FF;
+          color: #4338CA;
+        }
+
+        .sla-details-badge-success {
+          background: #DCFCE7;
+          color: #15803D;
+        }
+
+        .sla-details-badge-pending {
+          background: #FEF3C7;
+          color: #92400E;
+        }
+
+        /* Alert */
+        .sla-details-alert {
+          background: #FEF3C7;
+          border: 1px solid #FCD34D;
+          border-radius: 8px;
+          padding: 1rem;
+          display: flex;
+          gap: 0.75rem;
+          align-items: start;
+          margin-top: 1.5rem;
+        }
+
+        /* Section Title */
+        .sla-details-section-title {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: #111827;
+          margin: 0 0 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        /* Escalation Items */
+        .sla-details-escalation-item {
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+        }
+
+        .sla-details-escalation-content {
+          background: #F9FAFB;
+          border: 1px solid #E5E7EB;
+          border-radius: 8px;
+          padding: 1rem;
+        }
+
+        /* Pill-Style Tabs */
+        .sla-details-tabs-wrapper {
+          display: flex;
+          justify-content: flex-start;
+          margin-bottom: 1.25rem;
+        }
+
+        .sla-details-tabs-container {
+          display: inline-flex;
+          background: #27235C;
+          padding: 0.375rem;
+          border-radius: 50px;
+          gap: 0.375rem;
+          box-shadow: 0 2px 8px rgba(39, 35, 92, 0.2);
+        }
+
+        .sla-details-tab-pill {
+          padding: 0.625rem 1.75rem;
+          border-radius: 50px;
+          border: none;
+          background: transparent;
+          color: #FFFFFF;
+          font-size: 0.875rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.25s;
+          white-space: nowrap;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .sla-details-tab-pill:hover:not(.active) {
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sla-details-tab-pill.active {
+          background: #FFFFFF;
+          color: #27235C;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          border-radius: 50px;
+        }
+
+        /* Empty State */
+        .sla-details-empty {
+          text-align: center;
+          padding: 3rem 1rem;
+        }
+
+        .sla-details-empty-icon {
+          color: #D1D5DB;
+          opacity: 0.3;
+          margin-bottom: 1rem;
+        }
+
+        .sla-details-empty-text {
+          color: #6B7280;
+          font-weight: 500;
+          font-size: 0.9375rem;
+          margin: 0;
+        }
+
+        /* Sidebar */
+        .sla-details-sidebar {
+          background: #FFFFFF;
+          border-radius: 12px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          border: 1px solid #F3F4F6;
+          position: sticky;
+          top: 20px;
+        }
+
+        .sla-details-sidebar-title {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: #111827;
+          margin: 0 0 1.5rem;
+        }
+
+        .sla-details-sidebar-item {
+          margin-bottom: 1.5rem;
+          padding-bottom: 1.5rem;
+          border-bottom: 1px solid #E5E7EB;
+        }
+
+        .sla-details-sidebar-value {
+          font-size: 2rem;
+          font-weight: 700;
+          line-height: 1;
+        }
+
+        .sla-details-sidebar-subtitle {
+          font-size: 0.875rem;
+          margin-top: 0.25rem;
+          font-weight: 500;
+        }
+
+        .sla-details-sidebar-highlight {
+          background: #EFF6FF;
+          border: 1px solid #BFDBFE;
+          border-radius: 8px;
+          padding: 1rem;
+        }
+
+        .sla-details-sidebar-highlight-label {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #1E40AF;
+          margin-bottom: 0.5rem;
+          font-style: italic;
+          text-transform: uppercase;
+        }
+
+        .sla-details-sidebar-highlight-value {
+          font-size: 1.75rem;
+          font-weight: 700;
+          color: #1E40AF;
+          line-height: 1;
+        }
+
+        /* Animation */
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+          .sla-details-container {
+            padding: 1.25rem;
+          }
+
+          .sla-details-header {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .sla-details-actions {
+            width: 100%;
+          }
+
+          .sla-details-tabs-container {
+            width: 100%;
+          }
+
+          .sla-details-tab-pill {
+            flex: 1;
+            justify-content: center;
+          }
+
+          .sla-details-sidebar {
+            position: relative;
+            top: 0;
+          }
         }
       `}</style>
     </div>

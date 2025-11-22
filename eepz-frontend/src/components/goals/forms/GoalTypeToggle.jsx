@@ -17,13 +17,14 @@ const GoalTypeToggle = ({
 
   return (
     <div
-      className="btn-group w-100 mb-6"
-      role="group"
-      aria-label="Goal type toggle"
       style={{
-        minHeight: "3rem",
-        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-        borderRadius: "0.8rem",
+        display: "inline-flex",
+        backgroundColor: "rgb(39, 35, 92)",
+        borderRadius: "50px",
+        padding: "5px",
+        marginBottom: "1.5rem",
+        width: "100%",
+        maxWidth: "900px",
       }}
     >
       {types.map((type) => {
@@ -34,32 +35,22 @@ const GoalTypeToggle = ({
           <button
             key={type.value}
             type="button"
-            className={`btn ${isActive ? "btn-primary" : "btn-outline-primary"
-              }`}
             onClick={() => onTypeChange(type.value)}
             disabled={disabled}
             style={{
               flex: 1,
-              minHeight: "3em",
-              padding: "0.7rem 1rem",
-              fontWeight: 600,
-              fontSize: "0.95rem",
+              padding: "15px 30px",
               border: "none",
-              borderRight: "1px solid rgba(0, 0, 0, 0.1)",
-              transition: "all 0.2s ease",
-              position: "relative",
-              backgroundColor: isActive ? "rgb(39, 35, 92)" : "#fff",
-              color: isActive ? "#fff" : "rgb(39, 35, 92)",
-            }}
-            onMouseEnter={(e) => {
-              if (!isActive && !disabled) {
-                e.currentTarget.style.backgroundColor = "#e7f1ff";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.backgroundColor = "#fff";
-              }
+              borderRadius: "50px",
+              backgroundColor: isActive ? "#ffffff" : "rgb(39, 35, 92)",
+              color: isActive ? "#000000" : "white",
+              fontWeight: 600,
+              cursor: disabled ? "not-allowed" : "pointer",
+              transition: "all 0.3s ease",
+              boxShadow: isActive ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
+              fontSize: "0.95rem",
+              whiteSpace: "nowrap",
+              opacity: disabled ? 0.6 : 1,
             }}
           >
             <i
@@ -69,16 +60,17 @@ const GoalTypeToggle = ({
             {type.label}
             {count !== null && (
               <span
-                className="badge ms-2"
                 style={{
+                  marginLeft: "8px",
                   backgroundColor: isActive
-                    ? "rgba(255, 255, 255, 0.3)"
-                    : "rgba(13, 110, 253, 0.15)",
-                  color: isActive ? "#fff" : "#0d6efd",
+                    ? "rgba(39, 35, 92, 0.15)"
+                    : "rgba(255, 255, 255, 0.3)",
+                  color: isActive ? "rgb(39, 35, 92)" : "#fff",
                   fontSize: "0.75rem",
                   fontWeight: 700,
                   padding: "0.25rem 0.5rem",
                   borderRadius: "10px",
+                  display: "inline-block",
                 }}
               >
                 {count}

@@ -94,7 +94,7 @@
 }
 
 /* ========== TAB NAVIGATION BAR ========== */
-.tab-navigation-bar {
+.tab-navigation-bar-hr {
   display: flex;
   background: #2c2762;
   border-radius: 50px;
@@ -106,7 +106,7 @@
 }
 
 /* NON-ACTIVE TAB BUTTON */
-.tab-button {
+.tab-button-hr {
   flex: 1;
   min-width: 100px;
   padding: 0.875rem 1.5rem;
@@ -121,7 +121,7 @@
 }
 
 /* ACTIVE TAB BUTTON - WHITE BACKGROUND */
-.tab-button.active {
+.tab-button-hr.active {
   background: #ffffff !important;
   color: #2c2762 !important;
   border-radius: 50px;
@@ -130,7 +130,7 @@
 }
 
 /* TAB CONTENT */
-.tab-content {
+.tab-content-hr {
   background: transparent;
   min-height: 400px;
   animation: fadeIn 0.3s ease-in-out;
@@ -220,7 +220,7 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .tab-button {
+  .tab-button-hr {
     padding: 0.75rem 1.2rem;
     font-size: 0.9rem;
   }
@@ -231,13 +231,13 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .tab-navigation-bar {
+  .tab-navigation-bar-hr {
     flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0.25rem;
   }
 
-  .tab-button {
+  .tab-button-hr {
     flex: 1;
     min-width: 80px;
     font-size: 0.8rem;
@@ -279,17 +279,17 @@
     font-size: 13px;
   }
 
-  .tab-content {
+  .tab-content-hr {
     min-height: 300px;
   }
 }
 
 @media (max-width: 480px) {
-  .tab-navigation-bar {
+  .tab-navigation-bar-hr {
     border-radius: 8px;
   }
 
-  .tab-button {
+  .tab-button-hr {
     min-width: 60px;
     font-size: 0.75rem;
     padding: 0.6rem 0.5rem;

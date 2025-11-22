@@ -235,35 +235,65 @@ const GoalApprovalsPage = () => {
       )}
 
       <div
-        className="btn-group mb-4 w-100"
-        role="group"
-        style={{ maxWidth: "500px" }}
+        style={{
+          display: "inline-flex",
+          backgroundColor: "rgb(39, 35, 92)",
+          borderRadius: "50px",
+          padding: "5px",
+          marginBottom: "1.5rem",
+          maxWidth: "700px",
+        }}
       >
         <button
           type="button"
-          className={`btn ${
-            viewMode === "pending" ? "btn-primary" : "btn-outline-primary"
-          }`}
           onClick={() => {
             setViewMode("pending");
             setCurrentPage(1);
           }}
+          style={{
+            flex: 1,
+            padding: "15px 50px",
+            border: "none",
+            borderRadius: "50px",
+            backgroundColor:
+              viewMode === "pending" ? "#ffffff" : "rgb(39, 35, 92)",
+            color: viewMode === "pending" ? "#000000" : "white",
+            fontWeight: 500,
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            boxShadow:
+              viewMode === "pending" ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
+            fontSize: "14px",
+            whiteSpace: "nowrap",
+          }}
         >
           <i className="bi bi-hourglass-split me-2"></i>
-          Pending Approvals ({pendingCount})
+          Pending ({pendingCount})
         </button>
         <button
           type="button"
-          className={`btn ${
-            viewMode === "history" ? "btn-primary" : "btn-outline-primary"
-          }`}
           onClick={() => {
             setViewMode("history");
             setCurrentPage(1);
           }}
+          style={{
+            flex: 1,
+            padding: "15px 40px",
+            border: "none",
+            borderRadius: "50px",
+            backgroundColor:
+              viewMode === "history" ? "#ffffff" : "rgb(39, 35, 92)",
+            color: viewMode === "history" ? "#000000" : "white",
+            fontWeight: 500,
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            boxShadow:
+              viewMode === "history" ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
+            fontSize: "14px",
+          }}
         >
           <i className="bi bi-clock-history me-2"></i>
-          History ({historyCount})
+          History
         </button>
       </div>
 

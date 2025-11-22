@@ -207,10 +207,10 @@
   margin-bottom: 1.5rem;
 }
 
-.stat-card {
+.ad-stat-card {
   background: #FFFFFF;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #27235c;
   padding: 1.5rem;
   display: flex;
   align-items: center;
@@ -219,7 +219,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
-.stat-card:hover {
+.ad-stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
@@ -275,7 +275,7 @@
 }
 
 /* Table Card */
-.table-card {
+.us-table-card {
   background: #FFFFFF;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
@@ -307,6 +307,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  
 }
 
 .user-table tbody tr {

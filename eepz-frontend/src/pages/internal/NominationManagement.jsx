@@ -9,7 +9,7 @@ import NominationReviewModal from "../../components/internal/NominationModals/No
 import NominationGraphModal from "../../components/internal/NominationModals/NominationGraphModal";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
-import "../../styles/internal/nominationManagement.css";
+import "../../styles/internal/NominationManagement.css";
 
 const NominationManagement = () => {
   const { user } = useAuth();
@@ -181,8 +181,8 @@ const NominationManagement = () => {
         ]}
       />
 
-      <div className="stats-grid">
-        <div className="stat-card">
+      <div className="nm-stats-grid">
+        <div className="nm-stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-hand-thumbs-up"></i>
           </div>
@@ -192,7 +192,7 @@ const NominationManagement = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="nm-stat-card">
           <div className="stat-icon stat-icon-success">
             <i className="bi bi-check-circle-fill"></i>
           </div>
@@ -208,7 +208,7 @@ const NominationManagement = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="nm-stat-card">
           <div className="stat-icon stat-icon-warning">
             <i className="bi bi-clock-fill"></i>
           </div>
@@ -224,7 +224,7 @@ const NominationManagement = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="nm-stat-card">
           <div className="stat-icon stat-icon-danger">
             <i className="bi bi-x-circle-fill"></i>
           </div>
@@ -285,7 +285,7 @@ const NominationManagement = () => {
         </div>
       </div>
 
-      <div className="table-card">
+      <div className="nm-table-card">
         <div className="table-wrapper">
           <table className="user-table">
             <thead>

@@ -206,7 +206,7 @@ const UserList = () => {
 
       {/* STATISTICS CARDS -  EXCLUDE ADMIN USERS */}
       <div className="ad-stats-grid">
-        <div className="stat-card">
+        <div className="ad-stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-people-fill"></i>
           </div>
@@ -215,7 +215,7 @@ const UserList = () => {
             <p className="stat-label">Total Users</p>
           </div>
         </div>
-        <div className="stat-card">
+        <div className="ad-stat-card">
           <div className="stat-icon stat-icon-success">
             <i className="bi bi-person-check-fill"></i>
           </div>
@@ -226,7 +226,7 @@ const UserList = () => {
             <p className="stat-label">Active Users</p>
           </div>
         </div>
-        <div className="stat-card">
+        <div className="ad-stat-card">
           <div className="stat-icon stat-icon-danger">
             <i className="bi bi-person-x-fill"></i>
           </div>
@@ -237,7 +237,7 @@ const UserList = () => {
             <p className="stat-label">Inactive Users</p>
           </div>
         </div>
-        <div className="stat-card">
+        <div className="ad-stat-card">
           <div className="stat-icon stat-icon-warning">
             <i className="bi bi-person-plus-fill"></i>
           </div>
@@ -322,7 +322,7 @@ const UserList = () => {
       </div>
 
       {/* TABLE CARD */}
-      <div className="table-card">
+      <div className="us-table-card">
         <div className="table-wrapper">
           <table className="user-table">
             <thead>

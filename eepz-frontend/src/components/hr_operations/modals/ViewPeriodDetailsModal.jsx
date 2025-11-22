@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { Modal, CloseButton } from "react-bootstrap";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
@@ -59,134 +58,217 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
 
   return (
     <>
-      {/* Custom Backdrop with Blur Effect */}
+      {/* Blurred Backdrop */}
       <div
         style={{
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(39, 35, 92, 0.4)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          backgroundColor: "rgba(39,35,92,0.4)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
           zIndex: 1040,
-          transition: 'all 0.3s ease'
         }}
         onClick={onClose}
       />
 
-      <Modal
-        show={true}
-        onHide={onClose}
-        centered
-        size="xl"
-        backdrop={false}
-        style={{ zIndex: 1050 }}
+      {/* Modal Container with Scroll */}
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "95%",
+          maxWidth: "800px",
+          maxHeight: "75vh",
+          zIndex: 1050,
+          display: "flex",
+          flexDirection: "column",
+        }}
       >
-        <div style={{
-          borderRadius: '0.5rem',
-          overflow: 'hidden',
-          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-          border: 'none',
-        }}>
-          {/* HEADER with White Close Button */}
+        <div
+          style={{
+            borderRadius: "0.5rem",
+            background: "#fff",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
+            overflow: "hidden",
+            width: "100%",
+            maxHeight: "85vh",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {/* HEADER - Fixed */}
           <div
             style={{
-              background: '#27235C',
-              color: '#ffffff',
-              padding: '16px 20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              position: 'relative'
+              background: "#27235C",
+              color: "#fff",
+              padding: "13px 15px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: "15px",
+              fontWeight: 600,
+              borderRadius: "0.5rem 0.5rem 0 0",
+              flexShrink: 0,
             }}
           >
             <div
               style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#ffffff'
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 600,
               }}
             >
               <i className="bi bi-eye"></i>
               {period.period} {period.periodYear} - Detailed View
             </div>
-            <CloseButton
+            <button
+              type="button"
               onClick={onClose}
-              variant="white"
+              aria-label="Close"
               style={{
-                filter: 'brightness(0) invert(1)',
-                opacity: 1
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: 18,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-            />
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
 
-          {/* BODY */}
-          <Modal.Body
+          {/* BODY - Scrollable */}
+          <div
             style={{
-              padding: '20px',
-              background: '#ffffff',
-              overflowY: 'auto',
-              maxHeight: 'calc(90vh - 140px)',
-              border: 'none'
+              padding: "20px",
+              background: "#fff",
+              textAlign: "left",
+              overflowY: "auto",
+              flex: 1,
             }}
           >
             {/* Period Summary */}
             <div
               style={{
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                background: '#f9fafb',
-                padding: '1rem',
-                marginBottom: '20px'
+                border: "1px solid #e5e7eb",
+                borderRadius: 8,
+                background: "#f9fafb",
+                padding: "1rem",
+                marginBottom: 20,
               }}
             >
-              <div style={{ marginBottom: '12px' }}>
-                <h6 style={{ fontSize: '15px', fontWeight: '600', color: '#1e293b', margin: 0 }}>
+              <div style={{ marginBottom: 12 }}>
+                <h6
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: "#1e293b",
+                    margin: 0,
+                  }}
+                >
                   {period.departmentName}
                 </h6>
               </div>
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(4, 1fr)',
-                  gap: '16px',
-                  marginTop: '12px'
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, 1fr)",
+                  gap: 16,
+                  marginTop: 12,
                 }}
               >
                 <div>
-                  <span style={{ fontSize: '11px', color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: "#64748b",
+                      display: "block",
+                      marginBottom: 4,
+                    }}
+                  >
                     Period
                   </span>
-                  <span style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 600,
+                      color: "#334155",
+                    }}
+                  >
                     {period.period} {period.periodYear}
                   </span>
                 </div>
                 <div>
-                  <span style={{ fontSize: '11px', color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: "#64748b",
+                      display: "block",
+                      marginBottom: 4,
+                    }}
+                  >
                     Allocated Amount
                   </span>
-                  <span style={{ fontSize: '15px', fontWeight: '600', color: '#0d6efd' }}>
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 600,
+                      color: "#0d6efd",
+                    }}
+                  >
                     {formatCurrency(period.allocatedAmount)}
                   </span>
                 </div>
                 <div>
-                  <span style={{ fontSize: '11px', color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: "#64748b",
+                      display: "block",
+                      marginBottom: 4,
+                    }}
+                  >
                     Utilized
                   </span>
-                  <span style={{ fontSize: '15px', fontWeight: '600', color: '#dc3545' }}>
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 600,
+                      color: "#dc3545",
+                    }}
+                  >
                     {formatCurrency(period.utilizedAmount || 0)}
                   </span>
                 </div>
                 <div>
-                  <span style={{ fontSize: '11px', color: '#64748b', display: 'block', marginBottom: '4px' }}>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      color: "#64748b",
+                      display: "block",
+                      marginBottom: 4,
+                    }}
+                  >
                     Remaining
                   </span>
-                  <span style={{ fontSize: '15px', fontWeight: '600', color: '#198754' }}>
+                  <span
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 600,
+                      color: "#198754",
+                    }}
+                  >
                     {formatCurrency(period.remainingAmount || 0)}
                   </span>
                 </div>
@@ -195,14 +277,14 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
               {period.notes && (
                 <div
                   style={{
-                    marginTop: '16px',
-                    padding: '12px 16px',
-                    backgroundColor: '#d1ecf1',
-                    border: '1px solid #bee5eb',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    color: '#0c5460',
-                    marginBottom: 0
+                    marginTop: 16,
+                    padding: "12px 16px",
+                    background: "#d1ecf1",
+                    border: "1px solid #bee5eb",
+                    borderRadius: 6,
+                    fontSize: 13,
+                    color: "#0c5460",
+                    marginBottom: 0,
                   }}
                 >
                   <strong>Notes:</strong> {period.notes}
@@ -211,51 +293,150 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
             </div>
 
             {/* Sub-Allocations */}
-            <h6 style={{ fontSize: '15px', fontWeight: '600', color: '#1e293b', marginBottom: '16px' }}>
-              <i className="bi bi-list-task" style={{ marginRight: '8px' }}></i>
+            <h6
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                color: "#1e293b",
+                marginBottom: 16,
+              }}
+            >
+              <i className="bi bi-list-task" style={{ marginRight: 8 }}></i>
               Sub-Allocations ({subAllocations.length})
             </h6>
 
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <div
+              <div style={{ textAlign: "center", padding: "40px 0" }}>
+                <span
                   style={{
-                    width: '40px',
-                    height: '40px',
-                    border: '4px solid #e5e7eb',
-                    borderTopColor: '#0d6efd',
-                    borderRadius: '50%',
-                    animation: 'spin 0.8s linear infinite',
-                    display: 'inline-block',
-                    marginBottom: '12px'
+                    width: 40,
+                    height: 40,
+                    border: "4px solid #e5e7eb",
+                    borderTop: "4px solid #0d6efd",
+                    borderRadius: "50%",
+                    animation: "spin 0.8s linear infinite",
+                    display: "inline-block",
+                    marginBottom: 12,
                   }}
                 />
-                <p style={{ fontSize: '13px', color: '#64748b', marginTop: '8px' }}>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#64748b",
+                    marginTop: 8,
+                  }}
+                >
                   Loading sub-allocations...
                 </p>
+                <style>{`
+                  @keyframes spin {
+                    0% { transform: rotate(0deg);}
+                    100% { transform: rotate(360deg);}
+                  }
+                `}</style>
               </div>
             ) : subAllocations.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <div style={{ textAlign: "center", padding: "40px 0" }}>
                 <i
                   className="bi bi-inbox"
-                  style={{ fontSize: '48px', color: '#cbd5e1' }}
+                  style={{ fontSize: 48, color: "#cbd5e1" }}
                 ></i>
-                <p style={{ fontSize: '13px', color: '#64748b', marginTop: '16px' }}>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: "#64748b",
+                    marginTop: 16,
+                  }}
+                >
                   No sub-allocations created yet for this period
                 </p>
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <div style={{ overflowX: "auto" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    fontSize: 13,
+                  }}
+                >
                   <thead>
-                    <tr style={{ backgroundColor: '#f9fafb', borderBottom: '2px solid #e5e7eb' }}>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#334155' }}>Type</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#334155' }}>Amount</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#334155' }}>Utilized</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#334155' }}>Remaining</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#334155' }}>Utilization %</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#334155' }}>Status</th>
-                      <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600', color: '#334155' }}>Allocated Date</th>
+                    <tr
+                      style={{
+                        background: "#f9fafb",
+                        borderBottom: "2px solid #e5e7eb",
+                      }}
+                    >
+                      <th
+                        style={{
+                          padding: 12,
+                          textAlign: "left",
+                          fontWeight: 600,
+                          color: "#334155",
+                        }}
+                      >
+                        Type
+                      </th>
+                      <th
+                        style={{
+                          padding: 12,
+                          textAlign: "left",
+                          fontWeight: 600,
+                          color: "#334155",
+                        }}
+                      >
+                        Amount
+                      </th>
+                      <th
+                        style={{
+                          padding: 12,
+                          textAlign: "left",
+                          fontWeight: 600,
+                          color: "#334155",
+                        }}
+                      >
+                        Utilized
+                      </th>
+                      <th
+                        style={{
+                          padding: 12,
+                          textAlign: "left",
+                          fontWeight: 600,
+                          color: "#334155",
+                        }}
+                      >
+                        Remaining
+                      </th>
+                      <th
+                        style={{
+                          padding: 12,
+                          textAlign: "left",
+                          fontWeight: 600,
+                          color: "#334155",
+                        }}
+                      >
+                        Utilization %
+                      </th>
+                      <th
+                        style={{
+                          padding: 12,
+                          textAlign: "left",
+                          fontWeight: 600,
+                          color: "#334155",
+                        }}
+                      >
+                        Status
+                      </th>
+                      <th
+                        style={{
+                          padding: 12,
+                          textAlign: "left",
+                          fontWeight: 600,
+                          color: "#334155",
+                        }}
+                      >
+                        Allocated Date
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -267,71 +448,86 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
                       const statusText = getStatusText(utilization);
 
                       return (
-                        <tr key={alloc.allocationId} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                          <td style={{ padding: '12px' }}>
+                        <tr
+                          key={alloc.allocationId}
+                          style={{ borderBottom: "1px solid #e5e7eb" }}
+                        >
+                          <td style={{ padding: 12 }}>
                             <span
                               style={{
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                fontSize: '11px',
-                                fontWeight: '600',
-                                backgroundColor: '#e0e7ff',
-                                color: '#3730a3'
+                                padding: "4px 8px",
+                                borderRadius: 4,
+                                fontSize: 11,
+                                fontWeight: 600,
+                                background: "#e0e7ff",
+                                color: "#3730a3",
                               }}
                             >
                               {alloc.allocationType}
                             </span>
                           </td>
-                          <td style={{ padding: '12px', fontWeight: '600' }}>
+                          <td style={{ padding: 12, fontWeight: 600 }}>
                             {formatCurrency(alloc.amount)}
                           </td>
-                          <td style={{ padding: '12px', color: '#dc3545' }}>
+                          <td style={{ padding: 12, color: "#dc3545" }}>
                             {formatCurrency(alloc.utilizedAmount || 0)}
                           </td>
-                          <td style={{ padding: '12px', color: '#198754' }}>
+                          <td style={{ padding: 12, color: "#198754" }}>
                             {formatCurrency(remaining)}
                           </td>
-                          <td style={{ padding: '12px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <td style={{ padding: 12 }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
                               <div
                                 style={{
-                                  width: '80px',
-                                  height: '8px',
-                                  backgroundColor: '#e5e7eb',
-                                  borderRadius: '4px',
-                                  overflow: 'hidden'
+                                  width: 80,
+                                  height: 8,
+                                  background: "#e5e7eb",
+                                  borderRadius: 4,
+                                  overflow: "hidden",
                                 }}
                               >
                                 <div
                                   style={{
                                     width: `${utilization}%`,
-                                    height: '100%',
-                                    backgroundColor: statusColor,
-                                    borderRadius: '4px',
-                                    transition: 'width 0.3s ease'
+                                    height: "100%",
+                                    background: statusColor,
+                                    borderRadius: 4,
+                                    transition: "width 0.3s ease",
                                   }}
                                 ></div>
                               </div>
-                              <span style={{ fontSize: '11px', color: '#64748b' }}>
+                              <span style={{ fontSize: 11, color: "#64748b" }}>
                                 {Math.round(utilization)}%
                               </span>
                             </div>
                           </td>
-                          <td style={{ padding: '12px' }}>
+                          <td style={{ padding: 12 }}>
                             <span
                               style={{
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                fontSize: '11px',
-                                fontWeight: '600',
-                                backgroundColor: statusBg,
-                                color: '#ffffff'
+                                padding: "4px 8px",
+                                borderRadius: 4,
+                                fontSize: 11,
+                                fontWeight: 600,
+                                background: statusBg,
+                                color: "#fff",
                               }}
                             >
                               {statusText}
                             </span>
                           </td>
-                          <td style={{ padding: '12px', fontSize: '11px', color: '#64748b' }}>
+                          <td
+                            style={{
+                              padding: 12,
+                              fontSize: 11,
+                              color: "#64748b",
+                            }}
+                          >
                             {new Date(alloc.allocatedAt).toLocaleDateString()}
                           </td>
                         </tr>
@@ -339,16 +535,25 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
                     })}
                   </tbody>
                   <tfoot>
-                    <tr style={{ backgroundColor: '#f9fafb', borderTop: '2px solid #e5e7eb' }}>
-                      <td style={{ padding: '12px', fontWeight: '700' }}>
-                        Total
-                      </td>
-                      <td style={{ padding: '12px', fontWeight: '700' }}>
+                    <tr
+                      style={{
+                        background: "#f9fafb",
+                        borderTop: "2px solid #e5e7eb",
+                      }}
+                    >
+                      <td style={{ padding: 12, fontWeight: 700 }}>Total</td>
+                      <td style={{ padding: 12, fontWeight: 700 }}>
                         {formatCurrency(
                           subAllocations.reduce((sum, a) => sum + a.amount, 0)
                         )}
                       </td>
-                      <td style={{ padding: '12px', fontWeight: '700', color: '#dc3545' }}>
+                      <td
+                        style={{
+                          padding: 12,
+                          fontWeight: 700,
+                          color: "#dc3545",
+                        }}
+                      >
                         {formatCurrency(
                           subAllocations.reduce(
                             (sum, a) => sum + (a.utilizedAmount || 0),
@@ -356,79 +561,71 @@ const ViewPeriodDetailsModal = ({ period, onClose }) => {
                           )
                         )}
                       </td>
-                      <td style={{ padding: '12px', fontWeight: '700', color: '#198754' }}>
+                      <td
+                        style={{
+                          padding: 12,
+                          fontWeight: 700,
+                          color: "#198754",
+                        }}
+                      >
                         {formatCurrency(
                           subAllocations.reduce(
-                            (sum, a) => sum + (a.amount - (a.utilizedAmount || 0)),
+                            (sum, a) =>
+                              sum + (a.amount - (a.utilizedAmount || 0)),
                             0
                           )
                         )}
                       </td>
-                      <td colSpan="3" style={{ padding: '12px' }}></td>
+                      <td colSpan="3" style={{ padding: 12 }}></td>
                     </tr>
                   </tfoot>
                 </table>
               </div>
             )}
-          </Modal.Body>
+          </div>
 
-          {/* FOOTER */}
+          {/* FOOTER - Fixed */}
           <div
             style={{
-              padding: '12px 20px',
-              borderTop: '1px solid #e2e8f0',
-              background: '#ffffff',
+              padding: "10px 15px",
+              borderTop: "1px solid #e2e8f0",
+              background: "#fff",
+              display: "flex",
+              justifyContent: "flex-end",
+              borderBottomLeftRadius: "0.5rem",
+              borderBottomRightRadius: "0.5rem",
               flexShrink: 0,
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '8px',
-              borderBottomLeftRadius: '12px',
-              borderBottomRightRadius: '12px'
             }}
           >
-            {/* Close Button */}
             <button
               type="button"
               onClick={onClose}
               style={{
-                background: '#6c757d',
-                borderColor: '#6c757d',
-                color: '#ffffff',
-                fontWeight: '600',
-                padding: '8px 16px',
-                fontSize: '13px',
-                borderRadius: '6px',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
+                background: "#6c757d",
+                border: "none",
+                color: "#fff",
+                fontWeight: 600,
+                padding: "7px 12px",
+                fontSize: 12,
+                borderRadius: 5,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
               }}
               onMouseEnter={(e) => {
-                e.target.style.background = '#5a6268';
-                e.target.style.borderColor = '#5a6268';
+                e.target.style.background = "#5a6268";
               }}
               onMouseLeave={(e) => {
-                e.target.style.background = '#6c757d';
-                e.target.style.borderColor = '#6c757d';
+                e.target.style.background = "#6c757d";
               }}
             >
               Close
             </button>
           </div>
         </div>
-      </Modal>
-
-      {/* Keyframe Animation for Spinner */}
-      <style>
-        {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-      </style>
+      </div>
     </>
   );
 };

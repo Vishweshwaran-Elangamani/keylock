@@ -104,11 +104,11 @@ const HROperations = () => {
         </div>
       ) : (
         <>
-          <div className="tab-navigation-bar">
+          <div className="tab-navigation-bar-hr">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
-                className={`tab-button ${
+                className={`tab-button-hr ${
                   activeTab === tab.key ? "active" : ""
                 }`}
                 onClick={() => handleTabChange(tab)}
@@ -118,7 +118,7 @@ const HROperations = () => {
             ))}
           </div>
 
-          <div className="tab-content">
+          <div className="tab-content-hr">
             <Routes>
               <Route path="policies" element={<PolicyManagement />} />
               <Route path="career-goals" element={<CareerGoals />} />

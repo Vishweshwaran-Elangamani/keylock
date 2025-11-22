@@ -165,8 +165,8 @@ const EditOpportunityModal = ({
         <div
           style={{
             width: '100%',
-            maxWidth: '900px',
-            maxHeight: '90vh',
+            maxWidth: '800px',
+            maxHeight: '75vh',
             display: 'flex',
             flexDirection: 'column',
             borderRadius: '0.5rem',

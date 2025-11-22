@@ -1,4 +1,3 @@
-// src/pages/sla/DeptHeadSLADashboard.jsx - REDESIGNED WITH PROPER CSS CLASSES
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,14 +11,13 @@ import {
   AlertTriangle,
   Eye,
   Search,
-  Calendar,
 } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "../../styles/sla/DeptHeadSLADashboard.css";
 
-const DeptHeadSLADashboard = () => {
+const DeptHeadDashboard = () => {
   const navigate = useNavigate();
 
   // State Management
@@ -37,7 +35,6 @@ const DeptHeadSLADashboard = () => {
   const [resolutionComments, setResolutionComments] = useState("");
   const [approvingEscalation, setApprovingEscalation] = useState(false);
 
-  // ============= LIFECYCLE HOOKS =============
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -46,7 +43,6 @@ const DeptHeadSLADashboard = () => {
     applyFilters();
   }, [selectedPeriod, searchQuery, selectedStatus, allL2Escalations]);
 
-  // ============= DATA FETCHING =============
   const fetchAllData = async () => {
     setLoading(true);
     setError(null);
@@ -83,7 +79,6 @@ const DeptHeadSLADashboard = () => {
           escalationStatus: e.escalationStatus || "Pending",
           submittedAt: e.submittedAt,
           period: e.reviewCycle || "Q1-2025",
-          daysLeft: e.daysUntilDeadline || 0,
         }));
 
         setAllL2Escalations(processed);
@@ -96,23 +91,19 @@ const DeptHeadSLADashboard = () => {
     }
   };
 
-  // ============= FILTERING =============
   const applyFilters = () => {
     let filtered = [...allL2Escalations];
 
-    // Period filter
     if (selectedPeriod !== "all") {
       filtered = filtered.filter((e) => e.period === selectedPeriod);
     }
 
-    // Status filter
     if (selectedStatus !== "all") {
       filtered = filtered.filter(
         (e) => e.escalationStatus.toLowerCase() === selectedStatus
       );
     }
 
-    // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -126,7 +117,6 @@ const DeptHeadSLADashboard = () => {
     setFilteredL2Escalations(filtered);
   };
 
-  // ============= EVENT HANDLERS =============
   const handleViewDetails = (slaid) => {
     navigate(`/sla/depthead/details/${slaid}`);
   };
@@ -176,7 +166,6 @@ const DeptHeadSLADashboard = () => {
     }
   };
 
-  // ============= HELPER FUNCTIONS =============
   const calculateStats = () => {
     const filteredByPeriod =
       selectedPeriod === "all"
@@ -205,12 +194,12 @@ const DeptHeadSLADashboard = () => {
 
   const getAvatarClass = (index) => {
     const classes = [
-      "avatar-pink",
-      "avatar-purple",
-      "avatar-deep-purple",
-      "avatar-indigo",
-      "avatar-blue",
-      "avatar-teal",
+      "dept-head-sla-avatar-pink",
+      "dept-head-sla-avatar-purple",
+      "dept-head-sla-avatar-indigo",
+      "dept-head-sla-avatar-blue",
+      "dept-head-sla-avatar-teal",
+      "dept-head-sla-avatar-green",
     ];
     return classes[index % classes.length];
   };
@@ -224,15 +213,11 @@ const DeptHeadSLADashboard = () => {
     });
   };
 
-  // ============= RENDER =============
   const stats = calculateStats();
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "600px" }}
-      >
+      <div className="dept-head-sla-loading">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -241,89 +226,109 @@ const DeptHeadSLADashboard = () => {
   }
 
   return (
-    <div className="container-fluid">
-      {/* Breadcrumb */}
-      <Breadcrumb items={[{ label: "L2 Escalations" }]} />
+    <div className="dept-head-sla-container">
+      <Breadcrumb
+        items={[
+          { label: "Dashboard" },
+          { label: "SLA Management" },
+          { label: "Department Head" },
+        ]}
+      />
 
-      {/* Error Alert */}
-      {error && (
-        <div className="alert alert-danger alert-dismissible fade show mb-4">
-          <AlertCircle size={20} className="me-2" />
-          {error}
+      {/* Header */}
+      <div className="dept-head-sla-header">
+        <div>
+          <h1 className="dept-head-sla-title">Department Head Dashboard</h1>
+          <p className="dept-head-sla-subtitle">
+            Review and approve L2 escalations
+          </p>
+        </div>
+        <div className="dept-head-sla-header-actions">
           <button
-            type="button"
-            className="btn-close"
-            onClick={() => setError(null)}
-          />
-        </div>
-      )}
-
-      {/* Stats Cards */}
-      <div className="row g-3 mb-4">
-        <div className="col-lg-3 col-md-6">
-          <div className="stat-card card">
-            <div className="card-body">
-              <div className="stat-icon stat-icon-blue">
-                <Users size={28} color="#1976D2" />
-              </div>
-              <div className="stat-content">
-                <h3>{stats.total}</h3>
-                <p>Total Escalations</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-3 col-md-6">
-          <div className="stat-card card">
-            <div className="card-body">
-              <div className="stat-icon stat-icon-green">
-                <CheckCircle size={28} color="#388E3C" />
-              </div>
-              <div className="stat-content">
-                <h3>{stats.resolved}</h3>
-                <p>Approved</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-3 col-md-6">
-          <div className="stat-card card">
-            <div className="card-body">
-              <div className="stat-icon stat-icon-orange">
-                <Clock size={28} color="#F57C00" />
-              </div>
-              <div className="stat-content">
-                <h3>{stats.pending}</h3>
-                <p>Pending</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-lg-3 col-md-6">
-          <div className="stat-card card">
-            <div className="card-body">
-              <div className="stat-icon stat-icon-red">
-                <AlertTriangle size={28} color="#C62828" />
-              </div>
-              <div className="stat-content">
-                <h3>{stats.rejected}</h3>
-                <p>Rejected</p>
-              </div>
-            </div>
-          </div>
+            className="dept-head-sla-btn dept-head-sla-btn-refresh"
+            onClick={fetchAllData}
+          >
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+          <button
+            className="dept-head-sla-btn dept-head-sla-btn-export"
+            onClick={() => toast.info("Export feature coming soon")}
+          >
+            <Download size={16} />
+            Export
+          </button>
         </div>
       </div>
 
-      {/* Search and Filter Bar */}
-      <div className="search-filter-bar">
-        <div className="search-input-wrapper">
-          <Search size={18} className="search-icon" />
+      {/* Error Alert */}
+      {error && (
+        <div className="dept-head-sla-alert-error">
+          <AlertCircle size={20} className="dept-head-sla-alert-icon" />
+          <span>{error}</span>
+          <button
+            type="button"
+            className="dept-head-sla-alert-close"
+            onClick={() => setError(null)}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Stats Grid */}
+      <div className="dept-head-sla-stats-grid">
+        {[
+          {
+            label: "Total Escalations",
+            value: stats.total,
+            icon: Users,
+            bg: "#EEF2FF",
+            color: "#3B82F6",
+          },
+          {
+            label: "Approved",
+            value: stats.resolved,
+            icon: CheckCircle,
+            bg: "#DCFCE7",
+            color: "#16A34A",
+          },
+          {
+            label: "Pending",
+            value: stats.pending,
+            icon: Clock,
+            bg: "#FEF3C7",
+            color: "#D97706",
+          },
+          {
+            label: "Rejected",
+            value: stats.rejected,
+            icon: AlertTriangle,
+            bg: "#FEE2E2",
+            color: "#DC2626",
+          },
+        ].map(({ label, value, icon: Icon, bg, color }) => (
+          <div key={label} className="dept-head-sla-stat-card">
+            <div
+              className="dept-head-sla-stat-icon"
+              style={{ backgroundColor: bg }}
+            >
+              <Icon size={22} color={color} strokeWidth={2.5} />
+            </div>
+            <h3 className="dept-head-sla-stat-value">{value}</h3>
+            <p className="dept-head-sla-stat-label">{label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="dept-head-sla-filters">
+        <div className="dept-head-sla-search-wrapper">
+          <Search size={16} className="dept-head-sla-search-icon" />
           <input
             type="text"
-            className="form-control"
+            className="dept-head-sla-search-input"
             placeholder="Search escalations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -331,7 +336,7 @@ const DeptHeadSLADashboard = () => {
         </div>
 
         <select
-          className="form-select filter-select"
+          className="dept-head-sla-select"
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
         >
@@ -342,7 +347,7 @@ const DeptHeadSLADashboard = () => {
         </select>
 
         <select
-          className="form-select filter-select"
+          className="dept-head-sla-select"
           value={selectedPeriod}
           onChange={(e) => setSelectedPeriod(e.target.value)}
         >
@@ -352,111 +357,106 @@ const DeptHeadSLADashboard = () => {
           <option value="Q2-2025">Q2 2025</option>
           <option value="Q3-2025">Q3 2025</option>
         </select>
-
-        <button
-          className="btn btn-outline-primary d-flex align-items-center gap-2"
-          onClick={fetchAllData}
-          style={{ borderRadius: "8px", height: "44px" }}
-        >
-          <RefreshCw size={16} />
-          Refresh
-        </button>
       </div>
 
       {/* Table */}
-      <div className="table-card">
+      <div className="dept-head-sla-table-wrapper">
         <div className="table-responsive">
-          <table className="escalations-table table table-hover">
+          <table className="dept-head-sla-table">
             <thead>
               <tr>
-                <th>Full Name</th>
+                <th>Employee</th>
                 <th>Manager</th>
                 <th>Reason</th>
                 <th>Status</th>
                 <th>Submitted Date</th>
-                <th className="text-center">Actions</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredL2Escalations.length === 0 ? (
                 <tr>
-                  <td colSpan="6">
-                    <div className="table-empty-state">
-                      <div className="empty-state-icon">
-                        <Users size={40} color="#9CA3AF" />
-                      </div>
-                      <p className="empty-state-text">No escalations found</p>
-                    </div>
+                  <td colSpan="6" className="dept-head-sla-empty">
+                    <Users size={48} className="dept-head-sla-empty-icon" />
+                    <p className="dept-head-sla-empty-text">
+                      No escalations found
+                    </p>
                   </td>
                 </tr>
               ) : (
                 filteredL2Escalations.map((esc, index) => (
                   <tr key={esc.escalationId}>
                     <td>
-                      <div className="employee-cell">
+                      <div className="dept-head-sla-employee-cell">
                         <div
-                          className={`employee-avatar ${getAvatarClass(index)}`}
+                          className={`dept-head-sla-avatar ${getAvatarClass(
+                            index
+                          )}`}
                         >
                           {getInitials(esc.employeeName)}
                         </div>
-                        <div className="employee-info">
-                          <div className="employee-name">
+                        <div className="dept-head-sla-employee-info">
+                          <div className="dept-head-sla-employee-name">
                             {esc.employeeName}
                           </div>
-                          <div className="employee-email">
+                          <div className="dept-head-sla-employee-email">
                             {esc.employeeEmail || "No email"}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <div className="manager-cell">{esc.managerName}</div>
+                      <div className="dept-head-sla-manager-name">
+                        {esc.managerName}
+                      </div>
                     </td>
                     <td>
-                      <div className="reason-cell">
-                        <div className="reason-title">{esc.reason}</div>
+                      <div className="dept-head-sla-reason-cell">
+                        <div className="dept-head-sla-reason-title">
+                          {esc.reason}
+                        </div>
                         {esc.description && (
-                          <div className="reason-description">
-                            {esc.description.substring(0, 40)}
-                            {esc.description.length > 40 ? "..." : ""}
+                          <div className="dept-head-sla-reason-description">
+                            {esc.description.substring(0, 50)}
+                            {esc.description.length > 50 ? "..." : ""}
                           </div>
                         )}
                       </div>
                     </td>
                     <td>
                       <span
-                        className={`status-badge ${
+                        className={`dept-head-sla-badge ${
                           esc.escalationStatus === "Pending"
-                            ? "status-pending"
+                            ? "dept-head-sla-badge-pending"
                             : esc.escalationStatus === "Resolved"
-                            ? "status-resolved"
-                            : "status-rejected"
+                            ? "dept-head-sla-badge-resolved"
+                            : "dept-head-sla-badge-rejected"
                         }`}
                       >
                         {esc.escalationStatus}
                       </span>
                     </td>
                     <td>
-                      <div className="date-cell">
+                      <div className="dept-head-sla-date">
                         {formatDate(esc.submittedAt)}
                       </div>
                     </td>
                     <td>
-                      <div className="action-buttons">
+                      <div className="dept-head-sla-actions">
                         <button
-                          className="action-btn btn-view"
+                          className="dept-head-sla-action-btn dept-head-sla-action-view"
                           onClick={() => handleViewDetails(esc.slaid)}
                           title="View Details"
                         >
-                          <Eye size={16} />
+                          <Eye size={14} />
                         </button>
                         {esc.escalationStatus === "Pending" && (
                           <button
-                            className="action-btn btn-approve"
+                            className="dept-head-sla-action-btn dept-head-sla-action-approve"
                             onClick={() => handleOpenResolutionModal(esc)}
                             title="Approve Escalation"
                           >
-                            <CheckCircle size={16} />
+                            <CheckCircle size={14} />
                           </button>
                         )}
                       </div>
@@ -472,94 +472,86 @@ const DeptHeadSLADashboard = () => {
       {/* Approval Modal */}
       {showResolutionModal && selectedEscalation && (
         <div
-          className="modal show d-block escalation-modal"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1055 }}
+          className="dept-head-sla-modal-backdrop"
           onClick={handleCloseResolutionModal}
         >
           <div
-            className="modal-dialog modal-dialog-centered"
+            className="dept-head-sla-modal-dialog"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title fw-bold">
-                  <AlertTriangle
-                    size={20}
-                    color="#E01950"
-                    className="me-2"
-                    style={{ verticalAlign: "middle" }}
-                  />
+            <div className="dept-head-sla-modal-content">
+              <div className="dept-head-sla-modal-header">
+                <h5 className="dept-head-sla-modal-title">
+                  <AlertTriangle size={20} className="me-2" />
                   Approve L2 Escalation
                 </h5>
                 <button
-
-                
                   type="button"
-                  className="btn-close"
+                  className="dept-head-sla-modal-close"
                   onClick={handleCloseResolutionModal}
                   disabled={approvingEscalation}
-                />
+                >
+                  ×
+                </button>
               </div>
 
-              <div className="modal-body">
-                <div className="info-box">
-                  <div className="info-box-item">
-                    <span className="info-box-label">Employee</span>
-                    <div className="info-box-value">
+              <div className="dept-head-sla-modal-body">
+                <div className="dept-head-sla-info-box">
+                  <div className="dept-head-sla-info-item">
+                    <span className="dept-head-sla-info-label">Employee</span>
+                    <div className="dept-head-sla-info-value">
                       {selectedEscalation.employeeName}
                     </div>
                   </div>
-                  <div className="info-box-item">
-                    <span className="info-box-label">
+                  <div className="dept-head-sla-info-item">
+                    <span className="dept-head-sla-info-label">
                       Manager (Escalated By)
                     </span>
-                    <div className="info-box-value">
+                    <div className="dept-head-sla-info-value">
                       {selectedEscalation.managerName}
                     </div>
                   </div>
-                  <div className="info-box-item">
-                    <span className="info-box-label">Reason</span>
-                    <div className="info-box-value">
+                  <div className="dept-head-sla-info-item">
+                    <span className="dept-head-sla-info-label">Reason</span>
+                    <div className="dept-head-sla-info-value">
                       {selectedEscalation.reason}
                     </div>
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <label className="form-label fw-semibold">
+                <div className="dept-head-sla-form-group">
+                  <label className="dept-head-sla-form-label">
                     Approval Comments <span className="text-danger">*</span>
                   </label>
                   <textarea
-                    className="form-control"
+                    className="dept-head-sla-textarea"
                     rows="4"
                     value={resolutionComments}
                     onChange={(e) => setResolutionComments(e.target.value)}
                     placeholder="Provide your decision and comments..."
                     disabled={approvingEscalation}
-                    style={{ borderRadius: "8px", resize: "none" }}
+                    maxLength={500}
                   />
-                  <small className="text-muted mt-2 d-block">
+                  <small className="dept-head-sla-char-count">
                     {resolutionComments.length}/500
                   </small>
                 </div>
               </div>
 
-              <div className="modal-footer">
+              <div className="dept-head-sla-modal-footer">
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="dept-head-sla-btn dept-head-sla-btn-cancel"
                   onClick={handleCloseResolutionModal}
                   disabled={approvingEscalation}
-                  style={{ borderRadius: "8px" }}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  className="btn btn-success d-flex align-items-center gap-2"
+                  className="dept-head-sla-btn dept-head-sla-btn-approve"
                   onClick={handleApproveEscalation}
                   disabled={approvingEscalation || !resolutionComments.trim()}
-                  style={{ borderRadius: "8px" }}
                 >
                   <CheckCircle size={16} />
                   {approvingEscalation ? "Approving..." : "Approve Escalation"}
@@ -573,4 +565,4 @@ const DeptHeadSLADashboard = () => {
   );
 };
 
-export default DeptHeadSLADashboard;
+export default DeptHeadDashboard;
