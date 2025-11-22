@@ -300,7 +300,6 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
           <div
             style={{
               overflowY: "auto",
-              padding: "1.5rem",
               flexGrow: 1,
               padding: 0,
             }}
