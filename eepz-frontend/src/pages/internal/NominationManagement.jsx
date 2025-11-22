@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Modal } from "react-bootstrap";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import nominationService from "../../services/internal/nominationService";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
@@ -7,6 +6,7 @@ import SelfNominateModal from "../../components/internal/NominationModals/SelfNo
 import ManagerNominateModal from "../../components/internal/NominationModals/ManagerNominateModal";
 import NominationReviewModal from "../../components/internal/NominationModals/NominationReviewModal";
 import NominationGraphModal from "../../components/internal/NominationModals/NominationGraphModal";
+import NominationDetailsModal from "../../components/internal/NominationModals/NominationDetailsModal";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/internal/NominationManagement.css";
@@ -240,6 +240,7 @@ const NominationManagement = () => {
           </div>
         </div>
       </div>
+
       <div className="filters-card">
         <div className="filters-content">
           <div className="filters-left">
@@ -384,6 +385,7 @@ const NominationManagement = () => {
           onNominationSubmitted={handleNominationSubmitted}
         />
       )}
+
       {showManagerNominateModal && (
         <ManagerNominateModal
           show={showManagerNominateModal}
@@ -392,6 +394,7 @@ const NominationManagement = () => {
           onNominationSubmitted={handleNominationSubmitted}
         />
       )}
+
       {showReviewModal && selectedNomination && (
         <NominationReviewModal
           show={showReviewModal}
@@ -401,6 +404,7 @@ const NominationManagement = () => {
           onReviewSubmitted={handleReviewSubmitted}
         />
       )}
+
       {showGraphModal && (
         <NominationGraphModal
           show={showGraphModal}
@@ -408,412 +412,12 @@ const NominationManagement = () => {
         />
       )}
 
-      {/* Responsive Details Modal */}
       {showDetailsModal && selectedNomination && (
-        <Modal
+        <NominationDetailsModal
           show={showDetailsModal}
           onHide={() => setShowDetailsModal(false)}
-          size="lg"
-          centered
-          className="nomination-details-modal"
-        >
-          <Modal.Header
-            closeButton
-            style={{
-              backgroundColor: "#f8f9fa",
-              borderBottom: "2px solid #dee2e6",
-            }}
-          >
-            <Modal.Title>
-              <i
-                className="bi bi-info-circle me-2"
-                style={{ color: "#27235c" }}
-              ></i>
-              Nomination Details
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body style={{ padding: "24px" }}>
-            {/* Opportunity Information */}
-            <div
-              style={{
-                marginBottom: "24px",
-                padding: "16px",
-                backgroundColor: "#f0f4ff",
-                borderRadius: "8px",
-              }}
-            >
-              <h6
-                style={{
-                  color: "#27235c",
-                  fontWeight: "600",
-                  marginBottom: "12px",
-                  fontSize: "14px",
-                }}
-              >
-                <i className="bi bi-briefcase me-2"></i>
-                Opportunity Information
-              </h6>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "12px",
-                }}
-              >
-                <div>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Opportunity Name:
-                  </label>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      fontWeight: "600",
-                      color: "#27235c",
-                    }}
-                  >
-                    {selectedNomination.opportunityName || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Opportunity ID:
-                  </label>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      fontWeight: "600",
-                      color: "#27235c",
-                    }}
-                  >
-                    #{selectedNomination.opportunityId || "N/A"}
-                  </p>
-                </div>
-              </div>
-            </div>
-            {/* Nominee Information */}
-            <div
-              style={{
-                marginBottom: "24px",
-                padding: "16px",
-                backgroundColor: "#f0fdf4",
-                borderRadius: "8px",
-              }}
-            >
-              <h6
-                style={{
-                  color: "#166534",
-                  fontWeight: "600",
-                  marginBottom: "12px",
-                  fontSize: "14px",
-                }}
-              >
-                <i className="bi bi-person me-2"></i>
-                Nominee Information
-              </h6>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "12px",
-                }}
-              >
-                <div>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Nominee Email:
-                  </label>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      fontWeight: "600",
-                      color: "#166534",
-                    }}
-                  >
-                    {selectedNomination.nomineeName || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Nominee User ID:
-                  </label>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      fontWeight: "600",
-                      color: "#166534",
-                    }}
-                  >
-                    #{selectedNomination.nomineeUserId || "N/A"}
-                  </p>
-                </div>
-              </div>
-            </div>
-            {/* Nomination Details */}
-            <div
-              style={{
-                marginBottom: "24px",
-                padding: "16px",
-                backgroundColor: "#fef3c7",
-                borderRadius: "8px",
-              }}
-            >
-              <h6
-                style={{
-                  color: "#92400e",
-                  fontWeight: "600",
-                  marginBottom: "12px",
-                  fontSize: "14px",
-                }}
-              >
-                <i className="bi bi-file-text me-2"></i>
-                Nomination Details
-              </h6>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "12px",
-                  marginBottom: "12px",
-                }}
-              >
-                <div>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Nominated By Email:
-                  </label>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      fontWeight: "600",
-                      color: "#92400e",
-                    }}
-                  >
-                    {selectedNomination.nominatedByName || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Nomination Type:
-                  </label>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      fontWeight: "600",
-                      color: "#92400e",
-                    }}
-                  >
-                    {selectedNomination.nominationType
-                      ?.replace(/_/g, " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase()) || "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Submitted Date:
-                  </label>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      fontWeight: "600",
-                      color: "#92400e",
-                    }}
-                  >
-                    {formatDate(selectedNomination.submittedAt)}
-                  </p>
-                </div>
-                <div>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Status:
-                  </label>
-                  <p style={{ margin: "4px 0 0 0" }}>
-                    <span
-                      className={`status-badge ${getStatusBadgeClass(
-                        selectedNomination.status
-                      )}`}
-                    >
-                      {selectedNomination.status
-                        ?.replace(/_/g, " ")
-                        .replace(/\b\w/g, (l) => l.toUpperCase()) || "N/A"}
-                    </span>
-                  </p>
-                </div>
-              </div>
-              {selectedNomination.justification && (
-                <div style={{ marginTop: "12px" }}>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      color: "#6c757d",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Justification:
-                  </label>
-                  <p
-                    style={{
-                      margin: "4px 0 0 0",
-                      color: "#374151",
-                      lineHeight: "1.6",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    {selectedNomination.justification}
-                  </p>
-                </div>
-              )}
-            </div>
-            {/* Review Information (if available) */}
-            {(selectedNomination.reviewRemarks ||
-              selectedNomination.reviewedByName) && (
-              <div
-                style={{
-                  padding: "16px",
-                  backgroundColor: "#e0e7ff",
-                  borderRadius: "8px",
-                }}
-              >
-                <h6
-                  style={{
-                    color: "#1e40af",
-                    fontWeight: "600",
-                    marginBottom: "12px",
-                    fontSize: "14px",
-                  }}
-                >
-                  <i className="bi bi-chat-left-text me-2"></i>
-                  Review Information
-                </h6>
-                {selectedNomination.reviewedByName && (
-                  <div style={{ marginBottom: "12px" }}>
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        color: "#6c757d",
-                        fontWeight: "500",
-                      }}
-                    >
-                      Reviewed By:
-                    </label>
-                    <p
-                      style={{
-                        margin: "4px 0 0 0",
-                        color: "#374151",
-                        lineHeight: "1.6",
-                      }}
-                    >
-                      {selectedNomination.reviewedByName}
-                    </p>
-                  </div>
-                )}
-                {selectedNomination.reviewedAt && (
-                  <div style={{ marginBottom: "12px" }}>
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        color: "#6c757d",
-                        fontWeight: "500",
-                      }}
-                    >
-                      Reviewed At:
-                    </label>
-                    <p
-                      style={{
-                        margin: "4px 0 0 0",
-                        color: "#374151",
-                        lineHeight: "1.6",
-                      }}
-                    >
-                      {formatDate(selectedNomination.reviewedAt)}
-                    </p>
-                  </div>
-                )}
-                {selectedNomination.reviewRemarks && (
-                  <div>
-                    <label
-                      style={{
-                        fontSize: "12px",
-                        color: "#6c757d",
-                        fontWeight: "500",
-                      }}
-                    >
-                      Review Remarks:
-                    </label>
-                    <p
-                      style={{
-                        margin: "4px 0 0 0",
-                        color: "#374151",
-                        lineHeight: "1.6",
-                      }}
-                    >
-                      {selectedNomination.reviewRemarks}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </Modal.Body>
-          <Modal.Footer
-            style={{
-              backgroundColor: "#f8f9fa",
-              borderTop: "2px solid #dee2e6",
-            }}
-          >
-            <button
-              className="btn btn-secondary"
-              onClick={() => setShowDetailsModal(false)}
-              style={{ padding: "8px 20px" }}
-            >
-              <i className="bi bi-x-circle me-2"></i>
-              Close
-            </button>
-          </Modal.Footer>
-        </Modal>
+          nomination={selectedNomination}
+        />
       )}
     </div>
   );

@@ -134,6 +134,7 @@ const EditBudgetModal = ({ show, budget, onHide, onBudgetUpdated }) => {
           transform: "translate(-50%, -50%)",
           width: "97%",
           maxWidth: "800px",
+          maxHeight: "100vh",
           zIndex: 1050,
         }}
       >

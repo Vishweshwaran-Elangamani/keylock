@@ -7,287 +7,329 @@ const EscalationDetailModal = ({
   getSeverityBadge,
   getStatusBadge 
 }) => {
-  if (!escalation) return null;
+  if (!show || !escalation) return null;
+
+  // Custom Badge Component
+  const CustomBadge = ({ variant, children }) => {
+    const colors = {
+      danger: { bg: "#fee2e2", text: "#991b1b", border: "#fecaca" },
+      warning: { bg: "#fef3c7", text: "#92400e", border: "#fde68a" },
+      info: { bg: "#dbeafe", text: "#1e40af", border: "#93c5fd" },
+      success: { bg: "#dcfce7", text: "#166534", border: "#86efac" },
+      secondary: { bg: "#f3f4f6", text: "#374151", border: "#d1d5db" },
+    };
+
+    const color = colors[variant] || colors.secondary;
+
+    return (
+      <span
+        style={{
+          display: "inline-block",
+          padding: "4px 10px",
+          borderRadius: 4,
+          fontSize: 12,
+          fontWeight: 500,
+          background: color.bg,
+          color: color.text,
+          border: `1px solid ${color.border}`,
+        }}
+      >
+        {children}
+      </span>
+    );
+  };
 
   return (
     <>
-      {/* Custom Backdrop with Blur Effect */}
-      {show && (
+      {/* Blurred Backdrop */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(39,35,92,0.4)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          zIndex: 1040,
+        }}
+        onClick={onHide}
+      />
+
+      {/* Modal Container with Scroll */}
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "95%",
+          maxWidth: "800px",
+          maxHeight: "75vh",
+          zIndex: 1050,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <div
           style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(39, 35, 92, 0.4)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            zIndex: 1040,
-            transition: 'all 0.3s ease'
+            borderRadius: "0.5rem",
+            background: "#fff",
+            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
+            overflow: "hidden",
+            width: "100%",
+            maxHeight: "85vh",
+            display: "flex",
+            flexDirection: "column",
           }}
-          onClick={onHide}
-        />
-      )}
-
-      <Modal 
-        show={show} 
-        onHide={onHide} 
-        size="lg" 
-        centered
-        backdrop={false}
-        style={{ zIndex: 1050 }}
-      >
-        <div style={{
-          borderRadius: '0.5rem',
-          overflow: 'hidden',
-          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-          border: 'none'
-        }}>
-          {/* HEADER with White Close Button */}
-          <div 
+        >
+          {/* HEADER - Fixed */}
+          <div
             style={{
-              background: '#27235C',
-              color: '#ffffff',
-              padding: '16px 20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              position: 'relative'
+              background: "#27235C",
+              color: "#fff",
+              padding: "13px 15px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: "15px",
+              fontWeight: 600,
+              borderRadius: "0.5rem 0.5rem 0 0",
+              flexShrink: 0,
             }}
           >
-            <div 
-              style={{ 
-                fontSize: '16px', 
-                fontWeight: '600', 
-                color: '#ffffff'
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 600,
               }}
             >
+              <i className="bi bi-exclamation-triangle"></i>
               SLA Escalation Details
             </div>
-            <CloseButton 
+            <button
+              type="button"
               onClick={onHide}
-              variant="white"
+              aria-label="Close"
               style={{
-                filter: 'brightness(0) invert(1)',
-                opacity: 1
+                background: "none",
+                border: "none",
+                color: "#fff",
+                fontSize: 18,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-            />
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
-          
-          {/* BODY */}
-          <Modal.Body 
-            style={{ 
-              padding: '24px', 
-              background: '#ffffff',
-              border: 'none',
-              maxHeight: 'calc(90vh - 140px)',
-              overflowY: 'auto'
+
+          {/* BODY - Scrollable */}
+          <div
+            style={{
+              padding: "24px",
+              background: "#fff",
+              textAlign: "left",
+              overflowY: "auto",
+              flex: 1,
             }}
           >
             {/* Detail Grid */}
-            <div 
+            <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '16px',
-                fontSize: '14px'
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 16,
+                fontSize: 14,
               }}
             >
               {/* Employee Name */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Employee Name:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {escalation.employeeName || "N/A"}
                 </span>
               </div>
 
               {/* Employee ID */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Employee ID:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {escalation.employeeUserId}
                 </span>
               </div>
 
               {/* Email */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Email:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {escalation.employeeEmail || "N/A"}
                 </span>
               </div>
 
               {/* SLA Type */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   SLA Type:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {escalation.slaType || "N/A"}
                 </span>
               </div>
 
               {/* Escalation Level */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Escalation Level:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {escalation.escalationLevel}
                 </span>
               </div>
 
               {/* Severity */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Severity:
                 </label>
                 <div>
-                  <Badge 
-                    bg={getSeverityBadge(escalation.severity)}
-                    style={{
-                      fontSize: '12px',
-                      padding: '4px 10px',
-                      fontWeight: '500'
-                    }}
-                  >
+                  <CustomBadge variant={getSeverityBadge(escalation.severity)}>
                     {escalation.severity}
-                  </Badge>
+                  </CustomBadge>
                 </div>
               </div>
 
               {/* Status */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Status:
                 </label>
                 <div>
-                  <Badge 
-                    bg={getStatusBadge(escalation.escalationStatus)}
-                    style={{
-                      fontSize: '12px',
-                      padding: '4px 10px',
-                      fontWeight: '500'
-                    }}
-                  >
+                  <CustomBadge variant={getStatusBadge(escalation.escalationStatus)}>
                     {escalation.escalationStatus}
-                  </Badge>
+                  </CustomBadge>
                 </div>
               </div>
 
               {/* Days Overdue */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Days Overdue:
                 </label>
-                <span 
-                  style={{ 
-                    color: '#dc2626', 
-                    fontWeight: '700',
-                    fontSize: '15px'
+                <span
+                  style={{
+                    color: "#dc2626",
+                    fontWeight: 700,
+                    fontSize: 15,
                   }}
                 >
                   {escalation.daysOverdue} days
@@ -295,121 +337,121 @@ const EscalationDetailModal = ({
               </div>
 
               {/* SLA Deadline */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   SLA Deadline:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {new Date(escalation.slaDeadline).toLocaleDateString()}
                 </span>
               </div>
 
               {/* Escalated To */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Escalated To:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {escalation.escalatedToName || "N/A"}
                 </span>
               </div>
 
               {/* Escalated At */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Escalated At:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {new Date(escalation.submittedAt).toLocaleString()}
                 </span>
               </div>
 
               {/* Submitted By */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Submitted By:
                 </label>
-                <span style={{ color: '#1e293b' }}>
+                <span style={{ color: "#1e293b" }}>
                   {escalation.submittedByName || "N/A"}
                 </span>
               </div>
 
               {/* Reason - Full Width */}
-              <div 
+              <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  gridColumn: '1 / -1'
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  gridColumn: "1 / -1",
                 }}
               >
-                <label 
+                <label
                   style={{
-                    fontWeight: '600',
-                    color: '#475569',
-                    fontSize: '13px'
+                    fontWeight: 600,
+                    color: "#475569",
+                    fontSize: 13,
                   }}
                 >
                   Reason:
                 </label>
-                <p 
-                  style={{ 
+                <p
+                  style={{
                     margin: 0,
-                    padding: '12px',
-                    backgroundColor: '#f8fafc',
-                    borderRadius: '6px',
-                    border: '1px solid #e2e8f0',
-                    color: '#334155',
-                    lineHeight: '1.6',
-                    fontSize: '13px'
+                    padding: 12,
+                    background: "#f8fafc",
+                    borderRadius: 6,
+                    border: "1px solid #e2e8f0",
+                    color: "#334155",
+                    lineHeight: 1.6,
+                    fontSize: 13,
                   }}
                 >
                   {escalation.reason}
@@ -418,33 +460,33 @@ const EscalationDetailModal = ({
 
               {/* Description - Full Width (Conditional) */}
               {escalation.description && (
-                <div 
+                <div
                   style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '8px',
-                    gridColumn: '1 / -1'
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                    gridColumn: "1 / -1",
                   }}
                 >
-                  <label 
+                  <label
                     style={{
-                      fontWeight: '600',
-                      color: '#475569',
-                      fontSize: '13px'
+                      fontWeight: 600,
+                      color: "#475569",
+                      fontSize: 13,
                     }}
                   >
                     Description:
                   </label>
-                  <p 
-                    style={{ 
+                  <p
+                    style={{
                       margin: 0,
-                      padding: '12px',
-                      backgroundColor: '#f8fafc',
-                      borderRadius: '6px',
-                      border: '1px solid #e2e8f0',
-                      color: '#334155',
-                      lineHeight: '1.6',
-                      fontSize: '13px'
+                      padding: 12,
+                      background: "#f8fafc",
+                      borderRadius: 6,
+                      border: "1px solid #e2e8f0",
+                      color: "#334155",
+                      lineHeight: 1.6,
+                      fontSize: 13,
                     }}
                   >
                     {escalation.description}
@@ -456,78 +498,78 @@ const EscalationDetailModal = ({
               {escalation.resolvedAt && (
                 <>
                   {/* Resolved At */}
-                  <div 
+                  <div
                     style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px'
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 4,
                     }}
                   >
-                    <label 
+                    <label
                       style={{
-                        fontWeight: '600',
-                        color: '#475569',
-                        fontSize: '13px'
+                        fontWeight: 600,
+                        color: "#475569",
+                        fontSize: 13,
                       }}
                     >
                       Resolved At:
                     </label>
-                    <span style={{ color: '#1e293b' }}>
+                    <span style={{ color: "#1e293b" }}>
                       {new Date(escalation.resolvedAt).toLocaleString()}
                     </span>
                   </div>
 
                   {/* Resolved By */}
-                  <div 
+                  <div
                     style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4px'
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 4,
                     }}
                   >
-                    <label 
+                    <label
                       style={{
-                        fontWeight: '600',
-                        color: '#475569',
-                        fontSize: '13px'
+                        fontWeight: 600,
+                        color: "#475569",
+                        fontSize: 13,
                       }}
                     >
                       Resolved By:
                     </label>
-                    <span style={{ color: '#1e293b' }}>
+                    <span style={{ color: "#1e293b" }}>
                       {escalation.resolvedByName || "N/A"}
                     </span>
                   </div>
 
                   {/* Resolution Comments (Conditional) */}
                   {escalation.resolutionComments && (
-                    <div 
+                    <div
                       style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px',
-                        gridColumn: '1 / -1'
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 8,
+                        gridColumn: "1 / -1",
                       }}
                     >
-                      <label 
+                      <label
                         style={{
-                          fontWeight: '600',
-                          color: '#475569',
-                          fontSize: '13px'
+                          fontWeight: 600,
+                          color: "#475569",
+                          fontSize: 13,
                         }}
                       >
                         Resolution Comments:
                       </label>
-                      <p 
-                        style={{ 
+                      <p
+                        style={{
                           margin: 0,
-                          padding: '12px',
-                          backgroundColor: '#f0fdf4',
-                          borderRadius: '6px',
-                          border: '1px solid #86efac',
-                          color: '#166534',
-                          lineHeight: '1.6',
-                          fontSize: '13px'
+                          padding: 12,
+                          background: "#f0fdf4",
+                          borderRadius: 6,
+                          border: "1px solid #86efac",
+                          color: "#166534",
+                          lineHeight: 1.6,
+                          fontSize: 13,
                         }}
                       >
                         {escalation.resolutionComments}
@@ -537,9 +579,50 @@ const EscalationDetailModal = ({
                 </>
               )}
             </div>
-          </Modal.Body>
+          </div>
+
+          {/* FOOTER - Fixed */}
+          <div
+            style={{
+              padding: "10px 15px",
+              borderTop: "1px solid #e2e8f0",
+              background: "#fff",
+              display: "flex",
+              justifyContent: "flex-end",
+              borderBottomLeftRadius: "0.5rem",
+              borderBottomRightRadius: "0.5rem",
+              flexShrink: 0,
+            }}
+          >
+            <button
+              type="button"
+              onClick={onHide}
+              style={{
+                background: "#6c757d",
+                border: "none",
+                color: "#fff",
+                fontWeight: 600,
+                padding: "7px 12px",
+                fontSize: 12,
+                borderRadius: 5,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = "#5a6268";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = "#6c757d";
+              }}
+            >
+              Close
+            </button>
+          </div>
         </div>
-      </Modal>
+      </div>
     </>
   );
 };

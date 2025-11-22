@@ -171,7 +171,7 @@ const NominationReviewModal = ({
           style={{
             width: '100%',
             maxWidth: '800px',
-            maxHeight: '90vh',
+            maxHeight: '75vh',
             display: 'flex',
             flexDirection: 'column',
             borderRadius: '0.5rem',

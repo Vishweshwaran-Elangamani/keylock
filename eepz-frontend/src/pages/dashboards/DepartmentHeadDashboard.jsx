@@ -58,6 +58,13 @@ const DepartmentHeadDashboard = () => {
       gradient: "gradient-teal",
       path: "/department-head/dashboard/feedback",
     },
+    {
+      title: "Nomination Reviews",
+      description: "Review and approve nominations from your team",
+      icon: "bi-clipboard-check",
+      gradient: "gradient-green",
+      path: "/internal/nominations",
+    }
   ];
   return (
     <div className="dashboard-container">

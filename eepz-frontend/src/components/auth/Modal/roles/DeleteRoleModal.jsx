@@ -146,13 +146,13 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
             >
               <div
                 style={{
-                  display: "flex",
                   alignItems: "center",
                   gap: 6,
                   color: "#b45309",
                   fontWeight: 700,
                   fontSize: 13,
                   marginBottom: 3,
+                  textAlign: "center"
                 }}
               >
                 <i className="bi bi-exclamation-triangle-fill"></i>
@@ -240,7 +240,7 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
                 if (!loading) e.target.style.background = "#6c757d";
               }}
             >
-              <i className="bi bi-arrow-left"></i>
+              <i className=""></i>
               Cancel
             </button>
             {/* DELETE */}
@@ -249,7 +249,7 @@ const DeleteRoleModal = ({ show, role, onClose, onConfirm }) => {
               disabled={loading}
               onClick={handleDelete}
               style={{
-                background: "linear-gradient(90deg, #ea3e44 0%, #e01950 100%)",
+                background: "linear-gradient(90deg, #e01950 0%, #e01950 100%)",
                 border: "none",
                 color: "#fff",
                 fontWeight: 600,

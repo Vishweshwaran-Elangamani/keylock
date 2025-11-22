@@ -416,7 +416,7 @@ const CareerGoals = () => {
         </div>
       )}
 
-      <div className="cg-filter-section">
+      <div className="cag-filter-section">
         <div className="cg-filter-row-single">
           <div className="cg-search-input-wrapper">
             <i className="bi bi-search cg-search-icon"></i>
