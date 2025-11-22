@@ -353,14 +353,6 @@ const PolicyManagement = () => {
                         >
                           <i className="bi bi-pencil"></i>
                         </button>
-
-                        <button
-                          className="action-btn action-btn-delete"
-                          onClick={() => handleDelete(policy.policyId)}
-                          title="Delete Policy"
-                        >
-                          <i className="bi bi-trash"></i>
-                        </button>
                       </div>
                     </td>
                   </tr>

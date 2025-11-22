@@ -256,7 +256,7 @@ const InternalOpportunityManagement = () => {
       />
 
       {/* Statistics Cards - Compact */}
-      <div className="stats-grid">
+      <div className="int-stats-grid">
         <div className="stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-briefcase-fill"></i>
