@@ -537,82 +537,197 @@ export default function MySubmissions() {
         </div>
       )}
 
-      {/* Tabs */}
-      <div
-        style={{
-          backgroundColor: "#27235c",
-          borderRadius: "10px 10px 0 0",
-          padding: "0 1rem",
-          marginBottom: 0,
-        }}
-      >
-        <ul className="nav nav-tabs border-0 m-0" role="tablist">
-          {[
-            {
-              key: "HR Forms",
-              label: "HR Forms",
-              icon: FileText,
-              count: hrForms.length,
-            },
-            {
-              key: "Goal Feedback",
-              label: "Goal Feedback",
-              icon: Target,
-              count: goalFeedback.length,
-            },
-            {
-              key: "Mentor",
-              label: "Mentor",
-              icon: Send,
-              count: mentor.length,
-            },
-            { key: "Peer", label: "Peer", icon: Users, count: peer.length },
-          ].map(({ key, label, icon: Icon, count }) => (
-            <li key={key} className="nav-item">
-              <button
-                className={`nav-link border-0 d-flex align-items-center gap-2 ${
-                  tab === key ? "active" : ""
-                }`}
-                onClick={() => setTab(key)}
+      {/* PILL-STYLE TOGGLE NAVIGATION */}
+      <div className="d-flex justify-content-center mb-3">
+        <div
+          className="toggle-container"
+          style={{
+            backgroundColor: "#27235c",
+            borderRadius: "55px",
+            padding: "7px",
+            display: "inline-flex",
+            gap: "2px",
+            boxShadow: "0 5px 15px rgba(39, 35, 92, 0.22)",
+            minHeight: "54px",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setTab("HR Forms")}
+            style={{
+              background: tab === "HR Forms" ? "#ffffff" : "transparent",
+              color: tab === "HR Forms" ? "#27235c" : "#ffffff",
+              border: "none",
+              borderRadius: "55px",
+              padding: "12px 30px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              whiteSpace: "nowrap",
+              minHeight: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+            }}
+          >
+            <FileText size={15} />
+            HR Forms
+            {hrForms.length > 0 && (
+              <span
                 style={{
-                  color: tab === key ? "#fff" : "rgba(255,255,255,0.7)",
                   backgroundColor:
-                    tab === key ? "rgba(255,255,255,0.1)" : "transparent",
-                  borderBottom:
-                    tab === key ? "3px solid #fff" : "3px solid transparent",
-                  padding: "1rem 1.25rem",
-                  fontWeight: 600,
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  if (tab !== key) {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(255,255,255,0.05)";
-                    e.currentTarget.style.color = "#fff";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (tab !== key) {
-                    e.currentTarget.style.backgroundColor = "transparent";
-                    e.currentTarget.style.color = "rgba(255,255,255,0.7)";
-                  }
+                    tab === "HR Forms" ? "#27235c" : "rgba(255,255,255,0.3)",
+                  color: "#ffffff",
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  minWidth: "24px",
+                  textAlign: "center",
                 }}
               >
-                <Icon size={16} />
-                {label} ({count})
-              </button>
-            </li>
-          ))}
-        </ul>
+                {hrForms.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setTab("Goal Feedback")}
+            style={{
+              background: tab === "Goal Feedback" ? "#ffffff" : "transparent",
+              color: tab === "Goal Feedback" ? "#27235c" : "#ffffff",
+              border: "none",
+              borderRadius: "55px",
+              padding: "12px 30px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              whiteSpace: "nowrap",
+              minHeight: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+            }}
+          >
+            <Target size={15} />
+            Goal Feedback
+            {goalFeedback.length > 0 && (
+              <span
+                style={{
+                  backgroundColor:
+                    tab === "Goal Feedback"
+                      ? "#27235c"
+                      : "rgba(255,255,255,0.3)",
+                  color: "#ffffff",
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  minWidth: "24px",
+                  textAlign: "center",
+                }}
+              >
+                {goalFeedback.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setTab("Mentor")}
+            style={{
+              background: tab === "Mentor" ? "#ffffff" : "transparent",
+              color: tab === "Mentor" ? "#27235c" : "#ffffff",
+              border: "none",
+              borderRadius: "55px",
+              padding: "12px 30px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              whiteSpace: "nowrap",
+              minHeight: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+            }}
+          >
+            <Send size={15} />
+            Mentor
+            {mentor.length > 0 && (
+              <span
+                style={{
+                  backgroundColor:
+                    tab === "Mentor" ? "#27235c" : "rgba(255,255,255,0.3)",
+                  color: "#ffffff",
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  minWidth: "24px",
+                  textAlign: "center",
+                }}
+              >
+                {mentor.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setTab("Peer")}
+            style={{
+              background: tab === "Peer" ? "#ffffff" : "transparent",
+              color: tab === "Peer" ? "#27235c" : "#ffffff",
+              border: "none",
+              borderRadius: "55px",
+              padding: "12px 30px",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              whiteSpace: "nowrap",
+              minHeight: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+            }}
+          >
+            <Users size={15} />
+            Peer
+            {peer.length > 0 && (
+              <span
+                style={{
+                  backgroundColor:
+                    tab === "Peer" ? "#27235c" : "rgba(255,255,255,0.3)",
+                  color: "#ffffff",
+                  padding: "2px 8px",
+                  borderRadius: "12px",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  minWidth: "24px",
+                  textAlign: "center",
+                }}
+              >
+                {peer.length}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Content Area */}
       <div
         style={{
           backgroundColor: "#fff",
-          borderRadius: "0 0 10px 10px",
+          borderRadius: "10px",
           boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
           padding: "1.5rem",
           minHeight: "400px",
@@ -1019,6 +1134,14 @@ export default function MySubmissions() {
       <style>{`
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .toggle-container button:hover {
+          opacity: 0.92;
+        }
+        
+        .toggle-container button:active {
+          transform: scale(0.98);
+        }
       `}</style>
     </div>
   );
