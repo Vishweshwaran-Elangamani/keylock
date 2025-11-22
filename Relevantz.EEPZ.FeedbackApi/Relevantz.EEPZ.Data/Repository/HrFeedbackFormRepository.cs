@@ -428,8 +428,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     return false;
 
                 // Only allow deletion if Draft status
-                if (response.Status != "Draft")
-                    throw new InvalidOperationException($"Cannot delete response in {response.Status} status. Only Draft responses can be deleted.");
+               
 
                 _context.Hrfeedbackformresponses.Remove(response);
                 await _context.SaveChangesAsync();
