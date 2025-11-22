@@ -351,7 +351,7 @@ const ApprovalHistory = () => {
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "1.5fr 1fr 1.2fr 1.2fr 0.9fr 1fr 0.8fr 0.8fr",
+                    "1.2fr 1fr 1.2fr 1.2fr 0.9fr 0.8fr 0.8fr 0.8fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
@@ -368,7 +368,7 @@ const ApprovalHistory = () => {
                   { label: "Submitted By", field: "requesterName" },
                   { label: "Assigned To", field: "approverName" },
                   { label: "Status", field: "status" },
-                  { label: "Submission Date", field: "requestedOn" },
+                  { label: "Date", field: "requestedOn" },
                   { label: "Attachment" },
                   { label: "Comments" },
                 ].map(({ label, field }) => (
@@ -406,7 +406,7 @@ const ApprovalHistory = () => {
                     style={{
                       display: "grid",
                       gridTemplateColumns:
-                        "1.5fr 1fr 1.2fr 1.2fr 0.9fr 1fr 0.8fr 0.8fr",
+                        "1.2fr 1fr 1.2fr 1.2fr 0.9fr 1fr 0.8fr 0.8fr",
                       alignItems: "center",
                       fontSize: "0.875rem",
                       color: "#212529",
@@ -426,7 +426,7 @@ const ApprovalHistory = () => {
                       e.currentTarget.style.background = "#fff";
                     }}
                   >
-                    <div style={{ fontWeight: "500" }}>
+                    <div style={{ fontWeight: "500", paddingLeft: "5px" }}>
                       {getApprovalTypeLabel(approval.approvalType)}
                     </div>
                     <div style={{ color: "#6b7280" }}>
@@ -462,7 +462,7 @@ const ApprovalHistory = () => {
                         ? new Date(approval.requestedOn).toLocaleDateString()
                         : "None"}
                     </div>
-                    <div style={{ textAlign: "center" }}>
+                    <div style={{ textAlign: "left" }}>
                       {approval.attachmentPath ? (
                         <button
                           onClick={() => handleDownload(approval)}
@@ -507,7 +507,7 @@ const ApprovalHistory = () => {
                       )}
                     </div>
 
-                    <div style={{ textAlign: "center" }}>
+                    <div style={{ textAlign: "left" }}>
                       {approval.approvalType === "SME_REQUEST" ? (
                         <span
                           style={{

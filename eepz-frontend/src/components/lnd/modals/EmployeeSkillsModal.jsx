@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Plus, Edit, Trash2, Award } from "lucide-react";
 import RatingDisplay from "../common/RatingDisplay";
 import RecordSkillModal from "./RecordSkillModal";
-import ConfirmationModal from "../common/ConfirmationModal";
+import ConfirmationModal from "./ConfirmationModal";
 import RequestSmeModal from "./RequestSmeModal";
 import { lndService } from "../../../services/lnd/lndService";
 import { toast } from "sonner";
@@ -198,6 +198,25 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
 
   return (
     <>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { 
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
+
       <div
         onClick={onClose}
         style={{
@@ -212,6 +231,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
           alignItems: "center",
           justifyContent: "center",
           padding: "1rem",
+          animation: "fadeIn 0.2s ease-in-out",
         }}
       >
         <div
@@ -282,17 +302,18 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
             </div>
             <button
               type="button"
-              class="btn-close"
+              class="btn-close-white"
               onClick={onClose}
+              disabled={loading}
               style={{
                 border: "none",
                 width: "36px",
                 backgroundColor: "transparent",
                 height: "36px",
                 borderRadius: "0.5rem",
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
                 color: "white",
-                fontSize: "1.5rem",
+                fontSize: "20px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -300,10 +321,14 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                 flexShrink: 0,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = "red";
+                if (!loading) {
+                  e.currentTarget.style.color = "red";
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = "white";
+                if (!loading) {
+                  e.currentTarget.style.color = "white";
+                }
               }}
             >
               <i className="bi bi-x-lg"></i>
@@ -569,14 +594,12 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
           >
             <button
               type="button"
-              className="btn btn-outline-secondary"
+              className="btn btn-secondary"
               onClick={onClose}
               style={{
                 padding: "0.5rem 1rem",
                 border: "1px solid #e5e7eb",
                 borderRadius: "6px",
-                background: "#fff",
-                color: "#212529",
                 fontSize: "0.825rem",
                 fontWeight: "500",
                 cursor: "pointer",
@@ -592,7 +615,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
                   border: "none",
                   borderRadius: "6px",
                   background:
-                    "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
+                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                   color: "#fff",
                   fontSize: "0.825rem",
                   fontWeight: "600",

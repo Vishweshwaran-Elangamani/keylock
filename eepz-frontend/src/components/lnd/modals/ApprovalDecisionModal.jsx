@@ -129,8 +129,19 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     <>
       <style>
         {`
-          div::-webkit-scrollbar {
-            display: none;
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { 
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
           }
         `}
       </style>
@@ -150,6 +161,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
           alignItems: "center",
           justifyContent: "center",
           padding: "1rem",
+          animation: "fadeIn 0.2s ease-in-out",
         }}
       >
         {/* Modal */}
@@ -163,6 +175,8 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
             maxHeight: "90vh",
             overflow: "auto",
             boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           {/* Header */}
@@ -174,6 +188,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexShrink: 0,
             }}
           >
             <h5 style={{ margin: 0, fontWeight: "600", color: "white" }}>
@@ -181,7 +196,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
             </h5>
             <button
               type="button"
-              class="btn-close"
+              class="btn-close-white"
               onClick={onClose}
               style={{
                 border: "none",
@@ -191,7 +206,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                 borderRadius: "0.5rem",
                 cursor: "pointer",
                 color: "white",
-                fontSize: "1.5rem",
+                fontSize: "20px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -210,220 +225,264 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
           </div>
 
           {/* Body */}
-          <form onSubmit={handleSubmit}>
-            <div style={{ padding: "1.5rem" }}>
-              {/* Approval Info */}
-              <div
-                style={{
-                  padding: "1rem",
-                  background: "#f8f9fa",
-                  borderRadius: "8px",
-                  marginBottom: "1.5rem",
-                }}
-              >
-                <p
+          <div
+            style={{
+              flexGrow: 1, // take remaining space
+              overflowY: "auto", // scroll only here
+              padding: "1.5rem",
+            }}
+          >
+            <form onSubmit={handleSubmit}>
+              <div style={{ padding: "1.5rem" }}>
+                {/* Approval Info */}
+                <div
                   style={{
-                    fontSize: "0.875rem",
-                    color: "#6c757d",
-                    margin: 0,
-                    marginBottom: "0.25rem",
+                    padding: "1rem",
+                    background: "#f8f9fa",
+                    borderRadius: "8px",
+                    marginBottom: "1.5rem",
+                    border: "1px solid rgb(39, 35, 92, 0.5)",
                   }}
                 >
-                  Approval Type
-                </p>
-                <p
-                  style={{
-                    fontSize: "1rem",
-                    fontWeight: "600",
-                    color: "#212529",
-                    margin: 0,
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  {getApprovalTypeLabel(approval.approvalType)}
-                </p>
+                  <p
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#6c757d",
+                      margin: 0,
+                      marginBottom: "0.25rem",
+                    }}
+                  >
+                    Approval Type
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                      color: "#212529",
+                      margin: 0,
+                      marginBottom: "0.75rem",
+                    }}
+                  >
+                    {getApprovalTypeLabel(approval.approvalType)}
+                  </p>
 
-                {approval.skillName && (
-                  <>
-                    <p
+                  {approval.skillName && (
+                    <>
+                      <p
+                        style={{
+                          fontSize: "0.875rem",
+                          color: "#6c757d",
+                          margin: 0,
+                          marginBottom: "0.25rem",
+                        }}
+                      >
+                        Skill
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "1rem",
+                          fontWeight: "600",
+                          color: "#212529",
+                          margin: 0,
+                          marginBottom: "0.75rem",
+                        }}
+                      >
+                        {approval.skillName}
+                      </p>
+                    </>
+                  )}
+
+                  <p
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#6c757d",
+                      margin: 0,
+                      marginBottom: "0.25rem",
+                    }}
+                  >
+                    Requested by
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "0.9375rem",
+                      fontWeight: "500",
+                      color: "#212529",
+                      margin: 0,
+                      marginBottom: "0.75rem",
+                    }}
+                  >
+                    {approval.requesterName}
+                  </p>
+
+                  <p
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#6c757d",
+                      margin: 0,
+                      marginBottom: "0.25rem",
+                    }}
+                  >
+                    Requested On
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "0.9375rem",
+                      fontWeight: "500",
+                      color: "#212529",
+                      margin: 0,
+                    }}
+                  >
+                    {new Date(approval.requestedOn).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Download Attachment */}
+                {approval.attachmentPath && (
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <button
+                      type="button"
+                      onClick={handleDownload}
                       style={{
+                        width: "100%",
+                        padding: "0.75rem",
+                        background: "#f8f9fa",
+                        border: "1px solid rgb(39, 35, 92, 0.5)",
+                        borderRadius: "8px",
                         fontSize: "0.875rem",
-                        color: "#6c757d",
-                        margin: 0,
-                        marginBottom: "0.25rem",
-                      }}
-                    >
-                      Skill
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "1rem",
                         fontWeight: "600",
-                        color: "#212529",
-                        margin: 0,
-                        marginBottom: "0.75rem",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.5rem",
+                        color: "#97247E",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = "#97247E";
+                        e.target.style.color = "#fff";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = "#f8f9fa";
+                        e.target.style.color = "#97247E";
                       }}
                     >
-                      {approval.skillName}
-                    </p>
-                  </>
+                      <Download size={16} />
+                      Download Attached Document
+                    </button>
+                  </div>
                 )}
 
-                <p
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "#6c757d",
-                    margin: 0,
-                    marginBottom: "0.25rem",
-                  }}
-                >
-                  Requested by
-                </p>
-                <p
-                  style={{
-                    fontSize: "0.9375rem",
-                    fontWeight: "500",
-                    color: "#212529",
-                    margin: 0,
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  {approval.requesterName}
-                </p>
-
-                <p
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "#6c757d",
-                    margin: 0,
-                    marginBottom: "0.25rem",
-                  }}
-                >
-                  Requested On
-                </p>
-                <p
-                  style={{
-                    fontSize: "0.9375rem",
-                    fontWeight: "500",
-                    color: "#212529",
-                    margin: 0,
-                  }}
-                >
-                  {new Date(approval.requestedOn).toLocaleDateString()}
-                </p>
-              </div>
-
-              {/* Download Attachment */}
-              {approval.attachmentPath && (
+                {/* Decision Buttons */}
                 <div style={{ marginBottom: "1.5rem" }}>
-                  <button
-                    type="button"
-                    onClick={handleDownload}
+                  <label
                     style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      background: "#f8f9fa",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
                       fontSize: "0.875rem",
                       fontWeight: "600",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "0.5rem",
-                      color: "#97247E",
-                      transition: "all 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.background = "#97247E";
-                      e.target.style.color = "#fff";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.background = "#f8f9fa";
-                      e.target.style.color = "#97247E";
+                      color: "#212529",
+                      marginBottom: "0.75rem",
+                      display: "block",
                     }}
                   >
-                    <Download size={16} />
-                    Download Attached Document
-                  </button>
+                    Decision <span style={{ color: "#dc3545" }}>*</span>
+                  </label>
+                  <div style={{ display: "flex", gap: "1rem" }}>
+                    <button
+                      type="button"
+                      onClick={() => setDecision("approve")}
+                      style={{
+                        flex: 1,
+                        padding: "0.75rem",
+                        border:
+                          decision === "approve"
+                            ? "2px solid #198754"
+                            : "1px solid rgb(39, 35, 92, 0.5)",
+                        borderRadius: "8px",
+                        background: decision === "approve" ? "#d1fae5" : "#fff",
+                        color: decision === "approve" ? "#065f46" : "#212529",
+                        fontSize: "0.875rem",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.5rem",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      <CheckCircle size={16} />
+                      Approve
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setDecision("reject")}
+                      style={{
+                        flex: 1,
+                        padding: "0.75rem",
+                        border:
+                          decision === "reject"
+                            ? "2px solid #dc3545"
+                            : "1px solid rgb(39, 35, 92, 0.5)",
+                        borderRadius: "8px",
+                        background: decision === "reject" ? "#fee2e2" : "#fff",
+                        color: decision === "reject" ? "#991b1b" : "#212529",
+                        fontSize: "0.875rem",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.5rem",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      <XCircle size={16} />
+                      Reject
+                    </button>
+                  </div>
                 </div>
-              )}
 
-              {/* Decision Buttons */}
-              <div style={{ marginBottom: "1.5rem" }}>
-                <label
-                  style={{
-                    fontSize: "0.875rem",
-                    fontWeight: "600",
-                    color: "#212529",
-                    marginBottom: "0.75rem",
-                    display: "block",
-                  }}
-                >
-                  Decision <span style={{ color: "#dc3545" }}>*</span>
-                </label>
-                <div style={{ display: "flex", gap: "1rem" }}>
-                  <button
-                    type="button"
-                    onClick={() => setDecision("approve")}
-                    style={{
-                      flex: 1,
-                      padding: "0.75rem",
-                      border:
-                        decision === "approve"
-                          ? "2px solid #198754"
-                          : "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                      background: decision === "approve" ? "#d1fae5" : "#fff",
-                      color: decision === "approve" ? "#065f46" : "#212529",
-                      fontSize: "0.875rem",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "0.5rem",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    <CheckCircle size={16} />
-                    Approve
-                  </button>
+                {/* Show new rating input only for assignment completion AND approve */}
+                {approval.approvalType ===
+                  APPROVAL_TYPE.ASSIGNMENT_COMPLETION &&
+                  decision === "approve" && (
+                    <div style={{ marginBottom: "1rem" }}>
+                      <label
+                        style={{
+                          fontSize: "0.875rem",
+                          fontWeight: "600",
+                          color: "#212529",
+                          marginBottom: "0.5rem",
+                          display: "block",
+                        }}
+                      >
+                        New Rating <span style={{ color: "#dc3545" }}>*</span>
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={10}
+                        step={1}
+                        value={newRating}
+                        onChange={(e) => setNewRating(e.target.value)}
+                        placeholder="Enter new skill rating for this employee (1-10)"
+                        style={{
+                          width: "100%",
+                          padding: "0.75rem",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "8px",
+                          fontSize: "0.875rem",
+                          outline: "none",
+                          fontFamily: "inherit",
+                        }}
+                      />
+                    </div>
+                  )}
 
-                  <button
-                    type="button"
-                    onClick={() => setDecision("reject")}
-                    style={{
-                      flex: 1,
-                      padding: "0.75rem",
-                      border:
-                        decision === "reject"
-                          ? "2px solid #dc3545"
-                          : "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                      background: decision === "reject" ? "#fee2e2" : "#fff",
-                      color: decision === "reject" ? "#991b1b" : "#212529",
-                      fontSize: "0.875rem",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "0.5rem",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    <XCircle size={16} />
-                    Reject
-                  </button>
-                </div>
-              </div>
-
-              {/* Show new rating input only for assignment completion AND approve */}
-              {approval.approvalType === APPROVAL_TYPE.ASSIGNMENT_COMPLETION &&
-                decision === "approve" && (
-                  <div style={{ marginBottom: "1rem" }}>
+                {/* Notes */}
+                {approval.approvalType !== APPROVAL_TYPE.SME_REQUEST && (
+                  <div style={{ marginBottom: "1.5rem" }}>
                     <label
                       style={{
                         fontSize: "0.875rem",
@@ -433,203 +492,168 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                         display: "block",
                       }}
                     >
-                      New Rating <span style={{ color: "#dc3545" }}>*</span>
+                      Notes <span style={{ color: "#dc3545" }}>*</span>
                     </label>
-                    <input
-                      type="number"
-                      min={1}
-                      max={10}
-                      step={1}
-                      value={newRating}
-                      onChange={(e) => setNewRating(e.target.value)}
-                      placeholder="Enter new skill rating for this employee (1-10)"
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder={
+                        decision === "approve"
+                          ? "Add approval notes..."
+                          : decision === "reject"
+                          ? "Explain reason for rejection..."
+                          : "Select a decision first..."
+                      }
+                      rows={4}
+                      required={
+                        approval.approvalType !== APPROVAL_TYPE.SME_REQUEST
+                      }
                       style={{
                         width: "100%",
                         padding: "0.75rem",
-                        border: "1px solid #e5e7eb",
+                        border: "1px solid rgb(39, 35, 92, 0.5)",
                         borderRadius: "8px",
                         fontSize: "0.875rem",
                         outline: "none",
+                        resize: "vertical",
                         fontFamily: "inherit",
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "#97247E";
+                        e.target.style.boxShadow =
+                          "0 0 0 3px rgba(151, 36, 126, 0.1)";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "#e5e7eb";
+                        e.target.style.boxShadow = "none";
                       }}
                     />
                   </div>
                 )}
+              </div>
 
-              {/* Notes */}
-              {approval.approvalType !== APPROVAL_TYPE.SME_REQUEST && (
-                <div style={{ marginBottom: "1.5rem" }}>
-                  <label
-                    style={{
-                      fontSize: "0.875rem",
-                      fontWeight: "600",
-                      color: "#212529",
-                      marginBottom: "0.5rem",
-                      display: "block",
-                    }}
-                  >
-                    Notes <span style={{ color: "#dc3545" }}>*</span>
-                  </label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder={
-                      decision === "approve"
-                        ? "Add approval notes..."
-                        : decision === "reject"
-                        ? "Explain reason for rejection..."
-                        : "Select a decision first..."
-                    }
-                    rows={4}
-                    required={
-                      approval.approvalType !== APPROVAL_TYPE.SME_REQUEST
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: "1px solid #e5e7eb",
-                      borderRadius: "8px",
-                      fontSize: "0.875rem",
-                      outline: "none",
-                      resize: "vertical",
-                      fontFamily: "inherit",
-                    }}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = "#97247E";
-                      e.target.style.boxShadow =
-                        "0 0 0 3px rgba(151, 36, 126, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = "#e5e7eb";
-                      e.target.style.boxShadow = "none";
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div
-              style={{
-                padding: "1rem 1.5rem",
-                borderTop: "1px solid #e5e7eb",
-                display: "flex",
-                gap: "0.75rem",
-                justifyContent: "flex-end",
-              }}
-            >
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={processing}
+              {/* Footer */}
+              <div
                 style={{
-                  padding: "0.625rem 1.25rem",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  background: "#fff",
-                  color: "#212529",
-                  fontSize: "0.875rem",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={
-                  !decision ||
-                  (approval.approvalType ===
-                    APPROVAL_TYPE.ASSIGNMENT_COMPLETION &&
-                    decision === "approve" &&
-                    (processing ||
-                      !newRating ||
-                      isNaN(newRating) ||
-                      Number(newRating) < 1 ||
-                      Number(newRating) > 10)) ||
-                  (approval.approvalType !== APPROVAL_TYPE.SME_REQUEST &&
-                    !notes.trim()) ||
-                  processing
-                }
-                style={{
-                  padding: "0.625rem 1.25rem",
-                  border: "none",
-                  borderRadius: "8px",
-                  background:
-                    decision &&
-                    (approval.approvalType !==
-                      APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
-                      (decision === "approve" &&
-                        newRating &&
-                        !isNaN(newRating) &&
-                        Number(newRating) >= 1 &&
-                        Number(newRating) <= 10)) &&
-                    (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
-                      notes.trim()) &&
-                    !processing
-                      ? decision === "approve"
-                        ? "#198754"
-                        : "#dc3545"
-                      : "#e5e7eb",
-                  color:
-                    decision &&
-                    (approval.approvalType !==
-                      APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
-                      (decision === "approve" &&
-                        newRating &&
-                        !isNaN(newRating) &&
-                        Number(newRating) >= 1 &&
-                        Number(newRating) <= 10)) &&
-                    (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
-                      notes.trim()) &&
-                    !processing
-                      ? "#fff"
-                      : "#6c757d",
-                  fontSize: "0.875rem",
-                  fontWeight: "600",
-                  cursor:
-                    decision &&
-                    (approval.approvalType !==
-                      APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
-                      (decision === "approve" &&
-                        newRating &&
-                        !isNaN(newRating) &&
-                        Number(newRating) >= 1 &&
-                        Number(newRating) <= 10)) &&
-                    (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
-                      notes.trim()) &&
-                    !processing
-                      ? "pointer"
-                      : "not-allowed",
+                  padding: "1rem 1.5rem",
+                  borderTop: "1px solid #e5e7eb",
                   display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
+                  gap: "0.75rem",
+                  justifyContent: "flex-end",
                 }}
               >
-                {processing ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm"
-                      role="status"
-                    />{" "}
-                    Processing...
-                  </>
-                ) : decision === "approve" ? (
-                  <>
-                    <CheckCircle size={16} />
-                    Approve Request
-                  </>
-                ) : decision === "reject" ? (
-                  <>
-                    <XCircle size={16} />
-                    Reject Request
-                  </>
-                ) : (
-                  "Submit Decision"
-                )}
-              </button>
-            </div>
-          </form>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={onClose}
+                  disabled={processing}
+                  style={{
+                    padding: "0.625rem 1.25rem",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={
+                    !decision ||
+                    (approval.approvalType ===
+                      APPROVAL_TYPE.ASSIGNMENT_COMPLETION &&
+                      decision === "approve" &&
+                      (processing ||
+                        !newRating ||
+                        isNaN(newRating) ||
+                        Number(newRating) < 1 ||
+                        Number(newRating) > 10)) ||
+                    (approval.approvalType !== APPROVAL_TYPE.SME_REQUEST &&
+                      !notes.trim()) ||
+                    processing
+                  }
+                  style={{
+                    padding: "0.625rem 1.25rem",
+                    border: "none",
+                    borderRadius: "8px",
+                    background:
+                      decision &&
+                      (approval.approvalType !==
+                        APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
+                        (decision === "approve" &&
+                          newRating &&
+                          !isNaN(newRating) &&
+                          Number(newRating) >= 1 &&
+                          Number(newRating) <= 10)) &&
+                      (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
+                        notes.trim()) &&
+                      !processing
+                        ? decision === "approve"
+                          ? "#198754"
+                          : "#dc3545"
+                        : "#e5e7eb",
+                    color:
+                      decision &&
+                      (approval.approvalType !==
+                        APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
+                        (decision === "approve" &&
+                          newRating &&
+                          !isNaN(newRating) &&
+                          Number(newRating) >= 1 &&
+                          Number(newRating) <= 10)) &&
+                      (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
+                        notes.trim()) &&
+                      !processing
+                        ? "#fff"
+                        : "#6c757d",
+                    fontSize: "0.875rem",
+                    fontWeight: "600",
+                    cursor:
+                      decision &&
+                      (approval.approvalType !==
+                        APPROVAL_TYPE.ASSIGNMENT_COMPLETION ||
+                        (decision === "approve" &&
+                          newRating &&
+                          !isNaN(newRating) &&
+                          Number(newRating) >= 1 &&
+                          Number(newRating) <= 10)) &&
+                      (approval.approvalType === APPROVAL_TYPE.SME_REQUEST ||
+                        notes.trim()) &&
+                      !processing
+                        ? "pointer"
+                        : "not-allowed",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  {processing ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                      />{" "}
+                      Processing...
+                    </>
+                  ) : decision === "approve" ? (
+                    <>
+                      <CheckCircle size={16} />
+                      Approve Request
+                    </>
+                  ) : decision === "reject" ? (
+                    <>
+                      <XCircle size={16} />
+                      Reject Request
+                    </>
+                  ) : (
+                    "Submit Decision"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </>

@@ -94,6 +94,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
           alignItems: "center",
           justifyContent: "center",
           padding: "1rem",
+          animation: "fadeIn 0.2s ease-in-out",
         }}
       >
         {/* Modal */}
@@ -125,7 +126,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
             </h5>
             <button
               type="button"
-              class="btn-close"
+              class="btn-close-white"
               onClick={onClose}
               style={{
                 border: "none",
@@ -135,7 +136,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
                 borderRadius: "0.5rem",
                 cursor: "pointer",
                 color: "white",
-                fontSize: "1.5rem",
+                fontSize: "20px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -201,8 +202,9 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
-                    fontSize: "0.875rem",
+                    fontSize: "14px",
                     fontWeight: "600",
+                    textAlign: "left",
                     color: "#212529",
                     marginBottom: "0.5rem",
                     display: "block",
@@ -337,14 +339,13 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
             >
               <button
                 type="button"
+                className="btn btn-secondary"
                 onClick={onClose}
                 disabled={uploading}
                 style={{
                   padding: "0.625rem 1.25rem",
                   border: "1px solid #e5e7eb",
                   borderRadius: "8px",
-                  background: "#fff",
-                  color: "#212529",
                   fontSize: "0.875rem",
                   fontWeight: "500",
                   cursor: "pointer",
@@ -361,7 +362,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
                   borderRadius: "8px",
                   background:
                     file && !uploading
-                      ? "linear-gradient(135deg, #AC5098 0%, #97247E 100%)"
+                      ? "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
                       : "#e5e7eb",
                   color: file && !uploading ? "#fff" : "#6c757d",
                   fontSize: "0.875rem",
@@ -388,6 +389,25 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
           </form>
         </div>
       </div>
+
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { 
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
     </>
   );
 };

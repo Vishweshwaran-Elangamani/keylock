@@ -66,7 +66,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
       style={{
         cursor: "pointer",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        border: "1px solid #e0e0e0",
+        border: "1px solid rgba(39, 35, 92, 0.4)",
         borderRadius: "12px",
         overflow: "hidden",
         position: "relative",
@@ -75,29 +75,14 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.12)";
         e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.borderColor = "#0d6efd";
+        e.currentTarget.style.borderColor = "rgb(39, 35, 92)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
         e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.borderColor = "#e0e0e0";
+        e.currentTarget.style.borderColor = "rgba(39, 35, 92, 0.4)";
       }}
     >
-      {/* Accent Bar */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "4px",
-          background: `linear-gradient(90deg, ${getProgressColor(
-            currentProgress
-          )} 0%, ${getProgressColor(currentProgress)}99 100%)`,
-          zIndex: 1,
-        }}
-      />
-
       {/* Card Header */}
       <div
         style={{
@@ -184,6 +169,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             minHeight: "2.8rem",
+            textAlign: "left",
           }}
         >
           {goal.title}
@@ -202,6 +188,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
               minHeight: "2.6rem",
+              textAlign: "left",
             }}
           >
             {truncateText(goal.descriptionShort, 100)}
@@ -265,7 +252,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
         </div>
 
         {/* Days until deadline */}
-        {daysUntil !== null && !overdueStatus && (
+        {daysUntil !== null && !overdueStatus && goal.status != "completed" && (
           <div
             style={{
               display: "flex",
@@ -416,38 +403,10 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="d-flex justify-content-end align-items-center gap-2">
-            <button
-              type="button"
-              className="btn btn-sm btn-primary d-flex justify-content-center align-items-center"
-              onClick={handleCardClick}
-              data-bs-toggle="tooltip"
-              data-bs-placement="top"
-              title="View Details"
-              style={{
-                fontSize: "0.9rem",
-                padding: "0.4rem 0.9rem",
-                borderRadius: "6px",
-                transition: "all 0.2s",
-                width: "36px",
-                height: "36px",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 12px rgba(13, 110, 253, 0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              <i className="bi bi-eye-fill" aria-hidden="true"></i>
-            </button>
-
             {/*  UPDATED: Comment Button - Hide for non-leadership on org goals */}
             {canShowCommentButton && (
               <button
-                className="btn btn-sm btn-outline-info d-flex justify-content-center align-items-center"
+                className="btn btn-sm btn-outline-secondary d-flex justify-content-center align-items-center"
                 onClick={() => onComment(goal)}
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
@@ -472,38 +431,6 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
                 }}
               >
                 <i className="bi bi-chat-dots-fill" aria-hidden="true"></i>
-              </button>
-            )}
-
-            {/* Assign Button */}
-            {canAssign && onAssign && (
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-info d-flex justify-content-center align-items-center"
-                onClick={() => onAssign(goal)}
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="Assign to Team"
-                style={{
-                  fontSize: "0.9rem",
-                  padding: "0.4rem 0.9rem",
-                  borderRadius: "6px",
-                  transition: "all 0.2s",
-                  width: "36px",
-                  height: "36px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#0dcaf0";
-                  e.currentTarget.style.color = "white";
-                  e.currentTarget.style.borderColor = "#0dcaf0";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.color = "#0dcaf0";
-                  e.currentTarget.style.borderColor = "#0dcaf0";
-                }}
-              >
-                <i className="bi bi-person-plus-fill" aria-hidden="true"></i>
               </button>
             )}
           </div>

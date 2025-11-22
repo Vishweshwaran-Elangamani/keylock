@@ -552,7 +552,36 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
   return (
     <>
-      <div className="modal-backdrop fade show" style={{ zIndex: 1040 }} />
+      <style>
+        {`
+          .form-select {
+            appearance: auto;
+            -webkit-appearance: auto;
+            -moz-appearance: auto;
+            text-align: left;
+          }
+
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { 
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
+
+      <div
+        className="modal-backdrop fade show"
+        style={{ zIndex: 1040, animation: "fadeIn 0.2s ease-in-out" }}
+      />
       <div
         className="modal fade show d-block"
         tabIndex="-1"
@@ -566,7 +595,12 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           <div className="modal-content">
             <div
               className="modal-header"
-              style={{ backgroundColor: "rgb(39, 35, 92)" }}
+              style={{
+                backgroundColor: "rgb(39, 35, 92)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
             >
               <h5
                 className="modal-title"
@@ -580,17 +614,18 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
               </h5>
               <button
                 type="button"
-                class="btn-close"
+                class="btn-close-white"
                 onClick={onClose}
+                disabled={loading}
                 style={{
                   border: "none",
                   width: "36px",
                   backgroundColor: "transparent",
                   height: "36px",
                   borderRadius: "0.5rem",
-                  cursor: "pointer",
+                  cursor: loading ? "not-allowed" : "pointer",
                   color: "white",
-                  fontSize: "16px",
+                  fontSize: "20px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -598,10 +633,14 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   flexShrink: 0,
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "red";
+                  if (!loading) {
+                    e.currentTarget.style.color = "red";
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "white";
+                  if (!loading) {
+                    e.currentTarget.style.color = "white";
+                  }
                 }}
               >
                 <i className="bi bi-x-lg"></i>
@@ -614,8 +653,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
               style={{
                 maxHeight: "70vh",
                 overflowY: "auto",
-                msOverflowStyle: "none",
-                scrollbarWidth: "none",
               }}
             >
               {alert && (
@@ -638,7 +675,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   <div className="row">
                     <div className="col-md-6">
                       <div className="mb-3">
-                        <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
+                        <label
+                          className="form-label"
+                          style={{ fontSize: "14px", fontWeight: 700 }}
+                        >
                           Goal Type <span className="text-danger">*</span>
                         </label>
                         <select
@@ -669,7 +709,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       </div>
 
                       <div className="mb-3">
-                        <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
+                        <label
+                          className="form-label"
+                          style={{ fontSize: "14px", fontWeight: 700 }}
+                        >
                           Title <span className="text-danger">*</span>
                         </label>
                         <input
@@ -702,7 +745,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                     <div className="col-md-6">
                       {/* Disable project for org goals */}
                       <div className="mb-3">
-                        <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
+                        <label
+                          className="form-label"
+                          style={{ fontSize: "14px", fontWeight: 700 }}
+                        >
                           Project
                           {formData.type === GOAL_TYPES.TEAM && (
                             <span className="text-danger">*</span>
@@ -755,7 +801,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       </div>
 
                       <div className="mb-3">
-                        <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
+                        <label
+                          className="form-label"
+                          style={{ fontSize: "14px", fontWeight: 700 }}
+                        >
                           Deadline <span className="text-danger">*</span>
                         </label>
                         <input
@@ -798,7 +847,12 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   </div>
 
                   <div className="mb-3">
-                    <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>Description</label>
+                    <label
+                      className="form-label"
+                      style={{ fontSize: "14px", fontWeight: 700 }}
+                    >
+                      Description
+                    </label>
                     <textarea
                       className="form-control"
                       rows="3"
@@ -815,7 +869,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
                   {formData.type === GOAL_TYPES.TEAM && (
                     <div className="mb-3" ref={assigneeDropdownRef}>
-                      <label className="form-label" style={{fontSize: "14px", fontWeight: 700}}>
+                      <label
+                        className="form-label"
+                        style={{ fontSize: "14px", fontWeight: 700 }}
+                      >
                         Team Members <span className="text-danger">*</span>
                       </label>
                       {!formData.projectId && !isEdit ? (
@@ -911,7 +968,11 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                         />
                                         <label
                                           className="form-check-label"
-                                          style={{ paddingLeft: "20px", fontSize: "14px", fontWeight: 700 }}
+                                          style={{
+                                            paddingLeft: "20px",
+                                            fontSize: "14px",
+                                            fontWeight: 700,
+                                          }}
                                         >
                                           {emp.fullName}
                                         </label>
@@ -995,7 +1056,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           return (
                             <div key={assigneeId} className="mb-4">
                               <div className="d-flex justify-content-between align-items-center mb-2">
-                                <label className="form-label mb-0" style={{fontSize: "14px", fontWeight: 700}}>
+                                <label
+                                  className="form-label mb-0"
+                                  style={{ fontSize: "14px", fontWeight: 700 }}
+                                >
                                   <i className="bi bi-person-badge me-2"></i>
                                   {assigneeName}
                                 </label>
@@ -1003,7 +1067,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                 {items.length < 10 && (
                                   <button
                                     type="button"
-                                    className="btn btn-sm btn-outline-primary"
+                                    className="btn btn-sm btn-primary"
                                     onClick={() => addChecklistItem(assigneeId)}
                                     disabled={loading}
                                     style={{ fontSize: "15px" }}
@@ -1200,7 +1264,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-outline-secondary"
+                className="btn btn-secondary"
                 onClick={onClose}
                 disabled={loading}
               >
@@ -1246,7 +1310,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                 {loading ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2" />
-                    {isEdit ? "Updating..." : "Creating..."}
+                    {isEdit ? "Updating..." : "Saving..."}
                   </>
                 ) : (
                   <>
@@ -1255,7 +1319,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                         isEdit ? "bi-check-circle" : "bi-plus-circle"
                       } me-2`}
                     ></i>
-                    {isEdit ? "Update Goal" : "Create Goal"}
+                    {isEdit ? "Update Goal" : "Save Goal"}
                   </>
                 )}
               </button>

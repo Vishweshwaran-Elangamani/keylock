@@ -607,7 +607,6 @@ const GoalChecklist = ({
       </div>
 
       {/* Checklist */}
-
       <div
         className="goal-card-header"
         style={{
@@ -615,6 +614,7 @@ const GoalChecklist = ({
           fontWeight: 600,
           padding: "1rem 1.25rem",
           fontSize: "16px",
+          textAlign: "left",
           backgroundColor: "rgb(39, 35, 92)",
           borderRadius: "1.5rem 1.5rem 0rem 0rem",
         }}
@@ -855,7 +855,7 @@ const ChecklistItem = ({ item, isDisabled, onToggle, isLast = false }) => {
               textDecoration: isItemCompleted ? "line-through" : "none",
               color: isItemCompleted ? "#6c757d" : "#212529",
               fontWeight: isItemCompleted ? 400 : 600,
-              fontSize: "1.0rem",
+              fontSize: "14px",
               lineHeight: "1.5",
               marginBottom: item.description ? "0.25rem" : 0,
               opacity: isItemCompleted ? 0.7 : 1,

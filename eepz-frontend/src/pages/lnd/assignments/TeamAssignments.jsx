@@ -300,7 +300,7 @@ const TeamAssignments = () => {
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "1.3fr 1.3fr 1.2fr 1.5fr 1fr 1fr 0.7fr 0.7fr 1fr",
+                    "1.2fr 1.2fr 1fr 1.4fr 1fr 0.7fr 0.7fr 0.7fr 1fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
@@ -320,7 +320,7 @@ const TeamAssignments = () => {
                   { label: "Skill Name", field: "skillName", align: "left" },
                   { label: "SME Assigned", field: "smeName", align: "left" },
                   {
-                    label: "Assignment Status",
+                    label: "Status",
                     field: "status",
                     align: "center",
                   },
@@ -370,7 +370,7 @@ const TeamAssignments = () => {
                     style={{
                       display: "grid",
                       gridTemplateColumns:
-                        "1.3fr 1.3fr 1.2fr 1.5fr 1fr 1fr 0.7fr 0.7fr 1fr",
+                        "1.2fr 1.2fr 1fr 1.4fr 1fr 0.7fr 0.7fr 0.7fr 1fr",
                       alignItems: "center",
                       fontSize: "0.875rem",
                       color: "#212529",
@@ -429,7 +429,13 @@ const TeamAssignments = () => {
                     <div style={{ display: "flex", justifyContent: "center" }}>
                       <StatusBadge status={assignment.status} />
                     </div>
-                    <div style={{ textAlign: "left", color: "#6b7280" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "left",
+                        color: "#6b7280",
+                      }}
+                    >
                       {assignment.createdOn ? (
                         new Date(assignment.createdOn).toLocaleDateString()
                       ) : (
@@ -438,7 +444,13 @@ const TeamAssignments = () => {
                         </span>
                       )}
                     </div>
-                    <div style={{ textAlign: "left", color: "#6b7280" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "left",
+                        color: "#6b7280",
+                      }}
+                    >
                       {assignment.deadline ? (
                         new Date(assignment.deadline).toLocaleDateString()
                       ) : (

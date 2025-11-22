@@ -143,7 +143,7 @@ const Pagination = ({ pagination, onPageChange }) => {
               padding: "0.5rem 0.75rem",
               border: "1px solid #e5e7eb",
               borderRadius: "6px",
-              background: page === pageNumber ? "#97247E" : "#fff",
+              background: page === pageNumber ? "rgb(39, 35, 92)" : "#fff",
               color: page === pageNumber ? "#fff" : "#212529",
               cursor:
                 page === "..." || page === pageNumber ? "default" : "pointer",

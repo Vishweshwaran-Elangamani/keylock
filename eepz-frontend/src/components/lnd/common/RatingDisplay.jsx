@@ -68,7 +68,7 @@ const RatingDisplay = ({ rating, showLabel = true, size = 'md' }) => {
           {rating}/{RATING.MAX}
         </span>
       </div>
-      {showLabel && (
+      {/* {showLabel && (
         <span
           style={{
             fontSize: '0.8125rem',
@@ -78,7 +78,7 @@ const RatingDisplay = ({ rating, showLabel = true, size = 'md' }) => {
         >
           {info.label}
         </span>
-      )}
+      )} */}
     </div>
   );
 };

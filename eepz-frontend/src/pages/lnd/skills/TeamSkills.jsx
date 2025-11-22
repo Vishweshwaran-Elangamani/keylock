@@ -183,7 +183,7 @@ const TeamSkills = () => {
                   onClick={() => handleEmployeeClick(employee)}
                   style={{
                     background: "#fff",
-                    border: "1px solid #e5e7eb",
+                    border: "1px solid rgb(39, 35, 92, 0.5)",
                     borderRadius: "12px",
                     padding: "1.5rem",
                     cursor: "pointer",
@@ -200,7 +200,7 @@ const TeamSkills = () => {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.boxShadow = "none";
-                    e.currentTarget.style.borderColor = "#e5e7eb";
+                    e.currentTarget.style.borderColor = "rgb(39, 35, 92, 0.5)";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >

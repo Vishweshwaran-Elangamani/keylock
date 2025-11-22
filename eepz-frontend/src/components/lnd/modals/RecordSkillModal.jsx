@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { X, AlertCircle } from "lucide-react";
 import { lndService } from "../../../services/lnd/lndService";
 import { RATING } from "../../../constants/lnd/lndConstants";
-import ConfirmationModal from "../common/ConfirmationModal";
+import ConfirmationModal from "./ConfirmationModal";
 import { toast } from "sonner";
 
 const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
@@ -198,6 +198,25 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
 
   return (
     <>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { 
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
+
       <div
         onClick={onClose}
         style={{
@@ -211,21 +230,21 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "1rem",
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
+          padding: "10px",
+          animation: "fadeIn 0.2s ease-in-out",
         }}
       >
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
             background: "#fff",
-            borderRadius: "12px",
+            borderRadius: "14px",
             width: "100%",
             maxWidth: "500px",
             maxHeight: "90vh",
-            overflow: "auto",
             boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <div
@@ -233,9 +252,11 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
               padding: "1.5rem",
               background: "rgb(39, 35, 92)",
               borderBottom: "1px solid #e5e7eb",
+              borderRadius: "12px 12px 0px 0px",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexShrink: 0,
             }}
           >
             <h5 style={{ margin: 0, fontWeight: "600", color: "white" }}>
@@ -243,7 +264,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
             </h5>
             <button
               type="button"
-              class="btn-close"
+              class="btn-close-white"
               onClick={onClose}
               disabled={loading}
               style={{
@@ -254,7 +275,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
                 borderRadius: "0.5rem",
                 cursor: loading ? "not-allowed" : "pointer",
                 color: "white",
-                fontSize: "1.5rem",
+                fontSize: "20px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -276,450 +297,408 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div style={{ padding: "1.5rem" }}>
-              {isEditMode ? (
-                <div
-                  style={{
-                    padding: "1rem",
-                    background: "#f8f9fa",
-                    borderRadius: "8px",
-                    marginBottom: "1.5rem",
-                  }}
-                >
-                  <p
+          <div
+            style={{
+              overflowY: "auto",
+              padding: "1.5rem",
+              flexGrow: 1,
+              padding: 0,
+            }}
+          >
+            <form onSubmit={handleSubmit}>
+              <div style={{ padding: "1.5rem" }}>
+                {isEditMode ? (
+                  <div
                     style={{
-                      fontSize: "0.875rem",
-                      color: "#6c757d",
-                      margin: 0,
-                      marginBottom: "0.25rem",
+                      padding: "1rem",
+                      background: "#f8f9fa",
+                      borderRadius: "8px",
+                      marginBottom: "1.5rem",
                     }}
                   >
-                    Employee
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "1rem",
-                      fontWeight: "600",
-                      color: "#212529",
-                      margin: 0,
-                      marginBottom: "0.75rem",
-                    }}
-                  >
-                    {skill.employeeName}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "0.875rem",
-                      color: "#6c757d",
-                      margin: 0,
-                      marginBottom: "0.25rem",
-                    }}
-                  >
-                    Skill
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "1rem",
-                      fontWeight: "600",
-                      color: "#212529",
-                      margin: 0,
-                    }}
-                  >
-                    {skill.skillName}
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div style={{ marginBottom: "1.5rem" }}>
-                    <label
+                    <p
                       style={{
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        color: "#212529",
-                        marginBottom: "0.5rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
+                        fontSize: "0.875rem",
+                        color: "#6c757d",
+                        margin: 0,
+                        marginBottom: "0.25rem",
                       }}
                     >
-                      <span
+                      Employee
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "1rem",
+                        fontWeight: "600",
+                        color: "#212529",
+                        margin: 0,
+                        marginBottom: "0.75rem",
+                      }}
+                    >
+                      {skill.employeeName}
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "#6c757d",
+                        margin: 0,
+                        marginBottom: "0.25rem",
+                      }}
+                    >
+                      Skill
+                    </p>
+                    <p
+                      style={{
+                        fontSize: "1rem",
+                        fontWeight: "600",
+                        color: "#212529",
+                        margin: 0,
+                      }}
+                    >
+                      {skill.skillName}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ marginBottom: "1.5rem" }}>
+                      <label
                         style={{
-                          background: "#97247E",
-                          color: "#fff",
-                          borderRadius: "50%",
-                          width: "20px",
-                          height: "20px",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          color: "#212529",
+                          marginBottom: "0.5rem",
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        Employee <span style={{ color: "#dc3545" }}>*</span>
+                      </label>
+                      <select
+                        value={selectedEmployeeId}
+                        className="EmployeeSelector"
+                        onChange={handleEmployeeChange}
+                        required
+                        disabled
+                        style={{
+                          width: "100%",
+                          padding: "0.625rem",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "8px",
+                          fontSize: "14px",
+                          outline: "none",
+                          background: "#fff",
+                          cursor: fetchingEmployees ? "not-allowed" : "pointer",
+                          disabled: "true",
+                          appearance: "none",
+                          WebkitAppearance: "none",
+                          MozAppearance: "none",
+                          backgroundImage: "none",
+                        }}
+                      >
+                        <option value="">
+                          {fetchingEmployees
+                            ? "Loading employees..."
+                            : "Select Employee"}
+                        </option>
+                        {employees.map((emp) => (
+                          <option key={emp.employeeId} value={emp.employeeId}>
+                            {emp.employeeName}{" "}
+                            {emp.departmentName && `(${emp.departmentName})`}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div style={{ marginBottom: "1.5rem" }}>
+                      <label
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          color: selectedEmployeeId ? "#212529" : "#9ca3af",
+                          marginBottom: "0.5rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        Select Skill <span style={{ color: "#dc3545" }}>*</span>
+                      </label>
+                      <select
+                        value={selectedSkillId}
+                        onChange={(e) => setSelectedSkillId(e.target.value)}
+                        required
+                        disabled={
+                          !selectedEmployeeId ||
+                          fetchingSkills ||
+                          !allSkillsLoaded
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "0.625rem",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "8px",
+                          fontSize: "14px",
+                          outline: "none",
+                          background: !selectedEmployeeId ? "#f9fafb" : "#fff",
+                          cursor:
+                            !selectedEmployeeId || fetchingSkills
+                              ? "not-allowed"
+                              : "pointer",
+                          color: !selectedEmployeeId ? "#9ca3af" : "#212529",
+                        }}
+                      >
+                        <option value="">
+                          {!selectedEmployeeId
+                            ? "Select employee first"
+                            : !allSkillsLoaded
+                            ? "Loading skills..."
+                            : fetchingSkills
+                            ? "Loading available skills..."
+                            : availableSkills.length === 0
+                            ? "No skills available"
+                            : "Select Skill"}
+                        </option>
+                        {availableSkills.map((skill) => (
+                          <option key={skill.skillId} value={skill.skillId}>
+                            {skill.skillName}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedEmployeeId && availableSkills.length > 0 && (
+                        <p
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#6c757d",
+                            margin: "0.5rem 0 0 0",
+                          }}
+                        >
+                          {availableSkills.length} skill(s) available for this
+                          employee
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                <div
+                  style={{ opacity: isEditMode || selectedSkillId ? 1 : 0.5 }}
+                >
+                  <label
+                    style={{
+                      fontSize: "0.875rem",
+                      fontWeight: "600",
+                      color:
+                        isEditMode || selectedSkillId ? "#212529" : "#9ca3af",
+                      marginBottom: "0.75rem",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    Rating:{" "}
+                    <span
+                      style={{
+                        color: getRatingColor(rating),
+                        fontWeight: "700",
+                        fontSize: "1.25rem",
+                      }}
+                    >
+                      {rating}
+                    </span>
+                    <span style={{ color: "#6c757d", fontWeight: "500" }}>
+                      /10
+                    </span>
+                  </label>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: "8px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {[...Array(10)].map((_, index) => {
+                      const value = index + 1;
+                      return (
+                        <button
+                          type="button"
+                          key={value}
+                          onClick={() => setRating(value)}
+                          disabled={!isEditMode && !selectedSkillId}
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "50%",
+                            border:
+                              rating === value
+                                ? `2px solid ${getRatingColor(value)}`
+                                : "1px solid #ccc",
+                            backgroundColor:
+                              rating === value
+                                ? getRatingColor(value)
+                                : "#f8f9fa",
+                            color: rating === value ? "#fff" : "#212529",
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            cursor:
+                              !isEditMode && !selectedSkillId
+                                ? "not-allowed"
+                                : "pointer",
+                            transition: "all 0.2s ease",
+                          }}
+                        >
+                          {value}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginTop: "0.75rem",
+                      paddingTop: "0.5rem",
+                      borderTop: "1px solid #f3f4f6",
+                    }}
+                  >
+                    <div style={{ textAlign: "left", flex: 1 }}>
+                      <span
+                        style={{
                           fontSize: "0.75rem",
-                          fontWeight: "700",
+                          color: "#6c757d",
+                          display: "block",
+                        }}
+                      >
+                        Min
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "0.875rem",
+                          fontWeight: "600",
+                          color: "#dc3545",
                         }}
                       >
                         1
                       </span>
-                      Employee <span style={{ color: "#dc3545" }}>*</span>
-                    </label>
-                    <select
-                      value={selectedEmployeeId}
-                      className="EmployeeSelector"
-                      onChange={handleEmployeeChange}
-                      required
-                      disabled
-                      style={{
-                        width: "100%",
-                        padding: "0.625rem",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        outline: "none",
-                        background: "#fff",
-                        cursor: fetchingEmployees ? "not-allowed" : "pointer",
-                        disabled: "true",
-                        appearance: "none",
-                        WebkitAppearance: "none",
-                        MozAppearance: "none",
-                        backgroundImage: "none",
-                      }}
-                    >
-                      <option value="">
-                        {fetchingEmployees
-                          ? "Loading employees..."
-                          : "Select Employee"}
-                      </option>
-                      {employees.map((emp) => (
-                        <option key={emp.employeeId} value={emp.employeeId}>
-                          {emp.employeeName}{" "}
-                          {emp.departmentName && `(${emp.departmentName})`}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                    </div>
 
-                  <div style={{ marginBottom: "1.5rem" }}>
-                    <label
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        color: selectedEmployeeId ? "#212529" : "#9ca3af",
-                        marginBottom: "0.5rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                      }}
-                    >
+                    <div style={{ textAlign: "center", flex: 1 }}>
                       <span
                         style={{
-                          background: selectedEmployeeId
-                            ? "#97247E"
-                            : "#e5e7eb",
-                          color: selectedEmployeeId ? "#fff" : "#9ca3af",
-                          borderRadius: "50%",
-                          width: "20px",
-                          height: "20px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "14px",
-                          fontWeight: "700",
+                          fontSize: "0.75rem",
+                          fontWeight: "600",
+                          color: getRatingColor(rating),
+                          padding: "0.375rem 0.75rem",
+                          background: `${getRatingColor(rating)}15`,
+                          borderRadius: "12px",
+                          border: `1px solid ${getRatingColor(rating)}30`,
                         }}
                       >
-                        2
+                        {getRatingLabel(rating)}
                       </span>
-                      Select Skill <span style={{ color: "#dc3545" }}>*</span>
-                    </label>
-                    <select
-                      value={selectedSkillId}
-                      onChange={(e) => setSelectedSkillId(e.target.value)}
-                      required
-                      disabled={
-                        !selectedEmployeeId ||
-                        fetchingSkills ||
-                        !allSkillsLoaded
-                      }
-                      style={{
-                        width: "100%",
-                        padding: "0.625rem",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        outline: "none",
-                        background: !selectedEmployeeId ? "#f9fafb" : "#fff",
-                        cursor:
-                          !selectedEmployeeId || fetchingSkills
-                            ? "not-allowed"
-                            : "pointer",
-                        color: !selectedEmployeeId ? "#9ca3af" : "#212529",
-                      }}
-                    >
-                      <option value="">
-                        {!selectedEmployeeId
-                          ? "Select employee first"
-                          : !allSkillsLoaded
-                          ? "Loading skills..."
-                          : fetchingSkills
-                          ? "Loading available skills..."
-                          : availableSkills.length === 0
-                          ? "No skills available"
-                          : "Select Skill"}
-                      </option>
-                      {availableSkills.map((skill) => (
-                        <option key={skill.skillId} value={skill.skillId}>
-                          {skill.skillName}
-                        </option>
-                      ))}
-                    </select>
-                    {selectedEmployeeId && availableSkills.length > 0 && (
-                      <p
+                    </div>
+
+                    <div style={{ textAlign: "right", flex: 1 }}>
+                      <span
                         style={{
                           fontSize: "0.75rem",
                           color: "#6c757d",
-                          margin: "0.5rem 0 0 0",
+                          display: "block",
                         }}
                       >
-                        {availableSkills.length} skill(s) available for this
-                        employee
-                      </p>
-                    )}
+                        Max
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "0.875rem",
+                          fontWeight: "600",
+                          color: "#198754",
+                        }}
+                      >
+                        10
+                      </span>
+                    </div>
                   </div>
-                </>
-              )}
+                </div>
+              </div>
 
-              <div style={{ opacity: isEditMode || selectedSkillId ? 1 : 0.5 }}>
-                <label
+              <div
+                style={{
+                  padding: "1rem 1.5rem",
+                  borderTop: "1px solid #e5e7eb",
+                  display: "flex",
+                  gap: "0.75rem",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={onClose}
+                  disabled={loading}
                   style={{
+                    padding: "0.625rem 1.25rem",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={
+                    loading ||
+                    (!isEditMode && (!selectedEmployeeId || !selectedSkillId))
+                  }
+                  style={{
+                    padding: "0.625rem 1.25rem",
+                    border: "none",
+                    borderRadius: "8px",
+                    background:
+                      !loading &&
+                      (isEditMode || (selectedEmployeeId && selectedSkillId))
+                        ? "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+                        : "#e5e7eb",
+                    color:
+                      !loading &&
+                      (isEditMode || (selectedEmployeeId && selectedSkillId))
+                        ? "#fff"
+                        : "#6c757d",
                     fontSize: "0.875rem",
                     fontWeight: "600",
-                    color:
-                      isEditMode || selectedSkillId ? "#212529" : "#9ca3af",
-                    marginBottom: "0.75rem",
+                    cursor:
+                      !loading &&
+                      (isEditMode || (selectedEmployeeId && selectedSkillId))
+                        ? "pointer"
+                        : "not-allowed",
                     display: "flex",
                     alignItems: "center",
                     gap: "0.5rem",
                   }}
                 >
-                  {!isEditMode && (
-                    <span
-                      style={{
-                        background: selectedSkillId ? "#97247E" : "#e5e7eb",
-                        color: selectedSkillId ? "#fff" : "#9ca3af",
-                        borderRadius: "50%",
-                        width: "20px",
-                        height: "20px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "0.75rem",
-                        fontWeight: "700",
-                      }}
-                    >
-                      3
-                    </span>
+                  {loading ? (
+                    <>
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                      />
+                      {isEditMode ? "Updating..." : "Recording..."}
+                    </>
+                  ) : isEditMode ? (
+                    "Update Rating"
+                  ) : (
+                    "Record Skill"
                   )}
-                  Rating:{" "}
-                  <span
-                    style={{
-                      color: getRatingColor(rating),
-                      fontWeight: "700",
-                      fontSize: "1.25rem",
-                    }}
-                  >
-                    {rating}
-                  </span>
-                  <span style={{ color: "#6c757d", fontWeight: "500" }}>
-                    /10
-                  </span>
-                </label>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: "8px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {[...Array(10)].map((_, index) => {
-                    const value = index + 1;
-                    return (
-                      <button
-                        type="button"
-                        key={value}
-                        onClick={() => setRating(value)}
-                        disabled={!isEditMode && !selectedSkillId}
-                        style={{
-                          width: "36px",
-                          height: "36px",
-                          borderRadius: "50%",
-                          border:
-                            rating === value
-                              ? `2px solid ${getRatingColor(value)}`
-                              : "1px solid #ccc",
-                          backgroundColor:
-                            rating === value
-                              ? getRatingColor(value)
-                              : "#f8f9fa",
-                          color: rating === value ? "#fff" : "#212529",
-                          fontSize: "14px",
-                          fontWeight: "600",
-                          cursor:
-                            !isEditMode && !selectedSkillId
-                              ? "not-allowed"
-                              : "pointer",
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        {value}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginTop: "0.75rem",
-                    paddingTop: "0.5rem",
-                    borderTop: "1px solid #f3f4f6",
-                  }}
-                >
-                  <div style={{ textAlign: "left", flex: 1 }}>
-                    <span
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6c757d",
-                        display: "block",
-                      }}
-                    >
-                      Min
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        color: "#dc3545",
-                      }}
-                    >
-                      1
-                    </span>
-                  </div>
-
-                  <div style={{ textAlign: "center", flex: 1 }}>
-                    <span
-                      style={{
-                        fontSize: "0.75rem",
-                        fontWeight: "600",
-                        color: getRatingColor(rating),
-                        padding: "0.375rem 0.75rem",
-                        background: `${getRatingColor(rating)}15`,
-                        borderRadius: "12px",
-                        border: `1px solid ${getRatingColor(rating)}30`,
-                      }}
-                    >
-                      {getRatingLabel(rating)}
-                    </span>
-                  </div>
-
-                  <div style={{ textAlign: "right", flex: 1 }}>
-                    <span
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6c757d",
-                        display: "block",
-                      }}
-                    >
-                      Max
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        color: "#198754",
-                      }}
-                    >
-                      10
-                    </span>
-                  </div>
-                </div>
+                </button>
               </div>
-            </div>
-
-            <div
-              style={{
-                padding: "1rem 1.5rem",
-                borderTop: "1px solid #e5e7eb",
-                display: "flex",
-                gap: "0.75rem",
-                justifyContent: "flex-end",
-              }}
-            >
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={loading}
-                style={{
-                  padding: "0.625rem 1.25rem",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  background: "#fff",
-                  color: "#212529",
-                  fontSize: "0.875rem",
-                  fontWeight: "500",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={
-                  loading ||
-                  (!isEditMode && (!selectedEmployeeId || !selectedSkillId))
-                }
-                style={{
-                  padding: "0.625rem 1.25rem",
-                  border: "none",
-                  borderRadius: "8px",
-                  background:
-                    !loading &&
-                    (isEditMode || (selectedEmployeeId && selectedSkillId))
-                      ? "linear-gradient(135deg, #AC5098 0%, #97247E 100%)"
-                      : "#e5e7eb",
-                  color:
-                    !loading &&
-                    (isEditMode || (selectedEmployeeId && selectedSkillId))
-                      ? "#fff"
-                      : "#6c757d",
-                  fontSize: "0.875rem",
-                  fontWeight: "600",
-                  cursor:
-                    !loading &&
-                    (isEditMode || (selectedEmployeeId && selectedSkillId))
-                      ? "pointer"
-                      : "not-allowed",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                }}
-              >
-                {loading ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm"
-                      role="status"
-                    />
-                    {isEditMode ? "Updating..." : "Recording..."}
-                  </>
-                ) : isEditMode ? (
-                  "Update Rating"
-                ) : (
-                  "Record Skill"
-                )}
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
 

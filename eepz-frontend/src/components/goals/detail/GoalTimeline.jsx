@@ -160,7 +160,10 @@ const GoalTimeline = ({ goalId }) => {
 
       <div
         className="card"
-        style={{ border: "1px solid #dee2e6", borderRadius: "12px" }}
+        style={{
+          border: "1px solid rgb(39, 35, 92, 0.5)",
+          borderRadius: "12px",
+        }}
       >
         {/* Header */}
         <div
@@ -168,15 +171,15 @@ const GoalTimeline = ({ goalId }) => {
           style={{ backgroundColor: "#f8f9fa", padding: "1rem 1.25rem" }}
         >
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <h6 className="mb-0" style={{ fontWeight: 600 }}>
+            <h6 className="mb-0" style={{ fontWeight: 600, fontSize: "18px" }}>
               <i
                 className="bi bi-clock-history me-2"
-                style={{ color: "#0d6efd" }}
+                style={{ color: "rgb(39, 35, 92)" }}
               ></i>
               Timeline
               <span
                 className="badge bg-secondary ms-2"
-                style={{ fontSize: "0.75rem" }}
+                style={{ fontSize: "10px" }}
               >
                 {filteredEvents.length} events
               </span>
@@ -195,24 +198,13 @@ const GoalTimeline = ({ goalId }) => {
                         : "btn-outline-secondary"
                     }`}
                     onClick={() => setFilter(type.value)}
-                    style={{ fontSize: "0.8rem", padding: "0.25rem 0.75rem" }}
+                    style={{ fontSize: "12px", padding: "0.25rem 0.75rem" }}
                   >
                     <i className={`bi ${type.icon} me-1`}></i>
                     {type.label}
                   </button>
                 ))}
               </div>
-
-              {/* Refresh */}
-              <button
-                className="btn btn-sm btn-outline-primary"
-                onClick={loadTimeline}
-                disabled={loading}
-              >
-                <i
-                  className={`bi bi-arrow-clockwise ${loading ? "spin" : ""}`}
-                ></i>
-              </button>
             </div>
           </div>
         </div>
@@ -328,7 +320,7 @@ const GoalTimeline = ({ goalId }) => {
                           </h6>
                           <small
                             className="text-muted"
-                            style={{ fontSize: "0.8rem", whiteSpace: "nowrap" }}
+                            style={{ fontSize: "12px", whiteSpace: "nowrap" }}
                             title={formatDateTime(event.timestamp)}
                           >
                             <i className="bi bi-clock me-1"></i>

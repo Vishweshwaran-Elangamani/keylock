@@ -409,7 +409,7 @@ const GoalDetailsHeader = ({
                   !hasPendingApproval &&
                   !(goal.goalType === "org" && user.role !== "Leadership") && (
                     <button
-                      className="btn btn-sm btn-outline-primary"
+                      className="btn btn-sm btn-primary"
                       onClick={onEdit}
                       title="Edit this goal"
                     >

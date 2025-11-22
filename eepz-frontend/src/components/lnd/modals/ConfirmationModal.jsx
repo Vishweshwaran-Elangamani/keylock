@@ -25,7 +25,7 @@ const ConfirmationModal = ({
           right: 0,
           bottom: 0,
           background: "rgba(0, 0, 0, 0.5)",
-          zIndex: 2000, // Higher than other modals
+          zIndex: 2000,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -49,10 +49,12 @@ const ConfirmationModal = ({
           <div
             style={{
               padding: "1.5rem",
-              borderBottom: "1px solid #e5e7eb",
+              borderBottom: "1px solid rgb(39, 35, 92, 0.5)",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              borderRadius: "16px 16px 0px 0px",
+              backgroundColor: "rgb(39, 35, 92)",
             }}
           >
             <div
@@ -71,25 +73,37 @@ const ConfirmationModal = ({
               >
                 <AlertTriangle size={20} color={confirmColor} />
               </div>
-              <h5 style={{ margin: 0, fontWeight: "600", color: "#212529" }}>
+              <h5 style={{ margin: 0, fontWeight: "600", color: "white" }}>
                 {title}
               </h5>
             </div>
             <button
+              type="button"
+              class="btn-close-white"
               onClick={onClose}
-              disabled={loading}
               style={{
-                background: "transparent",
                 border: "none",
-                cursor: loading ? "not-allowed" : "pointer",
-                padding: "0.25rem",
-                color: "#6c757d",
+                width: "36px",
+                backgroundColor: "transparent",
+                height: "36px",
+                borderRadius: "0.5rem",
+                cursor: "pointer",
+                color: "white",
+                fontSize: "20px",
                 display: "flex",
                 alignItems: "center",
-                opacity: loading ? 0.5 : 1,
+                justifyContent: "center",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "red";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "white";
               }}
             >
-              <X size={20} />
+              <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
@@ -118,14 +132,14 @@ const ConfirmationModal = ({
             }}
           >
             <button
+              type="button"
+              className="btn btn-secondary"
               onClick={onClose}
               disabled={loading}
               style={{
                 padding: "0.625rem 1.25rem",
                 border: "1px solid #e5e7eb",
                 borderRadius: "8px",
-                background: "#fff",
-                color: "#212529",
                 fontSize: "0.875rem",
                 fontWeight: "500",
                 cursor: loading ? "not-allowed" : "pointer",

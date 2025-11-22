@@ -184,7 +184,7 @@ const GoalsDashboard = () => {
                   background:
                     "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                   whiteSpace: "nowrap",
-                  height: "60px"
+                  height: "55px"
                 }}
               >
                 <i className="bi bi-plus-circle me-2"></i>
@@ -197,7 +197,7 @@ const GoalsDashboard = () => {
                   backgroundColor: "rgb(39, 35, 92)",
                   color: "white",
                   whiteSpace: "nowrap",
-                  height: "45px"
+                  height: "50px"
                 }}
               >
                 <i className="bi bi-list-ul me-2"></i>

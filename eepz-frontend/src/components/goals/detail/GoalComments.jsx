@@ -143,19 +143,19 @@ const GoalComments = ({
       {effectiveCanComment && !isCompleted && (
         <div
           className="card mb-4"
-          style={{ border: "1px solid #dee2e6", borderRadius: "12px" }}
+          style={{ border: "1px solid rgb(39, 35, 92, 0.5)", borderRadius: "12px" }}
         >
-          <div className="card-body" style={{ padding: "1.25rem" }}>
+          <div className="card-body" style={{ padding: "10px", }}>
             <h6
               style={{
                 fontWeight: 600,
+                fontSize: "16px",
                 marginBottom: "1rem",
-                color: "#212529",
               }}
             >
               <i
                 className="bi bi-chat-dots me-2"
-                style={{ color: "#0d6efd" }}
+                style={{ color: "rgb(39, 35, 92)" }}
               ></i>
               Add Comment
               {isDeptHeadMonitoring && (
@@ -170,7 +170,7 @@ const GoalComments = ({
             </h6>
             <form onSubmit={handleSubmitClick}>
               <textarea
-                className="form-control mb-2"
+                className="form-control mb-4"
                 rows="4"
                 placeholder="Share your thoughts, updates, or questions... (Ctrl+Enter to post)"
                 value={newComment}
@@ -178,9 +178,9 @@ const GoalComments = ({
                 onKeyDown={handleKeyDown}
                 disabled={submitting}
                 style={{
+                  border: "1px solid rgb(39, 35, 92, 0.5)",
                   resize: "vertical",
-                  fontSize: "0.95rem",
-                  lineHeight: "1.6",
+                  fontSize: "14px",
                 }}
               />
               <div className="d-flex justify-content-between align-items-center">
@@ -190,7 +190,7 @@ const GoalComments = ({
                       ? "text-danger"
                       : "text-muted"
                   }
-                  style={{ fontSize: "0.8rem" }}
+                  style={{ fontSize: "12px" }}
                 >
                   <i className="bi bi-keyboard me-1"></i>
                   {characterCount}/{MAX_CHARS} characters
@@ -205,6 +205,9 @@ const GoalComments = ({
                   type="submit"
                   className="btn btn-primary"
                   disabled={submitting || !newComment.trim()}
+                  style={{
+                    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+                  }}
                 >
                   {submitting ? (
                     <>
@@ -227,16 +230,16 @@ const GoalComments = ({
       {/* Comments List */}
       <div
         className="card"
-        style={{ border: "1px solid #dee2e6", borderRadius: "12px" }}
+        style={{ border: "1px solid rgb(39, 35, 92, 0.5)", borderRadius: "12px" }}
       >
         <div
           className="goal-card-header d-flex justify-content-between align-items-center flex-wrap gap-2"
           style={{ backgroundColor: "#f8f9fa", padding: "1rem 1.25rem" }}
         >
-          <h6 className="mb-0" style={{ fontWeight: 600 }}>
+          <h6 className="mb-0" style={{ fontWeight: 600, fontSize: "16px" }}>
             <i
               className="bi bi-chat-left-text me-2"
-              style={{ color: "#0d6efd" }}
+              style={{ color: "rgb(39, 35, 92)" }}
             ></i>
             Comments
             <span
@@ -265,7 +268,7 @@ const GoalComments = ({
                   filter === "all" ? "btn-primary" : "btn-outline-secondary"
                 }`}
                 onClick={() => setFilter("all")}
-                style={{ fontSize: "0.8rem", padding: "0.25rem 0.75rem" }}
+                style={{ fontSize: "12px", padding: "0.25rem 0.75rem" }}
               >
                 <i className="bi bi-people me-1"></i>
                 All
@@ -276,7 +279,7 @@ const GoalComments = ({
                   filter === "mine" ? "btn-primary" : "btn-outline-secondary"
                 }`}
                 onClick={() => setFilter("mine")}
-                style={{ fontSize: "0.8rem", padding: "0.25rem 0.75rem" }}
+                style={{ fontSize: "12px", padding: "0.25rem 0.75rem" }}
               >
                 <i className="bi bi-person me-1"></i>
                 Mine
@@ -287,7 +290,7 @@ const GoalComments = ({
                   filter === "others" ? "btn-primary" : "btn-outline-secondary"
                 }`}
                 onClick={() => setFilter("others")}
-                style={{ fontSize: "0.8rem", padding: "0.25rem 0.75rem" }}
+                style={{ fontSize: "12px", padding: "0.25rem 0.75rem" }}
               >
                 <i className="bi bi-person-dash me-1"></i>
                 Others
@@ -296,11 +299,11 @@ const GoalComments = ({
 
             {/* Sort Toggle */}
             <button
-              className="btn btn-sm btn-outline-primary"
+              className="btn btn-sm btn-primary"
               onClick={() =>
                 setSortOrder(sortOrder === "desc" ? "asc" : "desc")
               }
-              style={{ fontSize: "0.8rem" }}
+              style={{ fontSize: "14px" }}
               title={sortOrder === "desc" ? "Newest First" : "Oldest First"}
             >
               <i

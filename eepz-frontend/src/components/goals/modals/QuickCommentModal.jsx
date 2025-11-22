@@ -60,6 +60,25 @@ const QuickCommentModal = ({
 
   return (
     <>
+      <style>
+        {`
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { 
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
+
       {/* Backdrop */}
       <div
         style={{
@@ -74,6 +93,7 @@ const QuickCommentModal = ({
           alignItems: "center",
           justifyContent: "center",
           padding: "1rem",
+          animation: "fadeIn 0.2s ease-in-out",
         }}
         onClick={handleClose}
       >
@@ -92,7 +112,6 @@ const QuickCommentModal = ({
           <div
             style={{
               padding: "1.25rem 1.5rem",
-
               borderRadius: "1rem 1rem 0rem 0rem",
               backgroundColor: "rgb(39, 35, 92)",
               borderBottom: "1px solid #dee2e6",
@@ -107,7 +126,7 @@ const QuickCommentModal = ({
             </h5>
             <button
               type="button"
-              class="btn-close"
+              class="btn-close-white"
               onClick={onClose}
               disabled={loading}
               style={{
@@ -118,7 +137,7 @@ const QuickCommentModal = ({
                 borderRadius: "0.5rem",
                 cursor: loading ? "not-allowed" : "pointer",
                 color: "white",
-                fontSize: "1.5rem",
+                fontSize: "20px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -150,22 +169,13 @@ const QuickCommentModal = ({
               />
             )}
 
-            {/* Goal Title */}
-            <div
-              className="alert alert-light mb-3"
-              style={{
-                fontSize: "0.9rem",
-                padding: "0.75rem 1rem",
-              }}
-            >
-              <i className="bi bi-target me-2"></i>
-              <strong>Goal:</strong> {goalTitle}
-            </div>
-
             <form onSubmit={handleSubmit}>
               {/* Comment Textarea */}
               <div className="mb-3">
-                <label className="form-label" style={{ fontWeight: 600 }}>
+                <label
+                  className="form-label"
+                  style={{ fontWeight: 600, fontSize: "16px" }}
+                >
                   Your Comment <span style={{ color: "#dc3545" }}>*</span>
                 </label>
                 <textarea
@@ -177,7 +187,7 @@ const QuickCommentModal = ({
                   onKeyDown={handleKeyDown}
                   disabled={loading}
                   autoFocus
-                  style={{ resize: "vertical" }}
+                  style={{ resize: "vertical", fontSize: "16px" }}
                 />
                 <small className="text-muted mt-1 d-block">
                   <i className="bi bi-lightbulb me-1"></i>
@@ -209,7 +219,7 @@ const QuickCommentModal = ({
               type="submit"
               className="btn btn-primary"
               style={{
-                background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+                background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
               }}
               onClick={handleSubmit}
               disabled={loading || !comment.trim()}
