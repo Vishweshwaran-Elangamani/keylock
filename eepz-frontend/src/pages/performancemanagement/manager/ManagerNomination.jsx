@@ -1,965 +1,387 @@
-// import React, { useState, useEffect } from "react";
-// import { toast, ToastContainer } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import * as managerNominationApi from "../../../services/performancemanagement/manager/managernominationapi";
-// import "../../../styles/performancemanagement/manager/ManagerNomination.css";
-
-// function ManagerNomination() {
-//   // Get manager ID from JWT token
-//   const user = JSON.parse(localStorage.getItem("user"));
-//   const empId = user ? user.empId : null;
-//   const [managerId] = useState(() => empId);
-
-//   // State management
-//   const [rewardTypes, setRewardTypes] = useState([]);
-//   const [selectedRewardType, setSelectedRewardType] = useState(null);
-//   const [categoryRewards, setCategoryRewards] = useState([]);
-//   const [parameters, setParameters] = useState([]);
-//   const [teamMembers, setTeamMembers] = useState([]);
-//   const [selectedEmployee, setSelectedEmployee] = useState(null);
-//   const [justification, setJustification] = useState("");
-//   const [parameterValues, setParameterValues] = useState({});
-//   const [loading, setLoading] = useState(false);
-//   const [myNominations, setMyNominations] = useState([]);
-//   const [showNominationModal, setShowNominationModal] = useState(false);
-//   const [activeTab, setActiveTab] = useState("pending");
-
-//   // Fetch reward types on mount
-//   useEffect(() => {
-//     fetchRewardTypes();
-//   }, []);
-
-//   // Auto-fetch data when managerId is available
-//   useEffect(() => {
-//     if (managerId) {
-//       fetchTeamMembers();
-//       fetchMyNominations();
-//     }
-//   }, [managerId]);
-
-//   // ============ API CALLS ============
-//   const fetchRewardTypes = async () => {
-//     try {
-//       const { data } = await managerNominationApi.getRewardTypes();
-//       if (data.success) {
-//         setRewardTypes(data.data || []);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching reward types:", error);
-//       toast.error("Failed to load reward types");
-//     }
-//   };
-
-//   const fetchTeamMembers = async () => {
-//     try {
-//       setLoading(true);
-//       const { data } = await managerNominationApi.getTeamMembers(managerId);
-//       if (data.success) {
-//         setTeamMembers(data.data || []);
-//         toast.success(`Loaded ${data.data?.length || 0} team members`);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching team members:", error);
-//       toast.error("Error loading team members. Please check the Manager ID.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const fetchMyNominations = async () => {
-//     try {
-//       const { data } = await managerNominationApi.getMyNominations(managerId);
-//       if (data.success) {
-//         setMyNominations(data.data || []);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching nominations:", error);
-//       toast.error("Failed to load nominations");
-//     }
-//   };
-
-//   // ============ HELPER FUNCTIONS ============
-//   const getNominationStatus = (employeeId) => {
-//     const nomination = myNominations.find((n) => n?.nominee?.employeeId === employeeId);
-//     if (!nomination) return "No nomination yet";
-//     return nomination.status || "Unknown";
-//   };
-
-//   const resetNominationForm = () => {
-//     setSelectedRewardType(null);
-//     setSelectedEmployee(null);
-//     setJustification("");
-//     setParameterValues({});
-//     setParameters([]);
-//     setCategoryRewards([]);
-//   };
-
-//   // ============ EVENT HANDLERS ============
-//   const handleNominateClick = async (employee) => {
-//     setSelectedEmployee(employee);
-//     setSelectedRewardType(null);
-//     setCategoryRewards([]);
-//     setParameters([]);
-//     setJustification("");
-//     setParameterValues({});
-
-//     // Auto-load Recognition rewards
-//     const recognitionRewards = rewardTypes.filter(
-//       (rt) => rt?.rewardCategory === "Recognition"
-//     );
-//     setCategoryRewards(recognitionRewards);
-//     setShowNominationModal(true);
-//   };
-
-//   const handleRewardTypeSelect = async (rewardTypeId) => {
-//     const rewardType = rewardTypes.find((rt) => rt?.rewardTypeId === rewardTypeId);
-//     setSelectedRewardType(rewardType);
-//     setParameters([]);
-//     setParameterValues({});
-
-//     if (rewardTypeId) {
-//       try {
-//         const { data } = await managerNominationApi.getNominationParameters(rewardTypeId);
-//         if (data.success) {
-//           setParameters(data.data || []);
-//         }
-//       } catch (error) {
-//         console.error("Error fetching parameters:", error);
-//         toast.error("Error loading parameters. Please try again.");
-//       }
-//     }
-//   };
-
-//   const handleParameterChange = (parameterId, value) => {
-//     setParameterValues({
-//       ...parameterValues,
-//       [parameterId]: value,
-//     });
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!selectedRewardType) {
-//       toast.warning("Please select a reward type");
-//       return;
-//     }
-
-//     if (!justification.trim()) {
-//       toast.warning("Justification is required");
-//       return;
-//     }
-
-//     const requiredParams = parameters.filter((p) => p?.isRequired);
-//     const missingParams = requiredParams.filter(
-//       (p) =>
-//         !parameterValues[p.parameterId] ||
-//         parameterValues[p.parameterId].toString().trim() === ""
-//     );
-
-//     if (missingParams.length > 0) {
-//       toast.warning(
-//         `Please fill in all required fields: ${missingParams
-//           .map((p) => p.parameterName)
-//           .join(", ")}`
-//       );
-//       return;
-//     }
-
-//     try {
-//       const payload = {
-//         rewardTypeId: selectedRewardType.rewardTypeId,
-//         nomineeEmployeeId: selectedEmployee?.employeeId,
-//         nominatedByEmployeeId: parseInt(managerId),
-//         justification: justification,
-//         parameterValues: Object.entries(parameterValues).map(
-//           ([parameterId, value]) => ({
-//             parameterId: parseInt(parameterId),
-//             value: value.toString(),
-//           })
-//         ),
-//       };
-
-//       const { data } = await managerNominationApi.submitNomination(payload);
-
-//       if (data.success) {
-//         toast.success("Nomination submitted successfully!");
-//         setShowNominationModal(false);
-//         resetNominationForm();
-//         fetchMyNominations();
-//       }
-//     } catch (error) {
-//       console.error("Submission error:", error);
-//       toast.error(
-//         "Error submitting nomination: " +
-//           (error.response?.data?.message || error.message)
-//       );
-//     }
-//   };
-
-//   // ============ RENDER FUNCTIONS ============
-//   const renderParameterField = (parameter) => {
-//     if (!parameter) return null;
-
-//     const value = parameterValues[parameter.parameterId] || "";
-
-//     switch (parameter.parameterType) {
-//       case "Text":
-//         return (
-//           <input
-//             type="text"
-//             value={value}
-//             onChange={(e) =>
-//               handleParameterChange(parameter.parameterId, e.target.value)
-//             }
-//             placeholder={parameter.placeholderText || "Enter text..."}
-//             required={parameter.isRequired}
-//             className="tlp-input"
-//           />
-//         );
-
-//       case "TextArea":
-//         return (
-//           <textarea
-//             value={value}
-//             onChange={(e) =>
-//               handleParameterChange(parameter.parameterId, e.target.value)
-//             }
-//             placeholder={parameter.placeholderText || "Enter details..."}
-//             required={parameter.isRequired}
-//             className="tlp-textarea"
-//           />
-//         );
-
-//       case "Number":
-//       case "Rating":
-//         return (
-//           <input
-//             type="number"
-//             value={value}
-//             onChange={(e) =>
-//               handleParameterChange(parameter.parameterId, e.target.value)
-//             }
-//             placeholder={parameter.placeholderText || "Enter number..."}
-//             min={parameter.minimumValue || undefined}
-//             max={parameter.maximumValue || undefined}
-//             required={parameter.isRequired}
-//             className="tlp-input"
-//           />
-//         );
-
-//       case "Date":
-//         return (
-//           <input
-//             type="date"
-//             value={value}
-//             onChange={(e) =>
-//               handleParameterChange(parameter.parameterId, e.target.value)
-//             }
-//             required={parameter.isRequired}
-//             className="tlp-input"
-//           />
-//         );
-
-//       default:
-//         return null;
-//     }
-//   };
-
-//   // Filter nominations by status
-//   const approvedNominations = myNominations.filter(
-//     (n) => n && n.status === "Approved"
-//   );
-//   const pendingNominations = myNominations.filter(
-//     (n) => n && n.status === "Pending"
-//   );
-//   const rejectedNominations = myNominations.filter(
-//     (n) => n && n.status === "Rejected"
-//   );
-
-//   // Get approved team members
-//   const approvedMembers = approvedNominations
-//     .filter((nom) => nom && nom.rewardType && nom.nominee)
-//     .map((nom) => ({
-//       name: `${nom.nominee.firstName || ""} ${nom.nominee.lastName || ""}`.trim(),
-//       rewardName: nom.rewardType.rewardName || "N/A",
-//     }));
-
-//   return (
-//     <div className="tlp-container">
-//       <ToastContainer position="top-right" autoClose={3000} />
-
-//       {/* Congratulations Banner */}
-//       {approvedMembers.length > 0 && (
-//         <div className="tlp-congrats-card">
-//           <div className="tlp-congrats-header">
-//             <div className="tlp-congrats-icon">🎉</div>
-//             <div>
-//               <h2 className="tlp-congrats-title">
-//                 Congratulations! {approvedMembers.length} Team{" "}
-//                 {approvedMembers.length === 1 ? "Member" : "Members"} Approved
-//                 by HR
-//               </h2>
-//               <p className="tlp-congrats-subtitle">
-//                 Your nominations have been successfully approved
-//               </p>
-//             </div>
-//           </div>
-
-//           <div className="tlp-approved-members-list">
-//             {approvedMembers.map((member, index) => (
-//               <div key={index} className="tlp-approved-member">
-//                 <div className="tlp-approved-member-info">
-//                   <div className="tlp-approved-member-number">{index + 1}</div>
-//                   <div>
-//                     <div className="tlp-approved-member-name">{member.name}</div>
-//                     <div className="tlp-approved-reward-name">
-//                       {member.rewardName}
-//                     </div>
-//                   </div>
-//                 </div>
-//                 <div className="tlp-approved-badge">Approved</div>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-//       )}
-
-      
-
-//       {/* Team Members Section with Tabs */}
-//       {teamMembers.length > 0 && (
-//         <div className="tlp-card">
-//           <h2 className="tlp-section-title">My Team Nominations</h2>
-
-//           {/* Tabs */}
-//           <div className="tlp-tab-container">
-//             <button
-//               onClick={() => setActiveTab("pending")}
-//               className={`tlp-tab ${activeTab === "pending" ? "tlp-tab-active" : ""}`}
-//             >
-//               Pending ({pendingNominations.length})
-//             </button>
-//             <button
-//               onClick={() => setActiveTab("approved")}
-//               className={`tlp-tab ${activeTab === "approved" ? "tlp-tab-active" : ""}`}
-//             >
-//               Approved ({approvedNominations.length})
-//             </button>
-//             <button
-//               onClick={() => setActiveTab("rejected")}
-//               className={`tlp-tab ${activeTab === "rejected" ? "tlp-tab-active" : ""}`}
-//             >
-//               Rejected ({rejectedNominations.length})
-//             </button>
-//           </div>
-
-//           {/* Nominations Table */}
-//           <div className="tlp-table-wrapper">
-//             <table className="tlp-table">
-//               <thead>
-//                 <tr>
-//                   <th>#</th>
-//                   <th>Name</th>
-//                   <th>Department</th>
-//                   <th>Reward Type</th>
-//                   <th>Status</th>
-//                   {activeTab === "pending" && <th>Action</th>}
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {activeTab === "pending" &&
-//                   pendingNominations.map((nom, index) => (
-//                     <tr key={nom?.nominationId || index}>
-//                       <td>{index + 1}</td>
-//                       <td>
-//                         {nom?.nominee?.firstName || ""}{" "}
-//                         {nom?.nominee?.lastName || ""}
-//                       </td>
-//                       <td>
-//                         {nom?.nominee?.department?.departmentName || "N/A"}
-//                       </td>
-//                       <td>{nom?.rewardType?.rewardName || "N/A"}</td>
-//                       <td>
-//                         <span className="tlp-badge tlp-badge-pending">
-//                           Pending
-//                         </span>
-//                       </td>
-//                       <td>
-//                         <button className="tlp-view-button">
-//                           View Details
-//                         </button>
-//                       </td>
-//                     </tr>
-//                   ))}
-
-//                 {activeTab === "approved" &&
-//                   approvedNominations.map((nom, index) => (
-//                     <tr key={nom?.nominationId || index}>
-//                       <td>{index + 1}</td>
-//                       <td>
-//                         {nom?.nominee?.firstName || ""}{" "}
-//                         {nom?.nominee?.lastName || ""}
-//                       </td>
-//                       <td>
-//                         {nom?.nominee?.department?.departmentName || "N/A"}
-//                       </td>
-//                       <td>{nom?.rewardType?.rewardName || "N/A"}</td>
-//                       <td>
-//                         <span className="tlp-badge tlp-badge-approved">
-//                           Approved
-//                         </span>
-//                       </td>
-//                     </tr>
-//                   ))}
-
-//                 {activeTab === "rejected" &&
-//                   rejectedNominations.map((nom, index) => (
-//                     <tr key={nom?.nominationId || index}>
-//                       <td>{index + 1}</td>
-//                       <td>
-//                         {nom?.nominee?.firstName || ""}{" "}
-//                         {nom?.nominee?.lastName || ""}
-//                       </td>
-//                       <td>
-//                         {nom?.nominee?.department?.departmentName || "N/A"}
-//                       </td>
-//                       <td>{nom?.rewardType?.rewardName || "N/A"}</td>
-//                       <td>
-//                         <span className="tlp-badge tlp-badge-rejected">
-//                           Rejected
-//                         </span>
-//                       </td>
-//                     </tr>
-//                   ))}
-
-//                 {((activeTab === "pending" &&
-//                   pendingNominations.length === 0) ||
-//                   (activeTab === "approved" &&
-//                     approvedNominations.length === 0) ||
-//                   (activeTab === "rejected" &&
-//                     rejectedNominations.length === 0)) && (
-//                   <tr>
-//                     <td
-//                       colSpan={activeTab === "pending" ? 6 : 5}
-//                       className="tlp-empty-row"
-//                     >
-//                       No {activeTab} nominations found
-//                     </td>
-//                   </tr>
-//                 )}
-//               </tbody>
-//             </table>
-//           </div>
-
-//           {/* Available for Nomination */}
-//           <div className="tlp-available-section">
-//             <h3 className="tlp-subsection-title">
-//               Available for Nomination
-//             </h3>
-//             <table className="tlp-table">
-//               <thead>
-//                 <tr>
-//                   <th>#</th>
-//                   <th>Name</th>
-//                   <th>Department</th>
-//                   <th>Action</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {teamMembers
-//                   .filter(
-//                     (member) =>
-//                       getNominationStatus(member?.employeeId) ===
-//                       "No nomination yet"
-//                   )
-//                   .map((member, index) => (
-//                     <tr key={member?.employeeId || index}>
-//                       <td>{index + 1}</td>
-//                       <td>
-//                         {member?.firstName || ""} {member?.lastName || ""}
-//                       </td>
-//                       <td>
-//                         {member?.department?.departmentName || "N/A"}
-//                       </td>
-//                       <td>
-//                         <button
-//                           onClick={() => handleNominateClick(member)}
-//                           className="tlp-nominate-button"
-//                         >
-//                           Nominate
-//                         </button>
-//                       </td>
-//                     </tr>
-//                   ))}
-//               </tbody>
-//             </table>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Nomination Modal */}
-//       {showNominationModal && (
-//         <div
-//           className="tlp-modal-overlay"
-//           onClick={() => setShowNominationModal(false)}
-//         >
-//           <div
-//             className="tlp-modal-content"
-//             onClick={(e) => e.stopPropagation()}
-//           >
-//             <div className="tlp-modal-header">
-//               <h3 className="tlp-modal-title">
-//                 Nominate {selectedEmployee?.firstName || ""}{" "}
-//                 {selectedEmployee?.lastName || ""}
-//               </h3>
-//               <p className="tlp-modal-subtitle">
-//                 Select a Recognition reward type and fill in the details
-//               </p>
-//             </div>
-
-//             <form onSubmit={handleSubmit} className="tlp-modal-form">
-//               {/* Select Reward Type - Only Recognition */}
-//               {!selectedRewardType && (
-//                 <div className="tlp-form-section">
-//                   <label className="tlp-form-label">
-//                     Select Recognition Reward{" "}
-//                     <span className="tlp-required">*</span>
-//                   </label>
-
-//                   <div className="tlp-reward-grid">
-//                     {categoryRewards.map((reward) => (
-//                       <div
-//                         key={reward?.rewardTypeId}
-//                         onClick={() =>
-//                           handleRewardTypeSelect(reward?.rewardTypeId)
-//                         }
-//                         className="tlp-reward-card"
-//                       >
-//                         <div className="tlp-reward-name">
-//                           {reward?.rewardName || "N/A"}
-//                         </div>
-//                         {reward?.description && (
-//                           <div className="tlp-reward-desc">
-//                             {reward.description}
-//                           </div>
-//                         )}
-//                       </div>
-//                     ))}
-//                   </div>
-//                 </div>
-//               )}
-
-//               {/* Justification & Parameters */}
-//               {selectedRewardType && (
-//                 <>
-//                   <div className="tlp-selected-info">
-//                     <strong>Selected:</strong>{" "}
-//                     {selectedRewardType?.rewardName || "N/A"}
-//                   </div>
-
-//                   <div className="tlp-form-section">
-//                     <label className="tlp-form-label">
-//                       Justification <span className="tlp-required">*</span>
-//                     </label>
-//                     <textarea
-//                       value={justification}
-//                       onChange={(e) => setJustification(e.target.value)}
-//                       placeholder="Explain why this employee deserves this nomination..."
-//                       required
-//                       className="tlp-textarea"
-//                     />
-//                   </div>
-
-//                   {/* Parameters */}
-//                   {parameters.length > 0 && (
-//                     <div className="tlp-form-section">
-//                       <h4 className="tlp-parameters-title">
-//                         Additional Information ({parameters.length} fields)
-//                       </h4>
-
-//                       {parameters.map((parameter, index) => (
-//                         <div
-//                           key={parameter?.parameterId || index}
-//                           className="tlp-parameter-field"
-//                         >
-//                           <label className="tlp-form-label">
-//                             {index + 1}. {parameter?.parameterName || "N/A"}
-//                             {parameter?.isRequired && (
-//                               <span className="tlp-required"> *</span>
-//                             )}
-//                             <span className="tlp-parameter-type">
-//                               ({parameter?.parameterType || "Text"})
-//                             </span>
-//                           </label>
-//                           {renderParameterField(parameter)}
-//                         </div>
-//                       ))}
-//                     </div>
-//                   )}
-//                 </>
-//               )}
-
-//               {/* Submit Buttons */}
-//               <div className="tlp-modal-actions">
-//                 <button
-//                   type="button"
-//                   onClick={() => setShowNominationModal(false)}
-//                   className="tlp-cancel-button"
-//                 >
-//                   Cancel
-//                 </button>
-//                 <button
-//                   type="submit"
-//                   disabled={!selectedRewardType}
-//                   className="tlp-submit-button"
-//                 >
-//                   Submit Nomination
-//                 </button>
-//               </div>
-//             </form>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default ManagerNomination;
-
-
-import React, { useState, useEffect } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useEffect, useMemo, useState } from "react";
+import { Toaster, toast } from "sonner";
 import * as managerNominationApi from "../../../services/performancemanagement/manager/managernominationapi";
 import NominationModal from "../../../components/performance_management/modals/ManagerNomination/NominationModal";
-import  "../../../styles/performancemanagement/manager/ManagerNomination.css";
-
-function ManagerNomination() {
-  // Get manager ID from JWT token
-  const user = JSON.parse(localStorage.getItem("user"));
-  const empId = user ? user.empId : null;
+import "../../../styles/performancemanagement/manager/ManagerNomination.css";
+ 
+/* Uploaded fallback path (your environment will map this to a URL) */
+const FALLBACK_HOME_ICON = "/mnt/data/72db97da-9426-4032-9c37-de8aaa35465e.png";
+ 
+/* Helper: safe text fallback for fields returned differently by APIs */
+const safeText = (...vals) => {
+  for (const v of vals) {
+    if (v !== undefined && v !== null) {
+      const s = typeof v === "string" ? v.trim() : v;
+      if (s !== "") return s;
+    }
+  }
+  return "-";
+};
+ 
+/* Pagination hook */
+const usePagination = (items = [], pageSize = 5) => {
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil((items?.length || 0) / pageSize));
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [items, totalPages]);
+  const paged = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return (items || []).slice(start, start + pageSize);
+  }, [items, page, pageSize]);
+  return { page, setPage, totalPages, paged, pageSize };
+};
+ 
+/* Breadcrumbs component using inline SVGs (no external images required) */
+const Breadcrumbs = ({ items = [] }) => {
+  const HomeSvg = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M3 10.5L12 4l9 6.5" stroke="#8f2b6b" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M5 12.5v6a1 1 0 0 0 1 1h3v-5h6v5h3a1 1 0 0 0 1-1v-6" stroke="#8f2b6b" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+ 
+  const Chevron = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M9 18l6-6-6-6" stroke="#bdb2c8" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+ 
+  return (
+    <nav className="managernomination-breadcrumbs" aria-label="Breadcrumb">
+      <ol className="managernomination-breadcrumb-list">
+        <li className="managernomination-crumb" aria-hidden>
+          {/* inline svg home icon */}
+          <span className="managernomination-home-icon">
+            <HomeSvg />
+          </span>
+          {/* Fallback: reference to uploaded file (hidden). Keep for build mapping if needed */}
+          <img src={FALLBACK_HOME_ICON} alt="" style={{ display: "none" }} />
+        </li>
+ 
+        {items.map((it, idx) => {
+          const isLast = idx === items.length - 1;
+          return (
+            <li
+              key={idx}
+              className={`managernomination-crumb ${isLast ? "managernomination-crumb-active" : ""}`}
+            >
+              <span className="managernomination-crumb-sep" aria-hidden>
+                <Chevron />
+              </span>
+ 
+              {isLast ? (
+                <span className="managernomination-crumb-text" aria-current="page">
+                  {it.label}
+                </span>
+              ) : (
+                <a className="managernomination-crumb-link" href={it.to || "#"}>
+                  {it.label}
+                </a>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+};
+ 
+export default function ManagerNomination() {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const empId = user?.empId ?? null;
   const [managerId] = useState(() => empId);
-
-  // State management
+ 
   const [rewardTypes, setRewardTypes] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [myNominations, setMyNominations] = useState([]);
   const [showNominationModal, setShowNominationModal] = useState(false);
-  const [activeTab, setActiveTab] = useState("pending");
-
-  // Fetch reward types on mount
-  useEffect(() => {
-    fetchRewardTypes();
-  }, []);
-
-  // Auto-fetch data when managerId is available
-  useEffect(() => {
-    if (managerId) {
-      fetchTeamMembers();
-      fetchMyNominations();
-    }
-  }, [managerId]);
-
-  // ============ API CALLS ============
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [activeTab, setActiveTab] = useState("pending"); // pending | approved | rejected
+  const [loading, setLoading] = useState(false);
+ 
+  useEffect(() => { fetchRewardTypes(); }, []);
+  useEffect(() => { if (managerId) { fetchTeamMembers(); fetchMyNominations(); } }, [managerId]);
+ 
   const fetchRewardTypes = async () => {
     try {
       const { data } = await managerNominationApi.getRewardTypes();
-      if (data.success) {
-        setRewardTypes(data.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching reward types:", error);
+      if (data?.success) setRewardTypes(data.data || []);
+    } catch (e) {
+      console.error(e);
       toast.error("Failed to load reward types");
     }
   };
-
+ 
   const fetchTeamMembers = async () => {
     try {
       setLoading(true);
       const { data } = await managerNominationApi.getTeamMembers(managerId);
-      if (data.success) {
-        setTeamMembers(data.data || []);
-        toast.success(`Loaded ${data.data?.length || 0} team members`);
-      }
-    } catch (error) {
-      console.error("Error fetching team members:", error);
-      toast.error("Error loading team members. Please check the Manager ID.");
+      if (data?.success) setTeamMembers(data.data || []);
+      else toast.error("Unable to load team members");
+    } catch (e) {
+      console.error(e);
+      toast.error("Error loading team members");
     } finally {
       setLoading(false);
     }
   };
-
+ 
   const fetchMyNominations = async () => {
     try {
       const { data } = await managerNominationApi.getMyNominations(managerId);
-      if (data.success) {
-        setMyNominations(data.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching nominations:", error);
+      if (data?.success) setMyNominations(data.data || []);
+    } catch (e) {
+      console.error(e);
       toast.error("Failed to load nominations");
     }
   };
-
-  // ============ HELPER FUNCTIONS ============
-  const getNominationStatus = (employeeId) => {
-    const nomination = myNominations.find(
-      (n) => n?.nominee?.employeeId === employeeId
-    );
-    if (!nomination) return "No nomination yet";
-    return nomination.status || "Unknown";
-  };
-
-  // ============ EVENT HANDLERS ============
-  const handleNominateClick = (employee) => {
-    setSelectedEmployee(employee);
+ 
+  /* Strict partitions by status */
+  const pendingNominations = myNominations.filter((n) => n?.status === "Pending");
+  const approvedNominations = myNominations.filter((n) => n?.status === "Approved");
+  const rejectedNominations = myNominations.filter((n) => n?.status === "Rejected");
+ 
+  /* Pagination hooks */
+  const pendingPager = usePagination(pendingNominations, 5);
+  const approvedPager = usePagination(approvedNominations, 5);
+  const rejectedPager = usePagination(rejectedNominations, 5);
+  const availableMembers = teamMembers.filter((m) => !myNominations.some((nom) => nom?.nominee?.employeeId === m?.employeeId));
+  const availablePager = usePagination(availableMembers, 5);
+ 
+  /* Only show "Nominate" buttons when Pending tab is active */
+  const canNominate = activeTab === "pending";
+ 
+  const handleOpenNominate = (member) => {
+    setSelectedEmployee(member);
     setShowNominationModal(true);
   };
-
+ 
   const handleNominationSuccess = () => {
     fetchMyNominations();
+    fetchTeamMembers();
+    setShowNominationModal(false);
+    toast.success("Nomination submitted");
   };
-
-  // Filter nominations by status
-  const approvedNominations = myNominations.filter(
-    (n) => n && n.status === "Approved"
-  );
-  const pendingNominations = myNominations.filter(
-    (n) => n && n.status === "Pending"
-  );
-  const rejectedNominations = myNominations.filter(
-    (n) => n && n.status === "Rejected"
-  );
-
-  // Get approved team members
-  const approvedMembers = approvedNominations
-    .filter((nom) => nom && nom.rewardType && nom.nominee)
-    .map((nom) => ({
-      name: `${nom.nominee.firstName || ""} ${nom.nominee.lastName || ""}`.trim(),
-      rewardName: nom.rewardType.rewardName || "N/A",
-    }));
-
+ 
+  /* Simple Pagination UI */
+  const Pagination = ({ pager }) => {
+    const { page, setPage, totalPages } = pager;
+    if (totalPages <= 1) return null;
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+    return (
+      <div className="managernomination-pagination" aria-label="Pagination">
+        <button
+          className="managernomination-pg-btn"
+          onClick={() => setPage(Math.max(1, page - 1))}
+          disabled={page === 1}
+        >
+          Prev
+        </button>
+ 
+        {pages.map((p) => (
+          <button
+            key={p}
+            className={`managernomination-pg-btn ${p === page ? "active" : ""}`}
+            onClick={() => setPage(p)}
+            aria-current={p === page ? "page" : undefined}
+          >
+            {p}
+          </button>
+        ))}
+ 
+        <button
+          className="managernomination-pg-btn"
+          onClick={() => setPage(Math.min(totalPages, page + 1))}
+          disabled={page === totalPages}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+ 
   return (
-    <div className="tlp-container">
-      <ToastContainer position="top-right" autoClose={3000} />
-
-      {/* Congratulations Banner */}
-      {approvedMembers.length > 0 && (
-        <div className="tlp-congrats-card">
-          <div className="tlp-congrats-header">
-            <div className="tlp-congrats-icon">🎉</div>
-            <div>
-              <h2 className="tlp-congrats-title">
-                Congratulations! {approvedMembers.length} Team{" "}
-                {approvedMembers.length === 1 ? "Member" : "Members"} Approved
-                by HR
-              </h2>
-              <p className="tlp-congrats-subtitle">
-                Your nominations have been successfully approved
-              </p>
-            </div>
-          </div>
-
-          <div className="tlp-approved-members-list">
-            {approvedMembers.map((member, index) => (
-              <div key={index} className="tlp-approved-member">
-                <div className="tlp-approved-member-info">
-                  <div className="tlp-approved-member-number">{index + 1}</div>
-                  <div>
-                    <div className="tlp-approved-member-name">{member.name}</div>
-                    <div className="tlp-approved-reward-name">
-                      {member.rewardName}
-                    </div>
-                  </div>
-                </div>
-                <div className="tlp-approved-badge">Approved</div>
-              </div>
-            ))}
-          </div>
+    <div className="managernomination-container">
+      <Toaster position="top-right" richColors />
+ 
+      <Breadcrumbs items={[{ label: "Performance", to: "/performance" }, { label: "Performance Review", to: "/performance/review" }]} />
+ 
+      <h1 className="managernomination-page-title">My Team Nominations</h1>
+ 
+      <div className="managernomination-card">
+        <div className="managernomination-tab-container" role="tablist" aria-label="Nomination tabs">
+          <button
+            className={`managernomination-tab ${activeTab === "pending" ? "managernomination-tab-active" : ""}`}
+            onClick={() => setActiveTab("pending")}
+            role="tab"
+            aria-selected={activeTab === "pending"}
+          >
+            Pending ({pendingNominations.length})
+          </button>
+ 
+          <button
+            className={`managernomination-tab ${activeTab === "approved" ? "managernomination-tab-active" : ""}`}
+            onClick={() => setActiveTab("approved")}
+            role="tab"
+            aria-selected={activeTab === "approved"}
+          >
+            Approved ({approvedNominations.length})
+          </button>
+ 
+          <button
+            className={`managernomination-tab ${activeTab === "rejected" ? "managernomination-tab-active" : ""}`}
+            onClick={() => setActiveTab("rejected")}
+            role="tab"
+            aria-selected={activeTab === "rejected"}
+          >
+            Rejected ({rejectedNominations.length})
+          </button>
         </div>
-      )}
-
-      {/* Team Members Section with Tabs */}
-      {teamMembers.length > 0 && (
-        <div className="tlp-card">
-          <h2 className="tlp-section-title">My Team Nominations</h2>
-
-          {/* Tabs */}
-          <div className="tlp-tab-container">
-            <button
-              onClick={() => setActiveTab("pending")}
-              className={`tlp-tab ${
-                activeTab === "pending" ? "tlp-tab-active" : ""
-              }`}
-            >
-              Pending ({pendingNominations.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("approved")}
-              className={`tlp-tab ${
-                activeTab === "approved" ? "tlp-tab-active" : ""
-              }`}
-            >
-              Approved ({approvedNominations.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("rejected")}
-              className={`tlp-tab ${
-                activeTab === "rejected" ? "tlp-tab-active" : ""
-              }`}
-            >
-              Rejected ({rejectedNominations.length})
-            </button>
-          </div>
-
-          {/* Nominations Table */}
-          <div className="tlp-table-wrapper">
-            <table className="tlp-table">
-              <thead>
+ 
+        {/* Nominations table for selected tab */}
+        <div className="managernomination-table-wrapper">
+          <table className="managernomination-table" role="table" aria-label="Nominations table">
+            <thead>
+              <tr>
+                <th className="col-index">#</th>
+                <th className="col-name">Name</th>
+                <th className="col-dept">Department</th>
+                <th className="col-reward">Reward Type</th>
+                <th className="col-status">Status</th>
+              </tr>
+            </thead>
+ 
+            <tbody>
+              {activeTab === "pending" &&
+                pendingPager.paged.map((nom, i) => {
+                  const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
+                  const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
+                  const reward = safeText(nom?.rewardType?.rewardName, nom?.rewardName, "-");
+                  return (
+                    <tr key={nom?.nominationId || i}>
+                      <td className="col-index">{(pendingPager.page - 1) * pendingPager.pageSize + i + 1}</td>
+                      <td className="col-name">{name}</td>
+                      <td className="col-dept">{dept}</td>
+                      <td className="col-reward">{reward}</td>
+                      <td className="col-status">
+                        <span className="managernomination-badge managernomination-badge-pending">Pending</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+ 
+              {activeTab === "approved" &&
+                approvedPager.paged.map((nom, i) => {
+                  const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
+                  const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
+                  const reward = safeText(nom?.rewardType?.rewardName, nom?.rewardName, "-");
+                  return (
+                    <tr key={nom?.nominationId || i}>
+                      <td className="col-index">{(approvedPager.page - 1) * approvedPager.pageSize + i + 1}</td>
+                      <td className="col-name">{name}</td>
+                      <td className="col-dept">{dept}</td>
+                      <td className="col-reward">{reward}</td>
+                      <td className="col-status">
+                        <span className="managernomination-badge managernomination-badge-approved">Approved</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+ 
+              {activeTab === "rejected" &&
+                rejectedPager.paged.map((nom, i) => {
+                  const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
+                  const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
+                  const reward = safeText(nom?.rewardType?.rewardName, nom?.rewardName, "-");
+                  return (
+                    <tr key={nom?.nominationId || i}>
+                      <td className="col-index">{(rejectedPager.page - 1) * rejectedPager.pageSize + i + 1}</td>
+                      <td className="col-name">{name}</td>
+                      <td className="col-dept">{dept}</td>
+                      <td className="col-reward">{reward}</td>
+                      <td className="col-status">
+                        <span className="managernomination-badge managernomination-badge-rejected">Rejected</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+ 
+              {/* Empty fallback */}
+              {((activeTab === "pending" && pendingNominations.length === 0) ||
+                (activeTab === "approved" && approvedNominations.length === 0) ||
+                (activeTab === "rejected" && rejectedNominations.length === 0)) && (
                 <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Department</th>
-                  <th>Reward Type</th>
-                  <th>Status</th>
-                  {activeTab === "pending" && <th>Action</th>}
+                  <td colSpan={5} className="managernomination-empty-row">
+                    No {activeTab} nominations found
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {activeTab === "pending" &&
-                  pendingNominations.map((nom, index) => (
-                    <tr key={nom?.nominationId || index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        {nom?.nominee?.firstName || ""}{" "}
-                        {nom?.nominee?.lastName || ""}
-                      </td>
-                      <td>
-                        {nom?.nominee?.department?.departmentName || "N/A"}
-                      </td>
-                      <td>{nom?.rewardType?.rewardName || "N/A"}</td>
-                      <td>
-                        <span className="tlp-badge tlp-badge-pending">
-                          Pending
-                        </span>
-                      </td>
-                      <td>
-                        <button className="tlp-view-button">
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-
-                {activeTab === "approved" &&
-                  approvedNominations.map((nom, index) => (
-                    <tr key={nom?.nominationId || index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        {nom?.nominee?.firstName || ""}{" "}
-                        {nom?.nominee?.lastName || ""}
-                      </td>
-                      <td>
-                        {nom?.nominee?.department?.departmentName || "N/A"}
-                      </td>
-                      <td>{nom?.rewardType?.rewardName || "N/A"}</td>
-                      <td>
-                        <span className="tlp-badge tlp-badge-approved">
-                          Approved
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-
-                {activeTab === "rejected" &&
-                  rejectedNominations.map((nom, index) => (
-                    <tr key={nom?.nominationId || index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        {nom?.nominee?.firstName || ""}{" "}
-                        {nom?.nominee?.lastName || ""}
-                      </td>
-                      <td>
-                        {nom?.nominee?.department?.departmentName || "N/A"}
-                      </td>
-                      <td>{nom?.rewardType?.rewardName || "N/A"}</td>
-                      <td>
-                        <span className="tlp-badge tlp-badge-rejected">
-                          Rejected
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-
-                {((activeTab === "pending" &&
-                  pendingNominations.length === 0) ||
-                  (activeTab === "approved" &&
-                    approvedNominations.length === 0) ||
-                  (activeTab === "rejected" &&
-                    rejectedNominations.length === 0)) && (
-                  <tr>
-                    <td
-                      colSpan={activeTab === "pending" ? 6 : 5}
-                      className="tlp-empty-row"
-                    >
-                      No {activeTab} nominations found
+              )}
+            </tbody>
+          </table>
+        </div>
+ 
+        {/* Pagination area */}
+        <div style={{ marginTop: 12 }}>
+          {activeTab === "pending" && <Pagination pager={pendingPager} />}
+          {activeTab === "approved" && <Pagination pager={approvedPager} />}
+          {activeTab === "rejected" && <Pagination pager={rejectedPager} />}
+        </div>
+ 
+        {/* Available for nomination */}
+        <div className="managernomination-available-section" style={{ marginTop: 28 }}>
+          <h3 className="managernomination-subsection-title">Available for Nomination</h3>
+ 
+          <table className="managernomination-table" role="table" aria-label="Available for nomination">
+            <thead>
+              <tr>
+                <th className="col-index">#</th>
+                <th className="col-name">Name</th>
+                <th className="col-dept">Department</th>
+                <th className="col-action">Action</th>
+              </tr>
+            </thead>
+ 
+            <tbody>
+              {availablePager.paged.map((member, i) => {
+                const name = safeText(`${member?.firstName || ""} ${member?.lastName || ""}`, member?.name);
+                const dept = safeText(member?.department?.departmentName, member?.departmentName, "-");
+                return (
+                  <tr key={member?.employeeId || i}>
+                    <td className="col-index">{(availablePager.page - 1) * availablePager.pageSize + i + 1}</td>
+                    <td className="col-name">{name}</td>
+                    <td className="col-dept">{dept}</td>
+                    <td className="col-action">
+                      <button
+                        className="managernomination-nominate-button"
+                        onClick={() => handleOpenNominate(member)}
+                        disabled={!canNominate}
+                        title={canNominate ? "Nominate this employee" : "Switch to Pending tab to nominate"}
+                        aria-disabled={!canNominate}
+                      >
+                        Nominate
+                      </button>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Available for Nomination */}
-          <div className="tlp-available-section">
-            <h3 className="tlp-subsection-title">
-              Available for Nomination
-            </h3>
-            <table className="tlp-table">
-              <thead>
+                );
+              })}
+ 
+              {availableMembers.length === 0 && (
                 <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Department</th>
-                  <th>Action</th>
+                  <td colSpan={4} className="managernomination-empty-row">No available team members</td>
                 </tr>
-              </thead>
-              <tbody>
-                {teamMembers
-                  .filter(
-                    (member) =>
-                      getNominationStatus(member?.employeeId) ===
-                      "No nomination yet"
-                  )
-                  .map((member, index) => (
-                    <tr key={member?.employeeId || index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        {member?.firstName || ""} {member?.lastName || ""}
-                      </td>
-                      <td>
-                        {member?.department?.departmentName || "N/A"}
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => handleNominateClick(member)}
-                          className="tlp-nominate-button"
-                        >
-                          Nominate
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+              )}
+            </tbody>
+          </table>
+ 
+          <div style={{ marginTop: 12 }}>
+            <Pagination pager={availablePager} />
           </div>
         </div>
-      )}
-
-      {/* Nomination Modal */}
+      </div>
+ 
+      {/* Nomination modal */}
       <NominationModal
         show={showNominationModal}
         onHide={() => setShowNominationModal(false)}
@@ -971,5 +393,5 @@ function ManagerNomination() {
     </div>
   );
 }
-
-export default ManagerNomination;
+ 
+ 

@@ -141,6 +141,8 @@ export const getAllManagerNominations = () => {
 export const approveNominations = (payload) => {
   return api.post("/HRNomination/hr/nominations/approve", payload);
 };
+// Add this new function!
+
 
 /**
  * Reject selected nominations

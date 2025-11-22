@@ -179,7 +179,7 @@
 
 
 .dp-tab-btn.active {
-  background: linear-gradient(135deg, #97247E 0%, #E01950 100%);
+  background: #27235c;
   color: #fff;
   box-shadow: 0 2px 8px rgba(151, 36, 126, 0.3);
 }
@@ -228,6 +228,7 @@
   flex: 1;
   min-width: 250px;
   max-width: 400px;
+  border:  #27235c;
 }
 
 
@@ -244,7 +245,7 @@
 .dp-search-input {
   width: 100%;
   padding: 0.625rem 1rem 0.625rem 2.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid  #27235c;
   border-radius: 8px;
   font-size: 0.9375rem;
   transition: all 0.3s ease;
@@ -261,7 +262,7 @@
 .dp-filter-select,
 .dp-filter-date {
   padding: 0.625rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid  #27235c;
   border-radius: 8px;
   font-size: 0.9375rem;
   color: #27235c;
@@ -297,7 +298,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #27235c;
   transition: all 0.3s ease;
 }
 
@@ -369,11 +370,16 @@
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   overflow: hidden;
+  width: 100%;
+  border: 1px #27235c;
 }
 
 
 .dp-table-wrapper {
   overflow-x: auto;
+  width: 100%;
+  
+  border: 1px #27235c;
 }
 
 
@@ -381,11 +387,16 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9375rem;
+  border: 1px #27235c;
+  
 }
 
 
+
 .dp-table thead {
-  background: #f8f9fa;
+  width: 100%;
+  background: #27235c;
+
 }
 
 
@@ -393,7 +404,7 @@
   padding: 0.875rem 1rem;
   text-align: left;
   font-weight: 600;
-  color: #27235c;
+  color: white;
   border-bottom: 2px solid #e5e7eb;
   font-size: 0.875rem;
   text-transform: uppercase;
@@ -417,6 +428,7 @@
   padding: 0.875rem 1rem;
   color: #27235c;
   vertical-align: middle;
+  text-align: left;
 }
 
 
@@ -428,7 +440,10 @@
 .dp-table .text-muted {
   color: #6c757d;
 }
-
+.dp-table,
+.dp-table th {
+  border: 1px solid #27235c;
+}
 
 /* User Info */
 .dp-user-info {
@@ -658,7 +673,7 @@
 
 
 .dp-pagination .dp-page-item.active .dp-page-link {
-  background: linear-gradient(135deg, #97247E 0%, #E01950 100%);
+  background: #27235c;
   border-color: transparent;
   color: #fff;
   box-shadow: 0 2px 6px rgba(151, 36, 126, 0.3);
@@ -1004,6 +1019,7 @@
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
+ 
 }
 
 
@@ -1280,17 +1296,34 @@
     grid-template-columns: 1fr;
   }
 
+  .dp-table-card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    overflow: visible;
+    width: fit-content;
+    margin: 0 auto;
+    /* Remove width: 100% here! Use fit-content for shrink-to-data card */
+  }
+  
   .dp-table-wrapper {
+    width: fit-content;
+    margin: 0 auto;
     overflow-x: auto;
-  }
+    
+    
 
+
+  }
+  
   .dp-table {
-    min-width: 1000px;
-  }
+    width: auto;
+    min-width: 600px;        /* or remove for absolute shrink, or set your min desired */
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    table-layout: auto;
 
-  .dp-pagination-container {
-    flex-direction: column;
-    align-items: flex-start;
+       /* columns size to content */
   }
 
   .dp-details-grid {
@@ -1300,6 +1333,7 @@
   .dp-inner-table-wrapper {
     overflow-x: scroll;
   }
+  
 }
 
 
@@ -1308,11 +1342,18 @@
   .dp-table td {
     padding: 0.75rem 0.75rem;
     font-size: 0.875rem;
+    
   }
 
   .dp-modal-dialog {
     margin: 0.5rem;
   }
+  .dp-table,
+.dp-table th,
+.dp-table td {
+  border: 1px solid #27235c;
+}
+
 }
 
 

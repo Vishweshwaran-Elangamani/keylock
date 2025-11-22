@@ -69,5 +69,8 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+// Add this new function!
+
+
 
 export default api;

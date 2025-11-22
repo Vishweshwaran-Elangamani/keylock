@@ -1,16 +1,16 @@
 /**
  * ManagerDashboard Component
- * 
+ *
  * Manager Evaluation Dashboard
  * Features:
  * - Tab-based view (Pending/Completed)
  * - Advanced filtering (Form name + Type)
  * - Simple professional form template
  * - Assessment submission and viewing
- * 
+ *
  * @component
  */
-
+ 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/hr/api";
@@ -19,12 +19,12 @@ import "react-toastify/dist/ReactToastify.css";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
 import "../../../components/performance_management/modals/ManagerPerformanceDashboard/ManagerPerformanceDashboardModal";
-
+ 
 export default function ManagerDashboard() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
-
+ 
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -33,53 +33,53 @@ export default function ManagerDashboard() {
   const [assessmentData, setAssessmentData] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
-
+ 
   // Filter states
   const [pendingFormNameFilter, setPendingFormNameFilter] = useState("");
   const [pendingTypeFilter, setPendingTypeFilter] = useState("");
   const [completedFormNameFilter, setCompletedFormNameFilter] = useState("");
   const [completedTypeFilter, setCompletedTypeFilter] = useState("");
-
+ 
   // ========================
   // EFFECTS
   // ========================
-
+ 
   useEffect(() => {
     if (userId) {
       fetchAssignments();
     }
   }, [userId]);
-
+ 
   // ========================
   // API FUNCTIONS
   // ========================
-
+ 
   const fetchAssignments = async () => {
     if (!userId) {
       toast.error("Unable to load manager ID. Please login again.");
       return;
     }
-
+ 
     setLoading(true);
     setAssignments([]);
-
+ 
     try {
       const roleResponse = await api.get(`/AppraisalProcess/user/${userId}/role`);
-
+ 
       if (!roleResponse.data.success) {
         toast.error("User not found.");
         return;
       }
-
+ 
       const userRole = roleResponse.data.data;
-
+ 
       if (!userRole.isManager) {
         toast.error("This user is not a Manager.");
         return;
       }
-
+ 
       const assignmentRes = await api.get(`/AppraisalProcess/employee/${userId}`);
-
+ 
       if (assignmentRes.data.success) {
         setAssignments(assignmentRes.data.data);
         const pending = assignmentRes.data.data.filter((a) => !a.isCompleted).length;
@@ -93,7 +93,7 @@ export default function ManagerDashboard() {
       setLoading(false);
     }
   };
-
+ 
   const updateAssessmentData = (competencyId, field, value) => {
     setAssessmentData((prev) =>
       prev.map((item) =>
@@ -101,14 +101,14 @@ export default function ManagerDashboard() {
       )
     );
   };
-
+ 
   const handleSubmitAssessment = async () => {
     const incomplete = assessmentData.filter((item) => !item.rating);
     if (incomplete.length > 0) {
       toast.warning("Please provide ratings for all competencies.");
       return;
     }
-
+ 
     setSubmitting(true);
     const payload = {
       formId: currentAssignment.formId,
@@ -120,10 +120,10 @@ export default function ManagerDashboard() {
         employeeComments: item.comments || "",
       })),
     };
-
+ 
     try {
       const response = await api.post("/SelfAssessment/submit", payload);
-
+ 
       if (response.data?.success) {
         toast.success("Assessment submitted successfully!");
         setShowModal(false);
@@ -137,17 +137,17 @@ export default function ManagerDashboard() {
       setSubmitting(false);
     }
   };
-
+ 
   const handleViewCompleted = async (assignment) => {
     setCurrentAssignment(assignment);
     setModalMode("view");
     setSubmitting(true);
-
+ 
     try {
       const { data } = await api.get(
         `/SelfAssessment/view/${assignment.formId}/user/${userId}`
       );
-
+ 
       if (data.success) {
         const viewData = data.data.details.map((detail) => ({
           competencyId: detail.competencyId,
@@ -156,7 +156,7 @@ export default function ManagerDashboard() {
           rating: detail.rating,
           comments: detail.comments || "",
         }));
-
+ 
         setAssessmentData(viewData);
         setShowModal(true);
         toast.info("Assessment loaded successfully");
@@ -170,11 +170,11 @@ export default function ManagerDashboard() {
       setSubmitting(false);
     }
   };
-
+ 
   // ========================
   // FILTER & DATA PROCESSING
   // ========================
-
+ 
   const pendingAssignments = assignments
     .filter((a) => !a.isCompleted)
     .filter((a) => {
@@ -182,7 +182,7 @@ export default function ManagerDashboard() {
       const matchesType = pendingTypeFilter === "" || a.formType === pendingTypeFilter;
       return matchesFormName && matchesType;
     });
-
+ 
   const completedAssignments = assignments
     .filter((a) => a.isCompleted)
     .filter((a) => {
@@ -190,13 +190,13 @@ export default function ManagerDashboard() {
       const matchesType = completedTypeFilter === "" || a.formType === completedTypeFilter;
       return matchesFormName && matchesType;
     });
-
+ 
   const allFormTypes = [...new Set(assignments.map(a => a.formType))];
-
+ 
   // ========================
   // RENDER FUNCTIONS
   // ========================
-
+ 
   const renderTable = (data, isCompleted) => (
     <div className="manevap-table-container">
       <table className="manevap-table">
@@ -269,11 +269,11 @@ export default function ManagerDashboard() {
       </table>
     </div>
   );
-
+ 
   // ========================
   // MAIN RENDER - LOADING STATE
   // ========================
-
+ 
   if (loading) {
     return (
       <div className="manevap-container">
@@ -285,21 +285,21 @@ export default function ManagerDashboard() {
       </div>
     );
   }
-
+ 
   // ========================
   // MAIN RENDER - PAGE CONTENT
   // ========================
-
+ 
   return (
     <div className="manevap-container">
       <ToastContainer />
-
+ 
       {/* Bootstrap Icons CDN */}
-      <link 
-        rel="stylesheet" 
+      <link
+        rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
       />
-
+ 
       {/* Header Section - LEFT ALIGNED */}
       <div className="manevap-header-section">
         <div className="manevap-header-icon">
@@ -310,7 +310,7 @@ export default function ManagerDashboard() {
           <p className="manevap-subtitle">Manage and review your performance assessments</p>
         </div>
       </div>
-
+ 
       {/* Tab Navigation */}
       <div className="manevap-tab-container">
         <button
@@ -330,7 +330,7 @@ export default function ManagerDashboard() {
           <span className="manevap-tab-badge">{completedAssignments.length}</span>
         </button>
       </div>
-
+ 
       {/* Pending Tab */}
       {activeTab === "pending" && (
         <div className="manevap-card">
@@ -378,13 +378,13 @@ export default function ManagerDashboard() {
               </button>
             )}
           </div>
-
+ 
           {pendingAssignments.length === 0 ? (
             <div className="manevap-empty-state">
               <i className="bi bi-inbox"></i>
               <h3>
-                {pendingFormNameFilter || pendingTypeFilter 
-                  ? "No Matching Assessments" 
+                {pendingFormNameFilter || pendingTypeFilter
+                  ? "No Matching Assessments"
                   : "No Pending Assessments"}
               </h3>
               <p>
@@ -398,7 +398,7 @@ export default function ManagerDashboard() {
           )}
         </div>
       )}
-
+ 
       {/* Completed Tab */}
       {activeTab === "completed" && (
         <div className="manevap-card">
@@ -446,7 +446,7 @@ export default function ManagerDashboard() {
               </button>
             )}
           </div>
-
+ 
           {completedAssignments.length === 0 ? (
             <div className="manevap-empty-state">
               <i className="bi bi-clipboard-check"></i>
@@ -466,13 +466,13 @@ export default function ManagerDashboard() {
           )}
         </div>
       )}
-
+ 
       {/* Assessment Modal - Simple Professional Form */}
-      
+     
      {showModal && currentAssignment && (
   <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
     <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
-
+ 
       <div className="manevap-form-header-strict">
         <div style={{display: 'flex', alignItems: 'center', gap: 16}}>
           <img src={logoImage} alt="EEPZ Logo" className="manevap-modal-logo" />
@@ -483,7 +483,7 @@ export default function ManagerDashboard() {
           </div>
         </div>
       </div>
-      
+     
       {submitting && modalMode === "view"
         ? <div className="manevap-modal-loading"><div className="spinner-border"></div><p>Loading assessment...</p></div>
         : (
@@ -563,7 +563,9 @@ export default function ManagerDashboard() {
     </div>
   </div>
 )}
-
+ 
     </div>
   );
 }
+ 
+ 

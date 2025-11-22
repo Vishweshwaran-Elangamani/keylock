@@ -1,11 +1,20 @@
- 
+// Paste your JSX component code below (replace this entire file contents with your .jsx file)
+
+/*
+  MyAssessments_updated.jsx
+  - Updated: search box now uses a separate Search button and Enter key to trigger filtering
+  - Fixed: Form Type select default value now matches filter logic ("All")
+  - Added: local input state `searchInput` so typing doesn't immediately filter results
+  - Minor: Enter key submits search, and Search button placed next to input
+*/
+
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import api from "../../../services/performancemanagement/hr/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
- 
+
 // Utility function to get days and hours left
 function getTimeLeft(deadline) {
   const now = new Date();
@@ -16,7 +25,38 @@ function getTimeLeft(deadline) {
   const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   return { days, hours, expired: ms === 0 };
 }
- 
+
+/**
+ * Breadcrumbs component
+ * items: [{ label: string, to: string }]
+ */
+function Breadcrumbs({ items = [] }) {
+  return (
+    <nav aria-label="breadcrumb" className="empassper-breadcrumbs">
+      <ol>
+        {items.map((item, index) => {
+          const last = index === items.length - 1;
+
+          return (
+            <li key={index} className={last ? "current" : ""}>
+              {!last ? (
+                <Link to={item.to || "#"} className="breadcrumb-link">
+                  {item.label}
+                </Link>
+              ) : (
+                <span className="breadcrumb-current" aria-current="page">{item.label}</span>
+              )}
+
+              {!last && <span className="breadcrumb-sep">{'>'}</span>}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
+
 function MyAssessments() {
   const navigate = useNavigate();
   const [assignments, setAssignments] = useState([]);
@@ -28,18 +68,20 @@ function MyAssessments() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
   const [searchQuery, setSearchQuery] = useState("");
+  // NEW: local input state so typing does NOT immediately filter
+  const [searchInput, setSearchInput] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [formTypeFilter, setFormTypeFilter] = useState("All");
   const [timers, setTimers] = useState({}); // Store all pending form timers
   const [visibleTimers, setVisibleTimers] = useState([]); // Store visible timer bars
- 
+
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
- 
+
   // ========================
   // EFFECTS
   // ========================
- 
+
   useEffect(() => {
     if (!userId) {
       navigate("/employee/login");
@@ -47,20 +89,20 @@ function MyAssessments() {
     }
     fetchAssignments();
   }, [userId, navigate]);
- 
+
   // TIMER EFFECT - RUNS EVERY SECOND FOR ALL PENDING FORMS
   useEffect(() => {
     const interval = setInterval(() => {
       const pendingAssignments = assignments.filter((a) => !a.isCompleted);
       const newTimers = {};
       const now = new Date();
- 
+
       pendingAssignments.forEach((assignment) => {
         if (assignment.deadline) {
           const deadline = new Date(assignment.deadline);
           const diffTime = deadline - now;
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-         
+
           newTimers[assignment.assignmentId] = {
             days: diffDays >= 0 ? diffDays : 0,
             formName: assignment.formName,
@@ -69,19 +111,22 @@ function MyAssessments() {
           };
         }
       });
- 
+
       setTimers(newTimers);
-      // Show all pending form timers at the top
-      setVisibleTimers(Object.entries(newTimers).map(([key, value]) => ({ id: key, ...value })));
+      // Show all pending form timers at the top, sorted by soonest deadline
+      const sorted = Object.entries(newTimers)
+        .map(([key, value]) => ({ id: key, ...value }))
+        .sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+      setVisibleTimers(sorted);
     }, 1000);
- 
+
     return () => clearInterval(interval);
   }, [assignments]);
- 
+
   // ========================
   // API FUNCTIONS
   // ========================
- 
+
   const fetchAssignments = async () => {
     setLoading(true);
     try {
@@ -99,11 +144,11 @@ function MyAssessments() {
       setLoading(false);
     }
   };
- 
+
   const openSubmitModal = (assignment) => {
     setCurrentAssignment(assignment);
     setModalMode("submit");
-    const initialData = assignment.competencies.map((comp) => ({
+    const initialData = (assignment.competencies || []).map((comp) => ({
       competencyId: comp.competencyId,
       competencyName: comp.name,
       competencyDescription: comp.description,
@@ -113,7 +158,7 @@ function MyAssessments() {
     setAssessmentData(initialData);
     setShowModal(true);
   };
- 
+
   const openViewModal = async (assignment) => {
     setCurrentAssignment(assignment);
     setModalMode("view");
@@ -121,7 +166,7 @@ function MyAssessments() {
     try {
       const { data } = await api.get(`/SelfAssessment/view/${assignment.formId}/user/${userId}`);
       if (data.success) {
-        const viewData = data.data.details.map((detail) => ({
+        const viewData = (data.data.details || []).map((detail) => ({
           competencyId: detail.competencyId,
           competencyName: detail.competencyName,
           competencyDescription: detail.competencyDescription,
@@ -141,102 +186,108 @@ function MyAssessments() {
       setSubmitting(false);
     }
   };
- 
+
   const updateAssessmentData = (competencyId, field, value) => {
     setAssessmentData((prev) =>
-      prev.map((item) =>
-        item.competencyId === competencyId ? { ...item, [field]: value } : item
-      )
+      prev.map((item) => (item.competencyId === competencyId ? { ...item, [field]: value } : item))
     );
   };
- 
-const handleSubmitAssessment = async () => {
-  // ✅ Validate ratings
-  const incompleteRatings = assessmentData.filter((item) => !item.rating);
-  if (incompleteRatings.length > 0) {
-    toast.error("Please provide ratings for all competencies.");
-    return;
-  }
- 
-  // ✅ Validate comments
-  const incompleteComments = assessmentData.filter(
-    (item) => !item.comments || item.comments.trim() === ""
-  );
-  if (incompleteComments.length > 0) {
-    toast.error("Please provide comments for all competencies.");
-    return;
-  }
- 
-  setSubmitting(true);
-  const payload = {
-    formId: currentAssignment.formId,
-    userId: parseInt(userId),
-    status: "Submitted",
-    assessmentDetails: assessmentData.map((item) => ({
-      competencyId: item.competencyId,
-      employeeRating: parseInt(item.rating),
-      employeeComments: item.comments.trim(),
-    })),
-  };
- 
-  try {
-    const { data } = await api.post("/SelfAssessment/submit", payload);
-    if (data.success) {
-      toast.success("Assessment submitted successfully!");
-      setShowModal(false);
- 
-      // Remove timer for submitted form
-      const assignmentIdToRemove = currentAssignment.assignmentId;
-      setTimers((prev) => {
-        const newTimers = { ...prev };
-        delete newTimers[assignmentIdToRemove];
-        return newTimers;
-      });
- 
-      setCurrentAssignment(null);
-      await fetchAssignments();
-    } else {
-      toast.error("Submission failed.");
+
+  const handleSubmitAssessment = async () => {
+    // ✅ Validate ratings
+    const incompleteRatings = assessmentData.filter((item) => !item.rating);
+    if (incompleteRatings.length > 0) {
+      toast.error("Please provide ratings for all competencies.");
+      return;
     }
-  } catch (error) {
-    toast.error("Submission failed.");
-    console.error(error);
-  } finally {
-    setSubmitting(false);
-  }
-};
+
+    // ✅ Validate comments
+    const incompleteComments = assessmentData.filter((item) => !item.comments || item.comments.trim() === "");
+    if (incompleteComments.length > 0) {
+      toast.error("Please provide comments for all competencies.");
+      return;
+    }
+
+    setSubmitting(true);
+    const payload = {
+      formId: currentAssignment.formId,
+      userId: parseInt(userId),
+      status: "Submitted",
+      assessmentDetails: assessmentData.map((item) => ({
+        competencyId: item.competencyId,
+        employeeRating: parseInt(item.rating),
+        employeeComments: item.comments.trim(),
+      })),
+    };
+
+    try {
+      const { data } = await api.post("/SelfAssessment/submit", payload);
+      if (data.success) {
+        toast.success("Assessment submitted successfully!");
+        setShowModal(false);
+
+        // Remove timer for submitted form
+        const assignmentIdToRemove = currentAssignment.assignmentId;
+        setTimers((prev) => {
+          const newTimers = { ...prev };
+          delete newTimers[assignmentIdToRemove];
+          return newTimers;
+        });
+
+        setCurrentAssignment(null);
+        await fetchAssignments();
+      } else {
+        toast.error("Submission failed.");
+      }
+    } catch (error) {
+      toast.error("Submission failed.");
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   // ========================
   // FILTER & DATA PROCESSING
   // ========================
- 
+
   const pendingAssignments = assignments.filter((a) => !a.isCompleted);
   const completedAssignments = assignments.filter((a) => a.isCompleted);
- 
+
   const formTypes = ["All", ...new Set(assignments.map((a) => a.formType).filter(Boolean))];
- 
+
   const filterAssignments = (assignmentList) => {
     return assignmentList.filter((assignment) => {
       const matchSearch =
         assignment.formName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         assignment.formType.toLowerCase().includes(searchQuery.toLowerCase());
- 
+
       const matchDate = !dateFilter ||
         new Date(assignment.deadline).toLocaleDateString("en-GB") ===
         new Date(dateFilter).toLocaleDateString("en-GB");
- 
+
       const matchType = formTypeFilter === "All" || assignment.formType === formTypeFilter;
- 
+
       return matchSearch && matchDate && matchType;
     });
   };
- 
+
   const filteredPending = filterAssignments(pendingAssignments);
   const filteredCompleted = filterAssignments(completedAssignments);
- 
+
+  // ========================
+  // SEARCH HANDLER (NEW)
+  // ========================
+  const handleSearch = () => {
+    // Trim input and update the actual query used for filtering
+    setSearchQuery(searchInput.trim());
+    // You could also reset pagination or other UI state here if present
+  };
+
   // ========================
   // RENDER FUNCTIONS
   // ========================
- 
+
   const renderTable = (data) => (
     <div className="empassper-table-container">
       <table className="empassper-table">
@@ -287,7 +338,7 @@ const handleSubmitAssessment = async () => {
                   ) : (
                     <button className="empassper-btn empassper-btn-view" onClick={() => openViewModal(assignment)}>
                       <i className="bi bi-eye-fill"></i>
-                      View
+                      
                     </button>
                   )}
                 </td>
@@ -298,11 +349,11 @@ const handleSubmitAssessment = async () => {
       </table>
     </div>
   );
- 
+
   // ========================
   // MAIN RENDER - LOADING STATE
   // ========================
- 
+
   if (loading) {
     return (
       <div className="empassper-container">
@@ -314,26 +365,30 @@ const handleSubmitAssessment = async () => {
       </div>
     );
   }
- 
+
   // ========================
   // MAIN RENDER - PAGE CONTENT
   // ========================
- 
+
   return (
     <div className="empassper-container">
       <Toaster position="top-right" richColors />
- 
-      {/* Header Section */}
+
+      {/* Header Section with breadcrumbs */}
       <div className="empassper-header-section">
         <div className="empassper-header-content">
-          <div className="empassper-header-icon">
-            <i className="bi bi-clipboard-check"></i>
-          </div>
-          <div className="empassper-header-text">
-            <h2 className="empassper-header-title">My Performance Assessments</h2>
-            <p className="empassper-header-description">View and complete your assigned performance evaluations</p>
+          <div className="empassper-header-text" style={{ flex: 1 }}>
+            {/* Breadcrumbs */}
+            <Breadcrumbs
+              items={[
+                { label: <i className="bi bi-house-fill" aria-hidden="true"></i>, to: "/employee/dashboard", isIcon: true },
+                { label: "Performance Management", to: "/employee/dashboard/performance" },
+                { label: <strong>My Performance Assessments</strong>, to: "/employee/dashboard/performance/my-assessments" }
+              ]}
+            />
           </div>
         </div>
+
         {showModal && currentAssignment && timers[currentAssignment.assignmentId] && (
           <div className="empassper-timer-container">
             <div className="empassper-timer-label">Time Remaining</div>
@@ -348,7 +403,7 @@ const handleSubmitAssessment = async () => {
           </div>
         )}
       </div>
- 
+
       {/* TIMER BARS - ALWAYS VISIBLE FOR ALL PENDING FORMS */}
       {visibleTimers.length > 0 && (
         <div className="empassper-timer-bars-container">
@@ -367,24 +422,28 @@ const handleSubmitAssessment = async () => {
           ))}
         </div>
       )}
- 
+
       {/* Search & Filter */}
       <div className="empassper-search-filter-container">
         <div className="empassper-search-box">
-          <i className="bi bi-search"></i>
+         
           <input
             type="text"
             placeholder="Search by form name or type..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            aria-label="Search assessments"
           />
+          {/* NEW: Separate Search button */}
+          <button className="empassper-search-btn" onClick={handleSearch} aria-label="Search">Search</button>
         </div>
         <select
           className="empassper-filter-select"
           value={formTypeFilter}
           onChange={(e) => setFormTypeFilter(e.target.value)}
         >
-          <option value="">All Form Types</option>
+          <option value="All">All Form Types</option>
           {formTypes.filter(t => t !== "All").map((type) => (
             <option key={type} value={type}>
               {type}
@@ -399,7 +458,7 @@ const handleSubmitAssessment = async () => {
           placeholder="Filter by deadline"
         />
       </div>
- 
+
       {/* Statistics Cards */}
       <div className="empassper-stats-grid">
         <div className="empassper-stat-card empassper-stat-pending">
@@ -430,7 +489,7 @@ const handleSubmitAssessment = async () => {
           </div>
         </div>
       </div>
- 
+
       {/* Tab Navigation */}
       <div className="empassper-tab-container">
         <button
@@ -450,7 +509,7 @@ const handleSubmitAssessment = async () => {
           <span className="empassper-tab-badge">{filteredCompleted.length}</span>
         </button>
       </div>
- 
+
       {/* Content */}
       <div className="empassper-card">
         {activeTab === "pending" && (
@@ -472,7 +531,7 @@ const handleSubmitAssessment = async () => {
             )}
           </>
         )}
- 
+
         {activeTab === "completed" && (
           <>
             {filteredCompleted.length > 0 ? (
@@ -491,7 +550,7 @@ const handleSubmitAssessment = async () => {
           </>
         )}
       </div>
- 
+
       {/* Modal - KEEPING ORIGINAL FORMAT */}
       {showModal && currentAssignment && (
         <div
@@ -515,9 +574,9 @@ const handleSubmitAssessment = async () => {
                 </p>
               </div>
             </div>
- 
+
             <div className="form-divider"></div>
- 
+
             {submitting && modalMode === "view" ? (
               <div
                 className="form-body"
@@ -593,7 +652,7 @@ const handleSubmitAssessment = async () => {
                                 placeholder="Justify through comments"
                                 className="form-textarea"
                                 disabled={submitting}
-                             
+
                               />
                             )}
                           </td>
@@ -602,7 +661,7 @@ const handleSubmitAssessment = async () => {
                     </tbody>
                   </table>
                 </div>
- 
+
                 {/* Form Footer */}
                 <div className="form-footer">
                   <button
@@ -630,8 +689,9 @@ const handleSubmitAssessment = async () => {
     </div>
   );
 }
- 
+
 export default MyAssessments;
- 
- 
- 
+
+
+
+/* Responsive: reduce spacing on small screens */

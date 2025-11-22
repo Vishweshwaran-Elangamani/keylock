@@ -1,7 +1,7 @@
 import React from "react";
 import logoImage from "../../../../assets/logodark.png"
 import "../../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css"
-
+ 
 const ManagerPerformanceDashboardModal = ({
   showModal,
   setShowModal,
@@ -13,7 +13,7 @@ const ManagerPerformanceDashboardModal = ({
   updateAssessmentData,
 }) => {
   if (!showModal || !currentAssignment) return null;
-
+ 
   return (
     <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
       <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -27,7 +27,7 @@ const ManagerPerformanceDashboardModal = ({
             </div>
           </div>
         </div>
-
+ 
         {submitting && modalMode === "view" ? (
           <div className="manevap-modal-loading">
             <div className="spinner-border"></div>
@@ -112,5 +112,7 @@ const ManagerPerformanceDashboardModal = ({
     </div>
   );
 };
-
+ 
 export default ManagerPerformanceDashboardModal;
+ 
+ 
