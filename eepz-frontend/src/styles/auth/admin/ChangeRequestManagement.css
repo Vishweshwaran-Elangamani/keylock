@@ -64,7 +64,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #27235c;
   transition: all 0.3s ease;
   min-height: 95px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);

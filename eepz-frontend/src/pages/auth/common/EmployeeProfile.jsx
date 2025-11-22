@@ -103,7 +103,7 @@ const EmployeeProfile = () => {
         setProfileData(response.data);
         initializeFormData(response.data);
         toast.dismiss();
-        toast.success("Profile loaded successfully");
+        // toast.success("Profile loaded successfully");
       } else {
         toast.dismiss();
         toast.error(response.message || "Failed to load profile");

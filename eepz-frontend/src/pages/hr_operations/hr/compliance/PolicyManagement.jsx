@@ -276,7 +276,7 @@ const PolicyManagement = () => {
       </div>
 
       {/* Policies Table */}
-      <div className="table-card">
+      <div className="pm-table-card">
         <div className="table-wrapper">
           <table className="pm-table">
             <thead>

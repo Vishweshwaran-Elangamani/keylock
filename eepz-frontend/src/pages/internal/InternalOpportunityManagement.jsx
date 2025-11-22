@@ -257,7 +257,7 @@ const InternalOpportunityManagement = () => {
 
       {/* Statistics Cards - Compact */}
       <div className="int-stats-grid">
-        <div className="stat-card">
+        <div className="in-stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-briefcase-fill"></i>
           </div>
@@ -267,7 +267,7 @@ const InternalOpportunityManagement = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="in-stat-card">
           <div className="stat-icon stat-icon-success">
             <i className="bi bi-check-circle-fill"></i>
           </div>
@@ -279,7 +279,7 @@ const InternalOpportunityManagement = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="in-stat-card">
           <div className="stat-icon stat-icon-danger">
             <i className="bi bi-x-circle-fill"></i>
           </div>
@@ -291,7 +291,7 @@ const InternalOpportunityManagement = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="in-stat-card">
           <div className="stat-icon stat-icon-warning">
             <i className="bi bi-clock-fill"></i>
           </div>
@@ -352,7 +352,7 @@ const InternalOpportunityManagement = () => {
       </div>
 
       {/* Table Card */}
-      <div className="table-card">
+      <div className="in-table-card">
         <div className="table-wrapper">
           <table className="user-table">
             <thead>

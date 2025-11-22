@@ -474,7 +474,7 @@ const Login = () => {
                 </div>
                 {/* Remember Me & Forgot Password Row */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                  <div className="form-check">
+                  {/* <div className="form-check">
                     <input
                       type="checkbox"
                       className="form-check-input eepz-form-check-input"
@@ -487,7 +487,7 @@ const Login = () => {
                     <label className="form-check-label" htmlFor="rememberMe">
                       Remember me
                     </label>
-                  </div>
+                  </div> */}
                   <a
                     href="/reset-password"
                     className="text-decoration-none fw-semibold eepz-forgot-link"

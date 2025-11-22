@@ -216,7 +216,7 @@ const ComplianceIssues = () => {
       </div>
 
       {/* Escalations Container with Pagination */}
-      <div className="table-card">
+      <div className="ci-table-card">
         <div className="ci-violations-container">
           {currentItems.length === 0 ? (
             <div className="empty-state">
