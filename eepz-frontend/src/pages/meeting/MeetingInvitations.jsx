@@ -16,6 +16,7 @@ import {
   Mail,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 const RSVP_STATUS = {
   ACCEPTED: "Accepted",
@@ -32,6 +33,7 @@ const MeetingInvitations = () => {
   const [rsvpComment, setRsvpComment] = useState("");
   const [rsvpStatus, setRsvpStatus] = useState(RSVP_STATUS.ACCEPTED);
   const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     loadInvitations();
@@ -44,8 +46,12 @@ const MeetingInvitations = () => {
       const data = Array.isArray(response) ? response : response.data ?? [];
       setInvitations(data);
     } catch (err) {
-      toastr.error("Failed to load meeting invitations.");
-      console.error(err);
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to load meeting invitations.";
+      toastr.error(errorMessage);
+      console.error("Load invitations error:", err);
     } finally {
       setLoading(false);
     }
@@ -53,6 +59,7 @@ const MeetingInvitations = () => {
 
   const openRsvpModal = (invitation) => {
     setSelectedInvitation(invitation);
+    setErrorMessage(""); // Clear any previous errors
     const currentStatus =
       invitation.rsvpStatus || invitation.RSVPStatus || RSVP_STATUS.PENDING;
     const validStatuses = Object.values(RSVP_STATUS);
@@ -67,6 +74,7 @@ const MeetingInvitations = () => {
   const closeRsvpModal = () => {
     setSelectedInvitation(null);
     setRsvpComment("");
+    setErrorMessage(""); // Clear errors when closing
   };
 
   const handleRsvpSubmit = async () => {
@@ -76,25 +84,58 @@ const MeetingInvitations = () => {
       selectedInvitation.meetingId || selectedInvitation.MeetingId;
 
     if (!meetingId || Number(meetingId) === 0) {
-      toastr.error("Invalid meeting ID.");
+      setErrorMessage("Invalid meeting ID.");
       return;
     }
 
     try {
       setSubmitting(true);
+      setErrorMessage(""); // Clear previous errors
+      
       const payload = {
         meetingId: Number(meetingId),
         rsvpStatus: rsvpStatus,
         rsvpComments: rsvpComment.trim(),
       };
 
-      await rsvpService.submitRsvp(payload);
+      const response = await rsvpService.submitRsvp(payload);
+      
+      // Check if response indicates failure (success === false)
+      if (response && response.success === false) {
+        const errorMsg = response.message || "Failed to submit RSVP.";
+        setErrorMessage(errorMsg);
+        return;
+      }
+
       toastr.success("RSVP submitted successfully.");
       closeRsvpModal();
       loadInvitations();
     } catch (err) {
-      toastr.error("Failed to submit RSVP.");
       console.error("RSVP submit error:", err);
+      
+      // Handle error - check if it has success and message properties
+      let errorMsg = "Failed to submit RSVP.";
+      
+      if (err && typeof err === 'object') {
+        // Check for direct success/message properties (your API format)
+        if (err.success === false && err.message) {
+          errorMsg = err.message;
+        }
+        // Check for response data
+        else if (err.response?.data?.message) {
+          errorMsg = err.response.data.message;
+        }
+        // Check for direct message
+        else if (err.message) {
+          errorMsg = err.message;
+        }
+        // Check for data object
+        else if (err.data?.message) {
+          errorMsg = err.data.message;
+        }
+      }
+      
+      setErrorMessage(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -194,36 +235,81 @@ const MeetingInvitations = () => {
     >
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          {/* Header */}
-          <div className="d-flex align-items-center gap-3 mb-4 flex-wrap">
-            <button
-              className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-              onClick={() => navigate(-1)}
-              style={{ width: "40px", height: "40px" }}
+          {/* Breadcrumb Navigation */}
+          <nav aria-label="breadcrumb" className="mb-3">
+            <ol
+              className="breadcrumb mb-0 d-flex align-items-center"
+              style={{
+                backgroundColor: "transparent",
+                padding: 0,
+                margin: 0,
+              }}
             >
-              <ArrowLeft size={20} />
-            </button>
-            <div className="flex-grow-1">
-              <h2
-                className="fw-bold mb-1"
-                style={{ color: "#1e293b", fontSize: "1.75rem" }}
+              <li
+                className="breadcrumb-item"
+                style={{ display: "flex", alignItems: "center" }}
               >
-                Meeting Invitations
-              </h2>
-              <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
-                Review and respond to your meeting invitations
-              </p>
-            </div>
-            <div className="d-flex align-items-center gap-2 px-3 py-2 bg-white rounded border">
-              <Mail size={20} className="text-primary" />
-              <div>
-                <div className="fw-bold" style={{ fontSize: "1.25rem" }}>
-                  {invitations.length}
-                </div>
-                <small className="text-muted">Total</small>
-              </div>
-            </div>
-          </div>
+                <button
+                  onClick={() => navigate("/employee/dashboard/meetmom")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#7a1d65")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "#97247E")
+                  }
+                >
+                  <i
+                    className="bi bi-house-door"
+                    style={{ fontSize: "1rem" }}
+                  ></i>
+                  Dashboard
+                </button>
+              </li>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#97247E",
+                  margin: "0 8px",
+                  fontSize: "1rem",
+                }}
+              >
+                /
+              </li>
+              <li
+                className="breadcrumb-item active"
+                aria-current="page"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span
+                  style={{
+                    color: "#1e293b",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  Meeting Invitations
+                </span>
+              </li>
+            </ol>
+          </nav>
 
           {/* Empty State */}
           {invitations.length === 0 ? (
@@ -292,7 +378,7 @@ const MeetingInvitations = () => {
                           <div className="col">
                             <div className="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
                               <h5
-                                className="fw-bold mb-0"
+                                className="fw-bold mb-0 text-start"
                                 style={{ color: "#1e293b" }}
                               >
                                 {meetingTitle}
@@ -300,7 +386,7 @@ const MeetingInvitations = () => {
                               {getStatusBadge(rsvpStatus)}
                             </div>
 
-                            <div className="row g-3">
+                            <div className="row g-3 text-start">
                               {schedulerName && (
                                 <div className="col-md-4">
                                   <div className="d-flex align-items-start gap-2">
@@ -396,8 +482,15 @@ const MeetingInvitations = () => {
                           <div className="col-12 col-md-auto mt-3 mt-md-0">
                             <div className="d-flex gap-2 flex-wrap">
                               <button
-                                className="btn btn-success d-flex align-items-center gap-2"
+                                className="btn gradient-button d-flex align-items-center gap-2"
                                 onClick={() => openRsvpModal(inv)}
+                                style={{
+                                  background:
+                                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                                  color: "#fff",
+                                  border: "none",
+                                  fontWeight: 500,
+                                }}
                               >
                                 <Send size={16} />
                                 RSVP
@@ -426,32 +519,69 @@ const MeetingInvitations = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="modal-content border-0 shadow">
-                  <div className="modal-header border-0 pb-0">
+                  <div
+                    className="modal-header border-0 pb-3"
+                    style={{
+                      background: "#27235C",
+                      borderRadius: "0.5rem 0.5rem 0 0",
+                    }}
+                  >
                     <div>
-                      <h5 className="modal-title fw-bold">Confirm RSVP</h5>
-                      <p className="text-muted small mb-0">
+                      <h5
+                        className="modal-title fw-bold"
+                        style={{ color: "#fff" }}
+                      >
+                        Confirm RSVP
+                      </h5>
+                      <p
+                        className="mb-0"
+                        style={{
+                          color: "rgba(255,255,255,0.8)",
+                          fontSize: "0.875rem",
+                        }}
+                      >
                         Respond to meeting invitation
                       </p>
                     </div>
                     <button
                       type="button"
-                      className="btn-close"
+                      className="btn-close btn-close-white"
                       onClick={closeRsvpModal}
                     ></button>
                   </div>
 
                   <div className="modal-body">
+                    {/* Error Message */}
+                    {errorMessage && (
+                      <div className="alert alert-danger d-flex align-items-start gap-2 mb-4 text-start">
+                        <XCircle
+                          size={18}
+                          className="mt-1"
+                          style={{ flexShrink: 0 }}
+                        />
+                        <div className="flex-grow-1">
+                          <strong>Error:</strong> {errorMessage}
+                        </div>
+                        <button
+                          type="button"
+                          className="btn-close btn-sm"
+                          onClick={() => setErrorMessage("")}
+                          style={{ fontSize: "0.7rem" }}
+                        ></button>
+                      </div>
+                    )}
+
                     {/* Meeting Info Card */}
                     <div className="card bg-light border-0 mb-4">
                       <div className="card-body">
-                        <h6 className="fw-semibold mb-3">
+                        <h6 className="fw-semibold mb-3 text-start">
                           {getField(
                             selectedInvitation,
                             "meetingTitle",
                             "MeetingTitle"
                           ) || "Meeting Details"}
                         </h6>
-                        <div className="d-flex flex-column gap-2">
+                        <div className="d-flex flex-column gap-2 text-start">
                           <div className="d-flex align-items-center gap-2">
                             <Clock size={16} className="text-primary" />
                             <span
@@ -518,7 +648,7 @@ const MeetingInvitations = () => {
                       "rsvpStatus",
                       "RSVPStatus"
                     ) !== RSVP_STATUS.PENDING && (
-                      <div className="alert alert-info d-flex align-items-start gap-2 mb-4">
+                      <div className="alert alert-info d-flex align-items-start gap-2 mb-4 text-start">
                         <AlertCircle
                           size={18}
                           className="mt-1"
@@ -552,7 +682,7 @@ const MeetingInvitations = () => {
                     )}
 
                     {/* RSVP Status Selection */}
-                    <div className="mb-4">
+                    <div className="mb-4 text-start">
                       <label className="form-label fw-semibold d-flex align-items-center gap-2 mb-3">
                         <Send size={18} />
                         Your Response
@@ -614,7 +744,7 @@ const MeetingInvitations = () => {
                     </div>
 
                     {/* Comment */}
-                    <div className="mb-3">
+                    <div className="mb-3 text-start">
                       <label className="form-label fw-semibold d-flex align-items-center gap-2">
                         <MessageSquare size={18} />
                         Add Comment (Optional)
@@ -646,15 +776,22 @@ const MeetingInvitations = () => {
 
                   <div className="modal-footer border-0 pt-0">
                     <button
-                      className="btn btn-secondary px-4"
+                      className="btn btn-light px-4"
                       onClick={closeRsvpModal}
                     >
                       Cancel
                     </button>
                     <button
-                      className="btn btn-success px-4 d-flex align-items-center gap-2"
+                      className="btn gradient-button px-4 d-flex align-items-center gap-2"
                       onClick={handleRsvpSubmit}
                       disabled={submitting}
+                      style={{
+                        background:
+                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                        color: "#fff",
+                        border: "none",
+                        fontWeight: 500,
+                      }}
                     >
                       {submitting ? (
                         <>
@@ -685,6 +822,23 @@ const MeetingInvitations = () => {
           )}
         </div>
       </div>
+
+      <style>{`
+        .breadcrumb-item + .breadcrumb-item::before {
+          display: none;
+        }
+        
+        .gradient-button:hover {
+          opacity: 0.9;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
+          transition: all 0.2s ease;
+        }
+        
+        .gradient-button:active {
+          transform: translateY(0);
+        }
+      `}</style>
     </div>
   );
 };

@@ -128,53 +128,6 @@ const ManagerMomDashboard = () => {
       className="container-fluid px-4 py-4"
       style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
     >
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <div>
-          <h2
-            className="fw-bold mb-1"
-            style={{ color: "#1e293b", fontSize: "1.75rem" }}
-          >
-            Manager MOM Dashboard
-          </h2>
-          <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
-            Manage team meetings, MOMs, and track action items
-          </p>
-        </div>
-        <div className="d-flex gap-2 flex-wrap">
-          <button
-            className="btn btn-primary d-flex align-items-center gap-2 px-3 py-2"
-            onClick={() =>
-              navigate("/manager/dashboard/meetmom/create-edit-mom")
-            }
-            style={{
-              backgroundColor: "#5046e5",
-              borderColor: "#5046e5",
-              fontWeight: "500",
-            }}
-          >
-            <i className="bi bi-plus-circle"></i>
-            Create MOM
-          </button>
-          <button
-            className="btn btn-success d-flex align-items-center gap-2 px-3 py-2"
-            onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
-            style={{ fontWeight: "500" }}
-          >
-            <i className="bi bi-calendar-plus"></i>
-            Schedule Meeting
-          </button>
-          <button
-            className="btn btn-info d-flex align-items-center gap-2 px-3 py-2"
-            onClick={() => navigate("/meeting/reports")}
-            style={{ fontWeight: "500" }}
-          >
-            <i className="bi bi-bar-chart"></i>
-            Reports
-          </button>
-        </div>
-      </div>
-
       {/* Statistics Cards */}
       <div className="row g-3 mb-4">
         <StatCard
@@ -211,8 +164,9 @@ const ManagerMomDashboard = () => {
         />
       </div>
 
-      {/* View Toggle */}
-      <div className="d-flex justify-content-end mb-3">
+      {/* View Toggle and Schedule Meeting Button */}
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+        {/* Left: View Toggle */}
         <div className="btn-group" role="group">
           <button
             type="button"
@@ -237,6 +191,32 @@ const ManagerMomDashboard = () => {
             Card View
           </button>
         </div>
+
+        {/* Right: Schedule Meeting Button with Gradient */}
+        <button
+          className="btn d-flex align-items-center gap-2 px-3 py-2"
+          onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
+          style={{ 
+            background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+            color: '#fff',
+            border: 'none',
+            fontWeight: '500',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '0.9';
+            e.currentTarget.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '1';
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+        >
+          <i className="bi bi-calendar-plus"></i>
+          Schedule Meeting
+        </button>
       </div>
 
       {/* Upcoming Meetings */}

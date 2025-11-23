@@ -133,35 +133,81 @@ const ActionItemsManagement = () => {
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <div
       className="container-fluid px-4 py-4"
       style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
     >
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2
-            className="fw-bold mb-1 d-flex align-items-center gap-2"
-            style={{ color: "#1e293b", fontSize: "1.75rem" }}
-          >
-            <i className="bi bi-list-check"></i>
-            My Action Items
-          </h2>
-          <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
-            Track and manage all your assigned tasks
-          </p>
-        </div>
-        <button
-          className="btn btn-outline-secondary d-flex align-items-center gap-2"
-          onClick={() => navigate(-1)}
+      {/* Breadcrumb Navigation */}
+      <nav aria-label="breadcrumb" className="mb-3">
+        <ol
+          className="breadcrumb mb-0 d-flex align-items-center"
+          style={{
+            backgroundColor: "transparent",
+            padding: 0,
+            margin: 0,
+          }}
         >
-          <i className="bi bi-arrow-left"></i>
-          Back to Dashboard
-        </button>
-      </div>
+          <li
+            className="breadcrumb-item"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <button
+              onClick={() => navigate("/employee/dashboard/meetmom")}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#97247E",
+                cursor: "pointer",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                textDecoration: "none",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+              <i className="bi bi-house-door" style={{ fontSize: "1rem" }}></i>
+              Dashboard
+            </button>
+          </li>
+          <li
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "#97247E",
+              margin: "0 8px",
+              fontSize: "1rem",
+            }}
+          >
+            /
+          </li>
+          <li
+            className="breadcrumb-item active"
+            aria-current="page"
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                color: "#1e293b",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+              }}
+            >
+              Action Items
+            </span>
+          </li>
+        </ol>
+      </nav>
 
       {/* Stats Cards */}
       <div className="row g-3 mb-4">
@@ -449,7 +495,7 @@ const ActionItemsManagement = () => {
                           </div>
                         </div>
 
-                        {/* Meeting Info - Updated icon and label */}
+                        {/* Meeting Info */}
                         <div
                           className="mb-3 p-2 rounded"
                           style={{ backgroundColor: "#f8f9fa" }}
@@ -500,12 +546,28 @@ const ActionItemsManagement = () => {
                           )}
                         </div>
 
-                        {/* Action Button */}
+                        {/* Action Button with Gradient */}
                         {item.status === "Pending" && (
                           <button
-                            className="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2"
+                            className="btn w-100 d-flex align-items-center justify-content-center gap-2"
                             onClick={() => openCompleteModal(item)}
-                            style={{ fontWeight: "500" }}
+                            style={{ 
+                              background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                              color: '#fff',
+                              border: 'none',
+                              fontWeight: '500',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.opacity = '0.9';
+                              e.currentTarget.style.transform = 'translateY(-1px)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.opacity = '1';
+                              e.currentTarget.style.transform = 'translateY(0)';
+                              e.currentTarget.style.boxShadow = 'none';
+                            }}
                           >
                             <i className="bi bi-check-circle"></i>
                             Mark as Completed
@@ -628,13 +690,30 @@ const ActionItemsManagement = () => {
                 className="modal-footer border-0"
                 style={{ padding: "0 1.5rem 1.5rem" }}
               >
-                <button className="btn btn-light px-4" onClick={closeModal}>
+                <button className="btn btn-danger px-4" onClick={closeModal}>
+                  <i className="bi bi-x-circle me-2"></i>
                   Cancel
                 </button>
                 <button
-                  className="btn btn-success px-4 d-flex align-items-center gap-2"
+                  className="btn px-4 d-flex align-items-center gap-2"
                   onClick={markAsCompleted}
-                  style={{ fontWeight: "500" }}
+                  style={{ 
+                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    fontWeight: '500',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
                   <i className="bi bi-check-circle"></i>
                   Confirm Completion
@@ -644,6 +723,12 @@ const ActionItemsManagement = () => {
           </div>
         </div>
       )}
+
+      <style>{`
+        .breadcrumb-item + .breadcrumb-item::before {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };

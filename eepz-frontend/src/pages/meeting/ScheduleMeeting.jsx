@@ -15,7 +15,7 @@ import {
   Check,
   X,
   Plus,
-  ArrowLeft,
+  Home,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -43,11 +43,9 @@ const ScheduleMeeting = () => {
 
   useEffect(() => {
     if (formData.meetingType === "One-on-One" && employeeOptions.length > 0) {
-      // Filter to get only employees with "Employee" role
       const employeesOnly = employeeOptions.filter(
         (emp) => emp.roleName?.toLowerCase() === "employee"
       );
-      
       if (employeesOnly.length > 0) {
         setFormData((prev) => ({
           ...prev,
@@ -151,18 +149,13 @@ const ScheduleMeeting = () => {
     }
   };
 
-  // Filter employees based on meeting type and search term
   const filteredEmployees = employeeOptions.filter((emp) => {
     const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
     const matchesSearch = fullName.includes(searchTerm.toLowerCase());
-    
-    // For One-on-One meetings, only show employees with "Employee" role
     if (formData.meetingType === "One-on-One") {
       const isEmployee = emp.roleName?.toLowerCase() === "employee";
       return matchesSearch && isEmployee;
     }
-    
-    // For other meeting types, show all employees
     return matchesSearch;
   });
 
@@ -172,293 +165,330 @@ const ScheduleMeeting = () => {
       style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}
     >
       <div className="row justify-content-center">
-        <div className="col-lg-8 col-xl-7">
-          {/* Header */}
-          <div className="d-flex align-items-center gap-3 mb-4">
-            <button
-              className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-              onClick={() => navigate(-1)}
-              style={{ width: "40px", height: "40px" }}
+        <div className="col-lg-10 col-xl-9">
+          {/* Breadcrumb Navigation */}
+          <nav aria-label="breadcrumb" className="mb-4">
+            <ol
+              className="breadcrumb mb-0 d-flex align-items-center"
+              style={{
+                backgroundColor: "transparent",
+                padding: 0,
+                margin: 0,
+              }}
             >
-              <ArrowLeft size={20} />
-            </button>
-            <div className="text-start">
-              <h2
-                className="fw-bold mb-1"
-                style={{ color: "#1e293b", fontSize: "1.75rem" }}
+              <li
+                className="breadcrumb-item"
+                style={{ display: "flex", alignItems: "center" }}
               >
-                Schedule Meeting
-              </h2>
-              <p className="text-muted mb-0 text-start" style={{ fontSize: "0.95rem" }}>
-                Create and schedule a new meeting with your team
-              </p>
-            </div>
-          </div>
+                <button
+                  onClick={() => navigate("/manager/dashboard/meetmom")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                >
+                  <Home size={16} />
+                  Dashboard
+                </button>
+              </li>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#97247E",
+                  margin: "0 8px",
+                  fontSize: "1rem",
+                }}
+              >
+                /
+              </li>
+              <li
+                className="breadcrumb-item active"
+                aria-current="page"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span
+                  style={{
+                    color: "#1e293b",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  Schedule Meeting
+                </span>
+              </li>
+            </ol>
+          </nav>
 
-          {/* Main Form Card */}
-          <div className="card border-0 shadow-sm">
-            <div className="card-body p-4">
-              <form onSubmit={handleSubmit}>
-                {/* Meeting Type */}
-                <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                    <Users size={18} />
-                    Meeting Type
-                  </label>
-                  <select
-                    name="meetingType"
-                    value={formData.meetingType}
-                    onChange={handleInputChange}
-                    className="form-select text-start"
-                  >
-                    <option value="One-on-One">One-on-One</option>
-                    <option value="Team Meeting">Team Meeting</option>
-                    <option value="Presentation">Presentation</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                {/* Meeting Title */}
-                <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                    <FileText size={18} />
-                    Meeting Title
-                    <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="meetingTitle"
-                    value={formData.meetingTitle}
-                    onChange={handleInputChange}
-                    className="form-control text-start"
-                    placeholder="Enter meeting title..."
-                    required
-                  />
-                </div>
-
-                {/* Participant Selection */}
-                <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                    <Users size={18} />
-                    Select Participant
-                    {formData.meetingType !== "One-on-One" ? "s" : ""}
-                    <span className="text-danger">*</span>
-                  </label>
-
-                  {/* Search Input */}
-                  <div className="input-group mb-3">
-                    <span className="input-group-text bg-white border-end-0">
-                      <Search size={18} className="text-muted" />
-                    </span>
-                    <input
-                      type="text"
-                      className="form-control border-start-0 ps-0 text-start"
-                      placeholder="Search employees..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ boxShadow: "none" }}
-                    />
-                  </div>
-
-                  {formData.meetingType === "One-on-One" ? (
-                    <select
-                      value={formData.participantEmployeeIds[0] || ""}
-                      onChange={handleOneOnOneChange}
-                      required
-                      className="form-select text-start"
-                    >
-                      <option value="">Select an employee</option>
-                      {filteredEmployees.map((emp) => (
-                        <option key={emp.employeeId} value={emp.employeeId}>
-                          {emp.firstName} {emp.lastName} - {emp.roleName}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <>
-                      <div
-                        className="border rounded"
-                        style={{ maxHeight: "300px", overflowY: "auto" }}
-                      >
-                        <table className="table table-hover mb-0">
-                          <thead
-                            className="table-light"
-                            style={{ position: "sticky", top: 0, zIndex: 1 }}
-                          >
-                            <tr>
-                              <th style={{ width: "60px" }} className="text-start">Select</th>
-                              <th className="text-start">Name</th>
-                              <th className="text-start">Role</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {filteredEmployees.length === 0 ? (
-                              <tr>
-                                <td
-                                  colSpan="3"
-                                  className="text-center py-4 text-muted"
-                                >
-                                  No employees found
-                                </td>
-                              </tr>
-                            ) : (
-                              filteredEmployees.map((emp) => (
-                                <tr
-                                  key={emp.employeeId}
-                                  onClick={() =>
-                                    handleCheckboxChange(emp.employeeId)
-                                  }
-                                  style={{ cursor: "pointer" }}
-                                >
-                                  <td className="text-start">
-                                    <div className="form-check">
-                                      <input
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        checked={formData.participantEmployeeIds.includes(
-                                          emp.employeeId
-                                        )}
-                                        onChange={() =>
-                                          handleCheckboxChange(emp.employeeId)
-                                        }
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                    </div>
-                                  </td>
-                                  <td className="text-start">
-                                    {emp.firstName} {emp.lastName}
-                                  </td>
-                                  <td className="text-start">
-                                    <span className="badge bg-light text-dark border">
-                                      {emp.roleName}
-                                    </span>
-                                  </td>
-                                </tr>
-                              ))
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 text-start">
-                        <Check size={18} />
-                        <span>
-                          <strong>
-                            {formData.participantEmployeeIds.length}
-                          </strong>{" "}
-                          participant
-                          {formData.participantEmployeeIds.length !== 1
-                            ? "s"
-                            : ""}{" "}
-                          selected
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Date and Time Row */}
-                <div className="row mb-4">
-                  <div className="col-md-6 mb-3 mb-md-0">
+          {/* FORM as Segments (2x2 grid) */}
+          <form onSubmit={handleSubmit}>
+            <div className="card border-0 shadow-sm mb-4">
+              <div className="card-body p-4">
+                <div className="row g-4">
+                  {/* MEETING TYPE & TITLE */}
+                  <div className="col-md-6">
                     <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                      <Calendar size={18} />
-                      Meeting Date
-                      <span className="text-danger">*</span>
+                      <Users size={20} /> Meeting Type
                     </label>
-                    <input
-                      type="date"
-                      name="meetingDate"
-                      value={formData.meetingDate}
+                    <select
+                      name="meetingType"
+                      value={formData.meetingType}
                       onChange={handleInputChange}
                       className="form-control text-start"
-                      required
-                    />
+                      style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
+                    >
+                      <option value="One-on-One">One-on-One</option>
+                      <option value="Team Meeting">Team Meeting</option>
+                      <option value="Presentation">Presentation</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                      <Clock size={18} />
-                      Meeting Time
-                      <span className="text-danger">*</span>
+                      <FileText size={20} /> Meeting Title <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="time"
-                      name="meetingTime"
-                      value={formData.meetingTime}
+                      type="text"
+                      name="meetingTitle"
+                      value={formData.meetingTitle}
                       onChange={handleInputChange}
                       className="form-control text-start"
+                      placeholder="Enter meeting title..."
                       required
+                      style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                     />
                   </div>
-                </div>
 
-                {/* Duration */}
-                <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                    <Clock size={18} />
-                    Duration
-                  </label>
-                  <select
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleInputChange}
-                    className="form-select text-start"
-                  >
-                    <option value="0.5">30 minutes</option>
-                    <option value="1">1 hour</option>
-                    <option value="1.5">1.5 hours</option>
-                    <option value="2">2 hours</option>
-                    <option value="3">3 hours</option>
-                  </select>
-                </div>
+                  {/* PARTICIPANTS SELECTION */}
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                      <Users size={20} />
+                      Select Participant{formData.meetingType !== "One-on-One" ? "s" : ""}
+                      <span className="text-danger">*</span>
+                    </label>
+                    {/* Search + participant dropdown/table */}
+                    <div className="input-group mb-3">
+                      <span className="input-group-text bg-white border-end-0">
+                        <Search size={20} className="text-muted" />
+                      </span>
+                      <input
+                        type="text"
+                        className="form-control border-start-0 ps-0 text-start"
+                        placeholder="Search employees..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{ boxShadow: "none", fontSize: "1rem", padding: "0.6rem 0.75rem" }}
+                      />
+                    </div>
+                    {formData.meetingType === "One-on-One" ? (
+                      <select
+                        value={formData.participantEmployeeIds[0] || ""}
+                        onChange={handleOneOnOneChange}
+                        required
+                        className="form-control text-start"
+                        style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
+                      >
+                        <option value="">Select an employee</option>
+                        {filteredEmployees.map((emp) => (
+                          <option key={emp.employeeId} value={emp.employeeId}>
+                            {emp.firstName} {emp.lastName} - {emp.roleName}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <>
+                        <div
+                          className="border rounded"
+                          style={{ maxHeight: "160px", overflowY: "auto" }}
+                        >
+                          <table className="table table-hover mb-0">
+                            <thead
+                              className="table-light"
+                              style={{ position: "sticky", top: 0, zIndex: 1 }}
+                            >
+                              <tr>
+                                <th style={{ width: "60px", fontSize: "1rem" }} className="text-start">Select</th>
+                                <th className="text-start" style={{ fontSize: "1rem" }}>Name</th>
+                                <th className="text-start" style={{ fontSize: "1rem" }}>Role</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredEmployees.length === 0 ? (
+                                <tr>
+                                  <td colSpan="3" className="text-center py-2 text-muted" style={{ fontSize: "1rem" }}>
+                                    No employees found
+                                  </td>
+                                </tr>
+                              ) : (
+                                filteredEmployees.map((emp) => (
+                                  <tr
+                                    key={emp.employeeId}
+                                    onClick={() =>
+                                      handleCheckboxChange(emp.employeeId)
+                                    }
+                                    style={{ cursor: "pointer" }}
+                                  >
+                                    <td className="text-start">
+                                      <div className="form-check">
+                                        <input
+                                          className="form-check-input"
+                                          type="checkbox"
+                                          checked={formData.participantEmployeeIds.includes(
+                                            emp.employeeId
+                                          )}
+                                          onChange={() =>
+                                            handleCheckboxChange(emp.employeeId)
+                                          }
+                                          onClick={(e) => e.stopPropagation()}
+                                          style={{ width: "1.2rem", height: "1.2rem" }}
+                                        />
+                                      </div>
+                                    </td>
+                                    <td className="text-start" style={{ fontSize: "1rem" }}>
+                                      {emp.firstName} {emp.lastName}
+                                    </td>
+                                    <td className="text-start">
+                                      <span className="badge bg-light text-dark border" style={{ fontSize: "0.9rem" }}>
+                                        {emp.roleName}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 text-start" style={{ fontSize: "1rem" }}>
+                          <Check size={20} />
+                          <span>
+                            <strong>{formData.participantEmployeeIds.length}</strong>
+                            {" participant" + (formData.participantEmployeeIds.length !== 1 ? "s" : "") + " selected"}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
 
-                {/* Meeting Link */}
-                <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                    <Video size={18} />
-                    Meeting Link
-                  </label>
-                  <div className="input-group">
-                    <input
-                      type="url"
-                      name="meetingLink"
-                      value={formData.meetingLink}
+                  {/* DATE/TIME, DURATION */}
+                  <div className="col-md-6">
+                    <div className="row">
+                      <div className="col-lg-6 mb-3 mb-lg-0">
+                        <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                          <Calendar size={20} />
+                          Meeting Date <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="meetingDate"
+                          value={formData.meetingDate}
+                          onChange={handleInputChange}
+                          className="form-control text-start"
+                          required
+                          style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
+                        />
+                      </div>
+                      <div className="col-lg-6">
+                        <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                          <Clock size={20} />
+                          Meeting Time <span className="text-danger">*</span>
+                        </label>
+                        <input
+                          type="time"
+                          name="meetingTime"
+                          value={formData.meetingTime}
+                          onChange={handleInputChange}
+                          className="form-control text-start"
+                          required
+                          style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                        <Clock size={20} /> Duration
+                      </label>
+                      <select
+                        name="duration"
+                        value={formData.duration}
+                        onChange={handleInputChange}
+                        className="form-control text-start"
+                        style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
+                      >
+                        <option value="0.5">30 minutes</option>
+                        <option value="1">1 hour</option>
+                        <option value="1.5">1.5 hours</option>
+                        <option value="2">2 hours</option>
+                        <option value="3">3 hours</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* MEETING LINK & AGENDA */}
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                      <Video size={20} /> Meeting Link
+                    </label>
+                    <div className="input-group mb-3">
+                      <input
+                        type="url"
+                        name="meetingLink"
+                        value={formData.meetingLink}
+                        onChange={handleInputChange}
+                        className="form-control text-start"
+                        placeholder="Enter meeting link or generate one..."
+                        style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={generateTeamsLink}
+                        className="btn btn-outline-primary d-flex align-items-center gap-2"
+                        style={{ fontSize: "1rem" }}
+                      >
+                        <Plus size={20} />
+                        Generate
+                      </button>
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                      <FileText size={20} />
+                      Agenda
+                    </label>
+                    <textarea
+                      name="agenda"
+                      value={formData.agenda}
                       onChange={handleInputChange}
                       className="form-control text-start"
-                      placeholder="Enter meeting link or generate one..."
+                      rows="4"
+                      placeholder="Enter meeting agenda and topics to discuss..."
+                      style={{ fontSize: "1rem", padding: "0.6rem 0.75rem", minHeight: 90 }}
                     />
-                    <button
-                      type="button"
-                      onClick={generateTeamsLink}
-                      className="btn btn-outline-primary d-flex align-items-center gap-2"
-                    >
-                      <Plus size={18} />
-                      Generate Teams Link
-                    </button>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Agenda */}
-                <div className="mb-4">
-                  <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                    <FileText size={18} />
-                    Agenda
-                  </label>
-                  <textarea
-                    name="agenda"
-                    value={formData.agenda}
-                    onChange={handleInputChange}
-                    className="form-control text-start"
-                    rows="4"
-                    placeholder="Enter meeting agenda and topics to discuss..."
-                  />
-                </div>
-
-                {/* Additional Options */}
-                <div className="card bg-light border-0 mb-4">
-                  <div className="card-body">
-                    <h6 className="fw-semibold mb-3 text-start">Additional Options</h6>
-
-                    {/* Send Calendar Invite */}
-                    <div className="form-check mb-3 text-start">
+            {/* SEGMENT: Additional Options */}
+            <div className="card bg-light border-0 shadow-sm mb-4">
+              <div className="card-body py-4">
+                <div className="row g-4">
+                  <div className="col-md-6">
+                    <div className="form-check text-start d-flex align-items-center" style={{ minHeight: "48px" }}>
                       <input
                         className="form-check-input"
                         type="checkbox"
@@ -466,103 +496,100 @@ const ScheduleMeeting = () => {
                         id="sendCalendarInvite"
                         checked={formData.sendCalendarInvite}
                         onChange={handleInputChange}
+                        style={{ width: "1.2rem", height: "1.2rem" }}
                       />
                       <label
                         className="form-check-label d-flex align-items-center gap-2"
                         htmlFor="sendCalendarInvite"
+                        style={{ fontSize: "1rem", marginLeft: "0.5rem" }}
                       >
-                        <Send size={18} />
+                        <Send size={20} />
                         Send calendar invite to participants
                       </label>
                     </div>
-
-                    {/* Reminder */}
-                    <div>
-                      <label className="form-label fw-semibold d-flex align-items-center gap-2 mb-2 text-start">
-                        <Bell size={18} />
-                        Reminder
-                      </label>
-                      <select
-                        name="reminder"
-                        value={formData.reminder}
-                        onChange={handleInputChange}
-                        className="form-select text-start"
-                      >
-                        <option value="0">None</option>
-                        <option value="1">1 day before</option>
-                        <option value="2">2 days before</option>
-                        <option value="7">1 week before</option>
-                      </select>
-                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2 mb-2 text-start">
+                      <Bell size={20} />
+                      Reminder
+                    </label>
+                    <select
+                      name="reminder"
+                      value={formData.reminder}
+                      onChange={handleInputChange}
+                      className="form-control text-start"
+                      style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
+                    >
+                      <option value="0">None</option>
+                      <option value="1">1 day before</option>
+                      <option value="2">2 days before</option>
+                      <option value="7">1 week before</option>
+                    </select>
                   </div>
                 </div>
-
-                {/* Action Buttons */}
-                <div className="d-flex gap-3 justify-content-end">
-                  <button
-                    type="button"
-                    className="btn btn-light px-4 d-flex align-items-center gap-2"
-                    onClick={() => navigate(-1)}
-                  >
-                    <X size={18} />
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-success px-4 d-flex align-items-center gap-2"
-                    disabled={loading}
-                    style={{ fontWeight: "500" }}
-                  >
-                    {loading ? (
-                      <>
-                        <span
-                          className="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                        Scheduling...
-                      </>
-                    ) : (
-                      <>
-                        <Calendar size={18} />
-                        Schedule Meeting
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
+              </div>
             </div>
-          </div>
 
-          {/* Quick Tips Card */}
-          <div className="card border-0 shadow-sm mt-4">
-            <div className="card-body">
-              <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2 text-start">
-                <FileText size={18} />
-                Quick Tips
-              </h6>
-              <ul
-                className="mb-0 ps-3 text-start"
-                style={{ fontSize: "0.9rem", color: "#64748b" }}
+            {/* ACTION BUTTONS */}
+            <div className="d-flex gap-3 justify-content-end">
+              <button
+                type="button"
+                className="btn btn-secondary px-4 d-flex align-items-center gap-2"
+                onClick={() => navigate(-1)}
+                style={{ fontSize: "1rem", fontWeight: "500" }}
               >
-                <li className="mb-2">
-                  Choose a clear and descriptive meeting title
-                </li>
-                <li className="mb-2">
-                  Select all required participants before scheduling
-                </li>
-                <li className="mb-2">
-                  Add a detailed agenda to help participants prepare
-                </li>
-                <li className="mb-2">
-                  Generate a Teams link for virtual meetings
-                </li>
-                <li>Enable reminders to ensure everyone is notified</li>
-              </ul>
+                <X size={20} />
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn px-4 d-flex align-items-center gap-2"
+                disabled={loading}
+                style={{ 
+                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  fontSize: "1rem",
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = '0.9';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    Scheduling...
+                  </>
+                ) : (
+                  <>
+                    <Calendar size={20} />
+                    Schedule Meeting
+                  </>
+                )}
+              </button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
+
+      <style>{`
+        .breadcrumb-item + .breadcrumb-item::before {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };

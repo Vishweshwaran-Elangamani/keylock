@@ -13,12 +13,12 @@ import {
   Trash2,
   Eye,
   Plus,
-  ArrowLeft,
   MessageSquare,
   AlertTriangle,
   Share2,
   Search,
   X,
+  Home,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -217,36 +217,74 @@ const MyMomsList = () => {
     >
       <div className="row justify-content-center">
         <div className="col-12 col-xl-11">
-          {/* Header */}
-          <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-            <div className="d-flex align-items-center gap-3">
-              <button
-                className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
-                onClick={() => navigate(-1)}
-                style={{ width: "40px", height: "40px", flexShrink: 0 }}
+          {/* Breadcrumb Navigation */}
+          <nav aria-label="breadcrumb" className="mb-4">
+            <ol
+              className="breadcrumb mb-0 d-flex align-items-center"
+              style={{
+                backgroundColor: "transparent",
+                padding: 0,
+                margin: 0,
+              }}
+            >
+              <li
+                className="breadcrumb-item"
+                style={{ display: "flex", alignItems: "center" }}
               >
-                <ArrowLeft size={20} />
-              </button>
-              <div>
-                <h2
-                  className="fw-bold mb-1"
-                  style={{ color: "#1e293b", fontSize: "1.75rem" }}
+                <button
+                  onClick={() => navigate("/employee/dashboard/meetmom")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                >
+                  <Home size={16} />
+                  Dashboard
+                </button>
+              </li>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#97247E",
+                  margin: "0 8px",
+                  fontSize: "1rem",
+                }}
+              >
+                /
+              </li>
+              <li
+                className="breadcrumb-item active"
+                aria-current="page"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span
+                  style={{
+                    color: "#1e293b",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                  }}
                 >
                   My MOMs
-                </h2>
-                <p className="text-muted mb-0" style={{ fontSize: "0.95rem" }}>
-                  View and manage your meeting minutes
-                </p>
-              </div>
-            </div>
-            <button
-              className="btn btn-success d-flex align-items-center gap-2 px-4"
-              onClick={() => navigate("/mom/create")}
-            >
-              <Plus size={18} />
-              Create New MOM
-            </button>
-          </div>
+                </span>
+              </li>
+            </ol>
+          </nav>
 
           {/* MOMs Count Badge */}
           {moms.length > 0 && (
@@ -277,13 +315,6 @@ const MyMomsList = () => {
                 <p className="text-muted mb-4">
                   You haven't submitted any meeting minutes yet.
                 </p>
-                <button
-                  className="btn btn-primary d-flex align-items-center gap-2 mx-auto"
-                  onClick={() => navigate("/mom/create")}
-                >
-                  <Plus size={18} />
-                  Create Your First MOM
-                </button>
               </div>
             </div>
           ) : (
@@ -555,17 +586,35 @@ const MyMomsList = () => {
 
                   <div className="modal-footer">
                     <button
-                      className="btn btn-secondary"
+                      className="btn btn-danger px-4"
                       onClick={closeShareModal}
                     >
+                      <X size={16} className="me-2" />
                       Cancel
                     </button>
                     <button
-                      className="btn btn-primary d-flex align-items-center gap-2"
+                      className="btn px-4 d-flex align-items-center gap-2"
                       onClick={handleShareMom}
                       disabled={
                         selectedEmployees.length === 0 || sharingLoading
                       }
+                      style={{ 
+                        background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                        color: '#fff',
+                        border: 'none',
+                        fontWeight: '500',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = '0.9';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
                     >
                       <Share2 size={16} />
                       {sharingLoading
@@ -578,7 +627,7 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* MOM Details Modal */}
+          {/* MOM Details Modal - Left Aligned */}
           {selectedMom && (
             <div
               className="modal fade show d-block"
@@ -591,12 +640,12 @@ const MyMomsList = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="modal-content border-0 shadow">
-                  <div className="modal-header border-0 pb-0">
+                  <div className="modal-header border-0 pb-0" style={{ textAlign: 'left' }}>
                     <div className="flex-grow-1">
-                      <h5 className="modal-title fw-bold">
+                      <h5 className="modal-title fw-bold" style={{ textAlign: 'left' }}>
                         {selectedMom.meetingTitle}
                       </h5>
-                      <p className="text-muted small mb-0">
+                      <p className="text-muted small mb-0" style={{ textAlign: 'left' }}>
                         {getMeetingTypeBadge(selectedMom.meetingType)}
                       </p>
                     </div>
@@ -607,11 +656,11 @@ const MyMomsList = () => {
                     ></button>
                   </div>
 
-                  <div className="modal-body">
+                  <div className="modal-body" style={{ textAlign: 'left' }}>
                     {/* Meeting Info Card */}
                     <div className="card bg-light border-0 mb-4">
-                      <div className="card-body">
-                        <h6 className="fw-semibold mb-3">
+                      <div className="card-body" style={{ textAlign: 'left' }}>
+                        <h6 className="fw-semibold mb-3" style={{ textAlign: 'left' }}>
                           Meeting Information
                         </h6>
                         <div className="row g-3">
@@ -622,7 +671,7 @@ const MyMomsList = () => {
                                 Meeting Date:
                               </small>
                             </div>
-                            <div className="fw-semibold">
+                            <div className="fw-semibold" style={{ textAlign: 'left' }}>
                               {formatDateTime(selectedMom.meetingDate)}
                             </div>
                           </div>
@@ -640,6 +689,7 @@ const MyMomsList = () => {
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-primary text-decoration-none d-flex align-items-center gap-1"
+                                style={{ textAlign: 'left' }}
                               >
                                 Join Meeting <LinkIcon size={14} />
                               </a>
@@ -651,7 +701,7 @@ const MyMomsList = () => {
                               <Users size={16} className="text-primary" />
                               <small className="text-muted">Attendees:</small>
                             </div>
-                            <div className="fw-semibold">
+                            <div className="fw-semibold" style={{ textAlign: 'left' }}>
                               {selectedMom.attendees || "N/A"}
                             </div>
                           </div>
@@ -663,7 +713,7 @@ const MyMomsList = () => {
                                 Submitted by:
                               </small>
                             </div>
-                            <div className="fw-semibold">
+                            <div className="fw-semibold" style={{ textAlign: 'left' }}>
                               {selectedMom.submittedByEmployeeName} (
                               {selectedMom.submittedByRole})
                             </div>
@@ -675,11 +725,11 @@ const MyMomsList = () => {
                     {/* Comments/Observations */}
                     {selectedMom.commentsObservations && (
                       <div className="mb-4">
-                        <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
+                        <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2" style={{ textAlign: 'left' }}>
                           <MessageSquare size={18} />
                           Comments & Observations
                         </h6>
-                        <div className="alert alert-secondary mb-0">
+                        <div className="alert alert-secondary mb-0" style={{ textAlign: 'left' }}>
                           {selectedMom.commentsObservations}
                         </div>
                       </div>
@@ -687,7 +737,7 @@ const MyMomsList = () => {
 
                     {/* Discussion Points */}
                     <div className="mb-4">
-                      <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
+                      <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2" style={{ textAlign: 'left' }}>
                         <MessageSquare size={18} />
                         Discussion Points
                       </h6>
@@ -697,6 +747,7 @@ const MyMomsList = () => {
                             <div
                               key={dp.pointId}
                               className="list-group-item border-0 bg-light mb-2 rounded"
+                              style={{ textAlign: 'left' }}
                             >
                               <div className="d-flex gap-2">
                                 <span
@@ -711,7 +762,7 @@ const MyMomsList = () => {
                                 >
                                   {index + 1}
                                 </span>
-                                <span className="flex-grow-1">
+                                <span className="flex-grow-1" style={{ textAlign: 'left' }}>
                                   {dp.pointText}
                                 </span>
                               </div>
@@ -719,7 +770,7 @@ const MyMomsList = () => {
                           ))}
                         </div>
                       ) : (
-                        <div className="alert alert-info mb-0">
+                        <div className="alert alert-info mb-0" style={{ textAlign: 'left' }}>
                           No discussion points recorded
                         </div>
                       )}
@@ -727,7 +778,7 @@ const MyMomsList = () => {
 
                     {/* Action Items */}
                     <div className="mb-4">
-                      <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
+                      <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2" style={{ textAlign: 'left' }}>
                         <CheckCircle size={18} />
                         Action Items
                       </h6>
@@ -737,9 +788,10 @@ const MyMomsList = () => {
                             <div
                               key={ai.actionItemId}
                               className="list-group-item border-0 bg-light mb-2 rounded"
+                              style={{ textAlign: 'left' }}
                             >
                               <div className="d-flex justify-content-between align-items-start mb-2">
-                                <h6 className="mb-0 fw-semibold">
+                                <h6 className="mb-0 fw-semibold" style={{ textAlign: 'left' }}>
                                   {ai.taskDescription}
                                 </h6>
                                 {getStatusBadge(ai.status, ai.isOverdue)}
@@ -749,7 +801,7 @@ const MyMomsList = () => {
                                   <small className="text-muted">
                                     Assigned to:
                                   </small>
-                                  <div className="fw-semibold">
+                                  <div className="fw-semibold" style={{ textAlign: 'left' }}>
                                     {ai.assignedToEmployeeName}
                                   </div>
                                 </div>
@@ -757,7 +809,7 @@ const MyMomsList = () => {
                                   <small className="text-muted">
                                     Due Date:
                                   </small>
-                                  <div className="fw-semibold">
+                                  <div className="fw-semibold" style={{ textAlign: 'left' }}>
                                     {ai.dueDate || "N/A"}
                                   </div>
                                 </div>
@@ -766,14 +818,14 @@ const MyMomsList = () => {
                           ))}
                         </div>
                       ) : (
-                        <div className="alert alert-info mb-0">
+                        <div className="alert alert-info mb-0" style={{ textAlign: 'left' }}>
                           No action items recorded
                         </div>
                       )}
                     </div>
 
                     {/* Metadata */}
-                    <div className="border-top pt-3">
+                    <div className="border-top pt-3" style={{ textAlign: 'left' }}>
                       <small className="text-muted">
                         <strong>Created:</strong>{" "}
                         {formatDateTime(selectedMom.createdAt)}
@@ -790,17 +842,35 @@ const MyMomsList = () => {
 
                   <div className="modal-footer border-0">
                     <button
-                      className="btn btn-secondary"
+                      className="btn btn-danger px-4"
                       onClick={closeMomDetails}
                     >
+                      <X size={16} className="me-2" />
                       Close
                     </button>
                     {selectedMom.isEditable && (
                       <button
-                        className="btn btn-primary d-flex align-items-center gap-2"
+                        className="btn px-4 d-flex align-items-center gap-2"
                         onClick={() => {
                           closeMomDetails();
                           navigate(`/mom/edit/${selectedMom.momId}`);
+                        }}
+                        style={{ 
+                          background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          fontWeight: '500',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.opacity = '0.9';
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.opacity = '1';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
                         }}
                       >
                         <Edit size={16} />
@@ -814,6 +884,12 @@ const MyMomsList = () => {
           )}
         </div>
       </div>
+
+      <style>{`
+        .breadcrumb-item + .breadcrumb-item::before {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };

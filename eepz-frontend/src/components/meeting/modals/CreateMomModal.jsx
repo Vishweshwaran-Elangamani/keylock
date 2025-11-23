@@ -202,6 +202,23 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                     style={{ backgroundColor: '#ffffff' }}
                   />
                 </div>
+                {/* ✅ NEW: Attendees Field */}
+                <div className="col-12">
+                  <label className="form-label fw-semibold small text-muted d-flex align-items-center gap-2">
+                    <i className="bi bi-people"></i>
+                    Attendees
+                  </label>
+                  <textarea 
+                    className="form-control form-control-sm" 
+                    rows="2"
+                    name="attendees"
+                    value={formData.attendees} 
+                    onChange={handleInputChange}
+                    placeholder="Enter attendees (comma separated)..."
+                    style={{ backgroundColor: '#ffffff', resize: 'vertical' }}
+                  />
+                  <small className="text-muted">List all meeting participants</small>
+                </div>
               </div>
             </div>
           </div>
@@ -414,8 +431,24 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             <button 
               type="submit" 
               disabled={submitting || loadingEmployees} 
-              className="btn btn-success flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-              style={{ fontWeight: '500' }}
+              className="btn gradient-primary-button flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+              style={{ 
+                background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                color: '#fff',
+                border: 'none',
+                fontWeight: '500',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.9';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             >
               {submitting ? (
                 <>
@@ -432,10 +465,11 @@ const CreateMomModal = ({ meetingData, onClose }) => {
             <button 
               type="button" 
               onClick={onClose} 
-              className="btn btn-light px-4 d-flex align-items-center gap-2"
+              className="btn btn-danger px-4 d-flex align-items-center gap-2"
               disabled={submitting}
+              style={{ fontWeight: '500' }}
             >
-              <i className="bi bi-x-lg"></i>
+              <i className="bi bi-x-circle"></i>
               Cancel
             </button>
           </div>

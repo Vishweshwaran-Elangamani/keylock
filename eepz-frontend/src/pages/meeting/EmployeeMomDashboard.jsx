@@ -164,39 +164,74 @@ const EmployeeMomDashboard = () => {
 
   return (
     <div className="container-fluid px-4 py-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2 className="fw-bold mb-1 d-flex align-items-center gap-2" style={{ color: '#1e293b', fontSize: '1.75rem' }}>
-            <i className="bi bi-journal-text"></i>
-            MOM Management Dashboard
-          </h2>
-          <p className="text-muted mb-0" style={{ fontSize: '0.95rem' }}>
-            Manage all meeting minutes across the organization
-          </p>
-        </div>
-        <button 
-          className="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 shadow-sm"
-          onClick={() => navigate('/employee/dashboard/meetmom/create-edit-mom')}
-          style={{ 
-            backgroundColor: '#5046e5', 
-            borderColor: '#5046e5',
-            fontWeight: '500',
-            transition: 'all 0.2s'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(80, 70, 229, 0.3)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+      {/* Breadcrumb Navigation */}
+      <nav aria-label="breadcrumb" className="mb-3">
+        <ol
+          className="breadcrumb mb-0 d-flex align-items-center"
+          style={{
+            backgroundColor: "transparent",
+            padding: 0,
+            margin: 0,
           }}
         >
-          <i className="bi bi-plus-circle"></i> 
-          Create MOM
-        </button>
-      </div>
+          <li
+            className="breadcrumb-item"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <button
+              onClick={() => navigate("/employee/dashboard")}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#97247E",
+                cursor: "pointer",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                textDecoration: "none",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+              <i className="bi bi-house-door" style={{ fontSize: '1rem' }}></i>
+              Dashboard
+            </button>
+          </li>
+          <li
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "#97247E",
+              margin: "0 8px",
+              fontSize: "1rem",
+            }}
+          >
+            /
+          </li>
+          <li
+            className="breadcrumb-item active"
+            aria-current="page"
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                color: "#1e293b",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+              }}
+            >
+              MOM Management
+            </span>
+          </li>
+        </ol>
+      </nav>
 
       {/* Quick Stats */}
       <div className="row g-3 mb-4">
@@ -364,12 +399,6 @@ const EmployeeMomDashboard = () => {
                   </div>
                   <h6 className="fw-semibold text-muted mb-2">No meetings found</h6>
                   <p className="text-muted small mb-3">Create your first meeting minute to get started</p>
-                  <button 
-                    className="btn btn-sm btn-primary"
-                    onClick={() => navigate('/employee/dashboard/meetmom/create-edit-mom')}
-                  >
-                    <i className="bi bi-plus-circle me-2"></i>Create MOM
-                  </button>
                 </div>
               ) : (
                 <>
@@ -448,6 +477,30 @@ const EmployeeMomDashboard = () => {
       )}
 
       {showSharedModal && <SharedMomsModal onClose={closeSharedModal} />}
+
+      <style>{`
+        .breadcrumb-item + .breadcrumb-item::before {
+          display: none;
+        }
+        
+        .gradient-primary-button {
+          background: linear-gradient(90deg, #97247E 0%, #E01950 100%);
+          color: #fff;
+          border: none;
+          font-weight: 500;
+        }
+        
+        .gradient-primary-button:hover {
+          opacity: 0.9;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
+          transition: all 0.2s ease;
+        }
+        
+        .gradient-primary-button:active {
+          transform: translateY(0);
+        }
+      `}</style>
     </div>
   );
 };
