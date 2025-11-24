@@ -18,10 +18,13 @@ export default function DeptHeadPage() {
   const [approvedRequests, setApprovedRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
+  
 
   const [activeTab, setActiveTab] = useState("pending");
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");       // what user types
+const [appliedSearch, setAppliedSearch] = useState(""); // what is actually applied
+
   const [filterProject, setFilterProject] = useState("");
   const [filteredData, setFilteredData] = useState([]);
 
@@ -99,12 +102,11 @@ const fetchData = async (silent = false) => {
   // ========================
   // FILTER FUNCTIONS
   // ========================
-
   const applyFilters = () => {
     let filtered = activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
-
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
+  
+    if (appliedSearch) {
+      const search = appliedSearch.toLowerCase();
       filtered = filtered.filter(
         (emp) =>
           emp.employeeName?.toLowerCase().includes(search) ||
@@ -112,14 +114,15 @@ const fetchData = async (silent = false) => {
           emp.employeeCompanyId?.toLowerCase().includes(search)
       );
     }
-
+  
     if (filterProject) {
       filtered = filtered.filter((emp) => emp.projectName === filterProject);
     }
-
+  
     setFilteredData(filtered);
     setCurrentPage(1);
   };
+  
 
   // ========================
   // APPROVE HANDLERS
@@ -128,6 +131,10 @@ const fetchData = async (silent = false) => {
   const handleViewDetails = (employee) => {
     setSelectedEmployee(employee);
     setShowDetailsModal(true);
+  };
+  const handleApproveClick = (employee) => {
+    setSelectedEmployee(employee);
+    setShowApproveModal(true);
   };
 
   const handleApproveSubmit = async () => {
@@ -574,163 +581,168 @@ const fetchData = async (silent = false) => {
                 alignItems: 'flex-start',
                 flexWrap: 'wrap',
               }}>
-                {/* Employee Card */}
-                <div style={{
-                  flex: '1 1 260px',
-                  background: '#fff',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 7px #c1b6dd26',
-                  marginBottom: '20px',
-                  padding: '18px 24px',
-                  
-                  minWidth: '250px',
-                  minHeight: "170px", 
-                  border: "1px solid #27235c"
-                   // or use height: "170px" if you want them strictly equal
+               {/* Employee Card */}
+<div style={{
+  flex: '1 1 240px',
+  background: '#fff',
+  borderRadius: '14px',
+  boxShadow: '0 2px 7px #c1b6dd26',
+  marginBottom: '20px',
+  padding: '18px 24px',
+  minWidth: '240px',
+  minHeight: "170px",
+  border: "1px solid #27235c"
+}}>
+  <h5 style={{
+    margin: 0,
+    fontWeight: 700,
+    color: '#27235c',
+    fontSize: "1.09rem",
+    display: "flex",
+    alignItems: "center",
+    gap: 7,
+  }}>
+    <i className="bi bi-person-badge"></i>
+    Employee Info
+  </h5>
+  <div style={{ marginTop: 10 }}>
+    <div style={{ fontWeight: 600, marginBottom: 6 }}>
+      {selectedEmployee.employeeName}
+    </div>
+    <div style={{ fontSize: "1.02rem", color: "#666" }}>
+      {selectedEmployee.projectName}
+    </div>
+    <div style={{ fontSize: "0.99rem", color: "#9c8dbb" }}>
+      <i className="bi bi-bullseye"></i>&nbsp;Goals:&nbsp;
+      <b>{selectedEmployee.goals?.length || 0}</b>
+    </div>
+  </div>
+</div>
 
-                }}>
-                  <h5 style={{
-                    margin: 0,
-                    fontWeight: 700,
-                    color: '#27235c',
-                    fontSize: "1.09rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 7,
-                    
-                  }}>
-                    <i className="bi bi-person-badge"></i>
-                    Employee Info
-                  </h5>
-                  <div style={{ marginTop: 10 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 6 }}>{selectedEmployee.employeeName}</div>
-                    <div style={{ fontSize: "1.02rem", color: "#666" }}>{selectedEmployee.projectName}</div>
-                    <div style={{ fontSize: "0.99rem", color: "#9c8dbb" }}>
-                      Goals:&nbsp;
-                      <b>{selectedEmployee.goals?.length || 0}</b>
-                    </div>
-                  </div>
-                </div>
-                {/* Ratings Card */}
-                <div style={{
-                  flex: '1 1 220px',
-                  background: '#fff',
-                  borderRadius: '14px',
-                  boxShadow: '0 2px 7px #c1b6dd26',
-                  marginBottom: '20px',
-                  padding: '18px 24px',
-                   border: "1px solid #27235c",
-                  minWidth: '180px',
-                  minHeight: "170px",  // or use height: "170px" if you want them strictly equal
+{/* Ratings Card */}
+<div style={{
+  flex: '1 1 240px',
+  background: '#fff',
+  borderRadius: '14px',
+  boxShadow: '0 2px 7px #c1b6dd26',
+  marginBottom: '20px',
+  padding: '18px 24px',
+  minWidth: '240px',
+  minHeight: "170px",
+  border: "1px solid #27235c"
+}}>
+  <h5 style={{
+    margin: 0,
+    fontWeight: 700,
+    color: '#27235c',
+    fontSize: "1.09rem",
+    display: "flex",
+    alignItems: "center",
+    gap: 7,
+  }}>
+    <i className="bi bi-star-half"></i>
+    Average Ratings
+  </h5>
+  <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span style={{ fontSize: 13, color: "#a1a2c0" }}>
+        <i className="bi bi-person"></i>&nbsp;Employee
+      </span>
+      <span style={{
+        fontSize: 19,
+        fontWeight: 700,
+        color: "#97247e"
+      }}>{getAvgRating(selectedEmployee.competencies, "employeeRating")}</span>
+    </div>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span style={{ fontSize: 13, color: "#a1a2c0" }}>
+        <i className="bi bi-1-circle"></i>&nbsp;L1
+      </span>
+      <span style={{
+        fontSize: 19,
+        fontWeight: 700,
+        color: "#6666B2"
+      }}>{getAvgRating(selectedEmployee.competencies, "l1Rating")}</span>
+    </div>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <span style={{ fontSize: 13, color: "#a1a2c0" }}>
+        <i className="bi bi-2-circle"></i>&nbsp;L2
+      </span>
+      <span style={{
+        fontSize: 19,
+        fontWeight: 700,
+        color: "#3CA36E"
+      }}>{getAvgRating(selectedEmployee.competencies, "l2Rating")}</span>
+    </div>
+  </div>
+</div>
+</div>
 
-                }}>
-                  <h5 style={{
-                    margin: 0,
-                    fontWeight: 700,
-                    color: '#27235c',
-                    fontSize: "1.09rem"
-                  }}>
-                    Average Ratings
-                  </h5>
-                  <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div>
-                      <span style={{ fontSize: 13, color: "#a1a2c0" }}>Employee</span>
-                      <span style={{
-                        fontSize: 19,
-                        fontWeight: 700,
-                        color: "#97247e",
-                        marginLeft: 9
-                      }}>{getAvgRating(selectedEmployee.competencies, "employeeRating")}</span>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: 13, color: "#a1a2c0" }}>L1</span>
-                      <span style={{
-                        fontSize: 19,
-                        fontWeight: 700,
-                        color: "#6666B2",
-                        marginLeft: 27
-                      }}>{getAvgRating(selectedEmployee.competencies, "l1Rating")}</span>
-                    </div>
-                    <div>
-                      <span style={{ fontSize: 13, color: "#a1a2c0" }}>L2</span>
-                      <span style={{
-                        fontSize: 19,
-                        fontWeight: 700,
-                        color: "#3CA36E",
-                        marginLeft: 26
-                      }}>{getAvgRating(selectedEmployee.competencies, "l2Rating")}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Competencies Section */}
-              <div style={{
-                background: "#fff",
-                margin: "0 32px 22px 32px",
-                borderRadius: '13px',
-                boxShadow: '0 2px 8px #c1b6dd1c',
-                padding: '24px 20px',
-                 border: "1px solid #27235c"
-              }}>
-                <div style={{
-                  fontWeight: 700,
-                  color: "#27235c",
-                  fontSize: "1.03rem",
-                  marginBottom: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7,
-                
-                }}>
-                  <i className="bi bi-grid"></i>
-                  Competencies Breakdown
-                </div>
-                <div className="dp-inner-table-wrapper">
-                  <table className="dp-inner-table" style={{ width: '100%', borderCollapse: 'collapse', }}>
-                    <thead >
-                      <tr style={{
-                        background: '#f7f8fc',
-                        color: '#4c426a'
-                      }}>
-                        <th>Competency</th>
-                        <th>Emp Rating</th>
-                        <th>Emp Comments</th>
-                        <th>L1 Reviewer</th>
-                        <th>L1 Rating</th>
-                        <th>L1 Comments</th>
-                        <th>L2 Reviewer</th>
-                        <th>L2 Rating</th>
-                        <th>L2 Comments</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedEmployee.competencies && selectedEmployee.competencies.length > 0 ? (
-                        selectedEmployee.competencies.map((c, idx) => (
-                          <tr key={idx}>
-                            <td>{c.competencyName}</td>
-                            <td><strong className="emp-rating">{c.employeeRating || "-"}</strong></td>
-                            <td>{c.employeeComments || "-"}</td>
-                            <td>{c.l1ReviewerName || "No L1"}</td>
-                            <td><strong className="l1-rating">{c.l1Rating || "-"}</strong></td>
-                            <td>{c.l1Comments || "-"}</td>
-                            <td>{c.l2ReviewerName || "No L2"}</td>
-                            <td><strong className="l2-rating">{c.l2Rating || "-"}</strong></td>
-                            <td>{c.l2Comments || "-"}</td>
-                            <td>
-                              <span className={`dp-status-badge status-${c.status?.toLowerCase()}`}>{c.status}</span>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={10} className="dp-no-data">No competencies found</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+          {/* Competencies Section */}
+<div style={{
+  background: "#fff",
+  margin: "0 32px 22px 32px",
+  borderRadius: '13px',
+  boxShadow: '0 2px 8px #c1b6dd1c',
+  padding: '24px 20px',
+  border: "1px solid #27235c"
+}}>
+  <div style={{
+    fontWeight: 700,
+    color: "#27235c",
+    fontSize: "1.03rem",
+    marginBottom: 10,
+    display: "flex",
+    alignItems: "center",
+    gap: 7,
+  }}>
+    <i className="bi bi-grid"></i>
+    Competencies Breakdown
+  </div>
+  <div className="dp-inner-table-wrapper">
+    <table className="dp-inner-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <thead>
+        <tr style={{ background: '#27235c' }}>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>Competency</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>Employee Rating</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>Employee Comments</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L1 Reviewer</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L1 Rating</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L1 Comments</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L2 Reviewer</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L2 Rating</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>L2 Comments</th>
+          <th style={{ color: '#ffffff', padding: '8px', textAlign: 'left' }}>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {selectedEmployee.competencies && selectedEmployee.competencies.length > 0 ? (
+          selectedEmployee.competencies.map((c, idx) => (
+            <tr key={idx}>
+              <td>{c.competencyName}</td>
+              <td><strong className="emp-rating">{c.employeeRating || "-"}</strong></td>
+              <td>{c.employeeComments || "-"}</td>
+              <td>{c.l1ReviewerName || "No L1"}</td>
+              <td><strong className="l1-rating">{c.l1Rating || "-"}</strong></td>
+              <td>{c.l1Comments || "-"}</td>
+              <td>{c.l2ReviewerName || "No L2"}</td>
+              <td><strong className="l2-rating">{c.l2Rating || "-"}</strong></td>
+              <td>{c.l2Comments || "-"}</td>
+              <td>
+                <span className={`dp-status-badge status-${c.status?.toLowerCase()}`}>{c.status}</span>
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan={10} className="dp-no-data">No competencies found</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
+
               {/* Goals Section */}
               <div style={{
                 background: "#fff",
@@ -897,118 +909,17 @@ const fetchData = async (silent = false) => {
   gap: "1rem", 
   marginBottom: "1.5rem" 
 }}>
-  <div style={{
-    background: "white",
-    borderRadius: "12px",
-    padding: "1.5rem",
-    display: "flex",
-    alignItems: "center",
-    gap: "1rem",
-    border: "1px solid #27235c", 
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-    transition: "all 0.3s ease",
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = "translateY(-4px)";
-    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.12)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = "translateY(0)";
-    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
-  }}
-  >
-    <div style={{
-      width: "60px",
-      height: "60px",
-      borderRadius: "12px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "1.5rem",
-      color: "white",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-    }}>
-      <i className="bi bi-hourglass-split"></i>
-    </div>
-    <div style={{ flex: 1 }}>
-      <h3 style={{
-        margin: 0,
-        fontSize: "2rem",
-        fontWeight: 700,
-        color: "#212529",
-        lineHeight: 1,
-        marginBottom: "0.25rem"
-      }}>{pendingRequests.length}</h3>
-      <p style={{
-        margin: 0,
-        color: "#6c757d",
-        fontSize: "0.875rem"
-      }}>Pending Approvals</p>
-    </div>
-  </div>
+ 
 
-  {/* Add more stat cards here with different gradient colors */}
-  <div style={{
-    background: "white",
-    borderRadius: "12px",
-    padding: "1.5rem",
-    display: "flex",
-    alignItems: "center",
-    gap: "1rem",
-    border: "1px solid #27235c", 
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-    transition: "all 0.3s ease",
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = "translateY(-4px)";
-    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.12)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = "translateY(0)";
-    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
-  }}
-  >
-    <div style={{
-      width: "60px",
-      height: "60px",
-      borderRadius: "12px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: "1.5rem",
-      color: "white",
-      background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-    }}>
-      <i className="bi bi-check-circle"></i>
-    </div>
-    <div style={{ flex: 1 }}>
-      <h3 style={{
-        margin: 0,
-        fontSize: "2rem",
-        fontWeight: 700,
-        color: "#212529",
-        lineHeight: 1,
-        marginBottom: "0.25rem"
-      }}>24</h3>
-      <p style={{
-        margin: 0,
-        color: "#6c757d",
-        fontSize: "0.875rem"
-      }}>Approved</p>
-    </div>
-  </div>
-</div>
-
-
-
+ {/* Active Tabs with Counts */}
 <div
   style={{
     display: "flex",
     justifyContent: "flex-start",
     background: "#27235C",
     borderRadius: 30,
-    padding: "3px 6px",
-    gap: 3,
+    padding: "4px 8px",
+    gap: 6,
     border: "3px solid #27235C",
     width: "fit-content",
     margin: "16px 0 20px 0",
@@ -1017,7 +928,7 @@ const fetchData = async (silent = false) => {
 >
   <button
     style={{
-      padding: "8px 22px",
+      padding: "10px 28px",
       background: activeTab === "pending" ? "#fff" : "transparent",
       color: activeTab === "pending" ? "#27235C" : "#fff",
       border: "none",
@@ -1025,21 +936,27 @@ const fetchData = async (silent = false) => {
       fontWeight: 700,
       fontSize: 15,
       cursor: "pointer",
-      minWidth: 80,
+      minWidth: 140, // increased width
       transition: "all 0.18s cubic-bezier(.82,.75,.11,1.36)",
       outline: "none",
       boxShadow:
         activeTab === "pending"
           ? "0 2px 8px 0 rgb(39 35 92 / 7%)"
           : "none",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
     }}
     onClick={() => setActiveTab("pending")}
   >
-    Pending
+    <i className="bi bi-hourglass-split"></i>
+    Pending ({pendingRequests.length})
   </button>
+
   <button
     style={{
-      padding: "8px 22px",
+      padding: "10px 28px",
       background: activeTab === "approved" ? "#fff" : "transparent",
       color: activeTab === "approved" ? "#27235C" : "#fff",
       border: "none",
@@ -1047,61 +964,92 @@ const fetchData = async (silent = false) => {
       fontWeight: 700,
       fontSize: 15,
       cursor: "pointer",
-      minWidth: 80,
+      minWidth: 140, // increased width
       transition: "all 0.18s cubic-bezier(.82,.75,.11,1.36)",
       outline: "none",
       boxShadow:
         activeTab === "approved"
           ? "0 2px 8px 0 rgb(39 35 92 / 7%)"
           : "none",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
     }}
     onClick={() => setActiveTab("approved")}
   >
-    Approved
+    <i className="bi bi-check-circle"></i>
+    Approved (24)
   </button>
 </div>
 
+{/* Filters */}
 
-      {/* Filters */}
-      <div className="dp-filters-card">
-        <div className="dp-filters-content">
-          <div className="dp-filters-left">
-            <div className="dp-search-box">
-              <i className="bi bi-search dp-search-icon"></i>
-              <input
-                type="text"
-                className="dp-search-input"
-                placeholder="Search employee or project..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+</div>
+{/* Filters */}
+<div className="dp-filters-card">
+  <div className="dp-filters-content">
+    <div className="dp-filters-left">
+      <div className="dp-search-box">
+        <i className="bi bi-search dp-search-icon"></i>
+        <input
+  type="text"
+  className="dp-search-input"
+  placeholder="Search employee or project..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)} // just updates typing
+/>
 
-            <select className="dp-filter-select" value={filterProject} onChange={(e) => setFilterProject(e.target.value)}>
-              <option value="">All Projects</option>
-              {getUniqueProjects().map((project, idx) => (
-                <option key={idx} value={project}>
-                  {project}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
       </div>
 
-   
+      <select
+        className="dp-filter-select"
+        value={filterProject}
+        onChange={(e) => setFilterProject(e.target.value)}
+      >
+        <option value="">All Projects</option>
+        {getUniqueProjects().map((project, idx) => (
+          <option key={idx} value={project}>
+            {project}
+          </option>
+        ))}
+      </select>
+      <button
+  onClick={() => {
+    setAppliedSearch(searchTerm); // commit the typed value
+    applyFilters();
+  }}
+  style={{
+    marginLeft: "10px",
+    padding: "8px 18px",
+    backgroundColor: "#27235C",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    fontWeight: 600,
+    cursor: "pointer",
+  }}
+>
+  Search
+</button>
 
-      {/* Table */}
-    {/* Table */}
-<div className="dp-table-card">
+    </div>
+  </div>
+</div>
+
+{/* Table */}
+<div 
+  className="dp-table-card" 
+  style={{ border: "2px solid #27235C", borderRadius: "8px", overflow: "hidden" }}
+>
   <div className="dp-table-wrapper">
     {activeTab === "pending" ? (
-      <table className="dp-table">
+      <table className="dp-table" style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th>Employee</th>
             <th>Project</th>
-            <th>Avg Emp Rating</th>
+            <th>Avg Employee Rating</th>
             <th>Avg L1 Rating</th>
             <th>Avg L2 Rating</th>
             <th>Goals</th>
@@ -1111,9 +1059,15 @@ const fetchData = async (silent = false) => {
         <tbody>
           {getPaginatedData().length === 0 ? (
             <tr>
-              <td colSpan={7} className="dp-empty-state">
-                <i className="bi bi-inbox"></i>
-                <p>No pending approvals found</p>
+              <td 
+                colSpan={7} 
+                className="dp-empty-state"
+                style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}
+              >
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+                  <i className="bi bi-inbox" style={{ fontSize: "1.5rem" }}></i>
+                  <p style={{ margin: 0 }}>No pending approvals found</p>
+                </div>
               </td>
             </tr>
           ) : (
@@ -1125,21 +1079,27 @@ const fetchData = async (silent = false) => {
                       <div className="dp-user-avatar">{getInitials(emp.employeeName)}</div>
                       <div>
                         <span className="dp-user-name">{emp.employeeName}</span>
-                        {emp.employeeCompanyId
-                          ? <small className="dp-user-id">@{emp.employeeCompanyId}</small>
-                          : null}
+                        {emp.employeeCompanyId && (
+                          <small className="dp-user-id">@{emp.employeeCompanyId}</small>
+                        )}
                       </div>
                     </div>
                   </td>
                   <td>{emp.projectName}</td>
                   <td>
-                    <span className="dp-rating-badge emp-rating">{getAvgRating(emp.competencies, "employeeRating")}</span>
+                    <span className="dp-rating-badge emp-rating">
+                      {getAvgRating(emp.competencies, "employeeRating")}
+                    </span>
                   </td>
                   <td>
-                    <span className="dp-rating-badge l1-rating">{getAvgRating(emp.competencies, "l1Rating")}</span>
+                    <span className="dp-rating-badge l1-rating">
+                      {getAvgRating(emp.competencies, "l1Rating")}
+                    </span>
                   </td>
                   <td>
-                    <span className="dp-rating-badge l2-rating">{getAvgRating(emp.competencies, "l2Rating")}</span>
+                    <span className="dp-rating-badge l2-rating">
+                      {getAvgRating(emp.competencies, "l2Rating")}
+                    </span>
                   </td>
                   <td>
                     <span className="dp-goals-badge">
@@ -1172,8 +1132,7 @@ const fetchData = async (silent = false) => {
         </tbody>
       </table>
     ) : (
-      // Leave your APPROVED tab table code as is, do not touch!
-      <table className="dp-table">
+      <table className="dp-table" style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th>Employee</th>
@@ -1184,7 +1143,7 @@ const fetchData = async (silent = false) => {
         <tbody>
           {getPaginatedData().length === 0 ? (
             <tr>
-              <td colSpan={5} className="dp-empty-state">
+              <td colSpan={5} className="dp-empty-state" style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}>
                 <i className="bi bi-inbox"></i>
                 <p>No approved employees found</p>
               </td>
@@ -1198,14 +1157,13 @@ const fetchData = async (silent = false) => {
                       <div className="dp-user-avatar">{getInitials(emp.employeeName)}</div>
                       <div>
                         <span className="dp-user-name">{emp.employeeName}</span>
-                        {emp.employeeCompanyId
-                          ? <small className="dp-user-id">@{emp.employeeCompanyId}</small>
-                          : null}
+                        {emp.employeeCompanyId && (
+                          <small className="dp-user-id">@{emp.employeeCompanyId}</small>
+                        )}
                       </div>
                     </div>
                   </td>
                   <td>{emp.projectName}</td>
-              
                   <td className="text-muted">{formatDate(emp.approvedAt)}</td>
                 </tr>
               </React.Fragment>
@@ -1215,9 +1173,13 @@ const fetchData = async (silent = false) => {
       </table>
     )}
   </div>
-  {/* Pagination - keep your existing pagination code */}
+
+  {/* Pagination */}
   {filteredData.length > 0 && (
-    <div className="dp-pagination-container">
+    <div 
+      className="dp-pagination-container" 
+      style={{ borderTop: "2px solid #27235C", paddingTop: "10px", marginTop: "10px" }}
+    >
       <div className="dp-pagination-info">
         <span className="dp-pagination-label">Show</span>
         <select
@@ -1279,6 +1241,7 @@ const fetchData = async (silent = false) => {
     </div>
   )}
 </div>
+
 
 
       {/* Modals */}
