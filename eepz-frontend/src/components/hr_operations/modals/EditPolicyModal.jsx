@@ -341,12 +341,16 @@ const EditPolicyModal = ({
                     display: "flex",
                     alignItems: "center",
                     fontSize: 13,
-                    background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
+                    background:
+                      "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
                     border: "2px solid #ef4444",
                     color: "#991b1b",
                   }}
                 >
-                  <i className="bi bi-exclamation-triangle-fill" style={{ marginRight: 8, color: "#ef4444" }}></i>
+                  <i
+                    className="bi bi-exclamation-triangle-fill"
+                    style={{ marginRight: 8, color: "#ef4444" }}
+                  ></i>
                   {errors.submit}
                 </div>
               )}
@@ -359,7 +363,9 @@ const EditPolicyModal = ({
                   marginBottom: 0,
                 }}
               >
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 12 }}
+                >
                   <div>
                     <label
                       style={{
@@ -372,7 +378,10 @@ const EditPolicyModal = ({
                         gap: 4,
                       }}
                     >
-                      Policy Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                      Policy Name{" "}
+                      <span style={{ color: "#ef4444", fontWeight: 700 }}>
+                        *
+                      </span>
                     </label>
                     <input
                       type="text"
@@ -382,7 +391,9 @@ const EditPolicyModal = ({
                       onChange={handleChange}
                       style={{
                         width: "100%",
-                        border: errors.policyName ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                        border: errors.policyName
+                          ? "1px solid #ef4444"
+                          : "1px solid #cbd5e1",
                         borderRadius: 6,
                         padding: "8px 10px",
                         fontSize: 13,
@@ -391,7 +402,9 @@ const EditPolicyModal = ({
                       }}
                     />
                     {errors.policyName && (
-                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                      <div
+                        style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}
+                      >
                         {errors.policyName}
                       </div>
                     )}
@@ -409,7 +422,10 @@ const EditPolicyModal = ({
                         gap: 4,
                       }}
                     >
-                      Category <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                      Category{" "}
+                      <span style={{ color: "#ef4444", fontWeight: 700 }}>
+                        *
+                      </span>
                     </label>
                     <select
                       name="category"
@@ -417,7 +433,9 @@ const EditPolicyModal = ({
                       onChange={handleChange}
                       style={{
                         width: "100%",
-                        border: errors.category ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                        border: errors.category
+                          ? "1px solid #ef4444"
+                          : "1px solid #cbd5e1",
                         borderRadius: 6,
                         padding: "8px 10px",
                         fontSize: 13,
@@ -434,7 +452,9 @@ const EditPolicyModal = ({
                       ))}
                     </select>
                     {errors.category && (
-                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                      <div
+                        style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}
+                      >
                         {errors.category}
                       </div>
                     )}
@@ -476,7 +496,9 @@ const EditPolicyModal = ({
                   </div>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: 12 }}
+                >
                   <div>
                     <label
                       style={{
@@ -489,7 +511,10 @@ const EditPolicyModal = ({
                         gap: 4,
                       }}
                     >
-                      Description <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                      Description{" "}
+                      <span style={{ color: "#ef4444", fontWeight: 700 }}>
+                        *
+                      </span>
                     </label>
                     <textarea
                       rows={3}
@@ -499,7 +524,9 @@ const EditPolicyModal = ({
                       onChange={handleChange}
                       style={{
                         width: "100%",
-                        border: errors.description ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                        border: errors.description
+                          ? "1px solid #ef4444"
+                          : "1px solid #cbd5e1",
                         borderRadius: 6,
                         padding: "8px 10px",
                         fontSize: 13,
@@ -513,7 +540,9 @@ const EditPolicyModal = ({
                       }}
                     />
                     {errors.description && (
-                      <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                      <div
+                        style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}
+                      >
                         {errors.description}
                       </div>
                     )}
@@ -576,7 +605,10 @@ const EditPolicyModal = ({
                     gap: 8,
                   }}
                 >
-                  <i className="bi bi-file-earmark-text" style={{ fontSize: 14 }}></i>
+                  <i
+                    className="bi bi-file-earmark-text"
+                    style={{ fontSize: 14 }}
+                  ></i>
                   Policy Document
                 </label>
 
@@ -677,7 +709,8 @@ const EditPolicyModal = ({
                       flex: 1,
                       padding: "8px 12px",
                       border: "none",
-                      background: documentType === "upload" ? "#27235C" : "#fff",
+                      background:
+                        documentType === "upload" ? "#27235C" : "#fff",
                       color: documentType === "upload" ? "white" : "#6c757d",
                       fontWeight: 500,
                       fontSize: 13,
@@ -690,7 +723,11 @@ const EditPolicyModal = ({
                       gap: 4,
                     }}
                   >
-                    <i className="bi bi-cloud-upload" style={{ fontSize: 13 }}></i> Upload New File
+                    <i
+                      className="bi bi-cloud-upload"
+                      style={{ fontSize: 13 }}
+                    ></i>{" "}
+                    Upload New File
                   </button>
                   <button
                     type="button"
@@ -711,24 +748,55 @@ const EditPolicyModal = ({
                       gap: 4,
                     }}
                   >
-                    <i className="bi bi-link-45deg" style={{ fontSize: 14 }}></i> Add New Link
+                    <i
+                      className="bi bi-link-45deg"
+                      style={{ fontSize: 14 }}
+                    ></i>{" "}
+                    Add New Link
                   </button>
                 </div>
 
                 {documentType === "upload" && (
                   <div style={{ marginTop: 12 }}>
+                    <label
+                      htmlFor="file-upload-edit"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 8,
+                        padding: "12px",
+                        border: "2px dashed #cbd5e1",
+                        borderRadius: 8,
+                        background: "#fff",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        fontSize: 13,
+                        color: "#64748b",
+                        fontWeight: 500,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = "#97247E";
+                        e.currentTarget.style.background = "#faf5ff";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = "#cbd5e1";
+                        e.currentTarget.style.background = "#fff";
+                      }}
+                    >
+                      <i
+                        className="bi bi-cloud-upload"
+                        style={{ fontSize: 20 }}
+                      ></i>
+                      <span>Click to upload or drag and drop</span>
+                    </label>
                     <input
+                      id="file-upload-edit"
                       type="file"
                       accept=".pdf,.doc,.docx"
                       onChange={handleFileChange}
                       style={{
-                        width: "100%",
-                        border: "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        padding: 8,
-                        fontSize: 13,
-                        background: "#fff",
-                        cursor: "pointer",
+                        display: "none",
                       }}
                     />
                     <small
@@ -736,28 +804,82 @@ const EditPolicyModal = ({
                         fontSize: 11,
                         color: "#64748b",
                         display: "block",
-                        marginTop: 6,
+                        marginTop: 8,
+                        textAlign: "center",
+                        fontStyle: "italic",
                       }}
                     >
                       Supported: PDF, DOC, DOCX (Max 5MB)
                     </small>
+
+                    {/* Selected File Display - Green */}
                     {selectedFile && (
                       <div
                         style={{
                           marginTop: 12,
-                          padding: "6px 12px",
-                          fontSize: 12,
-                          borderRadius: 4,
-                          display: "inline-flex",
+                          padding: "12px 14px",
+                          fontSize: 13,
+                          borderRadius: 8,
+                          display: "flex",
                           alignItems: "center",
-                          gap: 4,
-                          background: "#dcfce7",
-                          color: "#166534",
-                          border: "1px solid #86efac",
+                          justifyContent: "space-between",
+                          background:
+                            "linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%)",
+                          border: "2px solid #86efac",
                         }}
                       >
-                        <i className="bi bi-check-circle"></i>
-                        {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            color: "#166534",
+                          }}
+                        >
+                          <i
+                            className="bi bi-file-earmark-check-fill"
+                            style={{ fontSize: 20, color: "#16a34a" }}
+                          ></i>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: 14 }}>
+                              {selectedFile.name}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: 11,
+                                color: "#15803d",
+                                marginTop: 2,
+                              }}
+                            >
+                              {(selectedFile.size / 1024).toFixed(2)} KB
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFile(null)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "#dc2626",
+                            cursor: "pointer",
+                            padding: "4px 8px",
+                            borderRadius: 4,
+                            transition: "all 0.2s",
+                            display: "flex",
+                            alignItems: "center",
+                            fontSize: 18,
+                          }}
+                          title="Remove file"
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "#fee2e2";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "none";
+                          }}
+                        >
+                          <i className="bi bi-x-circle-fill"></i>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -777,7 +899,10 @@ const EditPolicyModal = ({
                           gap: 4,
                         }}
                       >
-                        Document URL <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                        Document URL{" "}
+                        <span style={{ color: "#ef4444", fontWeight: 700 }}>
+                          *
+                        </span>
                       </label>
                       <input
                         type="url"
@@ -786,7 +911,9 @@ const EditPolicyModal = ({
                         onChange={(e) => setDocumentLink(e.target.value)}
                         style={{
                           width: "100%",
-                          border: errors.documentLink ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                          border: errors.documentLink
+                            ? "1px solid #ef4444"
+                            : "1px solid #cbd5e1",
                           borderRadius: 6,
                           padding: "8px 10px",
                           fontSize: 13,
@@ -795,7 +922,13 @@ const EditPolicyModal = ({
                         }}
                       />
                       {errors.documentLink && (
-                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        <div
+                          style={{
+                            color: "#ef4444",
+                            fontSize: 11,
+                            marginTop: 4,
+                          }}
+                        >
                           {errors.documentLink}
                         </div>
                       )}
@@ -812,7 +945,10 @@ const EditPolicyModal = ({
                           gap: 4,
                         }}
                       >
-                        Document Name <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
+                        Document Name{" "}
+                        <span style={{ color: "#ef4444", fontWeight: 700 }}>
+                          *
+                        </span>
                       </label>
                       <input
                         type="text"
@@ -821,7 +957,9 @@ const EditPolicyModal = ({
                         onChange={(e) => setDocumentName(e.target.value)}
                         style={{
                           width: "100%",
-                          border: errors.documentName ? "1px solid #ef4444" : "1px solid #cbd5e1",
+                          border: errors.documentName
+                            ? "1px solid #ef4444"
+                            : "1px solid #cbd5e1",
                           borderRadius: 6,
                           padding: "8px 10px",
                           fontSize: 13,
@@ -830,7 +968,13 @@ const EditPolicyModal = ({
                         }}
                       />
                       {errors.documentName && (
-                        <div style={{ color: "#ef4444", fontSize: 11, marginTop: 4 }}>
+                        <div
+                          style={{
+                            color: "#ef4444",
+                            fontSize: 11,
+                            marginTop: 4,
+                          }}
+                        >
                           {errors.documentName}
                         </div>
                       )}
@@ -875,10 +1019,12 @@ const EditPolicyModal = ({
                     gap: 6,
                   }}
                   onMouseEnter={(e) => {
-                    if (!isAnyActionLoading) e.target.style.background = "#f59e0b";
+                    if (!isAnyActionLoading)
+                      e.target.style.background = "#f59e0b";
                   }}
                   onMouseLeave={(e) => {
-                    if (!isAnyActionLoading) e.target.style.background = "#fbbf24";
+                    if (!isAnyActionLoading)
+                      e.target.style.background = "#fbbf24";
                   }}
                 >
                   {unpublishing ? (
@@ -931,10 +1077,12 @@ const EditPolicyModal = ({
                   gap: 6,
                 }}
                 onMouseEnter={(e) => {
-                  if (!isAnyActionLoading) e.target.style.background = "#5a6268";
+                  if (!isAnyActionLoading)
+                    e.target.style.background = "#5a6268";
                 }}
                 onMouseLeave={(e) => {
-                  if (!isAnyActionLoading) e.target.style.background = "#6c757d";
+                  if (!isAnyActionLoading)
+                    e.target.style.background = "#6c757d";
                 }}
               >
                 Cancel
@@ -944,7 +1092,8 @@ const EditPolicyModal = ({
                 type="submit"
                 disabled={isAnyActionLoading}
                 style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  background:
+                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                   border: "none",
                   color: "#fff",
                   fontWeight: 600,

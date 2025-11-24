@@ -122,7 +122,7 @@ const CreateOpportunityModal = ({
         toast.error(response.message || "Failed to create opportunity");
       }
     } catch (error) {
-      console.error(" Error:", error);
+      console.error("Error:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.title ||
@@ -189,7 +189,7 @@ const CreateOpportunityModal = ({
           style={{
             width: '100%',
             maxWidth: '800px',
-            maxHeight: '75vh',
+            maxHeight: '85vh',
             display: 'flex',
             flexDirection: 'column',
             borderRadius: '0.5rem',
@@ -198,7 +198,7 @@ const CreateOpportunityModal = ({
             backgroundColor: '#ffffff'
           }}
         >
-          {/* Modal Header - Dark Navy Blue like Policy Modal */}
+          {/* Modal Header */}
           <div
             style={{
               background: '#27235C',
@@ -251,7 +251,7 @@ const CreateOpportunityModal = ({
                 overflowY: 'auto',
                 flex: 1,
                 backgroundColor: '#ffffff',
-                maxHeight: 'calc(90vh - 140px)'
+                maxHeight: 'calc(85vh - 140px)'
               }}
             >
               {/* Opportunity Name - Full Width */}
@@ -587,167 +587,186 @@ const CreateOpportunityModal = ({
                 />
               </div>
 
-              {/* Status - Narrow Width */}
-              <div style={{ marginBottom: '16px', maxWidth: '250px' }}>
-                <label
-                  style={{
-                    display: 'block',
-                    fontWeight: '600',
-                    fontSize: '13px',
-                    color: '#334155',
-                    marginBottom: '6px',
-                    textAlign: 'left'
-                  }}
-                >
-                  Status <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    fontSize: '13px',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '6px',
-                    outline: 'none',
-                    cursor: 'pointer',
-                    backgroundColor: '#ffffff',
-                    transition: 'all 0.2s ease',
-                    textAlign: 'left'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#27235C';
-                    e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#cbd5e1';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                >
-                  <option value="Active">Active</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Closed">Closed</option>
-                </select>
-              </div>
-
-              {/* Info Alert */}
-              <div
+              {/* Status and Info Row */}
+              <div 
                 style={{
-                  marginTop: '20px',
-                  padding: '12px 16px',
-                  backgroundColor: '#f9fafb',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '11px',
-                  color: '#64748b'
+                  display: 'grid',
+                  gridTemplateColumns: '250px 1fr',
+                  gap: '20px',
+                  marginBottom: '16px',
+                  alignItems: 'start'
                 }}
               >
-                <i className="bi bi-info-circle" style={{ fontSize: '14px' }}></i>
-                <small>Employees will be able to view and apply for active opportunities</small>
+                {/* Status - Left Side */}
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontWeight: '600',
+                      fontSize: '13px',
+                      color: '#334155',
+                      marginBottom: '6px',
+                      textAlign: 'left'
+                    }}
+                  >
+                    Status <span style={{ color: '#ef4444', fontWeight: '700' }}>*</span>
+                  </label>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      fontSize: '13px',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '6px',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      backgroundColor: '#ffffff',
+                      transition: 'all 0.2s ease',
+                      textAlign: 'left'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#27235C';
+                      e.target.style.boxShadow = '0 0 0 0.2rem rgba(39, 35, 92, 0.25)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = '#cbd5e1';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </div>
+
+                {/* Info Alert - Right Side */}
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    backgroundColor: '#f0f9ff',
+                    border: '1px solid #bae6fd',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    fontSize: '12px',
+                    color: '#0369a1',
+                    marginTop: '20px' // Aligns with select field
+                  }}
+                >
+                  <i 
+                    className="bi bi-info-circle-fill" 
+                    style={{ 
+                      fontSize: '16px',
+                      flexShrink: 0,
+                      color: '#0284c7'
+                    }}
+                  ></i>
+                  <span style={{ lineHeight: '1.4' }}>
+                    Employees will be able to view and apply for active opportunities
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Modal Footer - Fixed */}
-<div
-  style={{
-    padding: '12px 20px',
-    borderTop: '1px solid #e2e8f0',
-    background: '#ffffff',
-    flexShrink: 0,
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '8px',
-    borderBottomLeftRadius: '12px',
-    borderBottomRightRadius: '12px'
-  }}
->
-  {/* Close Button */}
-  <button
-    type="button"
-    onClick={handleClose}
-    disabled={loading}
-    style={{
-      background: '#6c757d',
-      borderColor: '#6c757d',
-      color: '#ffffff',
-      fontWeight: '600',
-      padding: '8px 16px',
-      fontSize: '13px',
-      borderRadius: '6px',
-      border: 'none',
-      cursor: loading ? 'not-allowed' : 'pointer',
-      opacity: loading ? 0.65 : 1,
-      transition: 'all 0.2s ease',
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '6px'
-    }}
-    onMouseEnter={(e) => {
-      if (!loading) {
-        e.target.style.background = '#5a6268';
-        e.target.style.borderColor = '#5a6268';
-      }
-    }}
-    onMouseLeave={(e) => {
-      if (!loading) {
-        e.target.style.background = '#6c757d';
-        e.target.style.borderColor = '#6c757d';
-      }
-    }}
-  >
-    Cancel
-  </button>
-  
-  {/* Create Opportunity Button */}
-  <button
-    type="submit"
-    disabled={loading}
-    style={{
-      background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-      border: 'none',
-      color: '#ffffff',
-      padding: '8px 16px',
-      fontWeight: '600',
-      fontSize: '13px',
-      borderRadius: '6px',
-      transition: 'all 0.12s ease',
-      boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
-      cursor: loading ? 'not-allowed' : 'pointer',
-      opacity: loading ? 0.65 : 1,
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: '6px'
-    }}
-  >
-    {loading ? (
-      <>
-        <span
-          style={{
-            width: '14px',
-            height: '14px',
-            border: '2px solid #ffffff',
-            borderTopColor: 'transparent',
-            borderRadius: '50%',
-            animation: 'spin 0.6s linear infinite',
-            display: 'inline-block'
-          }}
-        />
-        Creating...
-      </>
-    ) : (
-      <>
-        <i className="bi bi-check-circle"></i>
-        Create Opportunity
-      </>
-    )}
-  </button>
-</div>
-
+            <div
+              style={{
+                padding: '12px 20px',
+                borderTop: '1px solid #e2e8f0',
+                background: '#ffffff',
+                flexShrink: 0,
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '8px',
+                borderBottomLeftRadius: '12px',
+                borderBottomRightRadius: '12px'
+              }}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={handleClose}
+                disabled={loading}
+                style={{
+                  background: '#6c757d',
+                  borderColor: '#6c757d',
+                  color: '#ffffff',
+                  fontWeight: '600',
+                  padding: '8px 16px',
+                  fontSize: '13px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.65 : 1,
+                  transition: 'all 0.2s ease',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.target.style.background = '#5a6268';
+                    e.target.style.borderColor = '#5a6268';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) {
+                    e.target.style.background = '#6c757d';
+                    e.target.style.borderColor = '#6c757d';
+                  }
+                }}
+              >
+                Cancel
+              </button>
+              
+              {/* Create Opportunity Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                  border: 'none',
+                  color: '#ffffff',
+                  padding: '8px 16px',
+                  fontWeight: '600',
+                  fontSize: '13px',
+                  borderRadius: '6px',
+                  transition: 'all 0.12s ease',
+                  boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.65 : 1,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                {loading ? (
+                  <>
+                    <span
+                      style={{
+                        width: '14px',
+                        height: '14px',
+                        border: '2px solid #ffffff',
+                        borderTopColor: 'transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 0.6s linear infinite',
+                        display: 'inline-block'
+                      }}
+                    />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle"></i>
+                    Create Opportunity
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </div>

@@ -216,7 +216,13 @@ const EmployeeProfile = () => {
         JSON.stringify(data.permanentAddress)
     ) {
       setSameAsCurrentAddress(true);
+    } else {
+      setSameAsCurrentAddress(false);
     }
+    
+    // Reset errors and touched state
+    setErrors({});
+    setTouched({});
   };
 
   /**
@@ -301,46 +307,49 @@ const EmployeeProfile = () => {
   const validateField = (name, value) => {
     let error = "";
 
+    // Convert value to string if it's not already, handle null/undefined
+    const stringValue = value != null ? String(value) : "";
+
     switch (name) {
       case "firstName":
         // Required field validation
-        if (!value || !value.trim()) {
+        if (!stringValue || !stringValue.trim()) {
           error = "First name is required";
         }
         // Length validation
-        else if (value.trim().length < 2) {
+        else if (stringValue.trim().length < 2) {
           error = "First name must be at least 2 characters";
-        } else if (value.trim().length > 50) {
+        } else if (stringValue.trim().length > 50) {
           error = "First name cannot exceed 50 characters";
         }
         // Character validation - only letters
-        else if (!/^[a-zA-Z]+$/.test(value.trim())) {
+        else if (!/^[a-zA-Z]+$/.test(stringValue.trim())) {
           error = "First name can only contain letters";
         }
         // Check for consecutive spaces
-        else if (/\s{2,}/.test(value)) {
+        else if (/\s{2,}/.test(stringValue)) {
           error = "First name cannot contain consecutive spaces";
         }
         break;
 
       case "middleName":
         // Optional field - only validate if value exists
-        if (value && value.trim()) {
+        if (stringValue && stringValue.trim()) {
           // Length validation
-          if (value.trim().length > 50) {
+          if (stringValue.trim().length > 50) {
             error = "Middle name cannot exceed 50 characters";
           }
           // Character validation
-          else if (!/^[a-zA-Z\s'-]*$/.test(value.trim())) {
+          else if (!/^[a-zA-Z\s'-]*$/.test(stringValue.trim())) {
             error =
               "Middle name can only contain letters, spaces, hyphens, and apostrophes";
           }
           // Check for consecutive spaces
-          else if (/\s{2,}/.test(value)) {
+          else if (/\s{2,}/.test(stringValue)) {
             error = "Middle name cannot contain consecutive spaces";
           }
           // Check for consecutive special chars
-          else if (/[-']{2,}/.test(value)) {
+          else if (/[-']{2,}/.test(stringValue)) {
             error =
               "Middle name cannot contain consecutive hyphens or apostrophes";
           }
@@ -349,43 +358,43 @@ const EmployeeProfile = () => {
 
       case "lastName":
         // Required field validation
-        if (!value || !value.trim()) {
+        if (!stringValue || !stringValue.trim()) {
           error = "Last name is required";
         }
         // Length validation
-        else if (value.trim().length < 2) {
+        else if (stringValue.trim().length < 2) {
           error = "Last name must be at least 2 characters";
-        } else if (value.trim().length > 50) {
+        } else if (stringValue.trim().length > 50) {
           error = "Last name cannot exceed 50 characters";
         }
         // Character validation - only letters
-        else if (!/^[a-zA-Z]+$/.test(value.trim())) {
+        else if (!/^[a-zA-Z]+$/.test(stringValue.trim())) {
           error = "Last name can only contain letters";
         }
         // Check for consecutive spaces
-        else if (/\s{2,}/.test(value)) {
+        else if (/\s{2,}/.test(stringValue)) {
           error = "Last name cannot contain consecutive spaces";
         }
         break;
 
       case "callingName":
         // Optional field - only validate if value exists
-        if (value && value.trim()) {
+        if (stringValue && stringValue.trim()) {
           // Length validation
-          if (value.trim().length > 50) {
+          if (stringValue.trim().length > 50) {
             error = "Calling name cannot exceed 50 characters";
           }
           // Character validation
-          else if (!/^[a-zA-Z\s'-]*$/.test(value.trim())) {
+          else if (!/^[a-zA-Z\s'-]*$/.test(stringValue.trim())) {
             error =
               "Calling name can only contain letters, spaces, hyphens, and apostrophes";
           }
           // Check for consecutive spaces
-          else if (/\s{2,}/.test(value)) {
+          else if (/\s{2,}/.test(stringValue)) {
             error = "Calling name cannot contain consecutive spaces";
           }
           // Check for consecutive special chars
-          else if (/[-']{2,}/.test(value)) {
+          else if (/[-']{2,}/.test(stringValue)) {
             error =
               "Calling name cannot contain consecutive hyphens or apostrophes";
           }
@@ -394,12 +403,12 @@ const EmployeeProfile = () => {
 
       case "mobileNumber":
         // Required field validation
-        if (!value || !value.trim()) {
+        if (!stringValue || !stringValue.trim()) {
           error = "Mobile number is required";
         }
         // Remove spaces for validation
         else {
-          const cleanNumber = value.replace(/\s+/g, "");
+          const cleanNumber = stringValue.replace(/\s+/g, "");
           // Check if only digits
           if (!/^\d+$/.test(cleanNumber)) {
             error = "Mobile number can only contain digits";
@@ -428,8 +437,8 @@ const EmployeeProfile = () => {
 
       case "alternateNumber":
         // Optional field - only validate if value exists
-        if (value && value.trim()) {
-          const cleanNumber = value.replace(/\s+/g, "");
+        if (stringValue && stringValue.trim()) {
+          const cleanNumber = stringValue.replace(/\s+/g, "");
           // Check if only digits
           if (!/^\d+$/.test(cleanNumber)) {
             error = "Alternate number can only contain digits";
@@ -455,8 +464,8 @@ const EmployeeProfile = () => {
 
       case "personalEmail":
         // Optional field - only validate if value exists
-        if (value && value.trim()) {
-          const email = value.trim().toLowerCase();
+        if (stringValue && stringValue.trim()) {
+          const email = stringValue.trim().toLowerCase();
           // Length validation
           if (email.length > 100) {
             error = "Email address cannot exceed 100 characters";
@@ -493,15 +502,15 @@ const EmployeeProfile = () => {
 
       case "gender":
         // Required field validation
-        if (!value || value === "") {
+        if (!stringValue || stringValue === "") {
           error = "Gender is required";
         }
         break;
 
       case "dateOfBirthOfficial":
         // Optional field - only validate if value exists
-        if (value) {
-          const birthDate = new Date(value);
+        if (stringValue) {
+          const birthDate = new Date(stringValue);
           const today = new Date();
 
           // Validate date is not in future
@@ -536,14 +545,14 @@ const EmployeeProfile = () => {
 
       case "nationality":
         // Required field validation
-        if (!value || value === "") {
+        if (!stringValue || stringValue === "") {
           error = "Nationality is required";
         }
         break;
 
       case "maritalStatus":
         // Required field validation
-        if (!value || value === "") {
+        if (!stringValue || stringValue === "") {
           error = "Marital status is required";
         }
         break;
@@ -565,109 +574,112 @@ const EmployeeProfile = () => {
   const validateAddressField = (addressType, field, value) => {
     let error = "";
 
+    // Convert value to string if it's not already, handle null/undefined
+    const stringValue = value != null ? String(value) : "";
+
     // All address fields are optional
-    if (!value || !value.trim()) {
+    if (!stringValue || !stringValue.trim()) {
       return "";
     }
 
     switch (field) {
       case "doorNumber":
         // Length validation
-        if (value.trim().length > 20) {
+        if (stringValue.trim().length > 20) {
           error = "Door number cannot exceed 20 characters";
         }
         // Check for only special characters
-        else if (/^[^a-zA-Z0-9]+$/.test(value.trim())) {
+        else if (/^[^a-zA-Z0-9]+$/.test(stringValue.trim())) {
           error = "Door number must contain alphanumeric characters";
         }
         // Check for consecutive spaces
-        else if (/\s{2,}/.test(value)) {
+        else if (/\s{2,}/.test(stringValue)) {
           error = "Door number cannot contain consecutive spaces";
         }
         break;
 
       case "street":
         // Length validation
-        if (value.trim().length < 2) {
+        if (stringValue.trim().length < 2) {
           error = "Street must be at least 2 characters";
-        } else if (value.trim().length > 100) {
+        } else if (stringValue.trim().length > 100) {
           error = "Street cannot exceed 100 characters";
         }
         // Character validation - alphanumeric with spaces and common chars
-        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(value.trim())) {
+        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
           error =
             "Street can only contain letters, numbers, spaces, commas, dots, and hyphens";
         }
         // Check for consecutive spaces
-        else if (/\s{2,}/.test(value)) {
+        else if (/\s{2,}/.test(stringValue)) {
           error = "Street cannot contain consecutive spaces";
         }
         break;
 
       case "landmark":
         // Length validation
-        if (value.trim().length > 100) {
+        if (stringValue.trim().length > 100) {
           error = "Landmark cannot exceed 100 characters";
         }
         // Character validation
-        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(value.trim())) {
+        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
           error =
             "Landmark can only contain letters, numbers, spaces, commas, dots, and hyphens";
         }
         // Check for consecutive spaces
-        else if (/\s{2,}/.test(value)) {
+        else if (/\s{2,}/.test(stringValue)) {
           error = "Landmark cannot contain consecutive spaces";
         }
         break;
 
       case "area":
         // Length validation
-        if (value.trim().length < 2) {
+        if (stringValue.trim().length < 2) {
           error = "Area must be at least 2 characters";
-        } else if (value.trim().length > 100) {
+        } else if (stringValue.trim().length > 100) {
           error = "Area cannot exceed 100 characters";
         }
         // Character validation
-        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(value.trim())) {
+        else if (!/^[a-zA-Z0-9\s,.-]+$/.test(stringValue.trim())) {
           error =
             "Area can only contain letters, numbers, spaces, commas, dots, and hyphens";
         }
         // Check for consecutive spaces
-        else if (/\s{2,}/.test(value)) {
+        else if (/\s{2,}/.test(stringValue)) {
           error = "Area cannot contain consecutive spaces";
         }
         break;
 
       case "city":
         // Length validation
-        if (value.trim().length < 2) {
+        if (stringValue.trim().length < 2) {
           error = "City must be at least 2 characters";
-        } else if (value.trim().length > 50) {
+        } else if (stringValue.trim().length > 50) {
           error = "City cannot exceed 50 characters";
         }
         // Character validation - only letters and spaces
-        else if (!/^[a-zA-Z\s]+$/.test(value.trim())) {
+        else if (!/^[a-zA-Z\s]+$/.test(stringValue.trim())) {
           error = "City can only contain letters and spaces";
         }
         // Check for consecutive spaces
-        else if (/\s{2,}/.test(value)) {
+        else if (/\s{2,}/.test(stringValue)) {
           error = "City cannot contain consecutive spaces";
         }
         // Check if city name is too short
-        else if (value.trim().replace(/\s/g, "").length < 2) {
+        else if (stringValue.trim().replace(/\s/g, "").length < 2) {
           error = "City name is too short";
         }
         break;
 
       case "state":
         // State is required if city is filled
-        if (formData[addressType]?.city && (!value || value === "")) {
+        if (formData[addressType]?.city && (!stringValue || stringValue === "")) {
           error = "State is required when city is provided";
         }
         break;
 
       case "pinCode":
-        const pinCode = value.replace(/\s+/g, "");
+        const pinCode = stringValue.replace(/\s+/g, "");
         // Check if only digits
         if (!/^\d+$/.test(pinCode)) {
           error = "PIN code can only contain digits";
@@ -688,7 +700,7 @@ const EmployeeProfile = () => {
 
       case "country":
         // Length validation
-        if (value && value.trim().length > 50) {
+        if (stringValue && stringValue.trim().length > 50) {
           error = "Country cannot exceed 50 characters";
         }
         break;
@@ -828,7 +840,8 @@ const EmployeeProfile = () => {
 
     // Validate required fields
     requiredFields.forEach((field) => {
-      if (!formData[field] || !formData[field].toString().trim()) {
+      const fieldValue = formData[field];
+      if (!fieldValue || (typeof fieldValue === 'string' && !fieldValue.trim())) {
         newErrors[field] = `${field
           .replace(/([A-Z])/g, " $1")
           .trim()} is required`;
@@ -837,7 +850,7 @@ const EmployeeProfile = () => {
 
     // Validate all string fields with specific validations
     Object.keys(formData).forEach((field) => {
-      if (typeof formData[field] === "string") {
+      if (typeof formData[field] === "string" || formData[field] != null) {
         const error = validateField(field, formData[field]);
         if (error) {
           newErrors[field] = error;
@@ -930,12 +943,27 @@ const EmployeeProfile = () => {
       if (response.success) {
         toast.dismiss();
         toast.success("Profile updated successfully!");
+        
+        // Update profileData with fresh data from response
         setProfileData(response.data);
+        
+        // Reinitialize form with updated data
         initializeFormData(response.data);
+        
+        // Exit edit mode
         setIsEditing(false);
-        setSameAsCurrentAddress(false);
-        setTouched({});
-        setErrors({});
+        
+        // Reset the sameAsCurrentAddress flag based on new data
+        if (
+          response.data.currentAddress &&
+          response.data.permanentAddress &&
+          JSON.stringify(response.data.currentAddress) ===
+            JSON.stringify(response.data.permanentAddress)
+        ) {
+          setSameAsCurrentAddress(true);
+        } else {
+          setSameAsCurrentAddress(false);
+        }
       } else {
         toast.dismiss();
         toast.error(
@@ -959,8 +987,6 @@ const EmployeeProfile = () => {
     setIsEditing(false);
     setSameAsCurrentAddress(false);
     initializeFormData(profileData);
-    setErrors({});
-    setTouched({});
     toast.info("Changes discarded");
   };
 
@@ -1366,7 +1392,7 @@ const EmployeeProfile = () => {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
-                      disabled={!isEditing}
+                      disabled
                       placeholder="Enter first name"
                     />
                     {showError("firstName") && (
@@ -1406,7 +1432,7 @@ const EmployeeProfile = () => {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
-                      disabled={!isEditing}
+                      disabled
                       placeholder="Enter last name"
                     />
                     {showError("lastName") && (
@@ -1416,7 +1442,10 @@ const EmployeeProfile = () => {
 
                   {/* Calling Name - OPTIONAL */}
                   <div className="form-field">
-                    <label>Calling Name</label>
+                    <label>
+                      Calling Name
+                      <span className="required">*</span>
+                    </label>
                     <input
                       type="text"
                       className={`form-control-modern ${
@@ -1451,7 +1480,10 @@ const EmployeeProfile = () => {
 
                   {/* Personal Email - OPTIONAL */}
                   <div className="form-field">
-                    <label>Personal Email</label>
+                    <label>
+                      Personal Email
+                      <span className="required">*</span>
+                    </label>
                     <input
                       type="email"
                       className={`form-control-modern ${
@@ -1497,7 +1529,10 @@ const EmployeeProfile = () => {
 
                   {/* Alternate Number - OPTIONAL */}
                   <div className="form-field">
-                    <label>Alternate Number</label>
+                    <label>
+                      Alternate Number
+                      <span className="required">*</span>
+                    </label>
                     <input
                       type="text"
                       className={`form-control-modern ${
