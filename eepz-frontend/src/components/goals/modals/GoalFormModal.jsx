@@ -592,7 +592,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
           style={{ borderRadius: "1.5rem" }}
         >
-          <div className="modal-content">
+          <div className="modal-content" style={{ minWidth: "1000px" }}>
             <div
               className="modal-header"
               style={{
@@ -685,6 +685,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           className="form-select"
                           value={formData.type}
                           onChange={(e) => handleChange("type", e.target.value)}
+                          style={{ fontSize: "14px" }}
                           disabled={isEdit || loading}
                         >
                           <option value={GOAL_TYPES.SELF}>
@@ -729,6 +730,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           }
                           placeholder="Enter goal title"
                           disabled={isEdit || loading}
+                          style={{ fontSize: "14px" }}
                           maxLength={200}
                         />
                         {isEdit && (
@@ -770,6 +772,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                             loading ||
                             formData.type === GOAL_TYPES.ORG // Disable for org goals
                           }
+                          style={{ fontSize: "14px" }}
                         >
                           <option value="">
                             {formData.type === GOAL_TYPES.TEAM
@@ -863,7 +866,11 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       placeholder="Enter goal description (optional)"
                       disabled={loading}
                       maxLength={1000}
-                      style={{ resize: "vertical", height: "100px" }}
+                      style={{
+                        resize: "vertical",
+                        height: "80px",
+                        fontSize: "14px",
+                      }}
                     />
                   </div>
 
@@ -1154,6 +1161,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                             required
                                             maxLength={200}
                                             style={{
+                                              fontSize: "14px",
                                               backgroundColor:
                                                 isItemCompleted ||
                                                 (isEdit && isExistingItem)
@@ -1230,7 +1238,9 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                           // Description can still be edited
                                           disabled={loading || isItemCompleted}
                                           style={{
+                                            fontSize: "14px",
                                             resize: "vertical",
+                                            minHeight: "80px",
                                             backgroundColor: isItemCompleted
                                               ? "#e9ecef"
                                               : "#fff",

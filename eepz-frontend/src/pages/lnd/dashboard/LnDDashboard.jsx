@@ -98,7 +98,6 @@ const LnDDashboard = () => {
     },
     {
       title: "My Assignments",
-      count: stats.activeAssignments,
       icon: TrendingUp,
       color: "#0d6efd",
       path: `${rolePrefix}/lnd/my-assignments`,
