@@ -42,9 +42,7 @@ const meetingService = {
       if (filters.startDate) params.append("startDate", filters.startDate);
       if (filters.endDate) params.append("endDate", filters.endDate);
 
-      const response = await apii.get(
-        `/Meeting/one-on-one-reports?${params.toString()}`
-      );
+      const response = await apii.get(`/Meeting/one-on-one-reports?${params.toString()}`);
       return response.data;
     } catch (error) {
       console.error("Get one-on-one reports error:", error);
@@ -58,6 +56,24 @@ const meetingService = {
       return response.data;
     } catch (error) {
       console.error("Get one-on-one summary error:", error);
+      throw error.response?.data || error;
+    }
+  },
+
+  // =========== NEW: Get Subordinates from LnD API ===========
+
+  getSubordinates: async () => {
+    try {
+      // Get access token from storage (adjust as needed)
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await apii.get("http://localhost:5307/api/LnD/employees/subordinates", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Get subordinates error:", error);
       throw error.response?.data || error;
     }
   },

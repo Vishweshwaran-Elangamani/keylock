@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import meetingService from "../../services/meeting/meetingService";
-import apii from "../../../src/services/meeting/index";
 import toastr from "toastr";
 import { useNavigate } from "react-router-dom";
 import {
@@ -37,42 +36,55 @@ const ScheduleMeeting = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Fetch subordinates for One-on-One meeting participants or all employees for others
   useEffect(() => {
-    fetchEmployees();
-  }, []);
-
-  useEffect(() => {
-    if (formData.meetingType === "One-on-One" && employeeOptions.length > 0) {
-      const employeesOnly = employeeOptions.filter(
-        (emp) => emp.roleName?.toLowerCase() === "employee"
-      );
-      if (employeesOnly.length > 0) {
-        setFormData((prev) => ({
-          ...prev,
-          participantEmployeeIds: [employeesOnly[0].employeeId],
-        }));
-      }
-    } else if (formData.meetingType !== "One-on-One") {
-      setFormData((prev) => ({
-        ...prev,
-        participantEmployeeIds: [],
-      }));
-    }
-  }, [employeeOptions, formData.meetingType]);
-
-  const fetchEmployees = async () => {
-    try {
-      const response = await apii.get("/EmployeeManagement/all");
-      if (response.data.success) {
-        setEmployeeOptions(response.data.data);
+    const fetchParticipants = async () => {
+      if (formData.meetingType === "One-on-One") {
+        try {
+          const response = await meetingService.getSubordinates();
+          if (response.success) {
+            const items = response.data.items.map((item) => ({
+              employeeId: item.employeeId,
+              firstName: item.employeeName,
+              lastName: "", // no last name provided in API response
+              email: item.email,
+              roleName: "",
+              departmentName: item.departmentName,
+            }));
+            setEmployeeOptions(items);
+            if (items.length > 0) {
+              setFormData((prev) => ({
+                ...prev,
+                participantEmployeeIds: [items[0].employeeId],
+              }));
+            }
+          } else {
+            toastr.error("Failed to fetch subordinates");
+          }
+        } catch (error) {
+          toastr.error("Error fetching subordinates");
+          console.error(error);
+        }
       } else {
-        toastr.error("Failed to fetch employees");
+        try {
+          const response = await meetingService.getAllEmployees();
+          if (response.success) {
+            setEmployeeOptions(response.data);
+          } else {
+            toastr.error("Failed to fetch employees");
+          }
+          setFormData((prev) => ({
+            ...prev,
+            participantEmployeeIds: [],
+          }));
+        } catch (error) {
+          toastr.error("Error fetching employees");
+          console.error(error);
+        }
       }
-    } catch (error) {
-      toastr.error("Error fetching employee list");
-      console.error(error);
-    }
-  };
+    };
+    fetchParticipants();
+  }, [formData.meetingType]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -86,7 +98,7 @@ const ScheduleMeeting = () => {
   const handleOneOnOneChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      participantEmployeeIds: [parseInt(e.target.value)],
+      participantEmployeeIds: [parseInt(e.target.value, 10)],
     }));
   };
 
@@ -137,6 +149,9 @@ const ScheduleMeeting = () => {
         meetingLink: formData.meetingLink,
         agenda: formData.agenda,
         participantEmployeeIds: formData.participantEmployeeIds,
+        duration: formData.duration,
+        sendCalendarInvite: formData.sendCalendarInvite,
+        reminder: formData.reminder,
       };
       await meetingService.scheduleMeeting(payload);
       toastr.success("Meeting scheduled successfully!");
@@ -152,10 +167,6 @@ const ScheduleMeeting = () => {
   const filteredEmployees = employeeOptions.filter((emp) => {
     const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
     const matchesSearch = fullName.includes(searchTerm.toLowerCase());
-    if (formData.meetingType === "One-on-One") {
-      const isEmployee = emp.roleName?.toLowerCase() === "employee";
-      return matchesSearch && isEmployee;
-    }
     return matchesSearch;
   });
 
@@ -166,20 +177,13 @@ const ScheduleMeeting = () => {
     >
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
-          {/* Breadcrumb Navigation */}
+          {/* Breadcrumb */}
           <nav aria-label="breadcrumb" className="mb-4">
             <ol
               className="breadcrumb mb-0 d-flex align-items-center"
-              style={{
-                backgroundColor: "transparent",
-                padding: 0,
-                margin: 0,
-              }}
+              style={{ backgroundColor: "transparent", padding: 0, margin: 0 }}
             >
-              <li
-                className="breadcrumb-item"
-                style={{ display: "flex", alignItems: "center" }}
-              >
+              <li className="breadcrumb-item d-flex align-items-center">
                 <button
                   onClick={() => navigate("/manager/dashboard/meetmom")}
                   style={{
@@ -190,7 +194,7 @@ const ScheduleMeeting = () => {
                     padding: 0,
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "6px",
+                    gap: 6,
                     fontSize: "0.875rem",
                     fontWeight: 500,
                     textDecoration: "none",
@@ -199,8 +203,7 @@ const ScheduleMeeting = () => {
                   onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
                   onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
                 >
-                  <Home size={16} />
-                  Dashboard
+                  <Home size={16} /> Dashboard
                 </button>
               </li>
               <li
@@ -214,42 +217,28 @@ const ScheduleMeeting = () => {
               >
                 /
               </li>
-              <li
-                className="breadcrumb-item active"
-                aria-current="page"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <span
-                  style={{
-                    color: "#1e293b",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                  }}
-                >
+              <li className="breadcrumb-item active d-flex align-items-center" aria-current="page">
+                <span style={{ color: "#1e293b", fontSize: "0.875rem", fontWeight: 600 }}>
                   Schedule Meeting
                 </span>
               </li>
             </ol>
           </nav>
 
-          {/* FORM as Segments (2x2 grid) */}
           <form onSubmit={handleSubmit}>
-            <div className="card border-0 shadow-sm mb-4">
+            <div className="card shadow-sm mb-4 border-0 rounded-3">
               <div className="card-body p-4">
                 <div className="row g-4">
-                  {/* MEETING TYPE & TITLE */}
+                  {/* Meeting Type & Title */}
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
                       <Users size={20} /> Meeting Type
                     </label>
                     <select
                       name="meetingType"
                       value={formData.meetingType}
                       onChange={handleInputChange}
-                      className="form-control text-start"
+                      className="form-select"
                       style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                     >
                       <option value="One-on-One">One-on-One</option>
@@ -259,7 +248,7 @@ const ScheduleMeeting = () => {
                     </select>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
                       <FileText size={20} /> Meeting Title <span className="text-danger">*</span>
                     </label>
                     <input
@@ -267,46 +256,46 @@ const ScheduleMeeting = () => {
                       name="meetingTitle"
                       value={formData.meetingTitle}
                       onChange={handleInputChange}
-                      className="form-control text-start"
+                      className="form-control"
                       placeholder="Enter meeting title..."
                       required
                       style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                     />
                   </div>
 
-                  {/* PARTICIPANTS SELECTION */}
+                  {/* Participants */}
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                      <Users size={20} />
-                      Select Participant{formData.meetingType !== "One-on-One" ? "s" : ""}
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                      <Users size={20} /> Select Participant{formData.meetingType !== "One-on-One" ? "s" : ""}
                       <span className="text-danger">*</span>
                     </label>
-                    {/* Search + participant dropdown/table */}
+
                     <div className="input-group mb-3">
                       <span className="input-group-text bg-white border-end-0">
                         <Search size={20} className="text-muted" />
                       </span>
                       <input
                         type="text"
-                        className="form-control border-start-0 ps-0 text-start"
+                        className="form-control border-start-0 ps-0"
                         placeholder="Search employees..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         style={{ boxShadow: "none", fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                       />
                     </div>
+
                     {formData.meetingType === "One-on-One" ? (
                       <select
                         value={formData.participantEmployeeIds[0] || ""}
                         onChange={handleOneOnOneChange}
                         required
-                        className="form-control text-start"
+                        className="form-select"
                         style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                       >
                         <option value="">Select an employee</option>
                         {filteredEmployees.map((emp) => (
                           <option key={emp.employeeId} value={emp.employeeId}>
-                            {emp.firstName} {emp.lastName} - {emp.roleName}
+                            {emp.firstName} {emp.lastName} {emp.departmentName && `- ${emp.departmentName}`}
                           </option>
                         ))}
                       </select>
@@ -314,15 +303,12 @@ const ScheduleMeeting = () => {
                       <>
                         <div
                           className="border rounded"
-                          style={{ maxHeight: "160px", overflowY: "auto" }}
+                          style={{ maxHeight: 160, overflowY: "auto" }}
                         >
                           <table className="table table-hover mb-0">
-                            <thead
-                              className="table-light"
-                              style={{ position: "sticky", top: 0, zIndex: 1 }}
-                            >
+                            <thead className="table-light" style={{ position: "sticky", top: 0, zIndex: 1 }}>
                               <tr>
-                                <th style={{ width: "60px", fontSize: "1rem" }} className="text-start">Select</th>
+                                <th style={{ width: 60, fontSize: "1rem" }} className="text-start">Select</th>
                                 <th className="text-start" style={{ fontSize: "1rem" }}>Name</th>
                                 <th className="text-start" style={{ fontSize: "1rem" }}>Role</th>
                               </tr>
@@ -330,7 +316,7 @@ const ScheduleMeeting = () => {
                             <tbody>
                               {filteredEmployees.length === 0 ? (
                                 <tr>
-                                  <td colSpan="3" className="text-center py-2 text-muted" style={{ fontSize: "1rem" }}>
+                                  <td colSpan={3} className="text-center py-2 text-muted" style={{ fontSize: "1rem" }}>
                                     No employees found
                                   </td>
                                 </tr>
@@ -338,9 +324,7 @@ const ScheduleMeeting = () => {
                                 filteredEmployees.map((emp) => (
                                   <tr
                                     key={emp.employeeId}
-                                    onClick={() =>
-                                      handleCheckboxChange(emp.employeeId)
-                                    }
+                                    onClick={() => handleCheckboxChange(emp.employeeId)}
                                     style={{ cursor: "pointer" }}
                                   >
                                     <td className="text-start">
@@ -348,14 +332,10 @@ const ScheduleMeeting = () => {
                                         <input
                                           className="form-check-input"
                                           type="checkbox"
-                                          checked={formData.participantEmployeeIds.includes(
-                                            emp.employeeId
-                                          )}
-                                          onChange={() =>
-                                            handleCheckboxChange(emp.employeeId)
-                                          }
+                                          checked={formData.participantEmployeeIds.includes(emp.employeeId)}
+                                          onChange={() => handleCheckboxChange(emp.employeeId)}
                                           onClick={(e) => e.stopPropagation()}
-                                          style={{ width: "1.2rem", height: "1.2rem" }}
+                                          style={{ width: 18, height: 18 }}
                                         />
                                       </div>
                                     </td>
@@ -364,7 +344,7 @@ const ScheduleMeeting = () => {
                                     </td>
                                     <td className="text-start">
                                       <span className="badge bg-light text-dark border" style={{ fontSize: "0.9rem" }}>
-                                        {emp.roleName}
+                                        {emp.roleName || emp.departmentName || "-"}
                                       </span>
                                     </td>
                                   </tr>
@@ -373,60 +353,57 @@ const ScheduleMeeting = () => {
                             </tbody>
                           </table>
                         </div>
-                        <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2 text-start" style={{ fontSize: "1rem" }}>
+                        <div className="alert alert-info mt-3 mb-0 d-flex align-items-center gap-2" style={{ fontSize: "1rem" }}>
                           <Check size={20} />
                           <span>
-                            <strong>{formData.participantEmployeeIds.length}</strong>
-                            {" participant" + (formData.participantEmployeeIds.length !== 1 ? "s" : "") + " selected"}
+                            <strong>{formData.participantEmployeeIds.length}</strong> participant{formData.participantEmployeeIds.length !== 1 ? "s" : ""} selected
                           </span>
                         </div>
                       </>
                     )}
                   </div>
 
-                  {/* DATE/TIME, DURATION */}
+                  {/* Date and Time */}
                   <div className="col-md-6">
                     <div className="row">
                       <div className="col-lg-6 mb-3 mb-lg-0">
-                        <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                          <Calendar size={20} />
-                          Meeting Date <span className="text-danger">*</span>
+                        <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                          <Calendar size={20} /> Meeting Date <span className="text-danger">*</span>
                         </label>
                         <input
                           type="date"
                           name="meetingDate"
                           value={formData.meetingDate}
                           onChange={handleInputChange}
-                          className="form-control text-start"
+                          className="form-control"
                           required
                           style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                         />
                       </div>
                       <div className="col-lg-6">
-                        <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                          <Clock size={20} />
-                          Meeting Time <span className="text-danger">*</span>
+                        <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                          <Clock size={20} /> Meeting Time <span className="text-danger">*</span>
                         </label>
                         <input
                           type="time"
                           name="meetingTime"
                           value={formData.meetingTime}
                           onChange={handleInputChange}
-                          className="form-control text-start"
+                          className="form-control"
                           required
                           style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                         />
                       </div>
                     </div>
                     <div className="mt-3">
-                      <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                      <label className="form-label fw-semibold d-flex align-items-center gap-2">
                         <Clock size={20} /> Duration
                       </label>
                       <select
                         name="duration"
                         value={formData.duration}
                         onChange={handleInputChange}
-                        className="form-control text-start"
+                        className="form-select"
                         style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                       >
                         <option value="0.5">30 minutes</option>
@@ -438,9 +415,9 @@ const ScheduleMeeting = () => {
                     </div>
                   </div>
 
-                  {/* MEETING LINK & AGENDA */}
+                  {/* Meeting Link & Agenda */}
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
                       <Video size={20} /> Meeting Link
                     </label>
                     <div className="input-group mb-3">
@@ -449,7 +426,7 @@ const ScheduleMeeting = () => {
                         name="meetingLink"
                         value={formData.meetingLink}
                         onChange={handleInputChange}
-                        className="form-control text-start"
+                        className="form-control"
                         placeholder="Enter meeting link or generate one..."
                         style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                       />
@@ -459,22 +436,20 @@ const ScheduleMeeting = () => {
                         className="btn btn-outline-primary d-flex align-items-center gap-2"
                         style={{ fontSize: "1rem" }}
                       >
-                        <Plus size={20} />
-                        Generate
+                        <Plus size={20} /> Generate
                       </button>
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2 text-start">
-                      <FileText size={20} />
-                      Agenda
+                    <label className="form-label fw-semibold d-flex align-items-center gap-2">
+                      <FileText size={20} /> Agenda
                     </label>
                     <textarea
                       name="agenda"
                       value={formData.agenda}
                       onChange={handleInputChange}
-                      className="form-control text-start"
-                      rows="4"
+                      className="form-control"
+                      rows={4}
                       placeholder="Enter meeting agenda and topics to discuss..."
                       style={{ fontSize: "1rem", padding: "0.6rem 0.75rem", minHeight: 90 }}
                     />
@@ -483,12 +458,12 @@ const ScheduleMeeting = () => {
               </div>
             </div>
 
-            {/* SEGMENT: Additional Options */}
-            <div className="card bg-light border-0 shadow-sm mb-4">
+            {/* Additional Options */}
+            <div className="card bg-light border-0 shadow-sm mb-4 rounded-3">
               <div className="card-body py-4">
                 <div className="row g-4">
                   <div className="col-md-6">
-                    <div className="form-check text-start d-flex align-items-center" style={{ minHeight: "48px" }}>
+                    <div className="form-check text-start d-flex align-items-center" style={{ minHeight: 48 }}>
                       <input
                         className="form-check-input"
                         type="checkbox"
@@ -496,28 +471,26 @@ const ScheduleMeeting = () => {
                         id="sendCalendarInvite"
                         checked={formData.sendCalendarInvite}
                         onChange={handleInputChange}
-                        style={{ width: "1.2rem", height: "1.2rem" }}
+                        style={{ width: 18, height: 18 }}
                       />
                       <label
                         className="form-check-label d-flex align-items-center gap-2"
                         htmlFor="sendCalendarInvite"
-                        style={{ fontSize: "1rem", marginLeft: "0.5rem" }}
+                        style={{ fontSize: "1rem", marginLeft: 8 }}
                       >
-                        <Send size={20} />
-                        Send calendar invite to participants
+                        <Send size={20} /> Send calendar invite to participants
                       </label>
                     </div>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-semibold d-flex align-items-center gap-2 mb-2 text-start">
-                      <Bell size={20} />
-                      Reminder
+                      <Bell size={20} /> Reminder
                     </label>
                     <select
                       name="reminder"
                       value={formData.reminder}
                       onChange={handleInputChange}
-                      className="form-control text-start"
+                      className="form-select"
                       style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
                     >
                       <option value="0">None</option>
@@ -530,38 +503,39 @@ const ScheduleMeeting = () => {
               </div>
             </div>
 
-            {/* ACTION BUTTONS */}
+            {/* Action Buttons */}
             <div className="d-flex gap-3 justify-content-end">
               <button
                 type="button"
                 className="btn btn-secondary px-4 d-flex align-items-center gap-2"
                 onClick={() => navigate(-1)}
-                style={{ fontSize: "1rem", fontWeight: "500" }}
+                style={{ fontSize: "1rem", fontWeight: 500 }}
               >
-                <X size={20} />
-                Cancel
+                <X size={20} /> Cancel
               </button>
               <button
                 type="submit"
                 className="btn px-4 d-flex align-items-center gap-2"
                 disabled={loading}
-                style={{ 
-                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                  color: '#fff',
-                  border: 'none',
+                style={{
+                  background:
+                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                  color: "#fff",
+                  border: "none",
                   fontSize: "1rem",
-                  fontWeight: '500',
-                  transition: 'all 0.2s ease'
+                  fontWeight: 500,
+                  transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.opacity = '0.9';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+                  e.currentTarget.style.opacity = "0.9";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(151, 36, 126, 0.3)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = '1';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.opacity = "1";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 {loading ? (
@@ -584,7 +558,6 @@ const ScheduleMeeting = () => {
           </form>
         </div>
       </div>
-
       <style>{`
         .breadcrumb-item + .breadcrumb-item::before {
           display: none;

@@ -28,6 +28,7 @@ const ResourcePoolMapping = () => {
   const [allEmployees, setAllEmployees] = useState([]);
   const [resourcePoolMappedEmployees, setResourcePoolMappedEmployees] = useState([]);
   const [mappedEmployees, setMappedEmployees] = useState([]);
+  const [resourcePoolProject, setResourcePoolProject] = useState(null);
 
   // UI state
   const [selectedEmployees, setSelectedEmployees] = useState([]);
@@ -52,35 +53,45 @@ const ResourcePoolMapping = () => {
     setError(null);
     setRecentlyMappedIds([]);
     try {
+      // ✅ Fetch all employees (filter for role "Employee" only)
       const employeesResponse = await projectService.getInitialStageEmployees();
-      if (employeesResponse.success !== false && employeesResponse.data) {
+      console.log("Initial stage employees response:", employeesResponse);
+      
+      if (employeesResponse.success && employeesResponse.data) {
         const filteredEmployees = employeesResponse.data.filter(
-          (emp) => emp.roleName?.toLowerCase() !== "admin"
+          (emp) => emp.roleName?.toLowerCase() === "employee" // ✅ Show only Employee role
         );
         setAllEmployees(filteredEmployees);
+        console.log("Filtered employees (Employee role only):", filteredEmployees);
       } else {
         throw new Error(employeesResponse?.message || "Failed to load employees");
       }
 
+      // ✅ Fetch all projects to find Resource Pool
       const projectsResponse = await projectService.getAllProjects();
-      if (projectsResponse.success !== false && projectsResponse.data) {
+      console.log("All projects response:", projectsResponse);
+      
+      if (projectsResponse.success && projectsResponse.data) {
         const allMapped = [];
-        const resourcePoolMapped = [];
+        let resourcePoolProj = null;
 
         projectsResponse.data.forEach((project) => {
+          // ✅ Find Resource Pool project
+          if (
+            project.projectName &&
+            project.projectName.toUpperCase() === RESOURCE_POOL_PROJECT_NAME.toUpperCase()
+          ) {
+            resourcePoolProj = project;
+            console.log("Found Resource Pool project:", resourcePoolProj);
+          }
+
+          // Collect all mapped employees
           if (Array.isArray(project.mappedEmployees)) {
             project.mappedEmployees.forEach((emp) => {
-              if (emp.roleName?.toLowerCase() === "admin") return;
-              
-              if (!allMapped.some((m) => m.employeeMasterId === emp.employeeMasterId)) {
-                allMapped.push(emp);
-              }
-              if (
-                project.projectName &&
-                project.projectName.toUpperCase() === RESOURCE_POOL_PROJECT_NAME.toUpperCase()
-              ) {
-                if (!resourcePoolMapped.some((m) => m.employeeMasterId === emp.employeeMasterId)) {
-                  resourcePoolMapped.push(emp);
+              // ✅ Filter for Employee role only
+              if (emp.roleName?.toLowerCase() === "employee") {
+                if (!allMapped.some((m) => m.employeeMasterId === emp.employeeMasterId)) {
+                  allMapped.push(emp);
                 }
               }
             });
@@ -88,12 +99,46 @@ const ResourcePoolMapping = () => {
         });
 
         setMappedEmployees(allMapped);
-        setResourcePoolMappedEmployees(resourcePoolMapped);
+        console.log("All mapped employees:", allMapped);
+
+        // ✅ Fetch Resource Pool project details using getProjectById
+        if (resourcePoolProj && resourcePoolProj.projectId) {
+          try {
+            const resourcePoolDetails = await projectService.getProjectById(
+              resourcePoolProj.projectId
+            );
+            console.log("Resource Pool details response:", resourcePoolDetails);
+            
+            if (resourcePoolDetails.success && resourcePoolDetails.data) {
+              setResourcePoolProject(resourcePoolDetails.data);
+              
+              // ✅ Update resource pool mapped employees from detailed data
+              if (Array.isArray(resourcePoolDetails.data.mappedEmployees)) {
+                const rpMapped = resourcePoolDetails.data.mappedEmployees.filter(
+                  (emp) => emp.roleName?.toLowerCase() === "employee"
+                );
+                setResourcePoolMappedEmployees(rpMapped);
+                console.log("Resource Pool mapped employees:", rpMapped);
+              } else {
+                setResourcePoolMappedEmployees([]);
+              }
+            }
+          } catch (err) {
+            console.error("Failed to fetch Resource Pool details:", err);
+            setResourcePoolMappedEmployees([]);
+          }
+        } else {
+          console.warn("Resource Pool project not found");
+          setResourcePoolProject(null);
+          setResourcePoolMappedEmployees([]);
+        }
       } else {
         setMappedEmployees([]);
         setResourcePoolMappedEmployees([]);
+        setResourcePoolProject(null);
       }
     } catch (err) {
+      console.error("Error in fetchInitialData:", err);
       setError(err.message || "Failed to load data. Please try again.");
       toast.error(err.message || "Failed to load data");
     } finally {
@@ -104,22 +149,29 @@ const ResourcePoolMapping = () => {
   // Status helpers
   const isEmployeeSelected = (empId) =>
     selectedEmployees.some((emp) => emp.employeeMasterId === empId);
-  const isEmployeeInResourcePool = (empId) =>
-    resourcePoolMappedEmployees.some((emp) => emp.employeeMasterId === empId);
+  
+  const isEmployeeInResourcePool = (empId) => {
+    const inPool = resourcePoolMappedEmployees.some((emp) => emp.employeeMasterId === empId);
+    console.log(`Checking if employee ${empId} is in resource pool:`, inPool);
+    return inPool;
+  };
+  
   const isEmployeeMappedToAny = (empId) =>
     mappedEmployees.some((emp) => emp.employeeMasterId === empId);
+  
   const isRecentlyMapped = (empId) => recentlyMappedIds.includes(empId);
 
   const getEmployeeStatus = (empId) => {
     if (isRecentlyMapped(empId) || isEmployeeInResourcePool(empId)) {
-      return { text: "Unavailable", badge: "rp-badge-secondary", icon: CheckCircle };
+      return { text: "In Resource Pool", badge: "rp-badge-secondary", icon: CheckCircle };
     }
     if (isEmployeeMappedToAny(empId)) {
-      return { text: "Unavailable", badge: "rp-badge-warning", icon: AlertCircle };
+      return { text: "Mapped to Project", badge: "rp-badge-warning", icon: AlertCircle };
     }
     return { text: "Available", badge: "rp-badge-success", icon: Check };
   };
 
+  // ✅ Filter employees to exclude those already in resource pool
   const filteredEmployees = (
     searchTerm
       ? allEmployees.filter((emp) =>
@@ -128,9 +180,14 @@ const ResourcePoolMapping = () => {
             .includes(searchTerm.toLowerCase())
         )
       : allEmployees
-  )
-    .filter((emp) => !resourcePoolMappedEmployees.some((e) => e.employeeMasterId === emp.employeeMasterId))
-    .filter((emp) => !recentlyMappedIds.includes(emp.employeeMasterId));
+  ).filter((emp) => {
+    // ✅ Exclude employees already in resource pool
+    const inResourcePool = isEmployeeInResourcePool(emp.employeeMasterId);
+    const recentlyMapped = isRecentlyMapped(emp.employeeMasterId);
+    return !inResourcePool && !recentlyMapped;
+  });
+
+  console.log("Filtered employees for display:", filteredEmployees);
 
   const availableCount = filteredEmployees.filter(
     (emp) => getEmployeeStatus(emp.employeeMasterId).text === "Available"
@@ -138,10 +195,25 @@ const ResourcePoolMapping = () => {
 
   // Actions
   const handleAddEmployee = (employee) => {
+    // ✅ Check if employee is already in resource pool
+    if (isEmployeeInResourcePool(employee.employeeMasterId)) {
+      toast.warning(
+        `${employee.firstName} ${employee.lastName} is already mapped to Resource Pool`,
+        { duration: 3000 }
+      );
+      return;
+    }
+
     const status = getEmployeeStatus(employee.employeeMasterId);
     if (status.text === "Available" && !isEmployeeSelected(employee.employeeMasterId)) {
       setSelectedEmployees((prev) => [...prev, employee]);
       toast.success(`${employee.firstName} ${employee.lastName} added to selection`);
+    } else if (status.text === "Mapped to Project") {
+      toast.warning(
+        `${employee.firstName} ${employee.lastName} is already mapped to another project. They will be moved to Resource Pool.`,
+        { duration: 4000 }
+      );
+      setSelectedEmployees((prev) => [...prev, employee]);
     } else {
       toast.warning(`${employee.firstName} ${employee.lastName} is unavailable for mapping`);
     }
@@ -154,9 +226,12 @@ const ResourcePoolMapping = () => {
 
   const handleSelectAll = () => {
     const canAdd = filteredEmployees.filter(
-      (emp) => getEmployeeStatus(emp.employeeMasterId).text === "Available"
+      (emp) => 
+        getEmployeeStatus(emp.employeeMasterId).text === "Available" &&
+        !isEmployeeInResourcePool(emp.employeeMasterId)
     );
     const addable = canAdd.filter((emp) => !isEmployeeSelected(emp.employeeMasterId));
+    
     if (addable.length > 0) {
       setSelectedEmployees((prev) => [...prev, ...addable]);
       toast.success(`${addable.length} employees added to selection`);
@@ -182,6 +257,21 @@ const ResourcePoolMapping = () => {
       toast.error("Please select at least one employee to map");
       return;
     }
+
+    // ✅ Check if any selected employees are already in resource pool
+    const alreadyInPool = selectedEmployees.filter((emp) =>
+      isEmployeeInResourcePool(emp.employeeMasterId)
+    );
+
+    if (alreadyInPool.length > 0) {
+      const names = alreadyInPool.map((e) => `${e.firstName} ${e.lastName}`).join(", ");
+      toast.error(
+        `Cannot map: ${names} ${alreadyInPool.length > 1 ? "are" : "is"} already in Resource Pool`,
+        { duration: 4000 }
+      );
+      return;
+    }
+
     setShowMapModal(true);
   };
 
@@ -192,6 +282,7 @@ const ResourcePoolMapping = () => {
 
     try {
       const response = await projectService.mapToResourcePool(employeeIds);
+      console.log("Map to resource pool response:", response);
 
       if (response.success === false) {
         throw new Error(response.message || "Mapping failed");
@@ -220,11 +311,14 @@ const ResourcePoolMapping = () => {
       setShowMapModal(false);
 
       toast.success(
-        `Successfully mapped ${response.data?.mappedCount || employeeIds.length} employee(s) to Resource Pool`
+        `Successfully mapped ${response.data?.mappedCount || employeeIds.length} employee(s) to Resource Pool`,
+        { duration: 3000 }
       );
 
-      fetchInitialData();
+      // ✅ Refresh data after mapping
+      await fetchInitialData();
     } catch (error) {
+      console.error("Error mapping to resource pool:", error);
       setRecentlyMappedIds((prev) => prev.filter((id) => !employeeIds.includes(id)));
       setResourcePoolMappedEmployees((prev) =>
         prev.filter((emp) => !employeeIds.includes(emp.employeeMasterId))
@@ -285,6 +379,24 @@ const ResourcePoolMapping = () => {
         </ol>
       </nav>
 
+      {/* ✅ Resource Pool Info Section */}
+      {resourcePoolProject && (
+        <div className="alert alert-info mb-3 d-flex align-items-center" role="alert">
+          <Database size={20} className="me-2" />
+          <div>
+            <strong>Resource Pool:</strong> {resourcePoolProject.projectName}
+            <span className="ms-3">
+              <strong>Mapped Employees:</strong> {resourcePoolMappedEmployees.length}
+            </span>
+            {resourcePoolProject.l2Approver && (
+              <span className="ms-3">
+                <strong>L2 Manager:</strong> {resourcePoolProject.l2Approver.firstName} {resourcePoolProject.l2Approver.lastName}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Error */}
       {error && (
         <div className="alert alert-danger rp-alert-error" role="alert">
@@ -305,7 +417,7 @@ const ResourcePoolMapping = () => {
           <div className="rp-card rp-card-left">
             <div className="rp-card-header">
               <div className="rp-card-title">
-                <Database size={20} /> Employees
+                <Database size={20} /> Employees (Role: Employee Only)
               </div>
               <button
                 className="btn btn-sm rp-btn-select-all"
@@ -326,7 +438,7 @@ const ResourcePoolMapping = () => {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Search by name, role, department, or ID..."
+                    placeholder="Search by name, department, or ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
@@ -352,20 +464,24 @@ const ResourcePoolMapping = () => {
                           <UserX size={64} className="rp-empty-icon" />
                           <p className="rp-empty-title">No employees found</p>
                           <p className="rp-empty-text">
-                            {searchTerm ? "No matches for your search." : "All eligible employees are mapped."}
+                            {searchTerm 
+                              ? "No matches for your search." 
+                              : "All eligible employees are mapped."}
                           </p>
                         </td>
                       </tr>
                     ) : (
                       filteredEmployees.map((emp) => {
                         const status = getEmployeeStatus(emp.employeeMasterId);
-                        const isUnavailable = status.text !== "Available";
+                        const isSelected = isEmployeeSelected(emp.employeeMasterId);
+                        const inResourcePool = isEmployeeInResourcePool(emp.employeeMasterId);
+                        
                         return (
                           <tr key={emp.employeeMasterId}>
                             <td className="rp-cell-employee">
                               <div className="rp-employee-name">{emp.firstName} {emp.lastName}</div>
                               <small className="rp-employee-id">{emp.employeeCompanyId}</small>
-                              <small className="rp-employee-email">{emp.email}</small>
+                              {emp.email && <small className="rp-employee-email">{emp.email}</small>}
                             </td>
                             <td>
                               <span className="rp-role-badge">{emp.roleName}</span>
@@ -381,18 +497,27 @@ const ResourcePoolMapping = () => {
                             <td>
                               <button
                                 className={`btn btn-sm ${
-                                  isEmployeeSelected(emp.employeeMasterId)
+                                  isSelected
                                     ? "btn-outline-success"
-                                    : isUnavailable
+                                    : inResourcePool
                                     ? "btn-outline-secondary"
-                                    : "btn-success"
+                                    : status.text === "Available"
+                                    ? "btn-success"
+                                    : "btn-warning"
                                 }`}
                                 onClick={() => handleAddEmployee(emp)}
-                                disabled={isEmployeeSelected(emp.employeeMasterId) || isUnavailable}
+                                disabled={isSelected || inResourcePool}
+                                title={
+                                  inResourcePool
+                                    ? "Already in Resource Pool"
+                                    : isSelected
+                                    ? "Selected"
+                                    : "Add to selection"
+                                }
                               >
-                                {isEmployeeSelected(emp.employeeMasterId) ? (
+                                {isSelected ? (
                                   <Check size={16} />
-                                ) : isUnavailable ? (
+                                ) : inResourcePool ? (
                                   <X size={16} />
                                 ) : (
                                   <Plus size={16} />
@@ -455,10 +580,26 @@ const ResourcePoolMapping = () => {
               </div>
 
               <div className="rp-selected-footer">
+                {/* ✅ GRADIENT BUTTON */}
                 <button
-                  className="btn btn-success w-100 rp-btn-map"
+                  className="btn w-100 rp-btn-map"
                   onClick={handleMapToResourcePool}
                   disabled={selectedEmployees.length === 0 || isSubmitting}
+                  style={{
+                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                    color: 'white',
+                    border: 'none',
+                    fontWeight: '500',
+                    padding: '0.75rem 1rem',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    opacity: selectedEmployees.length === 0 || isSubmitting ? 0.6 : 1,
+                    cursor: selectedEmployees.length === 0 || isSubmitting ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
                 >
                   {isSubmitting ? (
                     <>
@@ -542,14 +683,14 @@ const ResourcePoolMapping = () => {
                   <li>Assign them to '<strong>{RESOURCE_POOL_PROJECT_NAME}</strong>'</li>
                   <li>Set Resource Pool's L2 Approver as their reporting manager</li>
                   <li>Mark them as primary employees</li>
-                  <li>Remove them from any other projects</li>
+                  <li>Remove them from any other projects (if applicable)</li>
                 </ul>
               </div>
 
               <div className="rp-modal-selected-list">
                 <strong>Selected Employees:</strong>
                 <div className="rp-modal-employees">
-                  {selectedEmployees.map((emp, idx) => (
+                  {selectedEmployees.map((emp) => (
                     <span key={emp.employeeMasterId} className="rp-modal-employee-badge">
                       {emp.firstName} {emp.lastName}
                     </span>
@@ -565,10 +706,24 @@ const ResourcePoolMapping = () => {
               >
                 Cancel
               </button>
+              {/* ✅ GRADIENT BUTTON FOR MODAL */}
               <button 
-                className="btn rp-btn-map-confirm" 
+                className="btn"
                 onClick={confirmMapToResourcePool}
                 disabled={isSubmitting}
+                style={{
+                  background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                  color: 'white',
+                  border: 'none',
+                  fontWeight: '500',
+                  padding: '0.5rem 1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  opacity: isSubmitting ? 0.6 : 1,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
               >
                 {isSubmitting ? (
                   <>
