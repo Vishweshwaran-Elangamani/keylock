@@ -47,7 +47,7 @@ export default function EmployeeHome() {
   };
 
   return (
-    <div className="ehp-page" style={{ position: "relative", minHeight: "80vh" }}>
+    <div className="ehp-page" style={{ position: "relative", minHeight: "80vh"}}>
       <div
         className="ehp-container"
         style={{ padding: 24, paddingTop: 110, position: "relative" }}
@@ -64,19 +64,21 @@ export default function EmployeeHome() {
             aria-label="View Nominations"
             style={{
               position: "absolute",
-              top: "-60px",
-              right: "-65px",
+              top: "-70px",
+              right: "-29px",
               width: 320,
               backgroundColor: "#f5f5f7",
               borderRadius: 16,
               padding: "24px",
-              boxShadow: "0 12px 32px rgba(0, 0, 0, 0.15)",
+              boxShadow: "0 12px 32px rgba(45, 18, 145, 0.4)",
               cursor: "pointer",
               zIndex: 50,
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
               display: "flex",
               alignItems: "center",
+              // backgroundColor: "#d9f2d9",
               gap: "16px",
+              
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-4px)";
@@ -300,7 +302,7 @@ export default function EmployeeHome() {
                   e.currentTarget.style.backgroundColor = "#27235ce";
                 }}
               >
-                View Details
+                View
               </button>
             </div>
           </div>
@@ -314,6 +316,7 @@ export default function EmployeeHome() {
             alignItems: "center",
             justifyContent: "center",
             paddingBottom: 500,
+            marginTop: "20px", // moved card further down
           }}
         >
           <div
@@ -327,39 +330,40 @@ export default function EmployeeHome() {
             aria-label="Go to My Assessments"
             style={{
               cursor: "pointer",
-              width: "min(600px, 80%)",
-              borderRadius: 14,
-              padding: 36,
-              boxShadow: "0 18px 40px rgba(20,30,60,0.06)",
+              width: "min(500px, 75%)", // reduced width
+              borderRadius: 12,         // slightly smaller radius
+              padding: 24,              // reduced padding
+              boxShadow: "0 14px 32px rgba(20,30,60,0.06)",
               display: "flex",
               alignItems: "center",
-              gap: 28,
+              gap: 20,                  // reduced gap
               background: "#fff",
+              border: "1px solid darkblue"
             }}
           >
             <div
               className="ehp-assessment-icon"
               style={{
-                width: 96,
-                height: 96,
-                borderRadius: 20,
+                width: 80,               // smaller icon box
+                height: 80,
+                borderRadius: 16,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 background: "rgb(3, 34, 112)",
-                boxShadow: "0 10px 24px rgba(55, 100, 214, 0.14)",
+                boxShadow: "0 8px 20px rgba(55, 100, 214, 0.14)",
               }}
             >
               <i
                 className="bi bi-clipboard-check"
-                style={{ color: "#fff", fontSize: 30 }}
+                style={{ color: "#fff", fontSize: 24 }} // smaller icon
               />
             </div>
 
             <div className="ehp-assessment-content" style={{ flex: 1 }}>
               <h3
                 className="ehp-assessment-title"
-                style={{ fontSize: 32, margin: 0, color: "#0f172a" }}
+                style={{ fontSize: 24, margin: 0, color: "#0f172a" }} // reduced font size
               >
                 My Assessments
                 <br />
@@ -367,13 +371,13 @@ export default function EmployeeHome() {
               </h3>
               <p
                 className="ehp-assessment-description"
-                style={{ marginTop: "0px ", color: "#6b7280", fontSize: 15 }}
+                style={{ marginTop: "0px", color: "#6b7280", fontSize: 13 }} // smaller text
               >
                 Complete your performance assessments and track your progress across
                 all assigned evaluations.
               </p>
 
-              <div style={{ marginTop: 18 }}>
+              <div style={{ marginTop: 14 }}>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -381,16 +385,17 @@ export default function EmployeeHome() {
                   }}
                   className="ehp-primary-btn"
                   style={{
-                    background: "#eef2ff", 
+                    background: "#eef2ff",
                     color: "#3740d6",
-                    padding: "10px 16px",
-                    borderRadius: 10,
+                    padding: "8px 14px",   // smaller button
+                    borderRadius: 8,
                     border: "none",
-                    fontWeight: 700,
+                    fontWeight: 600,
+                    fontSize: 13,          // reduced font size
                     cursor: "pointer",
                   }}
                 >
-                  View Details 
+                  View Details
                 </button>
               </div>
             </div>
@@ -418,6 +423,7 @@ export default function EmployeeHome() {
             }
           }
         `}</style>
+
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-
+ 
  
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -78,11 +78,19 @@ export default function Nominations() {
         }}
         >
         <div className="ehp-nomination-content d-flex align-items-center">
-            <span className="badge text-dark me-3" style={{ fontSize: "6.5rem" }}>
-            🎖️
-            </span>
-
-            <div style={{ paddingLeft: "130px" }}>
+            <span className="badge text-dark me-3 position-relative" style={{ fontSize: "6.5rem" }}>
+            <i className="bi bi-award-fill" style={{ color: "#FFD700" }}></i>
+            <i
+              className="bi bi-star-fill position-absolute top-50 start-50"
+              style={{
+                color: "white",
+                fontSize: "2.5rem",
+                transform: "translate(-50%, -75%)" // custom centering + upward shift
+              }}
+            ></i>
+          </span>
+ 
+            <div style={{ paddingLeft: "79px" }}>
             <h3 className="ehp-nomination-title">Congratulations!</h3>
             <p className="ehp-nomination-text">
                 You have been nominated for:{" "}
@@ -90,13 +98,13 @@ export default function Nominations() {
                 {nominations.map((n) => n.roleType).join(", ")}
                 </strong>
             </p>
-            <p className="ehp-nomination-subtext">
+            <p className="ehp-nomination-subtext" style={{fontSize:"12px"}}>
                 Your hard work and dedication have been recognized!
             </p>
             </div>
         </div>
     </div>
-
+ 
   );
 };
  
@@ -134,7 +142,7 @@ export default function Nominations() {
         {nominations && nominations.length > 0 ? (
           <div className="ehp-nomination-list" style={{ marginTop: 20 }}>
             {/* <h4>Nomination details</h4> */}
-            
+           
           </div>
         ) : (
           <div style={{ textAlign: "center", padding: 40 }}>
@@ -145,5 +153,4 @@ export default function Nominations() {
     </div>
   );
 }
- 
  

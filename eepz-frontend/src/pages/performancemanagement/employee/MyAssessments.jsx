@@ -1,4 +1,12 @@
+// Paste your JSX component code below (replace this entire file contents with your .jsx file)
 
+/*
+  MyAssessments_updated.jsx
+  - Updated: search box now uses a separate Search button and Enter key to trigger filtering
+  - Fixed: Form Type select default value now matches filter logic ("All")
+  - Added: local input state `searchInput` so typing doesn't immediately filter results
+  - Minor: Enter key submits search, and Search button placed next to input
+*/
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -7,6 +15,7 @@ import api from "../../../services/performancemanagement/hr/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
 
+// Utility function to get days and hours left
 function getTimeLeft(deadline) {
   const now = new Date();
   const dl = new Date(deadline);
@@ -17,7 +26,10 @@ function getTimeLeft(deadline) {
   return { days, hours, expired: ms === 0 };
 }
 
-
+/**
+ * Breadcrumbs component
+ * items: [{ label: string, to: string }]
+ */
 function Breadcrumbs({ items = [] }) {
   return (
     <nav aria-label="breadcrumb" className="empassper-breadcrumbs">
@@ -121,7 +133,7 @@ function MyAssessments() {
       const { data } = await api.get(`/AppraisalProcess/employee/${userId}`);
       if (data.success) {
         setAssignments(data.data || []);
-        toast.success("Assessments loaded successfully");
+        // toast.success("Assessments loaded successfully");
       } else {
         toast.error(data.message || "Failed to fetch assignments.");
       }
@@ -360,7 +372,7 @@ function MyAssessments() {
 
   return (
     <div className="empassper-container">
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right" />
 
       {/* Header Section with breadcrumbs */}
       <div className="empassper-header-section">
@@ -450,29 +462,29 @@ function MyAssessments() {
 
       {/* Tab Navigation */}
       {/* Pill-style Tabs (replace previous .empassper-tab-container block) */}
-  <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
-  <div className="empassper-pill-tabs">
-    <button
-      role="tab"
-      aria-pressed={activeTab === "pending"}
-      className={`empassper-pill ${activeTab === "pending" ? "empassper-pill--active" : ""}`}
-      onClick={() => setActiveTab("pending")}
-    >
-      <span className="empassper-pill-text">Pending Assessments</span>
-      <span className="empassper-pill-count">({filteredPending.length})</span>
-    </button>
+      <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
+        <div className="empassper-pill-tabs">
+          <button
+            role="tab"
+            aria-pressed={activeTab === "pending"}
+            className={`empassper-pill ${activeTab === "pending" ? "empassper-pill--active" : ""}`}
+            onClick={() => setActiveTab("pending")}
+          >
+            <span className="empassper-pill-text">Pending Assessments</span>
+            <span className="empassper-pill-count">({filteredPending.length})</span>
+          </button>
 
-    <button
-      role="tab"
-      aria-pressed={activeTab === "completed"}
-      className={`empassper-pill ${activeTab === "completed" ? "empassper-pill--active" : ""}`}
-      onClick={() => setActiveTab("completed")}
-    >
-      <span className="empassper-pill-text">Completed Assessments</span>
-      <span className="empassper-pill-count">({filteredCompleted.length})</span>
-    </button>
-  </div>
-</div>
+          <button
+            role="tab"
+            aria-pressed={activeTab === "completed"}
+            className={`empassper-pill ${activeTab === "completed" ? "empassper-pill--active" : ""}`}
+            onClick={() => setActiveTab("completed")}
+          >
+            <span className="empassper-pill-text">Completed Assessments</span>
+            <span className="empassper-pill-count">({filteredCompleted.length})</span>
+          </button>
+        </div>
+      </div>
 
 
       {/* Content */}
@@ -595,20 +607,25 @@ function MyAssessments() {
                   style={{
                     width:"100%",
                     marginTop: "0px",
-                    borderCollapse: "collapse",
+                    borderCollapse: "separate",
                     borderLeft: "none",     // REMOVE LEFT BORDER
+                    borderRadius: "12px",
                     borderRight: "none",    // REMOVE RIGHT BORDER
                     borderBottom: "none",   // REMOVE BOTTOM BORDER
+                    border: "1px solid black",
+                    borderSpacing: 0,
+
                   }}
                 >
                   <thead>
                     <tr>
-                      <th style={{ padding: "14px 8px", height: "58px", borderTopLeftRadius: "8px" ,}}>Competency Name</th>
-                      <th style={{ padding: "14px 8px", height: "48px" }}>Description</th>
-                      <th style={{ padding: "14px 8px", height: "48px" }}>Rating</th>
-                      <th style={{ padding: "14px 8px", height: "48px", borderTopRightRadius: "8px" }}>Comments</th>
+                      <th style={{ padding: "10px 6px", height: "44px", borderTopLeftRadius: "8px" }}>Competency Name</th>
+                      <th style={{ padding: "10px 6px", height: "40px" }}>Description</th>
+                      <th style={{ padding: "10px 6px", height: "40px" }}>Rating</th>
+                      <th style={{ padding: "10px 6px", height: "40px", borderTopRightRadius: "8px" }}>Comments</th>
                     </tr>
                   </thead>
+
 
                   <tbody>
                     {assessmentData.map((item) => (
@@ -701,5 +718,4 @@ function MyAssessments() {
 }
 
 export default MyAssessments;
-
 
