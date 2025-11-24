@@ -214,7 +214,7 @@ const YourGoalsPage = () => {
     (searchTerm ? 1 : 0);
 
   return (
-    <div className="container-fluid p-4">
+    <div className="container-fluid">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[

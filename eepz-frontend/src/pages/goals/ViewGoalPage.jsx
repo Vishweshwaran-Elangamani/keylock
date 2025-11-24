@@ -161,7 +161,7 @@ const ViewGoalPage = () => {
     !isLeadershipMonitoring;
 
   return (
-    <div className="container-fluid p-4" style={{ marginBottom: "15px" }}>
+    <div className="container-fluid" style={{ marginBottom: "15px" }}>
       {/* Breadcrumb */}
       {goal && (
         <Breadcrumb

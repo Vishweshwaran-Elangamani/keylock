@@ -146,7 +146,7 @@ const GoalsDashboard = () => {
   };
 
   return (
-    <div className="container-fluid p-4">
+    <div className="container-fluid">
       <Breadcrumb
         items={[
           { label: "", path: "/dashboard", icon: "house-door" },
