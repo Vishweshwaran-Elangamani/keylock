@@ -415,6 +415,7 @@
   border: 1px solid #e5e7eb;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  margin: 0px 40px;
 }
 
 .table-wrapper-dept {
@@ -482,6 +483,7 @@
 .action-buttons {
   display: flex;
   justify-content: flex-start;
+  padding-left: 150px;
   gap: 0.5rem;
 }
 

@@ -659,10 +659,51 @@
   margin-top: 1.5rem;
 }
 
-/* Additional spacing after tab navigation */
+/* TAB NAVIGATION BAR - COMPACT TOGGLE STYLE */
 .tab-navigation-bar-hr {
-  margin-bottom: 0;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  background: #ffffff;
+  padding: 0.5rem;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  width: fit-content; /* Makes it only as wide as needed */
 }
+
+.tab-button-hr {
+  padding: 0.5rem 1rem; /* Reduced from larger padding */
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.875rem; /* Smaller font size */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.tab-button-hr:hover {
+  background: rgba(39, 35, 92, 0.05);
+  color: white;
+}
+
+.tab-button-hr.active {
+  background: #27235c;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
+}
+
+.tab-button-hr .badge {
+  font-size: 0.7rem; /* Smaller badge */
+  padding: 0.2rem 0.4rem;
+}
+
 
 .crm-modal-wrapper-process {
   position: fixed;

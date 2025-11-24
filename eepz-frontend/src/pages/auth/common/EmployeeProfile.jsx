@@ -973,7 +973,7 @@ const EmployeeProfile = () => {
     } catch (error) {
       toast.dismiss();
       toast.error(
-        error.message || "An error occurred while updating your profile"
+        error.message || "Verify all the fields that have been entered are valid!"
       );
     } finally {
       setSaving(false);
@@ -1402,7 +1402,7 @@ const EmployeeProfile = () => {
 
                   {/* Middle Name - OPTIONAL */}
                   <div className="form-field">
-                    <label>Middle Name</label>
+                    <label>Middle Name<span className="required">*</span></label>
                     <input
                       type="text"
                       className={`form-control-modern ${
@@ -1573,7 +1573,7 @@ const EmployeeProfile = () => {
                     <div className="form-grid address-grid">
                       {/* All address fields are OPTIONAL */}
                       <div className="form-field">
-                        <label>Door/Flat Number</label>
+                        <label>Door/Flat Number<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1599,7 +1599,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Street</label>
+                        <label>Street<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1623,7 +1623,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Landmark</label>
+                        <label>Landmark<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1647,7 +1647,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Area</label>
+                        <label>Area<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1671,7 +1671,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>City</label>
+                        <label>City<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1695,7 +1695,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>State</label>
+                        <label>State<span className="required">*</span></label>
                         <select
                           className={`form-control-modern ${
                             showError("currentAddress.state") ? "error" : ""
@@ -1724,7 +1724,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>PIN Code</label>
+                        <label>PIN Code<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1776,7 +1776,7 @@ const EmployeeProfile = () => {
                   ) : (
                     <div className="form-grid address-grid">
                       <div className="form-field">
-                        <label>Door/Flat Number</label>
+                        <label>Door/Flat Number<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1803,7 +1803,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Street</label>
+                        <label>Street<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1828,7 +1828,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Landmark</label>
+                        <label>Landmark<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1855,7 +1855,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Area</label>
+                        <label>Area<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1880,7 +1880,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>City</label>
+                        <label>City<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1905,7 +1905,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>State</label>
+                        <label>State<span className="required">*</span></label>
                         <select
                           className={`form-control-modern ${
                             showError("permanentAddress.state") ? "error" : ""
@@ -1935,7 +1935,7 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>PIN Code</label>
+                        <label>PIN Code<span className="required">*</span></label>
                         <input
                           type="text"
                           className={`form-control-modern ${

@@ -267,19 +267,13 @@ const NominationManagement = () => {
           </div>
 
           <div className="filters-actions">
-            {user?.role !== "HR" && (
+            {!["HR", "Department Head"].includes(user?.role) && (
               <button
                 className="btn-graph"
                 onClick={() => setShowGraphModal(true)}
                 title="View Analytics Graph"
               >
                 <i className="bi bi-bar-chart-fill"></i> View Graph
-              </button>
-            )}
-
-            {user?.role === "Employee" && (
-              <button className="btn-add" onClick={handleSelfNominate}>
-                <i className="bi bi-hand-thumbs-up"></i> Self Nominate
               </button>
             )}
           </div>

@@ -19,7 +19,7 @@ const RoleList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(9); // Changed to 9 for grid (3x3)
 
   useEffect(() => {
     fetchRoles();
@@ -28,16 +28,11 @@ const RoleList = () => {
   const fetchRoles = async () => {
     try {
       setLoading(true);
-      // toast.loading("Loading roles...");
-
       const response = await roleService.getAllRoles();
 
       if (response.success) {
         setRoles(response.data || []);
         toast.dismiss();
-        // toast.success(
-        //   `Loaded ${response.data?.length || 0} roles successfully`
-        // );
       } else {
         toast.dismiss();
         toast.error(response.message || "Failed to load roles");
@@ -100,6 +95,7 @@ const RoleList = () => {
     setSearchTerm("");
   };
 
+  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredRoles.slice(indexOfFirstItem, indexOfLastItem);
@@ -144,11 +140,6 @@ const RoleList = () => {
       : "N/A";
   };
 
-  // Updated function - Only 2 icons based on role type
-  const getRoleIcon = (isSystemRole) => {
-    return isSystemRole ? "bi-shield-lock-fill" : "bi-gear-fill";
-  };
-
   const getRoleStats = () => {
     const totalRoles = filteredRoles.length;
     const systemRoles = filteredRoles.filter((r) => r.isSystemRole).length;
@@ -161,7 +152,7 @@ const RoleList = () => {
 
   if (loading) {
     return (
-      <div className="loading-container-rl">
+      <div className="rlm-loading-container">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -170,8 +161,7 @@ const RoleList = () => {
   }
 
   return (
-    <div className="role-management-page">
-      {/* NEW BREADCRUMB COMPONENT */}
+    <div className="rlm-page">
       <Breadcrumb
         items={[
           {
@@ -180,7 +170,7 @@ const RoleList = () => {
         ]}
       />
 
-      {/* COMPACT STATISTICS CARDS */}
+      {/* KPI CARDS - UNCHANGED */}
       <div className="stats-cards-rl">
         <div className="stat-card-rl stat-total-rl">
           <div className="stat-icon-rl">
@@ -214,9 +204,9 @@ const RoleList = () => {
       </div>
 
       {/* CONTROLS BAR */}
-      <div className="controls-bar-rl">
-        <div className="search-section-rl">
-          <div className="search-input-wrapper-rl">
+      <div className="rlm-controls">
+        <div className="rlm-search-section">
+          <div className="rlm-search-wrapper">
             <i className="bi bi-search"></i>
             <input
               type="text"
@@ -226,7 +216,7 @@ const RoleList = () => {
             />
             {searchTerm && (
               <button
-                className="clear-search-rl"
+                className="rlm-clear-search"
                 onClick={() => setSearchTerm("")}
               >
                 <i className="bi bi-x-lg"></i>
@@ -235,33 +225,40 @@ const RoleList = () => {
           </div>
         </div>
 
-        <button className="btn-clear-rl" onClick={clearFilters}>
+        <button className="rlm-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
 
-        <div className="view-switcher-rl">
+        <div className="rlm-view-switcher">
           <button
-            className={`view-btn-rl ${viewMode === "grid" ? "active" : ""}`}
-            onClick={() => setViewMode("grid")}
+            className={`rlm-view-btn ${viewMode === "grid" ? "active" : ""}`}
+            onClick={() => {
+              setViewMode("grid");
+              setItemsPerPage(9);
+              setCurrentPage(1);
+            }}
             title="Grid View"
           >
             <i className="bi bi-grid-3x3-gap-fill"></i>
           </button>
           <button
-            className={`view-btn-rl ${viewMode === "table" ? "active" : ""}`}
-            onClick={() => setViewMode("table")}
+            className={`rlm-view-btn ${viewMode === "table" ? "active" : ""}`}
+            onClick={() => {
+              setViewMode("table");
+              setItemsPerPage(10);
+              setCurrentPage(1);
+            }}
             title="Table View"
           >
             <i className="bi bi-table"></i>
           </button>
         </div>
-        <div className="results-count-inline-rl">
-          Showing{" "}
-          {viewMode === "table" ? currentItems.length : filteredRoles.length} of{" "}
-          {filteredRoles.length} roles
+
+        <div className="rlm-results-count">
+          Showing {currentItems.length} of {filteredRoles.length} roles
         </div>
 
-        <button className="btn-create-rl" onClick={() => setShowAddModal(true)}>
+        <button className="rlm-btn-create" onClick={() => setShowAddModal(true)}>
           <i className="bi bi-plus-circle"></i>
           Create Role
         </button>
@@ -269,8 +266,8 @@ const RoleList = () => {
 
       {/* EMPTY STATE */}
       {filteredRoles.length === 0 ? (
-        <div className="empty-state-rl">
-          <div className="empty-icon-rl">
+        <div className="rlm-empty">
+          <div className="rlm-empty-icon">
             <i className="bi bi-inbox"></i>
           </div>
           <h4>No roles found</h4>
@@ -280,219 +277,293 @@ const RoleList = () => {
         <>
           {/* GRID VIEW */}
           {viewMode === "grid" && (
-            <div className="roles-grid-rl">
-              {filteredRoles.map((role) => (
-                <div key={role.roleId} className="role-card-item">
-                  <div className="card-header-rl">
-                    {/* Updated icon badge with blue background */}
-                    <div className="role-icon-badge" style={{ 
-                      background: '#27235c',
-                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
-                    }}>
-                      <i className={`bi ${getRoleIcon(role.isSystemRole)}`}></i>
+            <>
+              <div className="rlm-grid">
+                {currentItems.map((role) => (
+                  <div key={role.roleId} className="rlm-card">
+                    <div className="rlm-card-top">
+                      <div className="rlm-card-title">{role.roleName}</div>
+                      {role.isSystemRole && (
+                        <span className="rlm-badge-system">
+                          <i className="bi bi-shield-check"></i>
+                        </span>
+                      )}
                     </div>
-                    {role.isSystemRole && (
-                      <span className="system-badge-rl">
-                        <i className="bi bi-lock-fill"></i>
-                        System
-                      </span>
-                    )}
-                  </div>
 
-                  <div className="card-body-rl">
-                    <h3 className="role-name-text">{role.roleName}</h3>
-                    <span className="role-code-text">{role.roleCode}</span>
-                    <p className="role-description-text">
+                    <div className="rlm-card-code">{role.roleCode}</div>
+
+                    <div className="rlm-card-desc">
                       {role.description || "No description available"}
-                    </p>
+                    </div>
+
+                    <div className="rlm-card-footer">
+                      <div className="rlm-card-date">
+                        <i className="bi bi-calendar3"></i>
+                        {formatDate(role.createdAt)}
+                      </div>
+                      <div className="rlm-card-actions">
+                        <button
+                          className="rlm-action-edit"
+                          onClick={() => handleEdit(role)}
+                          title="Edit"
+                        >
+                          <i className="bi bi-pencil-square"></i>
+                        </button>
+                        <button
+                          className="rlm-action-delete"
+                          onClick={() => handleDelete(role)}
+                          disabled={role.isSystemRole}
+                          title={
+                            role.isSystemRole
+                              ? "Cannot delete system role"
+                              : "Delete"
+                          }
+                        >
+                          <i className="bi bi-trash3"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* GRID PAGINATION */}
+              {totalPages > 1 && (
+                <div className="rlm-pagination">
+                  <div className="rlm-pagination-info">
+                    <span>Show</span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => {
+                        setItemsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <option value="6">6</option>
+                      <option value="9">9</option>
+                      <option value="12">12</option>
+                      <option value="18">18</option>
+                    </select>
+                    <span>entries</span>
                   </div>
 
-                  <div className="card-footer-rl">
-                    <div className="role-info-date">
-                      <i className="bi bi-calendar3"></i>
-                      <span>{formatDate(role.createdAt)}</span>
-                    </div>
-                    <div className="card-actions-rl">
-                      <button
-                        className="action-btn action-btn-edit"
-                        onClick={() => handleEdit(role)}
-                        title="Edit"
-                      >
-                        <i className="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        className="action-btn action-btn-delete"
-                        onClick={() => handleDelete(role)}
-                        disabled={role.isSystemRole}
-                        title={
-                          role.isSystemRole
-                            ? "Cannot delete system role"
-                            : "Delete"
-                        }
-                      >
-                        <i className="bi bi-trash"></i>
-                      </button>
-                    </div>
+                  <div className="rlm-pagination-status">
+                    Showing {indexOfFirstItem + 1} to{" "}
+                    {Math.min(indexOfLastItem, filteredRoles.length)} of{" "}
+                    {filteredRoles.length}
                   </div>
+
+                  <nav className="rlm-pagination-nav">
+                    <ul className="rlm-pagination-list">
+                      <li
+                        className={`rlm-page-item ${
+                          currentPage === 1 ? "disabled" : ""
+                        }`}
+                      >
+                        <button
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                        >
+                          <i className="bi bi-chevron-left"></i>
+                        </button>
+                      </li>
+
+                      {getPageNumbers().map((page, index) => (
+                        <li
+                          key={index}
+                          className={`rlm-page-item ${
+                            page === currentPage ? "active" : ""
+                          } ${typeof page !== "number" ? "disabled" : ""}`}
+                        >
+                          <button
+                            onClick={() =>
+                              typeof page === "number" && setCurrentPage(page)
+                            }
+                            disabled={typeof page !== "number"}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      ))}
+
+                      <li
+                        className={`rlm-page-item ${
+                          currentPage === totalPages ? "disabled" : ""
+                        }`}
+                      >
+                        <button
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                        >
+                          <i className="bi bi-chevron-right"></i>
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
 
           {/* TABLE VIEW */}
-          {viewMode === "table" && (
-            <>
-              <div className="table-card-rl">
-                <div className="table-wrapper-rl">
-                  <table className="table-rl">
-                    <thead>
-                      <tr>
-                        <th>Role Name</th>
-                        <th>Role Code</th>
-                        <th>Description</th>
-                        <th>Type</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentItems.map((role) => (
-                        <tr key={role.roleId}>
-                          <td>
-                            {/* Removed icon from table view */}
-                            <div className="table-role-name">
-                              <span>{role.roleName}</span>
-                            </div>
-                          </td>
-                          <td>
-                            <code>{role.roleCode}</code>
-                          </td>
-                          <td className="description-cell">
-                            {role.description || "N/A"}
-                          </td>
-                          <td>
-                            {role.isSystemRole ? (
-                              <span className="badge-system">System</span>
-                            ) : (
-                              <span className="badge-custom">Custom</span>
-                            )}
-                          </td>
-                          <td>{formatDate(role.createdAt)}</td>
-                          <td>
-                            <div className="action-buttons">
-                              <button
-                                className="action-btn action-btn-edit"
-                                onClick={() => handleEdit(role)}
-                                title="Edit"
-                              >
-                                <i className="bi bi-pencil"></i>
-                              </button>
-                              <button
-                                className="action-btn action-btn-delete"
-                                onClick={() => handleDelete(role)}
-                                disabled={role.isSystemRole}
-                                title={
-                                  role.isSystemRole ? "Cannot delete" : "Delete"
-                                }
-                              >
-                                <i className="bi bi-trash"></i>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* PAGINATION */}
-                {filteredRoles.length > 0 && (
-                  <div className="pagination-container">
-                    <div className="pagination-info">
-                      <span className="pagination-label">Show</span>
-                      <select
-                        className="pagination-select"
-                        value={itemsPerPage}
-                        onChange={(e) => {
-                          setItemsPerPage(Number(e.target.value));
-                          setCurrentPage(1);
-                        }}
-                      >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                      </select>
-                      <span className="pagination-label">entries</span>
-                    </div>
-
-                    <div className="pagination-status">
-                      Showing {indexOfFirstItem + 1} to{" "}
-                      {Math.min(indexOfLastItem, filteredRoles.length)} of{" "}
-                      {filteredRoles.length} entries
-                    </div>
-
-                    <nav className="pagination-nav">
-                      <ul className="pagination">
-                        <li
-                          className={`page-item ${
-                            currentPage === 1 ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="page-link"
-                            onClick={() =>
-                              setCurrentPage((prev) => Math.max(prev - 1, 1))
-                            }
-                            disabled={currentPage === 1}
-                          >
-                            <i className="bi bi-chevron-left"></i>
-                          </button>
-                        </li>
-
-                        {getPageNumbers().map((page, index) => (
-                          <li
-                            key={index}
-                            className={`page-item ${
-                              page === currentPage ? "active" : ""
-                            } ${typeof page !== "number" ? "disabled" : ""}`}
-                          >
-                            <button
-                              className="page-link"
-                              onClick={() =>
-                                typeof page === "number" && setCurrentPage(page)
-                              }
-                              disabled={typeof page !== "number"}
-                            >
-                              {page}
-                            </button>
-                          </li>
-                        ))}
-
-                        <li
-                          className={`page-item ${
-                            currentPage === totalPages ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="page-link"
-                            onClick={() =>
-                              setCurrentPage((prev) =>
-                                Math.min(prev + 1, totalPages)
-                              )
-                            }
-                            disabled={currentPage === totalPages}
-                          >
-                            <i className="bi bi-chevron-right"></i>
-                          </button>
-                        </li>
-                      </ul>
-                    </nav>
+          {/* TABLE VIEW */}
+{viewMode === "table" && (
+  <>
+    <div className="rlm-table-card">
+      <div className="rlm-table-wrapper">
+        <table className="rlm-table">
+          <thead>
+            <tr>
+              <th>Role Name</th>
+              <th>Role Code</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Created At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentItems.map((role) => (
+              <tr key={role.roleId}>
+                <td>
+                  <div className="rlm-table-role-name">
+                    <span>{role.roleName}</span>
                   </div>
-                )}
-              </div>
-            </>
-          )}
+                </td>
+                <td>
+                  <code>{role.roleCode}</code>
+                </td>
+                <td className="rlm-desc-cell">
+                  {role.description || "N/A"}
+                </td>
+                <td>
+                  {role.isSystemRole ? (
+                    <span className="rlm-badge-table-system">
+                      System
+                    </span>
+                  ) : (
+                    <span className="rlm-badge-table-custom">
+                      Custom
+                    </span>
+                  )}
+                </td>
+                <td>{formatDate(role.createdAt)}</td>
+                <td>
+                  <div className="rlm-table-actions">
+                    <button
+                      className="rlm-action-edit"
+                      onClick={() => handleEdit(role)}
+                      title="Edit"
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                    <button
+                      className="rlm-action-delete"
+                      onClick={() => handleDelete(role)}
+                      disabled={role.isSystemRole}
+                      title={
+                        role.isSystemRole ? "Cannot delete" : "Delete"
+                      }
+                    >
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* TABLE PAGINATION - MOVED INSIDE TABLE CARD */}
+      <div className="rlm-pagination">
+        <div className="rlm-pagination-info">
+          <span>Show</span>
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+          <span>entries</span>
+        </div>
+
+        <div className="rlm-pagination-status">
+          Showing {indexOfFirstItem + 1} to{" "}
+          {Math.min(indexOfLastItem, filteredRoles.length)} of{" "}
+          {filteredRoles.length}
+        </div>
+
+        <nav className="rlm-pagination-nav">
+          <ul className="rlm-pagination-list">
+            <li
+              className={`rlm-page-item ${
+                currentPage === 1 ? "disabled" : ""
+              }`}
+            >
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.max(prev - 1, 1))
+                }
+                disabled={currentPage === 1}
+              >
+                <i className="bi bi-chevron-left"></i>
+              </button>
+            </li>
+
+            {getPageNumbers().map((page, index) => (
+              <li
+                key={index}
+                className={`rlm-page-item ${
+                  page === currentPage ? "active" : ""
+                } ${typeof page !== "number" ? "disabled" : ""}`}
+              >
+                <button
+                  onClick={() =>
+                    typeof page === "number" && setCurrentPage(page)
+                  }
+                  disabled={typeof page !== "number"}
+                >
+                  {page}
+                </button>
+              </li>
+            ))}
+
+            <li
+              className={`rlm-page-item ${
+                currentPage === totalPages ? "disabled" : ""
+              }`}
+            >
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) =>
+                    Math.min(prev + 1, totalPages)
+                  )
+                }
+                disabled={currentPage === totalPages}
+              >
+                <i className="bi bi-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </>
+)}
+
         </>
       )}
 
