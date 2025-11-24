@@ -227,10 +227,10 @@ export default function TopPerformers() {
         
         {/* Header Section */}
         <div className="dtp-header">
-          <button className="dtp-btn-back" onClick={() => navigate("/depthead/homes")}>
+          {/* <button className="dtp-btn-back" onClick={() => navigate("/depthead/homes")}>
             <i className="bi bi-arrow-left"></i>
             Back to Home
-          </button>
+          </button> */}
           <h1 className="dtp-page-title">Top Performers</h1>
           <p className="dtp-page-description">
             {nominations.length} Approved Nominations

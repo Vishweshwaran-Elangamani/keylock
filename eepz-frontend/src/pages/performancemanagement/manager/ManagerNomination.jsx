@@ -210,6 +210,7 @@ export default function ManagerNomination() {
  
       <h1 className="managernomination-page-title">My Team Nominations</h1>
  
+      {/* My Team Nominations Card */}
       <div className="managernomination-card">
         <div className="managernomination-tab-container" role="tablist" aria-label="Nomination tabs">
           <button
@@ -245,11 +246,11 @@ export default function ManagerNomination() {
           <table className="managernomination-table" role="table" aria-label="Nominations table">
             <thead>
               <tr>
-                <th className="col-index">#</th>
+                <th className="col-index">SNO</th>
                 <th className="col-name">Name</th>
                 <th className="col-dept">Department</th>
                 <th className="col-reward">Reward Type</th>
-                <th className="col-status">Status</th>
+                  {/* Status column removed */}
               </tr>
             </thead>
  
@@ -258,16 +259,18 @@ export default function ManagerNomination() {
                 pendingPager.paged.map((nom, i) => {
                   const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
                   const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
-                  const reward = safeText(nom?.rewardType?.rewardName, nom?.rewardName, "-");
+                  let reward = "-";
+                  if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
+                    const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
+                    if (foundType && foundType.rewardName) reward = foundType.rewardName;
+                  }
                   return (
                     <tr key={nom?.nominationId || i}>
                       <td className="col-index">{(pendingPager.page - 1) * pendingPager.pageSize + i + 1}</td>
                       <td className="col-name">{name}</td>
                       <td className="col-dept">{dept}</td>
                       <td className="col-reward">{reward}</td>
-                      <td className="col-status">
-                        <span className="managernomination-badge managernomination-badge-pending">Pending</span>
-                      </td>
+                      {/* Status cell removed */}
                     </tr>
                   );
                 })}
@@ -276,16 +279,18 @@ export default function ManagerNomination() {
                 approvedPager.paged.map((nom, i) => {
                   const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
                   const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
-                  const reward = safeText(nom?.rewardType?.rewardName, nom?.rewardName, "-");
+                  let reward = "-";
+                  if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
+                    const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
+                    if (foundType && foundType.rewardName) reward = foundType.rewardName;
+                  }
                   return (
                     <tr key={nom?.nominationId || i}>
                       <td className="col-index">{(approvedPager.page - 1) * approvedPager.pageSize + i + 1}</td>
                       <td className="col-name">{name}</td>
                       <td className="col-dept">{dept}</td>
                       <td className="col-reward">{reward}</td>
-                      <td className="col-status">
-                        <span className="managernomination-badge managernomination-badge-approved">Approved</span>
-                      </td>
+                      {/* Status cell removed */}
                     </tr>
                   );
                 })}
@@ -294,16 +299,18 @@ export default function ManagerNomination() {
                 rejectedPager.paged.map((nom, i) => {
                   const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
                   const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
-                  const reward = safeText(nom?.rewardType?.rewardName, nom?.rewardName, "-");
+                  let reward = "-";
+                  if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
+                    const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
+                    if (foundType && foundType.rewardName) reward = foundType.rewardName;
+                  }
                   return (
                     <tr key={nom?.nominationId || i}>
                       <td className="col-index">{(rejectedPager.page - 1) * rejectedPager.pageSize + i + 1}</td>
                       <td className="col-name">{name}</td>
                       <td className="col-dept">{dept}</td>
                       <td className="col-reward">{reward}</td>
-                      <td className="col-status">
-                        <span className="managernomination-badge managernomination-badge-rejected">Rejected</span>
-                      </td>
+                      {/* Status cell removed */}
                     </tr>
                   );
                 })}
@@ -313,7 +320,7 @@ export default function ManagerNomination() {
                 (activeTab === "approved" && approvedNominations.length === 0) ||
                 (activeTab === "rejected" && rejectedNominations.length === 0)) && (
                 <tr>
-                  <td colSpan={5} className="managernomination-empty-row">
+                  <td colSpan={4} className="managernomination-empty-row">
                     No {activeTab} nominations found
                   </td>
                 </tr>
@@ -328,58 +335,58 @@ export default function ManagerNomination() {
           {activeTab === "approved" && <Pagination pager={approvedPager} />}
           {activeTab === "rejected" && <Pagination pager={rejectedPager} />}
         </div>
+      </div>
  
-        {/* Available for nomination */}
-        <div className="managernomination-available-section" style={{ marginTop: 28 }}>
+      {/* Available for Nomination Card */}
+      {activeTab === "pending" && (
+        <div className="managernomination-card managernomination-available-section">
           <h3 className="managernomination-subsection-title">Available for Nomination</h3>
- 
-          <table className="managernomination-table" role="table" aria-label="Available for nomination">
-            <thead>
-              <tr>
-                <th className="col-index">#</th>
-                <th className="col-name">Name</th>
-                <th className="col-dept">Department</th>
-                <th className="col-action">Action</th>
-              </tr>
-            </thead>
- 
-            <tbody>
-              {availablePager.paged.map((member, i) => {
-                const name = safeText(`${member?.firstName || ""} ${member?.lastName || ""}`, member?.name);
-                const dept = safeText(member?.department?.departmentName, member?.departmentName, "-");
-                return (
-                  <tr key={member?.employeeId || i}>
-                    <td className="col-index">{(availablePager.page - 1) * availablePager.pageSize + i + 1}</td>
-                    <td className="col-name">{name}</td>
-                    <td className="col-dept">{dept}</td>
-                    <td className="col-action">
-                      <button
-                        className="managernomination-nominate-button"
-                        onClick={() => handleOpenNominate(member)}
-                        disabled={!canNominate}
-                        title={canNominate ? "Nominate this employee" : "Switch to Pending tab to nominate"}
-                        aria-disabled={!canNominate}
-                      >
-                        Nominate
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
- 
-              {availableMembers.length === 0 && (
+          <div className="managernomination-table-wrapper">
+            <table className="managernomination-table" role="table" aria-label="Available for nomination">
+              <thead>
                 <tr>
-                  <td colSpan={4} className="managernomination-empty-row">No available team members</td>
+                  <th className="col-index">SNO</th>
+                  <th className="col-name">Name</th>
+                  <th className="col-dept">Department</th>
+                  <th className="col-action">Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
- 
+              </thead>
+              <tbody>
+                {availablePager.paged.map((member, i) => {
+                  const name = safeText(`${member?.firstName || ""} ${member?.lastName || ""}`, member?.name);
+                  const dept = safeText(member?.department?.departmentName, member?.departmentName, "-");
+                  return (
+                    <tr key={member?.employeeId || i}>
+                      <td className="col-index">{(availablePager.page - 1) * availablePager.pageSize + i + 1}</td>
+                      <td className="col-name">{name}</td>
+                      <td className="col-dept">{dept}</td>
+                      <td className="col-action">
+                        <button
+                          className="managernomination-nominate-button"
+                          onClick={() => handleOpenNominate(member)}
+                          disabled={!canNominate}
+                          title={canNominate ? "Nominate this employee" : "Switch to Pending tab to nominate"}
+                          aria-disabled={!canNominate}
+                        >
+                          Nominate
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {availableMembers.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="managernomination-empty-row">No available team members</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
           <div style={{ marginTop: 12 }}>
             <Pagination pager={availablePager} />
           </div>
         </div>
-      </div>
+      )}
  
       {/* Nomination modal */}
       <NominationModal
@@ -393,5 +400,6 @@ export default function ManagerNomination() {
     </div>
   );
 }
+ 
  
  

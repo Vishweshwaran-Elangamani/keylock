@@ -38,6 +38,30 @@ const ReviewModal = ({
       aria-modal="true"
       aria-label="Review modal"
     >
+      <style>{`
+        .tl-modal-table th, .tl-modal-table td {
+          text-align: left !important;
+          vertical-align: middle !important;
+        }
+        .tl-modal-table th {
+          font-weight: 600;
+          font-size: 13px;
+          text-transform: uppercase !important;
+          letter-spacing: 0.5px;
+          background: #26225A !important;
+          color: #fff !important;
+          white-space: nowrap;
+        }
+        .tl-modal-table td {
+          font-size: 14px;
+          color: #222;
+          background: #fff;
+          padding: 12px 16px;
+        }
+        .tl-comp {
+          font-weight: 600;
+        }
+      `}</style>
       <div className="tl-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="tl-modal-header">
@@ -46,8 +70,8 @@ const ReviewModal = ({
           </div>
  
           <div className="tl-modal-header-center" aria-hidden>
-            <div className="tl-modal-title">{modalData?.formName || "Assessment Form"}</div>
-            <div className="tl-modal-subtitle">Self Assessment Form</div>
+            <div className="tl-modal-title "style={{ fontWeight: "bold" }} >{modalData?.formName || "Assessment Form"}</div>
+            <div className="tl-modal-subtitle"style={{ fontWeight: "bold" }}>Self Assessment Form</div>
           </div>
  
           <button
@@ -249,5 +273,6 @@ const ReviewModal = ({
 };
  
 export default ReviewModal;
+ 
  
  

@@ -159,10 +159,10 @@
     border-bottom: 3px solid transparent;
   }
    
-  .manevap-tab:hover {
+  /* .manevap-tab:hover {
     background: rgba(46, 43, 95, 0.05);
   }
-   
+    */
   .manevap-tab.active {
     background: var(--manevap-primary);
     color: #FFFFFF;
@@ -253,7 +253,7 @@
     align-items: center;
     gap: 6px;
     padding: 10px 18px;
-    background: var(--manevap-secondary);
+    background: var(--manevap-primary);
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -262,14 +262,13 @@
     font-weight: 600;
     transition: all 0.3s ease;
     white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(233, 30, 99, 0.3);
   }
    
-  .manevap-clear-btn:hover {
+  /* .manevap-clear-btn:hover {
     background: #C2185B;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
-  }
+  } */
    
   /* ========================
      EMPTY STATE
@@ -311,19 +310,20 @@
     border-collapse: collapse;
   }
    
+ 
   .manevap-table thead {
-    background: linear-gradient(135deg, #2E2B5F, #5E5BA7) !important;
+    background: #2E2B5F !important;
   }
-   
+ 
   .manevap-table thead tr {
-    background: transparent !important;
+    background: #2E2B5F !important;
   }
-   
+ 
   .manevap-table th {
     padding: 14px 16px;
     text-align: left;
     color: #FFFFFF !important;
-    background: transparent !important;
+    background: #2E2B5F !important;
     font-weight: 600;
     font-size: 13px;
     text-transform: uppercase;
@@ -347,6 +347,7 @@
     color: var(--manevap-text);
     vertical-align: middle;
     background: #FFFFFF;
+    text-align: left;
   }
    
   /* ========================
@@ -400,27 +401,71 @@
   }
    
   .manevap-btn-submit {
-    background: var(--manevap-primary);
+    background:  #C2185B;;
     color: #fff;
     box-shadow: 0 2px 6px rgba(46, 43, 95, 0.3);
   }
    
-  .manevap-btn-submit:hover {
+  /* .manevap-btn-submit:hover {
     background: linear-gradient(135deg, var(--manevap-primary), var(--manevap-secondary));
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(46, 43, 95, 0.4);
-  }
+  } */
    
   .manevap-btn-view {
-    background: var(--manevap-accent);
+    background:  #C2185B;;
     color: #fff;
-    box-shadow: 0 2px 6px rgba(94, 91, 167, 0.3);
   }
    
-  .manevap-btn-view:hover {
+  /* .manevap-btn-view:hover {
     background: #4E4B8F;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(94, 91, 167, 0.4);
+  } */
+ 
+  /* -------------------------------
+     Button styling (namespaced)
+     - .manevap-btn-primary: used by Search buttons (solid primary)
+     - .manevap-btn-submit-form: used by modal Submit (nomination gradient)
+     No hover transform or shadow changes to avoid unexpected animation.
+     ------------------------------- */
+ 
+  .manevap-btn-primary {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    color: #fff;
+    border: none;
+    /* search buttons should use the solid primary */
+    background: var(--manevap-primary);
+    box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+ 
+  .manevap-btn-primary:focus {
+    outline:  #C2185B;
+    outline-offset: 2px;
+  }
+ 
+  .manevap-btn-submit-form {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    color: #fff;
+    border: none;
+    /* submit buttons should use the nomination gradient */
+    background: #C2185B;;
+    box-shadow: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+ 
+  .manevap-btn-submit-form:focus {
+    outline: 3px solid rgba(224,25,80,0.08);
+    outline-offset: 2px;
   }
    
   /* ========================
@@ -701,17 +746,17 @@
     transition: all 0.3s ease;
   }
    
-  .manevap-btn-close:hover {
+  /* .manevap-btn-close:hover {
     background: #4B5563;
     transform: translateY(-2px);
-  }
+  } */
    
   .manevap-btn-submit-form {
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 12px 28px;
-    background: var(--manevap-primary);
+    background:  #C2185B;;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -722,11 +767,10 @@
     box-shadow: 0 4px 12px rgba(46, 43, 95, 0.3);
   }
    
-  .manevap-btn-submit-form:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--manevap-primary), var(--manevap-secondary));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(46, 43, 95, 0.4);
-  }
+  /* No hover effects for submit button to keep static appearance */
+  /* .manevap-btn-submit-form:hover:not(:disabled) {
+    background: linear-gradient(90deg,#97247e 0%,#e01950 100%);
+  } */
    
   .manevap-btn-submit-form:disabled {
     opacity: 0.6;
@@ -799,6 +843,24 @@
     background: #fff;
     border-radius: 8px 8px 0 0;
   }
+  .manevap-form-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .manevap-form-logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 84px;
+  }
+  .manevap-form-title-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* center the title and description horizontally */
+    text-align: center;
+  }
   .manevap-modal-logo {
     height: 42px;
     margin-bottom: 8px;
@@ -822,6 +884,18 @@
     font-size: 1rem;
     font-weight: 400;
   }
+ 
+  /* Responsive: stack logo above titles on narrow screens */
+  @media (max-width: 640px) {
+    .manevap-form-header-inner {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .manevap-form-logo-wrap {
+      margin-bottom: 8px;
+    }
+  }
   .manevap-strict-form-body {
     background: #fff;
     padding: 28px 37px 0 37px;
@@ -840,6 +914,7 @@
     font-size: 1rem;
     vertical-align: middle;
     background: #fff;
+    text-align: left; /* ensure left alignment */
   }
   .manevap-strict-table th {
     background: #2E2B5F !important;
@@ -889,7 +964,7 @@
     background: none;
   }
   .manevap-btn-submit-form {
-    background: #2E2B5F;
+    background:  #C2185B;;
     color: #fff;
     border: none;
     border-radius: 9px;
@@ -917,3 +992,4 @@
   }
    
    
+ 

@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "../../../styles/performancemanagement/manager/PerformanceManagerHome.css";
-
+ 
 export default function PerformanceManagerHome() {
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState(null);
-
+ 
   const cards = [
     {
       title: "Submit Form for Manager",
@@ -49,9 +49,12 @@ export default function PerformanceManagerHome() {
       path: "/manager/dashboard/employee-acknowledgments",
     },
   ];
-
+ 
   return (
     <div className="managerperfromancehome-container">
+      <header className="managerperfromancehome-header">
+        <h1 className="managerperfromancehome-main-title">Perfomance Management </h1>
+      </header>
       <div className="managerperfromancehome-cards-grid">
         {cards.map((card, index) => (
           <div
@@ -60,9 +63,6 @@ export default function PerformanceManagerHome() {
             onMouseEnter={() => setHoveredCard(index)}
             onMouseLeave={() => setHoveredCard(null)}
             onClick={() => navigate(card.path)}
-            style={{
-              borderColor: card.color,
-            }}
             tabIndex={0}
           >
             <div
@@ -87,3 +87,5 @@ export default function PerformanceManagerHome() {
     </div>
   );
 }
+ 
+ 

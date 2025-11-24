@@ -207,6 +207,17 @@ body { font-family: 'Segoe UI', 'Roboto', sans-serif; color: var(--text); backgr
   font-weight: 700;
   font-size: 12px;
 }
+/* Add styles for table header uppercase and table data left aligned */
+/* Table header uppercase */
+.cg-employee-table th {
+  text-transform: uppercase;
+  text-align: left;
+}
+ 
+/* Table data left aligned */
+.cg-employee-table td {
+  text-align: left;
+}
 .cg-employee-table tbody td {
   padding: 12px 12px;
   border-bottom: 1px solid rgba(224,224,224,0.6);
@@ -548,5 +559,6 @@ body { font-family: 'Segoe UI', 'Roboto', sans-serif; color: var(--text); backgr
   margin-top: 8px;
   margin-bottom: 12px;
 }
+ 
  
  

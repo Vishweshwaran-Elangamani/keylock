@@ -1,23 +1,9 @@
-/**
- * ManagerDashboard Component
- *
- * Manager Evaluation Dashboard
- * Features:
- * - Tab-based view (Pending/Completed)
- * - Advanced filtering (Form name + Type)
- * - Simple professional form template
- * - Assessment submission and viewing
- *
- * @component
- */
- 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../services/performancemanagement/hr/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster } from "sonner";
 import logoImage from "../../../assets/logodark.png";
-import "../../../styles/performancemanagement/manager/ManagerPerformanceDashboard.css";
+import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../components/performance_management/modals/ManagerPerformanceDashboard/ManagerPerformanceDashboardModal";
  
 export default function ManagerDashboard() {
@@ -34,15 +20,43 @@ export default function ManagerDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
  
+  const recentToastsRef = useRef(new Set());
+  const safeToast = (type, message, id, duration = 3000) => {
+    const key = id || message;
+    if (recentToastsRef.current.has(key)) return;
+    recentToastsRef.current.add(key);
+ 
+    const options = { duration, icon: null };
+    switch (type) {
+      case "success":
+        console.info("SUCCESS:", message);
+        break;
+      case "info":
+        console.log("INFO:", message);
+        break;
+      case "warning":
+        toast(message, options);
+        break;
+      case "error":
+        toast.error(message, options);
+        break;
+      default:
+        toast(message, options);
+    }
+ 
+    setTimeout(() => {
+      recentToastsRef.current.delete(key);
+    }, duration + 200);
+  };
+ 
   // Filter states
+  // For search: input state and filter state
+  const [pendingFormNameInput, setPendingFormNameInput] = useState("");
   const [pendingFormNameFilter, setPendingFormNameFilter] = useState("");
   const [pendingTypeFilter, setPendingTypeFilter] = useState("");
+  const [completedFormNameInput, setCompletedFormNameInput] = useState("");
   const [completedFormNameFilter, setCompletedFormNameFilter] = useState("");
   const [completedTypeFilter, setCompletedTypeFilter] = useState("");
- 
-  // ========================
-  // EFFECTS
-  // ========================
  
   useEffect(() => {
     if (userId) {
@@ -50,45 +64,35 @@ export default function ManagerDashboard() {
     }
   }, [userId]);
  
-  // ========================
-  // API FUNCTIONS
-  // ========================
- 
   const fetchAssignments = async () => {
     if (!userId) {
-      toast.error("Unable to load manager ID. Please login again.");
+      safeToast("error", "Unable to load manager ID. Please login again.", "no-manager-id");
       return;
     }
  
     setLoading(true);
     setAssignments([]);
- 
     try {
       const roleResponse = await api.get(`/AppraisalProcess/user/${userId}/role`);
- 
       if (!roleResponse.data.success) {
-        toast.error("User not found.");
+        safeToast("error", "User not found.", "user-not-found");
         return;
       }
- 
       const userRole = roleResponse.data.data;
- 
       if (!userRole.isManager) {
-        toast.error("This user is not a Manager.");
+        safeToast("error", "This user is not a Manager.", "not-manager");
         return;
       }
- 
       const assignmentRes = await api.get(`/AppraisalProcess/employee/${userId}`);
- 
       if (assignmentRes.data.success) {
         setAssignments(assignmentRes.data.data);
         const pending = assignmentRes.data.data.filter((a) => !a.isCompleted).length;
         const completed = assignmentRes.data.data.filter((a) => a.isCompleted).length;
-        toast.success(`Found ${pending} pending and ${completed} completed assessments.`);
+        safeToast("success", `Found ${pending} pending and ${completed} completed assessments.`, "found-assignments");
       }
     } catch (error) {
       console.error("Fetch error:", error);
-      toast.error("Failed to load data.");
+      safeToast("error", "Failed to load data.", "fetch-failed");
     } finally {
       setLoading(false);
     }
@@ -103,9 +107,16 @@ export default function ManagerDashboard() {
   };
  
   const handleSubmitAssessment = async () => {
-    const incomplete = assessmentData.filter((item) => !item.rating);
-    if (incomplete.length > 0) {
-      toast.warning("Please provide ratings for all competencies.");
+ 
+    const incompleteRating = assessmentData.filter((item) => !item.rating);
+    if (incompleteRating.length > 0) {
+      safeToast("warning", "Please provide ratings for all competencies.", "incomplete-ratings");
+      return;
+    }
+ 
+    const incompleteComments = assessmentData.filter((item) => !item.comments || item.comments.trim() === "");
+    if (incompleteComments.length > 0) {
+      safeToast("warning", "Please provide comments for all competencies.", "incomplete-comments");
       return;
     }
  
@@ -123,16 +134,15 @@ export default function ManagerDashboard() {
  
     try {
       const response = await api.post("/SelfAssessment/submit", payload);
- 
       if (response.data?.success) {
-        toast.success("Assessment submitted successfully!");
+        toast.success("Form submitted successfully!");
         setShowModal(false);
         await fetchAssignments();
       } else {
-        toast.error(response.data?.message || "Failed.");
+        safeToast("error", response.data?.message || "Failed.", "submit-failed");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed.");
+      safeToast("error", error.response?.data?.message || "Failed.", "submit-error");
     } finally {
       setSubmitting(false);
     }
@@ -142,12 +152,10 @@ export default function ManagerDashboard() {
     setCurrentAssignment(assignment);
     setModalMode("view");
     setSubmitting(true);
- 
     try {
       const { data } = await api.get(
         `/SelfAssessment/view/${assignment.formId}/user/${userId}`
       );
- 
       if (data.success) {
         const viewData = data.data.details.map((detail) => ({
           competencyId: detail.competencyId,
@@ -156,24 +164,19 @@ export default function ManagerDashboard() {
           rating: detail.rating,
           comments: detail.comments || "",
         }));
- 
         setAssessmentData(viewData);
         setShowModal(true);
-        toast.info("Assessment loaded successfully");
+        safeToast("info", "Assessment loaded successfully", "assessment-loaded");
       } else {
-        toast.error("Failed to load submitted assessment.");
+        safeToast("error", "Failed to load submitted assessment.", "assessment-load-failed");
       }
     } catch (error) {
       console.error("View error:", error);
-      toast.error("Error loading assessment: " + (error.response?.data?.message || error.message));
+      safeToast("error", "Error loading assessment: " + (error.response?.data?.message || error.message), "assessment-load-error");
     } finally {
       setSubmitting(false);
     }
   };
- 
-  // ========================
-  // FILTER & DATA PROCESSING
-  // ========================
  
   const pendingAssignments = assignments
     .filter((a) => !a.isCompleted)
@@ -193,10 +196,6 @@ export default function ManagerDashboard() {
  
   const allFormTypes = [...new Set(assignments.map(a => a.formType))];
  
-  // ========================
-  // RENDER FUNCTIONS
-  // ========================
- 
   const renderTable = (data, isCompleted) => (
     <div className="manevap-table-container">
       <table className="manevap-table">
@@ -206,7 +205,7 @@ export default function ManagerDashboard() {
             <th><i className="bi bi-tag"></i> Type</th>
             <th><i className="bi bi-calendar-event"></i> Assigned</th>
             <th><i className="bi bi-calendar-check"></i> Deadline</th>
-            <th><i className="bi bi-info-circle"></i> Status</th>
+            {/* Status column removed in completed section */}
             <th>Action</th>
           </tr>
         </thead>
@@ -226,12 +225,7 @@ export default function ManagerDashboard() {
                   ? new Date(assignment.deadline).toLocaleDateString()
                   : "N/A"}
               </td>
-              <td>
-                <span className={`manevap-badge ${isCompleted ? 'success' : 'warning'}`}>
-                  <i className={`bi ${isCompleted ? 'bi-patch-check-fill' : 'bi-exclamation-circle-fill'}`}></i>
-                  {assignment.status || (isCompleted ? "Submitted" : "Pending")}
-                </span>
-              </td>
+              {/* Status cell removed in completed section */}
               <td>
                 {!isCompleted ? (
                   <button
@@ -259,7 +253,7 @@ export default function ManagerDashboard() {
                     onClick={() => handleViewCompleted(assignment)}
                   >
                     <i className="bi bi-eye-fill"></i>
-                    View Details
+                   
                   </button>
                 )}
               </td>
@@ -270,14 +264,80 @@ export default function ManagerDashboard() {
     </div>
   );
  
-  // ========================
-  // MAIN RENDER - LOADING STATE
-  // ========================
+  // Internal CSS for pill toggle (no icons, no red hover, full width, proper padding, unique names)
+  const internalStyles = `
+  .mgrdash-pill-toggle {
+    display: flex;
+    justify-content: center;
+    width: 420px;
+    max-width: 90vw;
+    border-radius: 999px;
+    background: #2E2B5F;
+    padding: 4px;
+    box-shadow: 0 2px 12px rgba(46,43,95,0.12);
+    margin: 0 auto 28px auto;
+    gap: 0;
+  }
+  .mgrdash-pill-tab {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #fff;
+    border: none;
+    outline: none;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: background 0.22s, color 0.22s;
+    position: relative;
+    margin: 0 2px;
+    letter-spacing: 0.5px;
+  }
+  .mgrdash-pill-tab.active {
+    background: #fff;
+    color: #2E2B5F;
+    box-shadow: 0 2px 8px rgba(46,43,95,.13);
+    z-index: 1;
+  }
+  .mgrdash-pill-tab:not(.active):hover {
+    background: #393874;
+    color: #fff;
+  }
+  .mgrdash-pill-count {
+    background: rgba(46, 43, 95, 0.09);
+    color: #2E2B5F;
+    font-size: 13px;
+    padding: 2px 11px;
+    border-radius: 14px;
+    font-weight: 600;
+    margin-left: 10px;
+  }
+  @media (max-width: 700px) {
+    .mgrdash-pill-toggle {
+      padding: 4px;
+    }
+    .mgrdash-pill-tab {
+      padding: 11px 0;
+      font-size: 14px;
+    }
+    .mgrdash-pill-count {
+      margin-left: 6px;
+    }
+  }
+  `;
  
   if (loading) {
     return (
       <div className="manevap-container">
-        <ToastContainer />
+        <style>{internalStyles}</style>
+        <Toaster position="top-right" />
+        <div style={{ position: 'relative', zIndex: 12000 }}>
+          <Toaster position="top-right" />
+        </div>
         <div className="manevap-loading-state">
           <div className="spinner-border"></div>
           <p>Loading assessments...</p>
@@ -286,48 +346,45 @@ export default function ManagerDashboard() {
     );
   }
  
-  // ========================
-  // MAIN RENDER - PAGE CONTENT
-  // ========================
- 
   return (
     <div className="manevap-container">
-      <ToastContainer />
- 
-      {/* Bootstrap Icons CDN */}
+      <style>{internalStyles}</style>
+      <div style={{ position: 'relative', zIndex: 12000 }}>
+        <Toaster position="top-right" />
+      </div>
+      {/* Breadcrumb */}
+      <div className="hrfcper-top-bar">
+        <div style={{ width: '100%' }}>
+          <Breadcrumb
+            items={[
+              { label: 'Performance Management', path: '/manager/dashboard/performance' },
+              { label: 'Manager Form' }
+            ]}
+          />
+        </div>
+      </div>
       <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
       />
  
-      {/* Header Section - LEFT ALIGNED */}
-      <div className="manevap-header-section">
-        <div className="manevap-header-icon">
-          <i className="bi bi-speedometer2"></i>
-        </div>
-        <div className="manevap-header-text">
-          <h2 className="manevap-title">Team Evaluation</h2>
-          <p className="manevap-subtitle">Manage and review your performance assessments</p>
-        </div>
-      </div>
- 
-      {/* Tab Navigation */}
-      <div className="manevap-tab-container">
+      {/* Updated Pill Toggle - no icons or emojis */}
+      <div className="mgrdash-pill-toggle" role="tablist" aria-label="Assignments">
         <button
-          className={`manevap-tab ${activeTab === "pending" ? "active" : ""}`}
+          className={`mgrdash-pill-tab ${activeTab === "pending" ? "active" : ""}`}
           onClick={() => setActiveTab("pending")}
+          type="button"
+          aria-selected={activeTab === "pending"}
         >
-          <i className="bi bi-hourglass-split"></i>
-          Pending
-          <span className="manevap-tab-badge">{pendingAssignments.length}</span>
+          Pending <span className="mgrdash-pill-count">{pendingAssignments.length}</span>
         </button>
         <button
-          className={`manevap-tab ${activeTab === "completed" ? "active" : ""}`}
+          className={`mgrdash-pill-tab ${activeTab === "completed" ? "active" : ""}`}
           onClick={() => setActiveTab("completed")}
+          type="button"
+          aria-selected={activeTab === "completed"}
         >
-          <i className="bi bi-check-circle"></i>
-          Completed
-          <span className="manevap-tab-badge">{completedAssignments.length}</span>
+          Completed <span className="mgrdash-pill-count">{completedAssignments.length}</span>
         </button>
       </div>
  
@@ -336,24 +393,34 @@ export default function ManagerDashboard() {
         <div className="manevap-card">
           {/* Filters */}
           <div className="manevap-filter-section">
-            <div className="manevap-filter-group">
-              <label className="manevap-filter-label">
+            <div className="manevap-filter-group" style={{ display: 'flex', flexDirection: 'column' }}>
+              {/* <label className="manevap-filter-label">
                 <i className="bi bi-search"></i>
                 Search Form Name
-              </label>
-              <input
-                type="text"
-                placeholder="Search by form name..."
-                value={pendingFormNameFilter}
-                onChange={(e) => setPendingFormNameFilter(e.target.value)}
-                className="manevap-filter-input"
-              />
+              </label> */}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  placeholder="Search by form name..."
+                  value={pendingFormNameInput}
+                  onChange={(e) => setPendingFormNameInput(e.target.value)}
+                  className="manevap-filter-input"
+                  style={{ flex: 1 }}
+                />
+                <button
+                  className="manevap-btn-primary"
+                  onClick={() => setPendingFormNameFilter(pendingFormNameInput)}
+                  type="button"
+                >
+                  <i className="bi bi-search"></i> Search
+                </button>
+              </div>
             </div>
             <div className="manevap-filter-group">
-              <label className="manevap-filter-label">
+              {/* <label className="manevap-filter-label">
                 <i className="bi bi-funnel"></i>
                 Filter by Type
-              </label>
+              </label> */}
               <select
                 value={pendingTypeFilter}
                 onChange={(e) => setPendingTypeFilter(e.target.value)}
@@ -368,6 +435,7 @@ export default function ManagerDashboard() {
             {(pendingFormNameFilter || pendingTypeFilter) && (
               <button
                 onClick={() => {
+                  setPendingFormNameInput("");
                   setPendingFormNameFilter("");
                   setPendingTypeFilter("");
                 }}
@@ -378,7 +446,6 @@ export default function ManagerDashboard() {
               </button>
             )}
           </div>
- 
           {pendingAssignments.length === 0 ? (
             <div className="manevap-empty-state">
               <i className="bi bi-inbox"></i>
@@ -402,20 +469,29 @@ export default function ManagerDashboard() {
       {/* Completed Tab */}
       {activeTab === "completed" && (
         <div className="manevap-card">
-          {/* Filters */}
           <div className="manevap-filter-section">
-            <div className="manevap-filter-group">
+            <div className="manevap-filter-group" style={{ display: 'flex', flexDirection: 'column' }}>
               <label className="manevap-filter-label">
                 <i className="bi bi-search"></i>
                 Search Form Name
               </label>
-              <input
-                type="text"
-                placeholder="Search by form name..."
-                value={completedFormNameFilter}
-                onChange={(e) => setCompletedFormNameFilter(e.target.value)}
-                className="manevap-filter-input"
-              />
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  placeholder="Search by form name..."
+                  value={completedFormNameInput}
+                  onChange={(e) => setCompletedFormNameInput(e.target.value)}
+                  className="manevap-filter-input"
+                  style={{ flex: 1 }}
+                />
+                <button
+                  className="manevap-btn-primary"
+                  onClick={() => setCompletedFormNameFilter(completedFormNameInput)}
+                  type="button"
+                >
+                  <i className="bi bi-search"></i> Search
+                </button>
+              </div>
             </div>
             <div className="manevap-filter-group">
               <label className="manevap-filter-label">
@@ -436,6 +512,7 @@ export default function ManagerDashboard() {
             {(completedFormNameFilter || completedTypeFilter) && (
               <button
                 onClick={() => {
+                  setCompletedFormNameInput("");
                   setCompletedFormNameFilter("");
                   setCompletedTypeFilter("");
                 }}
@@ -446,7 +523,6 @@ export default function ManagerDashboard() {
               </button>
             )}
           </div>
- 
           {completedAssignments.length === 0 ? (
             <div className="manevap-empty-state">
               <i className="bi bi-clipboard-check"></i>
@@ -467,103 +543,99 @@ export default function ManagerDashboard() {
         </div>
       )}
  
-      {/* Assessment Modal - Simple Professional Form */}
-     
-     {showModal && currentAssignment && (
-  <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
-    <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
- 
-      <div className="manevap-form-header-strict">
-        <div style={{display: 'flex', alignItems: 'center', gap: 16}}>
-          <img src={logoImage} alt="EEPZ Logo" className="manevap-modal-logo" />
-          <div>
-            <div className="manevap-form-logo-label">APPRAISAL FORM</div>
-            <div className="manevap-form-title-main">Appraisal Form</div>
-            <div className="manevap-form-title-small">{currentAssignment?.formName || ""}</div>
+      {showModal && currentAssignment && (
+        <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="manevap-form-header-strict">
+              <div style={{display: 'flex', alignItems: 'center', gap: 16}}>
+                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                  <img src={logoImage} alt="EEPZ Logo" className="manevap-modal-logo" />
+                  <div className="manevap-form-logo-label" style={{ textAlign: 'center', marginTop: '8px' }}>MANAGER FORM</div>
+                </div>
+                <div style={{ textAlign: 'center', width: '100%' }}>
+                  <div className="manevap-form-title-main" style={{ textAlign: 'center', width: '100%' }}>Appraisal Form</div>
+                  <div className="manevap-form-title-small" style={{ textAlign: 'center', width: '100%' }}>{currentAssignment?.formName || ""}</div>
+                </div>
+              </div>
+            </div>
+            {submitting && modalMode === "view"
+              ? <div className="manevap-modal-loading"><div className="spinner-border"></div><p>Loading assessment...</p></div>
+              : (
+                <>
+                  <div className="manevap-strict-form-body">
+                    <table className="manevap-strict-table">
+                      <thead>
+                        <tr>
+                          <th>COMPETENCY NAME</th>
+                          <th>DESCRIPTION</th>
+                          <th>RATING</th>
+                          <th>COMMENTS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {assessmentData.map((item, idx) => (
+                          <tr key={item.competencyId || idx}>
+                            <td className="manevap-cell-bold" style={{ textAlign: 'center' }}>{item.competencyName}</td>
+                            <td style={{ textAlign: 'center' }}>{item.competencyDescription || ""}</td>
+                            <td>
+                              {modalMode === "view" ? (
+                                <div className="manevap-modal-cell-view">{item.rating ? `${item.rating} / 5` : '-'}</div>
+                              ) : (
+                                <select
+                                  value={item.rating || "1"}
+                                  onChange={e =>
+                                    updateAssessmentData(item.competencyId, "rating", e.target.value)
+                                  }
+                                  className="manevap-modal-cell-input"
+                                >
+                                  <option value="1">1 - Poor</option>
+                                  <option value="2">2 - Fair</option>
+                                  <option value="3">3 - Good</option>
+                                  <option value="4">4 - Very Good</option>
+                                  <option value="5">5 - Excellent</option>
+                                </select>
+                              )}
+                            </td>
+                            <td>
+                              {modalMode === "view" ? (
+                                <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
+                              ) : (
+                                <input
+                                  className="manevap-modal-cell-input"
+                                  type="text"
+                                  value={item.comments}
+                                  onChange={e =>
+                                    updateAssessmentData(item.competencyId, "comments", e.target.value)
+                                  }
+                                  placeholder="-"
+                                />
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="manevap-modal-actions">
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="manevap-btn-close"
+                    >Cancel</button>
+                    {modalMode === "submit" && (
+                      <button
+                        onClick={handleSubmitAssessment}
+                        disabled={submitting}
+                        className="manevap-btn-submit-form"
+                      >
+                        {submitting ? "Submitting..." : "Submit Assessment"}
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
           </div>
         </div>
-      </div>
-     
-      {submitting && modalMode === "view"
-        ? <div className="manevap-modal-loading"><div className="spinner-border"></div><p>Loading assessment...</p></div>
-        : (
-          <>
-            <div className="manevap-strict-form-body">
-              <table className="manevap-strict-table">
-                <thead>
-                  <tr>
-                    <th>COMPETENCY NAME</th>
-                    <th>DESCRIPTION</th>
-                    <th>RATING</th>
-                    <th>COMMENTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {assessmentData.map((item, idx) => (
-                    <tr key={item.competencyId || idx}>
-                      <td className="manevap-cell-bold">{item.competencyName}</td>
-                      <td>{item.competencyDescription || ""}</td>
-                      <td>
-                        {modalMode === "view" ? (
-                          <div className="manevap-modal-cell-view">{item.rating ? `${item.rating} / 5` : '-'}</div>
-                        ) : (
-                          <select
-                            value={item.rating}
-                            onChange={e =>
-                              updateAssessmentData(item.competencyId, "rating", e.target.value)
-                            }
-                            className="manevap-modal-cell-input"
-                          >
-                            <option value="">-</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                          </select>
-                        )}
-                      </td>
-                      <td>
-                        {modalMode === "view" ? (
-                          <div className="manevap-modal-cell-view">{item.comments || "-"}</div>
-                        ) : (
-                          <input
-                            className="manevap-modal-cell-input"
-                            type="text"
-                            value={item.comments}
-                            onChange={e =>
-                              updateAssessmentData(item.competencyId, "comments", e.target.value)
-                            }
-                            placeholder="-"
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="manevap-modal-actions">
-              <button
-                onClick={() => setShowModal(false)}
-                className="manevap-btn-close"
-              >Cancel</button>
-              {modalMode === "submit" && (
-                <button
-                  onClick={handleSubmitAssessment}
-                  disabled={submitting}
-                  className="manevap-btn-submit-form"
-                >
-                  {submitting ? "Submitting..." : "Submit Assessment"}
-                </button>
-              )}
-            </div>
-          </>
-        )}
-    </div>
-  </div>
-)}
- 
+      )}
     </div>
   );
 }

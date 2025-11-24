@@ -1,3 +1,22 @@
+/* Ensure the nominations table appears inside the card visually */
+.managernomination-table-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(46,43,95,0.08);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+/* Curved header for Available for Nomination table */
+.managernomination-available-section .managernomination-table thead tr {
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+.managernomination-available-section .managernomination-table thead {
+  background: #2E2B5F;
+  color: #fff;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
 /* ===================================================================
    MANAGER NOMINATION PAGE - PREFIX: managernomination-
    =================================================================== */
@@ -63,7 +82,11 @@
  
 /* Page title */
 .managernomination-page-title {
-  text-align:center; font-size:22px; color:var(--mn-primary); margin:6px 0 14px; font-weight:700;
+  text-align:left;
+  font-size:22px;
+  color:var(--mn-primary);
+  margin:24px 0 24px 0;
+  font-weight:700;
 }
  
 /* Card & Tabs */
@@ -85,10 +108,26 @@
 .managernomination-tab-active { color:var(--mn-primary); border-bottom-color:var(--mn-primary); box-shadow: 0 6px 12px rgba(39,35,92,0.04); }
  
 /* Table wrapper */
-.managernomination-table-wrapper { margin-top:8px; overflow:hidden; border-radius:6px; }
+.managernomination-table-wrapper { margin-top:8px; overflow:hidden; border-radius:16px 16px 0 0; }
  
 /* Table */
-.managernomination-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:14px; background:transparent; }
+.managernomination-table { width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed; font-size:14px; background:transparent; }
+/* Curved header for Available for Nomination table */
+.managernomination-available-section .managernomination-table thead {
+  background: #2E2B5F;
+  color: #fff;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+.managernomination-available-section .managernomination-table th {
+  border-radius: 0;
+}
+.managernomination-available-section .managernomination-table th:first-child {
+  border-top-left-radius: 16px;
+}
+.managernomination-available-section .managernomination-table th:last-child {
+  border-top-right-radius: 16px;
+}
 .managernomination-table thead { background-color:#26225A; color:#fff; }
 .managernomination-table th { padding:12px; text-align:left; font-weight:700; font-size:12px; color:#fff; border-bottom:2px solid rgba(255,255,255,0.05); text-transform:uppercase; letter-spacing:0.5px; }
  
@@ -97,8 +136,8 @@
 .managernomination-table th.col-name, .managernomination-table td.col-name { width:42%; min-width:220px; }
 .managernomination-table th.col-dept, .managernomination-table td.col-dept { width:30%; min-width:160px; }
 .managernomination-table th.col-reward, .managernomination-table td.col-reward { width:16%; min-width:120px; }
-.managernomination-table th.col-status, .managernomination-table td.col-status { width:12%; min-width:100px; }
-.managernomination-table th.col-action, .managernomination-table td.col-action { width:14%; min-width:120px; }
+.managernomination-table th.col-status, .managernomination-table td.col-status { width:12%; min-width:100px; text-align:center; }
+.managernomination-table th.col-action, .managernomination-table td.col-action { width:14%; min-width:120px; text-align:center; }
  
 /* Body rows */
 .managernomination-table tbody tr { border-bottom: 1px solid var(--mn-border); background:#fff; }
@@ -132,8 +171,23 @@
 .managernomination-pg-btn:disabled { opacity:0.5; cursor:not-allowed; }
  
 /* Available section */
-.managernomination-available-section { margin-top:28px; }
-.managernomination-subsection-title { font-size:20px; font-weight:700; color:var(--mn-primary); margin-bottom:18px; text-align:center; }
+.managernomination-available-section {
+  margin-top:32px;
+  background: var(--mn-card);
+  border-radius: 10px;
+  border: 1px solid var(--mn-border);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  padding: 24px 20px;
+}
+.managernomination-subsection-title {
+  font-size:20px;
+  font-weight:700;
+  color:var(--mn-primary);
+  margin:0 0 24px 0;
+  text-align:left;
+  padding-bottom:8px;
+  border-bottom:2px solid var(--mn-border);
+}
  
 /* Modal and inputs (namespaced) */
 .managernomination-modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(39,35,92,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; backdrop-filter: blur(3px); }
@@ -171,5 +225,6 @@
   outline: 3px solid rgba(39,35,92,0.08);
   outline-offset: 2px;
 }
+ 
  
  

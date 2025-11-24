@@ -18,10 +18,12 @@ const ManagerPerformanceDashboardModal = ({
     <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
       <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="manevap-form-header-strict">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <img src={logoImage} alt="EEPZ Logo" className="manevap-modal-logo" />
-            <div>
+          <div className="manevap-form-header-inner">
+            <div className="manevap-form-logo-wrap">
+              <img src={logoImage} alt="EEPZ Logo" className="manevap-modal-logo" />
               <div className="manevap-form-logo-label">APPRAISAL FORM</div>
+            </div>
+            <div className="manevap-form-title-wrap">
               <div className="manevap-form-title-main">Appraisal Form</div>
               <div className="manevap-form-title-small">{currentAssignment?.formName || ""}</div>
             </div>
@@ -114,5 +116,6 @@ const ManagerPerformanceDashboardModal = ({
 };
  
 export default ManagerPerformanceDashboardModal;
+ 
  
  

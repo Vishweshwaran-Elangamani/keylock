@@ -1,117 +1,142 @@
+/* Performance Manager Home Styles */
+ 
+/* Container */
 .managerperfromancehome-container {
-  max-width: 1100px;
-  margin: 40px auto 0 auto;
-  padding: 0 18px;
+  padding: 24px; /* give some horizontal spacing */
+  min-height: 60vh;
+  background: #f8f9fa;
 }
-
+ 
+/* Page title */
 .managerperfromancehome-main-title {
-  font-size: 2.1rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #26255c;
-  margin-bottom: 24px;
-  text-align: left;
-  letter-spacing: 0.01em;
+  color: #27235c;
+  text-align: left; /* ensure left aligned */
+  margin: 0 0 2rem 0; /* space between title and cards */
+  padding-left: 4px; /* small offset from container edge */
 }
-
+ 
+/* Management Cards */
 .managerperfromancehome-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
-  gap: 32px 28px;
-  margin-top: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 8px; /* small buffer under the title */
 }
-
+ 
+/* Individual Card */
 .managerperfromancehome-card-admin {
-  background: #fff;
-  border: 2px solid #eee;
-  border-radius: 18px;
-  min-height: 170px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #97247E; /* unified card border color */
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  cursor: pointer;
-  transition: box-shadow 0.16s, border 0.13s;
-  box-shadow: 0 2px 7px rgba(40, 37, 92, 0.07);
+  gap: 1rem;
   position: relative;
-  padding: 30px 20px 22px 20px;
+  overflow: hidden;
 }
-
-.managerperfromancehome-card-admin.hovered,
-.managerperfromancehome-card-admin:active,
-.managerperfromancehome-card-admin:focus {
-  box-shadow: 0 6px 32px rgba(51, 18, 82, 0.09), 0 2px 6px rgba(39,35,92,0.08);
-  transform: translateY(-2px) scale(1.016);
-  border-color: #ac5098;
+ 
+.managerperfromancehome-card-admin::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-
+ 
+.managerperfromancehome-card-admin:hover::before {
+  opacity: 1;
+}
+ 
+.managerperfromancehome-card-admin:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #97247e;
+}
+ 
 .managerperfromancehome-card-icon {
-  height: 48px;
-  width: 48px;
-  border-radius: 13px;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 3px rgba(39, 35, 92, 0.03);
+  font-size: 1.75rem;
+  color: #ffffff;
+  background: #97247e; /* Add background color to ensure visibility */
+  flex-shrink: 0;
+  margin: 0; /* remove auto centering */
+  align-self: flex-start; /* left align the icon inside the card */
 }
-
+ 
+.managerperfromancehome-card-content {
+  flex: 1;
+}
+ 
 .managerperfromancehome-card-title {
-  font-size: 1.13rem;
+  font-size: 1.125rem;
   font-weight: 700;
-  color: #252657;
-  margin: 0 0 6px 0;
-  text-align: left;
-  letter-spacing: 0.006em;
+  color: #27235c;
+  margin: 0 0 0.5rem 0;
 }
-
+ 
 .managerperfromancehome-card-description {
-  color: #666a87;
-  font-size: 0.99rem;
-  font-weight: 500;
-  margin: 0;
-  letter-spacing: 0.001em;
-  text-align: left;
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0 0 0.75rem 0;
+  line-height: 1.5;
 }
-
+ 
 .managerperfromancehome-card-arrow {
   position: absolute;
-  bottom: 16px;
-  right: 20px;
-  color: #ac5098;
-  font-size: 1.17rem;
-  transition: transform 0.14s;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(151, 36, 126, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #97247e;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
 }
-
-.managerperfromancehome-card-admin:hover .managerperfromancehome-card-arrow,
-.managerperfromancehome-card-admin:focus .managerperfromancehome-card-arrow {
-  transform: translateX(3px) scale(1.08);
-  color: #7c2562;
+ 
+.managerperfromancehome-card-admin:hover .managerperfromancehome-card-arrow {
+  opacity: 1;
+  transform: translateX(0);
 }
-
-/* Responsive fixes */
-@media (max-width: 950px) {
-  .managerperfromancehome-container {
-    padding: 0 3vw;
-  }
+ 
+/* Responsive Design */
+@media (max-width: 1400px) {
   .managerperfromancehome-cards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(246px, 1fr));
-    gap: 20px 14px;
-  }
-  .managerperfromancehome-card-admin {
-    padding: 26px 10px 16px 12px;
+    grid-template-columns: 1fr;
   }
 }
-@media (max-width: 600px) {
-  .managerperfromancehome-main-title {
-    font-size: 1.36rem;
-    margin-bottom: 13px;
+ 
+@media (max-width: 1024px) {
+  .managerperfromancehome-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+ 
+@media (max-width: 768px) {
+  .managerperfromancehome-card-title {
+    font-size: 1rem;
   }
   .managerperfromancehome-cards-grid {
     grid-template-columns: 1fr;
-    gap: 15px 0;
-  }
-  .managerperfromancehome-card-admin {
-    padding: 17px 8px 14px 11px;
   }
 }
+ 
+ 
