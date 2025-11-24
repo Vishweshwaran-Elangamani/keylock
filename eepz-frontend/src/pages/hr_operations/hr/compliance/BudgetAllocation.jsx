@@ -4,6 +4,7 @@ import budgetAllocationService from "../../../../services/hr_operations/hr/budge
 import CreateBudgetModal from "../../../../components/hr_operations/modals/CreateBudgetModal";
 import EditBudgetModal from "../../../../components/hr_operations/modals/EditBudgetModal";
 import ViewBudgetDetailsModal from "../../../../components/hr_operations/modals/ViewBudgetDetailsModal";
+import DeleteBudgetModal from "../../../../components/hr_operations/modals/DeleteBudgetModal";
 import Breadcrumb from "../../../../components/common/Breadcrumb";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
@@ -17,6 +18,7 @@ const BudgetAllocation = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
 
   const [viewType, setViewType] = useState("table");
@@ -172,22 +174,15 @@ const BudgetAllocation = () => {
     showToast("Success", "Department budget updated successfully", "success");
   };
 
-  const handleDeleteClick = async (budgetId) => {
-    if (
-      !window.confirm("Are you sure you want to delete this department budget?")
-    ) {
-      return;
-    }
+  const handleDeleteClick = (budget) => {
+    setSelectedBudget(budget);
+    setShowDeleteModal(true);
+  };
 
-    try {
-      console.log("Deleting budget:", budgetId);
-      await budgetAllocationService.deleteDepartmentBudget(budgetId);
-      fetchBudgets();
-      showToast("Success", "Department budget deleted successfully", "success");
-    } catch (err) {
-      console.error("Error deleting budget:", err);
-      showToast("Error", err.message || "Failed to delete budget", "danger");
-    }
+  const handleBudgetDeleted = () => {
+    setShowDeleteModal(false);
+    setSelectedBudget(null);
+    fetchBudgets();
   };
 
   const handleViewDetails = (budget) => {
@@ -455,7 +450,7 @@ const BudgetAllocation = () => {
                     </button>
                     <button
                       className="budget-btn-card-action budget-btn-delete"
-                      onClick={() => handleDeleteClick(budget.budgetId)}
+                      onClick={() => handleDeleteClick(budget)}
                       title="Delete"
                     >
                       <i className="bi bi-trash"></i>
@@ -581,7 +576,6 @@ const BudgetAllocation = () => {
                   <th>Total Budget</th>
                   <th>Allocated</th>
                   <th>Utilized</th>
-                  <th>Utilization</th>
                   <th>Headcount</th>
                   <th>Avg Cost/Employee</th>
                   {isLeadership && (
@@ -601,25 +595,6 @@ const BudgetAllocation = () => {
                     <td>{formatCurrency(budget.totalBudget)}</td>
                     <td>{formatCurrency(budget.allocatedAmount)}</td>
                     <td>{formatCurrency(budget.utilizedAmount)}</td>
-                    <td>
-                      <div className="budget-progress-container">
-                        <div
-                          className="budget-progress-bar"
-                          style={{
-                            width: `${Math.min(
-                              budget.utilizationPercentage || 0,
-                              100
-                            )}%`,
-                            backgroundColor: getUtilizationColor(
-                              budget.utilizationPercentage
-                            ),
-                          }}
-                        ></div>
-                        <span className="budget-progress-text">
-                          {budget.utilizationPercentage || 0}%
-                        </span>
-                      </div>
-                    </td>
                     <td className="budget-text-center">
                       {budget.headcount || 0}
                     </td>
@@ -643,7 +618,7 @@ const BudgetAllocation = () => {
                           </button>
                           <button
                             className="action-btn action-btn-delete"
-                            onClick={() => handleDeleteClick(budget.budgetId)}
+                            onClick={() => handleDeleteClick(budget)}
                             title="Delete"
                           >
                             <i className="bi bi-trash"></i>
@@ -794,11 +769,23 @@ const BudgetAllocation = () => {
         />
       )}
 
+      {showDeleteModal && selectedBudget && (
+        <DeleteBudgetModal
+          show={showDeleteModal}
+          budget={selectedBudget}
+          onHide={() => {
+            setShowDeleteModal(false);
+            setSelectedBudget(null);
+          }}
+          onBudgetDeleted={handleBudgetDeleted}
+        />
+      )}
+
       <div
         className="budget-blur-backdrop"
         style={{
           display:
-            showCreateModal || showEditModal || showDetailsModal
+            showCreateModal || showEditModal || showDetailsModal || showDeleteModal
               ? "block"
               : "none",
         }}

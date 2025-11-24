@@ -47,7 +47,6 @@ const PeriodAllocationManagement = () => {
     search: "",
     year: "all",
     period: "",
-    utilizationRange: "all",
   });
 
   // Filter Options
@@ -141,25 +140,6 @@ const PeriodAllocationManagement = () => {
       filtered = filtered.filter((p) => p.period === filters.period);
     }
 
-    // Utilization Range Filter
-    if (filters.utilizationRange !== "all") {
-      filtered = filtered.filter((p) => {
-        const util = p.utilizationPercentage || 0;
-        switch (filters.utilizationRange) {
-          case "low":
-            return util < 50;
-          case "medium":
-            return util >= 50 && util < 75;
-          case "high":
-            return util >= 75 && util < 90;
-          case "critical":
-            return util >= 90;
-          default:
-            return true;
-        }
-      });
-    }
-
     // Apply sorting
     if (sortConfig.key) {
       filtered.sort((a, b) => {
@@ -226,7 +206,6 @@ const PeriodAllocationManagement = () => {
       search: "",
       year: "all",
       period: "",
-      utilizationRange: "all",
     });
     setSortConfig({ key: null, direction: "asc" });
   };
@@ -253,9 +232,6 @@ const PeriodAllocationManagement = () => {
       "Period Year",
       "Department",
       "Allocated Amount",
-      "Utilized Amount",
-      "Remaining Amount",
-      "Utilization %",
       "Sub-Allocations",
     ];
 
@@ -264,9 +240,6 @@ const PeriodAllocationManagement = () => {
       period.periodYear || "",
       selectedBudget?.departmentName || "",
       period.allocatedAmount || 0,
-      period.utilizedAmount || 0,
-      period.remainingAmount || 0,
-      period.utilizationPercentage || 0,
       period.subAllocationCount || 0,
     ]);
 
@@ -317,7 +290,6 @@ const PeriodAllocationManagement = () => {
     setShowDetailsModal(true);
   };
 
-  // DELETE HANDLERS - FIXED
   const handleDeletePeriod = (period) => {
     setPeriodToDelete(period);
     setShowDeleteModal(true);
@@ -361,31 +333,11 @@ const PeriodAllocationManagement = () => {
     }
   };
 
-  const getUtilizationColor = (percentage) => {
-    if (!percentage) return "#cbd5e1";
-    if (percentage >= 90) return "#ef4444";
-    if (percentage >= 75) return "#f59e0b";
-    if (percentage >= 50) return "#10b981";
-    return "#3b82f6";
-  };
-
-  const getUtilizationBadgeClass = (percentage) => {
-    if (!percentage) return "period-utilization-badge low";
-    if (percentage >= 90) return "period-utilization-badge critical";
-    if (percentage >= 75) return "period-utilization-badge high";
-    if (percentage >= 50) return "period-utilization-badge medium";
-    return "period-utilization-badge low";
-  };
-
   // Calculate summary statistics
   const summaryStats = {
     totalAllocated: filteredPeriods.reduce((sum, p) => sum + (p.allocatedAmount || 0), 0),
-    totalUtilized: filteredPeriods.reduce((sum, p) => sum + (p.utilizedAmount || 0), 0),
-    totalRemaining: filteredPeriods.reduce((sum, p) => sum + (p.remainingAmount || 0), 0),
-    avgUtilization:
-      filteredPeriods.length > 0
-        ? filteredPeriods.reduce((sum, p) => sum + (p.utilizationPercentage || 0), 0) / filteredPeriods.length
-        : 0,
+    totalPeriods: filteredPeriods.length,
+    totalSubAllocations: filteredPeriods.reduce((sum, p) => sum + (p.subAllocationCount || 0), 0),
   };
 
   if (loading) {
@@ -401,8 +353,6 @@ const PeriodAllocationManagement = () => {
 
   return (
     <div className="period-root">
-      
-
       {error && (
         <div className="alert alert-danger period-alert" role="alert">
           <i className="bi bi-exclamation-triangle-fill me-2"></i>
@@ -410,7 +360,7 @@ const PeriodAllocationManagement = () => {
         </div>
       )}
 
-      {/* SUMMARY STATISTICS CARDS - COMPACT LEFT-ALIGNED */}
+      {/* SUMMARY STATISTICS CARDS */}
       {filteredPeriods.length > 0 && (
         <div className="period-summary-cards">
           <div className="period-summary-card total">
@@ -425,39 +375,29 @@ const PeriodAllocationManagement = () => {
 
           <div className="period-summary-card utilized">
             <div className="summary-card-icon">
-              <i className="bi bi-graph-up-arrow"></i>
+              <i className="bi bi-calendar-range"></i>
             </div>
             <div className="summary-card-content">
-              <div className="summary-card-value">{formatCurrency(summaryStats.totalUtilized)}</div>
-              <div className="summary-card-label">Total Utilized</div>
+              <div className="summary-card-value">{summaryStats.totalPeriods}</div>
+              <div className="summary-card-label">Total Periods</div>
             </div>
           </div>
 
           <div className="period-summary-card remaining">
             <div className="summary-card-icon">
-              <i className="bi bi-piggy-bank"></i>
+              <i className="bi bi-diagram-3"></i>
             </div>
             <div className="summary-card-content">
-              <div className="summary-card-value">{formatCurrency(summaryStats.totalRemaining)}</div>
-              <div className="summary-card-label">Total Remaining</div>
-            </div>
-          </div>
-
-          <div className="period-summary-card average">
-            <div className="summary-card-icon">
-              <i className="bi bi-percent"></i>
-            </div>
-            <div className="summary-card-content">
-              <div className="summary-card-value">{summaryStats.avgUtilization.toFixed(1)}%</div>
-              <div className="summary-card-label">Avg Utilization</div>
+              <div className="summary-card-value">{summaryStats.totalSubAllocations}</div>
+              <div className="summary-card-label">Sub-Allocations</div>
             </div>
           </div>
         </div>
       )}
 
-      {/* INTEGRATED FILTER BAR - TWO ROW LAYOUT */}
+      {/* INTEGRATED FILTER BAR */}
       <div className="period-filter-section">
-        {/* First Row - Budget Selector, Export, Add Period */}
+        {/* First Row */}
         <div className="period-filter-row-top">
           <select
             className="period-filter-select period-budget-dropdown"
@@ -491,7 +431,7 @@ const PeriodAllocationManagement = () => {
           </div>
         </div>
 
-        {/* Second Row - Search and Filters */}
+        {/* Second Row */}
         <div className="period-filter-row-bottom">
           <div className="period-search-input-wrapper">
             <i className="bi bi-search period-search-icon"></i>
@@ -533,19 +473,6 @@ const PeriodAllocationManagement = () => {
             ))}
           </select>
 
-          <select
-            name="utilizationRange"
-            value={filters.utilizationRange}
-            onChange={handleFilterChange}
-            className="period-filter-select"
-          >
-            <option value="all">All Ranges</option>
-            <option value="low">Low (&lt; 50%)</option>
-            <option value="medium">Medium (50-75%)</option>
-            <option value="high">High (75-90%)</option>
-            <option value="critical">Critical (≥ 90%)</option>
-          </select>
-
           <button className="period-clear-btn" onClick={clearFilters}>
             Clear Filters
           </button>
@@ -574,7 +501,6 @@ const PeriodAllocationManagement = () => {
               <div className="period-cards-grid">
                 {currentPageData.map((period) => (
                   <div key={period.periodAllocationId} className="period-card">
-                    {/* CARD HEADER */}
                     <div className="period-card-header">
                       <div className="period-card-avatar">
                         <i className="bi bi-calendar-event"></i>
@@ -585,28 +511,10 @@ const PeriodAllocationManagement = () => {
                       </div>
                     </div>
 
-                    {/* CARD BODY */}
                     <div className="period-card-body">
                       <div className="period-card-row">
                         <span className="period-card-label">Allocated</span>
                         <span className="period-card-value">{formatCurrency(period.allocatedAmount)}</span>
-                      </div>
-
-                      <div className="period-card-row">
-                        <span className="period-card-label">Utilized</span>
-                        <span className="period-card-value">{formatCurrency(period.utilizedAmount)}</span>
-                      </div>
-
-                      <div className="period-card-row">
-                        <span className="period-card-label">Remaining</span>
-                        <span className="period-card-value">{formatCurrency(period.remainingAmount)}</span>
-                      </div>
-
-                      <div className="period-card-row">
-                        <span className="period-card-label">Utilization</span>
-                        <span className={getUtilizationBadgeClass(period.utilizationPercentage)}>
-                          {period.utilizationPercentage || 0}%
-                        </span>
                       </div>
 
                       <div className="period-card-row">
@@ -622,7 +530,6 @@ const PeriodAllocationManagement = () => {
                       )}
                     </div>
 
-                    {/* CARD ACTIONS */}
                     <div className="period-card-actions">
                       <button
                         className="period-btn-card-action period-btn-view"
@@ -644,7 +551,6 @@ const PeriodAllocationManagement = () => {
                         className="period-btn-card-action period-btn-allocate"
                         onClick={() => handleAllocateFromPeriod(period)}
                         title="Sub-Allocate"
-                        disabled={period.remainingAmount <= 0}
                       >
                         <i className="bi bi-diagram-3"></i>
                         <span>Allocate</span>
@@ -758,15 +664,6 @@ const PeriodAllocationManagement = () => {
                       <th onClick={() => handleSort("allocatedAmount")} className="period-sortable-header">
                         Allocated {getSortIcon("allocatedAmount")}
                       </th>
-                      <th onClick={() => handleSort("utilizedAmount")} className="period-sortable-header">
-                        Utilized {getSortIcon("utilizedAmount")}
-                      </th>
-                      <th onClick={() => handleSort("remainingAmount")} className="period-sortable-header">
-                        Remaining {getSortIcon("remainingAmount")}
-                      </th>
-                      <th onClick={() => handleSort("utilizationPercentage")} className="period-sortable-header">
-                        Utilization {getSortIcon("utilizationPercentage")}
-                      </th>
                       <th onClick={() => handleSort("subAllocationCount")} className="period-sortable-header">
                         Sub-Allocations {getSortIcon("subAllocationCount")}
                       </th>
@@ -781,20 +678,6 @@ const PeriodAllocationManagement = () => {
                         </td>
                         <td>{period.periodYear}</td>
                         <td>{formatCurrency(period.allocatedAmount)}</td>
-                        <td>{formatCurrency(period.utilizedAmount)}</td>
-                        <td>{formatCurrency(period.remainingAmount)}</td>
-                        <td>
-                          <div className="period-progress-container">
-                            <div
-                              className="period-progress-bar"
-                              style={{
-                                width: `${Math.min(period.utilizationPercentage || 0, 100)}%`,
-                                backgroundColor: getUtilizationColor(period.utilizationPercentage),
-                              }}
-                            ></div>
-                            <span className="period-progress-text">{period.utilizationPercentage || 0}%</span>
-                          </div>
-                        </td>
                         <td className="period-text-center">{period.subAllocationCount || 0}</td>
                         <td>
                           <div className="action-buttons">
@@ -816,7 +699,6 @@ const PeriodAllocationManagement = () => {
                               className="action-btn action-btn-success"
                               onClick={() => handleAllocateFromPeriod(period)}
                               title="Sub-Allocate"
-                              disabled={period.remainingAmount <= 0}
                             >
                               <i className="bi bi-diagram-3"></i>
                             </button>
@@ -950,7 +832,6 @@ const PeriodAllocationManagement = () => {
         <ViewPeriodDetailsModal period={selectedPeriod} onClose={() => setShowDetailsModal(false)} />
       )}
 
-      {/* DELETE CONFIRMATION MODAL */}
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
         onClose={cancelDelete}
@@ -961,7 +842,6 @@ const PeriodAllocationManagement = () => {
         isDeleting={isDeleting}
       />
 
-      {/* BLUR BACKDROP */}
       <div
         className="period-blur-backdrop"
         style={{

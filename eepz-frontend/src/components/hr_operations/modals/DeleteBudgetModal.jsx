@@ -1,318 +1,152 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
+import "../../../styles/hr_operations/hr/deleteBudgetModal.css";
 
-const DeleteConfirmationModal = ({ show, onConfirm, onCancel, budget }) => {
-  const [deleting, setDeleting] = useState(false);
+const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
+  const [loading, setLoading] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
 
-  if (!show || !budget) return null;
+  const isConfirmValid = confirmText.toLowerCase() === "confirm";
 
-  const handleConfirm = async () => {
-    setDeleting(true);
+  const handleDelete = async () => {
+    if (!isConfirmValid) {
+      toast.error("Please type 'confirm' to proceed with deletion");
+      return;
+    }
+
     try {
-      await onConfirm();
+      setLoading(true);
+      await budgetAllocationService.deleteDepartmentBudget(budget.budgetId);
+      toast.success("Department budget deleted successfully!");
+      onBudgetDeleted();
+      setTimeout(() => {
+        onHide();
+      }, 500);
+    } catch (error) {
+      toast.error(error.message || "Failed to delete budget");
     } finally {
-      setDeleting(false);
+      setLoading(false);
     }
   };
+
+  if (!show) return null;
 
   return (
     <>
       {/* Blurred Backdrop */}
       <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(39,35,92,0.4)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          zIndex: 1040,
-        }}
-        onClick={onCancel}
+        className="delete-budget-backdrop"
+        onClick={onHide}
       />
 
       {/* Modal Container */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "95%",
-          maxWidth: "500px",
-          zIndex: 1050,
-        }}
-      >
-        <div
-          style={{
-            borderRadius: "0.5rem",
-            background: "#fff",
-            boxShadow: "0 8px 28px rgba(0,0,0,0.22)",
-            overflow: "hidden",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* HEADER - Fixed */}
-          <div
-            style={{
-              background: "#27235C",
-              color: "#fff",
-              padding: "13px 15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: "15px",
-              fontWeight: 600,
-              borderRadius: "0.5rem 0.5rem 0 0",
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                color: "#fff",
-                fontSize: 15,
-                fontWeight: 600,
-              }}
-            >
-              <i className="bi bi-exclamation-triangle"></i>
-              Confirm Delete
+      <div className="delete-budget-modal-wrapper">
+        <div className="delete-budget-modal-container">
+          {/* MODAL HEADER */}
+          <div className="delete-budget-modal-header">
+            <div className="delete-budget-header-title">
+              <i className="bi bi-trash-fill"></i>
+              Delete Department Budget
             </div>
             <button
               type="button"
-              onClick={onCancel}
-              disabled={deleting}
+              onClick={onHide}
+              disabled={loading}
               aria-label="Close"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: 18,
-                cursor: deleting ? "not-allowed" : "pointer",
-                opacity: deleting ? 0.7 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="delete-budget-close-btn"
             >
               <i className="bi bi-x-lg"></i>
             </button>
           </div>
 
-          {/* BODY */}
-          <div
-            style={{
-              padding: "20px",
-              background: "#fff",
-              textAlign: "center",
-            }}
-          >
-            {/* Warning Alert */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 20,
-              }}
-            >
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-                  borderRadius: "50%",
-                  background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <i
-                  className="bi bi-exclamation-triangle-fill"
-                  style={{ fontSize: 32, color: "#dc2626" }}
-                ></i>
-              </div>
-            </div>
-
-            <h5
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: "#1e293b",
-                marginBottom: 12,
-              }}
-            >
-              Delete Department Budget?
-            </h5>
-
-            <p
-              style={{
-                fontSize: 14,
-                color: "#64748b",
-                lineHeight: 1.6,
-                marginBottom: 16,
-              }}
-            >
-              Are you sure you want to delete this department budget?
+          {/* MODAL BODY */}
+          <div className="delete-budget-modal-body">
+            {/* Confirmation Question */}
+            <p className="delete-budget-confirmation-text">
+              Are you sure you want to permanently delete the budget for{" "}
+              <strong className="delete-budget-highlight">
+                {budget?.departmentName}
+              </strong>{" "}
+              (Fiscal Year: <strong>{budget?.fiscalYear}</strong>)?
             </p>
 
-            {budget && (
-              <div
-                style={{
-                  background: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: 8,
-                  padding: 12,
-                  marginBottom: 16,
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: "#1e293b",
-                    margin: 0,
-                  }}
-                >
-                  {budget.departmentName} - {budget.fiscalYear}
-                </p>
+            {/* Critical Warning Box */}
+            <div className="delete-budget-warning-box">
+              {/* Warning Header with Icon */}
+              <div className="delete-budget-warning-header">
+                <i className="bi bi-exclamation-triangle-fill"></i>
+                <span>Critical Warning</span>
               </div>
-            )}
 
-            <div
-              style={{
-                background: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: 8,
-                padding: 12,
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <i
-                className="bi bi-info-circle-fill"
-                style={{ fontSize: 16, color: "#dc2626", flexShrink: 0 }}
-              ></i>
-              <p
-                style={{
-                  fontSize: 13,
-                  color: "#991b1b",
-                  margin: 0,
-                  textAlign: "left",
-                  lineHeight: 1.5,
-                }}
-              >
-                <strong>Warning:</strong> This action cannot be undone. All
-                associated data will be permanently deleted.
+              {/* Warning Text */}
+              <p className="delete-budget-warning-text">
+                <strong>This action is PERMANENT and CANNOT be reversed!</strong>
+                <br />
               </p>
+
+              {/* Warning List */}
+              <ul className="delete-budget-warning-list">
+                <strong>Once deleted, this budget will:</strong>
+                <li>Be permanently removed from the system</li>
+                <li>Lose all allocation and utilization data</li>
+                <li>Cannot be recovered or restored</li>
+              </ul>
+            </div>
+
+            {/* Confirmation Input */}
+            <div className="delete-budget-input-section">
+              <label className="delete-budget-input-label">
+                Type <strong className="delete-budget-confirm-keyword">confirm</strong> to proceed:
+              </label>
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder="Type 'confirm' here"
+                disabled={loading}
+                className="delete-budget-input"
+              />
+            </div>
+
+            {/* Info Alert */}
+            <div className="delete-budget-info-alert">
+              <i className="bi bi-info-circle"></i>
+              <small>
+                <strong>Note:</strong> Please ensure this is the correct action
+                before proceeding.
+              </small>
             </div>
           </div>
 
-          {/* FOOTER - Fixed */}
-          <div
-            style={{
-              padding: "10px 15px",
-              borderTop: "1px solid #e2e8f0",
-              background: "#fff",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: 8,
-              borderBottomLeftRadius: "0.5rem",
-              borderBottomRightRadius: "0.5rem",
-              flexShrink: 0,
-            }}
-          >
+          {/* MODAL FOOTER - ACTION BUTTONS */}
+          <div className="delete-budget-modal-footer">
+            {/* Cancel Button */}
             <button
               type="button"
-              onClick={onCancel}
-              disabled={deleting}
-              style={{
-                background: "#6c757d",
-                border: "none",
-                color: "#fff",
-                fontWeight: 600,
-                padding: "7px 12px",
-                fontSize: 12,
-                borderRadius: 5,
-                cursor: deleting ? "not-allowed" : "pointer",
-                opacity: deleting ? 0.7 : 1,
-                transition: "all 0.2s ease",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-              onMouseEnter={(e) => {
-                if (!deleting) e.target.style.background = "#5a6268";
-              }}
-              onMouseLeave={(e) => {
-                if (!deleting) e.target.style.background = "#6c757d";
-              }}
+              onClick={onHide}
+              disabled={loading}
+              className="delete-budget-btn-cancel"
             >
-              <i className="bi bi-x-circle"></i>
-              Cancel
+              <i className="bi bi-arrow-left"></i> Cancel
             </button>
 
+            {/* Delete Button */}
             <button
               type="button"
-              onClick={handleConfirm}
-              disabled={deleting}
-              style={{
-                background: "linear-gradient(90deg, #dc2626 0%, #b91c1c 100%)",
-                border: "none",
-                color: "#fff",
-                fontWeight: 600,
-                padding: "7px 12px",
-                fontSize: 12,
-                borderRadius: 5,
-                boxShadow: "0 2px 8px rgba(220,38,38,0.25)",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                cursor: deleting ? "not-allowed" : "pointer",
-                opacity: deleting ? 0.85 : 1,
-                transition: "all 0.2s ease",
-                minWidth: 100,
-                justifyContent: "center",
-              }}
-              onMouseEnter={(e) => {
-                if (!deleting) e.target.style.opacity = 0.93;
-              }}
-              onMouseLeave={(e) => {
-                if (!deleting) e.target.style.opacity = 1;
-              }}
+              onClick={handleDelete}
+              disabled={loading || !isConfirmValid}
+              className={`delete-budget-btn-delete ${!isConfirmValid ? 'disabled' : ''}`}
             >
-              {deleting ? (
+              {loading ? (
                 <>
-                  <span
-                    style={{
-                      width: 14,
-                      height: 14,
-                      border: "2px solid #fff",
-                      borderTop: "2px solid #dc2626",
-                      borderRadius: "50%",
-                      animation: "spin 0.7s linear infinite",
-                      display: "inline-block",
-                      marginRight: 6,
-                    }}
-                  />
+                  <span className="delete-budget-spinner" />
                   Deleting...
-                  <style>{`
-                    @keyframes spin {
-                      0% { transform: rotate(0deg);}
-                      100% { transform: rotate(360deg);}
-                    }
-                  `}</style>
                 </>
               ) : (
                 <>
-                  <i className="bi bi-trash"></i>
-                  Delete
+                  <i className="bi bi-trash-fill"></i>
+                  Yes, Delete Permanently
                 </>
               )}
             </button>
