@@ -53,6 +53,7 @@ import DepartmentHeadBudgetView from "./pages/hr_operations/hr/compliance/Depart
 import TopPerformers from "./pages/performancemanagement/departmenthead/deptheadtopperformer";
 import ManagerDashboard from "./pages/dashboards/ManagerDashboard";
 import PerformanceManagerHome from "./pages/performancemanagement/manager/PerformanceManagerHome";
+import Nominations from "./pages/performancemanagement/employee/Nominations";
 import ManagerNomination from "./pages/performancemanagement/manager/ManagerNomination";
 import TeamLeadPage from "./pages/performancemanagement/manager/TeamLeadPage";
 import ManagerPerformanceDashboard from "./pages/performancemanagement/manager/ManagerPerformanceDashboard";
@@ -713,6 +714,16 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
               <UserAssignments />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/employee/dashboard/performance/nominations"
+        element={
+          <ProtectedRoute allowedRoles={["Employee"]}>
+            <DashboardLayout role="Employee">
+              <Nominations />
             </DashboardLayout>
           </ProtectedRoute>
         }

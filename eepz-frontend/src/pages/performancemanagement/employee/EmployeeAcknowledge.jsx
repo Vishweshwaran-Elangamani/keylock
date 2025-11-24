@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getPendingAcknowledgments, acknowledgeRating } from "../../../services/performancemanagement/hr/api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
- 
+
 const THEME = {
   primary: "#27235C",
   secondary: "#AC5098",
@@ -16,7 +17,7 @@ const THEME = {
   warning: "#F59E0B",
   danger: "#EF4444"
 };
- 
+
 export default function EmployeeAcknowledgment() {
   const [pendingRatings, setPendingRatings] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,11 +25,11 @@ export default function EmployeeAcknowledgment() {
   const [expandedRatingId, setExpandedRatingId] = useState(null);
   const [acknowledgingId, setAcknowledgingId] = useState(null);
   const [comments, setComments] = useState({});
- 
+
   useEffect(() => {
     fetchPendingAcknowledgments();
   }, []);
- 
+
   const fetchPendingAcknowledgments = async () => {
     setLoading(true);
     setError(null);
@@ -47,51 +48,53 @@ export default function EmployeeAcknowledgment() {
       setLoading(false);
     }
   };
-const handleAcknowledge = async (approvalId) => {
-  const comment = comments[approvalId];
- 
-  if (!comment || comment.trim().length < 10) {
-    toast.error("Please provide at least 10 characters in your comments");
-    return;
-  }
- 
-  setAcknowledgingId(approvalId);
-  try {
-    const res = await acknowledgeRating({
-      ApprovalId: approvalId,   // ✅ FIXED: PascalCase to match DTO
-      Comments: comment.trim()  // ✅ FIXED: PascalCase to match DTO
-    });
- 
-    if (res.data.success) {
-      toast.success("Rating acknowledged successfully!");
-      setPendingRatings(prev => prev.filter(r => r.approvalId !== approvalId));
-      setComments(prev => {
-        const updated = { ...prev };
-        delete updated[approvalId];
-        return updated;
-      });
+
+  const handleAcknowledge = async (approvalId) => {
+    const comment = comments[approvalId];
+
+    if (!comment || comment.trim().length < 10) {
+      toast.error("Please provide at least 10 characters in your comments");
+      return;
     }
-  } catch (err) {
-    console.error("Error acknowledging rating:", err);
-    const errorMsg = err.response?.data?.message || "Failed to acknowledge rating";
-    toast.error(errorMsg);
-  } finally {
-    setAcknowledgingId(null);
-  }
-};
- 
- 
+
+    setAcknowledgingId(approvalId);
+    try {
+      const res = await acknowledgeRating({
+        ApprovalId: approvalId,
+        Comments: comment.trim()
+      });
+
+      if (res.data.success) {
+        toast.success("Rating acknowledged successfully!");
+        setPendingRatings(prev => prev.filter(r => r.approvalId !== approvalId));
+        setComments(prev => {
+          const updated = { ...prev };
+          delete updated[approvalId];
+          return updated;
+        });
+      } else {
+        toast.error(res.data?.message || "Acknowledgment failed");
+      }
+    } catch (err) {
+      console.error("Error acknowledging rating:", err);
+      const errorMsg = err.response?.data?.message || "Failed to acknowledge rating";
+      toast.error(errorMsg);
+    } finally {
+      setAcknowledgingId(null);
+    }
+  };
+
   const toggleDetails = (approvalId) => {
     setExpandedRatingId(prev => prev === approvalId ? null : approvalId);
   };
- 
+
   const handleCommentChange = (approvalId, value) => {
     setComments(prev => ({
       ...prev,
       [approvalId]: value
     }));
   };
- 
+
   const getAvgRating = (competencies, key) => {
     if (!competencies || competencies.length === 0) return "-";
     const vals = competencies
@@ -101,80 +104,146 @@ const handleAcknowledge = async (approvalId) => {
     const total = vals.reduce((a, b) => a + b, 0);
     return (total / vals.length).toFixed(2);
   };
- 
-  return (
-    <div style={styles.container}>
-      <ToastContainer position="top-right" autoClose={3000} />
- 
-      <div style={styles.header}>
-        <h2 style={styles.title}>Performance Rating Acknowledgment</h2>
-        <p style={styles.subtitle}>Review and acknowledge your performance ratings</p>
+
+  // Breadcrumb component using react-router Link (clickable home)
+  const Breadcrumbs = () => (
+    <div style={breadcrumbStyles.wrapper}>
+      <div style={breadcrumbStyles.inner}>
+        <Link to="/employee/dashboard" style={breadcrumbStyles.link}>
+          <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard")}
+              style={{ cursor: "pointer" }}>
+              <i className="bi bi-house-door" style={{ fontSize: "12px" }}></i>
+            </li>
+        </Link>
+
+        <span style={breadcrumbStyles.sep}>›</span>
+
+        <span style={{ ...breadcrumbStyles.current, fontSize: "11px", fontStyle:"bold", color: "purple" }}>Performance Rating Acknowledgment</span>
       </div>
- 
+    </div>
+  );
+
+  return (
+    <div style={{ ...styles.container, ...styles.pageWrapper }}>
+      <ToastContainer position="top-right" autoClose={3000} />
+
+      {/* Breadcrumbs (compact wrapper to remove top gap) */}
+      <div style={styles.breadcrumbWrapper}>
+        <Breadcrumbs />
+      </div>
+
+      {/* retained loading / error / content flow */}
       {loading && (
         <div style={styles.loadingCard}>
           <div style={styles.spinner}></div>
           <p>Loading your ratings...</p>
         </div>
       )}
- 
+
       {error && (
         <div style={styles.errorCard}>
           <p>{error}</p>
         </div>
       )}
- 
+
       {!loading && !error && (
         <>
           {pendingRatings.length === 0 ? (
             <div style={styles.emptyState}>
-              <div style={styles.emptyIcon}>✅</div>
+              <div style={styles.emptyIcon}></div>
               <p style={styles.emptyText}>No pending acknowledgments</p>
               <p style={styles.emptySubtext}>You have acknowledged all your performance ratings</p>
             </div>
           ) : (
             <div style={styles.ratingsContainer}>
               {pendingRatings.map((rating) => (
-                <div key={rating.approvalId} style={styles.ratingCard}>
+                <div key={rating.approvalId} style={{ ...styles.ratingCard, ...styles.compactCard }}>
                   {/* Card Header */}
                   <div style={styles.cardHeader}>
                     <div>
-                      <h3 style={styles.projectName}>{rating.projectName}</h3>
-                      <p style={styles.approvedDate}>
-                        Approved on: {new Date(rating.approvedAt).toLocaleString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
+                      <h3
+                        style={{
+                          ...styles.projectName,
+                          textAlign: "left",     // ✅ force left alignment
+                          marginBottom: "8px"    // optional: spacing below title
+                        }}
+                      >
+                        {rating.projectName}
+                      </h3>
+                      <p
+                        style={{
+                          ...styles.approvedDate,
+                          textAlign: "left",     // ✅ aligns date text left as well
+                          marginTop: 0           // optional: remove extra gap
+                        }}
+                      >
+                        Approved on:{" "}
+                        {new Date(rating.approvedAt).toLocaleString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })}
                       </p>
                     </div>
+
                     <span style={styles.statusBadge}>Pending Acknowledgment</span>
                   </div>
- 
+
                   {/* Summary Ratings */}
                   <div style={styles.summarySection}>
-                    <div style={styles.summaryItem}>
+                    <div
+                      style={{
+                        ...styles.summaryItem,
+                        border: "1px solid black",   // ✅ light gray border
+                        borderRadius: "8px",           // ✅ rounded corners
+                        padding: "12px",               // ✅ spacing inside card
+                        margin: "8px",                 // ✅ spacing between cards
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)" // optional: subtle shadow
+                      }}
+                    >
                       <span style={styles.summaryLabel}>Your Average Rating</span>
                       <span style={styles.summaryValue}>
                         {getAvgRating(rating.competencies, "employeeRating")}
                       </span>
                     </div>
-                    <div style={styles.summaryItem}>
+
+                    <div
+                      style={{
+                        ...styles.summaryItem,
+                        border: "1px solid black",
+                        borderRadius: "8px",
+                        padding: "12px",
+                        margin: "8px",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                      }}
+                    >
                       <span style={styles.summaryLabel}>L1 Average Rating</span>
                       <span style={styles.summaryValue}>
                         {getAvgRating(rating.competencies, "l1Rating")}
                       </span>
                     </div>
-                    <div style={styles.summaryItem}>
+
+                    <div
+                      style={{
+                        ...styles.summaryItem,
+                        border: "1px solid black",
+                        borderRadius: "8px",
+                        padding: "12px",
+                        margin: "8px",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                      }}
+                    >
                       <span style={styles.summaryLabel}>L2 Average Rating</span>
                       <span style={styles.summaryValue}>
                         {getAvgRating(rating.competencies, "l2Rating")}
                       </span>
                     </div>
                   </div>
- 
+
                   {/* View Details Button */}
                   <button
                     onClick={() => toggleDetails(rating.approvalId)}
@@ -182,11 +251,11 @@ const handleAcknowledge = async (approvalId) => {
                   >
                     {expandedRatingId === rating.approvalId ? "Hide Details" : "View Details"}
                   </button>
- 
+
                   {/* Expanded Details */}
                   {expandedRatingId === rating.approvalId && (
                     <div style={styles.detailsSection}>
-                      <h4 style={styles.detailsTitle}>📊 Competency Details</h4>
+                      <h4 style={styles.detailsTitle}>Competency Details</h4>
                       <div style={styles.tableWrapper}>
                         <table style={styles.table}>
                           <thead>
@@ -212,14 +281,14 @@ const handleAcknowledge = async (approvalId) => {
                                   </strong>
                                 </td>
                                 <td style={styles.td}>{comp.employeeComments || "-"}</td>
-                                <td style={styles.td}>{comp.l1ReviewerName}</td>
+                                <td style={styles.td}>{comp.l1ReviewerName || "-"}</td>
                                 <td style={styles.td}>
                                   <strong style={{ color: THEME.accent }}>
                                     {comp.l1Rating || "-"}
                                   </strong>
                                 </td>
                                 <td style={styles.td}>{comp.l1Comments || "-"}</td>
-                                <td style={styles.td}>{comp.l2ReviewerName}</td>
+                                <td style={styles.td}>{comp.l2ReviewerName || "-"}</td>
                                 <td style={styles.td}>
                                   <strong style={{ color: THEME.accent }}>
                                     {comp.l2Rating || "-"}
@@ -233,10 +302,12 @@ const handleAcknowledge = async (approvalId) => {
                       </div>
                     </div>
                   )}
- 
+
                   {/* Acknowledgment Section */}
                   <div style={styles.acknowledgmentSection}>
-                    <h4 style={styles.acknowledgmentTitle}>✍️ Your Acknowledgment</h4>
+                    <h4 style={{ ...styles.acknowledgmentTitle, color: "rgb(39, 35, 92)" }}>
+                      Your Acknowledgment
+                    </h4>
                     <p style={styles.acknowledgmentSubtext}>
                       Please provide your comments or justification (minimum 10 characters):
                     </p>
@@ -260,7 +331,7 @@ const handleAcknowledge = async (approvalId) => {
                       }}
                       disabled={acknowledgingId === rating.approvalId}
                     >
-                      {acknowledgingId === rating.approvalId ? "Acknowledging..." : "✓ Acknowledge Rating"}
+                      {acknowledgingId === rating.approvalId ? "Acknowledging..." : "Acknowledge Rating"}
                     </button>
                   </div>
                 </div>
@@ -272,31 +343,72 @@ const handleAcknowledge = async (approvalId) => {
     </div>
   );
 }
- 
+
+/* Breadcrumb inline styles */
+const breadcrumbStyles = {
+  wrapper: {
+    marginBottom: "8px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start"
+  },
+  inner: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    background: "transparent",
+    padding: "4px 0"
+  },
+  link: {
+    display: "flex",
+    alignItems: "center",
+    textDecoration: "none",
+    color: THEME.primary,
+    fontWeight: 300,
+    marginRight: "6px"
+  },
+  sep: {
+    color: THEME.primary,
+    fontWeight: 700
+  },
+  current: {
+    fontSize: 16,
+    color: THEME.primary,
+    fontWeight: 700
+  }
+};
+
+/* Styles object (includes compact adjustments) */
 const styles = {
   container: {
-    padding: "32px",
+    padding: "0px 32px",
     maxWidth: "1400px",
     margin: "0 auto",
     backgroundColor: THEME.background,
     minHeight: "100vh",
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
   },
-  header: {
-    marginBottom: "32px",
-    textAlign: "center"
+
+  /* --- NEW: page wrapper to remove top gap and push content up --- */
+  pageWrapper: {
+    paddingTop: "8px",   // bring content up (was 32px)
+    marginTop: "0px"
   },
-  title: {
-    fontSize: "32px",
-    fontWeight: "700",
-    color: THEME.primary,
-    margin: 0
+
+  /* --- NEW: breadcrumb wrapper to ensure reduced spacing --- */
+  breadcrumbWrapper: {
+    marginTop: "0px",
+    paddingTop: "0px",
+    marginBottom: "12px"
   },
-  subtitle: {
-    fontSize: "16px",
-    color: THEME.textLight,
-    marginTop: "8px"
+
+  /* --- NEW: compact card adjustments to reduce vertical density --- */
+  compactCard: {
+    paddingTop: "12px",
+    paddingBottom: "12px",
+    marginTop: "0px"
   },
+
   loadingCard: {
     backgroundColor: THEME.card,
     padding: "48px",
@@ -304,15 +416,7 @@ const styles = {
     textAlign: "center",
     boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
   },
-  // spinner: {
-  //   width: "40px",
-  //   height: "40px",
-  //   border: `4px solid ${THEME.border}`,
-  //   borderTop: `4px solid ${THEME.primary}`,
-  //   borderRadius: "50%",
-  //   animation: "spin 1s linear infinite",
-  //   margin: "0 auto 16px"
-  // },
+  // spinner: { ... } // optional spinner styles
   errorCard: {
     backgroundColor: "#FEE2E2",
     color: THEME.danger,
@@ -344,7 +448,7 @@ const styles = {
   ratingsContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: "24px"
+    gap: "18px"
   },
   ratingCard: {
     backgroundColor: THEME.card,
@@ -357,20 +461,20 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: "20px",
-    paddingBottom: "20px",
+    marginBottom: "16px",
+    paddingBottom: "12px",
     borderBottom: `2px solid ${THEME.border}`
   },
   projectName: {
-    fontSize: "24px",
+    fontSize: "22px",
     fontWeight: "700",
     color: THEME.primary,
     margin: 0
   },
   approvedDate: {
-    fontSize: "14px",
+    fontSize: "13px",
     color: THEME.textLight,
-    marginTop: "8px"
+    marginTop: "6px"
   },
   statusBadge: {
     padding: "8px 16px",
@@ -383,12 +487,12 @@ const styles = {
   summarySection: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gap: "20px",
-    marginBottom: "24px"
+    gap: "16px",
+    marginBottom: "18px"
   },
   summaryItem: {
     backgroundColor: THEME.background,
-    padding: "16px",
+    padding: "12px",
     borderRadius: "8px",
     textAlign: "center"
   },
@@ -396,12 +500,12 @@ const styles = {
     display: "block",
     fontSize: "13px",
     color: THEME.textLight,
-    marginBottom: "8px",
+    marginBottom: "6px",
     fontWeight: "600"
   },
   summaryValue: {
     display: "block",
-    fontSize: "24px",
+    fontSize: "20px",
     fontWeight: "700",
     color: THEME.secondary
   },
@@ -415,17 +519,17 @@ const styles = {
     fontSize: "14px",
     fontWeight: "600",
     cursor: "pointer",
-    marginBottom: "20px",
+    marginBottom: "14px",
     transition: "all 0.2s"
   },
   detailsSection: {
-    marginBottom: "24px"
+    marginBottom: "16px"
   },
   detailsTitle: {
-    fontSize: "18px",
+    fontSize: "16px",
     fontWeight: "700",
     color: THEME.primary,
-    marginBottom: "16px"
+    marginBottom: "12px"
   },
   tableWrapper: {
     overflowX: "auto",
@@ -435,10 +539,10 @@ const styles = {
   table: {
     width: "100%",
     borderCollapse: "collapse",
-    minWidth: "1200px"
+    minWidth: "1100px"
   },
   th: {
-    padding: "12px",
+    padding: "10px",
     textAlign: "left",
     backgroundColor: `${THEME.primary}10`,
     fontWeight: "600",
@@ -450,18 +554,18 @@ const styles = {
     borderBottom: `1px solid ${THEME.border}`
   },
   td: {
-    padding: "12px",
+    padding: "10px",
     fontSize: "13px",
     color: THEME.text
   },
   acknowledgmentSection: {
     backgroundColor: THEME.background,
-    padding: "24px",
+    padding: "20px",
     borderRadius: "8px",
     border: `2px solid ${THEME.success}`
   },
   acknowledgmentTitle: {
-    fontSize: "18px",
+    fontSize: "16px",
     fontWeight: "700",
     color: THEME.success,
     marginBottom: "8px"
@@ -469,7 +573,7 @@ const styles = {
   acknowledgmentSubtext: {
     fontSize: "14px",
     color: THEME.textLight,
-    marginBottom: "16px"
+    marginBottom: "12px"
   },
   textarea: {
     width: "100%",
@@ -487,20 +591,18 @@ const styles = {
     fontSize: "12px",
     color: THEME.textLight,
     textAlign: "right",
-    marginBottom: "16px"
+    marginBottom: "12px"
   },
   acknowledgeButton: {
     width: "100%",
-    padding: "14px",
+    padding: "12px",
     backgroundColor: THEME.success,
     color: "#fff",
     border: "none",
     borderRadius: "8px",
-    fontSize: "16px",
+    fontSize: "15px",
     fontWeight: "700",
     cursor: "pointer",
     transition: "all 0.2s"
   }
 };
- 
- 

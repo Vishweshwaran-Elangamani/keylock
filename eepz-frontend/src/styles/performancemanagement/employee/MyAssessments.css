@@ -453,7 +453,7 @@
   }
   
   .empassper-table thead {
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: rgba(39, 35, 92, 0.03);
     position: sticky;
     top: 0;
     z-index: 5;
@@ -618,7 +618,7 @@
 /* ============================================================
    MODAL - UPDATED FOR INCREASED HEIGHT & SMALLER HEADER
    ============================================================ */
-   .modal-overlay {
+   .empassper-modal-overlay {
     position: fixed;
     top: 0;
     left: 250px;
@@ -634,7 +634,7 @@
     backdrop-filter: blur(4px);
   }
   
-  .modal-content {
+  .empassper-modal-content {
     background-color: var(--card);
     border-radius: 8px;
     max-width: 1100px;  /* Increased from 950px */
@@ -648,7 +648,7 @@
   
   /* Form Header - REDUCED HEIGHT */
 /* Form Header - REDUCED HEIGHT FOR LOGO SECTION */
-.form-header {
+.empass-form-header {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -659,7 +659,7 @@
   min-height: auto;             /* Remove any minimum height constraint */
 }
 
-.logo-section {
+.empass-logo-section {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -668,15 +668,15 @@
   justify-content: center;      /* Center content vertically */
 }
 
-.logo-small {
+.empass-logo-small {
   height: 22px;                 /* Smaller logo height */
   width: auto;
   object-fit: contain;
   display: block;               /* Remove any extra spacing */
 }
 
-.appraisal-label {
-  font-size: 7px;               /* Smaller text */
+.empass-appraisal-label {
+  font-size: 10px;               /* Smaller text */
   font-weight: 700;
   color: var(--primary);
   text-transform: uppercase;
@@ -686,14 +686,14 @@
   padding: 0;                   /* Remove any padding */
 }
 
-.form-title-container {
+.empass-form-title-container {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;      /* Center vertically */
 }
 
-.form-title {
+.empass-form-title {
   font-size: 16px;
   font-weight: 700;
   margin: 0;
@@ -701,14 +701,14 @@
   line-height: 1.2;
 }
 
-.form-subtitle {
+.empass-form-subtitle {
   font-size: 11px;
   color: var(--text-light);
   margin: 0;
   line-height: 1.2;
 }
 
-.form-divider {
+.empass-form-divider {
   height: 1px;
   background: var(--border);
   margin: 0;
@@ -716,7 +716,7 @@
 }
 
   
-  .logo-section {
+  .empass-logo-section {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -724,13 +724,13 @@
     flex-shrink: 0;
   }
   
-  .logo-small {
+  .empass-logo-small {
     height: 28px;                 /* Reduced from 40px */
     width: auto;
     object-fit: contain;
   }
   
-  .appraisal-label {
+  .empass-appraisal-label {
     font-size: 9px;               /* Reduced from 11px */
     font-weight: 700;
     color: var(--primary);
@@ -738,24 +738,24 @@
     letter-spacing: 0.5px;
   }
   
-  .form-title-container {
+  .empass-form-title-container {
     flex: 1;
   }
   
-  .form-title {
+  .empass-form-title {
     font-size: 18px;              /* Reduced from 22px */
     font-weight: 700;
     margin: 0 0 2px 0;            /* Reduced from 4px */
     color: var(--primary);
   }
   
-  .form-subtitle {
+  .empass-form-subtitle {
     font-size: 12px;              /* Reduced from 14px */
     color: var(--text-light);
     margin: 0;
   }
   
-  .form-divider {
+  .empass-form-divider {
     height: 1px;                  /* Reduced from 2px */
     background: var(--border);
     margin: 0;
@@ -763,7 +763,7 @@
   }
   
   /* Form Body - INCREASED HEIGHT */
-  .form-body {
+  .empass-form-body {
     flex: 1;
     padding: 20px 28px;           /* Reduced from 32px for more space */
     background: #FFFFFF;
@@ -771,37 +771,37 @@
     min-height: 400px;            /* Added minimum height */
   }
   
-  .form-body::-webkit-scrollbar {
+  .empass-form-body::-webkit-scrollbar {
     width: 8px;
   }
   
-  .form-body::-webkit-scrollbar-track {
+  .empass-form-body::-webkit-scrollbar-track {
     background: #F1F5F9;
   }
   
-  .form-body::-webkit-scrollbar-thumb {
+  .empass-form-body::-webkit-scrollbar-thumb {
     background: #CBD5E1;
     border-radius: 4px;
   }
   
-  .form-body::-webkit-scrollbar-thumb:hover {
+  .empass-form-body::-webkit-scrollbar-thumb:hover {
     background: #94A3B8;
   }
   
-  .form-table {
+  .empass-form-table {
     width: 100%;
     border-collapse: collapse;
     border: 2px solid var(--primary);
   }
   
-  .form-table thead {
+  .empass-form-table thead {
     position: sticky;
     top: 0;
     z-index: 10;
     background: var(--primary);   /* Ensure sticky header has background */
   }
   
-  .form-table th {
+  .empass-form-table th {
     padding: 10px;                /* Reduced from 12px */
     text-align: left;
     background: var(--primary);
@@ -813,11 +813,11 @@
     border-right: 1px solid var(--border);
   }
   
-  .form-table tr {
+  .empass-form-table tr {
     background: #FFFFFF;
   }
   
-  .form-table td {
+  .empass-form-table td {
     padding: 10px;                /* Reduced from 12px */
     font-size: 12px;              /* Reduced from 13px */
     color: var(--text);
@@ -886,7 +886,7 @@
     flex-shrink: 0;
   }
   
-  .btn-cancel {
+  .empass-btn-cancel {
     padding: 10px 24px;           /* Reduced from 12px 28px */
     background: #6B7280;
     color: #fff;
@@ -898,7 +898,7 @@
     transition: all 0.3s;
   }
   
-  .btn-cancel:hover {
+  .empass-btn-cancel:hover {
     background: #4B5563;
   }
   
@@ -933,12 +933,12 @@
       padding: 16px;
     }
   
-    .modal-overlay {
+    .empassper-modal-overlay {
       left: 0;
       width: 100vw;
     }
     
-    .modal-content {
+    .empassper-modal-content {
       max-height: 98vh;           /* Even taller on mobile */
     }
   
@@ -980,13 +980,13 @@
       width: 100%;
     }
   
-    .form-header {
+    .empass-form-header {
       flex-direction: column;
       align-items: flex-start;
       padding: 10px 16px;         /* Further reduced for mobile */
     }
   
-    .form-body {
+    .empass-form-body {
       padding: 12px 16px;         /* Reduced for mobile */
     }
   }
@@ -1141,12 +1141,12 @@
 .empassper-btn-submit, .empassper-btn-view { padding: 8px 12px; }
 
 /* Modal: reduce header/footer sizes and table paddings inside modal also */
-.modal-content { max-width: 1000px; }
-.form-header { padding: 8px 14px; }
-.form-title { font-size: 16px; }
-.form-subtitle { font-size: 11px; }
-.form-body { padding: 12px 16px; min-height: 320px; }
-.form-table th, .form-table td { padding: 8px; font-size: 12px; }
+.empassper-modal-content { max-width: 1000px; }
+.empass-form-header { padding: 8px 14px; }
+.empass-form-title { font-size: 16px; }
+.empass-form-subtitle { font-size: 11px; }
+.empass-form-body { padding: 12px 16px; min-height: 320px; }
+.empass-form-table th, .empass-form-table td { padding: 8px; font-size: 12px; }
 
 /* Form inputs smaller */
 .form-select { padding: 6px 8px; font-size: 12px; }
@@ -1218,7 +1218,7 @@
 
 /* 8) Optional: slightly reduce table header contrast so the sticky bar looks less heavy */
 .empassper-table thead {
-  background: linear-gradient(135deg, rgba(39,35,92,0.95), rgba(59,40,110,0.95));
+  background: rgba(39, 35, 92, 0.03);
 }
 
 /* ====== DENSE MODE (optional) - enable if you still want even more rows visible ====== */
@@ -1242,7 +1242,7 @@
   top: calc(var(--empassper-top-offset));
   z-index: 999;
   box-shadow: 0 4px 8px rgba(0,0,0,0.06);
-  background: linear-gradient(135deg, var(--primary), var(--accent));
+  background: rgb(8, 8, 95);
 }
 
 .empassper-table thead th {
@@ -1360,7 +1360,7 @@
   padding: 9px 14px;
   border-radius: 6px;
   border: none;
-  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+ background: rgb(8, 8, 95);
   color: #fff;
   cursor: pointer;
 }
@@ -1374,7 +1374,7 @@
    FULL-SCREEN MODAL OVERLAY FIX (OVERRIDES ALL PREVIOUS RULES)
    ============================================================ */
 
-.modal-overlay {
+.empassper-modal-overlay {
   position: fixed !important;       /* Always attach to viewport */
   inset: 0 !important;              /* Full screen coverage (top/left/right/bottom = 0) */
   width: 100vw !important;
@@ -1394,7 +1394,7 @@
 }
 
 /* Modal box itself */
-.modal-content {
+.empassper-modal-content {
   position: relative !important;
   z-index: 1000000 !important;      /* content above overlay */
   background: var(--card);
@@ -1407,3 +1407,149 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45) !important;
 }
 
+/* Breadcrumb — tighter, smaller, always overridden */
+.empassper-breadcrumbs {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+}
+
+.empassper-breadcrumbs ol {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
+}
+
+.empassper-breadcrumbs li {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Non-active breadcrumb items */
+.empassper-breadcrumbs .breadcrumb-link {
+  font-size: 11px !important;      /* forced */
+  color: #97247e !important;        /* forced color */
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  line-height: 1 !important;
+}
+
+/* separator */
+.empassper-breadcrumbs .breadcrumb-sep {
+  color: #97247e !important;
+  font-size: 11px !important;
+  opacity: 0.8 !important;
+  margin: 0 4px !important;
+}
+
+/* Current breadcrumb text */
+.empassper-breadcrumbs .breadcrumb-current {
+  font-size: 11px !important;       /* reduced size */
+  color: #97247e !important;        /* exact required color */
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}
+
+/* Icon size */
+.empassper-breadcrumbs .bi {
+  font-size: 13px !important;        /* smaller icon */
+  vertical-align: middle !important;
+}
+
+/* Remove top spacing above breadcrumb */
+.empassper-header-section {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+/* Pill tabs container */
+.empassper-pill-tabs-wrapper {
+  display: flex;
+  justify-content: flex-start; /* center horizontally */
+  padding: 12px 0 18px;
+}
+
+/* Outer pill background (nav) */
+.empassper-pill-tabs {
+  background: #27235c;          /* deep/navy purple from your earlier note */
+  padding: 6px;
+  border-radius: 999px;        /* large pill */
+  display: inline-flex;
+  gap: 6px;
+  box-shadow: 0 6px 18px rgba(39, 35, 92, 0.18);
+}
+
+/* Individual button inside pill */
+.empassper-pill {
+  background: transparent;
+  border: none;
+  padding: 8px 26px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;              /* default text color for inactive */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  outline: none;
+}
+
+/* active state: white inner pill with navy text */
+.empassper-pill--active {
+  background: #ffffff;
+  color: #27235c !important;
+  box-shadow: 0 4px 10px rgba(39, 35, 92, 0.12);
+  border-radius: 100px !important;
+}
+
+/* small count text on the right (keeps parentheses) */
+.empassper-pill-count {
+  font-weight: 700;
+  font-size: 12px;
+  opacity: 0.95;
+}
+
+/* responsive tweaks */
+@media (max-width: 520px) {
+  .empassper-pill {
+    padding: 7px 14px;
+    font-size: 12px;
+    
+  }
+  .empassper-pill-count {
+    font-size: 11px;
+  }
+}
+
+/* put this with your modal CSS (where .empassper-modal-content is defined) */
+.empassper-modal-content {
+  display: flex;
+  flex-direction: column;
+  width: 95%;               /* keep whatever width you already have */
+  max-height: 90vh;         /* crucial: limits the modal height so inner area can scroll */
+  overflow: hidden;         /* outer container should not scroll */
+  border-radius: 8px;
+}
+/* the element that wraps the table in your JSX is .form-body */
+.emppass-form-body {
+  overflow: auto; 
+  /* Reserve space for the modal header + divider + footer.
+     Adjust the subtraction value to match your actual header/footer heights. */
+  max-height: calc(90vh - 1px);
+  /* optional: keep layout neat */
+  padding: 0 20px;
+}
+.emppass-form-table thead th {
+  position: sticky;
+  top: 0;                        /* sticks to top of the .form-body scroll area */
+  z-index: 5;                    /* keep it above table rows */
+  background: var(--header-bg, #2b2350); /* ensure header background hides content behind */
+}

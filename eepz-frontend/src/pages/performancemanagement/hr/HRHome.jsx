@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
+ 
 export default function HRHome() {
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState(null);
-
+ 
   const cards = [
     {
       title: "Initiate Form",
@@ -23,6 +23,7 @@ export default function HRHome() {
       bg: "#EBFAF4",
       path: "/hr/dashboard/performance/create"
     },
+   
     {
       title: "Form Status",
       description: "Check review form submissions and status.",
@@ -56,26 +57,25 @@ export default function HRHome() {
       path: "/hr/dashboard/performance/nominations"
     }
   ];
-
+ 
   return (
     <div className="eepz-hrhome-bg">
       <div className="eepz-hrhome-container">
-      
-<h1 >
+
+        <h1 >
   Performance & Nomination Management
 </h1>
 <p style={{ color : "gray",  paddingBottom: "10px" }}>Initiate , Review , Track the form and nominations </p>
-
-        
+ 
+       
         <div className="eepz-hrhome-card-grid">
           {cards.map((card, idx) => (
             <div
               key={card.title}
               className={`eepz-hrhome-card${hoveredCard === idx ? " hovered" : ""}`}
               style={{
-                borderColor: hoveredCard === idx ? "#ac5098" : "#eee",
-                transition: "border-color 0.2s, box-shadow 0.18s, transform 0.18s"
-              }}
+                  transition: "border-color 0.2s, box-shadow 0.18s, transform 0.18s"
+                }}
               onMouseEnter={() => setHoveredCard(idx)}
               onMouseLeave={() => setHoveredCard(null)}
               onClick={() => navigate(card.path)}
@@ -132,27 +132,39 @@ export default function HRHome() {
   justify-items: stretch;
 }
 .eepz-hrhome-card {
-  background: #fff;
-  border: 2px solid #eee;
-  border-radius: 18px;
-  height: 170px;
-  min-width: 0;
-  width: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #97247E; /* unified card border color */
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
   position: relative;
-  align-items: flex-start;
-  cursor: pointer;
-  transition: box-shadow 0.18s, border 0.2s, transform 0.18s;
-  padding: 28px 20px 22px 20px;
-  box-shadow: 0 2px 10px rgba(40,37,92,0.05);
-  outline: none;
+  overflow: hidden;
 }
-.eepz-hrhome-card.hovered,
-.eepz-hrhome-card:focus {
-  border-color: #ac5098;
-  box-shadow: 0 6px 32px rgba(51,18,82,0.09), 0 2px 6px rgba(39,35,92,0.08);
-  transform: translateY(-1px) scale(1.018);
+ 
+.eepz-hrhome-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+ 
+.eepz-hrhome-card:hover::before {
+  opacity: 1;
+}
+ 
+.eepz-hrhome-card:hover {
+  transform: translateX(8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #97247e;
 }
 .hrhome-icon {
   height: 48px;
@@ -164,6 +176,8 @@ export default function HRHome() {
   font-size: 2rem;
   margin-bottom: 13px;
   box-shadow: 0 1px 3px rgba(39, 35, 92, 0.03);
+  margin: 0; /* remove any default margin */
+  align-self: flex-start; /* left align icon */
 }
 .hrhome-card-content {
   flex: 1;
@@ -206,3 +220,5 @@ export default function HRHome() {
     </div>
   );
 }
+ 
+ 

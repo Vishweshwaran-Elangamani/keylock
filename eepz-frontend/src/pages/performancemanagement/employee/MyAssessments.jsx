@@ -1,12 +1,4 @@
-// Paste your JSX component code below (replace this entire file contents with your .jsx file)
 
-/*
-  MyAssessments_updated.jsx
-  - Updated: search box now uses a separate Search button and Enter key to trigger filtering
-  - Fixed: Form Type select default value now matches filter logic ("All")
-  - Added: local input state `searchInput` so typing doesn't immediately filter results
-  - Minor: Enter key submits search, and Search button placed next to input
-*/
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -15,7 +7,6 @@ import api from "../../../services/performancemanagement/hr/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
 
-// Utility function to get days and hours left
 function getTimeLeft(deadline) {
   const now = new Date();
   const dl = new Date(deadline);
@@ -26,10 +17,7 @@ function getTimeLeft(deadline) {
   return { days, hours, expired: ms === 0 };
 }
 
-/**
- * Breadcrumbs component
- * items: [{ label: string, to: string }]
- */
+
 function Breadcrumbs({ items = [] }) {
   return (
     <nav aria-label="breadcrumb" className="empassper-breadcrumbs">
@@ -290,14 +278,14 @@ function MyAssessments() {
 
   const renderTable = (data) => (
     <div className="empassper-table-container">
-      <table className="empassper-table">
+      <table className="empassper-table" style={{ borderCollapse: "separate", borderSpacing: 0, width: "100%", border:"1px solid black", borderRadius:"9px"}}>
         <thead>
           <tr>
-            <th>Form Name</th>
-            <th>Type</th>
-            <th>Deadline</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th style={{ borderTopLeftRadius: "8px"}}>FORM NAME</th>
+            <th>TYPE</th>
+            <th>DEADLINE</th>
+            <th>STATUS</th>
+            <th style={{ borderTopRightRadius: "8px"}}>SUBMISSION</th>
           </tr>
         </thead>
         <tbody>
@@ -306,8 +294,8 @@ function MyAssessments() {
               <tr key={assignment.assignmentId}>
                 <td>
                   <div className="empassper-form-name">
-                    <i className="bi bi-file-earmark-text"></i>
-                    <strong>{assignment.formName}</strong>
+                    {/* <i className="bi bi-file-earmark-text"></i> */}
+                    {assignment.formName}
                   </div>
                 </td>
                 <td>
@@ -381,7 +369,7 @@ function MyAssessments() {
             {/* Breadcrumbs */}
             <Breadcrumbs
               items={[
-                { label: <i className="bi bi-house-fill" aria-hidden="true"></i>, to: "/employee/dashboard", isIcon: true },
+                { label:  <i className="bi bi-house-door"></i>, to: "/employee/dashboard", isIcon: true },
                 { label: "Performance Management", to: "/employee/dashboard/performance" },
                 { label: <strong>My Performance Assessments</strong>, to: "/employee/dashboard/performance/my-assessments" }
               ]}
@@ -459,59 +447,36 @@ function MyAssessments() {
         />
       </div>
 
-      {/* Statistics Cards */}
-      <div className="empassper-stats-grid">
-        <div className="empassper-stat-card empassper-stat-pending">
-          <div className="empassper-stat-icon">
-            <i className="bi bi-hourglass-split"></i>
-          </div>
-          <div className="empassper-stat-content">
-            <h3 className="empassper-stat-value">{pendingAssignments.length}</h3>
-            <p className="empassper-stat-label">Pending</p>
-          </div>
-        </div>
-        <div className="empassper-stat-card empassper-stat-completed">
-          <div className="empassper-stat-icon">
-            <i className="bi bi-check-circle-fill"></i>
-          </div>
-          <div className="empassper-stat-content">
-            <h3 className="empassper-stat-value">{completedAssignments.length}</h3>
-            <p className="empassper-stat-label">Completed</p>
-          </div>
-        </div>
-        <div className="empassper-stat-card empassper-stat-total">
-          <div className="empassper-stat-icon">
-            <i className="bi bi-list-check"></i>
-          </div>
-          <div className="empassper-stat-content">
-            <h3 className="empassper-stat-value">{assignments.length}</h3>
-            <p className="empassper-stat-label">Total</p>
-          </div>
-        </div>
-      </div>
 
       {/* Tab Navigation */}
-      <div className="empassper-tab-container">
-        <button
-          className={`empassper-tab-button ${activeTab === "pending" ? "active" : ""}`}
-          onClick={() => setActiveTab("pending")}
-        >
-          <i className="bi bi-hourglass-split"></i>
-          Pending Assessments
-          <span className="empassper-tab-badge">{filteredPending.length}</span>
-        </button>
-        <button
-          className={`empassper-tab-button ${activeTab === "completed" ? "active" : ""}`}
-          onClick={() => setActiveTab("completed")}
-        >
-          <i className="bi bi-check-circle-fill"></i>
-          Completed Assessments
-          <span className="empassper-tab-badge">{filteredCompleted.length}</span>
-        </button>
-      </div>
+      {/* Pill-style Tabs (replace previous .empassper-tab-container block) */}
+  <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
+  <div className="empassper-pill-tabs">
+    <button
+      role="tab"
+      aria-pressed={activeTab === "pending"}
+      className={`empassper-pill ${activeTab === "pending" ? "empassper-pill--active" : ""}`}
+      onClick={() => setActiveTab("pending")}
+    >
+      <span className="empassper-pill-text">Pending Assessments</span>
+      <span className="empassper-pill-count">({filteredPending.length})</span>
+    </button>
+
+    <button
+      role="tab"
+      aria-pressed={activeTab === "completed"}
+      className={`empassper-pill ${activeTab === "completed" ? "empassper-pill--active" : ""}`}
+      onClick={() => setActiveTab("completed")}
+    >
+      <span className="empassper-pill-text">Completed Assessments</span>
+      <span className="empassper-pill-count">({filteredCompleted.length})</span>
+    </button>
+  </div>
+</div>
+
 
       {/* Content */}
-      <div className="empassper-card">
+      
         {activeTab === "pending" && (
           <>
             {filteredPending.length > 0 ? (
@@ -549,149 +514,192 @@ function MyAssessments() {
             )}
           </>
         )}
-      </div>
-
-      {/* Modal - KEEPING ORIGINAL FORMAT */}
-      {showModal && currentAssignment && (
+      
+{/*-------------------------------------------------------MODAL---------------------------------- */}
+    {showModal && currentAssignment && (
+      <div
+        className="empassper-modal-overlay"
+        onClick={() => !submitting && setShowModal(false)}
+      >
         <div
-          className="modal-overlay"
-          onClick={() => !submitting && setShowModal(false)}
+          className="empassper-modal-content"
+          onClick={(e) => e.stopPropagation()}
+          style={{ paddingTop: "0px", marginTop: "0px" }}
         >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Form Header */}
-            <div className="form-header">
-              <div className="logo-section">
-                <img src={logoImage} alt="Logo" className="logo-small" />
-                <div className="appraisal-label">Appraisal Form</div>
-              </div>
-              <div className="form-title-container">
-                <h2 className="form-title">{currentAssignment?.formName}</h2>
-                <p className="form-subtitle">
-                  {currentAssignment?.formType} Assessment Form
+          
+          {/* Form Header */}
+          <div className="empass-form-header" style={{ marginBottom: "0px", paddingBottom: "0px" }}>
+            <div className="empass-logo-section">
+              <img src={logoImage} alt="Logo" className="empass-logo-small" />
+              
+              <div className="empass-appraisal-label" style={{paddingBottom:"10px"}}>Appraisal Form</div>
+              
+            </div>
+            <div className="empass-form-title-container" style={{marginRight:"100px"}}>
+              <h2 className="empass-form-title">{currentAssignment?.formName}</h2>
+              <p className="empass-form-subtitle">
+                {currentAssignment?.formType} Assessment Form
+                
+              </p>
+            </div>
+          </div>
+
+         <div
+          className="empass-form-divider"
+          style={{
+            marginTop: "0px",
+            marginBottom: "0px",
+            padding: "0",
+            height: "0px",          // ensure it's only 1px
+            lineHeight: "0",        // remove vertical space
+          }}
+          ></div>
+
+          {submitting && modalMode === "view" ? (
+            <div
+              className="empass-form-body"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingTop: "0px",
+                marginTop: "0px",
+                padding:"0px"
+              }}
+            >
+              <div>
+                <div className="spinner-border"></div>
+                <p
+                  style={{
+                    marginTop: "16px",
+                    color: "var(--text-light)",
+                    textAlign: "center",
+                  }}
+                >
+                  Loading assessment...
                 </p>
               </div>
             </div>
-
-            <div className="form-divider"></div>
-
-            {submitting && modalMode === "view" ? (
+          ) : (
+            <>
+              {/* Form Body */}
               <div
-                className="form-body"
-                style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                className="empass-form-body"
+                style={{
+                  paddingTop: "0px",
+                  marginTop: "0px",
+                }}
               >
-                <div>
-                  <div className="spinner-border"></div>
-                  <p style={{ marginTop: "16px", color: "var(--text-light)", textAlign: "center" }}>
-                    Loading assessment...
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* Form Body */}
-                <div className="form-body">
-                  <table className="form-table">
-                    <thead>
-                      <tr>
-                        <th>Competency Name</th>
-                        <th>Description</th>
-                        <th>Rating</th>
-                        <th>Comments</th>
+                <table
+                  className="empass-form-table"
+                  style={{
+                    width:"100%",
+                    marginTop: "0px",
+                    borderCollapse: "collapse",
+                    borderLeft: "none",     // REMOVE LEFT BORDER
+                    borderRight: "none",    // REMOVE RIGHT BORDER
+                    borderBottom: "none",   // REMOVE BOTTOM BORDER
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th style={{ padding: "14px 8px", height: "58px", borderTopLeftRadius: "8px" ,}}>Competency Name</th>
+                      <th style={{ padding: "14px 8px", height: "48px" }}>Description</th>
+                      <th style={{ padding: "14px 8px", height: "48px" }}>Rating</th>
+                      <th style={{ padding: "14px 8px", height: "48px", borderTopRightRadius: "8px" }}>Comments</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {assessmentData.map((item) => (
+                      <tr key={item.competencyId}>
+                        <td>
+                          <strong>{item.competencyName}</strong>
+                        </td>
+                        <td>{item.competencyDescription || "N/A"}</td>
+                        <td>
+                          {modalMode === "view" ? (
+                            <span className="rating-badge">
+                              {item.rating} / 5
+                            </span>
+                          ) : (
+                            <select
+                              value={item.rating}
+                              onChange={(e) =>
+                                updateAssessmentData(
+                                  item.competencyId,
+                                  "rating",
+                                  e.target.value
+                                )
+                              }
+                              className="form-select"
+                              disabled={submitting}
+                            >
+                              <option value="">-</option>
+                              <option value="1">1</option>
+                              <option value="2">2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                              <option value="5">5</option>
+                            </select>
+                          )}
+                        </td>
+
+                        <td>
+                          {modalMode === "view" ? (
+                            <span>{item.comments || "-"}</span>
+                          ) : (
+                            <textarea
+                              value={item.comments}
+                              onChange={(e) =>
+                                updateAssessmentData(
+                                  item.competencyId,
+                                  "comments",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Justify through comments"
+                              className="form-textarea"
+                              disabled={submitting}
+                            />
+                          )}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {assessmentData.map((item) => (
-                        <tr key={item.competencyId}>
-                          <td>
-                            <strong>{item.competencyName}</strong>
-                          </td>
-                          <td>{item.competencyDescription || "N/A"}</td>
-                          <td>
-                            {modalMode === "view" ? (
-                              <span className="rating-badge">
-                                {item.rating} / 5
-                              </span>
-                            ) : (
-                              <select
-                                value={item.rating}
-                                onChange={(e) =>
-                                  updateAssessmentData(
-                                    item.competencyId,
-                                    "rating",
-                                    e.target.value
-                                  )
-                                }
-                                className="form-select"
-                                disabled={submitting}
-                              >
-                                <option value="">-</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                              </select>
-                            )}
-                          </td>
-                          <td>
-                            {modalMode === "view" ? (
-                              <span>{item.comments || "-"}</span>
-                            ) : (
-                              <textarea
-                                value={item.comments}
-                                onChange={(e) =>
-                                  updateAssessmentData(
-                                    item.competencyId,
-                                    "comments",
-                                    e.target.value
-                                  )
-                                }
-                                placeholder="Justify through comments"
-                                className="form-textarea"
-                                disabled={submitting}
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-                              />
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              {/* Form Footer */}
+              <div className="form-footer">
+                <button
+                  className="empass-btn-cancel"
+                  onClick={() => setShowModal(false)}
+                  disabled={submitting}
+                >
+                  {modalMode === "view" ? "Close" : "Cancel"}
+                </button>
 
-                {/* Form Footer */}
-                <div className="form-footer">
+                {modalMode === "submit" && (
                   <button
-                    className="btn-cancel"
-                    onClick={() => setShowModal(false)}
+                    className="btn-submit-form"
+                    onClick={handleSubmitAssessment}
                     disabled={submitting}
                   >
-                    {modalMode === "view" ? "Close" : "Cancel"}
+                    {submitting ? "Submitting..." : "Submit Assessment"}
                   </button>
-                  {modalMode === "submit" && (
-                    <button
-                      className="btn-submit-form"
-                      onClick={handleSubmitAssessment}
-                      disabled={submitting}
-                    >
-                      {submitting ? "Submitting..." : "Submit Assessment"}
-                    </button>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    )}
+{/*-------------------------------------------------------MODAL---------------------------------- */}
+</div>
   );
 }
 
 export default MyAssessments;
 
 
-
-/* Responsive: reduce spacing on small screens */

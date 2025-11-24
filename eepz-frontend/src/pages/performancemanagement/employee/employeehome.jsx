@@ -1,255 +1,423 @@
-/**
- * EmployeeHome Component (updated ribbons)
- *
- * - More & smaller ribbons
- * - Ribbons show only when congratulations text is present (nominations exist)
- * - Smooth fall + fade (3s)
- */
-
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
 import { getEmployeeNominations } from "../../../services/performancemanagement/hr/api";
-import "react-toastify/dist/ReactToastify.css";
 import "../../../styles/performancemanagement/employee/EmployeeHome.css";
 
 export default function EmployeeHome() {
   const navigate = useNavigate();
-  const [nominations, setNominations] = useState([]);
-  const [loadingNominations, setLoadingNominations] = useState(true);
+  const [hasNominations, setHasNominations] = useState(false);
+  const [awardName, setAwardName] = useState("");
 
+  // Retrieve the employeeId from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
-  const empId = user ? user.empId : null;
-  const [employeeId] = useState(() => empId);
+  const employeeId = user ? user.empId : null;
 
-  // Ribbons state
-  const [showRibbons, setShowRibbons] = useState(false);
-  const timeoutRef = useRef(null);
+  if (!employeeId) {
+    navigate("/employee/login");
+    return null;
+  }
 
-  // Generate many smaller ribbons (memoized)
-  const ribbons = useMemo(() => {
-    const colors = ["#FF4D4F", "#40A9FF", "#73D13D", "#FAAD14", "#9254DE", "#FF85C0"];
-    const arr = [];
-    // increase count to 40 for more confetti-like effect
-    for (let i = 0; i < 40; i++) {
-      arr.push({
-        left: Math.random() * 100, // percentage
-        delay: Math.random() * 0.5, // seconds (stagger start)
-        rotate: Math.floor(Math.random() * 360),
-        color: colors[Math.floor(Math.random() * colors.length)],
-        // smaller ribbons
-        width: 4 + Math.random() * 8,
-        height: 10 + Math.random() * 20,
-        opacity: 0.8 - Math.random() * 0.5,
-        // gentle horizontal drift amplitude (px)
-        drift: -30 + Math.random() * 60,
-      });
-    }
-    return arr;
-  }, []);
-
-  // ========================
-  // EFFECTS
-  // ========================
-
-  useEffect(() => {
-    if (!employeeId) {
-      navigate("/employee/login");
-      return;
-    }
-    fetchNominations();
-
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeId, navigate]);
-
-  // Show ribbons when nominations exist and loading finished
-  useEffect(() => {
-    // only show ribbons when nominations are present
-    if (!loadingNominations && nominations && nominations.length > 0) {
-      // show for 3 seconds
-      setShowRibbons(true);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setShowRibbons(false), 3000);
-    } else {
-      // ensure ribbons hidden if no nominations
-      setShowRibbons(false);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    }
-  }, [loadingNominations, nominations]);
-
-  // ========================
-  // API FUNCTIONS
-  // ========================
-
+  // Function to fetch employee nominations and award details
   const fetchNominations = async () => {
     try {
       const response = await getEmployeeNominations(employeeId);
-      if (response.status === 200 && response.data.success && response.data.count > 0) {
-        setNominations(response.data.data);
+      console.log("Fetched Nominations: ", response);
+      if (response.data.success && response.data.data.length > 0) {
+        setHasNominations(true);
+        setAwardName(response.data.data[0].roleType);
       } else {
-        setNominations([]);
+        setHasNominations(false);
       }
     } catch (error) {
       console.error("Error fetching nominations:", error);
-      setNominations([]);
-    } finally {
-      setLoadingNominations(false);
+      setHasNominations(false);
     }
   };
 
-  // ========================
-  // HANDLER FUNCTIONS
-  // ========================
+  useEffect(() => {
+    fetchNominations();
+  }, [employeeId]);
 
   const handleNavigateToAssessments = () => {
     navigate("/employee/dashboard/performance/my-assessments");
   };
 
-  // ========================
-  // RENDER FUNCTIONS
-  // ========================
-
-  const renderNominationCard = () => {
-    if (loadingNominations || nominations.length === 0) return null;
-
-    return (
-      <div className="ehp-nomination-card">
-        
-        <div className="ehp-nomination-content">
-          <h3 className="ehp-nomination-title">Congratulations!</h3>
-          <p className="ehp-nomination-text">
-            You have been nominated for: <strong>{nominations.map(n => n.roleType).join(", ")}</strong>
-          </p>
-          <p className="ehp-nomination-subtext">
-            Your hard work and dedication have been recognized!
-          </p>
-        </div>
-      </div>
-    );
+  const handleNavigateToNominations = () => {
+    navigate("/employee/dashboard/performance/nominations");
   };
 
-  // ========================
-  // LOADING STATE
-  // ========================
-
-  if (loadingNominations) {
-    return (
-      <div className="ehp-loading-container">
-        <div className="ehp-loading-content">
-          <div className="spinner-border"></div>
-          <p className="ehp-loading-text">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // ========================
-  // MAIN RENDER
-  // ========================
-
   return (
-    <div className="ehp-page" style={{ position: "relative", minHeight: "100vh" }}>
-      <ToastContainer />
+    <div className="ehp-page" style={{ position: "relative", minHeight: "80vh" }}>
+      <div
+        className="ehp-container"
+        style={{ padding: 24, paddingTop: 110, position: "relative" }}
+      >
+        {/* Notification Card - Top Right with Medal on Left */}
+        {hasNominations && (
+          <div
+            onClick={handleNavigateToNominations}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) =>
+              (e.key === "Enter" || e.key === " ") && handleNavigateToNominations()
+            }
+            aria-label="View Nominations"
+            style={{
+              position: "absolute",
+              top: "-60px",
+              right: "-65px",
+              width: 320,
+              backgroundColor: "#f5f5f7",
+              borderRadius: 16,
+              padding: "24px",
+              boxShadow: "0 12px 32px rgba(0, 0, 0, 0.15)",
+              cursor: "pointer",
+              zIndex: 50,
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 16px 40px rgba(0, 0, 0, 0.2)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(0, 0, 0, 0.15)";
+            }}
+          >
+            {/* Medal/Star Icon - Left Side */}
+            <div
+              style={{
+                position: "relative",
+                width: 90,
+                height: 90,
+                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* Decorative stars around the medal */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: 4,
+                  left: 4,
+                  fontSize: 8,
+                  color: "#e74c3c",
+                }}
+              >
+                ★
+              </div>
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 12,
+                  fontSize: 7,
+                  color: "#3498db",
+                }}
+              >
+                ★
+              </div>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 18,
+                  left: 0,
+                  fontSize: 7,
+                  color: "#3498db",
+                }}
+              >
+                ★
+              </div>
+              <div
+                style={{
+                  position: "absolute",
+                  top: 6,
+                  right: 0,
+                  fontSize: 10,
+                  color: "#e67e22",
+                }}
+              >
+                ✦
+              </div>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 20,
+                  right: 4,
+                  fontSize: 6,
+                  color: "#16a085",
+                }}
+              >
+                ★
+              </div>
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 32,
+                  fontSize: 8,
+                  color: "#9b59b6",
+                }}
+              >
+                ✦
+              </div>
 
-      {/* Ribbons overlay - appears only for a few seconds and does not block interactions */}
-      {showRibbons && (
+              {/* Medal Circle */}
+              <div
+                style={{
+                  width: 75,
+                  height: 75,
+                  borderRadius: "50%",
+                  background:
+                    "linear-gradient(135deg, #f9ca24 0%, #f39c12 50%, #e67e22 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow:
+                    "0 8px 20px rgba(243, 156, 18, 0.4), inset 0 -3px 6px rgba(0, 0, 0, 0.15)",
+                  position: "relative",
+                }}
+              >
+                {/* Inner lighter circle */}
+                <div
+                  style={{
+                    width: 62,
+                    height: 62,
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, #ffd93d 0%, #f9ca24 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "inset 0 2px 4px rgba(255, 255, 255, 0.4)",
+                  }}
+                >
+                  {/* Star Icon */}
+                  <div
+                    style={{
+                      fontSize: 34,
+                      color: "#f39c12",
+                      filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))",
+                    }}
+                  >
+                    ★
+                  </div>
+                </div>
+              </div>
+
+              {/* Ribbon */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: -20,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: 42,
+                  height: 34,
+                  display: "flex",
+                  gap: 2,
+                }}
+              >
+                <div
+                  style={{
+                    width: 20,
+                    height: 34,
+                    background: "linear-gradient(180deg, #ff6b9d 0%, #c44569 100%)",
+                    clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                  }}
+                />
+                <div
+                  style={{
+                    width: 20,
+                    height: 34,
+                    background: "linear-gradient(180deg, #ffa07a 0%, #ff6b9d 100%)",
+                    clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Text Content - Right Side */}
+            <div style={{ flex: 1, textAlign: "left" }}>
+              <h2
+                style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: "#1a1a1a",
+                  margin: "0 0 4px",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                Congratulations!
+              </h2>
+              <p
+              style={{
+                fontSize: "14px",  // Increased font size for better readability
+                color: "#4a5568",  // Slightly darker color for better contrast
+                margin: "0 0 12px",  // Reduced bottom margin for better spacing
+                fontWeight: 600,  // Bold text for emphasis
+                lineHeight: 1.6,  // Increased line height for better text spacing
+                textAlign: "center",  // Center aligned text for symmetry
+                whiteSpace: "nowrap",  // Prevents text overflow in a single line
+                overflow: "hidden",  // Hides overflow text
+                textOverflow: "ellipsis",  // Adds ellipsis if the text is too long
+                padding: "4px 0",
+                paddingRight: "130px"  // Padding for better spacing within the paragraph
+              }}
+            >
+              {awardName ? `${awardName}` : "You earned points"}
+            </p>
+
+
+              {/* Action Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNavigateToNominations();
+                }}
+                style={{
+                  width: "50%",
+                  padding: "8px 16px",
+                  backgroundColor: "#27235c",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  boxShadow: "#27235c",
+                  letterSpacing: "0.01em",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#27235c";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#27235ce";
+                }}
+              >
+                View Details
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Center area that holds the My Assessments card */}
         <div
-          aria-hidden
-          className="ehp-ribbons-overlay"
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            pointerEvents: "none",
-            overflow: "hidden",
-            zIndex: 9999,
+            minHeight: "60vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: 500,
           }}
         >
-          {/* local keyframes for falling + slight horizontal drift to avoid jitter */}
-          <style>{`
-            @keyframes ehpRibbonFall {
-              0% {
-                transform: translateY(-10vh) translateX(0) rotate(var(--start-rot));
-                opacity: 1;
-              }
-              70% {
-                opacity: 1;
-              }
-              100% {
-                transform: translateY(110vh) translateX(var(--drift)) rotate(calc(var(--start-rot) + 360deg));
-                opacity: 0;
-              }
-            }
-
-            /* improve rendering performance and smoothness */
-            .ehp-ribbon {
-              will-change: transform, opacity;
-              backface-visibility: hidden;
-              -webkit-backface-visibility: hidden;
-              border-radius: 2px;
-            }
-          `}</style>
-
-          {ribbons.map((r, idx) => (
-            <div
-              key={idx}
-              className="ehp-ribbon"
-              style={{
-                position: "absolute",
-                left: `${r.left}%`,
-                top: `-10vh`,
-                width: r.width,
-                height: r.height,
-                background: r.color,
-                transform: `rotate(${r.rotate}deg)`,
-                opacity: r.opacity,
-                boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
-                animation: `ehpRibbonFall 3s cubic-bezier(.2,.8,.2,1) ${r.delay}s both`,
-                // custom properties for keyframes
-                ['--start-rot']: `${r.rotate}deg`,
-                ['--drift']: `${r.drift}px`,
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      <div className="ehp-container">
-        {/* Nomination Celebration Card */}
-        {renderNominationCard()}
-
-        {/* My Assessments Card - Single Centered Card */}
-        <div className="ehp-assessment-section">
           <div
-            className="ehp-assessment-card"
+            className="ehp-assessment-card ehp-card"
             onClick={handleNavigateToAssessments}
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && handleNavigateToAssessments()}
+            onKeyDown={(e) =>
+              (e.key === "Enter" || e.key === " ") && handleNavigateToAssessments()
+            }
+            aria-label="Go to My Assessments"
+            style={{
+              cursor: "pointer",
+              width: "min(600px, 80%)",
+              borderRadius: 14,
+              padding: 36,
+              boxShadow: "0 18px 40px rgba(20,30,60,0.06)",
+              display: "flex",
+              alignItems: "center",
+              gap: 28,
+              background: "#fff",
+            }}
           >
-            <div className="ehp-assessment-icon">
-              <i className="bi bi-clipboard-check"></i>
+            <div
+              className="ehp-assessment-icon"
+              style={{
+                width: 96,
+                height: 96,
+                borderRadius: 20,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgb(3, 34, 112)",
+                boxShadow: "0 10px 24px rgba(55, 100, 214, 0.14)",
+              }}
+            >
+              <i
+                className="bi bi-clipboard-check"
+                style={{ color: "#fff", fontSize: 30 }}
+              />
             </div>
-            <div className="ehp-assessment-content">
-              <h3 className="ehp-assessment-title">My Assessments</h3>
-              <p className="ehp-assessment-description">
-                Complete your performance assessments and track your progress across all assigned evaluations
+
+            <div className="ehp-assessment-content" style={{ flex: 1 }}>
+              <h3
+                className="ehp-assessment-title"
+                style={{ fontSize: 32, margin: 0, color: "#0f172a" }}
+              >
+                My Assessments
+                <br />
+                <br />
+              </h3>
+              <p
+                className="ehp-assessment-description"
+                style={{ marginTop: "0px ", color: "#6b7280", fontSize: 15 }}
+              >
+                Complete your performance assessments and track your progress across
+                all assigned evaluations.
               </p>
-              <div className="ehp-assessment-link">
-                View Details
-                <i className="bi bi-arrow-right"></i>
+
+              <div style={{ marginTop: 18 }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNavigateToAssessments();
+                  }}
+                  className="ehp-primary-btn"
+                  style={{
+                    background: "#eef2ff", 
+                    color: "#3740d6",
+                    padding: "10px 16px",
+                    borderRadius: 10,
+                    border: "none",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  View Details 
+                </button>
               </div>
             </div>
           </div>
         </div>
+
+        <style>{`
+          @media (max-width: 900px) {
+            .ehp-container {
+              padding: 16px !important;
+            }
+            
+            /* Move notification to static position on mobile */
+            .ehp-container > div[role="button"][aria-label="View Nominations"] {
+              position: static !important;
+              margin-bottom: 20px;
+              width: 100% !important;
+              right: auto !important;
+              flex-direction: column;
+              text-align: center;
+            }
+            
+            .ehp-container > div[role="button"][aria-label="View Nominations"] > div:last-child {
+              text-align: center !important;
+            }
+          }
+        `}</style>
       </div>
     </div>
   );

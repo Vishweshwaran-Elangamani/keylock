@@ -148,7 +148,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   style={{
                     width: '40px',
                     height: '40px',
-                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                    background: '#27235C',
                     borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
@@ -200,7 +200,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   style={{
                     width: '40px',
                     height: '40px',
-                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                    background: '#27235C',
                     borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
@@ -228,7 +228,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                     style={{
                       display: 'inline-block',
                       padding: '4px 12px',
-                      background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                      background: '#27235C',
                       color: '#ffffff',
                       borderRadius: '12px',
                       fontSize: '12px',
@@ -255,7 +255,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   style={{
                     width: '40px',
                     height: '40px',
-                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                    background: '#27235C',
                     borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
@@ -307,7 +307,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                   style={{
                     width: '40px',
                     height: '40px',
-                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                    background: '#27235C',
                     borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
@@ -390,7 +390,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                 width: '80px'
               }}
             >
-              #
+              S.NO
             </th>
             <th
               style={{
@@ -449,7 +449,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                    background: '#27235C',
                     color: '#ffffff',
                     fontWeight: '600',
                     fontSize: '13px'

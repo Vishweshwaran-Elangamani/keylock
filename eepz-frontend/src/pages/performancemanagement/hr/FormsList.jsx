@@ -1,4 +1,3 @@
-// FormsList.jsx
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -42,35 +41,52 @@ function FormsList() {
   ], [rows]);
   const formDeliveryOptions = ["All", "Delivery", "Enablement", "Delivery and Enablement"];
 
-  const analyticsIcons = {
-    "Total Forms": "bi-journal-text",
-    "Manager Forms": "bi-person-badge",
-    "Delivery Forms": "bi-folder",
-    "Enablement Forms": "bi-folder",
-    "Assigned Users": "bi-people-fill",
-  };
+ const analyticsIcons = {
+  "Total Forms": "bi-journal-text",
+  "Manager Forms": "bi-person-badge",
+  "Delivery Forms": "bi-folder",
+  "Enablement Forms": "bi-lightbulb",          // <-- Added icon
+  "Assigned Users": "bi-people",               // <-- Added icon
+};
 
-  const analyticsColors = {
-    "Total Forms": "stat-icon-primary",
-    "Manager Forms": "stat-icon-success",
-    "Delivery Forms": "stat-icon-warning",
-    "Enablement Forms": "stat-icon-info",
-    "Assigned Users": "stat-icon-secondary",
-  };
+const analyticsIconBg = {
+  "Total Forms": "#e2ebfd",    // blue
+  "Manager Forms": "#d2fbe7",  // green
+  "Delivery Forms": "#fbe7d2", // orange
+  "Enablement Forms": "#f9eaff", // violet or light purple
+  "Assigned Users": "#e2e7fa", // light gray-blue
+};
 
-  function AnalyticsStatCard({ title, value }) {
-    return (
-      <div className="ad-stat-card">
-        <div className={`stat-icon ${analyticsColors[title]}`}>
-          <i className={`bi ${analyticsIcons[title]}`}></i>
-        </div>
-        <div className="stat-content">
-          <h3 className="stat-value">{value}</h3>
-          <p className="stat-label">{title}</p>
-        </div>
+// Usage:
+function AnalyticsStatCard({ title, value }) {
+  return (
+    <div className="ad-stat-card">
+      <div
+        className="stat-icon"
+        style={{
+          background: analyticsIconBg[title] || "#f0f0f0",
+          width: 50,
+          height: 50,
+          borderRadius: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: "8px"
+        }}
+      >
+        <i
+          className={`bi ${analyticsIcons[title]}`}
+          style={{ fontSize: "26px", color: "#27235C" }}
+        />
       </div>
-    );
-  }
+      <div className="stat-content">
+        <h3 className="stat-value">{value}</h3>
+        <p className="stat-label">{title}</p>
+      </div>
+    </div>
+  );
+}
+
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -421,8 +437,8 @@ function FormsList() {
   }, [rows, assignedUserIds]);
 
   return (
-    <div className="formslist">
-      <div className="fld-root">
+    <div className="formlistperf">
+      <div className="flp-root">
         <nav className="cg-breadcrumbs" aria-label="breadcrumb">
           <ol className="cg-breadcrumb">
             <li
@@ -489,18 +505,18 @@ function FormsList() {
           pendingAction={pendingAction}
         />
 
-        <div className="fld-main-area">
-          <div className="fld-forms-section">
-            <div className="fld-section-header">
-              <div className="fld-header-left">
+        <div className="flp-main-area">
+          <div className="flp-forms-section">
+            <div className="flp-section-header">
+              <div className="flp-header-left">
                 <h3>
                   <i className="bi bi-list-ul"></i> Available Forms
                 </h3>
-                <span className="fld-count-badge">{filteredForms.length}</span>
+                <span className="flp-count-badge">{filteredForms.length}</span>
               </div>
-              <div className="fld-header-right">
-                <div className="fld-search-box">
-                  <i className="bi bi-search fld-search-icon"></i>
+              <div className="flp-header-right">
+                <div className="flp-search-box">
+                  <i className="bi bi-search flp-search-icon"></i>
                   <input
                     type="text"
                     placeholder="Search forms..."
@@ -512,7 +528,7 @@ function FormsList() {
                   />
                 </div>
                 <select
-                  className="fld-filter-select"
+                  className="flp-filter-select"
                   value={formTypeFilter}
                   onChange={(e) => {
                     setFormTypeFilter(e.target.value);
@@ -526,7 +542,7 @@ function FormsList() {
                   ))}
                 </select>
                 <select
-                  className="fld-filter-select"
+                  className="flp-filter-select"
                   value={formDeliveryFilter}
                   onChange={(e) => {
                     setFormDeliveryFilter(e.target.value);
@@ -542,9 +558,9 @@ function FormsList() {
               </div>
             </div>
 
-            <div className="fld-table-card">
-              <div className="fld-table-wrapper">
-                <table className="fld-table">
+            <div className="flp-table-card">
+              <div className="flp-table-wrapper">
+                <table className="flp-table">
                   <thead>
                     <tr>
                       <th>NAME</th>
@@ -556,14 +572,14 @@ function FormsList() {
                   <tbody>
                     {loading ? (
                       <tr>
-                        <td colSpan={4} className="fld-empty-state">
+                        <td colSpan={4} className="flp-empty-state">
                           <i className="bi bi-hourglass-split"></i>
                           <p>Loading forms...</p>
                         </td>
                       </tr>
                     ) : pagedForms.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="fld-empty-state">
+                        <td colSpan={4} className="flp-empty-state">
                           <i className="bi bi-inbox"></i>
                           <p>No forms found matching the criteria!</p>
                         </td>
@@ -573,14 +589,14 @@ function FormsList() {
                         <tr
                           key={f.formId}
                           className={
-                            selectedFormId === f.formId ? "fld-selected-row" : ""
+                            selectedFormId === f.formId ? "flp-selected-row" : ""
                           }
                         >
                           <td>
                             <strong>{f.name}</strong>
                           </td>
                           <td>
-                            <span className="fld-type-badge">{f.type}</span>
+                            <span className="flp-type-badge">{f.type}</span>
                           </td>
                           <td>
                             {f.deliveryEnablement === "Delivery"
@@ -590,7 +606,7 @@ function FormsList() {
                               : "Delivery and Enablement"}
                           </td>
                           <td>
-                            <div className="fld-action-buttons">
+                            <div className="flp-action-buttons">
                               <button
                                 className="themed-action-btn btn-view"
                                 onClick={() => handleView(f)}
@@ -627,11 +643,11 @@ function FormsList() {
                 </table>
               </div>
 
-              <div className="fld-pagination-container">
-                <div className="fld-pagination-info">
-                  <span className="fld-pagination-label">Rows per page:</span>
+              <div className="flp-pagination-container">
+                <div className="flp-pagination-info">
+                  <span className="flp-pagination-label">Rows per page:</span>
                   <select
-                    className="fld-pagination-select"
+                    className="flp-pagination-select"
                     value={formsPerPage}
                     onChange={(e) => {
                       setFormsPerPage(Number(e.target.value));
@@ -646,15 +662,15 @@ function FormsList() {
                   </select>
                 </div>
 
-                <nav className="fld-pagination-nav">
-                  <ul className="fld-pagination">
+                <nav className="flp-pagination-nav">
+                  <ul className="flp-pagination">
                     <li
-                      className={`fld-page-item ${
-                        formsPage === 1 ? "fld-disabled" : ""
+                      className={`flp-page-item ${
+                        formsPage === 1 ? "flp-disabled" : ""
                       }`}
                     >
                       <button
-                        className="fld-page-link"
+                        className="flp-page-link"
                         onClick={() => onFormsPageChange(formsPage - 1)}
                       >
                         &laquo;
@@ -663,12 +679,12 @@ function FormsList() {
                     {Array.from({ length: formsTotalPages }, (_, i) => (
                       <li
                         key={i + 1}
-                        className={`fld-page-item ${
-                          formsPage === i + 1 ? "fld-active" : ""
+                        className={`flp-page-item ${
+                          formsPage === i + 1 ? "flp-active" : ""
                         }`}
                       >
                         <button
-                          className="fld-page-link"
+                          className="flp-page-link"
                           onClick={() => onFormsPageChange(i + 1)}
                         >
                           {i + 1}
@@ -676,12 +692,12 @@ function FormsList() {
                       </li>
                     ))}
                     <li
-                      className={`fld-page-item ${
-                        formsPage === formsTotalPages ? "fld-disabled" : ""
+                      className={`flp-page-item ${
+                        formsPage === formsTotalPages ? "flp-disabled" : ""
                       }`}
                     >
                       <button
-                        className="fld-page-link"
+                        className="flp-page-link"
                         onClick={() => onFormsPageChange(formsPage + 1)}
                       >
                         &raquo;
@@ -690,7 +706,7 @@ function FormsList() {
                   </ul>
                 </nav>
 
-                <div className="fld-pagination-status">
+                <div className="flp-pagination-status">
                   {formsCount === 0
                     ? "No forms to display"
                     : `Showing ${Math.min(
@@ -705,13 +721,13 @@ function FormsList() {
             </div>
           </div>
 
-          <div className="fld-users-panel">
-            <div className="fld-panel-header">
+          <div className="flp-users-panel">
+            <div className="flp-panel-header">
               <h3>
                 <i className="bi bi-people-fill"></i> Select Users
               </h3>
               {selectedFormId && (
-                <div className="fld-users-filters">
+                <div className="flp-users-filters">
                   <input
                     type="text"
                     placeholder="Search users..."
@@ -720,11 +736,11 @@ function FormsList() {
                       setUserSearchQuery(e.target.value);
                       setUsersPage(1);
                     }}
-                    className="fld-user-search-input"
+                    className="flp-user-search-input"
                   />
                   <button
                     onClick={handleSelectAll}
-                    className="fld-btn-select-all"
+                    className="flp-btn-select-all"
                     style={{
                       background: allEligibleSelected ? "#AC5098" : "#27235C",
                     }}
@@ -746,7 +762,7 @@ function FormsList() {
             </div>
 
             <div
-              className="fld-panel-body"
+              className="flp-panel-body"
               style={{
                 overflowY: "auto",
                 maxHeight: "580px",
@@ -754,18 +770,18 @@ function FormsList() {
               }}
             >
               {!selectedFormId ? (
-                <div className="fld-empty-box">
+                <div className="flp-empty-box">
                   <i className="bi bi-hand-index"></i>
                   <p>Please choose a form to select users</p>
                 </div>
               ) : pagedUsers.length === 0 ? (
-                <div className="fld-empty-box">
+                <div className="flp-empty-box">
                   <i className="bi bi-inbox"></i>
                   <p>No users available</p>
                 </div>
               ) : (
                 <>
-                  <div className="fld-selected-count">
+                  <div className="flp-selected-count">
                     <i className="bi bi-check-circle-fill"></i>
                     <strong>{selectedUserIds.length}</strong> user(s) selected
                   </div>
@@ -777,9 +793,9 @@ function FormsList() {
                     return (
                       <div
                         key={user.userId}
-                        className={`fld-user-card ${
-                          isSelected ? "fld-selected" : ""
-                        } ${isAssigned ? "fld-disabled" : ""}`}
+                        className={`flp-user-card ${
+                          isSelected ? "flp-selected" : ""
+                        } ${isAssigned ? "flp-disabled" : ""}`}
                         onClick={() => !isAssigned && toggleUser(user.userId)}
                       >
                         <input
@@ -788,12 +804,12 @@ function FormsList() {
                           readOnly
                           disabled={isAssigned}
                         />
-                        <div className="fld-user-info">
+                        <div className="flp-user-info">
                           <strong>
                             {user.firstName} {user.lastName}
                           </strong>
                           {isAssigned && (
-                            <span className="fld-assigned-tag">
+                            <span className="flp-assigned-tag">
                               <i className="bi bi-lock-fill"></i> Assigned
                             </span>
                           )}
@@ -806,11 +822,11 @@ function FormsList() {
             </div>
 
             {usersTotalPages > 0 && (
-              <div className="fld-pagination-container">
-                <div className="fld-pagination-info">
-                  <span className="fld-pagination-label">Rows per page:</span>
+              <div className="flp-pagination-container">
+                <div className="flp-pagination-info">
+                  <span className="flp-pagination-label">Rows per page:</span>
                   <select
-                    className="fld-pagination-select"
+                    className="flp-pagination-select"
                     value={usersPerPage}
                     onChange={(e) => {
                       setUsersPerPage(Number(e.target.value));
@@ -825,15 +841,15 @@ function FormsList() {
                   </select>
                 </div>
 
-                <nav className="fld-pagination-nav">
-                  <ul className="fld-pagination">
+                <nav className="flp-pagination-nav">
+                  <ul className="flp-pagination">
                     <li
-                      className={`fld-page-item ${
-                        usersPage === 1 ? "fld-disabled" : ""
+                      className={`flp-page-item ${
+                        usersPage === 1 ? "flp-disabled" : ""
                       }`}
                     >
                       <button
-                        className="fld-page-link"
+                        className="flp-page-link"
                         onClick={() => onUsersPageChange(usersPage - 1)}
                       >
                         &laquo;
@@ -842,12 +858,12 @@ function FormsList() {
                     {Array.from({ length: usersTotalPages }, (_, i) => (
                       <li
                         key={i + 1}
-                        className={`fld-page-item ${
-                          usersPage === i + 1 ? "fld-active" : ""
+                        className={`flp-page-item ${
+                          usersPage === i + 1 ? "flp-active" : ""
                         }`}
                       >
                         <button
-                          className="fld-page-link"
+                          className="flp-page-link"
                           onClick={() => onUsersPageChange(i + 1)}
                         >
                           {i + 1}
@@ -855,12 +871,12 @@ function FormsList() {
                       </li>
                     ))}
                     <li
-                      className={`fld-page-item ${
-                        usersPage === usersTotalPages ? "fld-disabled" : ""
+                      className={`flp-page-item ${
+                        usersPage === usersTotalPages ? "flp-disabled" : ""
                       }`}
                     >
                       <button
-                        className="fld-page-link"
+                        className="flp-page-link"
                         onClick={() => onUsersPageChange(usersPage + 1)}
                       >
                         &raquo;
@@ -871,9 +887,9 @@ function FormsList() {
               </div>
             )}
 
-            <div className="fld-panel-footer">
+            <div className="flp-panel-footer">
               <button
-                className="fld-btn-share"
+                className="flp-btn-share"
                 onClick={() => openDeadlineModal("Send")}
                 disabled={
                   !selectedFormId ||
