@@ -522,22 +522,23 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return changes > 0;
         }
 
-        public async Task<bool> UnmapEmployeesFromProjectAsync(int projectId, List<int> employeeIds)
-        {
-            var mappingsToRemove = await _context
-                .Projectemployees.Where(pe =>
-                    pe.ProjectId == projectId && employeeIds.Contains(pe.EmployeeId)
-                )
-                .ToListAsync();
+       public async Task<bool> UnmapEmployeesFromProjectAsync(int projectId, List<int> employeeIds)
+{
+    var mappingsToRemove = await _context
+        .Projectemployees.Where(pe =>
+            pe.ProjectId == projectId && employeeIds.Contains(pe.EmployeeId)
+        )
+        .ToListAsync();
 
-            if (mappingsToRemove.Any())
-            {
-                _context.Projectemployees.RemoveRange(mappingsToRemove);
-                await _context.SaveChangesAsync();
-            }
+    if (mappingsToRemove.Any())
+    {
+        _context.Projectemployees.RemoveRange(mappingsToRemove);
+        await _context.SaveChangesAsync();
+    }
 
-            return true;
-        }
+    return true;
+}
+
 
         public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
         {
@@ -807,5 +808,112 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
+        /// <summary>
+/// ✅ NEW: Automatically move employees to resource pool if they have no project mappings
+/// Also updates L1/L2 reporting manager logic
+/// </summary>
+public async Task<int> MoveUnmappedEmployeesToResourcePoolAsync(List<int> employeeIds)
+{
+    try
+    {
+        Console.WriteLine($"🔄 Checking {employeeIds.Count} employees for resource pool auto-assignment...");
+
+        // Get resource pool project
+        var resourcePoolProject = await _context.Projects
+            .FirstOrDefaultAsync(p => p.ProjectName.ToLower() == "org.rz.resourcepool");
+
+        if (resourcePoolProject == null)
+        {
+            Console.WriteLine("⚠️ Resource pool project not found");
+            return 0;
+        }
+
+        // Get L2 approver's EmployeeId for reporting manager
+        int? l2ApproverEmployeeId = null;
+        if (resourcePoolProject.L2approverEmployeeId.HasValue)
+        {
+            l2ApproverEmployeeId = await GetEmployeeIdByMasterIdAsync(resourcePoolProject.L2approverEmployeeId.Value);
+        }
+
+        var movedCount = 0;
+
+        foreach (var empMasterId in employeeIds)
+        {
+            // Check if employee has ANY other project mappings (primary or secondary)
+            var otherProjectMappings = await _context.Projectemployees
+                .Where(pe => pe.EmployeeId == empMasterId)
+                .ToListAsync();
+
+            // If no other mappings exist, move to resource pool
+            if (!otherProjectMappings.Any())
+            {
+                Console.WriteLine($"✅ Employee {empMasterId} has no project mappings. Moving to resource pool...");
+
+                // Check if already in resource pool
+                var existingResourcePoolMapping = await _context.Projectemployees
+                    .FirstOrDefaultAsync(pe => pe.ProjectId == resourcePoolProject.ProjectId && 
+                                              pe.EmployeeId == empMasterId);
+
+                if (existingResourcePoolMapping == null)
+                {
+                    // Add to resource pool
+                    var resourcePoolMapping = new Projectemployee
+                    {
+                        ProjectId = resourcePoolProject.ProjectId,
+                        EmployeeId = empMasterId,
+                        AssignedAt = DateTime.UtcNow,
+                        IsPrimary = true // Resource pool is primary when no other projects
+                    };
+
+                    await _context.Projectemployees.AddAsync(resourcePoolMapping);
+
+                    // ✅ Update reporting manager to L2 approver of resource pool
+                    if (l2ApproverEmployeeId.HasValue)
+                    {
+                        var actualEmployeeId = await GetEmployeeIdByMasterIdAsync(empMasterId);
+                        if (actualEmployeeId.HasValue)
+                        {
+                            var employee = await _context.Employees
+                                .FirstOrDefaultAsync(e => e.EmployeeId == actualEmployeeId.Value);
+
+                            if (employee != null)
+                            {
+                                employee.ReportingManagerEmployeeId = l2ApproverEmployeeId.Value;
+                                employee.UpdatedAt = DateTime.UtcNow;
+                                _context.Entry(employee).State = EntityState.Modified;
+                                Console.WriteLine($"   Updated reporting manager to {l2ApproverEmployeeId.Value}");
+                            }
+                        }
+                    }
+
+                    movedCount++;
+                }
+                else
+                {
+                    Console.WriteLine($"   Employee {empMasterId} already in resource pool");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"ℹ️ Employee {empMasterId} still has {otherProjectMappings.Count} project mapping(s). Not moving to resource pool.");
+            }
+        }
+
+        if (movedCount > 0)
+        {
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"✅ Successfully moved {movedCount} employee(s) to resource pool");
+        }
+
+        return movedCount;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error in MoveUnmappedEmployeesToResourcePoolAsync: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        throw;
+    }
+}
+
     }
 }

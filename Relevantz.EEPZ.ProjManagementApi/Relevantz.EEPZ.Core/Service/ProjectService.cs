@@ -383,34 +383,46 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        public async Task<ApiResponse<bool>> UnmapEmployeesFromProjectAsync(UnmapEmployeesFromProjectRequest request)
+        /// <summary>
+/// ✅ UPDATED: Unmap employees from project and auto-move to resource pool if no other mappings exist
+/// </summary>
+public async Task<ApiResponse<bool>> UnmapEmployeesFromProjectAsync(UnmapEmployeesFromProjectRequest request)
+{
+    try
+    {
+        if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
         {
-            try
-            {
-                if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
-                {
-                    return ApiResponse<bool>.ErrorResponse("Project not found.");
-                }
-
-                if (request.EmployeeIds == null || !request.EmployeeIds.Any())
-                {
-                    return ApiResponse<bool>.ErrorResponse("No employees provided to unmap.");
-                }
-
-                var result = await _projectRepository.UnmapEmployeesFromProjectAsync(request.ProjectId, request.EmployeeIds);
-
-                if (result)
-                {
-                    return ApiResponse<bool>.SuccessResponse(true, "Employees unmapped from project successfully.");
-                }
-
-                return ApiResponse<bool>.ErrorResponse("Failed to unmap employees from project.");
-            }
-            catch (Exception ex)
-            {
-                return ApiResponse<bool>.ErrorResponse($"An error occurred while unmapping employees: {ex.Message}");
-            }
+            return ApiResponse<bool>.ErrorResponse("Project not found.");
         }
+
+        if (request.EmployeeIds == null || !request.EmployeeIds.Any())
+        {
+            return ApiResponse<bool>.ErrorResponse("No employees provided to unmap.");
+        }
+
+        // Unmap employees from the project
+        var result = await _projectRepository.UnmapEmployeesFromProjectAsync(request.ProjectId, request.EmployeeIds);
+
+        if (!result)
+        {
+            return ApiResponse<bool>.ErrorResponse("Failed to unmap employees from project.");
+        }
+
+        // ✅ NEW: Auto-move to resource pool logic
+        var movedToResourcePool = await _projectRepository.MoveUnmappedEmployeesToResourcePoolAsync(request.EmployeeIds);
+
+        var message = movedToResourcePool > 0
+            ? $"Employees unmapped from project successfully. {movedToResourcePool} employee(s) moved to resource pool."
+            : "Employees unmapped from project successfully.";
+
+        return ApiResponse<bool>.SuccessResponse(true, message);
+    }
+    catch (Exception ex)
+    {
+        return ApiResponse<bool>.ErrorResponse($"An error occurred while unmapping employees: {ex.Message}");
+    }
+}
+
 
         public async Task<ApiResponse<List<EmployeeBasicInfo>>> GetAvailableEmployeesAsync()
         {

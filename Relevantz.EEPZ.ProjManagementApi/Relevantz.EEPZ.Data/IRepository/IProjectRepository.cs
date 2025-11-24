@@ -39,7 +39,12 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<bool> UpdateProjectEmployeePrimaryFlagsAsync(List<Projectemployee> projectEmployees);
 
         // ✅ NEW: Get all employees with their primary project information
-Task<Dictionary<int, (int ProjectId, string ProjectName)?>> GetAllEmployeesWithPrimaryProjectAsync();
+        Task<Dictionary<int, (int ProjectId, string ProjectName)?>> GetAllEmployeesWithPrimaryProjectAsync();
+        /// <summary>
+/// Move employees to resource pool if they have no other project mappings
+/// </summary>
+Task<int> MoveUnmappedEmployeesToResourcePoolAsync(List<int> employeeIds);
+
 
     }
 }
