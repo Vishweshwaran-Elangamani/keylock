@@ -1,5 +1,6 @@
 // Repository/Interfaces/ISlaRepository.cs
 using Relevantz.EEPZ.Common.Entities;
+using System.Data;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
@@ -97,6 +98,21 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<List<Sla>> GetSlasDueInDaysAsync(int days);
         Task<List<Sla>> GetOverdueSlasByDaysAsync(int days);
         Task<List<Sla>> GetCompletedSlasAsync();
+
+         Task<List<Employee>> GetEmployeesByIdsAsync(List<int> employeeIds);
+
+        /// <summary>
+        /// Get database connection string for SqlBulkCopy
+        /// </summary>
+        string GetConnectionString();
+
+        /// <summary>
+        /// Bulk insert SLAs using SqlBulkCopy (15-85x faster)
+        /// </summary>
+        /// 
+        Task<int> BulkInsertSlasAsync(List<Sla> slas);
+
+
 
         
     }

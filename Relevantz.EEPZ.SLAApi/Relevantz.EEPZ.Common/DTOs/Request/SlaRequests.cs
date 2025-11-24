@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 
-
 namespace Relevantz.EEPZ.Common.DTOs.Request
 {
     /// <summary>
@@ -16,9 +15,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [Range(1, int.MaxValue, ErrorMessage = "Invalid Employee ID")]
         public int EmployeeId { get; set; }
 
-        [Required(ErrorMessage = "Assigned To Employee ID is required")]
-        [Range(1, int.MaxValue, ErrorMessage = "Invalid Assigned Employee ID")]
-        public int AssignedToEmployeeId { get; set; }
+        // ✅ FIXED: Removed [Required] and [Range] - Backend will auto-assign reporting manager
+        public int? AssignedToEmployeeId { get; set; }
 
         [Required(ErrorMessage = "Deadline is required")]
         public DateTime Deadline { get; set; }
@@ -27,9 +25,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string? RelatedEntityType { get; set; }
 
         [Required(ErrorMessage = "Department ID is required")]
-[Range(1, int.MaxValue, ErrorMessage = "Invalid Department ID")]
-public int DepartmentId { get; set; }
-
+        [Range(1, int.MaxValue, ErrorMessage = "Invalid Department ID")]
+        public int DepartmentId { get; set; }
 
         public int? RelatedEntityId { get; set; }
 

@@ -1,9 +1,12 @@
+global using Serilog;
+global using Serilog.Events;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Serilog;
-using System.Text;
 
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Implementations;
@@ -11,155 +14,319 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
-
-
-// Add these usings to match your folders (adjust if your namespaces differ)
-
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.DTOs.Request;
 
-var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine("Building........");
+// CRITICAL: Clear JWT claim type mappings BEFORE building
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
-// Serilog
+// Bootstrap logger - ensures early logs are captured
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
-builder.Host.UseSerilog();
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-// MVC + Swagger
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen(options =>
+try
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "EEPZ API",
-        Version = "v1",
-        Description = "Feedback API"
-    });
+    Log.Information("🚀 Starting EEPZ Feedback Backend Application");
+    
+    var builder = WebApplication.CreateBuilder(args);
+    Console.WriteLine("Building........");
 
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter: Bearer {your JWT token}"
-    });
+    // Configure Serilog - Full configuration from appsettings.json
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .WriteTo.Console());
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    Log.Information("✅ Serilog configured successfully");
+
+    // Add services to the container
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+
+    // Configure Swagger with JWT support
+    builder.Services.AddSwaggerGen(options =>
     {
-        {
+        options.SwaggerDoc(
+            "v1",
+            new OpenApiInfo
+            {
+                Title = "EEPZ Feedback API",
+                Version = "v1",
+                Description = "Feedback Module API",
+            }
+        );
+
+        options.AddSecurityDefinition(
+            "Bearer",
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Enter 'Bearer' followed by your JWT token",
+            }
+        );
+
+        options.AddSecurityRequirement(
+            new OpenApiSecurityRequirement
+            {
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer",
+                        },
+                    },
+                    Array.Empty<string>()
+                },
+            }
+        );
+    });
+
+    // Configure MySQL Database
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<EEPZDbContext>(options =>
+        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    );
+
+    Log.Information("📊 Database connection configured");
+
+    // UPDATED: Configure JWT Authentication with debugging
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+    var secretKey = jwtSettings["SecretKey"];
+
+    if (string.IsNullOrEmpty(secretKey))
+    {
+        throw new InvalidOperationException("JWT SecretKey is not configured in appsettings.json");
+    }
+
+    builder
+        .Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            var keyBytes = Encoding.UTF8.GetBytes(secretKey);
+
+            options.SaveToken = true;
+            options.RequireHttpsMetadata = false; // Set to true in production
+
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+
+                ClockSkew = TimeSpan.Zero,
+
+                RoleClaimType = ClaimTypes.Role,
+                NameClaimType = "sub",
+            };
+
+            // Event handlers for debugging
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    Log.Error("❌ JWT Authentication Failed: {Message}", context.Exception.Message);
+                    if (context.Exception.InnerException != null)
+                    {
+                        Log.Error(
+                            "   Inner Exception: {Message}",
+                            context.Exception.InnerException.Message
+                        );
+                    }
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    var claims =
+                        context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}").ToList()
+                        ?? new List<string>();
+
+                    Log.Information("✅ JWT Token Validated Successfully");
+                    Log.Information("   Claims: {Claims}", string.Join(", ", claims));
+
+                    var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
+                    var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
+
+                    if (empMasterIdClaim == null)
+                    {
+                        Log.Warning("⚠ WARNING: empMasterId claim not found!");
+                    }
+                    else
+                    {
+                        Log.Information("   empMasterId: {EmpMasterId}", empMasterIdClaim.Value);
+                    }
+
+                    if (roleClaim == null)
+                    {
+                        Log.Warning("⚠ WARNING: role claim not found!");
+                    }
+                    else
+                    {
+                        Log.Information("   role: {Role}", roleClaim.Value);
+                    }
+
+                    return Task.CompletedTask;
+                },
+
+                OnChallenge = context =>
+                {
+                    Log.Warning(
+                        "❌ JWT Challenge: {Error}, {ErrorDescription}",
+                        context.Error,
+                        context.ErrorDescription
+                    );
+                    return Task.CompletedTask;
+                },
+                OnMessageReceived = context =>
+                {
+                    var token = context
+                        .Request.Headers["Authorization"]
+                        .FirstOrDefault()
+                        ?.Split(" ")
+                        .Last();
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        Log.Information(
+                            "📨 JWT Token Received (first 20 chars): {Token}...",
+                            token.Substring(0, Math.Min(20, token.Length))
+                        );
+                    }
+                    return Task.CompletedTask;
+                },
+            };
+        });
+
+    builder.Services.AddAuthorization();
+
+    Log.Information("🔐 JWT Authentication configured");
+
+    // ==================================================================================
+    // FEEDBACK MODULE - DEPENDENCY INJECTION
+    // ==================================================================================
+    builder.Services.AddHttpContextAccessor();
+
+    // Repositories
+    builder.Services.AddScoped<IManagerReviewRepository, ManagerReviewRepository>();
+    builder.Services.AddScoped<IMentorFeedbackRepository, MentorFeedbackRepository>();
+    builder.Services.AddScoped<IOrgGoalFeedbackRepository, OrgGoalFeedbackRepository>();
+    builder.Services.AddScoped<IPeerFeedbackQueueRepository, PeerFeedbackQueueRepository>();
+    builder.Services.AddScoped<IHrFeedbackFormRepository, HrFeedbackFormRepository>();
+
+    // Services
+    builder.Services.AddScoped<IManagerReviewService, ManagerReviewService>();
+    builder.Services.AddScoped<IMentorFeedbackService, MentorFeedbackService>();
+    builder.Services.AddScoped<IOrgGoalFeedbackService, OrgGoalFeedbackService>();
+    builder.Services.AddScoped<IPeerFeedbackQueueService, PeerFeedbackQueueService>();
+    builder.Services.AddScoped<IHrFeedbackFormService, HrFeedbackFormService>();
+
+    Log.Information("💉 Dependency Injection configured - 5 repositories, 5 services");
+
+    // Configure CORS
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(
+            "AllowAll",
+            policy =>
+            {
+                policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            }
+        );
+    });
+
+    Log.Information("🌐 CORS configured");
+
+    var app = builder.Build();
+
+    // Swagger
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ Feedback API v1");
+        });
+        Log.Information("📚 Swagger UI enabled");
+    }
+
+    // Enable Serilog request logging
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.MessageTemplate =
+            "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+        options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Information;
+    });
+
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+
+    // CRITICAL: Order matters!
+    app.UseCors("AllowAll");
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    // Auto-migrate with logging
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
+        try
+        {
+            Log.Information("🗄️ Starting database migration...");
+            dbContext.Database.Migrate();
+            Log.Information("✅ Database migration completed successfully");
         }
-    });
-});
-
-// Database (MySQL)
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<EEPZDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
-// Auth (JWT)
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"];
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
-builder.Services.AddAuthorization();
-
-// ==================================================================================
-// FEEDBACK MODULE - DEPENDENCY INJECTION
-// ==================================================================================
-// Repositories
-builder.Services.AddScoped<IManagerReviewRepository, ManagerReviewRepository>();
-builder.Services.AddScoped<IMentorFeedbackRepository, MentorFeedbackRepository>();
-builder.Services.AddScoped<IOrgGoalFeedbackRepository, OrgGoalFeedbackRepository>();
-builder.Services.AddScoped<IPeerFeedbackQueueRepository, PeerFeedbackQueueRepository>();
-builder.Services.AddScoped<IHrFeedbackFormRepository, HrFeedbackFormRepository>();
-
-// Services
-builder.Services.AddScoped<IManagerReviewService, ManagerReviewService>();
-builder.Services.AddScoped<IMentorFeedbackService, MentorFeedbackService>();
-builder.Services.AddScoped<IOrgGoalFeedbackService, OrgGoalFeedbackService>();
-builder.Services.AddScoped<IPeerFeedbackQueueService, PeerFeedbackQueueService>();
-builder.Services.AddScoped<IHrFeedbackFormService, HrFeedbackFormService>();
-
-// ==================================================================================
-// CORS
-// ==================================================================================
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
-
-var app = builder.Build();
-
-// Swagger
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ API v1"); });
-}
-
-app.UseSerilogRequestLogging();
-
-app.UseHttpsRedirection();
-
-app.UseCors("AllowAll");
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-// Auto-migrate
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
-    try
-    {
-        dbContext.Database.Migrate();
-        Log.Information("Database migration completed successfully");
+        catch (Exception ex)
+        {
+            Log.Error(ex, "❌ Database migration failed: {Message}", ex.Message);
+        }
     }
-    catch (Exception ex)
-    {
-        Log.Error($"Database migration failed: {ex.Message}");
-    }
-}
 
-app.Run();
+    // Log configuration details
+    Log.Information("========================================");
+    Log.Information("🚀 Feedback Application Configuration:");
+    Log.Information("========================================");
+    Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
+    Log.Information("   JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
+    Log.Information("   JWT Audience: {Audience}", jwtSettings["Audience"]);
+    Log.Information(
+        "   Database: {Database}",
+        connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))
+    );
+    Log.Information("========================================");
+
+    Log.Information("✅ Feedback Application started successfully");
+    Log.Information("🎯 Ready to accept requests...");
+    
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "❌ Feedback Application terminated unexpectedly");
+    throw;
+}
+finally
+{
+    Log.Information("🛑 Shutting down Feedback Application");
+    Log.CloseAndFlush();
+}

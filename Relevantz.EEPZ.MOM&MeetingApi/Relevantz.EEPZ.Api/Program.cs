@@ -1,3 +1,5 @@
+global using Serilog;
+global using Serilog.Events;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,17 +9,21 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
-using Serilog;
 using System.Text;
-using Relevantz.EEPZ.Data.DBContexts;
 
 var builder = WebApplication.CreateBuilder(args);
+Console.WriteLine("Building........");
 
-// Configure Serilog - optional, uncomment if needed
-// Log.Logger = new LoggerConfiguration()
-//     .ReadFrom.Configuration(builder.Configuration)
-//     .CreateLogger();
-// builder.Host.UseSerilog();
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// Log application starting
+Log.Information("Starting EEPZ MoM Backend Application");
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -129,6 +135,14 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Enable Serilog request logging
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate =
+        "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Information;
+});
+
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
@@ -142,16 +156,36 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
     try
     {
-        Console.WriteLine("Starting database migration...");
+        Log.Information("Starting database migration...");
         dbContext.Database.Migrate();
-        Console.WriteLine("Database migration completed successfully");
+        Log.Information("Database migration completed successfully");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Database migration failed: {ex.Message}");
-        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        Log.Error(ex, "Database migration failed: {Message}", ex.Message);
     }
 }
 
-Console.WriteLine("Application starting...");
-app.Run();
+// Log configuration details
+Log.Information("🚀 Application Configuration:");
+Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
+Log.Information("   JWT Issuer: {Issuer}", issuer);
+Log.Information("   JWT Audience: {Audience}", audience);
+Log.Information(
+    "   Database: {Database}",
+    connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))
+);
+
+try
+{
+    Log.Information("MoM Application started successfully");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "❌ MoM Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

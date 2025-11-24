@@ -1,2 +1,0 @@
-2025-11-19 11:58:45.781 +05:30 [INF] Database migration completed successfully
-2025-11-19 12:12:14.147 +05:30 [INF] Database migration completed successfully

@@ -6,6 +6,8 @@ using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
 
+
+
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
     /// <summary>
@@ -667,6 +669,70 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
                 throw;
             }
         }
+
+        /// <summary>
+        /// Get multiple employees by IDs with their profiles
+        /// </summary>
+        public async Task<List<Employee>> GetEmployeesByIdsAsync(List<int> employeeIds)
+        {
+            return await _context.Employees
+                .Include(e => e.Userprofile)
+                .Where(e => employeeIds.Contains(e.EmployeeId))
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Get database connection string from DbContext
+        /// </summary>
+        public string GetConnectionString()
+        {
+            return _context.Database.GetDbConnection().ConnectionString;
+        }
+
+        /// <summary>
+        /// Bulk insert SLAs using SqlBulkCopy
+        /// </summary>
+        /// <summary>
+/// Bulk insert SLAs using AddRange (optimized for MySQL)
+/// </summary>
+public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
+{
+    try
+    {
+        if (slas == null || !slas.Any())
+        {
+            _logger.LogWarning("BulkInsertSlasAsync called with empty or null list");
+            return 0;
+        }
+
+        _logger.LogInformation($"Starting bulk insert of {slas.Count} SLAs");
+
+        // Disable change tracking for better performance
+        _context.ChangeTracker.AutoDetectChangesEnabled = false;
+
+        try
+        {
+            // AddRange is optimized in EF Core for bulk operations
+            _context.Slas.AddRange(slas);
+            var result = await _context.SaveChangesAsync();
+            
+            _logger.LogInformation($"Bulk insert completed: {result} SLAs inserted");
+            return result;
+        }
+        finally
+        {
+            // Re-enable change tracking
+            _context.ChangeTracker.AutoDetectChangesEnabled = true;
+        }
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error in BulkInsertSlasAsync");
+        throw;
+    }
+}
+
 
         /// <summary>
         /// Create a new notification

@@ -1,3 +1,8 @@
+global using Serilog;
+global using Serilog.Events;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -6,22 +11,28 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
-using Serilog;
-using System.Text;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services;
 using eepzbackend.Controllers;
 
+// CRITICAL: Clear JWT claim type mappings BEFORE building
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
+Console.WriteLine("Building........");
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+// Log application starting
+Log.Information("Starting EEPZ SLA Backend Application");
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -68,48 +79,125 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
+Log.Information("Database connection configured");
+
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
+
+if (string.IsNullOrEmpty(secretKey))
+{
+    throw new InvalidOperationException("JWT SecretKey is not configured in appsettings.json");
+}
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
+    var keyBytes = Encoding.UTF8.GetBytes(secretKey);
+
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false; // Set to true in production
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
-        ClockSkew = TimeSpan.Zero
+        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+
+        ClockSkew = TimeSpan.Zero,
+
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = "sub",
+    };
+
+    // ADD: Event handlers for debugging
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Log.Error("JWT Authentication Failed: {Message}", context.Exception.Message);
+            if (context.Exception.InnerException != null)
+            {
+                Log.Error("   Inner Exception: {Message}", context.Exception.InnerException.Message);
+            }
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            var claims =
+                context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}").ToList()
+                ?? new List<string>();
+
+            Log.Information("JWT Token Validated Successfully");
+            Log.Information("   Claims: {Claims}", string.Join(", ", claims));
+
+            var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
+            var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
+
+            if (empMasterIdClaim == null)
+            {
+                Log.Warning("WARNING: empMasterId claim not found!");
+            }
+            else
+            {
+                Log.Information("   empMasterId: {EmpMasterId}", empMasterIdClaim.Value);
+            }
+
+            if (roleClaim == null)
+            {
+                Log.Warning("WARNING: role claim not found!");
+            }
+            else
+            {
+                Log.Information("   role: {Role}", roleClaim.Value);
+            }
+
+            return Task.CompletedTask;
+        },
+
+        OnChallenge = context =>
+        {
+            Log.Warning("JWT Challenge: {Error}, {ErrorDescription}", context.Error, context.ErrorDescription);
+            return Task.CompletedTask;
+        },
+        OnMessageReceived = context =>
+        {
+            var token = context
+                .Request.Headers["Authorization"]
+                .FirstOrDefault()
+                ?.Split(" ")
+                .Last();
+            if (!string.IsNullOrEmpty(token))
+            {
+                Log.Information("JWT Token Received (first 20 chars): {Token}...",
+                    token.Substring(0, Math.Min(20, token.Length)));
+            }
+            return Task.CompletedTask;
+        },
     };
 });
 
 builder.Services.AddAuthorization();
 
-// ==================== Register Services - Dependency Injection ====================
+Log.Information("JWT Authentication configured");
 
-// ✅ ADD THESE THREE LINES IN ORDER
+// ==================== Register Services - Dependency Injection ====================
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ISlaService, SlaService>();
 builder.Services.AddScoped<ISlaRepository, SlaRepository>();
-// In Program.cs
 
-
-
-// Add other services here as you develop them
-// Example:
-// builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-// builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-// builder.Services.AddScoped<IGoalRepository, GoalRepository>();
-// builder.Services.AddScoped<IGoalService, GoalService>();
+Log.Information("Dependency Injection configured - EmailService, ISlaService, ISlaRepository");
 
 // ===================================================================================
 
@@ -124,6 +212,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+Log.Information("CORS configured");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -134,9 +224,16 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ API v1");
     });
+    Log.Information("Swagger UI enabled");
 }
 
-app.UseSerilogRequestLogging();
+// Enable Serilog request logging
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate =
+        "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.GetLevel = (httpContext, elapsed, ex) => LogEventLevel.Information;
+});
 
 app.UseHttpsRedirection();
 
@@ -158,8 +255,30 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Log.Error($"Database migration failed: {ex.Message}");
+        Log.Error(ex, "Database migration failed: {Message}", ex.Message);
     }
 }
 
-app.Run();
+// Log configuration details
+Log.Information("Application Configuration:");
+Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
+Log.Information("   JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
+Log.Information("   JWT Audience: {Audience}", jwtSettings["Audience"]);
+Log.Information(
+    "   Database: {Database}",
+    connectionString?.Split(';').FirstOrDefault(x => x.Contains("Database"))
+);
+
+try
+{
+    Log.Information("SLA Application started successfully");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "SLA Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
