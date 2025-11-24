@@ -777,3 +777,70 @@
 }
 
  
+/* TABLE CARD */
+.hrvasspm-table-card {
+  background: #fff;
+  border-radius: 0; /* REMOVE BORDER RADIUS */
+  overflow: hidden;
+}
+
+.hrvasspm-table-wrapper {
+  overflow-x: auto;
+  background: #fff;
+  padding: 0;
+}
+
+.hrvasspm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.98rem;
+  background: #fff;
+}
+
+.hrvasspm-table th {
+  background: var(--hrvasspm-brand-indigo);
+  color: #fff !important;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 1.01rem 0.97rem;
+  border: none;
+  font-size: 0.94rem;
+  border-radius: 0; /* REMOVE BORDER RADIUS FROM HEADER CELLS */
+}
+
+/* Remove border-radius from first and last header cells */
+.hrvasspm-table th:first-child {
+  padding-left: 1.5rem;
+  border-radius: 0; /* SHARP CORNER */
+}
+
+.hrvasspm-table th:last-child {
+  padding-right: 1.5rem;
+  border-radius: 0; /* SHARP CORNER */
+}
+
+.hrvasspm-table tbody tr {
+  border-bottom: 1.2px solid var(--hrvasspm-brand-indigo);
+  transition: background 0.11s;
+}
+
+.hrvasspm-table tbody tr:hover {
+  background: #F6F8FB;
+}
+
+.hrvasspm-table td {
+  padding: 1.01rem 0.84rem;
+  color: var(--hrvasspm-brand-indigo);
+  font-weight: 600;
+}
+
+.hrvasspm-table td:first-child {
+  font-weight: 600;
+  padding-left: 1.5rem;
+}
+
+.hrvasspm-table td:last-child {
+  text-align: center;
+  padding-right: 1.5rem;
+}

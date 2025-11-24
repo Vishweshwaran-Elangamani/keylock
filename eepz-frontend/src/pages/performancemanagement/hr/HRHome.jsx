@@ -25,7 +25,7 @@ export default function HRHome() {
     },
    
     {
-      title: "Form Status",
+      title: "Form Details",
       description: "Check review form submissions and status.",
       icon: "bi-file-earmark-text",
       color: "#36d1dc",

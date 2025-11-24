@@ -253,7 +253,7 @@ function HRViewAppraisals() {
               Performance
             </li>
             <li className="cg-breadcrumb-item active" aria-current="page">
-              Form Status
+              Form Details
             </li>
           </ol>
         </nav>

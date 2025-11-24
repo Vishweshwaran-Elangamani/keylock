@@ -45,8 +45,8 @@ function FormsList() {
   "Total Forms": "bi-journal-text",
   "Manager Forms": "bi-person-badge",
   "Delivery Forms": "bi-folder",
-  "Enablement Forms": "bi-lightbulb",          // <-- Added icon
-  "Assigned Users": "bi-people",               // <-- Added icon
+  "Enablement Forms": "bi-lightbulb",          
+  "Assigned Users": "bi-people",              
 };
 
 const analyticsIconBg = {
