@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   FileText,
   Clock,
   CheckCircle,
@@ -21,14 +20,13 @@ import slaService, {
   dateHelpers,
 } from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
+import "../../styles/sla/SLADetails.css";
 
-
-// Helper function to get role-based dashboard path
 const getSLADashboardPath = (roleName) => {
   const routes = {
     Employee: "/employee/dashboard/sla",
-    Manager: "/employee/dashboard/sla",
-    DepartmentHead: "/sla/depthead/dashboard",
+    Manager: "/manager/dashboard/sla",
+    DepartmentHead: "/depthead/daashboard/sla",
     "Department Head": "/sla/depthead/dashboard",
     HR: "/hr/dashboard/sla",
   };
@@ -53,12 +51,11 @@ const SLADetails = () => {
   const [user, setUser] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  // ========== INITIALIZE ==========
   useEffect(() => {
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
       setUser(userData);
-      console.log("👤 Current User:", {
+      console.log("Current User:", {
         empId: userData.empId,
         name: userData.name,
         role: userData.roleName,
@@ -69,7 +66,6 @@ const SLADetails = () => {
     fetchSLADetails();
   }, [slaid]);
 
-  // ========== FETCH SLA DATA ==========
   const fetchSLADetails = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -77,7 +73,7 @@ const SLADetails = () => {
     try {
       const userData = JSON.parse(localStorage.getItem("user") || "{}");
 
-      console.log(`🔍 Fetching SLA ${slaid}`);
+      console.log(`Fetching SLA ${slaid}`);
       const slaResponse = await slaService.getSLAById(parseInt(slaid));
 
       if (!slaResponse?.success || !slaResponse.data) {
@@ -88,23 +84,21 @@ const SLADetails = () => {
       }
 
       setSla(slaResponse.data);
-      console.log("✅ SLA loaded:", slaResponse.data);
+      console.log("SLA loaded:", slaResponse.data);
 
-      // Fetch SLA history
       try {
         const historyResponse = await slaService.getSLAHistory(parseInt(slaid));
         if (historyResponse?.success && Array.isArray(historyResponse.data)) {
           setHistory(historyResponse.data);
-          console.log(`📜 ${historyResponse.data.length} history entries loaded`);
+          console.log(`${historyResponse.data.length} history entries loaded`);
         } else {
           setHistory([]);
         }
       } catch (err) {
-        console.warn("⚠️ Could not load history:", err.message);
+        console.warn("Could not load history:", err.message);
         setHistory([]);
       }
 
-      // Fetch SLA escalations
       try {
         const escalationsResponse = await slaService.getSLAEscalations(
           parseInt(slaid)
@@ -115,14 +109,14 @@ const SLADetails = () => {
         ) {
           const escData = escalationsResponse.data;
           setEscalations(escData);
-          console.log(`🔺 ${escData.length} escalations loaded`);
+          console.log(`${escData.length} escalations loaded`);
           updateEscalationStatus(slaResponse.data, escData, userData);
         } else {
           setEscalations([]);
           updateEscalationStatus(slaResponse.data, [], userData);
         }
       } catch (err) {
-        console.warn("⚠️ Could not load escalations:", err.message);
+        console.warn("Could not load escalations:", err.message);
         setEscalations([]);
         updateEscalationStatus(slaResponse.data, [], userData);
       }
@@ -134,12 +128,11 @@ const SLADetails = () => {
     }
   }, [slaid]);
 
-  // ========== UPDATE ESCALATION STATUS ==========
   const updateEscalationStatus = useCallback(
     (slaData, escalationsData, userData) => {
       if (!slaData || !userData) return;
 
-      console.log("🔍 Checking escalation permissions:", {
+      console.log("Checking escalation permissions:", {
         slaStatus: slaData.status,
         userRole: userData.roleName,
         escalationsCount: escalationsData.length,
@@ -155,7 +148,7 @@ const SLADetails = () => {
 
       const canEsc = canEscalateL1 && isEligibleRole;
 
-      console.log("🎯 Escalation Check Result:", {
+      console.log("Escalation Check Result:", {
         canEscalateL1,
         isEligibleRole,
         finalDecision: canEsc,
@@ -170,10 +163,10 @@ const SLADetails = () => {
           "L1"
         );
         setEscalationBlockReason(reason);
-        console.log("⚠️ Escalation blocked:", reason);
+        console.log("Escalation blocked:", reason);
       } else {
         setEscalationBlockReason(null);
-        console.log("✅ Escalation allowed");
+        console.log("Escalation allowed");
       }
 
       setCanReopen(
@@ -183,18 +176,17 @@ const SLADetails = () => {
     []
   );
 
-  // ========== ACTION HANDLERS ==========
   const handleEscalateClick = useCallback(() => {
-    console.log("🚀 Escalate button clicked");
+    console.log("Escalate button clicked");
     if (!canEscalate) {
-      console.warn("⚠️ Escalation blocked:", escalationBlockReason);
+      console.warn("Escalation blocked:", escalationBlockReason);
       toast.error("Cannot escalate", {
         description: escalationBlockReason || "Escalation is not available",
         duration: 4000,
       });
       return;
     }
-    console.log("✅ Opening escalation form");
+    console.log("Opening escalation form");
     setShowEscalationForm(true);
   }, [canEscalate, escalationBlockReason]);
 
@@ -202,7 +194,7 @@ const SLADetails = () => {
     try {
       setRefreshing(true);
       setShowCloseConfirmation(false);
-      console.log(`🔒 Closing SLA ${sla.slaid}`);
+      console.log(`Closing SLA ${sla.slaid}`);
       const res = await slaService.closeSLA({
         slaid: sla.slaid,
         closedByEmployeeId: user.empId,
@@ -210,56 +202,39 @@ const SLADetails = () => {
       });
 
       if (res?.success) {
-        console.log("✅ SLA closed successfully");
-        toast.success("SLA closed successfully", {
-          description: "The SLA has been marked as closed",
-          duration: 4000,
-        });
+        console.log("SLA closed successfully");
+        toast.success("SLA closed successfully");
         await fetchSLADetails();
       } else {
-        console.error("❌ Failed to close SLA:", res?.message);
-        toast.error("Failed to close SLA", {
-          description: res?.message || "Unable to close the SLA",
-          duration: 5000,
-        });
+        console.error("Failed to close SLA:", res?.message);
+        toast.error("Failed to close SLA");
       }
     } catch (err) {
-      console.error("❌ Error closing SLA:", err);
-      toast.error("Error closing SLA", {
-        description: err.message || "An unexpected error occurred",
-        duration: 5000,
-      });
+      console.error("Error closing SLA:", err);
+      toast.error("Error closing SLA");
     } finally {
       setRefreshing(false);
     }
   }, [sla, user, fetchSLADetails]);
 
   const handleReopenSuccess = useCallback(() => {
-    console.log("✅ SLA reopened successfully");
+    console.log("SLA reopened successfully");
     setShowReopenForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
 
   const handleEscalationSuccess = useCallback(() => {
-    console.log("✅ Escalation submitted successfully");
+    console.log("Escalation submitted successfully");
     setShowEscalationForm(false);
     fetchSLADetails();
   }, [fetchSLADetails]);
 
-  // ========== RENDER ==========
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "600px" }}
-      >
-        <div className="text-center">
-          <Loader
-            size={48}
-            className="text-primary mb-3"
-            style={{ animation: "spin 1s linear infinite" }}
-          />
-          <p className="text-muted">Loading SLA details...</p>
+      <div className="sla-details-loading-wrapper">
+        <div className="sla-details-loading-content">
+          <Loader size={48} className="sla-details-loading-spinner" />
+          <p className="sla-details-loading-text">Loading SLA details...</p>
         </div>
       </div>
     );
@@ -267,13 +242,12 @@ const SLADetails = () => {
 
   if (error || !sla) {
     return (
-      <div className="p-4">
-        <div className="alert alert-danger d-flex align-items-center gap-2 mb-4">
+      <div className="sla-details-error-wrapper">
+        <div className="sla-details-error-alert">
           <AlertTriangle size={20} />
           <span>{error || "SLA not found"}</span>
         </div>
-        <button className="btn btn-primary" onClick={() => navigate(-1)}>
-          <ArrowLeft size={16} className="me-2" />
+        <button className="sla-details-error-btn" onClick={() => navigate(-1)}>
           Go Back
         </button>
       </div>
@@ -282,19 +256,16 @@ const SLADetails = () => {
 
   const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
   const hasEscalations = escalations.length > 0;
-
-  // Get role-based dashboard path
   const slaDashboardPath = user
     ? getSLADashboardPath(user.roleName)
-    : "/employee/dashboard/sla";
+    : "/dashboard/sla";
 
   return (
     <div className="sla-details-container">
-      {/* ========== BREADCRUMB ========== */}
       <Breadcrumb
         items={[
           {
-            label: "SLA Management",
+            label: "SLA Compliance",
             path: slaDashboardPath,
           },
           {
@@ -303,74 +274,52 @@ const SLADetails = () => {
         ]}
       />
 
-      {/* ========== HEADER ========== */}
-      <div className="sla-details-header">
-        <div className="sla-details-header-left">
-          <button
-            onClick={() => navigate(-1)}
-            className="sla-details-back-btn"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h2 className="sla-details-title">SLA Details</h2>
-            <p className="sla-details-subtitle">
-              SLA #{sla.slaid} - {sla.slatype}
-            </p>
-          </div>
-        </div>
-
-        {/* ACTION BUTTONS */}
-        <div className="sla-details-actions">
-          {sla.status !== "Closed" &&
-            (user?.roleName === "Employee" || user?.roleName === "Manager") &&
-            (canEscalate ? (
-              <button
-                onClick={handleEscalateClick}
-                className="sla-details-btn sla-details-btn-warning"
-              >
-                <AlertTriangle size={16} />
-                Escalate
-              </button>
-            ) : (
-              <button
-                disabled
-                className="sla-details-btn sla-details-btn-disabled"
-                title={escalationBlockReason || "Cannot escalate"}
-              >
-                <AlertTriangle size={16} />
-                Escalated
-              </button>
-            ))}
-
-          {canReopen && sla.status === "Closed" && (
+      <div className="sla-details-actions-wrapper">
+        {sla.status !== "Closed" &&
+          (user?.roleName === "Employee" || user?.roleName === "Manager") &&
+          (canEscalate ? (
             <button
-              onClick={() => setShowReopenForm(true)}
+              onClick={handleEscalateClick}
               className="sla-details-btn sla-details-btn-warning"
             >
-              <RotateCcw size={16} />
-              Reopen
+              <AlertTriangle size={16} />
+              Escalate
             </button>
-          )}
-
-          {sla.status !== "Closed" && user?.roleName === "Manager" && (
+          ) : (
             <button
-              onClick={() => setShowCloseConfirmation(true)}
-              disabled={refreshing}
-              className="sla-details-btn sla-details-btn-success"
+              disabled
+              className="sla-details-btn sla-details-btn-disabled"
+              title={escalationBlockReason || "Cannot escalate"}
             >
-              <CheckCircle size={16} />
-              Close SLA
+              <AlertTriangle size={16} />
+              Escalated
             </button>
-          )}
-        </div>
+          ))}
+
+        {canReopen && sla.status === "Closed" && (
+          <button
+            onClick={() => setShowReopenForm(true)}
+            className="sla-details-btn sla-details-btn-reopen"
+          >
+            <RotateCcw size={16} />
+            Reopen
+          </button>
+        )}
+
+        {sla.status !== "Closed" && user?.roleName === "Manager" && (
+          <button
+            onClick={() => setShowCloseConfirmation(true)}
+            disabled={refreshing}
+            className="sla-details-btn sla-details-btn-primary"
+          >
+            <CheckCircle size={16} />
+            Close SLA
+          </button>
+        )}
       </div>
 
-      {/* ========== MAIN GRID ========== */}
       <div className="row g-4">
-        {/* LEFT COLUMN */}
         <div className="col-lg-8">
-          {/* STATUS CARD */}
           <div className="sla-details-card mb-4">
             <div className="sla-details-card-body">
               <div className="sla-details-status-header">
@@ -401,7 +350,6 @@ const SLADetails = () => {
                 </div>
               </div>
 
-              {/* DETAILS GRID */}
               <div className="row g-4">
                 <div className="col-md-6">
                   <small className="sla-details-label">Employee</small>
@@ -410,7 +358,7 @@ const SLADetails = () => {
                   </strong>
                 </div>
                 <div className="col-md-6">
-                  <small className="sla-details-label">SLA Created By</small>
+                  <small className="sla-details-label">Department</small>
                   <strong className="sla-details-value">
                     {sla.departmentName || "—"}
                   </strong>
@@ -435,7 +383,6 @@ const SLADetails = () => {
                 </div>
               </div>
 
-              {/* REOPEN ALERT */}
               {sla.reopenedAt && (
                 <div className="sla-details-alert">
                   <RotateCcw size={20} className="flex-shrink-0" />
@@ -459,7 +406,6 @@ const SLADetails = () => {
             </div>
           </div>
 
-          {/* ESCALATION CHAIN */}
           {hasEscalations && (
             <div className="sla-details-card mb-4">
               <div className="sla-details-card-body">
@@ -550,7 +496,6 @@ const SLADetails = () => {
             </div>
           )}
 
-          {/* PILL-STYLE TABS */}
           <div className="sla-details-tabs-wrapper">
             <div className="sla-details-tabs-container">
               <button
@@ -574,7 +519,6 @@ const SLADetails = () => {
             </div>
           </div>
 
-          {/* TAB CONTENT */}
           <div className="sla-details-card">
             <div className="sla-details-card-body">
               {activeTab === "details" && (
@@ -616,7 +560,6 @@ const SLADetails = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDEBAR */}
         <div className="col-lg-4">
           <div className="sla-details-sidebar">
             <div className="sla-details-card-body">
@@ -674,7 +617,6 @@ const SLADetails = () => {
         </div>
       </div>
 
-      {/* ========== MODALS ========== */}
       {showReopenForm && (
         <ReopenSLAForm
           sla={sla}
@@ -691,74 +633,82 @@ const SLADetails = () => {
         />
       )}
 
-      {/* ========== REDESIGNED CLOSE CONFIRMATION MODAL - LEFT ALIGNED ========== */}
       {showCloseConfirmation && (
         <>
           <div
-            className="sla-modal-backdrop"
+            className="sla-close-modal-backdrop"
             onClick={() => !refreshing && setShowCloseConfirmation(false)}
           />
-          <div className="sla-modal-wrapper">
-            <div className="sla-modal-container">
-              {/* Close Button */}
-              <button
-                type="button"
-                className="sla-modal-close-btn"
-                onClick={() => setShowCloseConfirmation(false)}
-                disabled={refreshing}
-              >
-                <X size={20} />
-              </button>
-
-              {/* Icon & Title Section */}
-              <div className="sla-modal-header">
-                <div className="sla-modal-icon-wrapper">
-                  <CheckCircle size={32} />
-                </div>
-                <h3 className="sla-modal-title">Close This SLA?</h3>
-                <p className="sla-modal-description">
-                  You're about to mark this SLA as completed and closed.
-                </p>
-              </div>
-
-              {/* Info Box */}
-              <div className="sla-modal-info-box">
-                <div className="sla-modal-info-icon">
-                  <Info size={18} />
-                </div>
-                <div className="sla-modal-info-content">
-                  <p className="sla-modal-info-title">What happens next?</p>
-                  <ul className="sla-modal-info-list">
-                    <li>The SLA status will be changed to "Closed"</li>
-                    <li>This action will be recorded in the SLA history</li>
-                    <li>You can reopen this SLA later if needed</li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* SLA Details Summary */}
-              <div className="sla-modal-summary">
-                <div className="sla-modal-summary-row">
-                  <span className="sla-modal-summary-label">SLA Type:</span>
-                  <span className="sla-modal-summary-value">{sla.slatype}</span>
-                </div>
-                <div className="sla-modal-summary-row">
-                  <span className="sla-modal-summary-label">Employee:</span>
-                  <span className="sla-modal-summary-value">{sla.employeeName}</span>
-                </div>
-                <div className="sla-modal-summary-row">
-                  <span className="sla-modal-summary-label">Current Status:</span>
-                  <span className="sla-modal-badge sla-modal-badge-open">
-                    {sla.status}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="sla-modal-actions">
+          <div className="sla-close-modal-wrapper">
+            <div className="sla-close-modal-container">
+              <div className="sla-close-modal-header">
+                <h3 className="sla-close-modal-title">Close This SLA?</h3>
                 <button
                   type="button"
-                  className="sla-modal-btn sla-modal-btn-secondary"
+                  className="sla-close-modal-close-btn"
+                  onClick={() => setShowCloseConfirmation(false)}
+                  disabled={refreshing}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="sla-close-modal-body">
+                <div className="sla-close-modal-icon-wrapper">
+                  <CheckCircle size={48} />
+                </div>
+                <p className="sla-close-modal-description">
+                  You're about to mark this SLA as completed and closed.
+                </p>
+
+                <div className="sla-close-modal-info-box">
+                  <div className="sla-close-modal-info-icon">
+                    <Info size={18} />
+                  </div>
+                  <div className="sla-close-modal-info-content">
+                    <p className="sla-close-modal-info-title">
+                      What happens next?
+                    </p>
+                    <ul className="sla-close-modal-info-list">
+                      <li>The SLA status will be changed to "Closed"</li>
+                      <li>This action will be recorded in the SLA history</li>
+                      <li>You can reopen this SLA later if needed</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="sla-close-modal-summary">
+                  <div className="sla-close-modal-summary-row">
+                    <span className="sla-close-modal-summary-label">
+                      SLA Type:
+                    </span>
+                    <span className="sla-close-modal-summary-value">
+                      {sla.slatype}
+                    </span>
+                  </div>
+                  <div className="sla-close-modal-summary-row">
+                    <span className="sla-close-modal-summary-label">
+                      Employee:
+                    </span>
+                    <span className="sla-close-modal-summary-value">
+                      {sla.employeeName}
+                    </span>
+                  </div>
+                  <div className="sla-close-modal-summary-row">
+                    <span className="sla-close-modal-summary-label">
+                      Current Status:
+                    </span>
+                    <span className="sla-close-modal-badge sla-close-modal-badge-open">
+                      {sla.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="sla-close-modal-actions">
+                <button
+                  type="button"
+                  className="sla-close-modal-btn sla-close-modal-btn-secondary"
                   onClick={() => setShowCloseConfirmation(false)}
                   disabled={refreshing}
                 >
@@ -766,13 +716,13 @@ const SLADetails = () => {
                 </button>
                 <button
                   type="button"
-                  className="sla-modal-btn sla-modal-btn-primary"
+                  className="sla-close-modal-btn sla-close-modal-btn-primary"
                   onClick={handleCloseSLA}
                   disabled={refreshing}
                 >
                   {refreshing ? (
                     <>
-                      <span className="sla-modal-spinner" />
+                      <span className="sla-close-modal-spinner" />
                       Closing...
                     </>
                   ) : (
@@ -787,718 +737,6 @@ const SLADetails = () => {
           </div>
         </>
       )}
-
-      {/* ========== INTERNAL STYLES ========== */}
-      <style>{`
-        /* Container */
-        .sla-details-container {
-          padding: 1.5rem 1.75rem;
-          background-color: #F9FAFB;
-          min-height: 100vh;
-        }
-
-        /* Header */
-        .sla-details-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1.5rem;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
-        .sla-details-header-left {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          flex-grow: 1;
-        }
-
-        .sla-details-back-btn {
-          width: 40px;
-          height: 40px;
-          border-radius: 8px;
-          border: 1.5px solid #E5E7EB;
-          background: #FFFFFF;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s;
-          color: #6B7280;
-        }
-
-        .sla-details-back-btn:hover {
-          background: #F9FAFB;
-          border-color: #D1D5DB;
-          color: #111827;
-        }
-
-        .sla-details-title {
-          font-size: 1.75rem;
-          font-weight: 700;
-          color: #27235C;
-          margin: 0 0 0.25rem;
-          line-height: 1.2;
-        }
-
-        .sla-details-subtitle {
-          font-size: 0.875rem;
-          color: #6B7280;
-          margin: 0;
-        }
-
-        .sla-details-actions {
-          display: flex;
-          gap: 0.75rem;
-          flex-wrap: wrap;
-          justify-content: flex-end;
-        }
-
-        /* Buttons */
-        .sla-details-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.625rem 1.25rem;
-          font-size: 0.875rem;
-          font-weight: 600;
-          border-radius: 8px;
-          border: none;
-          cursor: pointer;
-          transition: all 0.2s;
-          white-space: nowrap;
-        }
-
-        .sla-details-btn-warning {
-          background: #FFFFFF;
-          color: #F59E0B;
-          border: 1.5px solid #F59E0B;
-        }
-
-        .sla-details-btn-warning:hover {
-          background: #F59E0B;
-          color: #FFFFFF;
-          transform: translateY(-1px);
-        }
-
-        .sla-details-btn-success {
-          background: linear-gradient(90deg, #16A34A 0%, #059669 100%);
-          color: #FFFFFF;
-        }
-
-        .sla-details-btn-success:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-        }
-
-        .sla-details-btn-disabled {
-          background: #F3F4F6;
-          color: #9CA3AF;
-          border: 1.5px solid #E5E7EB;
-          cursor: not-allowed;
-        }
-
-        /* Card */
-        .sla-details-card {
-          background: #FFFFFF;
-          border-radius: 12px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          border: 2px solid #27235C;
-          overflow: hidden;
-        }
-
-        .sla-details-card-body {
-          padding: 1.5rem;
-          text-align: left;
-          
-
-         
-
-
-
-        }
-
-        /* Status Header */
-        .sla-details-status-header {
-          display: flex;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-          align-items: start;
-        }
-
-        .sla-details-icon-wrapper {
-          width: 56px;
-          height: 56px;
-          background: #EEF2FF;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .sla-details-type-title {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #111827;
-          margin: 0 0 0.5rem;
-        }
-
-        /* Labels & Values */
-        .sla-details-label {
-          display: block;
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: #6B7280;
-          margin-bottom: 0.5rem;
-          font-style:normal;
-
-  
-          letter-spacing: 0.5px;
-        }
-
-        .sla-details-value {
-          font-size: 0.9375rem;
-          color: #111827;
-          font-weight: 500;
-          display: block;
-        }
-
-        /* Badges */
-        .sla-details-badges {
-          display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-          justify-content: flex-start;
-        }
-
-        .sla-details-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.25rem;
-          padding: 0.375rem 0.75rem;
-          border-radius: 6px;
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-
-        .sla-details-badge-open {
-          background: #DBEAFE;
-          color: #1E40AF;
-        }
-
-        .sla-details-badge-closed {
-          background: #DCFCE7;
-          color: #15803D;
-        }
-
-        .sla-details-badge-escalated {
-          background: #FEE2E2;
-          color: #B91C1C;
-        }
-
-        .sla-details-badge-warning {
-          background: #FEF3C7;
-          color: #92400E;
-        }
-
-        .sla-details-badge-info {
-          background: #E0E7FF;
-          color: #4338CA;
-        }
-
-        .sla-details-badge-success {
-          background: #DCFCE7;
-          color: #15803D;
-        }
-
-        .sla-details-badge-pending {
-          background: #FEF3C7;
-          color: #92400E;
-        }
-
-        /* Alert */
-        .sla-details-alert {
-          background: #FEF3C7;
-          border: 1px solid #FCD34D;
-          border-radius: 8px;
-          padding: 1rem;
-          display: flex;
-          gap: 0.75rem;
-          align-items: start;
-          margin-top: 1.5rem;
-        }
-
-        /* Section Title */
-        .sla-details-section-title {
-          font-size: 1.125rem;
-          font-weight: 700;
-          color: #111827;
-          margin: 0 0 1rem;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        /* Escalation Items */
-        .sla-details-escalation-item {
-          margin-bottom: 1rem;
-          padding-bottom: 1rem;
-          
-        }
-
-        .sla-details-escalation-content {
-          background: #F9FAFB;
-          border: 1px solid #27235C;
-          border-radius: 8px;
-          padding: 1rem;
-        }
-
-        /* Pill-Style Tabs */
-        .sla-details-tabs-wrapper {
-          display: flex;
-          justify-content: flex-start;
-          margin-bottom: 1.25rem;
-        }
-
-        .sla-details-tabs-container {
-          display: inline-flex;
-          background: #27235C;
-          padding: 0.375rem;
-          border-radius: 50px;
-          gap: 0.375rem;
-          box-shadow: 0 2px 8px rgba(39, 35, 92, 0.2);
-          te
-        }
-
-        .sla-details-tab-pill {
-          padding: 0.625rem 1.75rem;
-          border-radius: 50px;
-          border: none;
-          background: transparent;
-          color: #FFFFFF;
-          font-size: 0.875rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.25s;
-          white-space: nowrap;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .sla-details-tab-pill:hover:not(.active) {
-          background: rgba(255, 255, 255, 0.1);
-        }
-
-        .sla-details-tab-pill.active {
-          background: #FFFFFF;
-          color: #27235C;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Empty State */
-        .sla-details-empty {
-          text-align: center;
-          padding: 3rem 1rem;
-        }
-
-        .sla-details-empty-icon {
-          color: #D1D5DB;
-          opacity: 0.3;
-          margin-bottom: 1rem;
-        }
-
-        .sla-details-empty-text {
-          color: #6B7280;
-          font-weight: 500;
-          font-size: 0.9375rem;
-          margin: 0;
-        }
-
-        /* Sidebar */
-        .sla-details-sidebar {
-          background: #FFFFFF;
-          border-radius: 12px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          border: 3px solid #25235c;
-          position: sticky;
-          top: 20px;
-        }
-
-        .sla-details-sidebar-title {
-          font-size: 1.125rem;
-          font-weight: 700;
-          color: #111827;
-          margin: 0 0 1.5rem;
-        }
-
-        .sla-details-sidebar-item {
-          margin-bottom: 1.5rem;
-          padding-bottom: 1.5rem;
-          border-bottom: 1px solid #E5E7EB;
-        }
-
-        .sla-details-sidebar-value {
-          font-size: 2rem;
-          font-weight: 700;
-          line-height: 1;
-        }
-
-        .sla-details-sidebar-subtitle {
-          font-size: 0.875rem;
-          margin-top: 0.25rem;
-          font-weight: 500;
-        }
-
-        .sla-details-sidebar-highlight {
-          background: #EFF6FF;
-          border: 1px solid #BFDBFE;
-          border-radius: 8px;
-          padding: 1rem;
-        }
-
-        .sla-details-sidebar-highlight-label {
-          display: block;
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: #1E40AF;
-          margin-bottom: 0.5rem;
-          text-transform: uppercase;
-        }
-
-        .sla-details-sidebar-highlight-value {
-          font-size: 1.75rem;
-          font-weight: 700;
-          color: #1E40AF;
-          line-height: 1;
-        }
-
-        /* ========================================
-           REDESIGNED MODAL - LEFT ALIGNED
-           ======================================== */
-
-        .sla-modal-backdrop {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
-          z-index: 1050;
-          animation: sla-modal-fade-in 0.2s ease;
-        }
-
-        @keyframes sla-modal-fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        .sla-modal-wrapper {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 1055;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 1rem;
-          animation: sla-modal-slide-up 0.3s ease;
-        }
-
-        @keyframes sla-modal-slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .sla-modal-container {
-          background: #FFFFFF;
-          border-radius: 16px;
-          max-width: 500px;
-          width: 100%;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-          position: relative;
-          padding: 2rem;
-          text-align: left;
-        }
-
-        .sla-modal-close-btn {
-          position: absolute;
-          top: 1rem;
-          right: 1rem;
-          width: 36px;
-          height: 36px;
-          border-radius: 8px;
-          border: none;
-          background: #F3F4F6;
-          color: #6B7280;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-
-        .sla-modal-close-btn:hover:not(:disabled) {
-          background: #E5E7EB;
-          color: #111827;
-        }
-
-        .sla-modal-close-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        .sla-modal-header {
-          margin-bottom: 1.5rem;
-        }
-
-        .sla-modal-icon-wrapper {
-          width: 64px;
-          height: 64px;
-          background: linear-gradient(135deg, #DCFCE7 0%, #BBF7D0 100%);
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #16A34A;
-          margin-bottom: 1.25rem;
-        }
-
-        .sla-modal-title {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #111827;
-          margin: 0 0 0.75rem;
-          line-height: 1.2;
-        }
-
-        .sla-modal-description {
-          font-size: 0.9375rem;
-          color: #6B7280;
-          margin: 0;
-          line-height: 1.5;
-        }
-
-        .sla-modal-info-box {
-          background: #EFF6FF;
-          border: 1px solid #BFDBFE;
-          border-radius: 12px;
-          padding: 1rem;
-          margin-bottom: 1.5rem;
-          display: flex;
-          gap: 0.75rem;
-          align-items: start;
-        }
-
-        .sla-modal-info-icon {
-          width: 36px;
-          height: 36px;
-          background: #DBEAFE;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #2563EB;
-          flex-shrink: 0;
-        }
-
-        .sla-modal-info-content {
-          flex: 1;
-        }
-
-        .sla-modal-info-title {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #1E40AF;
-          margin: 0 0 0.5rem;
-        }
-
-        .sla-modal-info-list {
-          margin: 0;
-          padding-left: 1.25rem;
-          font-size: 0.8125rem;
-          color: #475569;
-          line-height: 1.6;
-        }
-
-        .sla-modal-info-list li {
-          margin-bottom: 0.25rem;
-        }
-
-        .sla-modal-summary {
-          background: #F9FAFB;
-          border: 1px solid #E5E7EB;
-          border-radius: 10px;
-          padding: 1rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .sla-modal-summary-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0.5rem 0;
-          border-bottom: 1px solid #E5E7EB;
-        }
-
-        .sla-modal-summary-row:last-child {
-          border-bottom: none;
-          padding-bottom: 0;
-        }
-
-        .sla-modal-summary-label {
-          font-size: 0.8125rem;
-          color: #6B7280;
-          font-weight: 600;
-        }
-
-        .sla-modal-summary-value {
-          font-size: 0.875rem;
-          color: #111827;
-          font-weight: 600;
-          text-align: right;
-        }
-
-        .sla-modal-badge {
-          display: inline-flex;
-          padding: 0.25rem 0.625rem;
-          border-radius: 5px;
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-
-        .sla-modal-badge-open {
-          background: #DBEAFE;
-          color: #1E40AF;
-        }
-
-        .sla-modal-actions {
-          display: flex;
-          gap: 0.75rem;
-          justify-content: flex-end;
-        }
-
-        .sla-modal-btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1.5rem;
-          font-size: 0.9375rem;
-          font-weight: 600;
-          border-radius: 8px;
-          border: none;
-          cursor: pointer;
-          transition: all 0.2s;
-          white-space: nowrap;
-        }
-
-        .sla-modal-btn-secondary {
-          background: #FFFFFF;
-          color: #6B7280;
-          border: 1.5px solid #E5E7EB;
-        }
-
-        .sla-modal-btn-secondary:hover:not(:disabled) {
-          background: #F9FAFB;
-          border-color: #D1D5DB;
-          color: #111827;
-        }
-
-        .sla-modal-btn-primary {
-          background: linear-gradient(90deg, #16A34A 0%, #059669 100%);
-          color: #FFFFFF;
-          box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
-        }
-
-        .sla-modal-btn-primary:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
-        }
-
-        .sla-modal-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .sla-modal-spinner {
-          width: 16px;
-          height: 16px;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-top-color: #FFFFFF;
-          border-radius: 50%;
-          animation: sla-modal-spin 0.6s linear infinite;
-        }
-
-        @keyframes sla-modal-spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        /* Animation */
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-          .sla-details-container {
-            padding: 1.25rem;
-          }
-
-          .sla-details-header {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-
-          .sla-details-actions {
-            width: 100%;
-          }
-
-          .sla-details-tabs-container {
-            width: 100%;
-          }
-
-          .sla-details-tab-pill {
-            flex: 1;
-            justify-content: center;
-          }
-
-          .sla-details-sidebar {
-            position: relative;
-            top: 0;
-          }
-
-          .sla-modal-container {
-            padding: 1.5rem;
-          }
-
-          .sla-modal-actions {
-            flex-direction: column;
-          }
-
-          .sla-modal-btn {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 };

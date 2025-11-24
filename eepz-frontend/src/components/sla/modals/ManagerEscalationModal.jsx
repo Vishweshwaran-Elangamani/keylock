@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Send, AlertTriangle } from "lucide-react";
+import { X, Send, AlertTriangle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
 
@@ -76,16 +76,10 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
 
     if (!reason) {
       setError("Please select a reason");
-      toast.warning("Validation Error", {
-        description: "Please select a reason for escalation",
-      });
       return;
     }
     if (comments.trim().length < 10) {
       setError("Comments must be at least 10 characters");
-      toast.warning("Validation Error", {
-        description: "Comments must be at least 10 characters",
-      });
       return;
     }
 
@@ -102,43 +96,21 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
       };
 
       await onEscalate(payload);
-
-      toast.success("Escalation Successful!", {
-        description: `SLA escalated to ${deptHead.firstName} ${deptHead.lastName} (Department Head).`,
-        duration: 3000,
-      });
-
+      toast.success("SLA escalated successfully");
       setTimeout(() => {
         onClose();
-      }, 1500);
+      }, 1000);
     } catch (err) {
       setError(err.message || "Error escalating");
-      toast.error("Escalation Failed", {
-        description:
-          err.message ||
-          "An error occurred while escalating. Please try again.",
-        duration: 4000,
-      });
+      toast.error("Escalation failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (
-      e.ctrlKey &&
-      e.key === "Enter" &&
-      reason &&
-      comments.trim().length >= 10 &&
-      !loading
-    ) {
-      handleSubmit(e);
-    }
-  };
-
   if (!review) return null;
 
-  // ========== LOADING STATE ==========
+  // Loading State
   if (fetchingDeptHead) {
     return (
       <div
@@ -148,34 +120,37 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 1055,
+          zIndex: 1050,
+          backdropFilter: "blur(4px)",
         }}
       >
         <div
           style={{
-            background: "#fff",
+            backgroundColor: "white",
             borderRadius: "12px",
-            padding: "3rem",
+            padding: "2rem",
             textAlign: "center",
-            maxWidth: "400px",
+            maxWidth: "320px",
           }}
         >
           <div
             className="spinner-border text-primary mb-3"
             role="status"
-            style={{ width: "3rem", height: "3rem" }}
+            style={{ width: "2.5rem", height: "2.5rem" }}
           />
-          <p className="text-muted mb-0">Loading escalation details...</p>
+          <p style={{ margin: 0, color: "#6B7280", fontSize: "0.875rem" }}>
+            Loading escalation details...
+          </p>
         </div>
       </div>
     );
   }
 
-  // ========== ALREADY ESCALATED ERROR ==========
+  // Already Escalated Error
   if (alreadyEscalated) {
     return (
       <div
@@ -185,73 +160,103 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 1055,
+          zIndex: 1050,
+          backdropFilter: "blur(4px)",
         }}
         onClick={onClose}
       >
         <div
           style={{
-            background: "#fff",
+            backgroundColor: "white",
             borderRadius: "12px",
-            overflow: "hidden",
-            maxWidth: "500px",
             width: "90%",
+            maxWidth: "420px",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
+            overflow: "hidden",
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div style={{ background: "#3E3A64", padding: "1rem 1.5rem" }}>
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center gap-2">
-                <AlertTriangle size={20} color="#FCD34D" />
-                <h6 className="mb-0 fw-bold" style={{ color: "#fff" }}>
-                  Already Escalated
-                </h6>
-              </div>
-              <button
-                onClick={onClose}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "4px",
-                }}
-              >
-                <X size={20} color="#fff" />
-              </button>
-            </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "1.25rem 1.5rem",
+              backgroundColor: "#3c3862",
+              borderBottom: "none",
+            }}
+          >
+            <h5
+              style={{
+                margin: 0,
+                fontWeight: 600,
+                fontSize: "1.1rem",
+                color: "white",
+                textAlign: "left",
+              }}
+            >
+              Already Escalated
+            </h5>
+            <button
+              onClick={onClose}
+              style={{
+                border: "none",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                padding: "0.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: 0.8,
+                transition: "opacity 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
+            >
+              <X size={24} color="white" />
+            </button>
           </div>
 
-          <div style={{ padding: "2rem", textAlign: "center" }}>
-            <AlertTriangle size={48} className="text-warning mb-3" />
-            <h5 className="fw-bold mb-2">Escalation Already Pending</h5>
-            <p className="text-muted mb-0">
-              This SLA has already been escalated to the Department Head and is
-              awaiting response.
+          <div style={{ padding: "2rem", backgroundColor: "#f8f9fa", textAlign: "center" }}>
+            <AlertTriangle size={48} style={{ color: "#F59E0B", marginBottom: "1rem" }} />
+            <h6 style={{ fontWeight: 600, color: "#111827", marginBottom: "0.75rem" }}>
+              Escalation Already Pending
+            </h6>
+            <p style={{ margin: 0, color: "#6B7280", fontSize: "0.875rem", textAlign: "center" }}>
+              This SLA has already been escalated to the Department Head and is awaiting response.
             </p>
           </div>
 
           <div
             style={{
               padding: "1rem 1.5rem",
-              borderTop: "1px solid #DEE2E6",
-              background: "#F8F9FA",
+              borderTop: "1px solid #e5e7eb",
+              backgroundColor: "white",
             }}
           >
             <button
               onClick={onClose}
               style={{
                 width: "100%",
-                borderRadius: "6px",
-                padding: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                background: "#6C757D",
-                color: "#fff",
+                padding: "0.625rem 1.25rem",
                 border: "none",
+                backgroundColor: "#6b7280",
+                color: "white",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#4b5563";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#6b7280";
               }}
             >
               Close
@@ -262,7 +267,7 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
     );
   }
 
-  // ========== NO DEPT HEAD ERROR ==========
+  // No Department Head Error
   if (!deptHead) {
     return (
       <div
@@ -272,50 +277,73 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          zIndex: 1055,
+          zIndex: 1050,
+          backdropFilter: "blur(4px)",
         }}
         onClick={onClose}
       >
         <div
           style={{
-            background: "#fff",
+            backgroundColor: "white",
             borderRadius: "12px",
-            overflow: "hidden",
-            maxWidth: "500px",
             width: "90%",
+            maxWidth: "420px",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
+            overflow: "hidden",
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div style={{ background: "#3E3A64", padding: "1rem 1.5rem" }}>
-            <div className="d-flex justify-content-between align-items-center">
-              <div className="d-flex align-items-center gap-2">
-                <AlertTriangle size={20} color="#DC3545" />
-                <h6 className="mb-0 fw-bold" style={{ color: "#fff" }}>
-                  Error
-                </h6>
-              </div>
-              <button
-                onClick={onClose}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "4px",
-                }}
-              >
-                <X size={20} color="#fff" />
-              </button>
-            </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "1.25rem 1.5rem",
+              backgroundColor: "#3c3862",
+              borderBottom: "none",
+            }}
+          >
+            <h5
+              style={{
+                margin: 0,
+                fontWeight: 600,
+                fontSize: "1.1rem",
+                color: "white",
+                textAlign: "left",
+              }}
+            >
+              Error
+            </h5>
+            <button
+              onClick={onClose}
+              style={{
+                border: "none",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                padding: "0.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: 0.8,
+                transition: "opacity 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
+            >
+              <X size={24} color="white" />
+            </button>
           </div>
 
-          <div style={{ padding: "2rem", textAlign: "center" }}>
-            <AlertTriangle size={48} className="text-danger mb-3" />
-            <h5 className="fw-bold mb-2">No Department Head Available</h5>
-            <p className="text-muted mb-0">
+          <div style={{ padding: "2rem", backgroundColor: "#f8f9fa", textAlign: "center" }}>
+            <AlertTriangle size={48} style={{ color: "#EF4444", marginBottom: "1rem" }} />
+            <h6 style={{ fontWeight: 600, color: "#111827", marginBottom: "0.75rem" }}>
+              No Department Head Available
+            </h6>
+            <p style={{ margin: 0, color: "#6B7280", fontSize: "0.875rem", textAlign: "center" }}>
               Cannot escalate: No department head found for your department.
             </p>
           </div>
@@ -323,21 +351,29 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
           <div
             style={{
               padding: "1rem 1.5rem",
-              borderTop: "1px solid #DEE2E6",
-              background: "#F8F9FA",
+              borderTop: "1px solid #e5e7eb",
+              backgroundColor: "white",
             }}
           >
             <button
               onClick={onClose}
               style={{
                 width: "100%",
-                borderRadius: "6px",
-                padding: "0.5rem",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                background: "#6C757D",
-                color: "#fff",
+                padding: "0.625rem 1.25rem",
                 border: "none",
+                backgroundColor: "#6b7280",
+                color: "white",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#4b5563";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#6b7280";
               }}
             >
               Close
@@ -358,178 +394,244 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "rgba(0,0,0,0.5)",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 1055,
-        padding: "1rem",
+        zIndex: 1050,
+        backdropFilter: "blur(4px)",
       }}
       onClick={!loading ? onClose : undefined}
     >
       <div
         style={{
-          background: "#fff",
+          backgroundColor: "white",
           borderRadius: "12px",
+          width: "90%",
+          maxWidth: "540px",
+          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
           overflow: "hidden",
-          maxWidth: "1100px",
-          width: "100%",
-          boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div
           style={{
-            background: "#3E3A64",
-            padding: "1rem 1.5rem",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            padding: "1.25rem 1.5rem",
+            backgroundColor: "#3c3862",
+            borderBottom: "none",
           }}
         >
-          <div className="d-flex align-items-center gap-2">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              style={{ color: "#fff" }}
-            >
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
-            <h6 className="mb-0 fw-bold" style={{ color: "#fff", fontSize: "1rem" }}>
-              Escalate to Department Head
-            </h6>
-          </div>
+          <h5
+            style={{
+              margin: 0,
+              fontWeight: 600,
+              fontSize: "1.1rem",
+              color: "white",
+              textAlign: "left",
+            }}
+          >
+            Escalate to Department Head
+          </h5>
           <button
             onClick={onClose}
             disabled={loading}
             style={{
-              background: "transparent",
               border: "none",
-              cursor: "pointer",
-              padding: "4px",
-              opacity: 0.9,
+              backgroundColor: "transparent",
+              cursor: loading ? "not-allowed" : "pointer",
+              padding: "0.5rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: loading ? 0.5 : 0.8,
+              transition: "opacity 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.opacity = "1";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.opacity = "0.8";
+              }
             }}
           >
-            <X size={20} color="#fff" />
+            <X size={24} color="white" />
           </button>
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit}>
-          <div style={{ padding: "2rem 3rem" }}>
-            {error && (
-              <div
-                className="alert alert-danger d-flex align-items-start gap-2 mb-4"
-                style={{ borderRadius: "8px" }}
-              >
-                <AlertTriangle size={18} className="flex-shrink-0 mt-1" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            {/* SLA Details Section */}
+        <div style={{ padding: "1.75rem", backgroundColor: "#f8f9fa" }}>
+          {/* Error Alert */}
+          {error && (
             <div
               style={{
-                background: "#F8F9FA",
-                padding: "1.25rem 1.5rem",
+                display: "flex",
+                gap: "0.75rem",
+                padding: "1rem",
+                backgroundColor: "rgba(224, 25, 80, 0.1)",
+                border: "1px solid rgba(224, 25, 80, 0.3)",
                 borderRadius: "8px",
-                border: "1px solid #E9ECEF",
                 marginBottom: "1.5rem",
-                textAlign: "center",
+                alignItems: "flex-start",
               }}
             >
-              <div
+              <AlertCircle
+                size={20}
+                style={{ color: "#E01950", flexShrink: 0, marginTop: "2px" }}
+              />
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, color: "#991b1b", fontSize: "0.875rem", textAlign: "left" }}>
+                  {error}
+                </p>
+              </div>
+              <button
+                onClick={() => setError(null)}
                 style={{
-                  fontSize: "0.813rem",
-                  fontWeight: 600,
-                  color: "#6C757D",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                  padding: "0",
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#E01950",
+                  opacity: 0.7,
+                  transition: "opacity 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
+              >
+                <X size={18} />
+              </button>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            {/* SLA Details Box */}
+            <div
+              style={{
+                backgroundColor: "white",
+                padding: "0.875rem",
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <small
+                style={{
+                  display: "block",
                   marginBottom: "0.5rem",
+                  fontSize: "0.8125rem",
+                  fontWeight: 500,
+                  color: "#6b7280",
+                  textAlign: "left",
                 }}
               >
-                SLA Details:
-              </div>
-              <div
+                SLA Details
+              </small>
+              <strong
                 style={{
-                  fontSize: "1.125rem",
-                  color: "#212529",
-                  fontWeight: 600,
+                  display: "block",
                   marginBottom: "0.25rem",
+                  fontSize: "0.9375rem",
+                  color: "#374151",
+                  textAlign: "left",
                 }}
               >
                 {review.employeeName} - {review.slatype}
-              </div>
-              <small style={{ color: "#6C757D", fontSize: "0.813rem" }}>
+              </strong>
+              <small
+                style={{
+                  display: "block",
+                  fontSize: "0.8125rem",
+                  color: "#6b7280",
+                  textAlign: "left",
+                }}
+              >
                 SLA #{review.slaid}
               </small>
             </div>
 
-            {/* Escalating To Section */}
+            {/* Escalating To Box */}
             <div
               style={{
-                background: "#E8F4F8",
-                padding: "1.25rem 1.5rem",
+                backgroundColor: "#E0E7FF",
+                padding: "0.875rem",
                 borderRadius: "8px",
-                border: "1px solid #BFDBFE",
+                border: "1px solid #C7D2FE",
                 marginBottom: "1.5rem",
-                textAlign: "center",
               }}
             >
-              <div
+              <small
                 style={{
-                  fontSize: "0.813rem",
-                  fontWeight: 600,
-                  color: "#1E40AF",
+                  display: "block",
                   marginBottom: "0.5rem",
+                  fontSize: "0.8125rem",
+                  fontWeight: 500,
+                  color: "#4338CA",
+                  textAlign: "left",
                 }}
               >
-                Escalating To:
-              </div>
-              <div
+                Escalating To
+              </small>
+              <strong
                 style={{
-                  fontSize: "1.125rem",
-                  color: "#1E40AF",
-                  fontWeight: 700,
+                  display: "block",
                   marginBottom: "0.25rem",
+                  fontSize: "0.9375rem",
+                  color: "#3730A3",
+                  textAlign: "left",
                 }}
               >
                 {deptHead.firstName} {deptHead.lastName}
-              </div>
-              <small style={{ color: "#2563EB", fontSize: "0.813rem" }}>
+              </strong>
+              <small
+                style={{
+                  display: "block",
+                  fontSize: "0.8125rem",
+                  color: "#4338CA",
+                  textAlign: "left",
+                }}
+              >
                 {deptHead.departmentName} - Department Head
               </small>
             </div>
 
             {/* Reason Dropdown */}
-            <div className="mb-4">
+            <div style={{ marginBottom: "1.5rem" }}>
               <label
-                htmlFor="reason"
                 style={{
-                  fontSize: "0.938rem",
-                  fontWeight: 600,
-                  color: "#212529",
-                  marginBottom: "0.5rem",
                   display: "block",
+                  marginBottom: "0.5rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  fontSize: "0.9rem",
+                  textAlign: "left",
                 }}
               >
-                Reason <span style={{ color: "#DC3545" }}>*</span>
+                Reason <span style={{ color: "#E01950" }}>*</span>
               </label>
               <select
-                id="reason"
-                className="form-select form-select-lg"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 disabled={loading}
-                required
                 style={{
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
                   borderRadius: "8px",
-                  border: "2px solid #0D6EFD",
-                  padding: "0.75rem 1rem",
-                  fontSize: "0.938rem",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.875rem",
+                  fontFamily: "inherit",
+                  boxSizing: "border-box",
+                  backgroundColor: "white",
+                  textAlign: "left",
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
                 <option value="">-- Select Reason --</option>
@@ -541,117 +643,157 @@ const ManagerEscalationModal = ({ review, onClose, onEscalate }) => {
               </select>
             </div>
 
-            {/* Comment Textarea */}
-            <div className="mb-3">
+            {/* Comments Textarea */}
+            <div style={{ marginBottom: "1rem" }}>
               <label
-                htmlFor="comments"
                 style={{
-                  fontSize: "0.938rem",
-                  fontWeight: 600,
-                  color: "#212529",
-                  marginBottom: "0.5rem",
                   display: "block",
+                  marginBottom: "0.5rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  fontSize: "0.9rem",
+                  textAlign: "left",
                 }}
               >
-                Your Comment <span style={{ color: "#DC3545" }}>*</span>
+                Your Comment <span style={{ color: "#E01950" }}>*</span>
               </label>
               <textarea
-                id="comments"
-                className="form-control"
-                rows={5}
+                rows="4"
+                placeholder="Explain why you're escalating..."
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Explain why you're escalating..."
-                disabled={loading}
                 maxLength={250}
-                required
+                disabled={loading}
                 style={{
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
                   borderRadius: "8px",
-                  border: "2px solid #0D6EFD",
-                  padding: "0.875rem 1rem",
-                  fontSize: "0.938rem",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.875rem",
+                  fontFamily: "inherit",
+                  boxSizing: "border-box",
+                  backgroundColor: "white",
+                  lineHeight: "1.6",
+                  textAlign: "left",
                   resize: "none",
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? "not-allowed" : "text",
                 }}
               />
-              <div
-                className="d-flex justify-content-between align-items-center"
-                style={{ marginTop: "0.5rem" }}
+              <small
+                style={{
+                  display: "block",
+                  marginTop: "0.375rem",
+                  fontSize: "0.8125rem",
+                  color: "#6b7280",
+                  textAlign: "left",
+                }}
               >
-                <small
-                  style={{
-                    color: "#6C757D",
-                    fontSize: "0.813rem",
-                    fontStyle: "italic",
-                  }}
-                >
-                  ⓘ Press Ctrl+Enter to submit quickly
-                </small>
-                <small style={{ color: "#6C757D", fontSize: "0.813rem" }}>
-                  {comments.length}/250
-                </small>
-              </div>
+                {comments.length}/250 characters
+              </small>
             </div>
-          </div>
+          </form>
+        </div>
 
-          {/* Footer */}
-          <div
+        {/* Footer */}
+        <div
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            padding: "1rem 1.5rem",
+            borderTop: "1px solid #e5e7eb",
+            backgroundColor: "white",
+            justifyContent: "flex-end",
+          }}
+        >
+          <button
+            onClick={onClose}
+            disabled={loading}
             style={{
-              padding: "1.25rem 3rem",
-              borderTop: "1px solid #DEE2E6",
-              background: "#F8F9FA",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "1rem",
+              padding: "0.625rem 1.25rem",
+              border: "none",
+              backgroundColor: "#6b7280",
+              color: "white",
+              borderRadius: "8px",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              opacity: loading ? 0.5 : 1,
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = "#4b5563";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#6b7280";
             }}
           >
-            <button
-              type="button"
-              className="btn btn-lg"
-              onClick={onClose}
-              disabled={loading}
-              style={{
-                borderRadius: "6px",
-                padding: "0.625rem 2rem",
-                fontSize: "0.938rem",
-                fontWeight: 500,
-                border: "1px solid #6C757D",
-                background: "transparent",
-                color: "#6C757D",
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn-lg d-flex align-items-center gap-2"
-              disabled={loading || !isValid}
-              style={{
-                borderRadius: "6px",
-                padding: "0.625rem 2.5rem",
-                fontSize: "0.938rem",
-                fontWeight: 500,
-                background: "#C2185B",
-                color: "#fff",
-                border: "none",
-                opacity: loading || !isValid ? 0.6 : 1,
-              }}
-            >
-              {loading ? (
-                <>
-                  <span className="spinner-border spinner-border-sm" />
-                  <span>Escalating...</span>
-                </>
-              ) : (
-                <>
-                  <Send size={18} />
-                  <span>Escalate to DH</span>
-                </>
-              )}
-            </button>
-          </div>
-        </form>
+            Cancel
+          </button>
+
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !isValid}
+            style={{
+              padding: "0.625rem 1.5rem",
+              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              cursor: loading || !isValid ? "not-allowed" : "pointer",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              opacity: loading || !isValid ? 0.6 : 1,
+              boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (!(loading || !isValid)) {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
+            }}
+          >
+            {loading ? (
+              <>
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "14px",
+                    height: "14px",
+                    border: "2px solid rgba(255,255,255,0.3)",
+                    borderTopColor: "white",
+                    borderRadius: "50%",
+                    animation: "spin 0.8s linear infinite",
+                  }}
+                />
+                Escalating...
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                Escalate to DH
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };

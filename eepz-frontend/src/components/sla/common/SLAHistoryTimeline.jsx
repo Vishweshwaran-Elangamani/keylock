@@ -10,27 +10,28 @@ import {
   User,
   Calendar,
 } from "lucide-react";
+import "../../../styles/sla/SLAHistoryTimeline.css";
 
 const SLAHistoryTimeline = ({ history }) => {
   const getIconAndColor = (changeType) => {
     switch (changeType) {
       case "Created":
-        return { icon: FileText, color: "#0F62FE", bgColor: "#0F62FE15" };
+        return { icon: FileText, color: "#16A34A", label: "Created" };
       case "StatusChanged":
-        return { icon: TrendingUp, color: "#E2B93B", bgColor: "#E2B93B15" };
+        return { icon: TrendingUp, color: "#3B82F6", label: "Status Changed" };
       case "Escalated":
       case "EscalatedToDeptHead":
-        return { icon: AlertTriangle, color: "#E01950", bgColor: "#E0195015" };
+        return { icon: AlertTriangle, color: "#F59E0B", label: "Escalated" };
       case "Reopened":
-        return { icon: RotateCcw, color: "#AC5098", bgColor: "#AC509815" };
+        return { icon: RotateCcw, color: "#8B5CF6", label: "Reopened" };
       case "Closed":
-        return { icon: CheckCircle, color: "#24A148", bgColor: "#24A14815" };
+        return { icon: CheckCircle, color: "#10B981", label: "Closed" };
       case "ComplianceChanged":
-        return { icon: Clock, color: "#6B7280", bgColor: "#6B728015" };
+        return { icon: Clock, color: "#6B7280", label: "Compliance Changed" };
       case "AutoClosed":
-        return { icon: XCircle, color: "#E01950", bgColor: "#E0195015" };
+        return { icon: XCircle, color: "#EF4444", label: "Auto Closed" };
       default:
-        return { icon: FileText, color: "#6B7280", bgColor: "#6B728015" };
+        return { icon: FileText, color: "#6B7280", label: changeType };
     }
   };
 
@@ -48,118 +49,89 @@ const SLAHistoryTimeline = ({ history }) => {
 
   if (!history || history.length === 0) {
     return (
-      <div className="text-center py-5">
-        <Clock size={48} className="text-muted mb-3" />
-        <p className="text-muted">No history available for this SLA</p>
+      <div className="sla-history-empty">
+        <Clock size={48} className="sla-history-empty-icon" />
+        <p className="sla-history-empty-text">No history available for this SLA</p>
       </div>
     );
   }
 
   return (
-    <div className="position-relative">
-      <div
-        className="position-absolute"
-        style={{
-          left: "20px",
-          top: "30px",
-          bottom: "30px",
-          width: "2px",
-          backgroundColor: "#e0e0e0",
-        }}
-      />
+    <div className="sla-history-timeline">
+      <div className="sla-history-timeline-line" />
 
       {history.map((item, index) => {
-        const { icon: Icon, color, bgColor } = getIconAndColor(item.changeType);
+        const { icon: Icon, color, label } = getIconAndColor(item.changeType);
 
         return (
-          <div
-            key={item.historyId || index}
-            className="d-flex gap-3 mb-4 position-relative"
-          >
+          <div key={item.historyId || index} className="sla-history-item">
             <div
-              className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 position-relative"
-              style={{
-                width: "40px",
-                height: "40px",
-                backgroundColor: bgColor,
-                border: `3px solid white`,
-                zIndex: 1,
-              }}
+              className="sla-history-icon-wrapper"
+              style={{ borderColor: color }}
             >
-              <Icon size={18} color={color} strokeWidth={2.5} />
+              <Icon size={20} color={color} strokeWidth={2.5} />
             </div>
 
-            <div className="flex-grow-1">
-              <div
-                className="card border-0 shadow-sm"
-                style={{
-                  borderRadius: "8px",
-                  borderLeft: `3px solid ${color}`,
-                }}
-              >
-                <div className="card-body p-3">
-                  <div className="d-flex justify-content-between align-items-start mb-2">
-                    <div>
-                      <h6 className="mb-1 fw-semibold" style={{ color }}>
-                        {item.changeType}
-                      </h6>
-                      <div className="d-flex align-items-center gap-3 text-muted small">
-                        <span className="d-flex align-items-center gap-1">
-                          <Calendar size={12} />
-                          {formatDateTime(item.createdAt)}
+            <div className="sla-history-content">
+              <div className="sla-history-card" style={{ borderLeftColor: color }}>
+                <div className="sla-history-card-header">
+                  <div className="sla-history-title-section">
+                    <h6 className="sla-history-title" style={{ color }}>
+                      {label}
+                    </h6>
+                    <div className="sla-history-meta">
+                      <span className="sla-history-meta-item">
+                        <Calendar size={14} />
+                        {formatDateTime(item.createdAt)}
+                      </span>
+                      {item.changedByEmployeeName && (
+                        <span className="sla-history-meta-item">
+                          <User size={14} />
+                          {item.changedByEmployeeName}
                         </span>
-                        {item.changedByEmployeeName && (
-                          <span className="d-flex align-items-center gap-1">
-                            <User size={12} />
-                            {item.changedByEmployeeName}
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
-
-                    {(item.changedFrom || item.changedTo) && (
-                      <div className="d-flex align-items-center gap-2">
-                        {item.changedFrom && (
-                          <span className="badge bg-light text-dark border small">
-                            {item.changedFrom}
-                          </span>
-                        )}
-                        {item.changedFrom && item.changedTo && (
-                          <span className="text-muted">→</span>
-                        )}
-                        {item.changedTo && (
-                          <span
-                            className="badge small"
-                            style={{
-                              backgroundColor: bgColor,
-                              color,
-                              border: `1px solid ${color}30`,
-                            }}
-                          >
-                            {item.changedTo}
-                          </span>
-                        )}
-                      </div>
-                    )}
                   </div>
 
-                  {item.reason && (
-                    <p
-                      className="mb-0 small text-muted"
-                      style={{ fontSize: "0.875rem" }}
-                    >
-                      {item.reason}
-                    </p>
-                  )}
-
-                  {item.referenceEscalationId && (
-                    <div className="mt-2">
-                      <span className="badge bg-light text-dark border small">
-                        Escalation #{item.referenceEscalationId}
-                      </span>
+                  {(item.changedFrom || item.changedTo) && (
+                    <div className="sla-history-badge-group">
+                      {item.changedFrom && (
+                        <span className="sla-history-badge sla-history-badge-from">
+                          {item.changedFrom}
+                        </span>
+                      )}
+                      {item.changedFrom && item.changedTo && (
+                        <span className="sla-history-arrow">→</span>
+                      )}
+                      {item.changedTo && (
+                        <span
+                          className="sla-history-badge sla-history-badge-to"
+                          style={{
+                            backgroundColor: `${color}15`,
+                            color: color,
+                            borderColor: `${color}40`,
+                          }}
+                        >
+                          {item.changedTo}
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
+
+                {item.reason && (
+                  <div className="sla-history-description">
+                    <strong>Reason:</strong> {item.reason}
+                  </div>
+                )}
+
+                {item.referenceEscalationId && (
+                  <div className="sla-history-reference">
+                    <span className="sla-history-reference-badge">
+                      Escalation #{item.referenceEscalationId}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

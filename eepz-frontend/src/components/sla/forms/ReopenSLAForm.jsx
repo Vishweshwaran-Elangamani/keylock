@@ -5,7 +5,7 @@ import slaService from "../../../services/sla/slaService";
 
 const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    extensionDays: 1, // Fixed to 1 only
+    extensionDays: 1,
     reason: "",
   });
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
 
       const reopenData = {
         slaid: sla.slaid,
-        extensionDays: 1, // Always 1 day
+        extensionDays: 1,
         reopenReason: formData.reason,
         reopenedByEmployeeId: user.empId,
       };
@@ -31,25 +31,16 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
       const response = await slaService.reopenSLA(reopenData);
 
       if (response.success) {
-        toast.success("SLA reopened successfully", {
-          description: "Extended by 1 day with new deadline",
-          duration: 4000,
-        });
+        toast.success("SLA reopened successfully");
         onSuccess();
         onClose();
       } else {
-        toast.error("Failed to reopen SLA", {
-          description: response.message || "Unable to process reopen request",
-          duration: 5000,
-        });
+        toast.error("Failed to reopen SLA");
         setError(response.message || "Failed to reopen SLA");
       }
     } catch (err) {
       console.error("Reopen error:", err);
-      toast.error("Error reopening SLA", {
-        description: err.message || "An unexpected error occurred",
-        duration: 5000,
-      });
+      toast.error("Error reopening SLA");
       setError(err.message || "Failed to reopen SLA");
     } finally {
       setLoading(false);
@@ -59,7 +50,7 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
   const calculateNewDeadline = () => {
     const originalDeadline = new Date(sla.deadline);
     const newDeadline = new Date(originalDeadline);
-    newDeadline.setDate(newDeadline.getDate() + 1); // Always +1 day
+    newDeadline.setDate(newDeadline.getDate() + 1);
     return newDeadline.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -69,154 +60,389 @@ const ReopenSLAForm = ({ sla, onClose, onSuccess }) => {
 
   return (
     <div
-      className="modal fade show d-block"
-      style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1055 }}
-      onClick={onClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1050,
+        backdropFilter: "blur(4px)",
+      }}
+      onClick={!loading ? onClose : undefined}
     >
       <div
-        className="modal-dialog modal-dialog-centered modal-lg"
+        style={{
+          backgroundColor: "white",
+          borderRadius: "12px",
+          width: "90%",
+          maxWidth: "520px",
+          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
+          overflow: "hidden",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header */}
         <div
-          className="modal-content border-0 shadow-lg"
-          style={{ borderRadius: "12px" }}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "1.25rem 1.5rem",
+            backgroundColor: "#3c3862",
+            borderBottom: "none",
+          }}
         >
-          <div className="modal-header border-0 pb-0">
-            <div>
-              <h5 className="modal-title d-flex align-items-center gap-2 mb-1">
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    backgroundColor: "#AC509815",
-                  }}
-                >
-                  <RotateCcw size={20} color="#AC5098" />
-                </div>
-                <span style={{ color: "var(--color-primary-1)" }}>
-                  Reopen SLA with 1 Day Extension
-                </span>
-              </h5>
-              <p className="text-muted mb-0 ms-5 ps-2 small">
-                Grant 1 additional day to complete this SLA
-              </p>
+          <h5
+            style={{
+              margin: 0,
+              fontWeight: 600,
+              fontSize: "1.1rem",
+              color: "white",
+              textAlign: "left",
+            }}
+          >
+            Reopen SLA (1 Day Extension)
+          </h5>
+          <button
+            onClick={onClose}
+            disabled={loading}
+            style={{
+              border: "none",
+              backgroundColor: "transparent",
+              cursor: loading ? "not-allowed" : "pointer",
+              padding: "0.5rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: loading ? 0.5 : 0.8,
+              transition: "opacity 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.opacity = "1";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.opacity = "0.8";
+              }
+            }}
+          >
+            <X size={24} color="white" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: "1.75rem", backgroundColor: "#f8f9fa" }}>
+          {/* Error Alert */}
+          {error && (
+            <div
+              style={{
+                display: "flex",
+                gap: "0.75rem",
+                padding: "1rem",
+                backgroundColor: "rgba(224, 25, 80, 0.1)",
+                border: "1px solid rgba(224, 25, 80, 0.3)",
+                borderRadius: "8px",
+                marginBottom: "1.5rem",
+                alignItems: "flex-start",
+              }}
+            >
+              <AlertCircle
+                size={20}
+                style={{ color: "#E01950", flexShrink: 0, marginTop: "2px" }}
+              />
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, color: "#991b1b", fontSize: "0.875rem", textAlign: "left" }}>
+                  {error}
+                </p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                style={{
+                  border: "none",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                  padding: "0",
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#E01950",
+                  opacity: 0.7,
+                  transition: "opacity 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
+              >
+                <X size={18} />
+              </button>
             </div>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={onClose}
-              disabled={loading}
-            />
-          </div>
+          )}
 
           <form onSubmit={handleSubmit}>
-            <div className="modal-body pt-3">
-              {error && (
-                <div className="alert alert-danger d-flex align-items-center gap-2 mb-3">
-                  <AlertCircle size={20} />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <div
-                className="card border-0 mb-4"
-                style={{ backgroundColor: "#f8f9fa" }}
-              >
-                <div className="card-body p-3">
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <small className="text-muted d-block">
-                        Current Deadline
-                      </small>
-                      <strong>
-                        {new Date(sla.deadline).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </strong>
-                    </div>
-                    <div className="col-md-6">
-                      <small className="text-muted d-block">
-                        New Deadline (+ 1 Day)
-                      </small>
-                      <strong className="text-success">
-                        {calculateNewDeadline()}
-                      </strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="alert alert-info d-flex align-items-center gap-2">
-                <AlertCircle size={18} />
-                <span>
-                  This SLA will be extended by <strong>1 day only</strong>
-                </span>
-              </div>
-
-              <div className="mb-4">
-                <label className="form-label fw-semibold">
-                  Reason for Reopening <span className="text-danger">*</span>
-                </label>
-                <textarea
-                  className="form-control"
-                  rows="4"
-                  value={formData.reason}
-                  onChange={(e) =>
-                    setFormData({ ...formData, reason: e.target.value })
-                  }
-                  placeholder="Explain why this SLA needs 1 more day..."
-                  required
-                  disabled={loading}
-                  maxLength={500}
-                  style={{ borderRadius: "8px" }}
-                />
-                <div className="d-flex justify-content-between mt-2">
-                  <small className="text-muted">
-                    Provide clear justification
+            {/* Deadline Comparison */}
+            <div
+              style={{
+                backgroundColor: "white",
+                padding: "1rem",
+                borderRadius: "8px",
+                border: "1px solid #e5e7eb",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <div style={{ flex: 1 }}>
+                  <small
+                    style={{
+                      display: "block",
+                      marginBottom: "0.375rem",
+                      fontSize: "0.8125rem",
+                      fontWeight: 500,
+                      color: "#6b7280",
+                      textAlign: "left",
+                    }}
+                  >
+                    Current Deadline
                   </small>
-                  <small className="text-muted">
-                    {formData.reason.length}/500
+                  <strong
+                    style={{
+                      display: "block",
+                      fontSize: "0.9375rem",
+                      color: "#374151",
+                      textAlign: "left",
+                    }}
+                  >
+                    {new Date(sla.deadline).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </strong>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <small
+                    style={{
+                      display: "block",
+                      marginBottom: "0.375rem",
+                      fontSize: "0.8125rem",
+                      fontWeight: 500,
+                      color: "#6b7280",
+                      textAlign: "left",
+                    }}
+                  >
+                    New Deadline (+1 Day)
                   </small>
+                  <strong
+                    style={{
+                      display: "block",
+                      fontSize: "0.9375rem",
+                      color: "#16A34A",
+                      textAlign: "left",
+                    }}
+                  >
+                    {calculateNewDeadline()}
+                  </strong>
                 </div>
               </div>
             </div>
 
-            <div className="modal-footer border-0 pt-0">
-              <button
-                type="button"
-                className="btn btn-outline-secondary d-flex align-items-center gap-2"
-                onClick={onClose}
-                disabled={loading}
-                style={{ borderRadius: "8px" }}
+            {/* Info Box */}
+            <div
+              style={{
+                display: "flex",
+                gap: "0.75rem",
+                padding: "0.875rem 1rem",
+                backgroundColor: "#DBEAFE",
+                border: "1px solid #BFDBFE",
+                borderRadius: "8px",
+                marginBottom: "1.5rem",
+                alignItems: "flex-start",
+              }}
+            >
+              <AlertCircle
+                size={18}
+                style={{ color: "#1E40AF", flexShrink: 0, marginTop: "2px" }}
+              />
+              <p style={{ margin: 0, color: "#1E40AF", fontSize: "0.875rem", textAlign: "left" }}>
+                This SLA will be extended by <strong>1 day only</strong>
+              </p>
+            </div>
+
+            {/* Reason Textarea */}
+            <div style={{ marginBottom: "1rem" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "0.5rem",
+                  fontWeight: 600,
+                  color: "#374151",
+                  fontSize: "0.9rem",
+                  textAlign: "left",
+                }}
               >
-                <X size={16} />
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary d-flex align-items-center gap-2"
+                Reason for Reopening <span style={{ color: "#E01950" }}>*</span>
+              </label>
+              <textarea
+                rows="4"
+                placeholder="Explain why this SLA needs 1 more day..."
+                value={formData.reason}
+                onChange={(e) =>
+                  setFormData({ ...formData, reason: e.target.value })
+                }
+                maxLength={500}
                 disabled={loading}
-                style={{ borderRadius: "8px", minWidth: "180px" }}
+                required
+                style={{
+                  width: "100%",
+                  padding: "0.65rem 0.75rem",
+                  borderRadius: "8px",
+                  border: "1px solid #d1d5db",
+                  fontSize: "0.875rem",
+                  fontFamily: "inherit",
+                  boxSizing: "border-box",
+                  backgroundColor: "white",
+                  lineHeight: "1.6",
+                  textAlign: "left",
+                  resize: "none",
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? "not-allowed" : "text",
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "0.375rem",
+                }}
               >
-                {loading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm" />
-                    <span>Extending...</span>
-                  </>
-                ) : (
-                  <>
-                    <Send size={16} />
-                    <span>Extend SLA</span>
-                  </>
-                )}
-              </button>
+                <small
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "#6b7280",
+                    textAlign: "left",
+                  }}
+                >
+                  Provide clear justification
+                </small>
+                <small
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "#6b7280",
+                    textAlign: "right",
+                  }}
+                >
+                  {formData.reason.length}/500
+                </small>
+              </div>
             </div>
           </form>
         </div>
+
+        {/* Footer */}
+        <div
+          style={{
+            display: "flex",
+            gap: "0.75rem",
+            padding: "1rem 1.5rem",
+            borderTop: "1px solid #e5e7eb",
+            backgroundColor: "white",
+            justifyContent: "flex-end",
+          }}
+        >
+          <button
+            onClick={onClose}
+            disabled={loading}
+            style={{
+              padding: "0.625rem 1.25rem",
+              border: "none",
+              backgroundColor: "#6b7280",
+              color: "white",
+              borderRadius: "8px",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              opacity: loading ? 0.5 : 1,
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = "#4b5563";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#6b7280";
+            }}
+          >
+            Cancel
+          </button>
+
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !formData.reason.trim()}
+            style={{
+              padding: "0.625rem 1.5rem",
+              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              cursor: loading || !formData.reason.trim() ? "not-allowed" : "pointer",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              opacity: loading || !formData.reason.trim() ? 0.6 : 1,
+              boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
+              transition: "all 0.2s ease",
+              minWidth: "140px",
+              justifyContent: "center",
+            }}
+            onMouseEnter={(e) => {
+              if (!(loading || !formData.reason.trim())) {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
+            }}
+          >
+            {loading ? (
+              <>
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "14px",
+                    height: "14px",
+                    border: "2px solid rgba(255,255,255,0.3)",
+                    borderTopColor: "white",
+                    borderRadius: "50%",
+                    animation: "spin 0.8s linear infinite",
+                  }}
+                />
+                Extending...
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                Extend SLA
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };

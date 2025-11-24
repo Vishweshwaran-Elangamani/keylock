@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Users,
-  ArrowLeft,
   CheckCircle,
   AlertCircle,
   Search,
@@ -11,14 +10,13 @@ import {
   Plus,
   X,
   Info,
-  RefreshCw,
   Database,
   UserX,
   Check,
-  Download,
 } from "lucide-react";
+import { toast } from "sonner";
 import projectService from "../../services/project_management/projectService";
-import { color } from "chart.js/helpers";
+import "../../styles/projectmanagement/ResourcePoolMapping.css";
 
 const RESOURCE_POOL_PROJECT_NAME = "ORG.RZ.RESOURCEPOOL";
 
@@ -28,8 +26,7 @@ const ResourcePoolMapping = () => {
 
   // Data
   const [allEmployees, setAllEmployees] = useState([]);
-  const [resourcePoolMappedEmployees, setResourcePoolMappedEmployees] =
-    useState([]);
+  const [resourcePoolMappedEmployees, setResourcePoolMappedEmployees] = useState([]);
   const [mappedEmployees, setMappedEmployees] = useState([]);
 
   // UI state
@@ -38,10 +35,12 @@ const ResourcePoolMapping = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [message, setMessage] = useState(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Optimistic guard: IDs just mapped in this session (used to disable action and remove from list immediately)
+  // Modals
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [showMapModal, setShowMapModal] = useState(false);
+
+  // Optimistic guard
   const [recentlyMappedIds, setRecentlyMappedIds] = useState([]);
 
   useEffect(() => {
@@ -51,25 +50,18 @@ const ResourcePoolMapping = () => {
   const fetchInitialData = async () => {
     setIsLoading(true);
     setError(null);
-    setMessage(null);
-    // Clear session-optimistic flags on full refresh (backend becomes source of truth)
     setRecentlyMappedIds([]);
     try {
-      // All employees
       const employeesResponse = await projectService.getInitialStageEmployees();
       if (employeesResponse.success !== false && employeesResponse.data) {
-        // Filter out Admin role employees
         const filteredEmployees = employeesResponse.data.filter(
           (emp) => emp.roleName?.toLowerCase() !== "admin"
         );
         setAllEmployees(filteredEmployees);
       } else {
-        throw new Error(
-          employeesResponse?.message || "Failed to load employees"
-        );
+        throw new Error(employeesResponse?.message || "Failed to load employees");
       }
 
-      // Projects with mapped employees
       const projectsResponse = await projectService.getAllProjects();
       if (projectsResponse.success !== false && projectsResponse.data) {
         const allMapped = [];
@@ -78,26 +70,16 @@ const ResourcePoolMapping = () => {
         projectsResponse.data.forEach((project) => {
           if (Array.isArray(project.mappedEmployees)) {
             project.mappedEmployees.forEach((emp) => {
-              // Filter out Admin role from mapped employees too
               if (emp.roleName?.toLowerCase() === "admin") return;
               
-              if (
-                !allMapped.some(
-                  (m) => m.employeeMasterId === emp.employeeMasterId
-                )
-              ) {
+              if (!allMapped.some((m) => m.employeeMasterId === emp.employeeMasterId)) {
                 allMapped.push(emp);
               }
               if (
                 project.projectName &&
-                project.projectName.toUpperCase() ===
-                  RESOURCE_POOL_PROJECT_NAME.toUpperCase()
+                project.projectName.toUpperCase() === RESOURCE_POOL_PROJECT_NAME.toUpperCase()
               ) {
-                if (
-                  !resourcePoolMapped.some(
-                    (m) => m.employeeMasterId === emp.employeeMasterId
-                  )
-                ) {
+                if (!resourcePoolMapped.some((m) => m.employeeMasterId === emp.employeeMasterId)) {
                   resourcePoolMapped.push(emp);
                 }
               }
@@ -113,6 +95,7 @@ const ResourcePoolMapping = () => {
       }
     } catch (err) {
       setError(err.message || "Failed to load data. Please try again.");
+      toast.error(err.message || "Failed to load data");
     } finally {
       setIsLoading(false);
     }
@@ -128,18 +111,15 @@ const ResourcePoolMapping = () => {
   const isRecentlyMapped = (empId) => recentlyMappedIds.includes(empId);
 
   const getEmployeeStatus = (empId) => {
-    // Treat recently mapped as Unavailable immediately
     if (isRecentlyMapped(empId) || isEmployeeInResourcePool(empId)) {
-      return { text: "Unavailable", badge: "bg-secondary", icon: CheckCircle };
+      return { text: "Unavailable", badge: "rp-badge-secondary", icon: CheckCircle };
     }
     if (isEmployeeMappedToAny(empId)) {
-      return { text: "Unavailable", badge: "bg-warning", icon: AlertCircle };
+      return { text: "Unavailable", badge: "rp-badge-warning", icon: AlertCircle };
     }
-    return { text: "Available", badge: "bg-success", icon: Check };
+    return { text: "Available", badge: "rp-badge-success", icon: Check };
   };
 
-  // NOTE: The table below now removes employees just mapped (and those already in Resource Pool)
-  // so that they do not appear again in the checklist immediately.
   const filteredEmployees = (
     searchTerm
       ? allEmployees.filter((emp) =>
@@ -149,17 +129,9 @@ const ResourcePoolMapping = () => {
         )
       : allEmployees
   )
-    // Remove employees already in Resource Pool (server truth)
-    .filter(
-      (emp) =>
-        !resourcePoolMappedEmployees.some(
-          (e) => e.employeeMasterId === emp.employeeMasterId
-        )
-    )
-    // Remove employees mapped in this session (optimistic removal)
+    .filter((emp) => !resourcePoolMappedEmployees.some((e) => e.employeeMasterId === emp.employeeMasterId))
     .filter((emp) => !recentlyMappedIds.includes(emp.employeeMasterId));
 
-  // Counts
   const availableCount = filteredEmployees.filter(
     (emp) => getEmployeeStatus(emp.employeeMasterId).text === "Available"
   ).length;
@@ -167,91 +139,56 @@ const ResourcePoolMapping = () => {
   // Actions
   const handleAddEmployee = (employee) => {
     const status = getEmployeeStatus(employee.employeeMasterId);
-    if (
-      status.text === "Available" &&
-      !isEmployeeSelected(employee.employeeMasterId)
-    ) {
+    if (status.text === "Available" && !isEmployeeSelected(employee.employeeMasterId)) {
       setSelectedEmployees((prev) => [...prev, employee]);
-      setMessage({
-        type: "info",
-        text: `${employee.firstName} ${employee.lastName} added to selection`,
-      });
-      setTimeout(() => setMessage(null), 1800);
+      toast.success(`${employee.firstName} ${employee.lastName} added to selection`);
     } else {
-      setMessage({
-        type: "warning",
-        text: `${employee.firstName} ${employee.lastName} is unavailable for mapping`,
-      });
-      setTimeout(() => setMessage(null), 2200);
+      toast.warning(`${employee.firstName} ${employee.lastName} is unavailable for mapping`);
     }
   };
 
   const handleRemoveEmployee = (empId) => {
-    setSelectedEmployees((prev) =>
-      prev.filter((emp) => emp.employeeMasterId !== empId)
-    );
-    setMessage({ type: "info", text: "Employee removed from selection" });
-    setTimeout(() => setMessage(null), 1500);
+    setSelectedEmployees((prev) => prev.filter((emp) => emp.employeeMasterId !== empId));
+    toast.info("Employee removed from selection");
   };
 
   const handleSelectAll = () => {
     const canAdd = filteredEmployees.filter(
       (emp) => getEmployeeStatus(emp.employeeMasterId).text === "Available"
     );
-    const addable = canAdd.filter(
-      (emp) => !isEmployeeSelected(emp.employeeMasterId)
-    );
+    const addable = canAdd.filter((emp) => !isEmployeeSelected(emp.employeeMasterId));
     if (addable.length > 0) {
       setSelectedEmployees((prev) => [...prev, ...addable]);
-      setMessage({
-        type: "success",
-        text: `${addable.length} employees added to selection`,
-      });
-      setTimeout(() => setMessage(null), 1800);
+      toast.success(`${addable.length} employees added to selection`);
+    } else {
+      toast.info("No available employees to select");
     }
   };
 
   const handleClearAll = () => {
-    if (
-      selectedEmployees.length > 0 &&
-      window.confirm("Clear all selections?")
-    ) {
-      setSelectedEmployees([]);
-      setMessage({ type: "info", text: "All selections cleared" });
-      setTimeout(() => setMessage(null), 1500);
+    if (selectedEmployees.length > 0) {
+      setShowClearModal(true);
     }
   };
 
-  const handleMapToResourcePool = async () => {
+  const confirmClearAll = () => {
+    setSelectedEmployees([]);
+    setShowClearModal(false);
+    toast.info("All selections cleared");
+  };
+
+  const handleMapToResourcePool = () => {
     if (selectedEmployees.length === 0) {
-      setMessage({
-        type: "error",
-        text: "Please select at least one employee to map",
-      });
-      setTimeout(() => setMessage(null), 2200);
+      toast.error("Please select at least one employee to map");
       return;
     }
+    setShowMapModal(true);
+  };
 
+  const confirmMapToResourcePool = async () => {
     const employeeIds = selectedEmployees.map((emp) => emp.employeeMasterId);
 
-    if (
-      !window.confirm(
-        `Confirm mapping ${selectedEmployees.length} employee(s) to Resource Pool?\n\n` +
-          `This will:\n` +
-          `• Assign them to '${RESOURCE_POOL_PROJECT_NAME}'\n` +
-          `• Set Resource Pool's L2 Approver as their reporting manager\n` +
-          `• Mark them as primary employees\n` +
-          `• Remove them from any other projects\n\n` +
-          `Selected: ${selectedEmployees
-            .map((e) => `${e.firstName} ${e.lastName}`)
-            .join(", ")}`
-      )
-    ) {
-      return;
-    }
-
     setIsSubmitting(true);
-    setMessage(null);
 
     try {
       const response = await projectService.mapToResourcePool(employeeIds);
@@ -260,10 +197,8 @@ const ResourcePoolMapping = () => {
         throw new Error(response.message || "Mapping failed");
       }
 
-      // 1) Optimistic: mark them as recently mapped so they are removed from the left list immediately
       setRecentlyMappedIds((prev) => [...new Set([...prev, ...employeeIds])]);
 
-      // 2) Also optimistically treat them as mapped (for any other guards using these arrays)
       const newlyMappedEmployees = selectedEmployees.map((emp) => ({
         ...emp,
         projectName: RESOURCE_POOL_PROJECT_NAME,
@@ -281,25 +216,16 @@ const ResourcePoolMapping = () => {
         ),
       ]);
 
-      // 3) Clear the right-side selection
       setSelectedEmployees([]);
+      setShowMapModal(false);
 
-      setMessage({
-        type: "success",
-        text: `Successfully mapped ${
-          response.data?.mappedCount || employeeIds.length
-        } employee(s) to Resource Pool. They have been removed from the list.`,
-        isLong: true,
-      });
-
-      // 4) Server sync (keeps totals and statuses consistent)
-      fetchInitialData();
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error) {
-      // Revert optimistic bits if server failed
-      setRecentlyMappedIds((prev) =>
-        prev.filter((id) => !employeeIds.includes(id))
+      toast.success(
+        `Successfully mapped ${response.data?.mappedCount || employeeIds.length} employee(s) to Resource Pool`
       );
+
+      fetchInitialData();
+    } catch (error) {
+      setRecentlyMappedIds((prev) => prev.filter((id) => !employeeIds.includes(id)));
       setResourcePoolMappedEmployees((prev) =>
         prev.filter((emp) => !employeeIds.includes(emp.employeeMasterId))
       );
@@ -307,39 +233,17 @@ const ResourcePoolMapping = () => {
         prev.filter((emp) => !employeeIds.includes(emp.employeeMasterId))
       );
 
-      setMessage({
-        type: "error",
-        text: error.message || "Failed to map employees to Resource Pool.",
-        isLong: true,
-      });
+      toast.error(error.message || "Failed to map employees to Resource Pool");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    await fetchInitialData();
-    setIsRefreshing(false);
-    setMessage({ type: "success", text: "Data refreshed" });
-    setTimeout(() => setMessage(null), 1600);
-  };
-
-  const stats = {
-    total: allEmployees.length,
-    inResourcePool: resourcePoolMappedEmployees.length,
-    available: availableCount,
-    selected: selectedEmployees.length,
-  };
-
   if (isLoading) {
     return (
-      <div className="h-100 d-flex align-items-center justify-content-center">
+      <div className="rp-wrapper h-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
-          <div
-            className="spinner-border text-primary mb-3"
-            style={{ width: "3rem", height: "3rem" }}
-          ></div>
+          <div className="spinner-border text-primary mb-3" style={{ width: "3rem", height: "3rem" }}></div>
           <p className="text-muted">Loading Resource Pool data...</p>
         </div>
       </div>
@@ -347,16 +251,10 @@ const ResourcePoolMapping = () => {
   }
 
   return (
-    <div className="h-100 d-flex flex-column">
+    <div className="rp-wrapper h-100 d-flex flex-column">
       {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="mb-3">
-        <ol
-          className="breadcrumb mb-0 p-3 rounded"
-          style={{
-            backgroundColor: "rgba(151, 36, 126, 0.05)",
-            fontSize: "0.875rem",
-          }}
-        >
+        <ol className="breadcrumb mb-0 p-3 rounded rp-breadcrumb">
           <li className="breadcrumb-item">
             <a
               href="#"
@@ -364,13 +262,7 @@ const ResourcePoolMapping = () => {
                 e.preventDefault();
                 navigate("/hr/dashboard/projectmgmt");
               }}
-              style={{
-                color: "var(--color-primary-3)",
-                textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.25rem",
-              }}
+              className="rp-breadcrumb-link"
             >
               <Home size={14} /> Dashboard
             </a>
@@ -382,114 +274,24 @@ const ResourcePoolMapping = () => {
                 e.preventDefault();
                 navigate("/hr/dashboard/projectmgmt/list");
               }}
-              style={{
-                color: "var(--color-primary-3)",
-                textDecoration: "none",
-              }}
+              className="rp-breadcrumb-link"
             >
               Projects
             </a>
           </li>
           <li className="breadcrumb-item active" aria-current="page">
-            <span style={{ color: "var(--color-primary-1)", fontWeight: 600 }}>
-              Resource Pool Mapping
-            </span>
+            <span className="rp-breadcrumb-active">Resource Pool Mapping</span>
           </li>
         </ol>
       </nav>
 
-      {/* Header */}
-      <div className="d-flex align-items-center justify-content-between mb-4">
-        <div className="d-flex align-items-center gap-3">
-          <button
-            className="btn btn-link text-decoration-none p-0"
-            onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
-          >
-            <ArrowLeft size={24} />
-          </button>
-          {/* <Users size={36} className="text-primary" /> */}
-          <div>
-            <h2 className="mb-0 fw-bold text-start">Resource Pool Mapping</h2>
-            <p className="text-muted mb-0 medium text-start">
-              Manage employee mappings to {RESOURCE_POOL_PROJECT_NAME}{" "}
-              (employees mapped now will disappear from the list)
-            </p>
-          </div>
-        </div>
-        <div className="d-flex gap-2">
-          <button
-            className="btn btn-outline-secondary d-flex align-items-center gap-2"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-          >
-            {isRefreshing ? (
-              <RefreshCw size={16} className="animate-spin" />
-            ) : (
-              <RefreshCw size={16} />
-            )}{" "}
-            Refresh
-          </button>
-          <button
-            className="btn btn-primary d-flex align-items-center gap-2"
-            onClick={() =>
-              navigate(
-                `/hr/dashboard/projectmgmt/details/${RESOURCE_POOL_PROJECT_NAME.toLowerCase().replace(
-                  /\./g,
-                  "-"
-                )}`
-              )
-            }
-          >
-            <Download size={16} /> View Project
-          </button>
-        </div>
-      </div>
-
-      {/* Alerts */}
-      {message && (
-        <div
-          className={`alert alert-${
-            message.type === "success"
-              ? "success"
-              : message.type === "info"
-              ? "info"
-              : message.type === "warning"
-              ? "warning"
-              : "danger"
-          } d-flex align-items-center gap-2 mb-4 ${
-            message.isLong ? "alert-dismissible fade show" : ""
-          }`}
-          role="alert"
-        >
-          {message.type === "success" && <CheckCircle size={20} />}
-          {message.type === "info" && <Info size={20} />}
-          {message.type === "warning" && (
-            <AlertCircle size={20} className="text-warning" />
-          )}
-          {message.type === "error" && <AlertCircle size={20} />}
-          <span className="flex-grow-1">{message.text}</span>
-          {message.isLong && (
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setMessage(null)}
-              aria-label="Close"
-            ></button>
-          )}
-        </div>
-      )}
+      {/* Error */}
       {error && (
-        <div
-          className="alert alert-danger d-flex align-items-center gap-2 mb-4"
-          role="alert"
-        >
+        <div className="alert alert-danger rp-alert-error" role="alert">
           <AlertCircle size={20} />
           <div>
             <strong>Error:</strong> {error}
-            <button
-              className="btn btn-sm btn-outline-danger ms-3"
-              onClick={fetchInitialData}
-            >
+            <button className="btn btn-sm btn-outline-danger ms-3" onClick={fetchInitialData}>
               Retry
             </button>
           </div>
@@ -497,34 +299,33 @@ const ResourcePoolMapping = () => {
       )}
 
       {/* Main */}
-      <div className="row g-4 h-100">
+      <div className="row g-4 flex-grow-1">
         {/* Left: Employees List */}
         <div className="col-lg-8">
-          <div className="card border-0 shadow-sm h-100 d-flex flex-column">
-            <div className="card-header bg-light d-flex align-items-center justify-content-between">
-              <h5 className="mb-0 d-flex align-items-center gap-2 text-start" style={{ color: "white" }}>
+          <div className="rp-card rp-card-left">
+            <div className="rp-card-header">
+              <div className="rp-card-title">
                 <Database size={20} /> Employees
-              </h5>
+              </div>
               <button
-                className="btn btn-sm btn-outline-secondary"
+                className="btn btn-sm rp-btn-select-all"
                 onClick={handleSelectAll}
                 disabled={availableCount === 0}
-                style={{ color: "white" }}
               >
                 Select All Available ({availableCount})
               </button>
             </div>
 
-            <div className="card-body p-0 d-flex flex-column flex-grow-1">
+            <div className="rp-card-body">
               {/* Search */}
-              <div className="p-3 border-bottom bg-light">
+              <div className="rp-search-bar">
                 <div className="input-group">
                   <span className="input-group-text">
                     <Search size={18} />
                   </span>
                   <input
                     type="text"
-                    className="form-control text-start"
+                    className="form-control"
                     placeholder="Search by name, role, department, or ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -533,37 +334,25 @@ const ResourcePoolMapping = () => {
               </div>
 
               {/* Table */}
-              <div className="table-responsive flex-grow-1">
-                <table className="table table-hover mb-0">
-                  <thead className="table-light sticky-top">
+              <div className="rp-table-wrapper">
+                <table className="table table-hover mb-0 rp-table">
+                  <thead className="rp-table-header">
                     <tr>
-                      <th className="py-3 px-3 text-start">Employee</th>
-                      <th className="py-3 text-start">Role</th>
-                      <th className="py-3 text-start">Department</th>
-                      <th
-                        className="py-3 text-start"
-                        style={{ width: "120px" }}
-                      >
-                        Status
-                      </th>
-                      <th
-                        className="py-3 text-start"
-                        style={{ width: "90px" }}
-                      >
-                        Action
-                      </th>
+                      <th>Employee</th>
+                      <th>Role</th>
+                      <th>Department</th>
+                      <th>Status</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredEmployees.length === 0 ? (
                       <tr>
-                        <td colSpan="5" className="text-center py-5 text-muted">
-                          <UserX size={64} className="mb-3 opacity-25" />
-                          <p className="mb-2 fs-5">No employees found</p>
-                          <p className="small mb-0">
-                            {searchTerm
-                              ? "No matches for your search."
-                              : "All eligible employees are mapped."}
+                        <td colSpan="5" className="rp-empty-state">
+                          <UserX size={64} className="rp-empty-icon" />
+                          <p className="rp-empty-title">No employees found</p>
+                          <p className="rp-empty-text">
+                            {searchTerm ? "No matches for your search." : "All eligible employees are mapped."}
                           </p>
                         </td>
                       </tr>
@@ -573,35 +362,23 @@ const ResourcePoolMapping = () => {
                         const isUnavailable = status.text !== "Available";
                         return (
                           <tr key={emp.employeeMasterId}>
-                            <td className="py-2 px-3 align-middle text-start">
-                              <div className="fw-semibold">
-                                {emp.firstName} {emp.lastName}
-                              </div>
-                              <small className="text-muted d-block">
-                                {emp.employeeCompanyId}
-                              </small>
-                              <small className="text-muted">{emp.email}</small>
+                            <td className="rp-cell-employee">
+                              <div className="rp-employee-name">{emp.firstName} {emp.lastName}</div>
+                              <small className="rp-employee-id">{emp.employeeCompanyId}</small>
+                              <small className="rp-employee-email">{emp.email}</small>
                             </td>
-                            <td className="py-2 align-middle text-start">
-                              <span className="badge bg-light text-dark fs-6">
-                                {emp.roleName}
+                            <td>
+                              <span className="rp-role-badge">{emp.roleName}</span>
+                            </td>
+                            <td>
+                              <small className="rp-department">{emp.departmentName}</small>
+                            </td>
+                            <td>
+                              <span className={`rp-status-badge ${status.badge}`}>
+                                {React.createElement(status.icon, { size: 12 })} {status.text}
                               </span>
                             </td>
-                            <td className="py-2 align-middle text-start">
-                              <small className="text-muted">
-                                {emp.departmentName}
-                              </small>
-                            </td>
-                            <td className="py-2 align-middle text-start">
-                              <span className={`badge ${status.badge}`}>
-                                {React.createElement(status.icon, {
-                                  size: 12,
-                                  className: "me-1",
-                                })}{" "}
-                                {status.text}
-                              </span>
-                            </td>
-                            <td className="py-2 align-middle text-start">
+                            <td>
                               <button
                                 className={`btn btn-sm ${
                                   isEmployeeSelected(emp.employeeMasterId)
@@ -611,17 +388,7 @@ const ResourcePoolMapping = () => {
                                     : "btn-success"
                                 }`}
                                 onClick={() => handleAddEmployee(emp)}
-                                disabled={
-                                  isEmployeeSelected(emp.employeeMasterId) ||
-                                  isUnavailable
-                                }
-                                title={
-                                  isUnavailable
-                                    ? "Unavailable for mapping"
-                                    : isEmployeeSelected(emp.employeeMasterId)
-                                    ? "Already selected"
-                                    : "Add to selection"
-                                }
+                                disabled={isEmployeeSelected(emp.employeeMasterId) || isUnavailable}
                               >
                                 {isEmployeeSelected(emp.employeeMasterId) ? (
                                   <Check size={16} />
@@ -645,109 +412,69 @@ const ResourcePoolMapping = () => {
 
         {/* Right: Selected Employees */}
         <div className="col-lg-4">
-          <div className="card border-0 shadow-sm h-100 d-flex flex-column">
-            <div className="card-header bg-light d-flex align-items-center justify-content-between">
-              <h5 className="mb-0 d-flex align-items-center gap-2 text-start" style={{ color: "white" }}>
-                <UserCheck size={20} className="text-success" /> Selected
-                Employees ({selectedEmployees.length})
-              </h5>
+          <div className="rp-card rp-card-right">
+            <div className="rp-card-header">
+              <div className="rp-card-title">
+                <UserCheck size={20} /> Selected ({selectedEmployees.length})
+              </div>
               {selectedEmployees.length > 0 && (
-                <div className="btn-group btn-group-sm" role="group">
-                  <button
-                    className="btn btn-outline-secondary"
-                    onClick={handleClearAll}
-                    title="Clear all"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
+                <button className="btn btn-sm rp-btn-clear" onClick={handleClearAll}>
+                  <X size={14} />
+                </button>
               )}
             </div>
-            <div className="card-body d-flex flex-column flex-grow-1 p-0">
-              <div
-                className="flex-grow-1 p-3"
-                style={{
-                  minHeight: "300px",
-                  maxHeight: "400px",
-                  overflowY: "auto",
-                  backgroundColor: "#f8f9fa",
-                }}
-              >
+
+            <div className="rp-card-body rp-selected-body">
+              <div className="rp-selected-list">
                 {selectedEmployees.length === 0 ? (
-                  <div className="text-center text-muted py-5">
-                    <Users size={48} className="mb-3 opacity-25" />
-                    <p className="mb-2">No employees selected</p>
-                    <small className="text-muted">
-                      Select available employees from the left to add here
-                    </small>
+                  <div className="rp-selected-empty">
+                    <Users size={48} className="rp-empty-icon" />
+                    <p className="rp-empty-title">No employees selected</p>
+                    <small className="rp-empty-text">Select available employees from the left</small>
                   </div>
                 ) : (
-                  <div className="list-unstyled">
-                    {selectedEmployees.map((emp, index) => (
-                      <div
-                        key={emp.employeeMasterId}
-                        className="d-flex align-items-center justify-content-between p-2 mb-2 bg-white rounded shadow-sm border"
-                      >
-                        <div className="flex-grow-1 text-start">
-                          <div className="fw-semibold small">
-                            {index + 1}. {emp.firstName} {emp.lastName}
-                          </div>
-                          <div
-                            className="text-muted text-start"
-                            style={{ fontSize: "0.75rem" }}
-                          >
-                            {emp.employeeCompanyId} • {emp.roleName} •{" "}
-                            {emp.departmentName}
-                          </div>
+                  selectedEmployees.map((emp, index) => (
+                    <div key={emp.employeeMasterId} className="rp-selected-item">
+                      <div className="rp-selected-info">
+                        <div className="rp-selected-name">
+                          {index + 1}. {emp.firstName} {emp.lastName}
                         </div>
-                        <button
-                          className="btn btn-sm btn-outline-danger ms-2"
-                          onClick={() =>
-                            handleRemoveEmployee(emp.employeeMasterId)
-                          }
-                          title="Remove"
-                        >
-                          <X size={14} />
-                        </button>
+                        <div className="rp-selected-meta">
+                          {emp.employeeCompanyId} • {emp.roleName} • {emp.departmentName}
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleRemoveEmployee(emp.employeeMasterId)}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))
                 )}
               </div>
 
-              <div className="p-3 border-top bg-light">
+              <div className="rp-selected-footer">
                 <button
-                  className="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2 fw-semibold py-2"
+                  className="btn btn-success w-100 rp-btn-map"
                   onClick={handleMapToResourcePool}
                   disabled={selectedEmployees.length === 0 || isSubmitting}
-                  title={
-                    selectedEmployees.length === 0
-                      ? "Select employees first"
-                      : isSubmitting
-                      ? "Mapping..."
-                      : "Map to Resource Pool"
-                  }
                 >
                   {isSubmitting ? (
                     <>
-                      <span className="spinner-border spinner-border-sm me-2"></span>
+                      <span className="spinner-border spinner-border-sm"></span>
                       Mapping {selectedEmployees.length} employee(s)...
                     </>
                   ) : (
                     <>
                       <UserCheck size={18} />
-                      Map{" "}
-                      {selectedEmployees.length > 0
-                        ? `${selectedEmployees.length} `
-                        : ""}
-                      to Resource Pool
+                      Map {selectedEmployees.length > 0 ? `${selectedEmployees.length} ` : ""}to Resource Pool
                     </>
                   )}
                 </button>
                 {selectedEmployees.length > 0 && (
-                  <small className="text-muted d-block text-center mt-2">
-                    Backend enforces: single-project rule, L2 manager
-                    assignment, primary status
+                  <small className="rp-selected-note">
+                    Enforces: single-project rule, L2 manager assignment, primary status
                   </small>
                 )}
               </div>
@@ -755,6 +482,110 @@ const ResourcePoolMapping = () => {
           </div>
         </div>
       </div>
+
+      {/* Clear All Modal */}
+      {showClearModal && (
+        <div className="rp-modal-overlay" onClick={() => setShowClearModal(false)}>
+          <div className="rp-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="rp-modal-header">
+              <div className="rp-modal-title">
+                <AlertCircle size={24} />
+                <h5>Clear All Selections</h5>
+              </div>
+              <button className="rp-modal-close" onClick={() => setShowClearModal(false)}>
+                ×
+              </button>
+            </div>
+            <div className="rp-modal-body">
+              <p>Are you sure you want to clear all selected employees?</p>
+              <div className="rp-modal-info">
+                <Info size={18} />
+                <span>{selectedEmployees.length} employee(s) will be removed from selection</span>
+              </div>
+            </div>
+            <div className="rp-modal-footer">
+              <button className="btn btn-secondary" onClick={() => setShowClearModal(false)}>
+                Cancel
+              </button>
+              <button className="btn rp-btn-clear-confirm" onClick={confirmClearAll}>
+                <X size={18} />
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Map to Resource Pool Modal */}
+      {showMapModal && (
+        <div className="rp-modal-overlay" onClick={() => !isSubmitting && setShowMapModal(false)}>
+          <div className="rp-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="rp-modal-header">
+              <div className="rp-modal-title">
+                <UserCheck size={24} />
+                <h5>Map to Resource Pool</h5>
+              </div>
+              <button 
+                className="rp-modal-close" 
+                onClick={() => setShowMapModal(false)}
+                disabled={isSubmitting}
+              >
+                ×
+              </button>
+            </div>
+            <div className="rp-modal-body">
+              <p>Confirm mapping <strong>{selectedEmployees.length} employee(s)</strong> to Resource Pool?</p>
+              
+              <div className="rp-modal-actions-list">
+                <h6>This will:</h6>
+                <ul>
+                  <li>Assign them to '<strong>{RESOURCE_POOL_PROJECT_NAME}</strong>'</li>
+                  <li>Set Resource Pool's L2 Approver as their reporting manager</li>
+                  <li>Mark them as primary employees</li>
+                  <li>Remove them from any other projects</li>
+                </ul>
+              </div>
+
+              <div className="rp-modal-selected-list">
+                <strong>Selected Employees:</strong>
+                <div className="rp-modal-employees">
+                  {selectedEmployees.map((emp, idx) => (
+                    <span key={emp.employeeMasterId} className="rp-modal-employee-badge">
+                      {emp.firstName} {emp.lastName}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="rp-modal-footer">
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setShowMapModal(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn rp-btn-map-confirm" 
+                onClick={confirmMapToResourcePool}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm"></span>
+                    Mapping...
+                  </>
+                ) : (
+                  <>
+                    <UserCheck size={18} />
+                    Confirm Mapping
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

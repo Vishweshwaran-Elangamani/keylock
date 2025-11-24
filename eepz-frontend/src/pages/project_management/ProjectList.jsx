@@ -1,7 +1,7 @@
 // src/pages/ProjectManagement/ProjectList.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FolderKanban, Plus, ArrowLeft, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home } from 'lucide-react';
 import { toast } from 'sonner';
 import projectService from '../../services/project_management/projectService';
 import '../../styles/projectmanagement/ProjectList.css'
@@ -610,7 +610,6 @@ const ProjectList = () => {
         setProjectToDelete(null);
         fetchProjects();
       } else {
-        // Handle error response from backend
         const errorMessage = response.message || 'Failed to delete project';
         toast.error(errorMessage, {
           duration: 5000,
@@ -619,7 +618,6 @@ const ProjectList = () => {
     } catch (error) {
       console.error('Failed to delete project:', error);
       
-      // Check if error has the response structure from backend
       const errorMessage = error.message || 
                           error.response?.data?.message || 
                           'Failed to delete project. Please try again.';
@@ -646,16 +644,6 @@ const ProjectList = () => {
     });
   };
 
-  const getStatusBadge = (status) => {
-    const statusColors = {
-      'Active': 'bg-success',
-      'On Hold': 'bg-warning text-dark',
-      'Completed': 'bg-info',
-      'Cancelled': 'bg-danger'
-    };
-    return statusColors[status] || 'bg-secondary';
-  };
-
   const hasSelectedMappedEmployees = () => {
     return selectedEmployeeIds.some(id => mappedEmployees.some(m => m.employeeMasterId === id));
   };
@@ -673,106 +661,68 @@ const ProjectList = () => {
   };
 
   return (
-    <div className="h-100 d-flex flex-column">
-      {/* Breadcrumb */}
+    <div className="prj-list-wrapper h-100 d-flex flex-column">
+      {/* Breadcrumb - KEPT */}
       <nav aria-label="breadcrumb" className="mb-3">
-        <ol 
-          className="breadcrumb mb-0 p-3 rounded" 
-          style={{
-            backgroundColor: 'rgba(151, 36, 126, 0.05)',
-            fontSize: '0.875rem'
-          }}
-        >
+        <ol className="breadcrumb mb-0 p-3 rounded prj-list-breadcrumb">
           <li className="breadcrumb-item">
             <a 
               href="#" 
               onClick={(e) => { e.preventDefault(); navigate('/hr/dashboard/projectmgmt'); }}
-              style={{
-                color: 'var(--color-primary-3)',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.25rem'
-              }}
+              className="prj-list-breadcrumb-link"
             >
               <Home size={14} />
               Dashboard
             </a>
           </li>
           <li className="breadcrumb-item active" aria-current="page">
-            <span style={{ color: 'var(--color-primary-1)', fontWeight: 600 }}>
-              All Projects
-            </span>
+            <span className="prj-list-breadcrumb-active">All Projects</span>
           </li>
         </ol>
       </nav>
 
-      {/* Page Header with Resource Pool Button */}
-      <div className="d-flex align-items-center justify-content-between mb-4">
-        <div className="d-flex align-items-center gap-3">
-          <button 
-            className="btn btn-link text-decoration-none p-0" 
-            onClick={() => navigate('/hr/dashboard/projectmgmt')}
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <FolderKanban size={36} className="text-primary" />
-          <div>
-            <h2 className="mb-0 fw-bold">All Projects</h2>
-            <p className="text-muted mb-0 small">View and manage all projects</p>
+      {/* Compact Filter Bar with Buttons */}
+      <div className="prj-list-filter-bar">
+        <div className="prj-list-filter-bar-content">
+          <div className="prj-list-search-wrapper">
+            <Search size={18} className="prj-list-search-icon" />
+            <input 
+              type="text" 
+              className="prj-list-search-input" 
+              placeholder="Search projects..." 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+            />
           </div>
-        </div>
-        <div className="d-flex gap-2">
-          <button 
-            className="btn btn-outline-primary d-flex align-items-center gap-2" 
-            onClick={() => navigate('/hr/dashboard/projectmgmt/resourcepool')}
-          >
-            <Users size={20} />
-            Resource Pool
-          </button>
-          <button 
-            className="btn btn-primary d-flex align-items-center gap-2" 
-            onClick={() => navigate('/hr/dashboard/projectmgmt/create')}
-          >
-            <Plus size={20} />
-            Create Project
-          </button>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="card border-0 shadow-sm mb-4">
-        <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-5">
-              <div className="input-group">
-                <span className="input-group-text bg-white"><Search size={18} /></span>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="Search projects..." 
-                  value={searchTerm} 
-                  onChange={(e) => setSearchTerm(e.target.value)} 
-                />
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="input-group">
-                <span className="input-group-text bg-white"><Filter size={18} /></span>
-                <select 
-                  className="form-select" 
-                  value={filterStatus} 
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                >
-                  <option value="All">All Status</option>
-                  <option value="Active">Active</option>
-                  <option value="On Hold">On Hold</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
-                </select>
-              </div>
-            </div>
-            
+          <div className="prj-list-status-filter-wrapper">
+            <Filter size={18} className="prj-list-filter-icon" />
+            <select 
+              className="prj-list-status-select" 
+              value={filterStatus} 
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="All">All Status</option>
+              <option value="Active">Active</option>
+              <option value="On Hold">On Hold</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div className="prj-list-actions-group">
+            <button 
+              className="prj-list-btn prj-list-btn-resource" 
+              onClick={() => navigate('/hr/dashboard/projectmgmt/resourcepool')}
+            >
+              <Users size={20} />
+              Resource Pool
+            </button>
+            <button 
+              className="prj-list-btn prj-list-btn-create" 
+              onClick={() => navigate('/hr/dashboard/projectmgmt/create')}
+            >
+              <Plus size={20} />
+              Create Project
+            </button>
           </div>
         </div>
       </div>
@@ -804,11 +754,11 @@ const ProjectList = () => {
       {/* Projects Table */}
       {!isLoading && !error && (
         <>
-          <div className="card border-0 shadow-sm flex-grow-1 table-card-rounded">
+          <div className="card border-0 shadow-sm flex-grow-1 prj-list-table-card">
             <div className="card-body p-0">
               <div className="table-responsive">
-                <table className="table table-hover mb-0 custom-project-table">
-                  <thead className="project-table-header">
+                <table className="table table-hover mb-0 prj-list-table">
+                  <thead className="prj-list-table-header">
                     <tr>
                       <th className="px-4 py-3">Project Name</th>
                       <th className="py-3">Status</th>
@@ -836,73 +786,80 @@ const ProjectList = () => {
                           <td className="px-4 py-3">
                             <div>
                               <div 
-                                className="fw-semibold text-primary" 
-                                style={{ cursor: 'pointer' }} 
+                                className="prj-list-project-name" 
                                 onClick={() => handleViewClick(project.projectId)}
                               >
                                 {project.projectName}
                               </div>
-                              <small className="text-muted">{project.engagementModel || 'N/A'}</small>
+                              <small className="prj-list-engagement-type">{project.engagementModel || 'N/A'}</small>
                             </div>
                           </td>
                           <td className="py-3">
-                            <span className={`badge ${getStatusBadge(project.status)}`}>
+                            <span className={`prj-list-badge prj-list-badge-${project.status.toLowerCase().replace(' ', '-')}`}>
                               {project.status}
                             </span>
                           </td>
                           <td className="py-3">
                             <div className="d-flex align-items-center gap-2">
-                              <Building size={16} className="text-muted" />
+                              <div className="prj-list-icon-wrapper prj-list-icon-business">
+                                <Building size={16} className="prj-list-icon-filled" />
+                              </div>
                               <span>{project.businessUnit || 'N/A'}</span>
                             </div>
                           </td>
                           <td className="py-3">
                             <div className="d-flex align-items-center gap-2">
-                              <Briefcase size={16} className="text-muted" />
+                              <div className="prj-list-icon-wrapper prj-list-icon-department">
+                                <Briefcase size={16} className="prj-list-icon-filled" />
+                              </div>
                               <span>{project.department || 'N/A'}</span>
                             </div>
                           </td>
                           <td className="py-3">
                             <div className="d-flex align-items-center gap-2">
-                              <Calendar size={16} className="text-muted" />
+                              <div className="prj-list-icon-wrapper prj-list-icon-calendar">
+                                <Calendar size={16} className="prj-list-icon-filled" />
+                              </div>
                               <span>{formatDate(project.startDate)}</span>
                             </div>
                           </td>
                           <td className="py-3">
                             {project.resourceOwner ? (
-                              <div>
-                                <div>{project.resourceOwner.firstName} {project.resourceOwner.lastName}</div>
-                                <small className="text-muted">{project.resourceOwner.roleName}</small>
+                              <div className="prj-list-resource-owner">
+                                <div className="prj-list-owner-name">
+                                  {project.resourceOwner.firstName} {project.resourceOwner.lastName}
+                                </div>
+                                <small className="prj-list-owner-role">{project.resourceOwner.roleName}</small>
                               </div>
                             ) : (
-                              <span className="text-muted fst-italic">Not Assigned</span>
+                              <span className="prj-list-not-assigned">Not Assigned</span>
                             )}
                           </td>
                           <td className="py-3">
                             <div className="d-flex gap-2 justify-content-center flex-wrap">
                               <button 
-                                className="btn btn-sm btn-outline-primary" 
+                                className="prj-list-action-btn prj-list-btn-edit" 
                                 onClick={() => handleEditClick(project)} 
                                 title="Edit Project"
                               >
                                 <Edit size={16} />
                               </button>
                               <button 
-                                className="btn btn-sm btn-outline-warning" 
+                                className="prj-list-action-btn prj-list-btn-manager" 
                                 onClick={() => handleManagerClick(project)} 
                                 title="Edit Managers"
                               >
                                 <UserCog size={16} />
                               </button>
                               <button 
-                                className="btn btn-sm btn-outline-info" 
+                                className="prj-list-action-btn prj-list-btn-employee" 
                                 onClick={() => handleEmployeeClick(project)} 
                                 title="Map/Unmap Employees"
                               >
                                 <Users size={16} />
                               </button>
                               <button 
-                                className="btn btn-sm btn-outline-danger" 
+                                className="prj-list-action-btn prj-list-btn-delete" 
                                 onClick={() => handleDeleteClick(project)} 
                                 title="Delete Project"
                               >

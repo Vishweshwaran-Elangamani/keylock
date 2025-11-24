@@ -1,21 +1,21 @@
 import React, { useState } from "react";
-import { CheckCircle, X } from "lucide-react";
+import { CheckCircle, X, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import "../../../styles/sla/ResolveEscalationModal.css";
 
 const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
   const [resolutionComments, setResolutionComments] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleResolve = async () => {
     if (!resolutionComments.trim()) {
-      toast.warning("Resolution comments required", {
-        description: "Please provide resolution comments before proceeding",
-        duration: 4000,
-      });
+      toast.warning("Resolution comments required");
       return;
     }
 
     setLoading(true);
+    setError(null);
     try {
       await onResolve({
         escalationId: escalation.escalationId,
@@ -23,78 +23,107 @@ const ResolveEscalationModal = ({ escalation, onClose, onResolve }) => {
         escalationStatus: "Resolved",
       });
 
-      toast.success("Escalation resolved successfully", {
-        description: "Resolution comments have been saved",
-        duration: 4000,
-      });
-    } catch (error) {
-      toast.error("Failed to resolve escalation", {
-        description: error.message || "An error occurred while resolving",
-        duration: 5000,
-      });
+      toast.success("Escalation resolved successfully");
+      onClose();
+    } catch (err) {
+      const errorMessage = err.message || "Failed to resolve escalation";
+      setError(errorMessage);
+      toast.error("Failed to resolve escalation");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      className="modal show d-block"
-      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-    >
-      <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content" style={{ borderRadius: "8px" }}>
-          <div className="modal-header border-0">
-            <h6 className="modal-title fw-semibold">Resolve Escalation</h6>
+    <>
+      <div className="resolve-modal-backdrop" onClick={() => !loading && onClose()} />
+      <div className="resolve-modal-wrapper">
+        <div className="resolve-modal-container">
+          <div className="resolve-modal-header">
+            <h3 className="resolve-modal-title">Resolve Escalation</h3>
             <button
-              type="button"
-              className="btn-close"
+              className="resolve-modal-close-btn"
               onClick={onClose}
               disabled={loading}
-            />
+            >
+              <X size={20} />
+            </button>
           </div>
 
-          <div className="modal-body">
-            <div className="mb-3 small">
-              <div className="mb-2">
-                <strong>{escalation.employeeName}</strong>
+          <div className="resolve-modal-body">
+            {error && (
+              <div className="resolve-error-alert">
+                <AlertCircle size={18} />
+                <div>
+                  <p>{error}</p>
+                </div>
+                <button onClick={() => setError(null)} className="resolve-error-close">
+                  <X size={16} />
+                </button>
               </div>
-              <div className="text-muted">{escalation.reason}</div>
+            )}
+
+            <div className="resolve-info-box">
+              <div className="resolve-info-row">
+                <span className="resolve-info-label">Employee:</span>
+                <span className="resolve-info-value">
+                  {escalation.employeeName}
+                </span>
+              </div>
+              <div className="resolve-info-row">
+                <span className="resolve-info-label">Reason:</span>
+                <span className="resolve-info-value">{escalation.reason}</span>
+              </div>
             </div>
 
-            <textarea
-              className="form-control form-control-sm"
-              rows="4"
-              value={resolutionComments}
-              onChange={(e) => setResolutionComments(e.target.value)}
-              placeholder="Enter resolution comments..."
-              disabled={loading}
-              style={{ fontSize: "0.9rem" }}
-            />
+            <div className="resolve-form-group">
+              <label className="resolve-form-label">
+                Resolution Comments <span className="resolve-required">*</span>
+              </label>
+              <textarea
+                className="resolve-textarea"
+                rows="3"
+                value={resolutionComments}
+                onChange={(e) => setResolutionComments(e.target.value)}
+                placeholder="Provide resolution details..."
+                disabled={loading}
+                maxLength={500}
+              />
+              <small className="resolve-char-count">
+                {resolutionComments.length}/500
+              </small>
+            </div>
           </div>
 
-          <div className="modal-footer border-0 gap-2">
+          <div className="resolve-modal-footer">
             <button
-              type="button"
-              className="btn btn-sm btn-light"
+              className="resolve-btn resolve-btn-secondary"
               onClick={onClose}
               disabled={loading}
             >
               Cancel
             </button>
             <button
-              type="button"
-              className="btn btn-sm btn-success d-flex align-items-center gap-2"
+              className="resolve-btn resolve-btn-primary"
               onClick={handleResolve}
               disabled={loading || !resolutionComments.trim()}
             >
-              <CheckCircle size={14} />
-              {loading ? "Resolving..." : "Resolve"}
+              {loading ? (
+                <>
+                  <span className="resolve-spinner" />
+                  Resolving...
+                </>
+              ) : (
+                <>
+                  <CheckCircle size={18} />
+                  Resolve Escalation
+                </>
+              )}
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -90,7 +90,7 @@ const ManagerSelectionModal = ({
             <div 
               className="modal-header" 
               style={{ 
-                backgroundColor: '#3c3862',
+                backgroundColor: '#25235c',
                 borderBottom: 'none',
                 padding: '1.25rem 1.5rem',
                 color: 'white'

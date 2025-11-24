@@ -5,8 +5,6 @@ import {
   Search,
   Filter,
   Download,
-  RefreshCw,
-  Eye,
   Edit3,
   Trash2,
   FileText,
@@ -14,14 +12,14 @@ import {
   Clock,
   CheckCircle,
   TrendingUp,
-  X,
+  Home,
 } from "lucide-react";
+import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
 import Pagination from "../../components/project_management_components/common/Pagination";
 import EditSLAModal from "../../components/sla/modals/EditSLAModal";
 import CreateSLAModal from "../../components/sla/modals/CreateSLAModal";
 import ConfirmationModal from "../../components/goals/modals/ConfirmationModal";
-import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "./../../styles/sla/HRSLADashboard.css";
 
 const HRSLADashboard = () => {
@@ -47,8 +45,6 @@ const HRSLADashboard = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [slaToDelete, setSlaToDelete] = useState(null);
 
-  const [showToast, setShowToast] = useState(false);
-
   useEffect(() => {
     fetchSLAs();
   }, []);
@@ -72,10 +68,12 @@ const HRSLADashboard = () => {
       } else {
         setError("Failed to load SLAs");
         setSlas([]);
+        toast.error("Failed to load SLAs");
       }
     } catch (err) {
       setError(err.message || "Failed to load SLAs");
       setSlas([]);
+      toast.error(err.message || "Failed to load SLAs");
     } finally {
       setLoading(false);
     }
@@ -102,7 +100,8 @@ const HRSLADashboard = () => {
     setFilteredSlas(filtered);
   };
 
-  const handleEdit = (sla) => {
+  const handleEdit = (e, sla) => {
+    e.stopPropagation();
     setSelectedSLA(sla);
     setShowEditModal(true);
   };
@@ -114,13 +113,16 @@ const HRSLADashboard = () => {
         setShowEditModal(false);
         setSelectedSLA(null);
         fetchSLAs();
+        toast.success("SLA updated successfully");
       }
     } catch (err) {
       console.error("Update error:", err);
+      toast.error("Failed to update SLA");
     }
   };
 
-  const handleDelete = (sla) => {
+  const handleDelete = (e, sla) => {
+    e.stopPropagation();
     setSlaToDelete(sla);
     setShowConfirmModal(true);
   };
@@ -131,23 +133,26 @@ const HRSLADashboard = () => {
       const response = await slaService.deleteSLA(slaToDelete.slaid);
       if (response.success) {
         fetchSLAs();
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 2500);
+        toast.success("SLA deleted successfully");
       }
     } catch (err) {
       console.error("Delete error:", err);
+      toast.error("Failed to delete SLA");
     } finally {
       setShowConfirmModal(false);
       setSlaToDelete(null);
     }
   };
 
-  const handleViewDetails = (slaid) => {
+  const handleRowClick = (slaid) => {
     navigate(`/hr/dashboard/sla/details/${slaid}`);
   };
 
   const handleExport = () => {
-    if (filteredSlas.length === 0) return;
+    if (filteredSlas.length === 0) {
+      toast.warning("No SLAs to export");
+      return;
+    }
     const csvData = filteredSlas.map((sla) => ({
       ID: sla.slaid,
       Employee: sla.employeeName,
@@ -171,15 +176,14 @@ const HRSLADashboard = () => {
     a.href = url;
     a.download = `sla-export-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
+    toast.success("SLAs exported successfully");
   };
 
   const calculateStats = () => ({
     total: slas.length,
     open: slas.filter((s) => s.status === "Open").length,
     closed: slas.filter((s) => s.status === "Closed").length,
-    breached: slas.filter((s) => s.complianceStatus === "Breached").length,
     onTime: slas.filter((s) => s.complianceStatus === "OnTime").length,
-    extended: slas.filter((s) => s.complianceStatus === "Extended").length,
   });
 
   const formatDate = (dateString) => {
@@ -194,26 +198,26 @@ const HRSLADashboard = () => {
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "Open":
-        return "sla-badge-open";
+        return "hr-sla-badge-open";
       case "Closed":
-        return "sla-badge-closed";
+        return "hr-sla-badge-closed";
       case "InProgress":
-        return "sla-badge-progress";
+        return "hr-sla-badge-progress";
       default:
-        return "sla-badge-default";
+        return "hr-sla-badge-default";
     }
   };
 
   const getComplianceBadgeClass = (compliance) => {
     switch (compliance) {
       case "OnTime":
-        return "sla-badge-ontime";
+        return "hr-sla-badge-ontime";
       case "Breached":
-        return "sla-badge-breached";
+        return "hr-sla-badge-breached";
       case "Extended":
-        return "sla-badge-extended";
+        return "hr-sla-badge-extended";
       default:
-        return "sla-badge-default";
+        return "hr-sla-badge-default";
     }
   };
 
@@ -222,6 +226,7 @@ const HRSLADashboard = () => {
     setStatusFilter("All");
     setTypeFilter("All");
     setComplianceFilter("All");
+    toast.info("Filters cleared");
   };
 
   const totalPages = Math.ceil(filteredSlas.length / itemsPerPage);
@@ -233,82 +238,52 @@ const HRSLADashboard = () => {
 
   if (loading) {
     return (
-      <div className="sla-loading-wrapper">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <div className="hr-sla-wrapper h-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <div className="spinner-border text-primary" style={{ width: "3rem", height: "3rem" }}></div>
+          <p className="text-muted mt-3">Loading SLA data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="sla-dashboard-container">
-      {/* Toast */}
-      {showToast && (
-        <div className="sla-toast">
-          SLA deleted successfully!
-          <button
-            className="sla-toast-close"
-            onClick={() => setShowToast(false)}
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
-        </div>
-      )}
-
-      <Breadcrumb
-        items={[
-          { label: "SLA Management", path: "/hr/dashboard/sla" },
-          { label: "HR" },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="sla-header">
-        <p className="sla-header-subtitle">
-          Manage all SLAs across the organization
-        </p>
-        <div className="sla-header-actions">
-          <button className="sla-btn sla-btn-refresh" onClick={fetchSLAs}>
-            <RefreshCw size={16} />
-            Refresh
-          </button>
-          <button
-            className="sla-btn sla-btn-export"
-            onClick={handleExport}
-            disabled={filteredSlas.length === 0}
-          >
-            <Download size={16} />
-            Export
-          </button>
-          <button
-            className="sla-btn sla-btn-create"
-            onClick={() => setShowCreateModal(true)}
-          >
-            <Plus size={16} />
-            Create SLA
-          </button>
-        </div>
-      </div>
+    <div className="hr-sla-wrapper">
+      {/* Breadcrumb */}
+      <nav aria-label="breadcrumb" className="mb-3">
+        <ol className="breadcrumb mb-0 p-3 rounded hr-sla-breadcrumb">
+          <li className="breadcrumb-item">
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/hr/dashboard");
+              }}
+              className="hr-sla-breadcrumb-link"
+            >
+              <Home size={14} />Dashboard
+            </a>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">
+            <span className="hr-sla-breadcrumb-active">HR</span>
+          </li>
+        </ol>
+      </nav>
 
       {/* Error Alert */}
       {error && (
-        <div className="sla-alert-error">
-          <AlertTriangle size={20} className="sla-alert-icon" />
-          <span>{error}</span>
-          <button
-            type="button"
-            className="sla-alert-close"
-            onClick={() => setError(null)}
-            aria-label="Close"
-          >
-            ×
-          </button>
+        <div className="alert alert-danger hr-sla-alert-error" role="alert">
+          <AlertTriangle size={20} />
+          <div>
+            <strong>Error:</strong> {error}
+            <button className="btn btn-sm btn-outline-danger ms-3" onClick={fetchSLAs}>
+              Retry
+            </button>
+          </div>
         </div>
       )}
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Only 4 */}
       <div className="row g-3 mb-3">
         {[
           {
@@ -339,54 +314,37 @@ const HRSLADashboard = () => {
             bgColor: "#D1FAE5",
             iconColor: "#059669",
           },
-          {
-            label: "Extended",
-            value: stats.extended,
-            icon: AlertTriangle,
-            bgColor: "#FEF3C7",
-            iconColor: "#D97706",
-          },
-          {
-            label: "Breached",
-            value: stats.breached,
-            icon: AlertTriangle,
-            bgColor: "#FEE2E2",
-            iconColor: "#DC2626",
-          },
         ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
-          <div key={label} className="col-md-2">
-            <div className="sla-stat-card">
-              <div
-                className="sla-stat-icon"
-                style={{ backgroundColor: bgColor }}
-              >
+          <div key={label} className="col-lg-3 col-md-6 col-sm-6">
+            <div className="hr-sla-stat-card">
+              <div className="hr-sla-stat-icon" style={{ backgroundColor: bgColor }}>
                 <Icon size={28} color={iconColor} strokeWidth={2.5} />
               </div>
-              <h2 className="sla-stat-value">{value}</h2>
-              <p className="sla-stat-label">{label}</p>
+              <h3 className="hr-sla-stat-value">{value}</h3>
+              <p className="hr-sla-stat-label">{label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Filters */}
-      <div className="sla-filters-card">
+      {/* Filters with Buttons */}
+      <div className="hr-sla-filters-card">
         <div className="row g-3 align-items-center">
-          <div className="col-md-4">
-            <div className="sla-search-wrapper">
-              <Search size={16} className="sla-search-icon" />
+          <div className="col-lg-3 col-md-6">
+            <div className="hr-sla-search-wrapper">
+              <Search size={16} className="hr-sla-search-icon" />
               <input
                 type="text"
-                className="sla-search-input"
+                className="form-control hr-sla-search-input"
                 placeholder="Search by employee, type, or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
-          <div className="col-md-2">
+          <div className="col-lg-2 col-md-6">
             <select
-              className="sla-select"
+              className="form-select hr-sla-select"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
@@ -396,9 +354,9 @@ const HRSLADashboard = () => {
               <option value="InProgress">In Progress</option>
             </select>
           </div>
-          <div className="col-md-2">
+          <div className="col-lg-2 col-md-6">
             <select
-              className="sla-select"
+              className="form-select hr-sla-select"
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
             >
@@ -409,9 +367,9 @@ const HRSLADashboard = () => {
               <option value="Goal">Goal</option>
             </select>
           </div>
-          <div className="col-md-3">
+          <div className="col-lg-2 col-md-6">
             <select
-              className="sla-select"
+              className="form-select hr-sla-select"
               value={complianceFilter}
               onChange={(e) => setComplianceFilter(e.target.value)}
             >
@@ -421,23 +379,30 @@ const HRSLADashboard = () => {
               <option value="Extended">Extended</option>
             </select>
           </div>
-          <div className="col-md-1">
-            <button
-              className="sla-btn sla-btn-filter"
-              onClick={clearFilters}
-              title="Clear all filters"
-            >
-              <Filter size={16} />
-            </button>
+          <div className="col-lg-3 col-md-12">
+            <div className="hr-sla-filter-actions">
+              <button className="btn btn-outline-secondary hr-sla-btn-clear" onClick={clearFilters}>
+                <Filter size={16} />
+                Clear
+              </button>
+              <button className="btn btn-outline-success hr-sla-btn-export" onClick={handleExport} disabled={filteredSlas.length === 0}>
+                <Download size={16} />
+                Export
+              </button>
+              <button className="btn btn-primary hr-sla-btn-create" onClick={() => setShowCreateModal(true)}>
+                <Plus size={16} />
+                Create SLA
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* SLA Table */}
-      <div className="sla-table-wrapper">
+      <div className="hr-sla-table-wrapper">
         <div className="table-responsive">
-          <table className="sla-table">
-            <thead>
+          <table className="table table-hover mb-0 hr-sla-table">
+            <thead className="hr-sla-table-header">
               <tr>
                 <th>Employee</th>
                 <th>Type</th>
@@ -451,18 +416,15 @@ const HRSLADashboard = () => {
             <tbody>
               {currentSLAs.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="sla-table-empty">
-                    <FileText size={48} className="sla-empty-icon" />
-                    <p className="sla-empty-text">
+                  <td colSpan="7" className="hr-sla-table-empty">
+                    <FileText size={48} className="hr-sla-empty-icon" />
+                    <p className="hr-sla-empty-text">
                       {filteredSlas.length === 0 && slas.length > 0
                         ? "No SLAs match your filters"
                         : "No SLAs found"}
                     </p>
                     {filteredSlas.length === 0 && slas.length > 0 && (
-                      <button
-                        className="sla-btn sla-btn-clear-filters"
-                        onClick={clearFilters}
-                      >
+                      <button className="btn btn-outline-primary" onClick={clearFilters}>
                         Clear Filters
                       </button>
                     )}
@@ -470,76 +432,53 @@ const HRSLADashboard = () => {
                 </tr>
               ) : (
                 currentSLAs.map((sla) => (
-                  <tr key={sla.slaid}>
+                  <tr 
+                    key={sla.slaid} 
+                    onClick={() => handleRowClick(sla.slaid)}
+                    className="hr-sla-clickable-row"
+                  >
                     <td>
-                      <div className="sla-employee-name">
-                        {sla.employeeName}
-                      </div>
-                      <div className="sla-employee-email">
-                        {sla.employeeEmail}
-                      </div>
+                      <div className="hr-sla-employee-name">{sla.employeeName}</div>
+                      <div className="hr-sla-employee-email">{sla.employeeEmail}</div>
                     </td>
-                    <td className="sla-cell-center">
-                      <span className="sla-badge sla-badge-type">
-                        {sla.slatype}
-                      </span>
+                    <td>
+                      <span className="hr-sla-badge hr-sla-badge-type">{sla.slatype}</span>
                     </td>
                     <td>
                       {sla.assignedToName ? (
-                        <span className="sla-assigned-name">
-                          {sla.assignedToName}
-                        </span>
+                        <span className="hr-sla-assigned-name">{sla.assignedToName}</span>
                       ) : (
-                        <span className="sla-not-assigned">Not assigned</span>
+                        <span className="hr-sla-not-assigned">Not assigned</span>
                       )}
                     </td>
                     <td>
-                      <div className="sla-deadline-date">
-                        {formatDate(sla.deadline)}
-                      </div>
+                      <div className="hr-sla-deadline-date">{formatDate(sla.deadline)}</div>
                       {sla.closedAt && (
-                        <div className="sla-closed-date">
-                          Closed: {formatDate(sla.closedAt)}
-                        </div>
+                        <div className="hr-sla-closed-date">Closed: {formatDate(sla.closedAt)}</div>
                       )}
                     </td>
-                    <td className="sla-cell-center">
-                      <span
-                        className={`sla-badge ${getStatusBadgeClass(
-                          sla.status
-                        )}`}
-                      >
+                    <td>
+                      <span className={`hr-sla-badge ${getStatusBadgeClass(sla.status)}`}>
                         {sla.status}
                       </span>
                     </td>
-                    <td className="sla-cell-center">
-                      <span
-                        className={`sla-badge ${getComplianceBadgeClass(
-                          sla.complianceStatus
-                        )}`}
-                      >
+                    <td>
+                      <span className={`hr-sla-badge ${getComplianceBadgeClass(sla.complianceStatus)}`}>
                         {sla.complianceStatus}
                       </span>
                     </td>
-                    <td className="sla-cell-center">
-                      <div className="sla-actions">
+                    <td>
+                      <div className="hr-sla-actions">
                         <button
-                          className="sla-action-btn sla-action-view"
-                          onClick={() => handleViewDetails(sla.slaid)}
-                          title="View details"
-                        >
-                          <Eye size={14} />
-                        </button>
-                        <button
-                          className="sla-action-btn sla-action-edit"
-                          onClick={() => handleEdit(sla)}
+                          className="btn btn-sm hr-sla-action-btn hr-sla-action-edit"
+                          onClick={(e) => handleEdit(e, sla)}
                           title="Edit SLA"
                         >
                           <Edit3 size={14} />
                         </button>
                         <button
-                          className="sla-action-btn sla-action-delete"
-                          onClick={() => handleDelete(sla)}
+                          className="btn btn-sm hr-sla-action-btn hr-sla-action-delete"
+                          onClick={(e) => handleDelete(e, sla)}
                           title="Delete SLA"
                         >
                           <Trash2 size={14} />
@@ -553,7 +492,7 @@ const HRSLADashboard = () => {
           </table>
         </div>
         {filteredSlas.length > itemsPerPage && (
-          <div className="sla-pagination-wrapper">
+          <div className="hr-sla-pagination-wrapper">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}

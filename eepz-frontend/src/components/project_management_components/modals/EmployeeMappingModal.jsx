@@ -107,7 +107,7 @@ const EmployeeMappingModal = ({
             <div 
               className="modal-header" 
               style={{ 
-                backgroundColor: '#3c3862',
+                backgroundColor: '#25235c',
                 borderBottom: 'none',
                 padding: '1.25rem 1.5rem',
                 color: 'white'
@@ -438,7 +438,7 @@ const EmployeeMappingModal = ({
                         </tr>
                       </thead>
                       <tbody>
-                        {/* ✅ UPDATED: Use displayEmployees instead of filteredEmployees */}
+                        {/* UPDATED: Use displayEmployees instead of filteredEmployees */}
                         {displayEmployees.length === 0 ? (
                           <tr>
                             <td

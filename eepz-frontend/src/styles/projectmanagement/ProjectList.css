@@ -1,22 +1,196 @@
-/* ProjectList.css */
+/* ========================================
+   PROJECT LIST - WITH BREADCRUMBS
+   ======================================== */
 
-/* Table Card - Rounded corners */
-.table-card-rounded {
-  border-radius: 12px !important;
-  overflow: hidden !important;
+/* Wrapper */
+.prj-list-wrapper {
+  padding: 1.5rem 2rem !important;
 }
 
-/* Table Header Styling */
-.project-table-header {
-  background-color: var(--color-primary-1) !important;
+/* ========================================
+   BREADCRUMBS - KEPT
+   ======================================== */
+
+.prj-list-breadcrumb {
+
+  font-size: 0.875rem !important;
+}
+
+.prj-list-breadcrumb-link {
+  color: #97247E !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  transition: color 0.2s !important;
+}
+
+.prj-list-breadcrumb-link:hover {
+  color: #7A1D66 !important;
+  text-decoration: underline !important;
+}
+
+.prj-list-breadcrumb-active {
+  color:  #97247E !important;
+  font-weight: 600 !important;
+}
+
+/* ========================================
+   COMPACT FILTER BAR WITH BUTTONS
+   ======================================== */
+
+.prj-list-filter-bar {
+  background: #FFFFFF !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 10px !important;
+  padding: 1rem 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.prj-list-filter-bar-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  flex-wrap: wrap !important;
+}
+
+/* Search Input */
+.prj-list-search-wrapper {
+  position: relative !important;
+  flex: 1 !important;
+  min-width: 250px !important;
+}
+
+.prj-list-search-icon {
+  position: absolute !important;
+  left: 0.875rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #6c757d !important;
+  pointer-events: none !important;
+}
+
+.prj-list-search-input {
+  width: 100% !important;
+  padding: 0.625rem 0.875rem 0.625rem 2.5rem !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s !important;
+}
+
+.prj-list-search-input:focus {
+  outline: none !important;
+  border-color: #0F62FE !important;
+  box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
+}
+
+/* Status Filter */
+.prj-list-status-filter-wrapper {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.prj-list-filter-icon {
+  position: absolute !important;
+  left: 0.875rem !important;
+  color: #6c757d !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.prj-list-status-select {
+  padding: 0.625rem 0.875rem 0.625rem 2.5rem !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  font-size: 0.875rem !important;
+  min-width: 160px !important;
+  background: #FFFFFF !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+}
+
+.prj-list-status-select:focus {
+  outline: none !important;
+  border-color: #0F62FE !important;
+  box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
+}
+
+/* Action Buttons Group */
+.prj-list-actions-group {
+  display: flex !important;
+  gap: 0.75rem !important;
+  margin-left: auto !important;
+}
+
+.prj-list-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 0.625rem 1.25rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+}
+
+.prj-list-btn-resource {
+  background: #FFFFFF !important;
+  color: #0F62FE !important;
+  border: 1.5px solid #0F62FE !important;
+}
+
+.prj-list-btn-resource:hover {
+  background: #0F62FE !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(15, 98, 254, 0.3) !important;
+}
+
+.prj-list-btn-create {
+  background: linear-gradient(90deg, #97247E 0%, #E01950 100%) !important;
+  color: #FFFFFF !important;
+}
+
+.prj-list-btn-create:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3) !important;
+}
+
+/* ========================================
+   TABLE STYLES
+   ======================================== */
+
+/* Table Card - Rounded Borders */
+.prj-list-table-card {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid #dee2e6 !important;
+}
+
+/* Table Styling */
+.prj-list-table {
+  margin-bottom: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+/* Table Header - Purple Background with Rounded Top */
+.prj-list-table-header {
+  background-color: #4A4669 !important;
   position: sticky !important;
   top: 0 !important;
   z-index: 10 !important;
 }
 
-.project-table-header th {
-  background-color: var(--color-primary-1) !important;
-  color: white !important;
+.prj-list-table-header th {
+  background-color: #25235c !important;
+  color: #ffffff !important;
   border: none !important;
   font-weight: 600 !important;
   font-size: 0.875rem !important;
@@ -24,55 +198,283 @@
   vertical-align: middle !important;
   text-align: left !important;
   white-space: nowrap !important;
-  
+  text-transform: uppercase !important;
+  letter-spacing: normal !important;
+}
+
+/* Rounded corners for first and last header cells */
+.prj-list-table-header th:first-child {
+  border-top-left-radius: 12px !important;
+}
+
+.prj-list-table-header th:last-child {
+  border-top-right-radius: 12px !important;
 }
 
 /* Center align specific header columns */
-.project-table-header th:nth-child(2), /* Status */
-.project-table-header th:last-child {  /* Actions */
+.prj-list-table-header th:nth-child(2) {
   text-align: center !important;
 }
 
-/* Table body styling */
-.custom-project-table {
-  margin-bottom: 0 !important;
+.prj-list-table-header th:last-child {
+  text-align: center !important;
 }
 
-.custom-project-table tbody td {
+/* Table Body Styling */
+.prj-list-table tbody td {
   vertical-align: middle !important;
   padding: 14px 16px !important;
-  border-top: 1px solid #e9ecef !important;
+  border-top: 1px solid #dee2e6 !important;
+  border-bottom: 1px solid #dee2e6 !important;
   text-align: left !important;
+  font-size: 0.875rem !important;
+  color: #212529 !important;
 }
 
-/* Center align specific body columns */
-.custom-project-table tbody td:nth-child(2), /* Status badge */
-.custom-project-table tbody td:last-child {  /* Actions buttons */
-  text-align: center !important;
+/* Rounded corners for last row */
+.prj-list-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 12px !important;
 }
 
-/* Project Name column styling */
-.custom-project-table tbody td:first-child {
-  font-weight: 500 !important;
+.prj-list-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 12px !important;
 }
 
-/* Icon + text alignment fix */
-.custom-project-table tbody td .d-flex {
-  align-items: center !important;
-}
-
-/* Remove default borders */
-.custom-project-table thead th {
-  border-bottom: none !important;
-}
-
-/* Hover effect */
-.custom-project-table tbody tr:hover {
-  background-color: rgba(151, 36, 126, 0.04) !important;
+/* Row Hover Effect */
+.prj-list-table tbody tr:hover {
+  background-color: #f8f9fa !important;
   transition: background-color 0.2s ease !important;
 }
 
-/* Empty state centering */
-.custom-project-table tbody td[colspan] {
+/* Project Name Styling */
+.prj-list-project-name {
+  font-weight: 600 !important;
+  color: #27235C !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+  font-size: 0.9375rem !important;
+}
+
+.prj-list-project-name:hover {
+  color: #0F62FE !important;
+  text-decoration: underline !important;
+}
+
+.prj-list-engagement-type {
+  color: #6c757d !important;
+  font-size: 0.75rem !important;
+  font-style: italic !important;
+}
+
+/* Status Badges - Normal Case */
+.prj-list-badge {
+  display: inline-block !important;
+  padding: 0.375rem 0.75rem !important;
+  border-radius: 6px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.prj-list-badge-active {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  border: 1px solid #badbcc !important;
+}
+
+.prj-list-badge-on-hold {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+  border: 1px solid #ffeaa7 !important;
+}
+
+.prj-list-badge-completed {
+  background-color: #cfe2ff !important;
+  color: #084298 !important;
+  border: 1px solid #b6d4fe !important;
+}
+
+.prj-list-badge-cancelled {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+  border: 1px solid #f5c2c7 !important;
+}
+
+/* Icon Wrappers - Filled Style */
+.prj-list-icon-wrapper {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+
+.prj-list-icon-business .prj-list-icon-filled {
+  color: #0F62FE !important;
+}
+
+.prj-list-icon-department .prj-list-icon-filled {
+  color: #97247E !important;
+}
+
+.prj-list-icon-calendar .prj-list-icon-filled {
+  color: #16A34A !important;
+}
+
+/* Resource Owner Styling */
+.prj-list-resource-owner {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.prj-list-owner-name {
+  font-weight: 600 !important;
+  color: #212529 !important;
+  font-size: 0.875rem !important;
+}
+
+.prj-list-owner-role {
+  color: #6c757d !important;
+  font-size: 0.75rem !important;
+}
+
+.prj-list-not-assigned {
+  color: #6c757d !important;
+  font-style: italic !important;
+  font-size: 0.875rem !important;
+}
+
+/* Action Buttons - Filled Style with Icons */
+.prj-list-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.prj-list-btn-edit {
+  background-color: #e3f2fd !important;
+  color: #1976d2 !important;
+}
+
+.prj-list-btn-edit:hover {
+  background-color: #1976d2 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3) !important;
+}
+
+.prj-list-btn-manager {
+  background-color: #fff3e0 !important;
+  color: #f57c00 !important;
+}
+
+.prj-list-btn-manager:hover {
+  background-color: #f57c00 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(245, 124, 0, 0.3) !important;
+}
+
+.prj-list-btn-employee {
+  background-color: #e0f2f1 !important;
+  color: #00796b !important;
+}
+
+.prj-list-btn-employee:hover {
+  background-color: #00796b !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(0, 121, 107, 0.3) !important;
+}
+
+.prj-list-btn-delete {
+  background-color: #ffebee !important;
+  color: #c62828 !important;
+}
+
+.prj-list-btn-delete:hover {
+  background-color: #c62828 !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(198, 40, 40, 0.3) !important;
+}
+
+/* Center align status and actions columns */
+.prj-list-table tbody td:nth-child(2) {
   text-align: center !important;
+}
+
+.prj-list-table tbody td:last-child {
+  text-align: center !important;
+}
+
+/* Empty State */
+.prj-list-table tbody td[colspan] {
+  text-align: center !important;
+  padding: 3rem 1rem !important;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 992px) {
+  .prj-list-filter-bar-content {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .prj-list-search-wrapper {
+    min-width: 100% !important;
+  }
+
+  .prj-list-actions-group {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .prj-list-btn {
+    flex: 1 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .prj-list-wrapper {
+    padding: 1rem !important;
+  }
+
+  .prj-list-filter-bar {
+    padding: 0.875rem !important;
+  }
+
+  .prj-list-table-header th {
+    font-size: 0.75rem !important;
+    padding: 10px 12px !important;
+  }
+
+  .prj-list-table tbody td {
+    font-size: 0.8125rem !important;
+    padding: 10px 12px !important;
+  }
+
+  .prj-list-action-btn {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .prj-list-action-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
 }

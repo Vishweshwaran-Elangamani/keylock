@@ -55,7 +55,7 @@ const Breadcrumb = ({ items }) => {
                   if (item.path) navigate(item.path);
                 }}
                 style={{
-                  color: "var(--color-primary-3)",
+                  color: "#97247E",
                   textDecoration: "none",
                 }}
               >
