@@ -65,20 +65,23 @@ const SLAHistoryTimeline = ({ history }) => {
 
         return (
           <div key={item.historyId || index} className="sla-history-item">
-            <div
-              className="sla-history-icon-wrapper"
-              style={{ borderColor: color }}
-            >
-              <Icon size={20} color={color} strokeWidth={2.5} />
-            </div>
+            
 
             <div className="sla-history-content">
               <div className="sla-history-card" style={{ borderLeftColor: color }}>
                 <div className="sla-history-card-header">
                   <div className="sla-history-title-section">
-                    <h6 className="sla-history-title" style={{ color }}>
+                  <div
+              className=""
+              style={{ borderColor: color }}
+            >
+              <Icon size={20} color={color} strokeWidth={2.5} />
+            
+                    <h3 className="sla-history-title" style={{ color }}>
                       {label}
-                    </h6>
+                      
+                    </h3>
+                    </div>
                     <div className="sla-history-meta">
                       <span className="sla-history-meta-item">
                         <Calendar size={14} />

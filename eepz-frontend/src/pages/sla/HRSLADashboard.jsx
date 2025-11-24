@@ -504,7 +504,7 @@ const HRSLADashboard = () => {
           </div>
         )}
       </div>
-
+        <div>
       {/* Modals */}
       <ConfirmationModal
         isOpen={showConfirmModal}
@@ -523,6 +523,7 @@ const HRSLADashboard = () => {
         cancelText="Cancel"
         confirmVariant="danger"
       />
+      </div>
 
       {showEditModal && selectedSLA && (
         <EditSLAModal

@@ -51,7 +51,7 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
         complianceStatus: status === "Closed" ? "OnTime" : sla.complianceStatus,
       };
 
-      console.log("📝 Updating SLA with:", updateData);
+      console.log("  Updating SLA with:", updateData);
       await onUpdate(sla.slaid, updateData);
     } catch (err) {
       setError(err.message || "Failed to update SLA");
@@ -95,7 +95,7 @@ const EditSLAModal = ({ sla, onClose, onUpdate }) => {
             justifyContent: "space-between",
             alignItems: "center",
             padding: "1.25rem 1.5rem",
-            backgroundColor: "#3c3862",
+            backgroundColor: "#27235C",
             borderBottom: "none",
           }}
         >

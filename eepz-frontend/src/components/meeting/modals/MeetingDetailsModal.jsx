@@ -19,7 +19,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-          {/* ✅ UPDATED: Dark purple header with white text */}
+          {/*    UPDATED: Dark purple header with white text */}
           <div 
             className="modal-header border-0" 
             style={{ 
@@ -43,7 +43,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
             ></button>
           </div>
 
-          {/* ✅ UPDATED: Left-aligned body content */}
+          {/*    UPDATED: Left-aligned body content */}
           <div className="modal-body" style={{ padding: '2rem', textAlign: 'left' }}>
             {/* Date & Time and Attendees Row */}
             <div className="row g-3 mb-4">
@@ -203,7 +203,7 @@ const MeetingDetailsModal = ({ meeting, onClose, employeeMap }) => {
             {showCreateMom && <CreateMomModal meetingData={meeting} onClose={toggleCreateMom} />}
           </div>
 
-          {/* ✅ UPDATED: Footer with consistent styling */}
+          {/*    UPDATED: Footer with consistent styling */}
           <div 
             className="modal-footer border-0" 
             style={{ 

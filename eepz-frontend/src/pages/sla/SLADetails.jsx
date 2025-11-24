@@ -312,7 +312,7 @@ const SLADetails = () => {
             disabled={refreshing}
             className="sla-details-btn sla-details-btn-primary"
           >
-            <CheckCircle size={16} />
+            {/* <CheckCircle size={16} /> */}
             Close SLA
           </button>
         )}

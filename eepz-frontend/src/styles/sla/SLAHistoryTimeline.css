@@ -11,7 +11,7 @@
 
 .sla-history-timeline-line {
   position: absolute;
-  left: 1.25rem;
+  right: .5rem;
   top: 2rem;
   bottom: 2rem;
   width: 3px;
@@ -28,6 +28,7 @@
   margin-bottom: 1.75rem;
   display: flex;
   gap: 1.25rem;
+  right: 2.2rem;
 }
 
 .sla-history-item:last-child {
@@ -37,13 +38,14 @@
 /* Icon Wrapper */
 .sla-history-icon-wrapper {
   position: absolute;
-  left: -2.5rem;
-  top: 0.5rem;
-  width: 48px;
-  height: 48px;
+  left: 6rem;
+  top: 1.3rem;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: #FFFFFF;
-  border: 3px solid;
+  background: transparent;
+  /* border: 3px solid; */
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,7 +66,7 @@
   border-radius: 10px;
   padding: 1.25rem;
   box-shadow: 0 2px 6px rgba(39, 35, 92, 0.08);
-  transition: all 0.2s ease;
+  transition: all 0.1s ease;
 }
 
 .sla-history-card:hover {
@@ -76,7 +78,7 @@
    CARD HEADER
    ======================================== */
 
-.sla-history-card-header {
+.sla-history-card-header {  
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -89,7 +91,7 @@
 }
 
 .sla-history-title {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
   line-height: 1.4;

@@ -111,6 +111,7 @@ import ActionItemsManagement from "./pages/meeting/ActionItemsManagement";
 import HRMomDashboard from "./pages/meeting/HRMomDashboard";
 import HRMomDetails from "./pages/meeting/HRMomDetails";
 import ManagerPeerFeedback from "./pages/feedback_management/manager/ManagerPeerFeedback";
+import MomDetailsView from "./components/meeting/modals/MomDetailsView";
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -1641,6 +1642,16 @@ const AppRoutes = () => {
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
               <RSVPSummary />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/dasboard/meetmom/meetdetails/:momId"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <MomDetailsView />
             </DashboardLayout>
           </ProtectedRoute>
         }

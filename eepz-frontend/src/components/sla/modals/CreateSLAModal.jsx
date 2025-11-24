@@ -180,7 +180,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* ✅ UPDATED HEADER - Dark Purple Theme */}
+        {/*   UPDATED HEADER - Dark Purple Theme */}
         <div
           style={{
             display: "flex",
@@ -222,7 +222,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           </button>
         </div>
 
-        {/* ✅ UPDATED BODY - Light Gray Background */}
+        {/*   UPDATED BODY - Light Gray Background */}
         <div style={{ padding: "1.75rem", backgroundColor: "#f8f9fa" }}>
           {fetchLoading ? (
             <div
@@ -246,7 +246,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              {/* ✅ UPDATED ERROR ALERT */}
+              {/*   UPDATED ERROR ALERT */}
               {error && (
                 <div
                   style={{
@@ -268,7 +268,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 </div>
               )}
 
-              {/* ✅ UPDATED REVIEW TYPE INPUT */}
+              {/*   UPDATED REVIEW TYPE INPUT */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -301,7 +301,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                     textAlign: "left",
                   }}
                 />
-                <small
+                {/* <small
                   style={{
                     color: "#6b7280",
                     display: "block",
@@ -311,10 +311,10 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                   }}
                 >
                   Type any review type name
-                </small>
+                </small> */}
               </div>
 
-              {/* ✅ UPDATED DEADLINE INPUT */}
+              {/*   UPDATED DEADLINE INPUT */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -349,7 +349,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 />
               </div>
 
-              {/* ✅ UPDATED REASON INPUT */}
+              {/*   UPDATED REASON INPUT */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -383,7 +383,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 />
               </div>
 
-              {/* ✅ UPDATED EMPLOYEE COUNT INFO */}
+              {/*   UPDATED EMPLOYEE COUNT INFO */}
               <div
                 style={{
                   backgroundColor: "rgba(13, 110, 253, 0.1)",
@@ -400,6 +400,8 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                     fontWeight: 600,
                     fontSize: "1.25rem",
                     lineHeight: 1.2,
+                    textAlign: "left"
+                    
                   }}
                 >
                   {employeeCount} Employees
@@ -412,7 +414,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           )}
         </div>
 
-        {/* ✅ UPDATED FOOTER */}
+        {/*   UPDATED FOOTER */}
         <div
           style={{
             display: "flex",
@@ -450,7 +452,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
             Cancel
           </button>
           
-          {/* ✅ UPDATED CREATE BUTTON - Gradient Theme */}
+          {/*   UPDATED CREATE BUTTON - Gradient Theme */}
           <button
             onClick={handleSubmit}
             disabled={loading || fetchLoading || employeeCount === 0}
