@@ -377,40 +377,40 @@ const CareerGoals = () => {
       {adoptionStats && (
         <div className="cg-summary-cards">
           <div className="cg-summary-card total">
-            <div className="summary-card-icon">
+            <div className="cg-summary-card-icon">
               <i className="bi bi-people-fill"></i>
             </div>
-            <div className="summary-card-content">
-              <div className="summary-card-value">
+            <div className="cg-summary-card-content">
+              <div className="cg-summary-card-value">
                 {adoptionStats.totalEmployees}
               </div>
-              <div className="summary-card-label">Total Employees</div>
+              <div className="cg-summary-card-label">Total Employees</div>
             </div>
           </div>
 
           <div className="cg-summary-card with-goals">
-            <div className="summary-card-icon">
+            <div className="cg-summary-card-icon">
               <i className="bi bi-check-circle-fill"></i>
             </div>
-            <div className="summary-card-content">
-              <div className="summary-card-value">
+            <div className="cg-summary-card-content">
+              <div className="cg-summary-card-value">
                 {adoptionStats.employeesWithGoals}
               </div>
-              <div className="summary-card-label">
+              <div className="cg-summary-card-label">
                 With Goals ({adoptionStats.adoptionRate}%)
               </div>
             </div>
           </div>
 
           <div className="cg-summary-card without-goals">
-            <div className="summary-card-icon">
+            <div className="cg-summary-card-icon">
               <i className="bi bi-exclamation-triangle-fill"></i>
             </div>
-            <div className="summary-card-content">
-              <div className="summary-card-value">
+            <div className="cg-summary-card-content">
+              <div className="cg-summary-card-value">
                 {adoptionStats.employeesWithoutGoals}
               </div>
-              <div className="summary-card-label">Without Goals</div>
+              <div className="cg-summary-card-label">Without Goals</div>
             </div>
           </div>
         </div>

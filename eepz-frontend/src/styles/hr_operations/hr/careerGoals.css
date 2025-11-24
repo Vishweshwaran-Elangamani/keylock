@@ -43,7 +43,7 @@
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(44, 39, 98, 0.08);
-  text-align: left;
+  text-align: center;
   transition: all 0.3s ease;
   cursor: pointer;
   border: 1px solid #27235c;
@@ -78,7 +78,7 @@
   border-color: #0d6efd;
 }
 
-.summary-card-icon {
+.cg-summary-card-icon {
   width: 48px;
   height: 48px;
   border-radius: 12px;
@@ -89,30 +89,31 @@
   flex-shrink: 0;
 }
 
-.cg-summary-card.total .summary-card-icon {
+.cg-summary-card.total .cg-summary-card-icon {
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   color: #1e40af;
 }
 
-.cg-summary-card.with-goals .summary-card-icon {
+.cg-summary-card.with-goals .cg-summary-card-icon {
   background: linear-gradient(135deg, #d1fae5, #a7f3d0);
   color: #065f46;
 }
 
-.cg-summary-card.without-goals .summary-card-icon {
+.cg-summary-card.without-goals .cg-summary-card-icon {
   background: linear-gradient(135deg, #fed7aa, #fdba74);
   color: #92400e;
 }
 
-.summary-card-content {
+.cg-summary-card-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  text-align: left;
-  align-items: flex-start;
+  text-align: center;
+  /* align-items:center */
 }
 
-.summary-card-label {
+.cg-summary-card-label {
   font-size: 10px;
   color: #64748b;
   font-weight: 600;
@@ -121,7 +122,7 @@
   line-height: 1.2;
 }
 
-.summary-card-value {
+.cg-summary-card-value {
   font-size: 20px;
   font-weight: 700;
   color: #1e293b;
@@ -388,7 +389,7 @@
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  justify-content: center;
+  justify-content:flex-start;
   gap: 0.5rem;
 }
 
@@ -611,17 +612,17 @@
     padding: 10px 12px;
   }
 
-  .summary-card-icon {
+  .cg-summary-card-icon {
     width: 40px;
     height: 40px;
     font-size: 18px;
   }
 
-  .summary-card-value {
+  .cg-summary-card-value {
     font-size: 18px;
   }
 
-  .summary-card-label {
+  .cg-summary-card-label {
     font-size: 9px;
   }
 

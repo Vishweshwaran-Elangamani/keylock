@@ -424,7 +424,7 @@ const Login = () => {
                       onPaste={handlePasswordPaste}
                       onCopy={handlePasswordCopy}
                       onCut={handlePasswordCut}
-                      autoComplete="current-password"
+                      autoComplete="new-password"
                       disabled={loading}
                       maxLength={50}
                     />
@@ -435,7 +435,11 @@ const Login = () => {
                       tabIndex="-1"
                       title={showPassword ? "Hide password" : "Show password"}
                     >
-                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                      <i
+                        className={`bi ${
+                          showPassword ? "bi-eye-slash" : "bi-eye"
+                        }`}
+                      ></i>
                     </button>
                   </div>
                   {errors.password && touched.password && (
@@ -465,9 +469,7 @@ const Login = () => {
                   className="btn btn-primary btn-lg w-100 eepz-submit-btn"
                   disabled={loading}
                   style={{
-                    background: loading
-                      ? "#6c757d"
-                      : "#27235c",
+                    background: loading ? "#6c757d" : "#27235c",
                     border: "none",
                     transition: "all 0.3s ease",
                   }}

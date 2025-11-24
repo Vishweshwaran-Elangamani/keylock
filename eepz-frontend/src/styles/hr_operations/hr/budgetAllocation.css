@@ -375,7 +375,7 @@
 
 .action-buttons {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.5rem;
 }
 

@@ -993,3 +993,8 @@ a:hover {
     padding: 10px;
   }
 }
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}

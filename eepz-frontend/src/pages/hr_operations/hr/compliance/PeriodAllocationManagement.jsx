@@ -7,7 +7,6 @@ import UpdatePeriodAllocationModal from "../../../../components/hr_operations/mo
 import AllocateFromPeriodModal from "../../../../components/hr_operations/modals/AllocateFromPeriodModal";
 import ViewPeriodDetailsModal from "../../../../components/hr_operations/modals/ViewPeriodDetailsModal";
 import DeleteConfirmationModal from "../../../../components/hr_operations/modals/DeleteConfirmationModal";
-import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 import "../../../../styles/hr_operations/hr/periodAllocation.css";
 
@@ -94,7 +93,8 @@ const PeriodAllocationManagement = () => {
 
   const fetchPeriodAllocations = async (budgetId) => {
     try {
-      const response = await periodAllocationService.getPeriodAllocationsByBudget(budgetId);
+      const response =
+        await periodAllocationService.getPeriodAllocationsByBudget(budgetId);
 
       if (response.success) {
         const data = response.data || [];
@@ -109,8 +109,12 @@ const PeriodAllocationManagement = () => {
   };
 
   const generateFilterOptions = (data) => {
-    const years = [...new Set(data.map((p) => p.periodYear))].sort((a, b) => b - a);
-    const periods = [...new Set(data.map((p) => p.period).filter(Boolean))].sort();
+    const years = [...new Set(data.map((p) => p.periodYear))].sort(
+      (a, b) => b - a
+    );
+    const periods = [
+      ...new Set(data.map((p) => p.period).filter(Boolean)),
+    ].sort();
 
     setFilterOptions({
       years,
@@ -126,13 +130,17 @@ const PeriodAllocationManagement = () => {
       const query = filters.search.toLowerCase();
       filtered = filtered.filter((p) => {
         const period = (p.period || "").toLowerCase();
-        return period.includes(query) || p.periodYear?.toString().includes(query);
+        return (
+          period.includes(query) || p.periodYear?.toString().includes(query)
+        );
       });
     }
 
     // Year filter
     if (filters.year !== "all") {
-      filtered = filtered.filter((p) => p.periodYear === parseInt(filters.year));
+      filtered = filtered.filter(
+        (p) => p.periodYear === parseInt(filters.year)
+      );
     }
 
     // Period filter
@@ -243,7 +251,10 @@ const PeriodAllocationManagement = () => {
       period.subAllocationCount || 0,
     ]);
 
-    const csvContent = [headers.join(","), ...csvData.map((row) => row.join(","))].join("\n");
+    const csvContent = [
+      headers.join(","),
+      ...csvData.map((row) => row.join(",")),
+    ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -297,13 +308,13 @@ const PeriodAllocationManagement = () => {
 
   const confirmDelete = async () => {
     if (!periodToDelete) return;
-    
+
     setIsDeleting(true);
     try {
       const response = await periodAllocationService.deletePeriodAllocation(
         periodToDelete.periodAllocationId
       );
-      
+
       if (response.success) {
         toast.success("Period allocation deleted successfully");
         fetchPeriodAllocations(selectedBudget.budgetId);
@@ -335,9 +346,15 @@ const PeriodAllocationManagement = () => {
 
   // Calculate summary statistics
   const summaryStats = {
-    totalAllocated: filteredPeriods.reduce((sum, p) => sum + (p.allocatedAmount || 0), 0),
+    totalAllocated: filteredPeriods.reduce(
+      (sum, p) => sum + (p.allocatedAmount || 0),
+      0
+    ),
     totalPeriods: filteredPeriods.length,
-    totalSubAllocations: filteredPeriods.reduce((sum, p) => sum + (p.subAllocationCount || 0), 0),
+    totalSubAllocations: filteredPeriods.reduce(
+      (sum, p) => sum + (p.subAllocationCount || 0),
+      0
+    ),
   };
 
   if (loading) {
@@ -364,32 +381,38 @@ const PeriodAllocationManagement = () => {
       {filteredPeriods.length > 0 && (
         <div className="period-summary-cards">
           <div className="period-summary-card total">
-            <div className="summary-card-icon">
+            <div className="period-summary-card-icon">
               <i className="bi bi-wallet2"></i>
             </div>
-            <div className="summary-card-content">
-              <div className="summary-card-value">{formatCurrency(summaryStats.totalAllocated)}</div>
-              <div className="summary-card-label">Total Allocated</div>
+            <div className="period-summary-card-content">
+              <div className="period-summary-card-value">
+                {formatCurrency(summaryStats.totalAllocated)}
+              </div>
+              <div className="period-summary-card-label">Total Allocated</div>
             </div>
           </div>
 
           <div className="period-summary-card utilized">
-            <div className="summary-card-icon">
+            <div className="period-summary-card-icon">
               <i className="bi bi-calendar-range"></i>
             </div>
-            <div className="summary-card-content">
-              <div className="summary-card-value">{summaryStats.totalPeriods}</div>
-              <div className="summary-card-label">Total Periods</div>
+            <div className="period-summary-card-content">
+              <div className="period-summary-card-value">
+                {summaryStats.totalPeriods}
+              </div>
+              <div className="period-summary-card-label">Total Periods</div>
             </div>
           </div>
 
           <div className="period-summary-card remaining">
-            <div className="summary-card-icon">
+            <div className="period-summary-card-icon">
               <i className="bi bi-diagram-3"></i>
             </div>
-            <div className="summary-card-content">
-              <div className="summary-card-value">{summaryStats.totalSubAllocations}</div>
-              <div className="summary-card-label">Sub-Allocations</div>
+            <div className="period-summary-card-content">
+              <div className="period-summary-card-value">
+                {summaryStats.totalSubAllocations}
+              </div>
+              <div className="period-summary-card-label">Sub-Allocations</div>
             </div>
           </div>
         </div>
@@ -403,7 +426,9 @@ const PeriodAllocationManagement = () => {
             className="period-filter-select period-budget-dropdown"
             value={selectedBudget?.budgetId || ""}
             onChange={(e) => {
-              const budget = budgets.find((b) => b.budgetId === parseInt(e.target.value));
+              const budget = budgets.find(
+                (b) => b.budgetId === parseInt(e.target.value)
+              );
               setSelectedBudget(budget);
             }}
           >
@@ -412,7 +437,8 @@ const PeriodAllocationManagement = () => {
             ) : (
               budgets.map((budget) => (
                 <option key={budget.budgetId} value={budget.budgetId}>
-                  {budget.departmentName} - FY {budget.fiscalYear} ({formatCurrency(budget.totalBudget)})
+                  {budget.departmentName} - FY {budget.fiscalYear} (
+                  {formatCurrency(budget.totalBudget)})
                 </option>
               ))
             )}
@@ -495,159 +521,6 @@ const PeriodAllocationManagement = () => {
                   : "No period allocations configured for this budget"}
               </p>
             </div>
-          ) : viewType === "card" ? (
-            <>
-              {/* CARD VIEW */}
-              <div className="period-cards-grid">
-                {currentPageData.map((period) => (
-                  <div key={period.periodAllocationId} className="period-card">
-                    <div className="period-card-header">
-                      <div className="period-card-avatar">
-                        <i className="bi bi-calendar-event"></i>
-                      </div>
-                      <div className="period-card-header-info">
-                        <h5 className="period-card-title">{period.period}</h5>
-                        <p className="period-card-year">Year {period.periodYear}</p>
-                      </div>
-                    </div>
-
-                    <div className="period-card-body">
-                      <div className="period-card-row">
-                        <span className="period-card-label">Allocated</span>
-                        <span className="period-card-value">{formatCurrency(period.allocatedAmount)}</span>
-                      </div>
-
-                      <div className="period-card-row">
-                        <span className="period-card-label">Sub-Allocations</span>
-                        <span className="period-card-value">{period.subAllocationCount || 0}</span>
-                      </div>
-
-                      {period.notes && (
-                        <div className="period-card-notes">
-                          <i className="bi bi-sticky"></i>
-                          <span>{period.notes}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="period-card-actions">
-                      <button
-                        className="period-btn-card-action period-btn-view"
-                        onClick={() => handleViewDetails(period)}
-                        title="View Details"
-                      >
-                        <i className="bi bi-eye"></i>
-                        <span>View</span>
-                      </button>
-                      <button
-                        className="period-btn-card-action period-btn-edit"
-                        onClick={() => handleUpdatePeriod(period)}
-                        title="Edit"
-                      >
-                        <i className="bi bi-pencil"></i>
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        className="period-btn-card-action period-btn-allocate"
-                        onClick={() => handleAllocateFromPeriod(period)}
-                        title="Sub-Allocate"
-                      >
-                        <i className="bi bi-diagram-3"></i>
-                        <span>Allocate</span>
-                      </button>
-                      <button
-                        className="period-btn-card-action period-btn-delete"
-                        onClick={() => handleDeletePeriod(period)}
-                        title="Delete"
-                      >
-                        <i className="bi bi-trash"></i>
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* PAGINATION FOR CARD VIEW */}
-              {totalPages > 1 && (
-                <div className="pagination-container">
-                  <div className="pagination-info">
-                    <span className="pagination-label">Show</span>
-                    <select
-                      className="pagination-select"
-                      value={itemsPerPage}
-                      onChange={handleItemsPerPageChange}
-                    >
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="25">25</option>
-                      <option value="50">50</option>
-                    </select>
-                    <span className="pagination-label">entries</span>
-                  </div>
-
-                  <div className="pagination-status">
-                    Showing {Math.min(startIndex + 1, filteredPeriods.length)}-
-                    {Math.min(endIndex, filteredPeriods.length)} of {filteredPeriods.length} entries
-                  </div>
-
-                  <nav className="pagination-nav">
-                    <ul className="pagination">
-                      <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                        <button
-                          className="page-link"
-                          onClick={() => goToPage(currentPage - 1)}
-                          disabled={currentPage === 1}
-                        >
-                          <i className="bi bi-chevron-left"></i>
-                        </button>
-                      </li>
-
-                      {Array.from({ length: totalPages }, (_, i) => i + 1)
-                        .filter((page) => {
-                          if (totalPages <= 7) return true;
-                          if (page === 1 || page === totalPages) return true;
-                          if (page >= currentPage - 1 && page <= currentPage + 1) return true;
-                          return false;
-                        })
-                        .map((page, index, array) => {
-                          if (index > 0 && page - array[index - 1] > 1) {
-                            return (
-                              <React.Fragment key={`ellipsis-${page}`}>
-                                <li className="page-item disabled">
-                                  <button className="page-link">...</button>
-                                </li>
-                                <li className={`page-item ${currentPage === page ? "active" : ""}`}>
-                                  <button className="page-link" onClick={() => goToPage(page)}>
-                                    {page}
-                                  </button>
-                                </li>
-                              </React.Fragment>
-                            );
-                          }
-                          return (
-                            <li key={page} className={`page-item ${currentPage === page ? "active" : ""}`}>
-                              <button className="page-link" onClick={() => goToPage(page)}>
-                                {page}
-                              </button>
-                            </li>
-                          );
-                        })}
-
-                      <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                        <button
-                          className="page-link"
-                          onClick={() => goToPage(currentPage + 1)}
-                          disabled={currentPage === totalPages}
-                        >
-                          <i className="bi bi-chevron-right"></i>
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              )}
-            </>
           ) : (
             <>
               {/* TABLE VIEW */}
@@ -655,19 +528,31 @@ const PeriodAllocationManagement = () => {
                 <table className="period-table">
                   <thead>
                     <tr>
-                      <th onClick={() => handleSort("period")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("period")}
+                        className="period-sortable-header"
+                      >
                         Period {getSortIcon("period")}
                       </th>
-                      <th onClick={() => handleSort("periodYear")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("periodYear")}
+                        className="period-sortable-header"
+                      >
                         Year {getSortIcon("periodYear")}
                       </th>
-                      <th onClick={() => handleSort("allocatedAmount")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("allocatedAmount")}
+                        className="period-sortable-header"
+                      >
                         Allocated {getSortIcon("allocatedAmount")}
                       </th>
-                      <th onClick={() => handleSort("subAllocationCount")} className="period-sortable-header">
+                      <th
+                        onClick={() => handleSort("subAllocationCount")}
+                        className="period-sortable-header"
+                      >
                         Sub-Allocations {getSortIcon("subAllocationCount")}
                       </th>
-                      <th className="period-text-center period-actions-header">Actions</th>
+                      <th className="period-actions-header">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -678,7 +563,7 @@ const PeriodAllocationManagement = () => {
                         </td>
                         <td>{period.periodYear}</td>
                         <td>{formatCurrency(period.allocatedAmount)}</td>
-                        <td className="period-text-center">{period.subAllocationCount || 0}</td>
+                        <td>{period.subAllocationCount || 0}</td>
                         <td>
                           <div className="action-buttons">
                             <button
@@ -717,8 +602,8 @@ const PeriodAllocationManagement = () => {
                 </table>
               </div>
 
-              {/* PAGINATION FOR TABLE VIEW */}
-              {totalPages > 1 && (
+              {/* PAGINATION - ALWAYS SHOW WHEN DATA EXISTS */}
+              {filteredPeriods.length > 0 && (
                 <div className="pagination-container">
                   <div className="pagination-info">
                     <span className="pagination-label">Show</span>
@@ -737,12 +622,17 @@ const PeriodAllocationManagement = () => {
 
                   <div className="pagination-status">
                     Showing {Math.min(startIndex + 1, filteredPeriods.length)}-
-                    {Math.min(endIndex, filteredPeriods.length)} of {filteredPeriods.length} entries
+                    {Math.min(endIndex, filteredPeriods.length)} of{" "}
+                    {filteredPeriods.length} entries
                   </div>
 
                   <nav className="pagination-nav">
                     <ul className="pagination">
-                      <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                      <li
+                        className={`page-item ${
+                          currentPage === 1 ? "disabled" : ""
+                        }`}
+                      >
                         <button
                           className="page-link"
                           onClick={() => goToPage(currentPage - 1)}
@@ -756,7 +646,11 @@ const PeriodAllocationManagement = () => {
                         .filter((page) => {
                           if (totalPages <= 7) return true;
                           if (page === 1 || page === totalPages) return true;
-                          if (page >= currentPage - 1 && page <= currentPage + 1) return true;
+                          if (
+                            page >= currentPage - 1 &&
+                            page <= currentPage + 1
+                          )
+                            return true;
                           return false;
                         })
                         .map((page, index, array) => {
@@ -766,8 +660,15 @@ const PeriodAllocationManagement = () => {
                                 <li className="page-item disabled">
                                   <button className="page-link">...</button>
                                 </li>
-                                <li className={`page-item ${currentPage === page ? "active" : ""}`}>
-                                  <button className="page-link" onClick={() => goToPage(page)}>
+                                <li
+                                  className={`page-item ${
+                                    currentPage === page ? "active" : ""
+                                  }`}
+                                >
+                                  <button
+                                    className="page-link"
+                                    onClick={() => goToPage(page)}
+                                  >
                                     {page}
                                   </button>
                                 </li>
@@ -775,15 +676,27 @@ const PeriodAllocationManagement = () => {
                             );
                           }
                           return (
-                            <li key={page} className={`page-item ${currentPage === page ? "active" : ""}`}>
-                              <button className="page-link" onClick={() => goToPage(page)}>
+                            <li
+                              key={page}
+                              className={`page-item ${
+                                currentPage === page ? "active" : ""
+                              }`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => goToPage(page)}
+                              >
                                 {page}
                               </button>
                             </li>
                           );
                         })}
 
-                      <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <li
+                        className={`page-item ${
+                          currentPage === totalPages ? "disabled" : ""
+                        }`}
+                      >
                         <button
                           className="page-link"
                           onClick={() => goToPage(currentPage + 1)}
@@ -829,7 +742,10 @@ const PeriodAllocationManagement = () => {
       )}
 
       {showDetailsModal && selectedPeriod && (
-        <ViewPeriodDetailsModal period={selectedPeriod} onClose={() => setShowDetailsModal(false)} />
+        <ViewPeriodDetailsModal
+          period={selectedPeriod}
+          onClose={() => setShowDetailsModal(false)}
+        />
       )}
 
       <DeleteConfirmationModal
@@ -838,7 +754,11 @@ const PeriodAllocationManagement = () => {
         onConfirm={confirmDelete}
         title="Confirm Deletion"
         message="Are you sure you want to delete this period allocation?"
-        itemName={periodToDelete ? `${periodToDelete.period} - ${periodToDelete.periodYear}` : ""}
+        itemName={
+          periodToDelete
+            ? `${periodToDelete.period} - ${periodToDelete.periodYear}`
+            : ""
+        }
         isDeleting={isDeleting}
       />
 

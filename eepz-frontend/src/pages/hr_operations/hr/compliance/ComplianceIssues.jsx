@@ -21,6 +21,9 @@ const ComplianceIssues = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
 
+  // View Mode State
+  const [viewMode, setViewMode] = useState("card");
+
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -151,6 +154,17 @@ const ComplianceIssues = () => {
     return badges[status] || "secondary";
   };
 
+  // ===== FORMAT DATE =====
+  const formatDate = (date) => {
+    return date
+      ? new Date(date).toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : "N/A";
+  };
+
   // ===== LOADING STATE =====
   if (loading) {
     return (
@@ -164,7 +178,7 @@ const ComplianceIssues = () => {
   // ===== RENDER =====
   return (
     <div className="ci-root">
-      {/* Escalation Filters */}
+      {/* CONTROLS BAR */}
       <div className="ci-filter-section">
         <div className="ci-filter-row-single">
           <InputGroup className="ci-search-input">
@@ -196,9 +210,8 @@ const ComplianceIssues = () => {
             onChange={(e) => setSelectedLevel(e.target.value)}
           >
             <option value="">All Levels</option>
-            <option value="Level 1">Level 1</option>
-            <option value="Level 2">Level 2</option>
-            <option value="Level 3">Level 3</option>
+            <option value="L1">L1</option>
+            <option value="L2">L2</option>
           </select>
 
           <Button
@@ -209,154 +222,326 @@ const ComplianceIssues = () => {
             Clear Filters
           </Button>
 
+          <div className="ci-view-switcher">
+            <button
+              className={`ci-view-btn ${viewMode === "card" ? "active" : ""}`}
+              onClick={() => setViewMode("card")}
+              title="Card View"
+            >
+              <i className="bi bi-grid-3x3-gap-fill"></i>
+            </button>
+            <button
+              className={`ci-view-btn ${viewMode === "table" ? "active" : ""}`}
+              onClick={() => setViewMode("table")}
+              title="Table View"
+            >
+              <i className="bi bi-table"></i>
+            </button>
+          </div>
+
           <div className="ci-results-count-inline">
             Showing {currentItems.length} of {filteredEscalations.length} escalations
           </div>
         </div>
       </div>
 
-      {/* Escalations Container with Pagination */}
-      <div className="ci-table-card">
-        <div className="ci-violations-container">
-          {currentItems.length === 0 ? (
-            <div className="empty-state">
-              <i className="bi bi-inbox"></i>
-              <p>No SLA escalations found matching your filters</p>
-            </div>
-          ) : (
-            currentItems.map((escalation) => (
-              <div key={escalation.escalationId} className="ci-violation-card">
-                <div className="ci-violation-header">
-                  <div>
-                    <h5 className="ci-employee-name">
-                      {escalation.employeeName || "Unknown Employee"}
-                      <Badge bg={getSeverityBadge(escalation.severity)} className="ms-2">
-                        {escalation.severity} Severity
-                      </Badge>
-                    </h5>
-                    <p className="ci-employee-id">
-                      User ID: {escalation.employeeUserId} • {escalation.employeeEmail || "N/A"}
-                    </p>
-                  </div>
-                  <Badge bg={getStatusBadge(escalation.escalationStatus)} className="ci-status-badge">
-                    {escalation.escalationStatus}
-                  </Badge>
-                </div>
-
-                <div className="ci-violation-details">
-                  <div className="ci-detail-row">
-                    <span className="ci-detail-label">SLA Type</span>
-                    <span className="ci-detail-value">{escalation.slaType || "N/A"}</span>
-                  </div>
-                  <div className="ci-detail-row">
-                    <span className="ci-detail-label">Escalation Level</span>
-                    <span className="ci-detail-value">{escalation.escalationLevel}</span>
-                  </div>
-                  <div className="ci-detail-row">
-                    <span className="ci-detail-label">Days Overdue</span>
-                    <span className="ci-detail-value ci-highlight-danger">
-                      {escalation.daysOverdue} days
-                    </span>
-                  </div>
-                  <div className="ci-detail-row">
-                    <span className="ci-detail-label">Escalated To</span>
-                    <span className="ci-detail-value">{escalation.escalatedToName || "N/A"}</span>
-                  </div>
-                </div>
-
-                <div className="ci-violation-description">
-                  <strong>Reason</strong>
-                  <p>{escalation.reason || "No reason provided"}</p>
-                  {escalation.description && (
-                    <>
-                      <strong className="mt-2 d-block">Description</strong>
-                      <p>{escalation.description}</p>
-                    </>
-                  )}
-                </div>
-
-                <div className="ci-violation-actions">
-                  <button
-                    className="action-btn action-btn-edit"
-                    onClick={() => handleViewEscalationDetails(escalation)}
-                    title="View Details"
-                  >
-                    <i className="bi bi-eye"></i>
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Pagination */}
-        {filteredEscalations.length > 0 && (
-          <div className="pagination-container">
-            <div className="pagination-info">
-              <span className="pagination-label">Show</span>
-              <select
-                className="pagination-select"
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-              <span className="pagination-label">entries</span>
-            </div>
-
-            <div className="pagination-status">
-              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEscalations.length)} of{" "}
-              {filteredEscalations.length} entries
-            </div>
-
-            <nav className="pagination-nav">
-              <ul className="pagination">
-                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                  <button
-                    className="page-link"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    <i className="bi bi-chevron-left"></i>
-                  </button>
-                </li>
-
-                {getPageNumbers().map((page, index) => (
-                  <li
-                    key={index}
-                    className={`page-item ${page === currentPage ? "active" : ""} ${
-                      typeof page !== "number" ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => typeof page === "number" && setCurrentPage(page)}
-                      disabled={typeof page !== "number"}
-                    >
-                      {page}
-                    </button>
-                  </li>
-                ))}
-
-                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                  <button
-                    className="page-link"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    <i className="bi bi-chevron-right"></i>
-                  </button>
-                </li>
-              </ul>
-            </nav>
+      {/* EMPTY STATE */}
+      {filteredEscalations.length === 0 ? (
+        <div className="ci-empty-state">
+          <div className="ci-empty-icon">
+            <i className="bi bi-inbox"></i>
           </div>
-        )}
-      </div>
+          <h4>No escalations found</h4>
+          <p>Adjust your search or filters</p>
+        </div>
+      ) : (
+        <>
+          {/* CARD VIEW WITH PAGINATION */}
+          {viewMode === "card" && (
+            <>
+              <div className="ci-violations-grid">
+                {currentItems.map((escalation) => (
+                  <div key={escalation.escalationId} className="ci-card-item">
+                    <div className="ci-card-header">
+                      <div className="ci-card-icon-badge">
+                        <i className="bi bi-exclamation-triangle-fill"></i>
+                      </div>
+                      <Badge bg={getStatusBadge(escalation.escalationStatus)} className="ci-card-status-badge">
+                        {escalation.escalationStatus}
+                      </Badge>
+                    </div>
+
+                    <div className="ci-card-body">
+                      <h3 className="ci-card-employee-name">
+                        {escalation.employeeName || "Unknown Employee"}
+                      </h3>
+                      <span className="ci-card-user-id">
+                        User ID: {escalation.employeeUserId}
+                      </span>
+                      <p className="ci-card-email">{escalation.employeeEmail || "N/A"}</p>
+
+                      <div className="ci-card-details-grid">
+                        <div className="ci-card-detail-item">
+                          <span className="ci-card-detail-label">SLA Type</span>
+                          <span className="ci-card-detail-value">{escalation.slaType || "N/A"}</span>
+                        </div>
+                        <div className="ci-card-detail-item">
+                          <span className="ci-card-detail-label">Level</span>
+                          <span className="ci-card-detail-value">{escalation.escalationLevel}</span>
+                        </div>
+                        <div className="ci-card-detail-item">
+                          <span className="ci-card-detail-label">Days Overdue</span>
+                          <span className="ci-card-detail-value ci-card-highlight-danger">
+                            {escalation.daysOverdue} days
+                          </span>
+                        </div>
+                        <div className="ci-card-detail-item">
+                          <span className="ci-card-detail-label">Severity</span>
+                          <Badge bg={getSeverityBadge(escalation.severity)} className="ci-card-severity-badge">
+                            {escalation.severity}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      <div className="ci-card-reason">
+                        <strong>Reason:</strong>
+                        <p>{escalation.reason || "No reason provided"}</p>
+                      </div>
+                    </div>
+
+                    <div className="ci-card-footer">
+                      <div className="ci-card-escalated-to">
+                        <i className="bi bi-person-fill"></i>
+                        <span>{escalation.escalatedToName || "Not Assigned"}</span>
+                      </div>
+                      <div className="ci-card-actions">
+                        <button
+                          className="action-btn action-btn-edit"
+                          onClick={() => handleViewEscalationDetails(escalation)}
+                          title="View Details"
+                        >
+                          <i className="bi bi-eye"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* PAGINATION FOR CARD VIEW */}
+              {filteredEscalations.length > 0 && (
+                <div className="ci-pagination-wrapper">
+                  <div className="pagination-container">
+                    <div className="pagination-info">
+                      <span className="pagination-label">Show</span>
+                      <select
+                        className="pagination-select"
+                        value={rowsPerPage}
+                        onChange={(e) => {
+                          setRowsPerPage(Number(e.target.value));
+                          setCurrentPage(1);
+                        }}
+                      >
+                        <option value="6">6</option>
+                        <option value="9">9</option>
+                        <option value="12">12</option>
+                        <option value="24">24</option>
+                      </select>
+                      <span className="pagination-label">entries</span>
+                    </div>
+
+                    <div className="pagination-status">
+                      Showing {indexOfFirstItem + 1} to{" "}
+                      {Math.min(indexOfLastItem, filteredEscalations.length)} of{" "}
+                      {filteredEscalations.length} entries
+                    </div>
+
+                    <nav className="pagination-nav">
+                      <ul className="pagination">
+                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                          >
+                            <i className="bi bi-chevron-left"></i>
+                          </button>
+                        </li>
+
+                        {getPageNumbers().map((page, index) => (
+                          <li
+                            key={index}
+                            className={`page-item ${page === currentPage ? "active" : ""} ${
+                              typeof page !== "number" ? "disabled" : ""
+                            }`}
+                          >
+                            <button
+                              className="page-link"
+                              onClick={() => typeof page === "number" && setCurrentPage(page)}
+                              disabled={typeof page !== "number"}
+                            >
+                              {page}
+                            </button>
+                          </li>
+                        ))}
+
+                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                          >
+                            <i className="bi bi-chevron-right"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* TABLE VIEW WITH PAGINATION */}
+          {viewMode === "table" && (
+            <>
+              <div className="ci-table-card">
+                <div className="ci-table-wrapper">
+                  <table className="ci-table">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>SLA Type</th>
+                        <th>Level</th>
+                        <th>Days Overdue</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Escalated To</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentItems.map((escalation) => (
+                        <tr key={escalation.escalationId}>
+                          <td>
+                            <div className="ci-table-employee">
+                              <span className="ci-table-employee-name">
+                                {escalation.employeeName || "Unknown Employee"}
+                              </span>
+                              <span className="ci-table-employee-id">
+                                ID: {escalation.employeeUserId}
+                              </span>
+                            </div>
+                          </td>
+                          <td>{escalation.slaType || "N/A"}</td>
+                          <td>{escalation.escalationLevel}</td>
+                          <td>
+                            <span className="ci-table-highlight-danger">
+                              {escalation.daysOverdue} days
+                            </span>
+                          </td>
+                          <td>
+                            <Badge bg={getSeverityBadge(escalation.severity)}>
+                              {escalation.severity}
+                            </Badge>
+                          </td>
+                          <td>
+                            <Badge bg={getStatusBadge(escalation.escalationStatus)}>
+                              {escalation.escalationStatus}
+                            </Badge>
+                          </td>
+                          <td>{escalation.escalatedToName || "Not Assigned"}</td>
+                          <td>
+                            <div className="action-buttons">
+                              <button
+                                className="action-btn action-btn-edit"
+                                onClick={() => handleViewEscalationDetails(escalation)}
+                                title="View Details"
+                              >
+                                <i className="bi bi-eye"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* PAGINATION FOR TABLE VIEW */}
+                {filteredEscalations.length > 0 && (
+                  <div className="pagination-container">
+                    <div className="pagination-info">
+                      <span className="pagination-label">Show</span>
+                      <select
+                        className="pagination-select"
+                        value={rowsPerPage}
+                        onChange={(e) => {
+                          setRowsPerPage(Number(e.target.value));
+                          setCurrentPage(1);
+                        }}
+                      >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                      </select>
+                      <span className="pagination-label">entries</span>
+                    </div>
+
+                    <div className="pagination-status">
+                      Showing {indexOfFirstItem + 1} to{" "}
+                      {Math.min(indexOfLastItem, filteredEscalations.length)} of{" "}
+                      {filteredEscalations.length} entries
+                    </div>
+
+                    <nav className="pagination-nav">
+                      <ul className="pagination">
+                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                          >
+                            <i className="bi bi-chevron-left"></i>
+                          </button>
+                        </li>
+
+                        {getPageNumbers().map((page, index) => (
+                          <li
+                            key={index}
+                            className={`page-item ${page === currentPage ? "active" : ""} ${
+                              typeof page !== "number" ? "disabled" : ""
+                            }`}
+                          >
+                            <button
+                              className="page-link"
+                              onClick={() => typeof page === "number" && setCurrentPage(page)}
+                              disabled={typeof page !== "number"}
+                            >
+                              {page}
+                            </button>
+                          </li>
+                        ))}
+
+                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                          <button
+                            className="page-link"
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                          >
+                            <i className="bi bi-chevron-right"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </>
+      )}
 
       {/* ESCALATION DETAIL MODAL */}
       <EscalationDetailModal

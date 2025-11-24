@@ -1,42 +1,5 @@
-/* Period Allocation Management - Complete Stylesheet */
+/* Period Allocation Management - Complete Stylesheet - Left Aligned */
 
-:root {
-  --gradient-primary: linear-gradient(135deg, #97247e 0%, #e01950 100%);
-  --color-primary: #27235c;
-  --color-primary-light: #3d3975;
-  --color-secondary: #97247e;
-  --color-accent: #e01950;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-info: #3b82f6;
-
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
-
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-
-  --border-color: #e2e8f0;
-  --border-color-light: #f1f5f9;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
-
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-
-  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-fast: all 0.15s ease;
-}
-
-/* ROOT CONTAINER */
 .period-root {
   padding: 20px 24px 64px 24px;
   max-width: 1600px;
@@ -46,14 +9,34 @@
 }
 
 .period-alert {
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   border-radius: 8px;
 }
 
-/* SUMMARY STATISTICS CARDS - COMPACT */
+/* ========================================
+   LOADING CONTAINER
+======================================== */
+.period-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.period-loading-container p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ========================================
+   SUMMARY CARDS
+======================================== */
 .period-summary-cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 1rem;
 }
@@ -62,7 +45,6 @@
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(44, 39, 98, 0.08);
-  text-align: left;
   transition: all 0.3s ease;
   cursor: pointer;
   border: 1px solid #27235c;
@@ -97,7 +79,7 @@
   border-color: #0d6efd;
 }
 
-.summary-card-icon {
+.period-summary-card-icon {
   width: 48px;
   height: 48px;
   border-radius: 12px;
@@ -108,35 +90,30 @@
   flex-shrink: 0;
 }
 
-.period-summary-card.total .summary-card-icon {
+.period-summary-card.total .period-summary-card-icon {
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   color: #1e40af;
 }
 
-.period-summary-card.utilized .summary-card-icon {
+.period-summary-card.utilized .period-summary-card-icon {
   background: linear-gradient(135deg, #fed7aa, #fdba74);
   color: #92400e;
 }
 
-.period-summary-card.remaining .summary-card-icon {
+.period-summary-card.remaining .period-summary-card-icon {
   background: linear-gradient(135deg, #d1fae5, #a7f3d0);
   color: #065f46;
 }
 
-.period-summary-card.average .summary-card-icon {
-  background: linear-gradient(135deg, #fce7f3, #fbcfe8);
-  color: #be185d;
-}
-
-.summary-card-content {
+.period-summary-card-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  text-align: left;
-  align-items: flex-start;
+  text-align: center;
 }
 
-.summary-card-label {
+.period-summary-card-label {
   font-size: 10px;
   color: #64748b;
   font-weight: 600;
@@ -145,14 +122,16 @@
   line-height: 1.2;
 }
 
-.summary-card-value {
+.period-summary-card-value {
   font-size: 20px;
   font-weight: 700;
   color: #1e293b;
   line-height: 1;
 }
 
-/* FILTER SECTION - TWO ROW LAYOUT */
+/* ========================================
+   FILTER SECTION
+======================================== */
 .period-filter-section {
   padding: 1rem 1.5rem;
   background: #ffffff;
@@ -186,10 +165,10 @@
   display: flex;
   gap: 1rem;
   align-items: center;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
-/* Budget Dropdown - Wider */
+/* Budget Dropdown */
 .period-budget-dropdown {
   min-width: 400px;
   max-width: 600px;
@@ -252,7 +231,7 @@
 
 /* Filter Selects */
 .period-filter-select {
-  min-width: 150px;
+  min-width: 160px;
   max-width: 180px;
   padding: 0.5rem 0.75rem;
   border: 1px solid #ced4da;
@@ -289,6 +268,15 @@
   border-color: #6c757d;
 }
 
+/* Results Count */
+.period-results-count-inline {
+  font-size: 0.875rem;
+  color: #6c757d;
+  white-space: nowrap;
+  font-weight: 500;
+  flex: 1;
+}
+
 /* Export Button */
 .period-btn-export {
   background: #ffffff;
@@ -301,7 +289,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.12s ease;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -344,29 +332,23 @@
   font-size: 16px;
 }
 
-/* Results Count */
-.period-results-count-inline {
-  font-size: 0.875rem;
-  color: #6c757d;
-  white-space: nowrap;
-  margin-left: auto;
-  font-weight: 500;
-}
-
-/* EMPTY STATE */
+/* ========================================
+   EMPTY STATE
+======================================== */
 .period-alert-empty {
   background: #ffffff;
   border: 2px dashed #e5e7eb;
   border-radius: 12px;
-  padding: 3rem;
+  padding: 3rem 1rem !important;
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .period-alert-empty i {
   font-size: 3rem;
   color: #cbd5e1;
   margin-bottom: 1rem;
+  display: block;
 }
 
 .period-alert-empty p {
@@ -375,7 +357,9 @@
   margin: 0;
 }
 
-/* TABLE VIEW */
+/* ========================================
+   TABLE VIEW - LEFT ALIGNED
+======================================== */
 .period-table-container {
   background: #ffffff;
   border-radius: 12px;
@@ -444,44 +428,21 @@
   background: rgba(39, 35, 92, 0.03);
 }
 
+/* Left align everything */
 .period-text-center {
-  text-align: center;
+  text-align: left !important;
 }
 
 .period-actions-header {
-  text-align: center;
+  text-align: left !important;
 }
 
-/* Progress Bar in Table */
-.period-progress-container {
-  position: relative;
-  width: 100%;
-  height: 24px;
-  background: #f1f5f9;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.period-progress-bar {
-  height: 100%;
-  border-radius: 12px;
-  transition: width 0.3s ease;
-}
-
-.period-progress-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 12px;
-  font-weight: 700;
-  color: #1e293b;
-}
-
-/* Action Buttons - UserList Style */
+/* ========================================
+   ACTION BUTTONS
+======================================== */
 .action-buttons {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.5rem;
 }
 
@@ -532,18 +493,6 @@
   transform: translateY(-1px);
 }
 
-.action-btn-success:disabled {
-  color: #cbd5e1;
-  border-color: #e5e7eb;
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.action-btn-success:disabled:hover {
-  background: transparent;
-  transform: none;
-}
-
 .action-btn-delete {
   color: #dc3545;
   border-color: rgba(220, 53, 69, 0.3);
@@ -555,7 +504,9 @@
   transform: translateY(-1px);
 }
 
-/* PAGINATION - UserList Style */
+/* ========================================
+   PAGINATION
+======================================== */
 .pagination-container {
   display: flex;
   justify-content: space-between;
@@ -647,23 +598,9 @@
   pointer-events: none;
 }
 
-/* LOADING STATE */
-.period-loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
-  gap: 1rem;
-}
-
-.period-loading-container p {
-  color: #64748b;
-  font-size: 1rem;
-  margin: 0;
-}
-
-/* BLUR BACKDROP FOR MODALS */
+/* ========================================
+   BLUR BACKDROP FOR MODALS
+======================================== */
 .period-blur-backdrop {
   position: fixed;
   top: 0;
@@ -675,7 +612,9 @@
   z-index: 1040;
 }
 
-/* RESPONSIVE DESIGN */
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
 @media (max-width: 1200px) {
   .period-summary-cards {
     grid-template-columns: repeat(2, 1fr);
@@ -718,6 +657,7 @@
 
   .period-filter-row-bottom {
     flex-direction: column;
+    align-items: stretch;
   }
 
   .period-search-input-wrapper,
@@ -727,9 +667,8 @@
   }
 
   .period-results-count-inline {
-    margin-left: 0;
-    text-align: center;
     width: 100%;
+    text-align: center;
   }
 
   .period-table-container {
@@ -737,7 +676,7 @@
   }
 
   .period-table {
-    min-width: 800px;
+    min-width: 1200px;
   }
 
   .pagination-container {
@@ -757,22 +696,22 @@
     padding: 10px 12px;
   }
 
-  .summary-card-icon {
+  .period-summary-card-icon {
     width: 40px;
     height: 40px;
     font-size: 18px;
   }
 
-  .summary-card-value {
+  .period-summary-card-value {
     font-size: 18px;
   }
 
-  .summary-card-label {
+  .period-summary-card-label {
     font-size: 9px;
   }
 
-  .action-buttons {
-    flex-wrap: wrap;
+  .period-table {
+    min-width: 900px;
   }
 
   .action-btn {
