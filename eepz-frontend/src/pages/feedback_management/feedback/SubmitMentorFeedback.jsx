@@ -292,52 +292,8 @@ export default function SubmitMentorFeedback() {
 
         {/* BACK BUTTON & HEADER */}
         <div className="d-flex align-items-center gap-3 mb-4">
-          <button
-            className="btn d-flex align-items-center justify-content-center"
-            onClick={() => navigate(-1)}
-            style={{
-              width: "44px",
-              height: "44px",
-              padding: 0,
-              backgroundColor: "#fff",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#f8fafc";
-              e.currentTarget.style.borderColor = "#cbd5e1";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#fff";
-              e.currentTarget.style.borderColor = "#e2e8f0";
-            }}
-          >
-            <ArrowLeft size={20} style={{ color: "#64748b" }} />
-          </button>
-          <div style={{ textAlign: "left" }}>
-            <h2
-              className="fw-bold mb-0"
-              style={{
-                color: "#27235c",
-                fontSize: "1.75rem",
-                letterSpacing: "-0.025em",
-                textAlign: "left",
-              }}
-            >
-              Submit SME Feedback
-            </h2>
-            <p
-              className="mb-0"
-              style={{
-                color: "#64748b",
-                fontSize: "0.938rem",
-                textAlign: "left",
-              }}
-            >
-              Rate your SME's guidance and expertise
-            </p>
-          </div>
+          
+          
         </div>
 
         {/* ALERTS */}

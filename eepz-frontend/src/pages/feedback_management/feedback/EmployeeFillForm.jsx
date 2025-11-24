@@ -345,22 +345,19 @@ export default function EmployeeFillForm() {
     if (!dateValue) return null;
 
     try {
-      // Handle different date formats from API
       let parsedDate;
 
       if (typeof dateValue === "string") {
-        // Try parsing as ISO string
         parsedDate = new Date(dateValue);
       } else if (typeof dateValue === "number") {
-        // Handle timestamp (milliseconds or seconds)
-        parsedDate = dateValue > 10000000000 
-          ? new Date(dateValue) 
-          : new Date(dateValue * 1000);
+        parsedDate =
+          dateValue > 10000000000
+            ? new Date(dateValue)
+            : new Date(dateValue * 1000);
       } else {
         parsedDate = new Date(dateValue);
       }
 
-      // Check if date is valid
       if (isNaN(parsedDate.getTime())) {
         console.error("Invalid date parsed:", dateValue);
         return null;
@@ -374,31 +371,37 @@ export default function EmployeeFillForm() {
   }, []);
 
   // Helper function to calculate days remaining
-  const calculateDaysLeft = useCallback((deadlineDate) => {
-    if (!deadlineDate) return null;
-    
-    const deadline = parseDate(deadlineDate);
-    if (!deadline) return null;
+  const calculateDaysLeft = useCallback(
+    (deadlineDate) => {
+      if (!deadlineDate) return null;
 
-    const now = new Date();
-    const diffTime = deadline - now;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    return diffDays;
-  }, [parseDate]);
+      const deadline = parseDate(deadlineDate);
+      if (!deadline) return null;
+
+      const now = new Date();
+      const diffTime = deadline - now;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return diffDays;
+    },
+    [parseDate]
+  );
 
   // Helper function to format date for display
-  const formatDate = useCallback((dateValue) => {
-    const date = parseDate(dateValue);
-    if (!date) return "No deadline set";
+  const formatDate = useCallback(
+    (dateValue) => {
+      const date = parseDate(dateValue);
+      if (!date) return "No deadline set";
 
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  }, [parseDate]);
+      return date.toLocaleDateString("en-US", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
+    [parseDate]
+  );
 
   // Fetch form details using service
   useEffect(() => {
@@ -478,8 +481,9 @@ export default function EmployeeFillForm() {
       console.log("Step 1 Complete - Response created:", createResponse);
 
       if (createResponse?.success || createResponse?.data?.success) {
-        const responseId = createResponse.data?.responseId || 
-                          createResponse.data?.data?.responseId;
+        const responseId =
+          createResponse.data?.responseId ||
+          createResponse.data?.data?.responseId;
 
         if (!responseId) {
           throw new Error("Response ID not returned from create endpoint");
@@ -494,8 +498,7 @@ export default function EmployeeFillForm() {
 
         if (submitResponse?.success || submitResponse?.data?.success) {
           setSuccess("Form submitted successfully!");
-          
-          // Redirect after 2 seconds
+
           setTimeout(() => {
             navigate("/feedback/assigned-forms");
           }, 2000);
@@ -505,9 +508,7 @@ export default function EmployeeFillForm() {
           );
         }
       } else {
-        setError(
-          createResponse?.message || "Failed to create form response"
-        );
+        setError(createResponse?.message || "Failed to create form response");
       }
     } catch (err) {
       console.error("Submission Error:", {
@@ -576,358 +577,539 @@ export default function EmployeeFillForm() {
   }
 
   return (
-    <div className="container-fluid py-4" style={{ maxWidth: "950px" }}>
-      {/* HEADER */}
-      <div className="mb-4">
-        <div className="d-flex align-items-center gap-3 mb-3">
-          <button
-            className="btn btn-outline-secondary"
-            onClick={() => navigate(-1)}
-            disabled={submitting}
-            style={{ padding: "0.5rem 0.75rem", borderRadius: "8px" }}
-            title="Go back"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div className="flex-grow-1">
-            <h2 className="fw-bold mb-1" style={{ color: "#0F62FE" }}>
-              {form.formName}
-            </h2>
-            <p className="mb-0 text-muted small">{form.formDescription}</p>
-          </div>
-        </div>
-
-        <div className="d-flex gap-2 flex-wrap">
-          <span className="badge bg-primary">{form.label}</span>
-          <span className="badge bg-secondary">
-            {form.questions.length} Questions
-          </span>
-        </div>
-      </div>
-
-      {/* ERROR ALERT */}
-      {error && (
-        <div
-          className="alert alert-danger alert-dismissible fade show mb-4"
-          role="alert"
-        >
-          <AlertTriangle
-            size={16}
-            className="me-2"
-            style={{ display: "inline" }}
-          />
-          <strong>Error:</strong> {error}
-          <button
-            type="button"
-            className="btn-close"
-            onClick={() => setError("")}
-          />
-        </div>
-      )}
-
-      {/* SUCCESS ALERT */}
-      {success && (
-        <div
-          className="alert alert-success alert-dismissible fade show mb-4"
-          role="alert"
-        >
-          <CheckCircle
-            size={16}
-            className="me-2"
-            style={{ display: "inline" }}
-          />
-          <strong>Success:</strong> {success}
-        </div>
-      )}
-
-      {/* DEADLINE INFO */}
-      {form.deadline && (
-        <div
-          className={`alert mb-4 d-flex align-items-center gap-2`}
-          style={{
-            backgroundColor:
-              daysLeft === null ? "#f8f9fa" :
-              daysLeft > 3 ? "#e3f2fd" : 
-              daysLeft > 0 ? "#fff3cd" : "#f8d7da",
-            border:
-              daysLeft === null ? "1px solid #dee2e6" :
-              daysLeft > 3
-                ? "1px solid #90caf9"
-                : daysLeft > 0
-                ? "1px solid #ffc107"
-                : "1px solid #f5c6cb",
-            borderRadius: "8px",
-          }}
-        >
-          <Clock
-            size={18}
-            style={{
-              color:
-                daysLeft === null ? "#6c757d" :
-                daysLeft > 3 ? "#0F62FE" : 
-                daysLeft > 0 ? "#ff9800" : "#dc3545",
-            }}
-          />
-          <div style={{ flex: 1 }}>
-            <strong>Deadline: </strong>
-            {formattedDeadline}
-            {daysLeft !== null && (
-              <span className="ms-2 small">
-                {daysLeft > 0
-                  ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} remaining`
-                  : daysLeft === 0
-                  ? "Due today"
-                  : "OVERDUE"}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* PROGRESS BAR */}
-      <div
-        className="card border-0 shadow-sm mb-4"
-        style={{ borderRadius: "8px" }}
-      >
-        <div className="card-body py-3">
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <span className="fw-bold small">Completion Progress</span>
-            <span className="small text-muted">
-              {Object.keys(responses).length} / {form.questions.length}
-            </span>
-          </div>
+    <div className="container-fluid py-4">
+      <div className="row">
+        {/* LEFT SIDEBAR - CIRCULAR PROGRESS */}
+        <div className="col-lg-3 col-xl-2">
           <div
-            className="progress"
-            style={{ height: "8px", borderRadius: "4px" }}
+            style={{
+              position: "sticky",
+              top: "20px",
+              paddingTop: "20px",
+            }}
           >
-            <div
-              className="progress-bar"
-              style={{
-                width: `${progress}%`,
-                transition: "width 0.3s ease",
-                backgroundColor: progress === 100 ? "#24A148" : "#0F62FE",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* FORM */}
-      <div className="card border-0 shadow-sm" style={{ borderRadius: "8px" }}>
-        <div className="card-body p-4">
-          <form onSubmit={handleSubmit}>
-            {/* FORM TYPE BANNER */}
-            <div
-              className="p-3 mb-4"
-              style={{
-                borderRadius: "8px",
-                borderLeft: "4px solid #0F62FE",
-                backgroundColor: "#f0f4ff",
-              }}
-            >
-              <h6 className="mb-1 fw-bold" style={{ color: "#0F62FE" }}>
-                Form Type
-              </h6>
-              <p className="mb-0 small text-muted">{form.label}</p>
-            </div>
-
-            {/* QUESTIONS */}
-            {form.questions.map((q, idx) => (
+            {/* Circular Progress */}
+            <div className="text-center mb-4">
               <div
-                key={q.id}
-                className="mb-4 pb-4"
                 style={{
-                  borderBottom:
-                    idx < form.questions.length - 1
-                      ? "1px solid #e0e0e0"
-                      : "none",
+                  position: "relative",
+                  width: "140px",
+                  height: "140px",
+                  margin: "0 auto",
                 }}
               >
-                <div className="d-flex gap-3">
-                  {/* Question Number */}
-                  <div
-                    className="d-flex align-items-center justify-content-center fw-bold"
+                <svg
+                  width="140"
+                  height="140"
+                  style={{ transform: "rotate(-90deg)" }}
+                >
+                  {/* Background circle */}
+                  <circle
+                    cx="70"
+                    cy="70"
+                    r="60"
+                    fill="none"
+                    stroke="#e0e0e0"
+                    strokeWidth="10"
+                  />
+                  {/* Progress circle */}
+                  <circle
+                    cx="70"
+                    cy="70"
+                    r="60"
+                    fill="none"
+                    stroke="#27235C"
+                    strokeWidth="10"
+                    strokeDasharray={`${(progress / 100) * 377} 377`}
+                    strokeLinecap="round"
                     style={{
-                      minWidth: "40px",
-                      height: "40px",
-                      borderRadius: "50%",
-                      backgroundColor: "#f0f4ff",
-                      color: "#0F62FE",
-                      flexShrink: 0,
+                      transition: "stroke-dasharray 0.3s ease",
+                    }}
+                  />
+                </svg>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    textAlign: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "28px",
+                      fontWeight: "bold",
+                      color: "#27235C",
                     }}
                   >
-                    {idx + 1}
+                    {Math.round(progress)}%
                   </div>
-
-                  {/* Question Content */}
-                  <div className="flex-grow-1">
-                    {/* Question Text */}
-                    <div className="mb-2">
-                      <h6 className="fw-bold mb-2">{q.text}</h6>
-                      <span className="badge bg-light text-dark small">
-                        {q.category}
-                      </span>
-                    </div>
-
-                    {/* Help Text */}
-                    {q.helpText && (
-                      <div
-                        className="d-flex gap-2 mb-3 p-2"
-                        style={{
-                          backgroundColor: "#f9f9f9",
-                          borderRadius: "4px",
-                          borderLeft: "3px solid #0F62FE",
-                        }}
-                      >
-                        <HelpCircle
-                          size={14}
-                          className="text-muted"
-                          style={{ flexShrink: 0, marginTop: "2px" }}
-                        />
-                        <small className="text-muted">{q.helpText}</small>
-                      </div>
-                    )}
-
-                    {/* Rating Buttons */}
-                    <div className="d-flex gap-2 flex-wrap mb-2">
-                      {[1, 2, 3, 4, 5].map((rating) => (
-                        <button
-                          key={rating}
-                          type="button"
-                          className={`btn btn-sm fw-bold ${
-                            responses[q.id] === rating
-                              ? "btn-primary"
-                              : "btn-outline-secondary"
-                          }`}
-                          onClick={() => handleRatingChange(q.id, rating)}
-                          disabled={submitting}
-                          style={{
-                            minWidth: "50px",
-                            transition: "all 0.2s",
-                          }}
-                          title={`Rate as ${RATING_LABELS[rating]}`}
-                        >
-                          {rating}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Response Status */}
-                    <div>
-                      {responses[q.id] ? (
-                        <small className="text-success fw-bold">
-                          <CheckCircle
-                            size={12}
-                            className="me-1"
-                            style={{ display: "inline" }}
-                          />
-                          Rated: {RATING_LABELS[responses[q.id]]}
-                        </small>
-                      ) : (
-                        <small className="text-muted">Response required</small>
-                      )}
-                    </div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#6c757d",
+                      marginTop: "4px",
+                    }}
+                  >
+                    Complete
                   </div>
                 </div>
               </div>
-            ))}
-
-            {/* COMMENTS */}
-            <div
-              className="mb-4"
-              style={{ borderTop: "2px solid #e0e0e0", paddingTop: "1.5rem" }}
-            >
-              <label htmlFor="comments" className="form-label fw-bold mb-2">
-                <MessageSquare
-                  size={16}
-                  className="me-2"
-                  style={{ display: "inline" }}
-                />
-                Additional Comments
-              </label>
-              <small className="text-muted d-block mb-2">
-                Optional - Maximum 1000 characters
-              </small>
-              <textarea
-                id="comments"
-                className="form-control"
-                rows={4}
-                value={comments}
-                onChange={(e) => setComments(e.target.value.slice(0, 1000))}
-                placeholder="Share any additional feedback about the process or system..."
-                disabled={submitting}
-                maxLength={1000}
-                style={{ resize: "vertical", borderRadius: "8px" }}
-              />
-              <small className="text-muted d-block mt-2">
-                {comments.length} / 1000 characters
-              </small>
+              <div className="mt-3">
+                <small className="text-muted d-block">
+                  {Object.keys(responses).length} of {form.questions.length}{" "}
+                  answered
+                </small>
+              </div>
             </div>
 
-            {/* SUBMIT BUTTON */}
-            <div className="d-grid gap-2">
-              <button
-                type="submit"
-                className="btn btn-primary fw-bold"
-                style={{
-                  padding: "0.75rem",
-                  borderRadius: "8px",
-                  fontSize: "1rem",
-                }}
-                disabled={
-                  submitting ||
-                  Object.keys(responses).length < form.questions.length
-                }
-              >
-                {submitting ? (
-                  <>
-                    <Loader
-                      size={16}
-                      className="me-2"
-                      style={{
-                        display: "inline",
-                        animation: "spin 1s linear infinite",
+            {/* Question List */}
+            <div className="card border-0 shadow-sm" style={{ borderRadius: "8px" }}>
+              <div className="card-body p-3">
+                <h6 className="fw-bold mb-3 text-start" style={{ fontSize: "14px" }}>
+                  Questions
+                </h6>
+                <div className="d-flex flex-column gap-2">
+                  {form.questions.map((q, idx) => (
+                    <div
+                      key={q.id}
+                      className="d-flex align-items-center gap-2"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        document
+                          .getElementById(`question-${q.id}`)
+                          ?.scrollIntoView({ behavior: "smooth", block: "center" });
                       }}
-                    />
-                    Submitting Form...
-                  </>
-                ) : (
-                  <>
-                    <Send
+                    >
+                      <div
+                        style={{
+                          width: "28px",
+                          height: "28px",
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                          backgroundColor: responses[q.id]
+                            ? "#27235C"
+                            : "#e0e0e0",
+                          color: responses[q.id] ? "#fff" : "#6c757d",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        {responses[q.id] ? (
+                          <CheckCircle size={16} />
+                        ) : (
+                          idx + 1
+                        )}
+                      </div>
+                      <small
+                        className="text-start"
+                        style={{
+                          fontSize: "11px",
+                          color: responses[q.id] ? "#27235C" : "#6c757d",
+                          fontWeight: responses[q.id] ? "600" : "400",
+                        }}
+                      >
+                        {q.category}
+                      </small>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div className="col-lg-9 col-xl-10">
+          {/* HEADER */}
+          <div className="mb-4 text-start">
+            <div className="d-flex align-items-center gap-3 mb-3">
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => navigate(-1)}
+                disabled={submitting}
+                style={{ padding: "0.5rem 0.75rem", borderRadius: "8px" }}
+                title="Go back"
+              >
+                <ArrowLeft size={18} />
+              </button>
+              <div className="flex-grow-1">
+                <h2 className="fw-bold mb-1" style={{ color: "#27235C" }}>
+                  {form.formName}
+                </h2>
+                <p className="mb-0 text-muted small">{form.formDescription}</p>
+              </div>
+            </div>
+
+            <div className="d-flex gap-2 flex-wrap">
+              <span
+                className="badge"
+                style={{
+                  backgroundColor: "#27235C",
+                  color: "#fff",
+                }}
+              >
+                {form.label}
+              </span>
+              <span className="badge bg-secondary">
+                {form.questions.length} Questions
+              </span>
+            </div>
+          </div>
+
+          {/* ERROR ALERT */}
+          {error && (
+            <div
+              className="alert alert-danger alert-dismissible fade show mb-4 text-start"
+              role="alert"
+            >
+              <AlertTriangle
+                size={16}
+                className="me-2"
+                style={{ display: "inline" }}
+              />
+              <strong>Error:</strong> {error}
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setError("")}
+              />
+            </div>
+          )}
+
+          {/* SUCCESS ALERT */}
+          {success && (
+            <div
+              className="alert alert-success alert-dismissible fade show mb-4 text-start"
+              role="alert"
+            >
+              <CheckCircle
+                size={16}
+                className="me-2"
+                style={{ display: "inline" }}
+              />
+              <strong>Success:</strong> {success}
+            </div>
+          )}
+
+          {/* DEADLINE INFO */}
+          {form.deadline && (
+            <div
+              className={`alert mb-4 d-flex align-items-center gap-2 text-start`}
+              style={{
+                backgroundColor:
+                  daysLeft === null
+                    ? "#f8f9fa"
+                    : daysLeft > 3
+                    ? "#e3f2fd"
+                    : daysLeft > 0
+                    ? "#fff3cd"
+                    : "#f8d7da",
+                border:
+                  daysLeft === null
+                    ? "1px solid #dee2e6"
+                    : daysLeft > 3
+                    ? "1px solid #90caf9"
+                    : daysLeft > 0
+                    ? "1px solid #ffc107"
+                    : "1px solid #f5c6cb",
+                borderRadius: "8px",
+              }}
+            >
+              <Clock
+                size={18}
+                style={{
+                  color:
+                    daysLeft === null
+                      ? "#6c757d"
+                      : daysLeft > 3
+                      ? "#27235C"
+                      : daysLeft > 0
+                      ? "#ff9800"
+                      : "#dc3545",
+                }}
+              />
+              <div style={{ flex: 1 }}>
+                <strong>Deadline: </strong>
+                {formattedDeadline}
+                {daysLeft !== null && (
+                  <span className="ms-2 small">
+                    {daysLeft > 0
+                      ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} remaining`
+                      : daysLeft === 0
+                      ? "Due today"
+                      : "OVERDUE"}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* FORM */}
+          <div
+            className="card border-0 shadow-sm"
+            style={{ borderRadius: "8px" }}
+          >
+            <div className="card-body p-4">
+              <form onSubmit={handleSubmit}>
+                {/* FORM TYPE BANNER */}
+                <div
+                  className="p-3 mb-4 text-start"
+                  style={{
+                    borderRadius: "8px",
+                    borderLeft: "4px solid #27235C",
+                    backgroundColor: "#f0f0ff",
+                  }}
+                >
+                  <h6 className="mb-1 fw-bold" style={{ color: "#27235C" }}>
+                    Form Type
+                  </h6>
+                  <p className="mb-0 small text-muted">{form.label}</p>
+                </div>
+
+                {/* QUESTIONS */}
+                {form.questions.map((q, idx) => (
+                  <div
+                    key={q.id}
+                    id={`question-${q.id}`}
+                    className="mb-4 pb-4 text-start"
+                    style={{
+                      borderBottom:
+                        idx < form.questions.length - 1
+                          ? "1px solid #e0e0e0"
+                          : "none",
+                      scrollMarginTop: "20px",
+                    }}
+                  >
+                    <div className="d-flex gap-3">
+                      {/* Question Number */}
+                      <div
+                        className="d-flex align-items-center justify-content-center fw-bold"
+                        style={{
+                          minWidth: "40px",
+                          height: "40px",
+                          borderRadius: "50%",
+                          backgroundColor: "#f0f0ff",
+                          color: "#27235C",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {idx + 1}
+                      </div>
+
+                      {/* Question Content */}
+                      <div className="flex-grow-1">
+                        {/* Question Text */}
+                        <div className="mb-2">
+                          <h6 className="fw-bold mb-2">{q.text}</h6>
+                          <span
+                            className="badge text-dark small"
+                            style={{ backgroundColor: "#e8e8f5" }}
+                          >
+                            {q.category}
+                          </span>
+                        </div>
+
+                        {/* Help Text */}
+                        {q.helpText && (
+                          <div
+                            className="d-flex gap-2 mb-3 p-2"
+                            style={{
+                              backgroundColor: "#f9f9f9",
+                              borderRadius: "4px",
+                              borderLeft: "3px solid #27235C",
+                            }}
+                          >
+                            <HelpCircle
+                              size={14}
+                              className="text-muted"
+                              style={{ flexShrink: 0, marginTop: "2px" }}
+                            />
+                            <small className="text-muted">{q.helpText}</small>
+                          </div>
+                        )}
+
+                        {/* Rating Buttons */}
+                        <div className="d-flex gap-2 flex-wrap mb-2">
+                          {[1, 2, 3, 4, 5].map((rating) => (
+                            <button
+                              key={rating}
+                              type="button"
+                              className={`btn btn-sm fw-bold`}
+                              onClick={() => handleRatingChange(q.id, rating)}
+                              disabled={submitting}
+                              style={{
+                                minWidth: "50px",
+                                transition: "all 0.2s",
+                                background:
+                                  responses[q.id] === rating
+                                    ? "#27235C"
+                                    : "transparent",
+                                color:
+                                  responses[q.id] === rating
+                                    ? "#fff"
+                                    : "#6c757d",
+                                border:
+                                  responses[q.id] === rating
+                                    ? "none"
+                                    : "1px solid #6c757d",
+                              }}
+                              title={`Rate as ${RATING_LABELS[rating]}`}
+                            >
+                              {rating}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Response Status */}
+                        <div>
+                          {responses[q.id] ? (
+                            <small className="text-success fw-bold">
+                              <CheckCircle
+                                size={12}
+                                className="me-1"
+                                style={{ display: "inline" }}
+                              />
+                              Rated: {RATING_LABELS[responses[q.id]]}
+                            </small>
+                          ) : (
+                            <small className="text-muted">
+                              Response required
+                            </small>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* COMMENTS */}
+                <div
+                  className="mb-4 text-start"
+                  style={{
+                    borderTop: "2px solid #e0e0e0",
+                    paddingTop: "1.5rem",
+                  }}
+                >
+                  <label htmlFor="comments" className="form-label fw-bold mb-2">
+                    <MessageSquare
                       size={16}
                       className="me-2"
                       style={{ display: "inline" }}
                     />
-                    Submit Feedback
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      {/* RATING GUIDE */}
-      <div
-        className="card border-0 shadow-sm mt-4"
-        style={{ borderRadius: "8px", backgroundColor: "#fafafa" }}
-      >
-        <div className="card-body">
-          <h6 className="fw-bold mb-3">Rating Scale</h6>
-          <div className="row g-3">
-            {Object.entries(RATING_LABELS).map(([rating, label]) => (
-              <div key={rating} className="col-12 col-sm-6">
-                <div className="d-flex align-items-center gap-2">
-                  <span
-                    className="badge bg-primary text-white fw-bold"
-                    style={{ minWidth: "35px", textAlign: "center" }}
-                  >
-                    {rating}
-                  </span>
-                  <span className="small">{label}</span>
+                    Additional Comments
+                  </label>
+                  <small className="text-muted d-block mb-2">
+                    Optional - Maximum 1000 characters
+                  </small>
+                  <textarea
+                    id="comments"
+                    className="form-control"
+                    rows={4}
+                    value={comments}
+                    onChange={(e) => setComments(e.target.value.slice(0, 1000))}
+                    placeholder="Share any additional feedback about the process or system..."
+                    disabled={submitting}
+                    maxLength={1000}
+                    style={{ resize: "vertical", borderRadius: "8px" }}
+                  />
+                  <small className="text-muted d-block mt-2">
+                    {comments.length} / 1000 characters
+                  </small>
                 </div>
+
+                {/* SUBMIT BUTTON */}
+                <div className="d-grid gap-2">
+                  <button
+                    type="submit"
+                    className="btn fw-bold"
+                    style={{
+                      padding: "0.75rem",
+                      borderRadius: "8px",
+                      fontSize: "1rem",
+                      background:
+                        "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                      color: "#fff",
+                      border: "none",
+                      transition: "all 0.3s ease",
+                    }}
+                    disabled={
+                      submitting ||
+                      Object.keys(responses).length < form.questions.length
+                    }
+                    onMouseEnter={(e) => {
+                      if (!e.currentTarget.disabled) {
+                        e.currentTarget.style.opacity = "0.9";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 12px rgba(151, 36, 126, 0.4)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.opacity = "1";
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader
+                          size={16}
+                          className="me-2"
+                          style={{
+                            display: "inline",
+                            animation: "spin 1s linear infinite",
+                          }}
+                        />
+                        Submitting Form...
+                      </>
+                    ) : (
+                      <>
+                        <Send
+                          size={16}
+                          className="me-2"
+                          style={{ display: "inline" }}
+                        />
+                        Submit Feedback
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {/* RATING GUIDE */}
+          <div
+            className="card border-0 shadow-sm mt-4 text-start"
+            style={{ borderRadius: "8px", backgroundColor: "#fafafa" }}
+          >
+            <div className="card-body">
+              <h6 className="fw-bold mb-3">Rating Scale</h6>
+              <div className="row g-3">
+                {Object.entries(RATING_LABELS).map(([rating, label]) => (
+                  <div key={rating} className="col-12 col-sm-6 col-md-4">
+                    <div className="d-flex align-items-center gap-2">
+                      <span
+                        className="badge text-white fw-bold"
+                        style={{
+                          minWidth: "35px",
+                          textAlign: "center",
+                          backgroundColor: "#27235C",
+                        }}
+                      >
+                        {rating}
+                      </span>
+                      <span className="small">{label}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>

@@ -329,50 +329,7 @@ export default function SubmitContextFeedback() {
           maxWidth: "900px",
         }}
       >
-        {/* Header with back button */}
-        <div className="d-flex align-items-center gap-3 mb-3">
-          <button
-            className="btn d-flex align-items-center justify-content-center"
-            onClick={() => navigate(-1)}
-            style={{
-              width: "40px",
-              height: "40px",
-              padding: 0,
-              backgroundColor: "#fff",
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#f8fafc";
-              e.currentTarget.style.borderColor = "#cbd5e1";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#fff";
-              e.currentTarget.style.borderColor = "#e2e8f0";
-            }}
-          >
-            <ArrowLeft size={18} style={{ color: "#64748b" }} />
-          </button>
-          <div>
-            <h2
-              className="fw-bold mb-0"
-              style={{
-                color: "#27235c",
-                fontSize: "1.5rem",
-                letterSpacing: "-0.025em",
-              }}
-            >
-              Submit Feedback
-            </h2>
-            <p
-              className="mb-0"
-              style={{ color: "#64748b", fontSize: "0.875rem" }}
-            >
-              Provide goal or context-based feedback
-            </p>
-          </div>
-        </div>
+        
 
         {/* Error alert */}
         {error && (
