@@ -8,6 +8,8 @@ import {
 import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { toast } from "sonner";
 import "../../../styles/performancemanagement/hr/DeptHeadPage.css";
+import Breadcrumb from "../../../components/common/Breadcrumb";
+
 
 export default function DeptHeadPage() {
   // ========================
@@ -36,6 +38,8 @@ const [appliedSearch, setAppliedSearch] = useState(""); // what is actually appl
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [expandedEmployeeIds, setExpandedEmployeeIds] = useState(new Set());
   const [approvingEmployeeId, setApprovingEmployeeId] = useState(null);
+  
+  
 
   // ========================
 // EFFECTS
@@ -262,11 +266,25 @@ const fetchData = async (silent = false) => {
 
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
-  const getPaginatedData = () => {
+  const getPaginatedData = (tab) => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-    return filteredData.slice(startIndex, endIndex);
+  
+    // pick dataset based on tab
+    const data = tab === "pending" ? pendingRequests : approvedRequests;
+  
+    // if you have filtering logic, apply it here
+    const filtered = filteredData
+      ? filteredData.filter(item =>
+          tab === "pending"
+            ? pendingRequests.includes(item)
+            : approvedRequests.includes(item)
+        )
+      : data;
+  
+    return filtered.slice(startIndex, endIndex);
   };
+  
 
   const getPageNumbers = () => {
     const pages = [];
@@ -878,21 +896,19 @@ const fetchData = async (silent = false) => {
   return (
     <div className="dp-page">
       {/* Top bar with Breadcrumbs */}
-      <div className="hrfcper-top-bar">
-        <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
-          <ol className="hrfcper-breadcrumb">
-            <li className="hrfcper-breadcrumb-item">
-             
-              <Link to="/hr/dashboard"> <i className="bi bi-house-door"></i></Link>
-            </li>
-            
-            <li className="hrfcper-breadcrumb-item active" aria-current="page">
-              Department Head Dashboard
-            </li>
-          </ol>
-        </nav>
-        <div />
-      </div>
+     {/* Top bar with Breadcrumbs */}
+<div className="hrfcper-top-bar">
+  <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
+    <Breadcrumb
+      items={[
+        { label: 'Department Head Dashboard' }
+      ]}
+    />
+  </nav>
+  <div />
+</div>
+
+      
 
       {/* Page Header */}
       <div className="dp-page-header">
@@ -979,7 +995,7 @@ const fetchData = async (silent = false) => {
     onClick={() => setActiveTab("approved")}
   >
     <i className="bi bi-check-circle"></i>
-    Approved (24)
+    Approved ({approvedRequests.length})
   </button>
 </div>
 
@@ -1036,7 +1052,6 @@ const fetchData = async (silent = false) => {
     </div>
   </div>
 </div>
-
 {/* Table */}
 <div 
   className="dp-table-card" 
@@ -1057,7 +1072,7 @@ const fetchData = async (silent = false) => {
           </tr>
         </thead>
         <tbody>
-          {getPaginatedData().length === 0 ? (
+          {getPaginatedData("pending").length === 0 ? (
             <tr>
               <td 
                 colSpan={7} 
@@ -1071,7 +1086,7 @@ const fetchData = async (silent = false) => {
               </td>
             </tr>
           ) : (
-            getPaginatedData().map((emp) => (
+            getPaginatedData("pending").map((emp) => (
               <React.Fragment key={emp.assessmentId || emp.employeeId}>
                 <tr>
                   <td>
@@ -1141,7 +1156,7 @@ const fetchData = async (silent = false) => {
           </tr>
         </thead>
         <tbody>
-          {getPaginatedData().length === 0 ? (
+          {getPaginatedData("approved").length === 0 ? (
             <tr>
               <td colSpan={5} className="dp-empty-state" style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}>
                 <i className="bi bi-inbox"></i>
@@ -1149,7 +1164,7 @@ const fetchData = async (silent = false) => {
               </td>
             </tr>
           ) : (
-            getPaginatedData().map((emp) => (
+            getPaginatedData("approved").map((emp) => (
               <React.Fragment key={emp.assessmentId || emp.employeeId}>
                 <tr>
                   <td>
@@ -1174,6 +1189,8 @@ const fetchData = async (silent = false) => {
     )}
   </div>
 
+
+
   {/* Pagination */}
   {filteredData.length > 0 && (
     <div 
@@ -1190,7 +1207,9 @@ const fetchData = async (silent = false) => {
             setCurrentPage(1);
           }}
         >
+          <option value="5">5</option>
           <option value="10">10</option>
+          
           <option value="25">25</option>
           <option value="50">50</option>
         </select>
