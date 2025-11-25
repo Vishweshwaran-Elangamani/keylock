@@ -133,28 +133,7 @@ export default function CreateFeedbackForm() {
         ]}
       />
 
-      {/* HEADER */}
-      <div className="d-flex align-items-center mb-4">
-        <button
-          className="btn btn-outline-secondary me-2"
-          onClick={() => navigate(-1)}
-          type="button"
-          disabled={loading}
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <div>
-          <h2
-            className="fw-bold mb-1"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            Create Feedback Form
-          </h2>
-          <p className="small text-muted mb-0">
-            Forms are automatically visible to all employees
-          </p>
-        </div>
-      </div>
+      
 
       {/* ERROR ALERT */}
       {error && (

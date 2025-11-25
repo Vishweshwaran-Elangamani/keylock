@@ -10,8 +10,9 @@ import {
   Loader,
   ArrowLeft,
   Star,
+  Home,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   orgGoalFeedbackApi,
   peerQueueApi,
@@ -329,7 +330,67 @@ export default function SubmitContextFeedback() {
           maxWidth: "900px",
         }}
       >
-        
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="breadcrumb" style={{ marginBottom: "2rem" }}>
+          <ol
+            style={{
+              display: "flex",
+              alignItems: "center",
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+              fontSize: "1rem",
+            }}
+          >
+            <li>
+              <Link
+                to="/employee/dashboard"
+                style={{
+                  color: "#97247E",
+                  display: "flex",
+                  alignItems: "center",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  transition: "color 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+              >
+                <Home size={18} style={{ marginRight: "5px" }} />
+                Dashboard
+              </Link>
+            </li>
+            <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
+            <li>
+              <Link
+                to="/employee/dashboard/feedback"
+                style={{
+                  color: "#97247E",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  transition: "color 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+              >
+                Feedback Management
+              </Link>
+            </li>
+            <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
+            <li>
+              <Link
+                to="/employee/dashboard/feedback/contextfeedback"
+                style={{
+                  color: "#97247E",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Submit Feedback
+              </Link>
+            </li>
+          </ol>
+        </nav>
 
         {/* Error alert */}
         {error && (

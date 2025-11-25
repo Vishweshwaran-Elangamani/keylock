@@ -14,8 +14,10 @@ import {
   Star,
   ArrowLeft,
   Inbox,
+  Home,
+  User,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   mentorFeedbackApi,
   peerQueueApi,
@@ -410,6 +412,68 @@ export default function MySubmissions() {
         backgroundColor: "#f8f9fa",
       }}
     >
+      {/* Breadcrumb Navigation */}
+      <nav aria-label="breadcrumb" style={{ marginBottom: "1.5rem" }}>
+        <ol
+          style={{
+            display: "flex",
+            alignItems: "center",
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            fontSize: "1rem",
+          }}
+        >
+          <li>
+            <Link
+              to="/employee/dashboard"
+              style={{
+                color: "#97247E",
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+                fontWeight: 500,
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+              <Home size={18} style={{ marginRight: "5px" }} />
+              Dashboard
+            </Link>
+          </li>
+          <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
+          <li>
+            <Link
+              to="/employee/dashboard/feedback"
+              style={{
+                color: "#97247E",
+                textDecoration: "none",
+                fontWeight: 500,
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+              Feedback Dashboard
+            </Link>
+          </li>
+          <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
+          <li>
+            <Link
+              to="/employee/dashboard/feedback/submissions"
+              style={{
+                color: "#97247E",
+                textDecoration: "none",
+                fontWeight: 600,
+              }}
+            >
+              My Submissions
+            </Link>
+          </li>
+        </ol>
+      </nav>
+
       {/* Toast Notification */}
       {toast.show && (
         <div
@@ -437,72 +501,6 @@ export default function MySubmissions() {
           />
         </div>
       )}
-
-      {/* Header */}
-      <div className="d-flex align-items-center gap-3 mb-3">
-        <button
-          className="btn d-flex align-items-center justify-content-center"
-          onClick={() => navigate(-1)}
-          style={{
-            width: "40px",
-            height: "40px",
-            padding: 0,
-            backgroundColor: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: "8px",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#f8fafc";
-            e.currentTarget.style.borderColor = "#cbd5e1";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#fff";
-            e.currentTarget.style.borderColor = "#e2e8f0";
-          }}
-        >
-          <ArrowLeft size={18} style={{ color: "#64748b" }} />
-        </button>
-        <div className="flex-grow-1">
-          <h2
-            className="fw-bold mb-0"
-            style={{
-              color: "#27235c",
-              fontSize: "1.5rem",
-              letterSpacing: "-0.025em",
-            }}
-          >
-            {user?.firstName} {user?.lastName}'s Submissions
-          </h2>
-          <p
-            className="mb-0"
-            style={{ color: "#64748b", fontSize: "0.875rem" }}
-          >
-            View and manage all feedback you have submitted
-          </p>
-        </div>
-        <button
-          className="btn d-flex align-items-center gap-2"
-          onClick={() => {
-            fetchEmployeeMap();
-            fetchObjectives();
-            fetchData();
-          }}
-          disabled={refreshing || loading}
-          style={{
-            backgroundColor: "transparent",
-            border: "1.5px solid #0F62FE",
-            color: "#0F62FE",
-            borderRadius: "8px",
-            padding: "8px 16px",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-          }}
-        >
-          <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
-          Refresh
-        </button>
-      </div>
 
       {/* Error Alert */}
       {error && (
@@ -726,10 +724,7 @@ export default function MySubmissions() {
       {/* Content Area */}
       <div
         style={{
-          backgroundColor: "#fff",
-          borderRadius: "10px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-          padding: "1.5rem",
+          backgroundColor: "transparent",
           minHeight: "400px",
         }}
       >
@@ -766,88 +761,152 @@ export default function MySubmissions() {
             {/* HR Forms Cards */}
             {tab === "HR Forms" &&
               hrForms.map((hr) => {
-                const statusColor =
-                  hr.status === "Reviewed"
-                    ? "#24A148"
-                    : hr.status === "Submitted"
-                    ? "#0F62FE"
-                    : "#E2B93B";
                 return (
                   <div className="col-md-6 col-lg-4" key={hr.responseId}>
                     <div
-                      className="card border-0 h-100"
+                      className="card h-100"
                       style={{
-                        border: "1px solid #e2e8f0",
-                        borderLeft: `4px solid ${statusColor}`,
-                        borderRadius: "8px",
+                        backgroundColor: "#fff",
+                        border: "1px solid #E5E7EB",
+                        borderLeft: "4px solid #27235C",
+                        borderRadius: "12px",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+                        e.currentTarget.style.transform = "translateY(0)";
                       }}
                     >
-                      <div className="card-body" style={{ padding: "1rem" }}>
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <h6
-                            className="mb-0"
-                            style={{
-                              fontSize: "0.875rem",
-                              fontWeight: 600,
-                              color: "#0f172a",
-                            }}
-                          >
-                            {hr.formName || "HR Form"}
-                          </h6>
+                      <div className="card-body" style={{ padding: "1.25rem" }}>
+                        {/* Header Section */}
+                        <div className="d-flex align-items-start justify-content-between mb-3">
+                          <div className="d-flex align-items-start gap-2 flex-grow-1">
+                            <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
+                            <div className="flex-grow-1" style={{ textAlign: "left" }}>
+                              <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                                From
+                              </div>
+                              <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                                {user.firstName} {user.lastName}
+                              </div>
+                            </div>
+                          </div>
                           <span
                             className="badge"
                             style={{
-                              backgroundColor: `${statusColor}20`,
-                              color: statusColor,
-                              padding: "4px 8px",
+                              backgroundColor: "#D1FAE5",
+                              color: "#065F46",
+                              padding: "4px 12px",
                               fontSize: "0.75rem",
                               borderRadius: "6px",
+                              fontWeight: 600,
+                              flexShrink: 0,
                             }}
                           >
-                            {hr.status || "Draft"}
+                            {hr.status || "Approved"}
                           </span>
                         </div>
-                        <div
-                          className="mb-3"
-                          style={{ fontSize: "0.75rem", color: "#64748b" }}
-                        >
-                          <Clock
-                            size={12}
-                            className="me-1"
-                            style={{ display: "inline" }}
-                          />
-                          {hr.submittedAtFormatted}
-                          {hr.daysAgo !== null && (
-                            <span> ({hr.daysAgo}d ago)</span>
-                          )}
+
+                        {/* To Section - Always HR */}
+                        <div className="d-flex align-items-start gap-2 mb-3">
+                          <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
+                          <div style={{ textAlign: "left" }}>
+                            <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                              To
+                            </div>
+                            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                              HR
+                            </div>
+                          </div>
                         </div>
-                        <div className="d-flex gap-2">
-                          <button
-                            className="btn btn-sm btn-outline-secondary flex-grow-1"
-                            onClick={() => handleViewResponse(hr, "HR")}
+
+                        {/* Date Section */}
+                        <div className="d-flex align-items-center gap-2 mb-4">
+                          <Clock size={16} style={{ color: "#6B7280", flexShrink: 0 }} />
+                          <div style={{ fontSize: "0.813rem", color: "#6B7280", textAlign: "left" }}>
+                            {hr.submittedAtFormatted}
+                          </div>
+                        </div>
+
+                        {/* Content Preview */}
+                        <div
+                          style={{
+                            backgroundColor: "#F9FAFB",
+                            borderRadius: "8px",
+                            padding: "0.75rem",
+                            marginBottom: "1rem",
+                            minHeight: "60px",
+                            textAlign: "left",
+                          }}
+                        >
+                          <p
                             style={{
                               fontSize: "0.813rem",
-                              borderRadius: "6px",
-                              padding: "6px",
+                              color: "#4B5563",
+                              margin: 0,
+                              lineHeight: "1.5",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
                             }}
                           >
-                            <Eye
-                              size={14}
-                              className="me-1"
-                              style={{ display: "inline" }}
-                            />
+                            {hr.formName || "[sample] sample..."}
+                          </p>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="d-flex gap-2">
+                          <button
+                            className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                            onClick={() => handleViewResponse(hr, "HR")}
+                            style={{
+                              backgroundColor: "#27235C",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: "8px",
+                              padding: "8px 16px",
+                              fontSize: "0.813rem",
+                              fontWeight: 600,
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#1a1840";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#27235C";
+                            }}
+                          >
+                            <Eye size={16} />
                             View
                           </button>
                           <button
-                            className="btn btn-sm btn-outline-danger"
+                            className="btn d-flex align-items-center justify-content-center"
                             onClick={() => deleteHRForm(hr.responseId)}
                             style={{
+                              backgroundColor: "transparent",
+                              color: "#EF4444",
+                              border: "1px solid #FEE2E2",
+                              borderRadius: "8px",
+                              padding: "8px 12px",
                               fontSize: "0.813rem",
-                              borderRadius: "6px",
-                              padding: "6px 10px",
+                              fontWeight: 600,
+                              transition: "all 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#FEE2E2";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "transparent";
                             }}
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </div>
@@ -861,94 +920,149 @@ export default function MySubmissions() {
               goalFeedback.map((goal) => (
                 <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
                   <div
-                    className="card border-0 h-100"
+                    className="card h-100"
                     style={{
-                      border: "1px solid #e2e8f0",
-                      borderLeft: "4px solid #0F62FE",
-                      borderRadius: "8px",
+                      backgroundColor: "#fff",
+                      border: "1px solid #E5E7EB",
+                      borderLeft: "4px solid #27235C",
+                      borderRadius: "12px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+                      e.currentTarget.style.transform = "translateY(0)";
                     }}
                   >
-                    <div className="card-body" style={{ padding: "1rem" }}>
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <h6
-                          className="mb-0"
+                    <div className="card-body" style={{ padding: "1.25rem" }}>
+                      {/* Header Section */}
+                      <div className="d-flex align-items-start justify-content-between mb-3">
+                        <div className="d-flex align-items-start gap-2 flex-grow-1">
+                          <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
+                          <div className="flex-grow-1" style={{ textAlign: "left" }}>
+                            <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                              From
+                            </div>
+                            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                              {user.firstName} {user.lastName}
+                            </div>
+                          </div>
+                        </div>
+                        <span
+                          className="badge"
                           style={{
-                            fontSize: "0.875rem",
+                            backgroundColor: "#D1FAE5",
+                            color: "#065F46",
+                            padding: "4px 12px",
+                            fontSize: "0.75rem",
+                            borderRadius: "6px",
                             fontWeight: 600,
-                            color: "#0f172a",
-                            flex: 1,
+                            flexShrink: 0,
                           }}
                         >
-                          {goal.objectiveTitle}
-                        </h6>
-                        <div className="d-flex align-items-center gap-1 ms-2">
-                          <Star
-                            size={14}
-                            style={{ color: "#FFB800", fill: "#FFB800" }}
-                          />
-                          <span
-                            className="fw-bold"
-                            style={{ fontSize: "0.813rem" }}
-                          >
-                            {goal.rating}/5
-                          </span>
+                          Approved
+                        </span>
+                      </div>
+
+                      {/* To Section */}
+                      <div className="d-flex align-items-start gap-2 mb-3">
+                        <Target size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
+                        <div style={{ textAlign: "left" }}>
+                          <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                            To
+                          </div>
+                          <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                            {goal.objectiveTitle}
+                          </div>
                         </div>
                       </div>
-                      <span
-                        className="badge mb-2"
+
+                      {/* Date Section */}
+                      <div className="d-flex align-items-center gap-2 mb-4">
+                        <Clock size={16} style={{ color: "#6B7280", flexShrink: 0 }} />
+                        <div style={{ fontSize: "0.813rem", color: "#6B7280", textAlign: "left" }}>
+                          {goal.submittedAtFormatted}
+                        </div>
+                      </div>
+
+                      {/* Content Preview */}
+                      <div
                         style={{
-                          backgroundColor: "#dbeafe",
-                          color: "#0f62fe",
-                          padding: "4px 8px",
-                          fontSize: "0.75rem",
-                          borderRadius: "6px",
+                          backgroundColor: "#F9FAFB",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          marginBottom: "1rem",
+                          minHeight: "60px",
+                          textAlign: "left",
                         }}
                       >
-                        {RATING_LABELS[goal.rating] || "N/A"}
-                      </span>
-                      <div
-                        className="mb-3"
-                        style={{ fontSize: "0.75rem", color: "#64748b" }}
-                      >
-                        <Clock
-                          size={12}
-                          className="me-1"
-                          style={{ display: "inline" }}
-                        />
-                        {goal.submittedAtFormatted}
-                        {goal.daysAgo !== null && (
-                          <span> ({goal.daysAgo}d ago)</span>
-                        )}
-                      </div>
-                      <div className="d-flex gap-2">
-                        <button
-                          className="btn btn-sm btn-outline-secondary flex-grow-1"
-                          onClick={() => handleViewResponse(goal, "Goal")}
+                        <p
                           style={{
                             fontSize: "0.813rem",
-                            borderRadius: "6px",
-                            padding: "6px",
+                            color: "#4B5563",
+                            margin: 0,
+                            lineHeight: "1.5",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
                           }}
                         >
-                          <Eye
-                            size={14}
-                            className="me-1"
-                            style={{ display: "inline" }}
-                          />
+                          {goal.feedbackComments || "No comments provided"}
+                        </p>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="d-flex gap-2">
+                        <button
+                          className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                          onClick={() => handleViewResponse(goal, "Goal")}
+                          style={{
+                            backgroundColor: "#27235C",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "8px 16px",
+                            fontSize: "0.813rem",
+                            fontWeight: 600,
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#1a1840";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "#27235C";
+                          }}
+                        >
+                          <Eye size={16} />
                           View
                         </button>
                         <button
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() =>
-                            deleteGoalFeedback(goal.orgGoalFeedbackId)
-                          }
+                          className="btn d-flex align-items-center justify-content-center"
+                          onClick={() => deleteGoalFeedback(goal.orgGoalFeedbackId)}
                           style={{
+                            backgroundColor: "transparent",
+                            color: "#EF4444",
+                            border: "1px solid #FEE2E2",
+                            borderRadius: "8px",
+                            padding: "8px 12px",
                             fontSize: "0.813rem",
-                            borderRadius: "6px",
-                            padding: "6px 10px",
+                            fontWeight: 600,
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#FEE2E2";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
                           }}
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
@@ -964,80 +1078,150 @@ export default function MySubmissions() {
                   key={m.trackingId || `mentor-${Math.random()}`}
                 >
                   <div
-                    className="card border-0 h-100"
-                    style={{ border: "1px solid #e2e8f0", borderRadius: "8px" }}
+                    className="card h-100"
+                    style={{
+                      backgroundColor: "#fff",
+                      border: "1px solid #E5E7EB",
+                      borderLeft: "4px solid #27235C",
+                      borderRadius: "12px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    }}
                   >
-                    <div className="card-body" style={{ padding: "1rem" }}>
-                      <div className="mb-2">
-                        <small
-                          style={{ fontSize: "0.75rem", color: "#64748b" }}
-                        >
-                          Mentor:
-                        </small>
-                        <h6
-                          className="mb-0"
-                          style={{
-                            fontSize: "0.875rem",
-                            fontWeight: 600,
-                            color: "#0f172a",
-                          }}
-                        >
-                          {m.mentorNameFull}
-                        </h6>
-                      </div>
-                      <div className="d-flex align-items-center gap-2 mb-2">
+                    <div className="card-body" style={{ padding: "1.25rem" }}>
+                      {/* Header Section */}
+                      <div className="d-flex align-items-start justify-content-between mb-3">
+                        <div className="d-flex align-items-start gap-2 flex-grow-1">
+                          <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
+                          <div className="flex-grow-1" style={{ textAlign: "left" }}>
+                            <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                              From
+                            </div>
+                            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                              {user.firstName} {user.lastName}
+                            </div>
+                          </div>
+                        </div>
                         <span
                           className="badge"
                           style={{
-                            backgroundColor: "#dcfce7",
-                            color: "#24A148",
-                            padding: "4px 8px",
+                            backgroundColor: "#D1FAE5",
+                            color: "#065F46",
+                            padding: "4px 12px",
                             fontSize: "0.75rem",
                             borderRadius: "6px",
+                            fontWeight: 600,
+                            flexShrink: 0,
                           }}
                         >
-                          {m.rating || 0}/5 Stars
+                          Approved
                         </span>
                       </div>
-                      <div
-                        className="mb-3"
-                        style={{ fontSize: "0.75rem", color: "#64748b" }}
-                      >
-                        <Clock
-                          size={12}
-                          className="me-1"
-                          style={{ display: "inline" }}
-                        />
-                        {m.createdAtFormatted}
+
+                      {/* To Section */}
+                      <div className="d-flex align-items-start gap-2 mb-3">
+                        <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
+                        <div style={{ textAlign: "left" }}>
+                          <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                            To
+                          </div>
+                          <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                            {m.mentorNameFull}
+                          </div>
+                        </div>
                       </div>
-                      <div className="d-flex gap-2">
-                        <button
-                          className="btn btn-sm btn-outline-secondary flex-grow-1"
-                          onClick={() => handleViewResponse(m, "Mentor")}
+
+                      {/* Date Section */}
+                      <div className="d-flex align-items-center gap-2 mb-4">
+                        <Clock size={16} style={{ color: "#6B7280", flexShrink: 0 }} />
+                        <div style={{ fontSize: "0.813rem", color: "#6B7280", textAlign: "left" }}>
+                          {m.createdAtFormatted}
+                        </div>
+                      </div>
+
+                      {/* Content Preview */}
+                      <div
+                        style={{
+                          backgroundColor: "#F9FAFB",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          marginBottom: "1rem",
+                          minHeight: "60px",
+                          textAlign: "left",
+                        }}
+                      >
+                        <p
                           style={{
                             fontSize: "0.813rem",
-                            borderRadius: "6px",
-                            padding: "6px",
+                            color: "#4B5563",
+                            margin: 0,
+                            lineHeight: "1.5",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
                           }}
                         >
-                          <Eye
-                            size={14}
-                            className="me-1"
-                            style={{ display: "inline" }}
-                          />
+                          {m.feedbackContent || m.comments || "Mentor feedback..."}
+                        </p>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="d-flex gap-2">
+                        <button
+                          className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                          onClick={() => handleViewResponse(m, "Mentor")}
+                          style={{
+                            backgroundColor: "#27235C",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "8px 16px",
+                            fontSize: "0.813rem",
+                            fontWeight: 600,
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#1a1840";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "#27235C";
+                          }}
+                        >
+                          <Eye size={16} />
                           View
                         </button>
                         <button
-                          className="btn btn-sm btn-outline-danger"
+                          className="btn d-flex align-items-center justify-content-center"
                           onClick={() => deleteMentor(m.trackingId)}
                           disabled={!m.trackingId}
                           style={{
+                            backgroundColor: "transparent",
+                            color: "#EF4444",
+                            border: "1px solid #FEE2E2",
+                            borderRadius: "8px",
+                            padding: "8px 12px",
                             fontSize: "0.813rem",
-                            borderRadius: "6px",
-                            padding: "6px 10px",
+                            fontWeight: 600,
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#FEE2E2";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
                           }}
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
@@ -1053,66 +1237,150 @@ export default function MySubmissions() {
                   key={p.queueId || `peer-${Math.random()}`}
                 >
                   <div
-                    className="card border-0 h-100"
-                    style={{ border: "1px solid #e2e8f0", borderRadius: "8px" }}
+                    className="card h-100"
+                    style={{
+                      backgroundColor: "#fff",
+                      border: "1px solid #E5E7EB",
+                      borderLeft: "4px solid #27235C",
+                      borderRadius: "12px",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    }}
                   >
-                    <div className="card-body" style={{ padding: "1rem" }}>
-                      <div className="mb-2">
-                        <small
-                          style={{ fontSize: "0.75rem", color: "#64748b" }}
-                        >
-                          Feedback for:
-                        </small>
-                        <h6
-                          className="mb-0"
+                    <div className="card-body" style={{ padding: "1.25rem" }}>
+                      {/* Header Section */}
+                      <div className="d-flex align-items-start justify-content-between mb-3">
+                        <div className="d-flex align-items-start gap-2 flex-grow-1">
+                          <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
+                          <div className="flex-grow-1" style={{ textAlign: "left" }}>
+                            <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                              From
+                            </div>
+                            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                              {user.firstName} {user.lastName}
+                            </div>
+                          </div>
+                        </div>
+                        <span
+                          className="badge"
                           style={{
-                            fontSize: "0.875rem",
+                            backgroundColor: "#D1FAE5",
+                            color: "#065F46",
+                            padding: "4px 12px",
+                            fontSize: "0.75rem",
+                            borderRadius: "6px",
                             fontWeight: 600,
-                            color: "#0f172a",
+                            flexShrink: 0,
                           }}
                         >
-                          {p.recipientNameFull}
-                        </h6>
+                          Approved
+                        </span>
                       </div>
+
+                      {/* To Section */}
+                      <div className="d-flex align-items-start gap-2 mb-3">
+                        <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
+                        <div style={{ textAlign: "left" }}>
+                          <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                            To
+                          </div>
+                          <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                            {p.recipientNameFull}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Date Section */}
+                      <div className="d-flex align-items-center gap-2 mb-4">
+                        <Clock size={16} style={{ color: "#6B7280", flexShrink: 0 }} />
+                        <div style={{ fontSize: "0.813rem", color: "#6B7280", textAlign: "left" }}>
+                          {p.createdAtFormatted}
+                        </div>
+                      </div>
+
+                      {/* Content Preview */}
                       <div
-                        className="mb-3"
-                        style={{ fontSize: "0.75rem", color: "#64748b" }}
+                        style={{
+                          backgroundColor: "#F9FAFB",
+                          borderRadius: "8px",
+                          padding: "0.75rem",
+                          marginBottom: "1rem",
+                          minHeight: "60px",
+                          textAlign: "left",
+                        }}
                       >
-                        <Clock
-                          size={12}
-                          className="me-1"
-                          style={{ display: "inline" }}
-                        />
-                        {p.createdAtFormatted}
-                      </div>
-                      <div className="d-flex gap-2">
-                        <button
-                          className="btn btn-sm btn-outline-secondary flex-grow-1"
-                          onClick={() => handleViewResponse(p, "Peer")}
+                        <p
                           style={{
                             fontSize: "0.813rem",
-                            borderRadius: "6px",
-                            padding: "6px",
+                            color: "#4B5563",
+                            margin: 0,
+                            lineHeight: "1.5",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
                           }}
                         >
-                          <Eye
-                            size={14}
-                            className="me-1"
-                            style={{ display: "inline" }}
-                          />
+                          {p.feedbackContent || "Peer feedback..."}
+                        </p>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="d-flex gap-2">
+                        <button
+                          className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                          onClick={() => handleViewResponse(p, "Peer")}
+                          style={{
+                            backgroundColor: "#27235C",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "8px 16px",
+                            fontSize: "0.813rem",
+                            fontWeight: 600,
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#1a1840";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "#27235C";
+                          }}
+                        >
+                          <Eye size={16} />
                           View
                         </button>
                         <button
-                          className="btn btn-sm btn-outline-danger"
+                          className="btn d-flex align-items-center justify-content-center"
                           onClick={() => deletePeer(p.queueId)}
                           disabled={!p.queueId}
                           style={{
+                            backgroundColor: "transparent",
+                            color: "#EF4444",
+                            border: "1px solid #FEE2E2",
+                            borderRadius: "8px",
+                            padding: "8px 12px",
                             fontSize: "0.813rem",
-                            borderRadius: "6px",
-                            padding: "6px 10px",
+                            fontWeight: 600,
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#FEE2E2";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
                           }}
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>

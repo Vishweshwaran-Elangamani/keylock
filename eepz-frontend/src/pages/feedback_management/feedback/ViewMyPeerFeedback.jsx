@@ -11,8 +11,9 @@ import {
   MessageCircle,
   Lock,
   Loader,
+  Home,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   peerQueueApi,
   employeeApi,
@@ -235,38 +236,67 @@ export default function ViewMyPeerFeedback() {
           paddingRight: "1rem",
         }}
       >
-        {/* Header */}
-        <div className="d-flex align-items-start mb-4">
-          <button
-            className="btn btn-outline-secondary me-2"
-            onClick={() => navigate(-1)}
-            style={{ borderRadius: "8px" }}
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="breadcrumb" style={{ marginBottom: "1.5rem" }}>
+          <ol
+            style={{
+              display: "flex",
+              alignItems: "center",
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+              fontSize: "1rem",
+            }}
           >
-            <ArrowLeft size={16} />
-          </button>
-          <div className="flex-grow-1">
-            <h2 className="fw-bold mb-1" style={{ color: "#0F62FE" }}>
-              Peer Feedback Received
-            </h2>
-            <p className="mb-0 small text-muted">
-              Feedback from your peers - anonymity is always respected
-            </p>
-          </div>
-          <button
-            className="btn btn-outline-secondary"
-            onClick={fetchPeerFeedback}
-            disabled={loading}
-            title="Refresh"
-            style={{ borderRadius: "8px" }}
-          >
-            <RefreshCw
-              size={18}
-              style={{
-                animation: loading ? "spin 1s linear infinite" : "none",
-              }}
-            />
-          </button>
-        </div>
+            <li>
+              <Link
+                to="/employee/dashboard"
+                style={{
+                  color: "#97247E",
+                  display: "flex",
+                  alignItems: "center",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  transition: "color 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+              >
+                <Home size={18} style={{ marginRight: "5px" }} />
+                Dashboard
+              </Link>
+            </li>
+            <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
+            <li>
+              <Link
+                to="/employee/dashboard/feedback"
+                style={{
+                  color: "#97247E",
+                  textDecoration: "none",
+                  fontWeight: 500,
+                  transition: "color 0.2s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+              >
+                Feedback Management
+              </Link>
+            </li>
+            <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
+            <li>
+              <Link
+                to="/employee/dashboard/feedback/submit-peer"
+                style={{
+                  color: "#97247E",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                View My Peer Feedback
+              </Link>
+            </li>
+          </ol>
+        </nav>
 
         {/* Error Alert */}
         {error && (

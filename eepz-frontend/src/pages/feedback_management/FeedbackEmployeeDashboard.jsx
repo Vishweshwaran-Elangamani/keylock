@@ -302,61 +302,7 @@ export default function FeedbackEmployeeDashboard() {
         backgroundColor: "#f8f9fa",
       }}
     >
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-start mb-3">
-        <div>
-          <div className="d-flex align-items-center gap-2 mb-1">
-            <h2
-              className="fw-bold mb-0"
-              style={{
-                color: "#27235c",
-                fontSize: "1.625rem",
-                letterSpacing: "-0.025em",
-              }}
-            >
-              Employee Dashboard
-            </h2>
-            {isMentor && (
-              <span
-                className="badge d-flex align-items-center gap-1"
-                style={{
-                  backgroundColor: "#fef3c7",
-                  color: "#d97706",
-                  fontSize: "0.75rem",
-                  padding: "4px 8px",
-                  borderRadius: "6px",
-                }}
-              >
-                <Award size={14} />
-                SME
-              </span>
-            )}
-          </div>
-          <p
-            className="mb-0"
-            style={{ color: "#64748b", fontSize: "0.875rem" }}
-          >
-            Welcome back, {user?.firstName} {user?.lastName}
-          </p>
-        </div>
-        <button
-          className="btn d-flex align-items-center gap-2"
-          onClick={refresh}
-          disabled={refreshing}
-          style={{
-            backgroundColor: "transparent",
-            border: "1.5px solid #0F62FE",
-            color: "#0F62FE",
-            borderRadius: "8px",
-            padding: "8px 16px",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-          }}
-        >
-          <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
-          Refresh
-        </button>
-      </div>
+      
 
       {/* Error Alert */}
       {error && (

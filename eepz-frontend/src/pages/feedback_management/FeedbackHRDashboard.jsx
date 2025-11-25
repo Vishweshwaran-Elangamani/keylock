@@ -522,35 +522,14 @@ export default function FeedbackHRDashboard() {
             }}
           >
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <h5 className="fw-bold mb-1" style={{ color: "#1F2937" }}>
+              <div style={{ textAlign: "left" }}>
+                <h5 className="fw-bold mb-1" style={{ color: "#1F2937", textAlign: "left" }}>
                   Peer Feedback Received
                 </h5>
-                <p className="mb-0" style={{ color: "#6B7280", fontSize: "0.875rem" }}>
+                <p className="mb-0" style={{ color: "#6B7280", fontSize: "0.875rem", textAlign: "left" }}>
                   {myPeerFeedback.length} feedback{myPeerFeedback.length !== 1 ? "s" : ""} from your colleagues
                 </p>
               </div>
-              <button
-                onClick={refresh}
-                disabled={refreshing}
-                className="btn btn-sm d-inline-flex align-items-center gap-2"
-                style={{
-                  background: "white",
-                  border: "1.5px solid #E5E7EB",
-                  borderRadius: "8px",
-                  color: "#374151",
-                  fontWeight: 600,
-                  padding: "6px 12px",
-                }}
-              >
-                <RefreshCw
-                  size={14}
-                  style={{
-                    animation: refreshing ? "spin 1s linear infinite" : "none",
-                  }}
-                />
-                {refreshing ? "Refreshing..." : "Refresh"}
-              </button>
             </div>
 
             <div className="row g-3">
@@ -563,21 +542,22 @@ export default function FeedbackHRDashboard() {
                     style={{
                       background: "#FAFBFC",
                       border: "1px solid #E5E7EB",
-                      borderLeft: "4px solid #97247E",
+                      borderLeft: "4px solid #27235C",
                       borderRadius: "10px",
                       padding: "1.25rem",
                       transition: "all 0.2s",
+                      textAlign: "left",
                     }}
                   >
                     <div className="d-flex justify-content-between align-items-start mb-2">
-                      <div>
+                      <div style={{ textAlign: "left", flex: 1 }}>
                         <h6
                           className="fw-bold mb-1"
-                          style={{ color: "#1F2937", fontSize: "0.938rem" }}
+                          style={{ color: "#1F2937", fontSize: "0.938rem", textAlign: "left" }}
                         >
                           {feedbackItem.submittedByName}
                         </h6>
-                        <small style={{ color: "#6B7280", fontSize: "0.813rem" }}>
+                        <small style={{ color: "#6B7280", fontSize: "0.813rem", textAlign: "left", display: "block" }}>
                           {feedbackItem.submittedDate
                             ? new Date(
                                 feedbackItem.submittedDate
@@ -606,6 +586,8 @@ export default function FeedbackHRDashboard() {
                           borderRadius: "6px",
                           textTransform: "uppercase",
                           letterSpacing: "0.5px",
+                          flexShrink: 0,
+                          marginLeft: "1rem",
                         }}
                       >
                         Peer Feedback
@@ -617,6 +599,7 @@ export default function FeedbackHRDashboard() {
                         lineHeight: "1.6",
                         color: "#374151",
                         fontSize: "0.875rem",
+                        textAlign: "left",
                       }}
                     >
                       {feedbackItem.feedbackContent ||
