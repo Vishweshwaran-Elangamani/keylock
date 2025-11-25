@@ -347,126 +347,171 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
 
         public async Task<bool> UpdateReportingManagersAsync(
-            int projectId,
-            int? resourceOwnerId,
-            int? l1ApproverId,
-            int? l2ApproverId
-        )
+    int projectId,
+    int? resourceOwnerId,
+    int? l1ApproverId,
+    int? l2ApproverId
+)
+{
+    var project = await _context.Projects.FindAsync(projectId);
+    if (project == null)
+    {
+        Console.WriteLine($"❌ Project {projectId} not found");
+        return false;
+    }
+
+    Console.WriteLine($"Updating managers for Project {projectId}:");
+    Console.WriteLine($"   - Resource Owner: {resourceOwnerId}");
+    Console.WriteLine($"   - L1 Approver: {l1ApproverId}");
+    Console.WriteLine($"   - L2 Approver: {l2ApproverId}");
+
+    // Update project's reporting manager fields
+    project.ResourceOwnerEmployeeId = resourceOwnerId;
+    project.L1approverEmployeeId = l1ApproverId;
+    project.L2approverEmployeeId = l2ApproverId;
+    project.UpdatedAt = DateTime.Now;
+
+    // Collect all manager EmployeeMasterIds
+    var managerMasterIds = new List<int?> { resourceOwnerId, l1ApproverId, l2ApproverId }
+        .Where(id => id.HasValue && id.Value > 0)
+        .Select(id => id!.Value)
+        .Distinct()
+        .ToList();
+
+    if (managerMasterIds.Any())
+    {
+        // Get manager details with validation
+        var managerDetails = await _context
+            .Employeedetailsmasters.Where(edm =>
+                managerMasterIds.Contains(edm.EmployeeMasterId)
+            )
+            .Include(edm => edm.Employee)
+            .ThenInclude(e => e!.Userprofile)
+            .ToListAsync();
+
+        Console.WriteLine(
+            $"👥 Found {managerDetails.Count}/{managerMasterIds.Count} managers:"
+        );
+        foreach (var detail in managerDetails)
         {
-            var project = await _context.Projects.FindAsync(projectId);
-            if (project == null)
+            var name =
+                $"{detail.Employee?.Userprofile?.FirstName} {detail.Employee?.Userprofile?.LastName}";
+            Console.WriteLine(
+                $"   - {name} (MasterId: {detail.EmployeeMasterId}, EmployeeId: {detail.EmployeeId})"
+            );
+        }
+
+        // Filter valid EmployeeIds
+        var validManagerEmployeeIds = managerDetails
+            .Where(md => md.EmployeeId > 0)
+            .Select(md => md.EmployeeId)
+            .ToList();
+
+        // Warn about problems
+        var invalidManagers = managerDetails.Where(md => md.EmployeeId <= 0).ToList();
+        if (invalidManagers.Any())
+        {
+            Console.WriteLine(
+                $"WARNING: {invalidManagers.Count} managers have invalid EmployeeId:"
+            );
+            foreach (var invalid in invalidManagers)
             {
-                Console.WriteLine($"❌ Project {projectId} not found");
-                return false;
+                var name =
+                    $"{invalid.Employee?.Userprofile?.FirstName} {invalid.Employee?.Userprofile?.LastName}";
+                Console.WriteLine(
+                    $"   - {name} (MasterId: {invalid.EmployeeMasterId}, EmployeeId: {invalid.EmployeeId})"
+                );
             }
+        }
 
-            Console.WriteLine($"📝 Updating managers for Project {projectId}:");
-            Console.WriteLine($"   - Resource Owner: {resourceOwnerId}");
-            Console.WriteLine($"   - L1 Approver: {l1ApproverId}");
-            Console.WriteLine($"   - L2 Approver: {l2ApproverId}");
+        // NEW: Update employee manager hierarchy correctly
+        // Get all employees currently assigned to this project (excluding managers themselves)
+        var projectEmployeeIds = await _context
+            .Projectemployees
+            .Where(pe => pe.ProjectId == projectId)
+            .Select(pe => pe.EmployeeId)
+            .ToListAsync();
 
-            // ✅ Update project's reporting manager fields
-            project.ResourceOwnerEmployeeId = resourceOwnerId;
-            project.L1approverEmployeeId = l1ApproverId;
-            project.L2approverEmployeeId = l2ApproverId;
-            project.UpdatedAt = DateTime.Now;
+        var employeesToUpdate = await _context
+            .Employees
+            .Where(edm => projectEmployeeIds.Contains(edm.EmployeeId))
+            .ToListAsync();
 
-            // ✅ Collect all manager EmployeeMasterIds
-            var managerMasterIds = new List<int?> { resourceOwnerId, l1ApproverId, l2ApproverId }
-                .Where(id => id.HasValue && id.Value > 0)
-                .Select(id => id!.Value)
-                .Distinct()
+        foreach (var employee in employeesToUpdate)
+        {
+            // Apply hierarchy logic based on employee's role
+            // Regular employees → L1 Approver
+            // L1 Approver → L2 Approver  
+            // L2 Approver → Resource Owner (or null if they're at the top)
+            
+            if (employee.EmployeeId == l1ApproverId)
+            {
+                // L1 Approver reports to L2 Approver
+                employee.ReportingManagerEmployeeId = l2ApproverId;
+                Console.WriteLine($"L1 Approver (EmployeeId {employee.EmployeeId}) → Manager: {l2ApproverId}");
+            }
+            else if (employee.EmployeeId == l2ApproverId)
+            {
+                // L2 Approver reports to Resource Owner
+                employee.ReportingManagerEmployeeId = resourceOwnerId;
+                Console.WriteLine($"L2 Approver (EmployeeId {employee.EmployeeId}) → Manager: {resourceOwnerId}");
+            }
+            else if (employee.EmployeeId == resourceOwnerId)
+            {
+                // Resource Owner has no manager (or reports to someone outside project)
+                // employee.ReportingManagerId = null; // Or leave unchanged
+                Console.WriteLine($"Resource Owner (EmployeeId {employee.EmployeeId}) → No manager in project");
+            }
+            else
+            {
+                // Regular employees report to L1 Approver
+                employee.ReportingManagerEmployeeId = l1ApproverId;
+                Console.WriteLine($"Regular Employee (EmployeeId {employee.EmployeeId}) → Manager: {l1ApproverId}");
+            }
+            
+            employee.UpdatedAt = DateTime.Now;
+        }
+
+        // ✅ Check existing project-employee mappings
+        var existingMappings = await _context
+            .Projectemployees.Where(pe =>
+                pe.ProjectId == projectId && validManagerEmployeeIds.Contains(pe.EmployeeId)
+            )
+            .Select(pe => pe.EmployeeId)
+            .ToListAsync();
+
+        var newManagerEmployeeIds = validManagerEmployeeIds
+            .Except(existingMappings)
+            .ToList();
+
+        Console.WriteLine(
+            $"➕ Managers to add: {newManagerEmployeeIds.Count}, Already mapped: {existingMappings.Count}"
+        );
+
+        // ✅ Add new manager mappings to Projectemployee table
+        if (newManagerEmployeeIds.Any())
+        {
+            var newProjectEmployees = newManagerEmployeeIds
+                .Select(empId => new Projectemployee
+                {
+                    ProjectId = projectId,
+                    EmployeeId = empId,
+                    IsPrimary = false,
+                })
                 .ToList();
 
-            if (managerMasterIds.Any())
-            {
-                // ✅ Get manager details with validation
-                var managerDetails = await _context
-                    .Employeedetailsmasters.Where(edm =>
-                        managerMasterIds.Contains(edm.EmployeeMasterId)
-                    )
-                    .Include(edm => edm.Employee)
-                    .ThenInclude(e => e!.Userprofile)
-                    .ToListAsync();
-
-                Console.WriteLine(
-                    $"👥 Found {managerDetails.Count}/{managerMasterIds.Count} managers:"
-                );
-                foreach (var detail in managerDetails)
-                {
-                    var name =
-                        $"{detail.Employee?.Userprofile?.FirstName} {detail.Employee?.Userprofile?.LastName}";
-                    Console.WriteLine(
-                        $"   - {name} (MasterId: {detail.EmployeeMasterId}, EmployeeId: {detail.EmployeeId})"
-                    );
-                }
-
-                // ✅ Filter valid EmployeeIds
-                var validManagerEmployeeIds = managerDetails
-                    .Where(md => md.EmployeeId > 0)
-                    .Select(md => md.EmployeeId)
-                    .ToList();
-
-                // ✅ Warn about problems
-                var invalidManagers = managerDetails.Where(md => md.EmployeeId <= 0).ToList();
-                if (invalidManagers.Any())
-                {
-                    Console.WriteLine(
-                        $"⚠️ WARNING: {invalidManagers.Count} managers have invalid EmployeeId:"
-                    );
-                    foreach (var invalid in invalidManagers)
-                    {
-                        var name =
-                            $"{invalid.Employee?.Userprofile?.FirstName} {invalid.Employee?.Userprofile?.LastName}";
-                        Console.WriteLine(
-                            $"   - {name} (MasterId: {invalid.EmployeeMasterId}, EmployeeId: {invalid.EmployeeId})"
-                        );
-                    }
-                }
-
-                // ✅ Check existing mappings
-                var existingMappings = await _context
-                    .Projectemployees.Where(pe =>
-                        pe.ProjectId == projectId && validManagerEmployeeIds.Contains(pe.EmployeeId)
-                    )
-                    .Select(pe => pe.EmployeeId)
-                    .ToListAsync();
-
-                var newManagerEmployeeIds = validManagerEmployeeIds
-                    .Except(existingMappings)
-                    .ToList();
-
-                Console.WriteLine(
-                    $"➕ Managers to add: {newManagerEmployeeIds.Count}, Already mapped: {existingMappings.Count}"
-                );
-
-                // ✅ Add new manager mappings
-                if (newManagerEmployeeIds.Any())
-                {
-                    var newProjectEmployees = newManagerEmployeeIds
-                        .Select(empId => new Projectemployee
-                        {
-                            ProjectId = projectId,
-                            EmployeeId = empId,
-                            IsPrimary = false,
-                        })
-                        .ToList();
-
-                    await _context.Projectemployees.AddRangeAsync(newProjectEmployees);
-                    Console.WriteLine(
-                        $"✅ Adding {newProjectEmployees.Count} new Projectemployee records"
-                    );
-                }
-            }
-
-            // ✅ NEW: Update manager reporting hierarchy
-            await UpdateManagerHierarchyAsync(resourceOwnerId, l1ApproverId, l2ApproverId);
-
-            await _context.SaveChangesAsync();
-            Console.WriteLine("✅ UpdateReportingManagersAsync completed successfully");
-
-            return true;
+            await _context.Projectemployees.AddRangeAsync(newProjectEmployees);
+            Console.WriteLine(
+                $"✅ Adding {newProjectEmployees.Count} new Projectemployee records"
+            );
         }
+    }
+
+    // ✅ Save all changes
+    var changes = await _context.SaveChangesAsync();
+    return changes > 0;
+}
+
 
         public async Task<List<Projectemployee>> GetProjectEmployeesAsync(int projectId)
         {
