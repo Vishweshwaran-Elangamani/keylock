@@ -21,7 +21,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             int? employeeId,
             string? searchTerm,
             string? sortBy,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         );
 
         Task<ApiResponse<EmployeeSkillDto>> RecordEmployeeSkill(
@@ -44,7 +45,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetMySkills(
             int employeeId,
             string searchTerm,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         );
 
         // SME Management
@@ -55,7 +57,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<ApiResponse<PaginatedResponse<SmeDto>>> GetAvailableSmes(
             int skillId,
             string searchTerm,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         );
 
         // Assignment Management
@@ -67,7 +70,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? searchTerm,
             string? sortField,
             string? sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         );
 
         Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetTeamAssignments(
@@ -76,7 +80,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string searchTerm,
             string sortField,
             string sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         );
         Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetSmeAssignments(
             int smeEmployeeId,
@@ -84,7 +89,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string searchTerm,
             string sortField,
             string sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         );
 
         Task<ApiResponse<bool>> UploadCompletionProof(
@@ -104,7 +110,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? status,
             string? sortField,
             string? sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         );
 
         Task<ApiResponse<bool>> ProcessApproval(int approverId, ApprovalDecisionRequest request);
@@ -118,7 +125,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? searchTerm,
             string? sortField,
             string? sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         );
 
         Task<ApiResponse<ApprovalDetailsDto>> GetApprovalDetails(int employeeId, int approvalId);

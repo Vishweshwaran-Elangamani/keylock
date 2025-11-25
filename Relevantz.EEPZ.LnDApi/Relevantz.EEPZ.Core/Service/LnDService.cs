@@ -113,7 +113,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int? employeeId,
             string? searchTerm,
             string? sortBy,
-            int pageNumber
+            int pageNumber,
+            int pageSize = 1_000_000
         )
         {
             try
@@ -133,7 +134,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     searchTerm,
                     sortBy,
                     pageNumber,
-                    LnDConstants.PAGE_SIZE
+                    pageSize
                 );
 
                 var skillDtos = items
@@ -163,7 +164,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Items = skillDtos,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
-                        PageSize = LnDConstants.PAGE_SIZE,
+                        PageSize = pageSize,
                     },
                 };
             }
@@ -467,7 +468,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetMySkills(
             int employeeId,
             string searchTerm,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         )
         {
             try
@@ -476,7 +478,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     employeeId,
                     searchTerm,
                     pageNumber,
-                    LnDConstants.PAGE_SIZE
+                    pageSize
                 );
 
                 var skillDtos = items
@@ -506,7 +508,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Items = skillDtos,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
-                        PageSize = LnDConstants.PAGE_SIZE,
+                        PageSize = pageSize,
                     },
                 };
             }
@@ -638,7 +640,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<ApiResponse<PaginatedResponse<SmeDto>>> GetAvailableSmes(
             int skillId,
             string searchTerm,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         )
         {
             try
@@ -648,7 +651,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         skillId,
                         searchTerm,
                         pageNumber,
-                        LnDConstants.PAGE_SIZE,
+                        pageSize,
                         LnDConstants.MAX_SME_ASSIGNMENTS
                     );
 
@@ -683,7 +686,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Items = smeDtos,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
-                        PageSize = LnDConstants.PAGE_SIZE,
+                        PageSize = pageSize,
                     },
                 };
             }
@@ -781,7 +784,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string? searchTerm,
             string? sortField,
             string? sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         )
         {
             try
@@ -793,7 +797,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     sortField,
                     sortOrder,
                     pageNumber,
-                    LnDConstants.PAGE_SIZE
+                    pageSize
                 );
 
                 var assignmentDtos = items
@@ -827,7 +831,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Items = assignmentDtos,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
-                        PageSize = LnDConstants.PAGE_SIZE,
+                        PageSize = pageSize,
                     },
                 };
             }
@@ -848,7 +852,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string searchTerm,
             string sortField,
             string sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         )
         {
             try
@@ -860,7 +865,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     sortField,
                     sortOrder,
                     pageNumber,
-                    LnDConstants.PAGE_SIZE
+                    pageSize
                 );
 
                 var assignmentDtos = items
@@ -894,7 +899,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Items = assignmentDtos,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
-                        PageSize = LnDConstants.PAGE_SIZE,
+                        PageSize = pageSize,
                     },
                 };
             }
@@ -915,7 +920,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string searchTerm,
             string sortField,
             string sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         )
         {
             try
@@ -927,7 +933,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     sortField,
                     sortOrder,
                     pageNumber,
-                    LnDConstants.PAGE_SIZE
+                    pageSize
                 );
 
                 var assignmentDtos = items
@@ -961,7 +967,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Items = assignmentDtos,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
-                        PageSize = LnDConstants.PAGE_SIZE,
+                        PageSize = pageSize,
                     },
                 };
             }
@@ -1154,7 +1160,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string? status,
             string? sortField,
             string? sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize
         )
         {
             try
@@ -1166,7 +1173,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     sortField,
                     sortOrder,
                     pageNumber,
-                    LnDConstants.PAGE_SIZE
+                    pageSize
                 );
 
                 var approvalDtos = items
@@ -1201,7 +1208,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Items = approvalDtos,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
-                        PageSize = LnDConstants.PAGE_SIZE,
+                        PageSize = pageSize,
                     },
                 };
             }
@@ -1383,11 +1390,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             string? searchTerm,
             string? sortField,
             string? sortOrder,
-            int pageNumber
+            int pageNumber,
+            int pageSize = 10 // Add this parameter with default value
         )
         {
             try
             {
+                // Validate pageSize to prevent abuse
+                if (pageSize < 1)
+                    pageSize = 10;
+                if (pageSize > 100)
+                    pageSize = 100;
+
                 var (items, totalCount) = await _repository.GetApprovalHistoryAsync(
                     employeeId,
                     approvalType,
@@ -1397,7 +1411,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     sortField,
                     sortOrder,
                     pageNumber,
-                    LnDConstants.PAGE_SIZE
+                    pageSize // Use dynamic pageSize instead of LnDConstants.PAGE_SIZE
                 );
 
                 var approvalDtos = items
@@ -1432,7 +1446,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         Items = approvalDtos,
                         TotalCount = totalCount,
                         PageNumber = pageNumber,
-                        PageSize = LnDConstants.PAGE_SIZE,
+                        PageSize = pageSize, // Use dynamic pageSize
                     },
                 };
             }

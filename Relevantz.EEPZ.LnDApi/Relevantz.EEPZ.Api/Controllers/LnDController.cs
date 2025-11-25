@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Relevantz.EEPZ.Common.Constants;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interface;
-using Relevantz.EEPZ.Common.Constants;
 
 namespace Relevantz.EEPZ.Api.Controllers
-
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -42,7 +42,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetSubordinateEmployees(
             [FromQuery] string? searchTerm,
             [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 9
+            [FromQuery] int pageSize = 12
         )
         {
             var managerId = GetCurrentEmployeeId();
@@ -81,7 +81,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 employeeId,
                 searchTerm,
                 sortBy,
-                pageNumber
+                pageNumber,
+                1_000_000
             );
 
             return result.Success ? Ok(result) : BadRequest(result);
@@ -130,11 +131,17 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("skills/my-skills")]
         public async Task<IActionResult> GetMySkills(
             [FromQuery] string? searchTerm,
-            [FromQuery] int pageNumber = 1
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10
         )
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetMySkills(employeeId, searchTerm, pageNumber);
+            var result = await _lndService.GetMySkills(
+                employeeId,
+                searchTerm,
+                pageNumber,
+                pageSize
+            );
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -165,10 +172,16 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> GetAvailableSmes(
             [FromQuery] int skillId,
             [FromQuery] string? searchTerm,
-            [FromQuery] int pageNumber = 1
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10
         )
         {
-            var result = await _lndService.GetAvailableSmes(skillId, searchTerm, pageNumber);
+            var result = await _lndService.GetAvailableSmes(
+                skillId,
+                searchTerm,
+                pageNumber,
+                pageSize
+            );
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -269,7 +282,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             [FromQuery] string? searchTerm,
             [FromQuery] string? sortField,
             [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10
         )
         {
             var employeeId = GetCurrentEmployeeId();
@@ -279,7 +293,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 searchTerm,
                 sortField,
                 sortOrder,
-                pageNumber
+                pageNumber,
+                pageSize
             );
 
             return result.Success ? Ok(result) : BadRequest(result);
@@ -291,7 +306,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             [FromQuery] string? searchTerm,
             [FromQuery] string? sortField,
             [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10
         )
         {
             var managerId = GetCurrentEmployeeId();
@@ -301,7 +317,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 searchTerm,
                 sortField,
                 sortOrder,
-                pageNumber
+                pageNumber,
+                pageSize
             );
 
             return result.Success ? Ok(result) : BadRequest(result);
@@ -313,7 +330,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             [FromQuery] string? searchTerm,
             [FromQuery] string? sortField,
             [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10
         )
         {
             var smeEmployeeId = GetCurrentEmployeeId();
@@ -323,7 +341,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 searchTerm,
                 sortField,
                 sortOrder,
-                pageNumber
+                pageNumber,
+                pageSize
             );
 
             return result.Success ? Ok(result) : BadRequest(result);
@@ -361,7 +380,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             [FromQuery] string? status,
             [FromQuery] string? sortField,
             [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10
         )
         {
             var employeeId = GetCurrentEmployeeId();
@@ -371,7 +391,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 status,
                 sortField,
                 sortOrder,
-                pageNumber
+                pageNumber,
+                pageSize
             );
 
             return result.Success ? Ok(result) : BadRequest(result);
@@ -401,7 +422,8 @@ namespace Relevantz.EEPZ.Api.Controllers
             [FromQuery] string? searchTerm,
             [FromQuery] string? sortField,
             [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10
         )
         {
             var employeeId = GetCurrentEmployeeId();
@@ -413,7 +435,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 searchTerm,
                 sortField,
                 sortOrder,
-                pageNumber
+                pageNumber,
+                pageSize // Pass to service
             );
 
             return result.Success ? Ok(result) : BadRequest(result);
