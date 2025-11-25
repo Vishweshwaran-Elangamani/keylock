@@ -145,7 +145,7 @@ const GoalTimeline = ({ goalId }) => {
     { value: "comment", label: "Comments", icon: "bi-chat" },
     { value: "approval", label: "Approvals", icon: "bi-check-circle" },
     { value: "assignment", label: "Assignments", icon: "bi-person-plus" },
-    { value: "creation", label: "Creation", icon: "bi-plus-circle" },
+    { value: "goal_created", label: "Creation", icon: "bi-plus-circle" },
   ];
 
   return (
