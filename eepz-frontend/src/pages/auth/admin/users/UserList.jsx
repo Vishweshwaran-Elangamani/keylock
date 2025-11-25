@@ -8,6 +8,8 @@ import DeactivateUserModal from "../../../../components/auth/Modal/users/Deactiv
 import BulkOperationsModal from "../../../../components/auth/Modal/bulk_operations/BulkOperationsModal";
 import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { toast } from "sonner";
+import { FaSearch } from "react-icons/fa";
+import { Form } from "react-bootstrap";
 import "../../../../styles/auth/user/UserList.css";
 
 /**
@@ -23,10 +25,10 @@ const UserList = () => {
   const [loading, setLoading] = useState(true);
 
   // Filters
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // What user types
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // What's actually used for filtering
   const [selectedRole, setSelectedRole] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
 
   // Pagination
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -43,15 +45,15 @@ const UserList = () => {
     fetchData();
   }, []);
 
+  // ✅ FIXED: Use activeSearchTerm instead of searchTerm
   useEffect(() => {
     filterUsers();
-  }, [users, searchTerm, selectedRole, selectedStatus, selectedDate]);
+  }, [users, activeSearchTerm, selectedRole, selectedStatus]);
 
   // Data load
   const fetchData = async () => {
     try {
       setLoading(true);
-      // toast.loading("Loading users and data...");
       const [usersResponse, rolesResponse, departmentsResponse] =
         await Promise.all([
           userService.getAllUsers(),
@@ -60,7 +62,6 @@ const UserList = () => {
         ]);
       if (usersResponse.success) {
         setUsers(usersResponse.data || []);
-        // toast.success("Users loaded!");
       }
       if (rolesResponse.success) setRoles(rolesResponse.data || []);
       if (departmentsResponse.success)
@@ -75,25 +76,26 @@ const UserList = () => {
     }
   };
 
-  //  FIXED: Filter out Admin users from display
+  // Filter out Admin users from display
   const getNonAdminUsers = () => {
     return users.filter((user) => user.roleName !== "Admin");
   };
 
   // Filters
   const filterUsers = () => {
-    //  Start with non-admin users only
+    // Start with non-admin users only
     let filtered = getNonAdminUsers();
 
-    if (searchTerm) {
+    // ✅ Use activeSearchTerm instead of searchTerm
+    if (activeSearchTerm) {
       filtered = filtered.filter(
         (user) =>
-          user.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user.firstName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+          user.lastName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+          user.email?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
           user.employeeCompanyId
             ?.toLowerCase()
-            .includes(searchTerm.toLowerCase())
+            .includes(activeSearchTerm.toLowerCase())
       );
     }
     if (selectedRole) {
@@ -103,15 +105,21 @@ const UserList = () => {
       const isActive = selectedStatus === "Active";
       filtered = filtered.filter((user) => user.isActive === isActive);
     }
-    if (selectedDate) {
-      filtered = filtered.filter((user) => {
-        const joinDate = new Date(user.joiningDate);
-        const filterDate = new Date(selectedDate);
-        return joinDate.toDateString() === filterDate.toDateString();
-      });
-    }
     setFilteredUsers(filtered);
     setCurrentPage(1);
+  };
+
+  // ✅ NEW: Handle search button click
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  // ✅ FIXED: Clear all filters including activeSearchTerm
+  const clearFilters = () => {
+    setSearchTerm("");
+    setActiveSearchTerm("");
+    setSelectedRole("");
+    setSelectedStatus("");
   };
 
   // Modal triggers
@@ -195,7 +203,7 @@ const UserList = () => {
 
   return (
     <div className="user-list-page">
-      {/* NEW BREADCRUMB COMPONENT */}
+      {/* BREADCRUMB COMPONENT */}
       <Breadcrumb
         items={[
           {
@@ -204,7 +212,7 @@ const UserList = () => {
         ]}
       />
 
-      {/* STATISTICS CARDS -  EXCLUDE ADMIN USERS */}
+      {/* STATISTICS CARDS - EXCLUDE ADMIN USERS */}
       <div className="ad-stats-grid">
         <div className="ad-stat-card">
           <div className="stat-icon stat-icon-primary">
@@ -261,18 +269,35 @@ const UserList = () => {
       <div className="filters-card">
         <div className="filters-content">
           <div className="filters-left">
-            {/* Search */}
-            <div className="search-box">
-              <i className="bi bi-search search-icon"></i>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search users..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            {/* Search with Button */}
+            <div className="ul-search-input">
+              <div className="ul-search-inner">
+                <span className="ul-search-icon">
+                  <FaSearch />
+                </span>
+                <Form.Control
+                  type="text"
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch();
+                    }
+                  }}
+                  className="ul-search-field"
+                />
+                <button
+                  type="button"
+                  className="ul-search-btn"
+                  onClick={handleSearch}
+                >
+                  Search
+                </button>
+              </div>
             </div>
-            {/* Role Filter -  EXCLUDE ADMIN ROLE */}
+
+            {/* Role Filter - EXCLUDE ADMIN ROLE */}
             <select
               className="filter-select"
               value={selectedRole}
@@ -287,6 +312,7 @@ const UserList = () => {
                   </option>
                 ))}
             </select>
+
             {/* Status Filter */}
             <select
               className="filter-select"
@@ -297,13 +323,11 @@ const UserList = () => {
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
             </select>
-            {/* Date Filter */}
-            <input
-              type="date"
-              className="filter-date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-            />
+
+            {/* Clear Filters Button */}
+            <button className="btn-clear-filters" onClick={clearFilters}>
+              Clear Filters
+            </button>
           </div>
           <div className="filters-actions">
             <button

@@ -43,7 +43,7 @@ code {
  
 /* Utility Classes */
 .text-center {
-  text-align: center;
+  text-align: left;
 }
  
 .font-semibold {

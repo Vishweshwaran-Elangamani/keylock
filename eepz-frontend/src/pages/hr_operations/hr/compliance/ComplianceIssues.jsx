@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Spinner, Badge, InputGroup, Form, Button } from "react-bootstrap";
+import { Spinner, Badge, Button } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
 import violationService from "../../../../services/hr_operations/hr/violationService";
 import EscalationDetailModal from "../../../../components/hr_operations/modals/EscalationDetailModal";
@@ -13,11 +13,13 @@ const ComplianceIssues = () => {
   const [loading, setLoading] = useState(true);
 
   // Modal States
-  const [showEscalationDetailModal, setShowEscalationDetailModal] = useState(false);
+  const [showEscalationDetailModal, setShowEscalationDetailModal] =
+    useState(false);
   const [selectedEscalation, setSelectedEscalation] = useState(null);
 
   // Filter States
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // applied search
+  const [searchInput, setSearchInput] = useState(""); // text in box
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
 
@@ -33,6 +35,7 @@ const ComplianceIssues = () => {
     fetchData();
   }, []);
 
+  // Apply filters whenever data / filters / applied search term change
   useEffect(() => {
     applyEscalationFilters();
   }, [searchTerm, selectedStatus, selectedLevel, slaEscalations]);
@@ -77,8 +80,10 @@ const ComplianceIssues = () => {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (e) =>
-          (e.employeeName && e.employeeName.toLowerCase().includes(searchLower)) ||
-          (e.employeeEmail && e.employeeEmail.toLowerCase().includes(searchLower)) ||
+          (e.employeeName &&
+            e.employeeName.toLowerCase().includes(searchLower)) ||
+          (e.employeeEmail &&
+            e.employeeEmail.toLowerCase().includes(searchLower)) ||
           (e.slaType && e.slaType.toLowerCase().includes(searchLower)) ||
           (e.reason && e.reason.toLowerCase().includes(searchLower))
       );
@@ -88,17 +93,30 @@ const ComplianceIssues = () => {
     setCurrentPage(1);
   };
 
+  // Triggered when user presses the Search button
+  const handleSearchClick = () => {
+    setSearchTerm(searchInput.trim());
+  };
+
   // ===== CLEAR FILTERS =====
   const clearFilters = () => {
+    setSearchInput("");
     setSearchTerm("");
     setSelectedStatus("");
     setSelectedLevel("");
+
+    // reset to full list explicitly
+    setFilteredEscalations(slaEscalations);
+    setCurrentPage(1);
   };
 
   // ===== PAGINATION HELPERS =====
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
-  const currentItems = filteredEscalations.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredEscalations.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredEscalations.length / rowsPerPage);
 
   const getPageNumbers = () => {
@@ -154,7 +172,7 @@ const ComplianceIssues = () => {
     return badges[status] || "secondary";
   };
 
-  // ===== FORMAT DATE =====
+  // ===== FORMAT DATE (unused currently but kept) =====
   const formatDate = (date) => {
     return date
       ? new Date(date).toLocaleDateString("en-US", {
@@ -181,17 +199,28 @@ const ComplianceIssues = () => {
       {/* CONTROLS BAR */}
       <div className="ci-filter-section">
         <div className="ci-filter-row-single">
-          <InputGroup className="ci-search-input">
-            <InputGroup.Text>
-              <FaSearch />
-            </InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Search by employee, SLA type, reason..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </InputGroup>
+          {/* Combined search input + button */}
+          <div className="ci-search-input-wrapper">
+            <div className="ci-search-inner">
+              <span className="ci-search-icon">
+                <FaSearch />
+              </span>
+              <input
+                type="text"
+                placeholder="Search by employee, SLA type, reason..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="ci-search-field"
+              />
+              <button
+                type="button"
+                className="ci-search-btn"
+                onClick={handleSearchClick}
+              >
+                Search
+              </button>
+            </div>
+          </div>
 
           <select
             className="ci-filter-select"
@@ -266,7 +295,10 @@ const ComplianceIssues = () => {
                       <div className="ci-card-icon-badge">
                         <i className="bi bi-exclamation-triangle-fill"></i>
                       </div>
-                      <Badge bg={getStatusBadge(escalation.escalationStatus)} className="ci-card-status-badge">
+                      <Badge
+                        bg={getStatusBadge(escalation.escalationStatus)}
+                        className="ci-card-status-badge"
+                      >
                         {escalation.escalationStatus}
                       </Badge>
                     </div>
@@ -278,26 +310,37 @@ const ComplianceIssues = () => {
                       <span className="ci-card-user-id">
                         User ID: {escalation.employeeUserId}
                       </span>
-                      <p className="ci-card-email">{escalation.employeeEmail || "N/A"}</p>
+                      <p className="ci-card-email">
+                        {escalation.employeeEmail || "N/A"}
+                      </p>
 
                       <div className="ci-card-details-grid">
                         <div className="ci-card-detail-item">
                           <span className="ci-card-detail-label">SLA Type</span>
-                          <span className="ci-card-detail-value">{escalation.slaType || "N/A"}</span>
+                          <span className="ci-card-detail-value">
+                            {escalation.slaType || "N/A"}
+                          </span>
                         </div>
                         <div className="ci-card-detail-item">
                           <span className="ci-card-detail-label">Level</span>
-                          <span className="ci-card-detail-value">{escalation.escalationLevel}</span>
+                          <span className="ci-card-detail-value">
+                            {escalation.escalationLevel}
+                          </span>
                         </div>
                         <div className="ci-card-detail-item">
-                          <span className="ci-card-detail-label">Days Overdue</span>
+                          <span className="ci-card-detail-label">
+                            Days Overdue
+                          </span>
                           <span className="ci-card-detail-value ci-card-highlight-danger">
                             {escalation.daysOverdue} days
                           </span>
                         </div>
                         <div className="ci-card-detail-item">
                           <span className="ci-card-detail-label">Severity</span>
-                          <Badge bg={getSeverityBadge(escalation.severity)} className="ci-card-severity-badge">
+                          <Badge
+                            bg={getSeverityBadge(escalation.severity)}
+                            className="ci-card-severity-badge"
+                          >
                             {escalation.severity}
                           </Badge>
                         </div>
@@ -312,12 +355,16 @@ const ComplianceIssues = () => {
                     <div className="ci-card-footer">
                       <div className="ci-card-escalated-to">
                         <i className="bi bi-person-fill"></i>
-                        <span>{escalation.escalatedToName || "Not Assigned"}</span>
+                        <span>
+                          {escalation.escalatedToName || "Not Assigned"}
+                        </span>
                       </div>
                       <div className="ci-card-actions">
                         <button
                           className="action-btn action-btn-edit"
-                          onClick={() => handleViewEscalationDetails(escalation)}
+                          onClick={() =>
+                            handleViewEscalationDetails(escalation)
+                          }
                           title="View Details"
                         >
                           <i className="bi bi-eye"></i>
@@ -358,10 +405,16 @@ const ComplianceIssues = () => {
 
                     <nav className="pagination-nav">
                       <ul className="pagination">
-                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                        <li
+                          className={`page-item ${
+                            currentPage === 1 ? "disabled" : ""
+                          }`}
+                        >
                           <button
                             className="page-link"
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            onClick={() =>
+                              setCurrentPage((prev) => Math.max(prev - 1, 1))
+                            }
                             disabled={currentPage === 1}
                           >
                             <i className="bi bi-chevron-left"></i>
@@ -371,13 +424,18 @@ const ComplianceIssues = () => {
                         {getPageNumbers().map((page, index) => (
                           <li
                             key={index}
-                            className={`page-item ${page === currentPage ? "active" : ""} ${
+                            className={`page-item ${
+                              page === currentPage ? "active" : ""
+                            } ${
                               typeof page !== "number" ? "disabled" : ""
                             }`}
                           >
                             <button
                               className="page-link"
-                              onClick={() => typeof page === "number" && setCurrentPage(page)}
+                              onClick={() =>
+                                typeof page === "number" &&
+                                setCurrentPage(page)
+                              }
                               disabled={typeof page !== "number"}
                             >
                               {page}
@@ -385,10 +443,18 @@ const ComplianceIssues = () => {
                           </li>
                         ))}
 
-                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                        <li
+                          className={`page-item ${
+                            currentPage === totalPages ? "disabled" : ""
+                          }`}
+                        >
                           <button
                             className="page-link"
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(prev + 1, totalPages)
+                              )
+                            }
                             disabled={currentPage === totalPages}
                           >
                             <i className="bi bi-chevron-right"></i>
@@ -426,7 +492,8 @@ const ComplianceIssues = () => {
                           <td>
                             <div className="ci-table-employee">
                               <span className="ci-table-employee-name">
-                                {escalation.employeeName || "Unknown Employee"}
+                                {escalation.employeeName ||
+                                  "Unknown Employee"}
                               </span>
                               <span className="ci-table-employee-id">
                                 ID: {escalation.employeeUserId}
@@ -446,16 +513,22 @@ const ComplianceIssues = () => {
                             </Badge>
                           </td>
                           <td>
-                            <Badge bg={getStatusBadge(escalation.escalationStatus)}>
+                            <Badge
+                              bg={getStatusBadge(escalation.escalationStatus)}
+                            >
                               {escalation.escalationStatus}
                             </Badge>
                           </td>
-                          <td>{escalation.escalatedToName || "Not Assigned"}</td>
+                          <td>
+                            {escalation.escalatedToName || "Not Assigned"}
+                          </td>
                           <td>
                             <div className="action-buttons">
                               <button
                                 className="action-btn action-btn-edit"
-                                onClick={() => handleViewEscalationDetails(escalation)}
+                                onClick={() =>
+                                  handleViewEscalationDetails(escalation)
+                                }
                                 title="View Details"
                               >
                                 <i className="bi bi-eye"></i>
@@ -497,10 +570,16 @@ const ComplianceIssues = () => {
 
                     <nav className="pagination-nav">
                       <ul className="pagination">
-                        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                        <li
+                          className={`page-item ${
+                            currentPage === 1 ? "disabled" : ""
+                          }`}
+                        >
                           <button
                             className="page-link"
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            onClick={() =>
+                              setCurrentPage((prev) => Math.max(prev - 1, 1))
+                            }
                             disabled={currentPage === 1}
                           >
                             <i className="bi bi-chevron-left"></i>
@@ -510,13 +589,18 @@ const ComplianceIssues = () => {
                         {getPageNumbers().map((page, index) => (
                           <li
                             key={index}
-                            className={`page-item ${page === currentPage ? "active" : ""} ${
+                            className={`page-item ${
+                              page === currentPage ? "active" : ""
+                            } ${
                               typeof page !== "number" ? "disabled" : ""
                             }`}
                           >
                             <button
                               className="page-link"
-                              onClick={() => typeof page === "number" && setCurrentPage(page)}
+                              onClick={() =>
+                                typeof page === "number" &&
+                                setCurrentPage(page)
+                              }
                               disabled={typeof page !== "number"}
                             >
                               {page}
@@ -524,10 +608,18 @@ const ComplianceIssues = () => {
                           </li>
                         ))}
 
-                        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                        <li
+                          className={`page-item ${
+                            currentPage === totalPages ? "disabled" : ""
+                          }`}
+                        >
                           <button
                             className="page-link"
-                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            onClick={() =>
+                              setCurrentPage((prev) =>
+                                Math.min(prev + 1, totalPages)
+                              )
+                            }
                             disabled={currentPage === totalPages}
                           >
                             <i className="bi bi-chevron-right"></i>

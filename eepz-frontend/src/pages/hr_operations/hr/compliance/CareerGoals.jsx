@@ -78,9 +78,11 @@ const CareerGoals = () => {
     fetchGoalStats();
   }, []);
 
+  // Auto-apply only when data / non-text filters change.
+  // Search text is applied when Search button is clicked.
   useEffect(() => {
     applyFilters();
-  }, [withoutGoals, searchTerm, departmentFilter, daysFilter]);
+  }, [withoutGoals, departmentFilter, daysFilter]);
 
   useEffect(() => {
     setSelectedEmployees([]);
@@ -192,6 +194,7 @@ const CareerGoals = () => {
     setSearchTerm("");
     setDepartmentFilter("");
     setDaysFilter("");
+    setFilteredData(withoutGoals); // reset table to all employees
     setCurrentPage(1);
   };
 
@@ -418,15 +421,27 @@ const CareerGoals = () => {
 
       <div className="cag-filter-section">
         <div className="cg-filter-row-single">
+          {/* Combined search input + button */}
           <div className="cg-search-input-wrapper">
-            <i className="bi bi-search cg-search-icon"></i>
-            <input
-              type="text"
-              placeholder="Search by name, email, or ID..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="cg-filter-search"
-            />
+            <div className="cg-search-inner">
+              <span className="cg-search-icon">
+                <FaSearch />
+              </span>
+              <input
+                type="text"
+                placeholder="Search by name, email, or ID..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="cg-search-field"
+              />
+              <button
+                type="button"
+                className="cg-search-btn"
+                onClick={applyFilters}
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           <select
@@ -597,7 +612,8 @@ const CareerGoals = () => {
                         className={`cg-days-badge ${
                           (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) > 30
                             ? "badge-danger"
-                            : (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) > 7
+                            : (emp.daysWithoutGoals ?? emp.DaysWithoutGoals) >
+                              7
                             ? "badge-warning"
                             : "badge-info"
                         }`}
@@ -718,7 +734,9 @@ const CareerGoals = () => {
                 <button
                   className="page-link"
                   onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    setCurrentPage((prev) =>
+                      Math.min(prev + 1, totalPages)
+                    )
                   }
                   disabled={currentPage === totalPages}
                 >

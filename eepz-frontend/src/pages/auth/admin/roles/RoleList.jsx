@@ -6,6 +6,8 @@ import EditRoleModal from "../../../../components/auth/Modal/roles/EditRoleModal
 import DeleteRoleModal from "../../../../components/auth/Modal/roles/DeleteRoleModal";
 import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { toast } from "sonner";
+import { FaSearch } from "react-icons/fa";
+import { Form } from "react-bootstrap";
 import "../../../../styles/auth/roles/RoleList.css";
 
 const RoleList = () => {
@@ -16,10 +18,14 @@ const RoleList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  
+  // ✅ UPDATED: Two-state search approach
+  const [searchTerm, setSearchTerm] = useState(""); // What user types
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
+  
   const [viewMode, setViewMode] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(9); // Changed to 9 for grid (3x3)
+  const [itemsPerPage, setItemsPerPage] = useState(9);
 
   useEffect(() => {
     fetchRoles();
@@ -84,15 +90,23 @@ const RoleList = () => {
     setShowEditModal(true);
   };
 
+  // ✅ UPDATED: Use activeSearchTerm for filtering
   const filteredRoles = roles.filter(
     (role) =>
-      role.roleName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      role.roleCode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      role.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      role.roleName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+      role.roleCode?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+      role.description?.toLowerCase().includes(activeSearchTerm.toLowerCase())
   );
 
+  // ✅ NEW: Handle search button click
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  // ✅ UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
+    setActiveSearchTerm("");
   };
 
   // Pagination logic
@@ -170,7 +184,7 @@ const RoleList = () => {
         ]}
       />
 
-      {/* KPI CARDS - UNCHANGED */}
+      {/* KPI CARDS */}
       <div className="stats-cards-rl">
         <div className="stat-card-rl stat-total-rl">
           <div className="stat-icon-rl">
@@ -203,28 +217,37 @@ const RoleList = () => {
         </div>
       </div>
 
-      {/* CONTROLS BAR */}
+      {/* CONTROLS BAR - UPDATED */}
       <div className="rlm-controls">
-        <div className="rlm-search-section">
-          <div className="rlm-search-wrapper">
-            <i className="bi bi-search"></i>
-            <input
+        {/* ✅ NEW: Search with Button */}
+        <div className="rlm-search-input">
+          <div className="rlm-search-inner">
+            <span className="rlm-search-icon">
+              <FaSearch />
+            </span>
+            <Form.Control
               type="text"
               placeholder="Search roles..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+              className="rlm-search-field"
             />
-            {searchTerm && (
-              <button
-                className="rlm-clear-search"
-                onClick={() => setSearchTerm("")}
-              >
-                <i className="bi bi-x-lg"></i>
-              </button>
-            )}
+            <button
+              type="button"
+              className="rlm-search-btn"
+              onClick={handleSearch}
+            >
+              Search
+            </button>
           </div>
         </div>
 
+        {/* ✅ UPDATED: Clear Filters Button */}
         <button className="rlm-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
@@ -412,158 +435,156 @@ const RoleList = () => {
           )}
 
           {/* TABLE VIEW */}
-          {/* TABLE VIEW */}
-{viewMode === "table" && (
-  <>
-    <div className="rlm-table-card">
-      <div className="rlm-table-wrapper">
-        <table className="rlm-table">
-          <thead>
-            <tr>
-              <th>Role Name</th>
-              <th>Role Code</th>
-              <th>Description</th>
-              <th>Type</th>
-              <th>Created At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((role) => (
-              <tr key={role.roleId}>
-                <td>
-                  <div className="rlm-table-role-name">
-                    <span>{role.roleName}</span>
-                  </div>
-                </td>
-                <td>
-                  <code>{role.roleCode}</code>
-                </td>
-                <td className="rlm-desc-cell">
-                  {role.description || "N/A"}
-                </td>
-                <td>
-                  {role.isSystemRole ? (
-                    <span className="rlm-badge-table-system">
-                      System
-                    </span>
-                  ) : (
-                    <span className="rlm-badge-table-custom">
-                      Custom
-                    </span>
-                  )}
-                </td>
-                <td>{formatDate(role.createdAt)}</td>
-                <td>
-                  <div className="rlm-table-actions">
-                    <button
-                      className="rlm-action-edit"
-                      onClick={() => handleEdit(role)}
-                      title="Edit"
+          {viewMode === "table" && (
+            <>
+              <div className="rlm-table-card">
+                <div className="rlm-table-wrapper">
+                  <table className="rlm-table">
+                    <thead>
+                      <tr>
+                        <th>Role Name</th>
+                        <th>Role Code</th>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentItems.map((role) => (
+                        <tr key={role.roleId}>
+                          <td>
+                            <div className="rlm-table-role-name">
+                              <span>{role.roleName}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <code>{role.roleCode}</code>
+                          </td>
+                          <td className="rlm-desc-cell">
+                            {role.description || "N/A"}
+                          </td>
+                          <td>
+                            {role.isSystemRole ? (
+                              <span className="rlm-badge-table-system">
+                                System
+                              </span>
+                            ) : (
+                              <span className="rlm-badge-table-custom">
+                                Custom
+                              </span>
+                            )}
+                          </td>
+                          <td>{formatDate(role.createdAt)}</td>
+                          <td>
+                            <div className="rlm-table-actions">
+                              <button
+                                className="rlm-action-edit"
+                                onClick={() => handleEdit(role)}
+                                title="Edit"
+                              >
+                                <i className="bi bi-pencil-square"></i>
+                              </button>
+                              <button
+                                className="rlm-action-delete"
+                                onClick={() => handleDelete(role)}
+                                disabled={role.isSystemRole}
+                                title={
+                                  role.isSystemRole ? "Cannot delete" : "Delete"
+                                }
+                              >
+                                <i className="bi bi-trash3"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* TABLE PAGINATION */}
+                <div className="rlm-pagination">
+                  <div className="rlm-pagination-info">
+                    <span>Show</span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => {
+                        setItemsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
                     >
-                      <i className="bi bi-pencil-square"></i>
-                    </button>
-                    <button
-                      className="rlm-action-delete"
-                      onClick={() => handleDelete(role)}
-                      disabled={role.isSystemRole}
-                      title={
-                        role.isSystemRole ? "Cannot delete" : "Delete"
-                      }
-                    >
-                      <i className="bi bi-trash3"></i>
-                    </button>
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                    </select>
+                    <span>entries</span>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
 
-      {/* TABLE PAGINATION - MOVED INSIDE TABLE CARD */}
-      <div className="rlm-pagination">
-        <div className="rlm-pagination-info">
-          <span>Show</span>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => {
-              setItemsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-          >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-          </select>
-          <span>entries</span>
-        </div>
+                  <div className="rlm-pagination-status">
+                    Showing {indexOfFirstItem + 1} to{" "}
+                    {Math.min(indexOfLastItem, filteredRoles.length)} of{" "}
+                    {filteredRoles.length}
+                  </div>
 
-        <div className="rlm-pagination-status">
-          Showing {indexOfFirstItem + 1} to{" "}
-          {Math.min(indexOfLastItem, filteredRoles.length)} of{" "}
-          {filteredRoles.length}
-        </div>
+                  <nav className="rlm-pagination-nav">
+                    <ul className="rlm-pagination-list">
+                      <li
+                        className={`rlm-page-item ${
+                          currentPage === 1 ? "disabled" : ""
+                        }`}
+                      >
+                        <button
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                        >
+                          <i className="bi bi-chevron-left"></i>
+                        </button>
+                      </li>
 
-        <nav className="rlm-pagination-nav">
-          <ul className="rlm-pagination-list">
-            <li
-              className={`rlm-page-item ${
-                currentPage === 1 ? "disabled" : ""
-              }`}
-            >
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.max(prev - 1, 1))
-                }
-                disabled={currentPage === 1}
-              >
-                <i className="bi bi-chevron-left"></i>
-              </button>
-            </li>
+                      {getPageNumbers().map((page, index) => (
+                        <li
+                          key={index}
+                          className={`rlm-page-item ${
+                            page === currentPage ? "active" : ""
+                          } ${typeof page !== "number" ? "disabled" : ""}`}
+                        >
+                          <button
+                            onClick={() =>
+                              typeof page === "number" && setCurrentPage(page)
+                            }
+                            disabled={typeof page !== "number"}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      ))}
 
-            {getPageNumbers().map((page, index) => (
-              <li
-                key={index}
-                className={`rlm-page-item ${
-                  page === currentPage ? "active" : ""
-                } ${typeof page !== "number" ? "disabled" : ""}`}
-              >
-                <button
-                  onClick={() =>
-                    typeof page === "number" && setCurrentPage(page)
-                  }
-                  disabled={typeof page !== "number"}
-                >
-                  {page}
-                </button>
-              </li>
-            ))}
-
-            <li
-              className={`rlm-page-item ${
-                currentPage === totalPages ? "disabled" : ""
-              }`}
-            >
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) =>
-                    Math.min(prev + 1, totalPages)
-                  )
-                }
-                disabled={currentPage === totalPages}
-              >
-                <i className="bi bi-chevron-right"></i>
-              </button>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </div>
-  </>
-)}
-
+                      <li
+                        className={`rlm-page-item ${
+                          currentPage === totalPages ? "disabled" : ""
+                        }`}
+                      >
+                        <button
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                        >
+                          <i className="bi bi-chevron-right"></i>
+                        </button>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
 

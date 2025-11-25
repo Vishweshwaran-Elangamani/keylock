@@ -10,6 +10,8 @@ import SelfNominateModal from "../../components/internal/NominationModals/SelfNo
 import ManagerNominateModal from "../../components/internal/NominationModals/ManagerNominateModal";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
+import { FaSearch } from "react-icons/fa";
+import { Form } from "react-bootstrap";
 import "../../styles/internal/InternalOpportunityManagement.css";
 
 const InternalOpportunityManagement = () => {
@@ -59,7 +61,7 @@ const InternalOpportunityManagement = () => {
 
   useEffect(() => {
     filterOpportunities();
-  }, [opportunities, searchTerm, selectedDepartment, selectedStatus]);
+  }, [opportunities, selectedDepartment, selectedStatus]);
 
   const fetchData = async () => {
     try {
@@ -311,18 +313,30 @@ const InternalOpportunityManagement = () => {
         </div>
       </div>
 
-      {/* Filter Section */}
+      {/* Filter Section with Search Button */}
       <div className="filters-card">
         <div className="filters-content">
-          <div className="search-box">
-            <i className="bi bi-search search-icon"></i>
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search opportunities..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          {/* Search with Button */}
+          <div className="io-search-input">
+            <div className="io-search-inner">
+              <span className="io-search-icon">
+                <FaSearch />
+              </span>
+              <Form.Control
+                type="text"
+                placeholder="Search opportunities..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="io-search-field"
+              />
+              <button
+                type="button"
+                className="io-search-btn"
+                onClick={filterOpportunities}
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           {(isHR || isEmployee || isManager) && (

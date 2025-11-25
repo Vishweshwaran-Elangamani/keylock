@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Form, InputGroup, Button } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
 import policyService from "../../../../services/hr_operations/hr/policyService";
 import AddPolicyModal from "../../../../components/hr_operations/modals/AddPolicyModal";
@@ -9,11 +9,12 @@ import PublishPolicyModal from "../../../../components/hr_operations/modals/Publ
 import UnpublishPolicyModal from "../../../../components/hr_operations/modals/UnpublishPolicyModal";
 import { Alert, Spinner } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/policyManagement.css";
-
+ 
 const PolicyManagement = () => {
   const [policies, setPolicies] = useState([]);
   const [filteredPolicies, setFilteredPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
+ 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
@@ -21,17 +22,18 @@ const PolicyManagement = () => {
   const [selectedPolicy, setSelectedPolicy] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
+ 
   const [alert, setAlert] = useState(null);
-
+ 
   // Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-
+ 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
+ 
   // Sonner toast function
   const enqueueToast = (variant, message) => {
     switch (variant) {
@@ -52,21 +54,20 @@ const PolicyManagement = () => {
         toast(message);
     }
   };
-
+ 
   useEffect(() => {
     fetchPolicies();
   }, []);
-
+ 
   useEffect(() => {
     applyFilters();
-  }, [policies, searchTerm, categoryFilter, statusFilter]);
-
+  }, [policies, categoryFilter, statusFilter]);
+ 
   const showAlert = (type, message) => {
     setAlert({ type, message });
     setTimeout(() => setAlert(null), 3000);
   };
-
-  const fetchPolicies = async () => {
+const fetchPolicies = async () => {
     try {
       setLoading(true);
       const response = await policyService.getAllPolicies();
@@ -79,46 +80,53 @@ const PolicyManagement = () => {
       setLoading(false);
     }
   };
-
+ 
   const applyFilters = () => {
     let filtered = [...policies];
-
+ 
     if (searchTerm) {
       filtered = filtered.filter(
         (policy) =>
-          policy.policyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          policy.description?.toLowerCase().includes(searchTerm.toLowerCase())
+          policy.policyName
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          policy.description
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase())
       );
     }
-
+ 
     if (categoryFilter) {
       filtered = filtered.filter(
         (policy) =>
           policy.category?.toLowerCase() === categoryFilter.toLowerCase()
       );
     }
-
+ 
     if (statusFilter) {
       const isPublished = statusFilter === "Published";
       filtered = filtered.filter(
         (policy) => policy.isPublished === isPublished
       );
     }
-
+ 
     setFilteredPolicies(filtered);
     setCurrentPage(1);
   };
-
+ 
   const clearFilters = () => {
     setSearchTerm("");
     setCategoryFilter("");
     setStatusFilter("");
+    setFilteredPolicies(policies);
+    setCurrentPage(1);
   };
-
+ 
   const uniqueCategories = [
-    ...new Set(policies.map((policy) => policy.category).filter(Boolean)),
+    ...new Set(
+      policies.map((policy) => policy.category).filter(Boolean)
+    ),
   ];
-
   // Pagination helpers
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
@@ -126,11 +134,14 @@ const PolicyManagement = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-  const totalPages = Math.ceil(filteredPolicies.length / rowsPerPage);
-
+  const totalPages = Math.ceil(
+    filteredPolicies.length / rowsPerPage
+  );
+ 
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
+ 
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -139,7 +150,13 @@ const PolicyManagement = () => {
       if (currentPage <= 3) {
         pages.push(1, 2, 3, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
-        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+        pages.push(
+          1,
+          "...",
+          totalPages - 2,
+          totalPages - 1,
+          totalPages
+        );
       } else {
         pages.push(
           1,
@@ -152,25 +169,25 @@ const PolicyManagement = () => {
         );
       }
     }
+ 
     return pages;
   };
-
+ 
   const handleAddSuccess = () => {
     setShowAddModal(false);
     fetchPolicies();
   };
-
+ 
   const handleEditSuccess = () => {
     setShowEditModal(false);
     setSelectedPolicy(null);
     fetchPolicies();
   };
-
-  const handleView = (policy) => {
+const handleView = (policy) => {
     setSelectedPolicy(policy);
     setShowEditModal(true);
   };
-
+ 
   const handleDelete = async (policyId) => {
     try {
       await policyService.deletePolicy(policyId);
@@ -180,15 +197,15 @@ const PolicyManagement = () => {
       enqueueToast("danger", "Failed to delete policy");
     }
   };
-
+ 
   const handlePublishClick = (policy) => {
     setSelectedPolicy(policy);
     setShowPublishModal(true);
   };
-
+ 
   const handlePublishConfirm = async () => {
     if (!selectedPolicy) return;
-
+ 
     try {
       setPublishing(true);
       await policyService.publishPolicy(selectedPolicy.policyId);
@@ -203,19 +220,22 @@ const PolicyManagement = () => {
       setPublishing(false);
     }
   };
-
+ 
   const handleUnpublishClick = (policy) => {
     setSelectedPolicy(policy);
     setShowUnpublishModal(true);
   };
-
+ 
   const handleUnpublishConfirm = async () => {
     if (!selectedPolicy) return;
-
+ 
     try {
       setUnpublishing(true);
       await policyService.unpublishPolicy(selectedPolicy.policyId);
-      enqueueToast("warning", "Policy unpublished - Now hidden from employees");
+      enqueueToast(
+        "warning",
+        "Policy unpublished - Now hidden from employees"
+      );
       setShowUnpublishModal(false);
       setSelectedPolicy(null);
       fetchPolicies();
@@ -226,7 +246,7 @@ const PolicyManagement = () => {
       setUnpublishing(false);
     }
   };
-
+ 
   if (loading) {
     return (
       <div className="pm-loading-container">
@@ -235,7 +255,7 @@ const PolicyManagement = () => {
       </div>
     );
   }
-
+ 
   return (
     <div className="pm-root">
       {alert && (
@@ -248,24 +268,35 @@ const PolicyManagement = () => {
           {alert.message}
         </Alert>
       )}
-
+ 
       {/* Filter Section with Add Button */}
       <div className="pm-filter-section">
         <div className="pm-filter-row-single">
-          <InputGroup className="pm-search-input">
-            <InputGroup.Text>
-              <FaSearch />
-            </InputGroup.Text>
-            <Form.Control
-              type="text"
-              placeholder="Search by policy name or description..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </InputGroup>
-
+          {/* Combined search (icon + input + button in one component) */}
+          <div className="pm-search-input">
+            <div className="pm-search-inner">
+              <span className="pm-search-icon">
+                <FaSearch />
+              </span>
+              <Form.Control
+                type="text"
+                placeholder="Search by policy name or description..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pm-search-field"
+              />
+              <button
+                type="button"
+                className="pm-search-btn"
+                onClick={applyFilters}
+              >
+                Search
+              </button>
+            </div>
+          </div>
+ 
           <select
-            className="pm-filter-select"
+className="pm-filter-select"
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
           >
@@ -276,7 +307,7 @@ const PolicyManagement = () => {
               </option>
             ))}
           </select>
-
+ 
           <select
             className="pm-filter-select"
             value={statusFilter}
@@ -286,7 +317,7 @@ const PolicyManagement = () => {
             <option value="Published">Published</option>
             <option value="Draft">Draft</option>
           </select>
-
+ 
           <Button
             variant="outline-secondary"
             onClick={clearFilters}
@@ -294,17 +325,19 @@ const PolicyManagement = () => {
           >
             Clear Filters
           </Button>
-          <div className="pm-results-count-inline">
+   <div className="pm-results-count-inline">
             Showing {currentItems.length} of {filteredPolicies.length} policies
           </div>
-
-          <button className="pm-btn-add" onClick={() => setShowAddModal(true)}>
-            <i className="bi bi-plus-circle"></i>
-            Add Policy
+ 
+          <button
+            className="pm-btn-add"
+            onClick={() => setShowAddModal(true)}
+          >
+            <i className="bi bi-plus-circle"></i> Add Policy
           </button>
         </div>
       </div>
-
+ 
       {/* Policies Table */}
       <div className="pm-table-card">
         <div className="table-wrapper">
@@ -365,17 +398,17 @@ const PolicyManagement = () => {
                             <i className="bi bi-send"></i>
                           </button>
                         )}
-
                         {policy.isPublished && (
                           <button
                             className="action-btn action-btn-unpublish"
-                            onClick={() => handleUnpublishClick(policy)}
+                            onClick={() =>
+                              handleUnpublishClick(policy)
+                            }
                             title="Unpublish Policy"
                           >
                             <i className="bi bi-eye-slash"></i>
                           </button>
                         )}
-
                         <button
                           className="action-btn action-btn-edit"
                           onClick={() => handleView(policy)}
@@ -391,7 +424,7 @@ const PolicyManagement = () => {
             </tbody>
           </table>
         </div>
-
+ 
         {/* Pagination */}
         {filteredPolicies.length > 0 && (
           <div className="pagination-container">
@@ -411,17 +444,18 @@ const PolicyManagement = () => {
               </select>
               <span className="pagination-label">entries</span>
             </div>
-
-            <div className="pagination-status">
+     <div className="pagination-status">
               Showing {indexOfFirstItem + 1} to{" "}
               {Math.min(indexOfLastItem, filteredPolicies.length)} of{" "}
               {filteredPolicies.length} entries
             </div>
-
+ 
             <nav className="pagination-nav">
               <ul className="pagination">
                 <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  className={`page-item ${
+                    currentPage === 1 ? "disabled" : ""
+                  }`}
                 >
                   <button
                     className="page-link"
@@ -433,18 +467,21 @@ const PolicyManagement = () => {
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-
+ 
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
                     className={`page-item ${
                       page === currentPage ? "active" : ""
-                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                    } ${
+                      typeof page !== "number" ? "disabled" : ""
+                    }`}
                   >
                     <button
-                      className="page-link"
+className="page-link"
                       onClick={() =>
-                        typeof page === "number" && setCurrentPage(page)
+                        typeof page === "number" &&
+                        setCurrentPage(page)
                       }
                       disabled={typeof page !== "number"}
                     >
@@ -452,7 +489,7 @@ const PolicyManagement = () => {
                     </button>
                   </li>
                 ))}
-
+ 
                 <li
                   className={`page-item ${
                     currentPage === totalPages ? "disabled" : ""
@@ -461,7 +498,9 @@ const PolicyManagement = () => {
                   <button
                     className="page-link"
                     onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      setCurrentPage((prev) =>
+                        Math.min(prev + 1, totalPages)
+                      )
                     }
                     disabled={currentPage === totalPages}
                   >
@@ -473,12 +512,15 @@ const PolicyManagement = () => {
           </div>
         )}
       </div>
-
+ 
       {/* Blur overlay when modal is open */}
-      {(showAddModal || showEditModal || showPublishModal || showUnpublishModal) && (
+      {(showAddModal ||
+        showEditModal ||
+        showPublishModal ||
+        showUnpublishModal) && (
         <div className="pm-blur-backdrop"></div>
       )}
-
+ 
       {/* Add Policy Modal */}
       {showAddModal && (
         <AddPolicyModal
@@ -488,7 +530,7 @@ const PolicyManagement = () => {
           onToast={enqueueToast}
         />
       )}
-
+ 
       {/* Edit Policy Modal */}
       {showEditModal && selectedPolicy && (
         <EditPolicyModal
@@ -503,7 +545,7 @@ const PolicyManagement = () => {
           onToast={enqueueToast}
         />
       )}
-
+ 
       {/* Publish Policy Modal */}
       {showPublishModal && selectedPolicy && (
         <PublishPolicyModal
@@ -517,7 +559,7 @@ const PolicyManagement = () => {
           publishing={publishing}
         />
       )}
-
+ 
       {/* Unpublish Policy Modal */}
       {showUnpublishModal && selectedPolicy && (
         <UnpublishPolicyModal
@@ -534,5 +576,6 @@ const PolicyManagement = () => {
     </div>
   );
 };
-
+ 
 export default PolicyManagement;
+ 

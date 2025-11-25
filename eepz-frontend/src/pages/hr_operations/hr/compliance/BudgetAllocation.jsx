@@ -6,6 +6,8 @@ import EditBudgetModal from "../../../../components/hr_operations/modals/EditBud
 import ViewBudgetDetailsModal from "../../../../components/hr_operations/modals/ViewBudgetDetailsModal";
 import DeleteBudgetModal from "../../../../components/hr_operations/modals/DeleteBudgetModal";
 import Breadcrumb from "../../../../components/common/Breadcrumb";
+import { FaSearch } from "react-icons/fa";
+import { Form } from "react-bootstrap";
 import "../../../../styles/hr_operations/hr/budgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
@@ -14,19 +16,20 @@ const BudgetAllocation = () => {
   const [filteredBudgets, setFilteredBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState(null);
-
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  // ✅ UPDATED: Two-state search approach
+  const [searchTerm, setSearchTerm] = useState(""); // What user types
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
+
   const [filters, setFilters] = useState({
-    search: "",
     year: "all",
     department: "",
   });
@@ -48,10 +51,11 @@ const BudgetAllocation = () => {
     fetchBudgets();
   }, []);
 
+  // ✅ UPDATED: Include activeSearchTerm in dependencies
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
-  }, [budgets, filters]);
+  }, [budgets, activeSearchTerm, filters]);
 
   const fetchBudgets = async () => {
     setLoading(true);
@@ -80,18 +84,15 @@ const BudgetAllocation = () => {
     const departments = [
       ...new Set(data.map((b) => b.departmentName).filter(Boolean)),
     ].sort();
-
-    setFilterOptions({
-      years,
-      departments,
-    });
+    setFilterOptions({ years, departments });
   };
 
+  // ✅ UPDATED: Use activeSearchTerm for filtering
   const applyFilters = () => {
     let filtered = budgets;
 
-    if (filters.search.trim()) {
-      const query = filters.search.toLowerCase();
+    if (activeSearchTerm.trim()) {
+      const query = activeSearchTerm.toLowerCase();
       filtered = filtered.filter((b) => {
         const dept = (b.departmentName || "").toLowerCase();
         return dept.includes(query) || b.fiscalYear.toString().includes(query);
@@ -121,16 +122,16 @@ const BudgetAllocation = () => {
     }));
   };
 
-  const handleSearchChange = (e) => {
-    setFilters((prev) => ({
-      ...prev,
-      search: e.target.value,
-    }));
+  // ✅ NEW: Handle search button click
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
   };
 
+  // ✅ UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
+    setSearchTerm("");
+    setActiveSearchTerm("");
     setFilters({
-      search: "",
       year: "all",
       department: "",
     });
@@ -192,7 +193,6 @@ const BudgetAllocation = () => {
 
   const showToast = (title, message, type) => {
     const fullMessage = `${title}: ${message}`;
-
     switch (type) {
       case "success":
         toast.success(fullMessage);
@@ -276,7 +276,6 @@ const BudgetAllocation = () => {
               <div className="summary-card-label">Total Budget</div>
             </div>
           </div>
-
           <div className="budget-summary-card allocated">
             <div className="summary-card-icon">
               <i className="bi bi-cash-stack"></i>
@@ -288,7 +287,6 @@ const BudgetAllocation = () => {
               <div className="summary-card-label">Total Allocated</div>
             </div>
           </div>
-
           <div className="budget-summary-card utilized">
             <div className="summary-card-icon">
               <i className="bi bi-graph-up-arrow"></i>
@@ -303,18 +301,35 @@ const BudgetAllocation = () => {
         </div>
       )}
 
+      {/* ✅ UPDATED: Filter Section with Search Button */}
       <div className="budget-filter-section">
         <div className="budget-filter-row-single">
-          <div className="budget-search-input-wrapper">
-            <i className="bi bi-search budget-search-icon"></i>
-            <input
-              type="text"
-              name="search"
-              placeholder="Search by department..."
-              value={filters.search}
-              onChange={handleSearchChange}
-              className="budget-filter-search"
-            />
+          {/* ✅ NEW: Search with Button */}
+          <div className="budget-search-input">
+            <div className="budget-search-inner">
+              <span className="budget-search-icon">
+                <FaSearch />
+              </span>
+              <Form.Control
+                type="text"
+                placeholder="Search by department..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+                className="budget-search-field"
+              />
+              <button
+                type="button"
+                className="budget-search-btn"
+                onClick={handleSearch}
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           <select
@@ -350,7 +365,8 @@ const BudgetAllocation = () => {
           </button>
 
           <div className="budget-results-count-inline">
-            Showing {currentPageData.length} of {filteredBudgets.length} budgets
+            Showing {currentPageData.length} of {filteredBudgets.length}{" "}
+            budgets
           </div>
 
           {isLeadership && (
@@ -366,7 +382,7 @@ const BudgetAllocation = () => {
         <div className="budget-alert-empty">
           <i className="bi bi-inbox"></i>
           <p>
-            {filters.search || filters.year !== "all" || filters.department
+            {searchTerm || filters.year !== "all" || filters.department
               ? "No budgets found matching your filters"
               : "No department budgets configured"}
           </p>
@@ -387,7 +403,6 @@ const BudgetAllocation = () => {
                     <p className="budget-card-year">{budget.fiscalYear}</p>
                   </div>
                 </div>
-
                 <div className="budget-card-body">
                   <div className="budget-card-row">
                     <span className="budget-card-label">Total Budget</span>
@@ -395,35 +410,30 @@ const BudgetAllocation = () => {
                       {formatCurrency(budget.totalBudget)}
                     </span>
                   </div>
-
                   <div className="budget-card-row">
                     <span className="budget-card-label">Allocated</span>
                     <span className="budget-card-value">
                       {formatCurrency(budget.allocatedAmount)}
                     </span>
                   </div>
-
                   <div className="budget-card-row">
                     <span className="budget-card-label">Utilized</span>
                     <span className="budget-card-value">
                       {formatCurrency(budget.utilizedAmount)}
                     </span>
                   </div>
-
                   <div className="budget-card-row">
                     <span className="budget-card-label">Utilization</span>
                     <span className="budget-card-value">
                       {budget.utilizationPercentage || 0}%
                     </span>
                   </div>
-
                   <div className="budget-card-row">
                     <span className="budget-card-label">Headcount</span>
                     <span className="budget-card-value">
                       {budget.headcount || 0}
                     </span>
                   </div>
-
                   <div className="budget-card-row">
                     <span className="budget-card-label">Avg Cost/Employee</span>
                     <span className="budget-card-value">
@@ -431,7 +441,6 @@ const BudgetAllocation = () => {
                     </span>
                   </div>
                 </div>
-
                 {isLeadership && (
                   <div className="budget-card-actions">
                     <button
@@ -785,7 +794,10 @@ const BudgetAllocation = () => {
         className="budget-blur-backdrop"
         style={{
           display:
-            showCreateModal || showEditModal || showDetailsModal || showDeleteModal
+            showCreateModal ||
+            showEditModal ||
+            showDetailsModal ||
+            showDeleteModal
               ? "block"
               : "none",
         }}

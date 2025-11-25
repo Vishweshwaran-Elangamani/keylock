@@ -30,7 +30,7 @@ const PeriodAllocationManagement = () => {
   const [periodToDelete, setPeriodToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // View & Pagination States
+  // View & Pagination States (viewType kept even if unused)
   const [viewType, setViewType] = useState("table");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -41,12 +41,15 @@ const PeriodAllocationManagement = () => {
     direction: "asc",
   });
 
-  // Filter States
+  // Filters (year + period only)
   const [filters, setFilters] = useState({
-    search: "",
     year: "all",
     period: "",
   });
+
+  // Search: input text vs applied search
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // only this is used for filtering
 
   // Filter Options
   const [filterOptions, setFilterOptions] = useState({
@@ -64,10 +67,11 @@ const PeriodAllocationManagement = () => {
     }
   }, [selectedBudget]);
 
+  // Re-run filters whenever data, filters, sort, or APPLIED searchTerm changes
   useEffect(() => {
     applyFilters();
     setCurrentPage(1);
-  }, [periodAllocations, filters, sortConfig]);
+  }, [periodAllocations, filters, sortConfig, searchTerm]);
 
   const fetchBudgets = async () => {
     try {
@@ -125,9 +129,9 @@ const PeriodAllocationManagement = () => {
   const applyFilters = () => {
     let filtered = periodAllocations;
 
-    // Search filter
-    if (filters.search.trim()) {
-      const query = filters.search.toLowerCase();
+    // Search filter uses ONLY searchTerm (applied search)
+    if (searchTerm.trim()) {
+      const query = searchTerm.toLowerCase();
       filtered = filtered.filter((p) => {
         const period = (p.period || "").toLowerCase();
         return (
@@ -202,19 +206,23 @@ const PeriodAllocationManagement = () => {
     }));
   };
 
-  const handleSearchChange = (e) => {
-    setFilters((prev) => ({
-      ...prev,
-      search: e.target.value,
-    }));
+  // Only update the textbox, not the filter
+  const handleSearchInputChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  // When Search button is clicked, apply the text as active filter
+  const handleSearchClick = () => {
+    setSearchTerm(searchInput.trim());
   };
 
   const clearFilters = () => {
     setFilters({
-      search: "",
       year: "all",
       period: "",
     });
+    setSearchInput("");
+    setSearchTerm("");
     setSortConfig({ key: null, direction: "asc" });
   };
 
@@ -459,16 +467,28 @@ const PeriodAllocationManagement = () => {
 
         {/* Second Row */}
         <div className="period-filter-row-bottom">
+          {/* Combined search bar (icon + input + button) */}
           <div className="period-search-input-wrapper">
-            <i className="bi bi-search period-search-icon"></i>
-            <input
-              type="text"
-              name="search"
-              placeholder="Search by period..."
-              value={filters.search}
-              onChange={handleSearchChange}
-              className="period-filter-search"
-            />
+            <div className="period-search-inner">
+              <span className="period-search-icon">
+                <i className="bi bi-search" />
+              </span>
+              <input
+                type="text"
+                name="search"
+                placeholder="Search by period or year..."
+                value={searchInput}
+                onChange={handleSearchInputChange}
+                className="period-search-field"
+              />
+              <button
+                type="button"
+                className="period-search-btn"
+                onClick={handleSearchClick}
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           <select
@@ -516,7 +536,7 @@ const PeriodAllocationManagement = () => {
             <div className="period-alert-empty">
               <i className="bi bi-inbox"></i>
               <p>
-                {filters.search || filters.year !== "all" || filters.period
+                {searchTerm || filters.year !== "all" || filters.period
                   ? "No period allocations found matching your filters"
                   : "No period allocations configured for this budget"}
               </p>

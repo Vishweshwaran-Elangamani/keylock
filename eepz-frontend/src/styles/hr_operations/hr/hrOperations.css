@@ -94,7 +94,7 @@
 }
 
 /* ========== TAB NAVIGATION BAR ========== */
-.tab-navigation-bar-hr {
+.tab-navigation-bar-hrop {
   display: flex;
   background: #2c2762;
   border-radius: 50px;
@@ -231,7 +231,7 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .tab-navigation-bar-hr {
+  .tab-navigation-bar-hrop {
     flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0.25rem;
@@ -285,7 +285,7 @@
 }
 
 @media (max-width: 480px) {
-  .tab-navigation-bar-hr {
+  .tab-navigation-bar-hrop {
     border-radius: 8px;
   }
 

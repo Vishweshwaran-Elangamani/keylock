@@ -104,7 +104,7 @@ const HROperations = () => {
         </div>
       ) : (
         <>
-          <div className="tab-navigation-bar-hr">
+          <div className="tab-navigation-bar-hrop">
             {tabs.map((tab) => (
               <button
                 key={tab.key}

@@ -44,38 +44,75 @@
   flex-wrap: wrap;
 }
 
-/* Search Input */
-.ci-search-input {
+/* Policy-style Search (icon + input + button) */
+.ci-search-input-wrapper {
   flex: 1;
-  min-width: 250px;
-  max-width: 350px;
+  min-width: 400px;
+  max-width: 550px;
+  display: flex;
 }
 
-.ci-search-input .input-group-text {
-  background-color: #f8f9fa;
-  border-right: none;
-  padding: 0.5rem 0.75rem;
+.ci-search-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 38px;
+  border-radius: 4px;
   border: 1px solid #ced4da;
-  border-radius: 8px 0 0 8px;
-}
-
-.ci-search-input .form-control {
-  border-left: none;
-  padding: 0.5rem 0.75rem;
-  font-size: 14px;
-  border: 1px solid #ced4da;
-  border-radius: 0 8px 8px 0;
+  background: #ffffff;
+  overflow: hidden;
   transition: all 0.2s ease;
 }
 
-.ci-search-input .form-control::placeholder {
+.ci-search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.75rem;
+  font-size: 14px;
   color: #a0aec0;
 }
 
-.ci-search-input .form-control:focus {
-  box-shadow: none;
-  border-color: #27235c;
+.ci-search-field {
+  flex: 1;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  height: 100%;
+  font-size: 14px;
+  padding: 0;
+  padding-right: 0.75rem;
+}
+
+.ci-search-field::placeholder {
+  color: #a0aec0;
+}
+
+.ci-search-btn {
+  border: none;
   outline: none;
+  height: 100%;
+  padding: 0 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #27235c;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  border-radius: 0 4px 4px 0;
+}
+
+.ci-search-btn:hover {
+  background: #1f1c4b;
+}
+
+.ci-search-inner:focus-within {
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
 /* Filter Selects */
@@ -107,22 +144,22 @@
 /* Clear Button */
 .ci-clear-btn {
   white-space: nowrap;
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  background: #ffffff;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #212529;
+  padding: 0.5rem 1rem !important;
+  font-weight: 500 !important;
+  background: #ffffff !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  color: #212529 !important;
   cursor: pointer;
   transition: all 0.2s ease;
   height: 38px;
 }
 
 .ci-clear-btn:hover {
-  background: #f8f9fa;
-  border-color: #6c757d;
-  color: #212529;
+  background: #f8f9fa !important;
+  border-color: #6c757d !important;
+  color: #212529 !important;
 }
 
 /* View Switcher */
@@ -363,9 +400,7 @@
    PAGINATION WRAPPER FOR CARD VIEW
 ======================================== */
 .ci-pagination-wrapper {
-  
   border-radius: 12px;
-  
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
@@ -707,7 +742,7 @@
     align-items: stretch;
   }
 
-  .ci-search-input {
+  .ci-search-input-wrapper {
     min-width: 100%;
     max-width: 100%;
   }
@@ -719,7 +754,6 @@
 
   .ci-clear-btn {
     width: 100%;
-    justify-content: center;
   }
 
   .ci-violations-grid {

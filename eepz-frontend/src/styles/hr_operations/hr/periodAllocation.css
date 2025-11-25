@@ -190,44 +190,89 @@
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-/* Search Input */
+/* ============================================================
+   SEARCH – same combined style as Policies page
+============================================================ */
 .period-search-input-wrapper {
   flex: 1;
-  min-width: 250px;
-  max-width: 350px;
-  position: relative;
+  min-width: 300px;
+  max-width: 420px;
+  display: flex;
+}
+
+.period-search-inner {
   display: flex;
   align-items: center;
-}
-
-.period-search-icon {
-  position: absolute;
-  left: 12px;
-  color: #6c757d;
-  font-size: 14px;
-  pointer-events: none;
-}
-
-.period-filter-search {
   width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  height: 38px;
+  border-radius: 4px;
   border: 1px solid #ced4da;
-  border-radius: 8px;
-  font-size: 14px;
   background: #ffffff;
-  color: #212529;
+  overflow: hidden;
   transition: all 0.2s ease;
 }
 
-.period-filter-search::placeholder {
-  color: #a0aec0;
-}
-
-.period-filter-search:focus {
-  outline: none;
+.period-search-inner:focus-within {
   border-color: #27235c;
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
+
+.period-search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.75rem;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  color: #a0aec0;
+}
+
+.period-search-field {
+  flex: 1;
+  height: 100%;
+  font-size: 14px;
+  padding: 0;
+  padding-right: 0.75rem;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+
+.period-search-field::placeholder {
+  color: #a0aec0;
+}
+
+.period-search-field:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Search button – right edge of same box */
+.period-search-btn {
+  border: none;
+  outline: none;
+  height: 100%;
+  padding: 0 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #27235c;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  border-radius: 0 4px 4px 0;
+}
+
+.period-search-btn:hover {
+  background: #1f1c4b;
+}
+
+/* (old .period-filter-search styles are no longer used by JSX) */
 
 /* Filter Selects */
 .period-filter-select {
@@ -392,7 +437,6 @@
 .period-sortable-header {
   cursor: pointer;
   transition: all 0.2s ease;
-  /* user-select: none; */
 }
 
 .period-sortable-header:hover {

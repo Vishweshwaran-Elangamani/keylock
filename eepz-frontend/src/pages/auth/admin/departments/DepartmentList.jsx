@@ -6,6 +6,8 @@ import EditDepartmentModal from "../../../../components/auth/Modal/departments/E
 import DeleteDepartmentModal from "../../../../components/auth/Modal/departments/DeleteDepartmentModal";
 import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { toast } from "sonner";
+import { FaSearch } from "react-icons/fa";
+import { Form } from "react-bootstrap";
 import "../../../../styles/auth/department/DepartmentList.css";
 
 const DepartmentList = () => {
@@ -16,7 +18,11 @@ const DepartmentList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  
+  // ✅ UPDATED: Two-state search approach
+  const [searchTerm, setSearchTerm] = useState(""); // What user types
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
@@ -81,14 +87,22 @@ const DepartmentList = () => {
     setShowEditModal(true);
   };
 
+  // ✅ UPDATED: Use activeSearchTerm for filtering
   const filteredDepartments = departments.filter(
     (dept) =>
-      dept.departmentName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dept.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      dept.departmentName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+      dept.description?.toLowerCase().includes(activeSearchTerm.toLowerCase())
   );
 
+  // ✅ NEW: Handle search button click
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  // ✅ UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
+    setActiveSearchTerm("");
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -158,28 +172,37 @@ const DepartmentList = () => {
         ]}
       />
 
-      {/* CONTROLS BAR */}
+      {/* CONTROLS BAR - UPDATED */}
       <div className="controls-bar-dept">
-        <div className="search-section-dept">
-          <div className="search-input-wrapper-dept">
-            <i className="bi bi-search"></i>
-            <input
+        {/* ✅ NEW: Search with Button */}
+        <div className="dept-search-input">
+          <div className="dept-search-inner">
+            <span className="dept-search-icon">
+              <FaSearch />
+            </span>
+            <Form.Control
               type="text"
               placeholder="Search departments..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+              className="dept-search-field"
             />
-            {searchTerm && (
-              <button
-                className="clear-search-dept"
-                onClick={() => setSearchTerm("")}
-              >
-                <i className="bi bi-x-lg"></i>
-              </button>
-            )}
+            <button
+              type="button"
+              className="dept-search-btn"
+              onClick={handleSearch}
+            >
+              Search
+            </button>
           </div>
         </div>
 
+        {/* ✅ UPDATED: Clear Filters Button */}
         <button className="btn-clear-dept" onClick={clearFilters}>
           Clear Filters
         </button>

@@ -420,7 +420,7 @@ const EditUserModal = ({
                 </div>
 
                 {/* Employment Status Field (Required) */}
-                <div style={{ flex: 1, minWidth: "47%" }}>
+                {/*<div style={{ flex: 1, minWidth: "47%" }}>
                   <label
                     style={{
                       fontWeight: 600,
@@ -460,7 +460,7 @@ const EditUserModal = ({
                       {errors.employmentStatus}
                     </div>
                   )}
-                </div>
+                </div>*/}
 
                 {/* Exit Date Field (Optional) */}
                 <div style={{ flex: 1, minWidth: "47%" }}>
