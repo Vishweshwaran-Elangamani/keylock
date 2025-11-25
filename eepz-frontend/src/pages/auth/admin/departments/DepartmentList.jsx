@@ -217,7 +217,7 @@ const DepartmentList = () => {
                   <tr>
                     <th style={{ width: "40%" }}>Department Name</th>
                     <th style={{ width: "30%" }}>Created At</th>
-                    <th className="text-center" style={{ width: "30%" }}>
+                    <th className="table-th" style={{ width: "30%" }}>
                       Actions
                     </th>
                   </tr>
