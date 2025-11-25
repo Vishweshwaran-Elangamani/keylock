@@ -25,8 +25,9 @@ const GoalApprovalsPage = () => {
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [pendingDecision, setPendingDecision] = useState(null);
 
+  // Pagination - itemsPerPage is now state
   const [currentPage, setCurrentPage] = useState(1);
-  const approvalsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const canApprove = ["Manager", "Department Head", "Leadership"].includes(
     user.role
@@ -124,6 +125,12 @@ const GoalApprovalsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
     setCurrentPage(1);
@@ -139,6 +146,11 @@ const GoalApprovalsPage = () => {
     if (e.key === "Enter") {
       handleSearch();
     }
+  };
+
+  const handleViewModeChange = (mode) => {
+    setViewMode(mode);
+    setCurrentPage(1);
   };
 
   const approvalsByMode = allApprovals.filter((approval) => {
@@ -185,13 +197,15 @@ const GoalApprovalsPage = () => {
     return true;
   });
 
-  const indexOfLastApproval = currentPage * approvalsPerPage;
-  const indexOfFirstApproval = indexOfLastApproval - approvalsPerPage;
+  // Calculate pagination
+  const totalItems = filteredApprovals.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const indexOfLastApproval = currentPage * itemsPerPage;
+  const indexOfFirstApproval = indexOfLastApproval - itemsPerPage;
   const currentApprovals = filteredApprovals.slice(
     indexOfFirstApproval,
     indexOfLastApproval
   );
-  const totalPages = Math.ceil(filteredApprovals.length / approvalsPerPage);
 
   const pendingCount = allApprovals.filter(
     (a) => a.approvalStatus === "pending"
@@ -246,71 +260,73 @@ const GoalApprovalsPage = () => {
           />
         )}
 
-        <div
-          style={{
-            display: "inline-flex",
-            backgroundColor: "rgb(39, 35, 92)",
-            borderRadius: "50px",
-            padding: "5px",
-            marginBottom: "1.5rem",
-            maxWidth: "700px",
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              setViewMode("pending");
-              setCurrentPage(1);
-            }}
-            style={{
-              flex: 1,
-              padding: "15px 50px",
-              border: "none",
-              borderRadius: "50px",
-              backgroundColor:
-                viewMode === "pending" ? "#ffffff" : "rgb(39, 35, 92)",
-              color: viewMode === "pending" ? "#000000" : "white",
-              fontWeight: 500,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow:
-                viewMode === "pending" ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
-              fontSize: "14px",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <i className="bi bi-hourglass-split me-2"></i>
-            Pending ({pendingCount})
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setViewMode("history");
-              setCurrentPage(1);
-            }}
-            style={{
-              flex: 1,
-              padding: "15px 40px",
-              border: "none",
-              borderRadius: "50px",
-              backgroundColor:
-                viewMode === "history" ? "#ffffff" : "rgb(39, 35, 92)",
-              color: viewMode === "history" ? "#000000" : "white",
-              fontWeight: 500,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow:
-                viewMode === "history" ? "0 2px 4px rgba(0,0,0,0.1)" : "none",
-              fontSize: "14px",
-            }}
-          >
-            <i className="bi bi-clock-history me-2"></i>
-            History
-          </button>
-        </div>
+        <div className="row g-3 mb-4 align-items-center">
+          {/* Toggle Buttons */}
+          <div className="col-12 col-lg-6">
+            <div
+              style={{
+                display: "flex",
+                backgroundColor: "rgb(39, 35, 92)",
+                borderRadius: "50px",
+                padding: "5px",
+                maxWidth: "100%", 
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => handleViewModeChange("pending")}
+                style={{
+                  flex: 1,
+                  padding: "15px 30px",
+                  border: "none",
+                  borderRadius: "50px",
+                  backgroundColor:
+                    viewMode === "pending" ? "#ffffff" : "rgb(39, 35, 92)",
+                  color: viewMode === "pending" ? "#000000" : "white",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow:
+                    viewMode === "pending"
+                      ? "0 2px 4px rgba(0,0,0,0.1)"
+                      : "none",
+                  fontSize: "14px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <i className="bi bi-hourglass-split me-2"></i>
+                Pending ({pendingCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => handleViewModeChange("history")}
+                style={{
+                  flex: 1,
+                  padding: "15px 30px",
+                  border: "none",
+                  borderRadius: "50px",
+                  backgroundColor:
+                    viewMode === "history" ? "#ffffff" : "rgb(39, 35, 92)",
+                  color: viewMode === "history" ? "#000000" : "white",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow:
+                    viewMode === "history"
+                      ? "0 2px 4px rgba(0,0,0,0.1)"
+                      : "none",
+                  fontSize: "14px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <i className="bi bi-clock-history me-2"></i>
+                History ({historyCount})
+              </button>
+            </div>
+          </div>
 
-        <div className="row g-3 mb-4">
-          <div className="col-md-6">
+          {/* Search Bar */}
+          <div className="col-12 col-md-6 col-lg-3">
             <div className="input-group">
               <input
                 type="text"
@@ -338,11 +354,15 @@ const GoalApprovalsPage = () => {
             </div>
           </div>
 
-          <div className="col-md-3">
+          {/* Filter Type */}
+          <div className="col-6 col-md-3 col-lg-1">
             <select
               className="form-select"
               value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
+              onChange={(e) => {
+                setFilterType(e.target.value);
+                setCurrentPage(1);
+              }}
             >
               <option value="">All Types</option>
               {Object.entries(APPROVAL_TYPE_LABELS).map(([key, value]) => (
@@ -353,11 +373,15 @@ const GoalApprovalsPage = () => {
             </select>
           </div>
 
-          <div className="col-md-3">
+          {/* Filter Date */}
+          <div className="col-6 col-md-3 col-lg-2">
             <select
               className="form-select"
               value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
+              onChange={(e) => {
+                setFilterDate(e.target.value);
+                setCurrentPage(1);
+              }}
             >
               <option value="">All Time</option>
               <option value="today">Today</option>
@@ -365,14 +389,6 @@ const GoalApprovalsPage = () => {
               <option value="month">Last 30 Days</option>
             </select>
           </div>
-        </div>
-
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          {totalPages > 1 && (
-            <div className="text-muted" style={{ fontSize: "0.9rem" }}>
-              Page {currentPage} of {totalPages}
-            </div>
-          )}
         </div>
 
         {loading ? (
@@ -398,164 +414,181 @@ const GoalApprovalsPage = () => {
         ) : (
           <>
             <div
-              className="table-responsive"
               style={{
-                borderRadius: "1.5rem 1.5rem 0rem 0rem",
-                border: "1px solid rgba(39, 35, 92, 0.24)",
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "70vh",
               }}
             >
-              <table className="table table-hover align-start mb-0">
-                <thead
+              <div style={{ flexGrow: 1 }}>
+                <div
+                  className="table-responsive"
                   style={{
-                    height: "50px",
-                    fontWeight: 600,
-                    verticalAlign: "middle",
+                    borderRadius: "1.5rem 1.5rem 0rem 0rem",
+                    border: "1px solid rgba(39, 35, 92, 0.24)",
                   }}
                 >
-                  <tr>
-                    <th
+                  <table className="table table-hover align-start mb-0">
+                    <thead
                       style={{
-                        width: "25%",
-                        color: "white",
-                        backgroundColor: "rgb(39, 35, 92)",
+                        height: "50px",
+                        fontWeight: 600,
+                        verticalAlign: "middle",
                       }}
                     >
-                      TITLE
-                    </th>
-                    <th
-                      style={{
-                        width: "20%",
-                        color: "white",
-                        backgroundColor: "rgb(39, 35, 92)",
-                      }}
-                    >
-                      TYPE
-                    </th>
-                    <th
-                      style={{
-                        width: "20%",
-                        color: "white",
-                        backgroundColor: "rgb(39, 35, 92)",
-                      }}
-                    >
-                      STATUS
-                    </th>
-                    <th
-                      style={{
-                        width: "15%",
-                        color: "white",
-                        backgroundColor: "rgb(39, 35, 92)",
-                      }}
-                    >
-                      REQUESTOR
-                    </th>
-                    <th
-                      style={{
-                        width: "20%",
-                        color: "white",
-                        backgroundColor: "rgb(39, 35, 92)",
-                      }}
-                    >
-                      REQUESTED ON
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentApprovals.map((approval) => {
-                    const isAutoApproved =
-                      approval.approvalStatus === "approved" &&
-                      approval.approverEmployeeMasterId ===
-                        approval.requestedByEmployeeMasterId;
-
-                    return (
-                      <tr
-                        key={approval.approvalId}
-                        onClick={() => handleReviewClick(approval)}
-                        style={{ cursor: "pointer", height: "60px" }}
-                      >
-                        <td
+                      <tr>
+                        <th
                           style={{
-                            fontSize: "14px",
-                            paddingTop: "20px",
-                            paddingBottom: "20px",
+                            width: "25%",
+                            color: "white",
+                            backgroundColor: "rgb(39, 35, 92)",
                           }}
                         >
-                          <div
-                            style={{
-                              fontWeight: 500,
-                              paddingLeft: "50px",
-                              textAlign: "left",
-                            }}
-                          >
-                            {approval.goalTitle}
-                          </div>
-                        </td>
-
-                        <td
+                          TITLE
+                        </th>
+                        <th
                           style={{
-                            paddingLeft: "50px",
-                            textAlign: "left",
-                            paddingTop: "20px",
-                            paddingBottom: "20px",
+                            width: "20%",
+                            color: "white",
+                            backgroundColor: "rgb(39, 35, 92)",
                           }}
                         >
-                          <span
-                            className="text-muted"
-                            style={{ fontSize: "14px" }}
-                          >
-                            {APPROVAL_TYPE_LABELS[approval.approvalType] ||
-                              approval.approvalType}
-                          </span>
-                        </td>
-
-                        <td
-                          style={{ paddingTop: "20px", paddingBottom: "20px" }}
-                        >
-                          {getStatusBadge(approval.approvalStatus)}
-                        </td>
-
-                        <td
+                          TYPE
+                        </th>
+                        <th
                           style={{
-                            paddingLeft: "30px",
-                            textAlign: "left",
-                            paddingTop: "20px",
-                            paddingBottom: "20px",
+                            width: "20%",
+                            color: "white",
+                            backgroundColor: "rgb(39, 35, 92)",
                           }}
                         >
-                          <span style={{ fontSize: "14px" }}>
-                            {approval.requestedByName}
-                          </span>
-                        </td>
-
-                        <td
-                          style={{ paddingTop: "20px", paddingBottom: "20px" }}
+                          STATUS
+                        </th>
+                        <th
+                          style={{
+                            width: "15%",
+                            color: "white",
+                            backgroundColor: "rgb(39, 35, 92)",
+                          }}
                         >
-                          <span
-                            className="text-muted"
-                            style={{ fontSize: "14px" }}
-                          >
-                            {new Date(
-                              approval.requestedOn
-                            ).toLocaleDateString()}
-                          </span>
-                        </td>
+                          REQUESTOR
+                        </th>
+                        <th
+                          style={{
+                            width: "20%",
+                            color: "white",
+                            backgroundColor: "rgb(39, 35, 92)",
+                          }}
+                        >
+                          REQUESTED ON
+                        </th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody>
+                      {currentApprovals.map((approval) => {
+                        const isAutoApproved =
+                          approval.approvalStatus === "approved" &&
+                          approval.approverEmployeeMasterId ===
+                            approval.requestedByEmployeeMasterId;
 
-            {totalPages > 1 && (
+                        return (
+                          <tr
+                            key={approval.approvalId}
+                            onClick={() => handleReviewClick(approval)}
+                            style={{ cursor: "pointer", height: "60px" }}
+                          >
+                            <td
+                              style={{
+                                fontSize: "14px",
+                                paddingTop: "20px",
+                                paddingBottom: "20px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  fontWeight: 500,
+                                  paddingLeft: "50px",
+                                  textAlign: "left",
+                                }}
+                              >
+                                {approval.goalTitle}
+                              </div>
+                            </td>
+
+                            <td
+                              style={{
+                                paddingLeft: "50px",
+                                textAlign: "left",
+                                paddingTop: "20px",
+                                paddingBottom: "20px",
+                              }}
+                            >
+                              <span
+                                className="text-muted"
+                                style={{ fontSize: "14px" }}
+                              >
+                                {APPROVAL_TYPE_LABELS[approval.approvalType] ||
+                                  approval.approvalType}
+                              </span>
+                            </td>
+
+                            <td
+                              style={{
+                                paddingTop: "20px",
+                                paddingBottom: "20px",
+                              }}
+                            >
+                              {getStatusBadge(approval.approvalStatus)}
+                            </td>
+
+                            <td
+                              style={{
+                                paddingLeft: "30px",
+                                textAlign: "left",
+                                paddingTop: "20px",
+                                paddingBottom: "20px",
+                              }}
+                            >
+                              <span style={{ fontSize: "14px" }}>
+                                {approval.requestedByName}
+                              </span>
+                            </td>
+
+                            <td
+                              style={{
+                                paddingTop: "20px",
+                                paddingBottom: "20px",
+                              }}
+                            >
+                              <span
+                                className="text-muted"
+                                style={{ fontSize: "14px" }}
+                              >
+                                {new Date(
+                                  approval.requestedOn
+                                ).toLocaleDateString()}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Updated Pagination with new props */}
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
                 loading={loading}
-                currentPageItems={currentApprovals.length}
-                pageSize={approvalsPerPage}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onItemsPerPageChange={handleItemsPerPageChange}
+                pageSizeOptions={[5, 10, 25, 50]}
               />
-            )}
+            </div>
           </>
         )}
 

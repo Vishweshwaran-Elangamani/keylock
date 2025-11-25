@@ -1,157 +1,131 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { lazy, Suspense } from "react";
 import { useAuth } from "./contexts/auth/AuthContext";
 import ProtectedRoute from "./components/guards/ProtectedRoute";
 import PublicRoute from "./components/guards/PublicRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
-
-// Loading component for fallback
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-  </div>
-);
-
-// Wrapper component for lazy loaded pages
-const LazyPage = ({ children }) => (
-  <Suspense fallback={<PageLoader />}>{children}</Suspense>
-);
-
-// ============= LAZY LOAD ALL PAGES =============
 // Auth Pages
-const Login = lazy(() => import("./pages/auth/common/Login"));
-const VerifyCode = lazy(() => import("./pages/auth/common/VerifyCode"));
-const ChangePassword = lazy(() => import("./pages/auth/common/ChangePassword"));
-const ResetPassword = lazy(() => import("./pages/auth/common/ResetPassword"));
-const VerifyResetOtp = lazy(() => import("./pages/auth/common/VerifyResetOtp"));
-const VerifyFirstLogin = lazy(() => import("./pages/auth/common/VerifyFirstLogin"));
-const EmployeeProfile = lazy(() => import("./pages/auth/common/EmployeeProfile"));
-
+import Login from "./pages/auth/common/Login";
+import VerifyCode from "./pages/auth/common/VerifyCode";
+import ChangePassword from "./pages/auth/common/ChangePassword";
+import ResetPassword from "./pages/auth/common/ResetPassword";
+import VerifyResetOtp from "./pages/auth/common/VerifyResetOtp";
+import VerifyFirstLogin from "./pages/auth/common/VerifyFirstLogin";
+import EmployeeProfile from "./pages/auth/common/EmployeeProfile";
 // Admin Pages
-const AdminDashboard = lazy(() => import("./pages/dashboards/AdminDashboard"));
-const DepartmentList = lazy(() => import("./pages/auth/admin/departments/DepartmentList"));
-const RoleList = lazy(() => import("./pages/auth/admin/roles/RoleList"));
-const UserList = lazy(() => import("./pages/auth/admin/users/UserList"));
-const ChangeRequestManagement = lazy(() => import("./pages/auth/admin/ChangeRequestManagement"));
-
+import AdminDashboard from "./pages/dashboards/AdminDashboard";
+import DepartmentList from "./pages/auth/admin/departments/DepartmentList";
+import RoleList from "./pages/auth/admin/roles/RoleList";
+import UserList from "./pages/auth/admin/users/UserList";
+import ChangeRequestManagement from "./pages/auth/admin/ChangeRequestManagement";
 // HR Pages
-const HRDashboard = lazy(() => import("./pages/dashboards/HRDashboard"));
-const HROperations = lazy(() => import("./pages/hr_operations/hr/HROperations"));
-const HRHome = lazy(() => import("./pages/performancemanagement/hr/HRHome"));
-const FormCreate = lazy(() => import("./pages/performancemanagement/hr/FormCreate"));
-const FormProgressTrackerPage = lazy(() => import("./pages/performancemanagement/hr/Formprogresstracker"));
-const FormsList = lazy(() => import("./pages/performancemanagement/hr/FormsList"));
-const HRNominations = lazy(() => import("./pages/performancemanagement/hr/HRNomination"));
-const HRAssessmentView = lazy(() => import("./pages/performancemanagement/hr/HRViewAssessment"));
-const RewardConfiguration = lazy(() => import("./pages/performancemanagement/hr/Rewardconfiguration"));
-const DraftsList = lazy(() => import("./pages/performancemanagement/hr/DraftList"));
-const ProjectManagementDashboard = lazy(() => import("./pages/project_management/ProjectManagementDashboard"));
-const CreateProject = lazy(() => import("./pages/project_management/CreateProject"));
-const ProjectDetails = lazy(() => import("./pages/project_management/ProjectDetails"));
-const ProjectList = lazy(() => import("./pages/project_management/ProjectList"));
-const ResourcePoolMapping = lazy(() => import("./pages/project_management/ResourcePoolMapping"));
-const HRSLADashboard = lazy(() => import("./pages/sla/HRSLADashboard"));
-const FeedbackHRDashboard = lazy(() => import("./pages/feedback_management/FeedbackHRDashboard"));
-const CreateFeedbackForm = lazy(() => import("./pages/feedback_management/hr/CreateFeedbackForm"));
-const HRFeedbackList = lazy(() => import("./pages/feedback_management/hr/HRFeedbackList"));
-const SLADetails = lazy(() => import("./pages/sla/SLADetails"));
-
+import HRDashboard from "./pages/dashboards/HRDashboard";
+import HROperations from "./pages/hr_operations/hr/HROperations";
+import HRHome from "./pages/performancemanagement/hr/HRHome";
+import FormCreate from "./pages/performancemanagement/hr/FormCreate";
+import FormProgressTrackerPage from "./pages/performancemanagement/hr/Formprogresstracker";
+import FormsList from "./pages/performancemanagement/hr/FormsList";
+import HRNominations from "./pages/performancemanagement/hr/HRNomination";
+import HRAssessmentView from "./pages/performancemanagement/hr/HRViewAssessment";
+import RewardConfiguration from "./pages/performancemanagement/hr/Rewardconfiguration";
+import DraftsList from "./pages/performancemanagement/hr/DraftList";
+import ProjectManagementDashboard from "./pages/project_management/ProjectManagementDashboard";
+import CreateProject from "./pages/project_management/CreateProject";
+import ProjectDetails from "./pages/project_management/ProjectDetails";
+import ProjectList from "./pages/project_management/ProjectList";
+import ResourcePoolMapping from "./pages/project_management/ResourcePoolMapping";
+import HRSLADashboard from "./pages/sla/HRSLADashboard";
+import FeedbackHRDashboard from "./pages/feedback_management/FeedbackHRDashboard";
+import CreateFeedbackForm from "./pages/feedback_management/hr/CreateFeedbackForm";
+import HRFeedbackList from "./pages/feedback_management/hr/HRFeedbackList";
+import SLADetails from "./pages/sla/SLADetails";
 // Internal Opportunity
-const InternalOpportunityManagement = lazy(() => import("./pages/internal/InternalOpportunityManagement"));
-const NominationManagement = lazy(() => import("./pages/internal/NominationManagement"));
-const PromotionManagement = lazy(() => import("./pages/internal/PromotionManagement"));
-const LeadershipDashboard = lazy(() => import("./pages/dashboards/LeadershipDashboard"));
-const BudgetAllocation = lazy(() => import("./pages/hr_operations/hr/compliance/BudgetAllocation"));
-const LeadershipApproval = lazy(() => import("./pages/hr_operations/hr/LeadershipApproval"));
-const DepartmentHeadDashboard = lazy(() => import("./pages/dashboards/DepartmentHeadDashboard"));
-const DeptHeadPage = lazy(() => import("./pages/performancemanagement/departmenthead/DeptHeadPage"));
-const DeptHeadSLADashboard = lazy(() => import("./pages/sla/DeptHeadDashboard"));
-const SLACompliance = lazy(() => import("./pages/sla/SLACompliance"));
-const DepartmentHeadBudgetView = lazy(() => import("./pages/hr_operations/hr/compliance/DepartmentHeadBudgetView"));
-const TopPerformers = lazy(() => import("./pages/performancemanagement/departmenthead/deptheadtopperformer"));
-const ManagerDashboard = lazy(() => import("./pages/dashboards/ManagerDashboard"));
-const PerformanceManagerHome = lazy(() => import("./pages/performancemanagement/manager/PerformanceManagerHome"));
-const Nominations = lazy(() => import("./pages/performancemanagement/employee/Nominations"));
-const ManagerNomination = lazy(() => import("./pages/performancemanagement/manager/ManagerNomination"));
-const TeamLeadPage = lazy(() => import("./pages/performancemanagement/manager/TeamLeadPage"));
-const ManagerPerformanceDashboard = lazy(() => import("./pages/performancemanagement/manager/ManagerPerformanceDashboard"));
-const ManagerSLADashboard = lazy(() => import("./pages/sla/ManagerSLADashboard"));
-const EmployeeDashboard = lazy(() => import("./pages/dashboards/EmployeeDashboard"));
-const EmployeeSLADashboard = lazy(() => import("./pages/sla/EmployeeSLADashboard"));
-const UserAssignments = lazy(() => import("./pages/performancemanagement/employee/MyAssessments"));
-const EmployeePolicyView = lazy(() => import("./pages/hr_operations/employee/EmployeePolicyView"));
-const SubmitMentorFeedback = lazy(() => import("./pages/feedback_management/feedback/SubmitMentorFeedback"));
-
-// LnD
-const LnDDashboard = lazy(() => import("./pages/lnd/dashboard/LnDDashboard"));
-const MySkills = lazy(() => import("./pages/lnd/skills/MySkills"));
-const TeamSkills = lazy(() => import("./pages/lnd/skills/TeamSkills"));
-const MyAssignments = lazy(() => import("./pages/lnd/assignments/MyAssignments"));
-const TeamAssignments = lazy(() => import("./pages/lnd/assignments/TeamAssignments"));
-const SmeAssignments = lazy(() => import("./pages/lnd/assignments/SmeAssignments"));
-const ApprovalHistory = lazy(() => import("./pages/lnd/approvals/ApprovalHistory"));
-const PendingApprovals = lazy(() => import("./pages/lnd/approvals/PendingApprovals"));
-const OrganizationSkills = lazy(() => import("./pages/lnd/hr/OrganizationSkills"));
-const OrganizationAssignments = lazy(() => import("./pages/lnd/hr/OrganizationAssignments"));
-const SmeDirectory = lazy(() => import("./pages/lnd/hr/SmeDirectory"));
-
-// Goals
-const GoalsDashboard = lazy(() => import("./pages/goals/GoalsDashboard"));
-const YourGoalsPage = lazy(() => import("./pages/goals/YourGoalsPage"));
-const ViewGoalPage = lazy(() => import("./pages/goals/ViewGoalPage"));
-const GoalApprovalsPage = lazy(() => import("./pages/goals/GoalApprovalsPage"));
-
-// Feedback imports
-const FeedbackEmployeeDashboard = lazy(() => import("./pages/feedback_management/FeedbackEmployeeDashboard"));
-const FeedbackManagerDashboard = lazy(() => import("./pages/feedback_management/FeedbackManagerDashboard"));
-const FeedbackDepartmentHeadDashboard = lazy(() => import("./pages/feedback_management/FeedbackDepartmentHeadDashboard"));
-const SubmitContextFeedback = lazy(() => import("./pages/feedback_management/feedback/SubmitContextFeedback"));
-const MySubmissions = lazy(() => import("./pages/feedback_management/feedback/MySubmissions"));
-const EmployeeAssignedForms = lazy(() => import("./pages/feedback_management/feedback/EmployeeAssignedForms"));
-const EmployeeFillForm = lazy(() => import("./pages/feedback_management/feedback/EmployeeFillForm"));
-const ViewMyPeerFeedback = lazy(() => import("./pages/feedback_management/feedback/ViewMyPeerFeedback"));
-const CreateManagerReview = lazy(() => import("./pages/feedback_management/manager/CreateManagerReview"));
-const ManagerReviewsList = lazy(() => import("./pages/feedback_management/manager/ManagerReviewsList"));
-const ManagerEmployeeList = lazy(() => import("./pages/feedback_management/manager/ManagerEmployeeList"));
-const ManagerTeamSubmissions = lazy(() => import("./pages/feedback_management/manager/ManagerTeamSubmissions"));
-const AllManagerReviews = lazy(() => import("./pages/feedback_management/head/AllManagerReviews"));
-const EmployeeHome = lazy(() => import("./pages/performancemanagement/employee/employeehome"));
-const EmployeeAcknowledgment = lazy(() => import("./pages/performancemanagement/employee/EmployeeAcknowledge"));
-const ManagerAcknowledgment = lazy(() => import("./pages/performancemanagement/manager/ManagerAcknowledgment"));
-const MentorFeedbackDashboard = lazy(() => import("./pages/feedback_management/feedback/MentorFeedbackDashboard"));
-const ViewManagerReview = lazy(() => import("./pages/feedback_management/manager/ViewManagerReview"));
-
-// Meeting and MOM
-const EmployeeMomDashboard = lazy(() => import("./pages/meeting/EmployeeMomDashboard"));
-const ManagerMomDashboard = lazy(() => import("./pages/meeting/ManagerMomDashboard"));
-const CreateOrEditMom = lazy(() => import("./pages/meeting/CreateOrEditMom"));
-const ScheduleMeeting = lazy(() => import("./pages/meeting/ScheduleMeeting"));
-const MeetingInvitations = lazy(() => import("./pages/meeting/MeetingInvitations"));
-const RSVPSummary = lazy(() => import("./pages/meeting/RSVPSummary"));
-const MyMomsList = lazy(() => import("./pages/meeting/MyMomsList"));
-const ActionItemsManagement = lazy(() => import("./pages/meeting/ActionItemsManagement"));
-const HRMomDashboard = lazy(() => import("./pages/meeting/HRMomDashboard"));
-const HRMomDetails = lazy(() => import("./pages/meeting/HRMomDetails"));
-const ManagerPeerFeedback = lazy(() => import("./pages/feedback_management/manager/ManagerPeerFeedback"));
-const MomDetailsView = lazy(() => import("./components/meeting/modals/MomDetailsView"));
+import InternalOpportunityManagement from "./pages/internal/InternalOpportunityManagement";
+import NominationManagement from "./pages/internal/NominationManagement";
+import PromotionManagement from "./pages/internal/PromotionManagement";
+import LeadershipDashboard from "./pages/dashboards/LeadershipDashboard";
+import BudgetAllocation from "./pages/hr_operations/hr/compliance/BudgetAllocation";
+import LeadershipApproval from "./pages/hr_operations/hr/LeadershipApproval";
+import DepartmentHeadDashboard from "./pages/dashboards/DepartmentHeadDashboard";
+import DeptHeadPage from "./pages/performancemanagement/departmenthead/DeptHeadPage";
+import DeptHeadSLADashboard from "./pages/sla/DeptHeadDashboard";
+import SLACompliance from "./pages/sla/SLACompliance";
+import DepartmentHeadBudgetView from "./pages/hr_operations/hr/compliance/DepartmentHeadBudgetView";
+import TopPerformers from "./pages/performancemanagement/departmenthead/deptheadtopperformer";
+import ManagerDashboard from "./pages/dashboards/ManagerDashboard";
+import PerformanceManagerHome from "./pages/performancemanagement/manager/PerformanceManagerHome";
+import Nominations from "./pages/performancemanagement/employee/Nominations";
+import ManagerNomination from "./pages/performancemanagement/manager/ManagerNomination";
+import TeamLeadPage from "./pages/performancemanagement/manager/TeamLeadPage";
+import ManagerPerformanceDashboard from "./pages/performancemanagement/manager/ManagerPerformanceDashboard";
+import ManagerSLADashboard from "./pages/sla/ManagerSLADashboard";
+import EmployeeDashboard from "./pages/dashboards/EmployeeDashboard";
+import EmployeeSLADashboard from "./pages/sla/EmployeeSLADashboard";
+import UserAssignments from "./pages/performancemanagement/employee/MyAssessments";
+import EmployeePolicyView from "./pages/hr_operations/employee/EmployeePolicyView";
+import SubmitMentorFeedback from "./pages/feedback_management/feedback/SubmitMentorFeedback";
+//LnD
+import LnDDashboard from "./pages/lnd/dashboard/LnDDashboard";
+import MySkills from "./pages/lnd/skills/MySkills";
+import TeamSkills from "./pages/lnd/skills/TeamSkills";
+import MyAssignments from "./pages/lnd/assignments/MyAssignments";
+import TeamAssignments from "./pages/lnd/assignments/TeamAssignments";
+import SmeAssignments from "./pages/lnd/assignments/SmeAssignments";
+import ApprovalHistory from "./pages/lnd/approvals/ApprovalHistory";
+import PendingApprovals from "./pages/lnd/approvals/PendingApprovals";
+import OrganizationSkills from "./pages/lnd/hr/OrganizationSkills";
+import OrganizationAssignments from "./pages/lnd/hr/OrganizationAssignments";
+import SmeDirectory from "./pages/lnd/hr/SmeDirectory";
+//Goals
+import GoalsDashboard from "./pages/goals/GoalsDashboard";
+import YourGoalsPage from "./pages/goals/YourGoalsPage";
+import ViewGoalPage from "./pages/goals/ViewGoalPage";
+import GoalApprovalsPage from "./pages/goals/GoalApprovalsPage";
+//Feedback imports
+import FeedbackEmployeeDashboard from "./pages/feedback_management/FeedbackEmployeeDashboard";
+import FeedbackManagerDashboard from "./pages/feedback_management/FeedbackManagerDashboard";
+import FeedbackDepartmentHeadDashboard from "./pages/feedback_management/FeedbackDepartmentHeadDashboard";
+import SubmitContextFeedback from "./pages/feedback_management/feedback/SubmitContextFeedback";
+import MySubmissions from "./pages/feedback_management/feedback/MySubmissions";
+import EmployeeAssignedForms from "./pages/feedback_management/feedback/EmployeeAssignedForms";
+import EmployeeFillForm from "./pages/feedback_management/feedback/EmployeeFillForm";
+import ViewMyPeerFeedback from "./pages/feedback_management/feedback/ViewMyPeerFeedback";
+import CreateManagerReview from "./pages/feedback_management/manager/CreateManagerReview";
+import ManagerReviewsList from "./pages/feedback_management/manager/ManagerReviewsList";
+import ManagerEmployeeList from "./pages/feedback_management/manager/ManagerEmployeeList";
+import ManagerTeamSubmissions from "./pages/feedback_management/manager/ManagerTeamSubmissions";
+import AllManagerReviews from "./pages/feedback_management/head/AllManagerReviews";
+import EmployeeHome from "./pages/performancemanagement/employee/employeehome";
+import EmployeeAcknowledgment from "./pages/performancemanagement/employee/EmployeeAcknowledge";
+import ManagerAcknowledgment from "./pages/performancemanagement/manager/ManagerAcknowledgment";
+import MentorFeedbackDashboard from "./pages/feedback_management/feedback/MentorFeedbackDashboard";
+import ViewManagerReview from "./pages/feedback_management/manager/ViewManagerReview";
+//Meeting and MOM
+import EmployeeMomDashboard from "./pages/meeting/EmployeeMomDashboard";
+import ManagerMomDashboard from "./pages/meeting/ManagerMomDashboard";
+import CreateOrEditMom from "./pages/meeting/CreateOrEditMom";
+import ScheduleMeeting from "./pages/meeting/ScheduleMeeting";
+import MeetingInvitations from "./pages/meeting/MeetingInvitations";
+import RSVPSummary from "./pages/meeting/RSVPSummary";
+import MyMomsList from "./pages/meeting/MyMomsList";
+import ActionItemsManagement from "./pages/meeting/ActionItemsManagement";
+import HRMomDashboard from "./pages/meeting/HRMomDashboard";
+import HRMomDetails from "./pages/meeting/HRMomDetails";
+import ManagerPeerFeedback from "./pages/feedback_management/manager/ManagerPeerFeedback";
+import MomDetailsView from "./components/meeting/modals/MomDetailsView";
 
 const AppRoutes = () => {
   const { user } = useAuth();
-  
   return (
     <Routes>
-      {/* DEFAULT/FALLBACK ROUTES */}
+      //region DEFAULT/FALLBACK ROUTES
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
-      
-      {/* PUBLIC ROUTES */}
+      //endregion DEFAULT/FALLBACK ROUTES //region PUBLIC ROUTES
       <Route
         path="/login"
         element={
           <PublicRoute>
-            <LazyPage>
-              <Login />
-            </LazyPage>
+            <Login />
           </PublicRoute>
         }
       />
@@ -159,9 +133,7 @@ const AppRoutes = () => {
         path="/verify-code"
         element={
           <PublicRoute>
-            <LazyPage>
-              <VerifyCode />
-            </LazyPage>
+            <VerifyCode />
           </PublicRoute>
         }
       />
@@ -169,9 +141,7 @@ const AppRoutes = () => {
         path="/reset-password"
         element={
           <PublicRoute>
-            <LazyPage>
-              <ResetPassword />
-            </LazyPage>
+            <ResetPassword />
           </PublicRoute>
         }
       />
@@ -179,9 +149,7 @@ const AppRoutes = () => {
         path="/verify-reset-otp"
         element={
           <PublicRoute>
-            <LazyPage>
-              <VerifyResetOtp />
-            </LazyPage>
+            <VerifyResetOtp />
           </PublicRoute>
         }
       />
@@ -189,30 +157,18 @@ const AppRoutes = () => {
         path="/verify-first-login"
         element={
           <PublicRoute>
-            <LazyPage>
-              <VerifyFirstLogin />
-            </LazyPage>
+            <VerifyFirstLogin />
           </PublicRoute>
         }
       />
-      <Route 
-        path="/change-password" 
-        element={
-          <LazyPage>
-            <ChangePassword />
-          </LazyPage>
-        } 
-      />
-      
-      {/* ADMIN ROUTES */}
+      <Route path="/change-password" element={<ChangePassword />} />
+      //endregion PUBLIC ROUTES //region ADMIN ROUTES
       <Route
         path="/admin/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Admin"]}>
             <DashboardLayout role="Admin">
-              <LazyPage>
-                <AdminDashboard />
-              </LazyPage>
+              <AdminDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -222,9 +178,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Admin"]}>
             <DashboardLayout role="Admin">
-              <LazyPage>
-                <DepartmentList />
-              </LazyPage>
+              <DepartmentList />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -234,9 +188,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Admin"]}>
             <DashboardLayout role="Admin">
-              <LazyPage>
-                <UserList />
-              </LazyPage>
+              <UserList />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -246,9 +198,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Admin"]}>
             <DashboardLayout role="Admin">
-              <LazyPage>
-                <RoleList />
-              </LazyPage>
+              <RoleList />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -258,37 +208,29 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Admin"]}>
             <DashboardLayout role="Admin">
-              <LazyPage>
-                <ChangeRequestManagement />
-              </LazyPage>
+              <ChangeRequestManagement />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* HR ROUTES */}
+      //endregion ADMIN ROUTES //region HR ROUTES
       <Route
         path="/hr/dashboard"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <HRDashboard />
-              </LazyPage>
+              <HRDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* HR • PERFORMANCE */}
+      //region HR • PERFORMANCE
       <Route
         path="/hr/dashboard/performance"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <HRHome />
-              </LazyPage>
+              <HRHome />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -298,9 +240,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <FormsList />
-              </LazyPage>
+              <FormsList />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -310,9 +250,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <FormCreate />
-              </LazyPage>
+              <FormCreate />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -322,9 +260,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <FormProgressTrackerPage />
-              </LazyPage>
+              <FormProgressTrackerPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -334,9 +270,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <RewardConfiguration />
-              </LazyPage>
+              <RewardConfiguration />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -346,9 +280,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <HRNominations />
-              </LazyPage>
+              <HRNominations />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -358,9 +290,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <DraftsList />
-              </LazyPage>
+              <DraftsList />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -370,23 +300,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <HRAssessmentView />
-              </LazyPage>
+              <HRAssessmentView />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* HR • PROJECT MANAGEMENT */}
+      //endregion HR • PERFORMANCE //region HR • PROJECT MANAGEMENT
       <Route
         path="/hr/dashboard/projectmgmt"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <ProjectManagementDashboard />
-              </LazyPage>
+              <ProjectManagementDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -396,33 +321,28 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <CreateProject />
-              </LazyPage>
+              <CreateProject />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/hr/dashboard/performance/create/:formId"
-        element={
-          <ProtectedRoute allowedRoles={["HR"]}>
-            <DashboardLayout role="HR">
-              <LazyPage>
-                <FormCreate />
-              </LazyPage>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+            <Route
+  path="/hr/dashboard/performance/create/:formId"
+  element={
+    <ProtectedRoute allowedRoles={["HR"]}>
+      <DashboardLayout role="HR">
+        <FormCreate />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/>
+ 
       <Route
         path="/hr/dashboard/projectmgmt/list"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <ProjectList />
-              </LazyPage>
+              <ProjectList />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -432,9 +352,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <ProjectDetails />
-              </LazyPage>
+              <ProjectDetails />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -444,23 +362,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <ResourcePoolMapping />
-              </LazyPage>
+              <ResourcePoolMapping />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* HR • SLA */}
+      //endregion HR • PROJECT MANAGEMENT //region HR • SLA
       <Route
         path="/hr/dashboard/sla"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <HRSLADashboard />
-              </LazyPage>
+              <HRSLADashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -470,23 +383,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <SLADetails />
-              </LazyPage>
+              <SLADetails />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* HR • FEEDBACK */}
+      //endregion HR • SLA //region HR • FEEDBACK
       <Route
         path="/hr/dashboard/feedback"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <FeedbackHRDashboard />
-              </LazyPage>
+              <FeedbackHRDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -496,9 +404,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <CreateFeedbackForm />
-              </LazyPage>
+              <CreateFeedbackForm />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -508,9 +414,10 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <HRFeedbackList />
-              </LazyPage>
+              {/* Keep HRFeedbackList as per your original routing */}
+              <HRFeedbackList />
+              {/* If you ever want FeedbackFormsList instead, swap it here */}
+              {/* <FeedbackFormsList /> */}
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -520,75 +427,88 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <SubmitMentorFeedback />
-              </LazyPage>
+              <SubmitMentorFeedback />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* HR • OPS */}
+      //endregion HR • Feedback //region HR • OPS
       <Route
         path="/hr/operations/*"
         element={
           <ProtectedRoute allowedRoles={["HR", "Department Head", "Manager"]}>
-            <DashboardLayout role={["HR", "Department Head", "Manager"]}>
-              <LazyPage>
-                <HROperations />
-              </LazyPage>
+            <DashboardLayout role={["HR", "Department Head, Manager"]}>
+              <HROperations />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* INTERNAL OPPORTUNITIES */}
+      //endregion HR • OPS //endregion HR ROUTES //region INTERNAL OPPORTUNITIES
+      {/* ========== INTERNAL OPPORTUNITY ROUTES ========== */}
+      {/*  INTERNAL OPPORTUNITIES - Accessible to Employee, Manager, HR with dynamic role-based UI */}
       <Route
         path="/internal/opportunities"
         element={
           <ProtectedRoute allowedRoles={["Employee", "Manager", "HR"]}>
             <DashboardLayout role={["Employee", "Manager", "HR"]}>
-              <LazyPage>
-                <InternalOpportunityManagement />
-              </LazyPage>
+              <InternalOpportunityManagement />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
+      {/*  NOMINATIONS - Employee self-nominate, Manager nominate & review, DeptHead review, HR view all */}
       <Route
         path="/internal/nominations"
         element={
-          <ProtectedRoute allowedRoles={["Employee", "Manager", "Department Head", "HR"]}>
-            <DashboardLayout role={["Employee", "Manager", "Department Head", "HR"]}>
-              <LazyPage>
-                <NominationManagement />
-              </LazyPage>
+          <ProtectedRoute
+            allowedRoles={["Employee", "Manager", "Department Head", "HR"]}
+          >
+            <DashboardLayout
+              role={["Employee", "Manager", "Department Head", "HR"]}
+            >
+              <NominationManagement />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* LEADERSHIP */}
+      {/*  PROMOTIONS - HR creates from approved nominations, Leadership approves/rejects */}
+      {/* <Route
+        path="/internal/promotions"
+        element={
+          <ProtectedRoute allowedRoles={["HR", "Leadership"]}>
+            <DashboardLayout role={["HR", "Leadership"]}>
+              <PromotionManagement />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      /> */}
+      //region INTERNAL OPPORTUNITIES LEADERSHIP
       <Route
         path="/leadership/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <LeadershipDashboard />
-              </LazyPage>
+              <LeadershipDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
+      {/* <Route
+        path="/leadership/promotions"
+        element={
+          <ProtectedRoute allowedRoles={["Leadership"]}>
+            <DashboardLayout role="Leadership">
+              <LeadershipApproval />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      /> */}
       <Route
         path="/leadership/budget-management"
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <BudgetAllocation />
-              </LazyPage>
+              <BudgetAllocation />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -598,23 +518,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <EmployeePolicyView />
-              </LazyPage>
+              <EmployeePolicyView />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* DEPARTMENT HEAD */}
+      //endregion INTERNAL OPPORTUNITIES LEADERSHIP //region INTERNAL
+      OPPORTUNITIES DEPARTMENT HEAD
       <Route
         path="/department-head/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <DepartmentHeadDashboard />
-              </LazyPage>
+              <DepartmentHeadDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -624,9 +540,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <DeptHeadPage />
-              </LazyPage>
+              <DeptHeadPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -636,9 +550,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <TopPerformers />
-              </LazyPage>
+              <TopPerformers />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -648,9 +560,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <DeptHeadSLADashboard />
-              </LazyPage>
+              <DeptHeadSLADashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -660,9 +570,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <SLACompliance />
-              </LazyPage>
+              <SLACompliance />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -672,9 +580,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <SLADetails />
-              </LazyPage>
+              <SLADetails />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -684,9 +590,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <EmployeePolicyView />
-              </LazyPage>
+              <EmployeePolicyView />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -696,23 +600,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <DepartmentHeadBudgetView />
-              </LazyPage>
+              <DepartmentHeadBudgetView />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* MANAGER */}
+      //endregion INTERNAL OPPORTUNITIES DEPARTMENT HEAD //region INTERNAL
+      OPPORTUNITIES MANAGER
       <Route
         path="/manager/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ManagerDashboard />
-              </LazyPage>
+              <ManagerDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -722,9 +622,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role={["Manager"]}>
-              <LazyPage>
-                <PerformanceManagerHome />
-              </LazyPage>
+              <PerformanceManagerHome />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -734,9 +632,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ManagerPerformanceDashboard />
-              </LazyPage>
+              <ManagerPerformanceDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -746,9 +642,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ManagerNomination />
-              </LazyPage>
+              <ManagerNomination />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -758,9 +652,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role={["Manager"]}>
-              <LazyPage>
-                <TeamLeadPage />
-              </LazyPage>
+              <TeamLeadPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -770,9 +662,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ManagerSLADashboard />
-              </LazyPage>
+              <ManagerSLADashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -782,9 +672,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <SLADetails />
-              </LazyPage>
+              <SLADetails />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -794,23 +682,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <EmployeePolicyView />
-              </LazyPage>
+              <EmployeePolicyView />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* EMPLOYEE */}
+      //endregion INTERNAL OPPORTUNITIES MANAGER
+      //region INTERNAL OPPORTUNITIES EMPLOYEE
       <Route
         path="/employee/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <EmployeeDashboard />
-              </LazyPage>
+              <EmployeeDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -820,9 +704,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <EmployeeHome />
-              </LazyPage>
+              <EmployeeHome />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -832,9 +714,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <UserAssignments />
-              </LazyPage>
+              <UserAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -844,9 +724,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <Nominations />
-              </LazyPage>
+              <Nominations />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -856,9 +734,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <EmployeeSLADashboard />
-              </LazyPage>
+              <EmployeeSLADashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -868,9 +744,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <SLADetails />
-              </LazyPage>
+              <SLADetails />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -880,37 +754,30 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <EmployeePolicyView />
-              </LazyPage>
+              <EmployeePolicyView />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* SHARED PROFILE */}
+      //endregion INTERNAL OPPORTUNITIES EMPLOYEE //region SHARED
       <Route
         path="/profile"
         element={
           <ProtectedRoute>
             <DashboardLayout role={user?.role}>
-              <LazyPage>
-                <EmployeeProfile />
-              </LazyPage>
+              <EmployeeProfile />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* GOALS - LEADERSHIP */}
+      //endregion SHARED //region GOALS LEADERSHIP
+      {/* Leadership Goal Routes */}
       <Route
         path="/leadership/dashboard/goals"
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <GoalsDashboard />
-              </LazyPage>
+              <GoalsDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -920,9 +787,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <YourGoalsPage />
-              </LazyPage>
+              <YourGoalsPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -932,9 +797,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <ViewGoalPage />
-              </LazyPage>
+              <ViewGoalPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -944,37 +807,30 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <GoalApprovalsPage />
-              </LazyPage>
+              <GoalApprovalsPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* GOALS - DEPARTMENT HEAD */}
+      //endregion GOALS LEADERSHIP //region GOALS DEPT HEAD
       <Route
         path="/department-head/dashboard/goals"
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <GoalsDashboard />
-              </LazyPage>
+              <GoalsDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* GOALS - MANAGER */}
+      //endregion GOALS DEPT HEAD //region GOALS MANAGER
+      {/* Manager Goal Routes */}
       <Route
         path="/manager/dashboard/goals"
         element={
           <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>
             <DashboardLayout role={["Manager", "Department Head"]}>
-              <LazyPage>
-                <GoalsDashboard />
-              </LazyPage>
+              <GoalsDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -984,9 +840,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>
             <DashboardLayout role={["Manager", "Department Head"]}>
-              <LazyPage>
-                <YourGoalsPage />
-              </LazyPage>
+              <YourGoalsPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -996,9 +850,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>
             <DashboardLayout role={["Manager", "Department Head"]}>
-              <LazyPage>
-                <ViewGoalPage />
-              </LazyPage>
+              <ViewGoalPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1008,23 +860,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>
             <DashboardLayout role={["Manager", "Department Head"]}>
-              <LazyPage>
-                <GoalApprovalsPage />
-              </LazyPage>
+              <GoalApprovalsPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* GOALS - EMPLOYEE */}
+      //endregion GOALS MANAGER //region GOALS EMPLOYEE
+      {/* Employee Goal Routes */}
       <Route
         path="/employee/dashboard/goals"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <GoalsDashboard />
-              </LazyPage>
+              <GoalsDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1034,9 +882,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <YourGoalsPage />
-              </LazyPage>
+              <YourGoalsPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1046,9 +892,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <ViewGoalPage />
-              </LazyPage>
+              <ViewGoalPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1058,23 +902,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <GoalApprovalsPage />
-              </LazyPage>
+              <GoalApprovalsPage />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* LND - LEADERSHIP */}
+      //endregion GOALS EMPLOYEE //region LND LEADERSHIP
+      {/* Leadership L&D Routes */}
       <Route
         path="/leadership/lnd/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <LnDDashboard />
-              </LazyPage>
+              <LnDDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1084,9 +924,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <MySkills />
-              </LazyPage>
+              <MySkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1096,9 +934,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <TeamSkills />
-              </LazyPage>
+              <TeamSkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1108,9 +944,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <MyAssignments />
-              </LazyPage>
+              <MyAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1120,9 +954,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <TeamAssignments />
-              </LazyPage>
+              <TeamAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1132,9 +964,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <SmeAssignments />
-              </LazyPage>
+              <SmeAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1144,9 +974,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <PendingApprovals />
-              </LazyPage>
+              <PendingApprovals />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1156,23 +984,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Leadership"]}>
             <DashboardLayout role="Leadership">
-              <LazyPage>
-                <ApprovalHistory />
-              </LazyPage>
+              <ApprovalHistory />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* LND - DEPARTMENT HEAD */}
+      //endregion LND LEADERSHIP //region LND DEPARTMENT HEAD
+      {/* Department Head L&D Routes */}
       <Route
         path="/department-head/lnd/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <LnDDashboard />
-              </LazyPage>
+              <LnDDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1182,9 +1006,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <MySkills />
-              </LazyPage>
+              <MySkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1194,9 +1016,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <TeamSkills />
-              </LazyPage>
+              <TeamSkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1206,9 +1026,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <MyAssignments />
-              </LazyPage>
+              <MyAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1218,9 +1036,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <TeamAssignments />
-              </LazyPage>
+              <TeamAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1230,9 +1046,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <SmeAssignments />
-              </LazyPage>
+              <SmeAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1242,9 +1056,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <PendingApprovals />
-              </LazyPage>
+              <PendingApprovals />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1254,23 +1066,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <ApprovalHistory />
-              </LazyPage>
+              <ApprovalHistory />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* LND - MANAGER */}
+      //endregion LND DEPARTMENT HEAD //region LND MANAGER
+      {/* Manager L&D Routes */}
       <Route
         path="/manager/lnd/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <LnDDashboard />
-              </LazyPage>
+              <LnDDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1280,9 +1088,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <MySkills />
-              </LazyPage>
+              <MySkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1292,9 +1098,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <TeamSkills />
-              </LazyPage>
+              <TeamSkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1304,9 +1108,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <MyAssignments />
-              </LazyPage>
+              <MyAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1316,9 +1118,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <TeamAssignments />
-              </LazyPage>
+              <TeamAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1328,9 +1128,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <SmeAssignments />
-              </LazyPage>
+              <SmeAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1340,9 +1138,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <PendingApprovals />
-              </LazyPage>
+              <PendingApprovals />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1352,23 +1148,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ApprovalHistory />
-              </LazyPage>
+              <ApprovalHistory />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* LND - EMPLOYEE */}
+      //endregion LND MANAGER //region LND EMPLOYEE
+      {/* Employee L&D Routes */}
       <Route
         path="/employee/lnd/dashboard"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <LnDDashboard />
-              </LazyPage>
+              <LnDDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1378,9 +1170,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <MySkills />
-              </LazyPage>
+              <MySkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1390,9 +1180,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <MyAssignments />
-              </LazyPage>
+              <MyAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1402,9 +1190,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <SmeAssignments />
-              </LazyPage>
+              <SmeAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1414,9 +1200,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <PendingApprovals />
-              </LazyPage>
+              <PendingApprovals />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1426,23 +1210,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <ApprovalHistory />
-              </LazyPage>
+              <ApprovalHistory />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* LND - HR */}
+      //endregion LND EMPLOYEE //region LND HR
       <Route
         path="/hr/lnd/dashboard"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <LnDDashboard />
-              </LazyPage>
+              <LnDDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1452,9 +1231,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <MySkills />
-              </LazyPage>
+              <MySkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1464,9 +1241,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <MyAssignments />
-              </LazyPage>
+              <MyAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1476,9 +1251,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <SmeAssignments />
-              </LazyPage>
+              <SmeAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1488,9 +1261,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <PendingApprovals />
-              </LazyPage>
+              <PendingApprovals />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1500,9 +1271,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <ApprovalHistory />
-              </LazyPage>
+              <ApprovalHistory />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1512,9 +1281,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <OrganizationSkills />
-              </LazyPage>
+              <OrganizationSkills />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1524,9 +1291,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <OrganizationAssignments />
-              </LazyPage>
+              <OrganizationAssignments />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1536,23 +1301,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <SmeDirectory />
-              </LazyPage>
+              <SmeDirectory />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* FEEDBACK - EMPLOYEE */}
+      //endregion LND HR //endregion DEFAULT/FALLBACK ROUTES //region FEEDBACK
+      EMPLOYEE
       <Route
         path="/employee/dashboard/feedback"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <FeedbackEmployeeDashboard />
-              </LazyPage>
+              <FeedbackEmployeeDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1562,9 +1323,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <SubmitMentorFeedback />
-              </LazyPage>
+              <SubmitMentorFeedback />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1574,9 +1333,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <SubmitContextFeedback />
-              </LazyPage>
+              <SubmitContextFeedback />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1586,9 +1343,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <EmployeeAssignedForms />
-              </LazyPage>
+              <EmployeeAssignedForms />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1598,9 +1353,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <ViewMyPeerFeedback />
-              </LazyPage>
+              <ViewMyPeerFeedback />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1610,9 +1363,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <MentorFeedbackDashboard />
-              </LazyPage>
+              <MentorFeedbackDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1622,9 +1373,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <MySubmissions />
-              </LazyPage>
+              <MySubmissions />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1634,23 +1383,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee", "Manager"]}>
             <DashboardLayout role={["Manager", "Employee"]}>
-              <LazyPage>
-                <EmployeeFillForm />
-              </LazyPage>
+              <EmployeeFillForm />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* FEEDBACK - MANAGER */}
+      {/* feedback manager */}
       <Route
         path="/manager/dashboard/feedback"
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <FeedbackManagerDashboard />
-              </LazyPage>
+              <FeedbackManagerDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1660,9 +1404,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <CreateManagerReview />
-              </LazyPage>
+              <CreateManagerReview />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1672,21 +1414,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ManagerReviewsList />
-              </LazyPage>
+              <ManagerReviewsList />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
+      
       <Route
         path="/manager/dashboard/feedback/team"
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ManagerPeerFeedback />
-              </LazyPage>
+              <ManagerPeerFeedback />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1696,9 +1435,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ManagerTeamSubmissions />
-              </LazyPage>
+              <ManagerTeamSubmissions />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1708,9 +1445,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <SubmitMentorFeedback />
-              </LazyPage>
+              <SubmitMentorFeedback />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1720,9 +1455,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <SubmitContextFeedback />
-              </LazyPage>
+              <SubmitContextFeedback />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1732,9 +1465,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <EmployeeAssignedForms />
-              </LazyPage>
+              <EmployeeAssignedForms />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1744,35 +1475,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <MySubmissions />
-              </LazyPage>
+              <MySubmissions />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/manager/dashboard/feedback/review/:id"
-        element={
-          <ProtectedRoute allowedRoles={["Manager"]}>
-            <DashboardLayout role="Manager">
-              <LazyPage>
-                <ViewManagerReview />
-              </LazyPage>
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
-      
-      {/* FEEDBACK - DEPARTMENT HEAD */}
+      {/* Feedback - depthead */}
       <Route
         path="/department-head/dashboard/feedback"
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <FeedbackDepartmentHeadDashboard />
-              </LazyPage>
+              <FeedbackDepartmentHeadDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1782,23 +1496,28 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Department Head"]}>
             <DashboardLayout role="Department Head">
-              <LazyPage>
-                <AllManagerReviews />
-              </LazyPage>
+              <AllManagerReviews />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* PERFORMANCE ACKNOWLEDGE */}
+      <Route
+        path="/manager/dashboard/feedback/review/:id"
+        element={
+          <ProtectedRoute allowedRoles={["Manager"]}>
+            <DashboardLayout role="Manager">
+              <ViewManagerReview />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+      //endregion LND EMPLOYEE //region PERFORMANCE Acknowledge
       <Route
         path="/manager/dashboard/manager-acknowledgments"
         element={
           <ProtectedRoute allowedRoles={["Manager", "Department Head"]}>
             <DashboardLayout role={["Manager", "Department Head"]}>
-              <LazyPage>
-                <ManagerAcknowledgment />
-              </LazyPage>
+              <ManagerAcknowledgment />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1808,9 +1527,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <EmployeeAcknowledgment />
-              </LazyPage>
+              <EmployeeAcknowledgment />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1820,23 +1537,19 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <EmployeeAcknowledgment />
-              </LazyPage>
+              <EmployeeAcknowledgment />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* MEETING AND MOM - EMPLOYEE */}
+      //endregion PERFORMANCE ACKNOWLEDGE //region MEETING AND MOM
+      {/* EMPLOYEE ROUTES */}
       <Route
         path="/employee/dashboard/meetmom"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <EmployeeMomDashboard />
-              </LazyPage>
+              <EmployeeMomDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1846,9 +1559,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <MyMomsList />
-              </LazyPage>
+              <MyMomsList />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1858,9 +1569,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <ActionItemsManagement />
-              </LazyPage>
+              <ActionItemsManagement />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1870,9 +1579,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <MeetingInvitations />
-              </LazyPage>
+              <MeetingInvitations />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1882,21 +1589,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <RSVPSummary />
-              </LazyPage>
+              <RSVPSummary />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
+      {/* NEW: CREATE and EDIT MOM (Employee) */}
       <Route
         path="/employee/dashboard/meetmom/create-mom/:meetingId"
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <CreateOrEditMom />
-              </LazyPage>
+              <CreateOrEditMom />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1906,23 +1610,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <LazyPage>
-                <CreateOrEditMom isEdit />
-              </LazyPage>
+              <CreateOrEditMom isEdit />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* MEETING AND MOM - MANAGER */}
+      {/* MANAGER ROUTES */}
       <Route
         path="/manager/dashboard/meetmom"
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ManagerMomDashboard />
-              </LazyPage>
+              <ManagerMomDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1932,9 +1631,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <ScheduleMeeting />
-              </LazyPage>
+              <ScheduleMeeting />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1944,9 +1641,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <RSVPSummary />
-              </LazyPage>
+              <RSVPSummary />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1956,21 +1651,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <MomDetailsView />
-              </LazyPage>
+              <MomDetailsView />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
+      {/* NEW: CREATE and EDIT MOM (Manager) */}
       <Route
         path="/manager/dashboard/meetmom/create-mom/:meetingId"
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <CreateOrEditMom />
-              </LazyPage>
+              <CreateOrEditMom />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -1980,23 +1672,18 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Manager"]}>
             <DashboardLayout role="Manager">
-              <LazyPage>
-                <CreateOrEditMom isEdit />
-              </LazyPage>
+              <CreateOrEditMom isEdit />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
-      
-      {/* MEETING AND MOM - HR */}
+      {/* HR ROUTES */}
       <Route
         path="/hr/dasboard/meetmom"
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <HRMomDashboard />
-              </LazyPage>
+              <HRMomDashboard />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -2006,15 +1693,13 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <LazyPage>
-                <HRMomDetails />
-              </LazyPage>
+              <HRMomDetails />
             </DashboardLayout>
           </ProtectedRoute>
         }
       />
+      //endregion MEETING AND MOM
     </Routes>
   );
 };
-
 export default AppRoutes;

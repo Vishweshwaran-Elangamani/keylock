@@ -17,16 +17,24 @@ import { toast } from "sonner";
 
 const PendingApprovals = () => {
   const [approvals, setApprovals] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [typeFilter, setTypeFilter] = useState("");
   const [showDecisionModal, setShowDecisionModal] = useState(false);
   const [selectedApproval, setSelectedApproval] = useState(null);
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
+
+  // Filter
+  const [typeFilter, setTypeFilter] = useState("");
+
+  // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -49,7 +57,7 @@ const PendingApprovals = () => {
 
   useEffect(() => {
     fetchPendingApprovals();
-  }, [currentPage, typeFilter, sortField, sortOrderAsc]);
+  }, [currentPage, itemsPerPage, typeFilter, sortField, sortOrderAsc]);
 
   const fetchPendingApprovals = async () => {
     try {
@@ -59,19 +67,14 @@ const PendingApprovals = () => {
         typeFilter,
         "PENDING",
         sortField,
-        sortOrderAsc ? "asc" : "desc"
+        sortOrderAsc ? "asc" : "desc",
+        itemsPerPage // Pass itemsPerPage to API
       );
 
       if (response.data.success) {
         setApprovals(response.data.data.items);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
+        setTotalItems(response.data.data.totalCount);
+        setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
       console.error("Failed to fetch pending approvals:", error);
@@ -83,6 +86,13 @@ const PendingApprovals = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleReview = (approval) => {
@@ -163,7 +173,8 @@ const PendingApprovals = () => {
     );
   };
 
-  if (loading) {
+  // Show initial loading spinner only when no data
+  if (loading && approvals.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
         <div className="spinner-border text-primary" role="status">
@@ -224,7 +235,7 @@ const PendingApprovals = () => {
       </div>
 
       {/* Pending Approvals Table */}
-      {approvals.length === 0 ? (
+      {approvals.length === 0 && !loading ? (
         <EmptyState
           icon={CheckCircle}
           title="No Pending Approvals"
@@ -232,7 +243,13 @@ const PendingApprovals = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "65vh" }}>
+          <div
+            style={{
+              minHeight: "65vh",
+              opacity: loading ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
             <div
               style={{
                 background: "#fff",
@@ -438,8 +455,17 @@ const PendingApprovals = () => {
             </div>
           </div>
 
-          {/*Pagination*/}
-          <Pagination pagination={pagination} onPageChange={handlePageChange} />
+          {/* Updated Pagination with new props */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[5, 10, 25, 50]}
+          />
         </>
       )}
 

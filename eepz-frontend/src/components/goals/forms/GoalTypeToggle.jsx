@@ -24,7 +24,7 @@ const GoalTypeToggle = ({
         padding: "5px",
         marginBottom: "1.5rem",
         width: "100%",
-        maxWidth: "900px",
+        maxWidth: "600px",
       }}
     >
       {types.map((type) => {

@@ -64,23 +64,38 @@ export const lndService = {
   // ==================== SKILLS ====================
 
   /**
-   * Get current user's skills
-   * @param {number} pageNumber - Page number (default: 1)
-   * @param {string} searchTerm - Search term (optional)
-   * @returns {Promise} API response
-   */
-  getMySkills: async (pageNumber = 1, searchTerm = "") => {
-    try {
-      const query = buildQueryString({ pageNumber, searchTerm });
-      const response = await axios.get(
-        `${API_BASE_URL}/LnD/skills/my-skills${query}`,
-        { headers: getHeaders() }
-      );
-      return response;
-    } catch (error) {
-      return handleError(error);
-    }
-  },
+ * Get current user's skills
+ * @param {number} pageNumber - Page number (default: 1)
+ * @param {string} searchTerm - Search term (optional)
+ * @param {string} sortField - Sort field (optional)
+ * @param {string} sortOrder - Sort order: 'asc' or 'desc' (optional)
+ * @param {number} pageSize - Items per page (default: 10)
+ * @returns {Promise} API response
+ */
+getMySkills: async (
+  pageNumber = 1,
+  searchTerm = "",
+  sortField = "",
+  sortOrder = "asc",
+  pageSize = 10
+) => {
+  try {
+    const query = buildQueryString({
+      pageNumber,
+      searchTerm,
+      sortField,
+      sortOrder,
+      pageSize,
+    });
+    const response = await axios.get(
+      `${API_BASE_URL}/LnD/skills/my-skills${query}`,
+      { headers: getHeaders() }
+    );
+    return response;
+  } catch (error) {
+    return handleError(error);
+  }
+},
 
   /**
    * Get subordinate employees' skills (Manager only)
@@ -194,7 +209,7 @@ export const lndService = {
   getSubordinateEmployees: async (
     pageNumber = 1,
     searchTerm = "",
-    pageSize = 9
+    pageSize = 12
   ) => {
     try {
       const query = buildQueryString({ pageNumber, searchTerm, pageSize });
@@ -292,7 +307,8 @@ export const lndService = {
     statusFilter = "",
     searchTerm = "",
     sortField = "",
-    sortOrder = ""
+    sortOrder = "",
+    pageSize = 10,
   ) => {
     try {
       const query = buildQueryString({
@@ -301,6 +317,7 @@ export const lndService = {
         searchTerm,
         sortField,
         sortOrder,
+    pageSize 
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/assignments/my-assignments${query}`,
@@ -324,7 +341,8 @@ export const lndService = {
     statusFilter = "",
     searchTerm = "",
     sortField = "",
-    sortOrder = "asc"
+    sortOrder = "asc",
+    pageSize = 10
   ) => {
     try {
       const query = buildQueryString({
@@ -333,6 +351,7 @@ export const lndService = {
         searchTerm,
         sortField,
         sortOrder,
+        pageSize
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/assignments/team${query}`,
@@ -356,7 +375,8 @@ export const lndService = {
     statusFilter = "",
     searchTerm = "",
     sortField = "",
-    sortOrder = "asc"
+    sortOrder = "asc",
+    pageSize = 10
   ) => {
     try {
       const query = buildQueryString({
@@ -365,6 +385,7 @@ export const lndService = {
         searchTerm,
         sortField,
         sortOrder,
+        pageSize
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/assignments/sme${query}`,
@@ -455,7 +476,7 @@ export const lndService = {
   getAllOrganizationEmployees: async (
     pageNumber = 1,
     searchTerm = "",
-    pageSize = 9
+    pageSize = 12
   ) => {
     try {
       const query = buildQueryString({ pageNumber, searchTerm, pageSize });
@@ -541,7 +562,8 @@ export const lndService = {
     approvalType = "",
     status = "",
     sortField = "",
-    sortOrder = "asc"
+    sortOrder = "asc",
+    pageSize = 10
   ) => {
     try {
       const query = buildQueryString({
@@ -550,6 +572,7 @@ export const lndService = {
         status,
         sortField,
         sortOrder,
+        pageSize
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/approvals/my-approvals${query}`,
@@ -594,7 +617,8 @@ export const lndService = {
     status = "",
     searchTerm = "",
     sortField = "",
-    sortOrder = ""
+    sortOrder = "",
+    pageSize = 10
   ) => {
     try {
       const query = buildQueryString({
@@ -605,6 +629,7 @@ export const lndService = {
         searchTerm,
         sortField,
         sortOrder,
+        pageSize,
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/approvals/history${query}`,

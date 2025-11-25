@@ -8,15 +8,21 @@ import { toast } from "sonner";
 
 const SmeDirectory = () => {
   const [smes, setSmes] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+
+  // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
   useEffect(() => {
     fetchSmes();
-  }, [currentPage, searchTerm]);
+  }, [currentPage, itemsPerPage, searchTerm]);
 
   const fetchSmes = async () => {
     try {
@@ -24,19 +30,13 @@ const SmeDirectory = () => {
       const response = await lndService.getAllActiveSmes(
         currentPage,
         searchTerm,
-        10
+        itemsPerPage // Pass itemsPerPage to API
       );
 
       if (response.data.success) {
         setSmes(response.data.data.items);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
+        setTotalItems(response.data.data.totalCount);
+        setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
       console.error("Failed to fetch SMEs:", error);
@@ -51,8 +51,14 @@ const SmeDirectory = () => {
   };
 
   const handleSearchSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setSearchTerm(searchInput);
+    setCurrentPage(1);
+  };
+
+  const handleCancelSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
     setCurrentPage(1);
   };
 
@@ -64,9 +70,17 @@ const SmeDirectory = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Show initial loading spinner only when no data
+  if (loading && smes.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
         <div className="spinner-border text-primary" role="status">
@@ -86,57 +100,44 @@ const SmeDirectory = () => {
         ]}
       />
 
+      {/* Search Bar */}
       <div style={{ marginBottom: "1.5rem" }}>
-        <form
-          onSubmit={handleSearchSubmit}
-          style={{
-            display: "flex",
-            gap: "0.5rem",
-            maxWidth: "400px",
-          }}
-        >
-          <div style={{ position: "relative", flexGrow: 1 }}>
+        <div style={{ width: "100%", maxWidth: "400px" }}>
+          <div className="input-group">
             <input
               type="text"
-              placeholder="Search by SME name or skill... (Press Enter)"
+              className="form-control"
+              placeholder="Search by SME name or skill..."
               value={searchInput}
               onChange={handleSearchInputChange}
               onKeyPress={handleKeyPress}
-              style={{
-                padding: "0.625rem 1rem",
-                paddingRight: "2.5rem",
-                border: "1px solid #e5e7eb",
-                borderRadius: 8,
-                fontSize: "0.875rem",
-                outline: "none",
-                width: "100%",
-              }}
+              style={{ minHeight: "35.7px" }}
             />
-            <button
-              type="submit"
-              style={{
-                position: "absolute",
-                right: "0.5rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#6c757d",
-              }}
-              title="Search"
-            >
-              <Search size={18} />
-            </button>
+            {searchTerm ? (
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={handleCancelSearch}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSearchSubmit}
+              >
+                <i className="bi bi-search me-1"></i>
+                Search
+              </button>
+            )}
           </div>
-        </form>
+        </div>
       </div>
 
-      {smes.length === 0 ? (
+      {/* SME List */}
+      {smes.length === 0 && !loading ? (
         <EmptyState
           icon={Award}
           title="No SMEs Found"
@@ -148,7 +149,13 @@ const SmeDirectory = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "65vh" }}>
+          <div
+            style={{
+              minHeight: "65vh",
+              opacity: loading ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
             <div
               style={{
                 background: "#fff",
@@ -157,6 +164,7 @@ const SmeDirectory = () => {
                 minWidth: 0,
               }}
             >
+              {/* Table Header */}
               <div
                 style={{
                   display: "grid",
@@ -177,6 +185,7 @@ const SmeDirectory = () => {
                 <div style={{ textAlign: "left" }}>Approved Date</div>
               </div>
 
+              {/* Table Rows */}
               {smes.map((sme, idx) => (
                 <div
                   key={sme.smeId}
@@ -207,28 +216,6 @@ const SmeDirectory = () => {
                         gap: "0.75rem",
                       }}
                     >
-                      <div
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
-                          background:
-                            "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#fff",
-                          fontWeight: "700",
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        {sme.employeeName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .substring(0, 2)
-                          .toUpperCase()}
-                      </div>
                       <span style={{ fontWeight: 600 }}>
                         {sme.employeeName}
                       </span>
@@ -259,12 +246,17 @@ const SmeDirectory = () => {
             </div>
           </div>
 
-          {pagination && (
-            <Pagination
-              pagination={pagination}
-              onPageChange={handlePageChange}
-            />
-          )}
+          {/* Updated Pagination with new props */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[5, 10, 25, 50]}
+          />
         </>
       )}
     </div>

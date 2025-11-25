@@ -245,6 +245,7 @@ const RecordSkillModal = ({ key, skill, onClose, onSuccess }) => {
             boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
             display: "flex",
             flexDirection: "column",
+            animation: "slideUp 0.3s ease-out",
           }}
         >
           <div

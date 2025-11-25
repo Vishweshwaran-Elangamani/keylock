@@ -66,14 +66,15 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
       style={{
         cursor: "pointer",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        border: "1px solid rgba(39, 35, 92, 0.4)",
+        border: "1px solid rgba(39, 35, 92, 0.75)",
         borderRadius: "12px",
         overflow: "hidden",
         position: "relative",
         background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+        width: "100%" 
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.12)";
+        e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.52)";
         e.currentTarget.style.transform = "translateY(-4px)";
         e.currentTarget.style.borderColor = "rgb(39, 35, 92)";
       }}
@@ -94,7 +95,6 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
       >
         <div className="d-flex justify-content-between align-items-start">
           <div className="d-flex gap-2 flex-wrap align-items-center">
-            <GoalTypeBadge type={goal.goalType} size="sm" />
 
             {showTaskStatus ? (
               // Show both badges for employee assignees
@@ -111,23 +111,6 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
               // Show only goal status for creators
               <GoalStatusBadge status={goal.status} size="sm" />
             )}
-
-            {goal.projectName && (
-              <span
-                className="badge"
-                style={{
-                  backgroundColor: "#e7f3ff",
-                  color: "#0056b3",
-                  fontSize: "0.7rem",
-                  fontWeight: 500,
-                  padding: "0.25rem 0.5rem",
-                  borderRadius: "4px",
-                }}
-              >
-                <i className="bi bi-folder2 me-1"></i>
-                {goal.projectName}
-              </span>
-            )}
           </div>
 
           {overdueStatus && (
@@ -135,7 +118,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
               className="badge"
               style={{
                 background: "linear-gradient(135deg, #dc3545 0%, #c82333 100%)",
-                fontSize: "0.7rem",
+                fontSize: "10px",
                 fontWeight: 600,
                 padding: "0.35rem 0.6rem",
                 borderRadius: "6px",
@@ -160,7 +143,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
           className="card-title mb-2"
           style={{
             fontWeight: 700,
-            fontSize: "1.1rem",
+            fontSize: "16px",
             color: "#212529",
             lineHeight: "1.4",
             overflow: "hidden",
@@ -179,7 +162,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
           <p
             className="card-text mb-3"
             style={{
-              fontSize: "0.875rem",
+              fontSize: "14px",
               color: "#6c757d",
               lineHeight: "1.5",
               overflow: "hidden",
@@ -289,7 +272,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
             backgroundColor: "#fff",
             padding: "0.75rem",
             borderRadius: "8px",
-            border: "1px solid #e9ecef",
+            border: "1px solid rgba(39, 35, 92, 0.5)",
           }}
         >
           {showTaskStatus ? (
@@ -391,51 +374,6 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
           )}
         </div>
       </div>
-
-      {/* Card Footer - Icon-only buttons with tooltips */}
-      {showActions && (
-        <div
-          style={{
-            backgroundColor: "rgba(248, 249, 250, 0.5)",
-            borderTop: "1px solid #e9ecef",
-            padding: "0.75rem 1.25rem",
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="d-flex justify-content-end align-items-center gap-2">
-            {/*  UPDATED: Comment Button - Hide for non-leadership on org goals */}
-            {canShowCommentButton && (
-              <button
-                className="btn btn-sm btn-outline-secondary d-flex justify-content-center align-items-center"
-                onClick={() => onComment(goal)}
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                title="Add Comment"
-                style={{
-                  fontSize: "0.9rem",
-                  padding: "0.4rem 0.9rem",
-                  borderRadius: "6px",
-                  transition: "all 0.2s",
-                  width: "36px",
-                  height: "36px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#6c757d";
-                  e.currentTarget.style.color = "white";
-                  e.currentTarget.style.borderColor = "#6c757d";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.color = "#6c757d";
-                  e.currentTarget.style.borderColor = "#6c757d";
-                }}
-              >
-                <i className="bi bi-chat-dots-fill" aria-hidden="true"></i>
-              </button>
-            )}
-          </div>
-        </div>
-      )}
 
       <style jsx>{`
         @keyframes pulse {

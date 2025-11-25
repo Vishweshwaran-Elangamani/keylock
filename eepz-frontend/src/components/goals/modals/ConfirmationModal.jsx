@@ -48,6 +48,7 @@ const ConfirmationModal = ({
             style={{
               maxWidth: "400px",
               minHeight: "200px",
+              animation: "slideUp 0.3s ease-out",
             }}
           >
             <div

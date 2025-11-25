@@ -245,6 +245,7 @@ const EmployeeSkillsModal = ({ employee, onClose, isReadOnly = false }) => {
             display: "flex",
             flexDirection: "column",
             boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            animation: "slideUp 0.3s ease-out",
           }}
         >
           <div

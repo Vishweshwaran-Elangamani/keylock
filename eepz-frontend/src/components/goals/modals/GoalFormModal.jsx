@@ -578,10 +578,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         `}
       </style>
 
-      <div
-        className="modal-backdrop fade show"
-        style={{ zIndex: 1040, animation: "fadeIn 0.2s ease-in-out" }}
-      />
+      <div className="modal-backdrop fade show" style={{ zIndex: 1040 }} />
       <div
         className="modal fade show d-block"
         tabIndex="-1"
@@ -592,7 +589,10 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
           style={{ borderRadius: "1.5rem" }}
         >
-          <div className="modal-content" style={{ minWidth: "1000px" }}>
+          <div
+            className="modal-content"
+            style={{ minWidth: "1000px", animation: "slideUp 0.3s ease-out" }}
+          >
             <div
               className="modal-header"
               style={{

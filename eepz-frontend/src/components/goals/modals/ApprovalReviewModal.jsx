@@ -162,7 +162,14 @@ const ApprovalReviewModal = ({
           className="modal-dialog modal-lg modal-dialog-scrollable"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="modal-content" style={{ borderRadius: "2rem" }}>
+          <div
+            className="modal-content"
+            style={{
+              borderRadius: "2rem",
+              minWidth: "700px",
+              animation: "fadeIn 0.2s ease-in-out",
+            }}
+          >
             <div
               className="modal-header"
               style={{

@@ -18,18 +18,28 @@ import { toast } from "sonner";
 
 const MyAssignments = () => {
   const [assignments, setAssignments] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [sortField, setSortField] = useState("");
-  const [sortOrderAsc, setSortOrderAsc] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
+
+  // Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+
+  // Filter
+  const [statusFilter, setStatusFilter] = useState("");
+
+  // Sorting
+  const [sortField, setSortField] = useState("");
+  const [sortOrderAsc, setSortOrderAsc] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -52,7 +62,14 @@ const MyAssignments = () => {
 
   useEffect(() => {
     fetchAssignments();
-  }, [currentPage, searchTerm, statusFilter, sortField, sortOrderAsc]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    searchTerm,
+    statusFilter,
+    sortField,
+    sortOrderAsc,
+  ]);
 
   const fetchAssignments = async () => {
     try {
@@ -62,18 +79,13 @@ const MyAssignments = () => {
         statusFilter,
         searchTerm,
         sortField,
-        sortOrderAsc ? "asc" : "desc"
+        sortOrderAsc ? "asc" : "desc",
+        itemsPerPage // Pass itemsPerPage to API
       );
       if (response.data.success) {
         setAssignments(response.data.data.items);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
+        setTotalItems(response.data.data.totalCount);
+        setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
       console.error("Failed to load assignments:", error);
@@ -107,6 +119,13 @@ const MyAssignments = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleUploadProof = (assignment) => {
@@ -178,7 +197,8 @@ const MyAssignments = () => {
     );
   };
 
-  if (loading) {
+  // Show initial loading spinner only when no data
+  if (loading && assignments.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
         <div className="spinner-border text-primary" role="status">
@@ -229,6 +249,7 @@ const MyAssignments = () => {
             />
             {searchTerm ? (
               <button
+                type="button"
                 className="btn btn-outline-secondary"
                 onClick={handleCancelSearch}
               >
@@ -236,7 +257,7 @@ const MyAssignments = () => {
                 Cancel
               </button>
             ) : (
-              <button className="btn btn-primary" onClick={handleSearch}>
+              <button type="submit" className="btn btn-primary">
                 <i className="bi bi-search me-1"></i>
                 Search
               </button>
@@ -272,7 +293,7 @@ const MyAssignments = () => {
       </div>
 
       {/* Assignments Table */}
-      {assignments.length === 0 ? (
+      {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
           title="No Assignments Found"
@@ -280,7 +301,13 @@ const MyAssignments = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "65vh" }}>
+          <div
+            style={{
+              minHeight: "65vh",
+              opacity: loading ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
             <div
               style={{
                 background: "#fff",
@@ -321,7 +348,7 @@ const MyAssignments = () => {
                     align: "center",
                   },
                   { label: "Proof", field: null, align: "center" },
-                  { label: "Request ack", field: null, align: "center" },
+                  { label: "Request Ack", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
                   <div
                     key={field || label}
@@ -517,8 +544,17 @@ const MyAssignments = () => {
             </div>
           </div>
 
-          {/*Pagination*/}
-          <Pagination pagination={pagination} onPageChange={handlePageChange} />
+          {/* Updated Pagination with new props */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[5, 10, 25, 50]}
+          />
         </>
       )}
 

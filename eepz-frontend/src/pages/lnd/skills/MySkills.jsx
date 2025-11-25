@@ -14,17 +14,25 @@ import {
 const MySkills = () => {
   const [skills, setSkills] = useState([]);
   const [approvals, setApprovals] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchInput, setSearchInput] = useState("");
   const [showSmeModal, setShowSmeModal] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
+
+  // Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+
+  // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -48,28 +56,30 @@ const MySkills = () => {
   useEffect(() => {
     fetchSkills();
     fetchApprovalHistory();
-  }, [currentPage, searchTerm, sortField, sortOrderAsc, showSmeModal]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    searchTerm,
+    sortField,
+    sortOrderAsc,
+    showSmeModal,
+  ]);
 
   const fetchSkills = async () => {
     try {
       setLoading(true);
       const response = await lndService.getMySkills(
-        currentPage,
-        searchTerm,
-        sortField,
-        sortOrderAsc ? "asc" : "desc"
+        currentPage, // pageNumber
+        searchTerm, // searchTerm
+        sortField, // sortField
+        sortOrderAsc ? "asc" : "desc", // sortOrder
+        itemsPerPage // pageSize
       );
 
       if (response.data.success) {
         setSkills(response.data.data.items);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
+        setTotalItems(response.data.data.totalCount);
+        setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
       console.error("Failed to fetch skills:", error);
@@ -81,7 +91,6 @@ const MySkills = () => {
 
   const fetchApprovalHistory = async () => {
     try {
-      setLoading(true);
       const response = await lndService.getApprovalHistory(
         1,
         "",
@@ -93,20 +102,9 @@ const MySkills = () => {
       );
       if (response.data.success) {
         setApprovals(response.data.data.items);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
       }
     } catch (error) {
       console.error("Failed to fetch approval history:", error);
-      toast.error("Failed to load approval history");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -140,6 +138,13 @@ const MySkills = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleBecomeSme = (skill) => {
@@ -203,7 +208,7 @@ const MySkills = () => {
     );
   };
 
-  if (loading) {
+  if (loading && skills.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
         <div className="spinner-border text-primary" role="status">
@@ -224,36 +229,36 @@ const MySkills = () => {
       />
 
       <div className="row g-3 mb-4">
-  <div className="col-md-6">
-    <div className="input-group">
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Search skills..."
-        value={searchInput}
-        onChange={handleSearchChange}
-        onKeyPress={handleSearchKeyPress}
-        style={{ minHeight: "35.7px" }}
-      />
-      {searchTerm ? (
-        <button
-          className="btn btn-outline-secondary"
-          onClick={handleCancelSearch}
-        >
-          <i className="bi bi-x-lg me-1"></i>
-          Cancel
-        </button>
-      ) : (
-        <button className="btn btn-primary" onClick={handleSearch}>
-          <i className="bi bi-search me-1"></i>
-          Search
-        </button>
-      )}
-    </div>
-  </div>
-</div>
+        <div className="col-md-6">
+          <div className="input-group">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search skills..."
+              value={searchInput}
+              onChange={handleSearchChange}
+              onKeyPress={handleSearchKeyPress}
+              style={{ minHeight: "35.7px" }}
+            />
+            {searchTerm ? (
+              <button
+                className="btn btn-outline-secondary"
+                onClick={handleCancelSearch}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button className="btn btn-primary" onClick={handleSearch}>
+                <i className="bi bi-search me-1"></i>
+                Search
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
 
-      {skills.length === 0 ? (
+      {skills.length === 0 && !loading ? (
         <EmptyState
           icon={Search}
           title="No Skills Found"
@@ -265,7 +270,13 @@ const MySkills = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "65vh" }}>
+          <div
+            style={{
+              minHeight: "65vh",
+              opacity: loading ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
             <div
               style={{
                 background: "#fff",
@@ -509,7 +520,17 @@ const MySkills = () => {
             </div>
           </div>
 
-          <Pagination pagination={pagination} onPageChange={handlePageChange} />
+          {/* Updated Pagination with new props */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[5, 10, 25, 50]}
+          />
         </>
       )}
 

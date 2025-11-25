@@ -102,10 +102,36 @@ const GoalFilters = ({ isOpen, onClose, filters, onApply, projects = [] }) => {
 
   return (
     <>
+      <style>
+        {`
+          .form-select {
+            appearance: auto;
+            -webkit-appearance: auto;
+            -moz-appearance: auto;
+            text-align: left;
+          }
+
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { 
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to { 
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
+
       <div
         className="modal-backdrop fade show"
         onClick={onClose}
-        style={{ zIndex: 1040 }}
+        style={{ zIndex: 1040, animation: "fadeIn 0.2s ease-in-out" }}
       />
 
       <div
@@ -114,13 +140,28 @@ const GoalFilters = ({ isOpen, onClose, filters, onApply, projects = [] }) => {
         style={{ zIndex: 1050 }}
       >
         <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content" style={{ borderRadius: "12px" }}>
+          <div
+            className="modal-content"
+            style={{
+              borderRadius: "12px",
+              animation: "slideUp 0.3s ease-out",
+            }}
+          >
             {/* Header */}
             <div
               className="modal-header"
-              style={{ borderBottom: "2px solid #dee2e6", backgroundColor: "rgb(39, 35, 92)" }}
+              style={{
+                borderBottom: "2px solid #dee2e6",
+                backgroundColor: "rgb(39, 35, 92)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
             >
-              <h5 className="modal-title" style={{ fontWeight: 600 }}>
+              <h5
+                className="modal-title"
+                style={{ fontWeight: 600, color: "white" }}
+              >
                 <i className="bi bi-funnel me-2" />
                 Filter Goals
                 {activeFilterCount > 0 && (
@@ -132,7 +173,34 @@ const GoalFilters = ({ isOpen, onClose, filters, onApply, projects = [] }) => {
                   </span>
                 )}
               </h5>
-              <button type="button" className="btn-close" onClick={onClose} />
+              <button
+                type="button"
+                class="btn-close-white"
+                onClick={onClose}
+                style={{
+                  border: "none",
+                  width: "36px",
+                  backgroundColor: "transparent",
+                  height: "36px",
+                  borderRadius: "0.5rem",
+                  cursor: "pointer",
+                  color: "white",
+                  fontSize: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "red";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "white";
+                }}
+              >
+                <i className="bi bi-x-lg"></i>
+              </button>
             </div>
 
             {/* Body */}
@@ -251,7 +319,8 @@ const GoalFilters = ({ isOpen, onClose, filters, onApply, projects = [] }) => {
                 className="btn btn-primary"
                 onClick={handleApply}
                 style={{
-                  background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+                  background:
+                    "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                 }}
               >
                 <i className="bi bi-check-circle me-2" />

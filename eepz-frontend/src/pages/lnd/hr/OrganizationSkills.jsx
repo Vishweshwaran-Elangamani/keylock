@@ -9,17 +9,23 @@ import { toast } from "sonner";
 
 const OrganizationSkills = () => {
   const [employees, setEmployees] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showSkillsModal, setShowSkillsModal] = useState(false);
 
+  // Search
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
   useEffect(() => {
     fetchEmployees();
-  }, [currentPage, searchTerm]);
+  }, [currentPage, itemsPerPage, searchTerm]);
 
   const fetchEmployees = async () => {
     try {
@@ -27,28 +33,22 @@ const OrganizationSkills = () => {
       const response = await lndService.getAllOrganizationEmployees(
         currentPage,
         searchTerm,
-        12
+        itemsPerPage // Pass itemsPerPage to API
       );
 
       if (response.data.success) {
-        let employees = response.data.data.items;
+        let employeesData = response.data.data.items;
 
         // Only filter out Admins if there is no search term
         if (!searchTerm) {
-          employees = employees.filter(
+          employeesData = employeesData.filter(
             (emp) => emp.departmentName !== "Administration"
           );
         }
 
-        setEmployees(employees);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
+        setEmployees(employeesData);
+        setTotalItems(response.data.data.totalCount);
+        setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
       console.error("Failed to fetch employees:", error);
@@ -63,13 +63,18 @@ const OrganizationSkills = () => {
   };
 
   const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    setSearchTerm(searchInput);
+    setCurrentPage(1);
+  };
+
+  const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      setSearchTerm(searchInput);
-      setCurrentPage(1);
+      handleSearchSubmit();
     }
   };
 
-  const handleClearSearch = () => {
+  const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
@@ -77,6 +82,13 @@ const OrganizationSkills = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleEmployeeClick = (employee) => {
@@ -89,7 +101,8 @@ const OrganizationSkills = () => {
     setSelectedEmployee(null);
   };
 
-  if (loading) {
+  // Show initial loading spinner only when no data
+  if (loading && employees.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
         <div className="spinner-border text-primary" role="status">
@@ -109,71 +122,44 @@ const OrganizationSkills = () => {
         ]}
       />
 
+      {/* Search Bar */}
       <div style={{ marginBottom: "1.5rem" }}>
-        <div style={{ position: "relative", width: "100%", maxWidth: "400px" }}>
-          <Search
-            size={18}
-            style={{
-              position: "absolute",
-              left: "0.75rem",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#6c757d",
-              pointerEvents: "none",
-            }}
-          />
-          <input
-            type="text"
-            value={searchInput}
-            onChange={handleSearchChange}
-            onKeyDown={handleSearchSubmit}
-            placeholder="Search employees... (Press Enter)"
-            style={{
-              width: "100%",
-              padding: "0.625rem 2.5rem 0.625rem 2.5rem",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              outline: "none",
-              transition: "all 0.2s",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = "#97247E";
-              e.target.style.boxShadow = "0 0 0 3px rgba(151, 36, 126, 0.1)";
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = "#e5e7eb";
-              e.target.style.boxShadow = "none";
-            }}
-          />
-          {searchInput && (
-            <button
-              onClick={handleClearSearch}
-              style={{
-                position: "absolute",
-                right: "0.75rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-                color: "#6c757d",
-                transition: "color 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#212529")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#6c757d")}
-              title="Clear search"
-            >
-              <X size={16} />
-            </button>
-          )}
+        <div style={{ width: "100%", maxWidth: "400px" }}>
+          <div className="input-group">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search employees..."
+              value={searchInput}
+              onChange={handleSearchChange}
+              onKeyPress={handleKeyPress}
+              style={{ minHeight: "35.7px" }}
+            />
+            {searchTerm ? (
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={handleCancelSearch}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSearchSubmit}
+              >
+                <i className="bi bi-search me-1"></i>
+                Search
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {employees.length === 0 ? (
+      {/* Employee List */}
+      {employees.length === 0 && !loading ? (
         <EmptyState
           icon={Users}
           title="No Employees Found"
@@ -185,7 +171,13 @@ const OrganizationSkills = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "65vh" }}>
+          <div
+            style={{
+              minHeight: "65vh",
+              opacity: loading ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
             <div
               style={{
                 display: "grid",
@@ -235,8 +227,7 @@ const OrganizationSkills = () => {
                           width: "48px",
                           height: "48px",
                           borderRadius: "50%",
-                          background:
-                            "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
+                          backgroundColor: "rgb(39, 35, 92)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -298,15 +289,21 @@ const OrganizationSkills = () => {
             </div>
           </div>
 
-          {pagination && (
-            <Pagination
-              pagination={pagination}
-              onPageChange={handlePageChange}
-            />
-          )}
+          {/* Updated Pagination with new props */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[4, 8, 12, 24]}
+          />
         </>
       )}
 
+      {/* Employee Skills Modal */}
       {showSkillsModal && selectedEmployee && (
         <EmployeeSkillsModal
           employee={selectedEmployee}

@@ -492,7 +492,7 @@ const GoalChecklist = ({
         style={{
           backgroundColor: "rgb(39, 35, 92)",
           fontWeight: 600,
-          fontSize: "16px",
+          fontSize: "14px",
           border: "1px solid rgba(39, 35, 92, 0.46)",
           padding: "1rem 1.25rem",
           borderRadius: "1.5rem 1.5rem 0rem 0rem",
@@ -509,7 +509,7 @@ const GoalChecklist = ({
             canViewAsManager) && (
             <span
               className="badge bg-secondary text-white ms-2"
-              style={{ fontSize: "0.7rem" }}
+              style={{ fontSize: "12px" }}
             >
               <i className="bi bi-lock-fill me-1"></i>
               {isCompleted
@@ -552,7 +552,7 @@ const GoalChecklist = ({
               disabled={loading}
               placeholder="Enter goal description..."
               style={{
-                fontSize: "16px",
+                fontSize: "14px",
                 height: "100px",
 
                 resize: "vertical", // allows manual resizing
@@ -613,7 +613,7 @@ const GoalChecklist = ({
           color: "white",
           fontWeight: 600,
           padding: "1rem 1.25rem",
-          fontSize: "16px",
+          fontSize: "14px",
           textAlign: "left",
           backgroundColor: "rgb(39, 35, 92)",
           borderRadius: "1.5rem 1.5rem 0rem 0rem",

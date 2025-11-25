@@ -9,14 +9,20 @@ import { toast } from "sonner";
 
 const TeamSkills = () => {
   const [employees, setEmployees] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showSkillsModal, setShowSkillsModal] = useState(false);
   const [rolePrefix, setRolePrefix] = useState("");
+
+  // Search
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -36,10 +42,10 @@ const TeamSkills = () => {
     return prefixMap[role] || "/employee";
   };
 
-  // Fetch employees when page or search changes
+  // Fetch employees when page, search, or itemsPerPage changes
   useEffect(() => {
     fetchEmployees();
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, itemsPerPage]);
 
   const fetchEmployees = async () => {
     try {
@@ -47,19 +53,13 @@ const TeamSkills = () => {
       const response = await lndService.getSubordinateEmployees(
         currentPage,
         searchTerm,
-        12 // Page size
+        itemsPerPage // Dynamic page size
       );
 
       if (response.data.success) {
         setEmployees(response.data.data.items);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
+        setTotalItems(response.data.data.totalCount);
+        setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
       console.error("Failed to fetch employees:", error);
@@ -93,6 +93,13 @@ const TeamSkills = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleEmployeeClick = (employee) => {
@@ -105,7 +112,8 @@ const TeamSkills = () => {
     setSelectedEmployee(null);
   };
 
-  if (loading) {
+  // Show initial loading spinner only when no data
+  if (loading && employees.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
         <div className="spinner-border text-primary" role="status">
@@ -157,7 +165,7 @@ const TeamSkills = () => {
       </div>
 
       {/* Employee List */}
-      {employees.length === 0 ? (
+      {employees.length === 0 && !loading ? (
         <EmptyState
           icon={Users}
           title="No Employees Found"
@@ -169,7 +177,13 @@ const TeamSkills = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "65vh" }}>
+          <div
+            style={{
+              minHeight: "65vh",
+              opacity: loading ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
             <div
               style={{
                 display: "grid",
@@ -219,8 +233,7 @@ const TeamSkills = () => {
                           width: "48px",
                           height: "48px",
                           borderRadius: "50%",
-                          background:
-                            "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
+                          backgroundColor: "rgb(39, 35, 92)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -281,13 +294,17 @@ const TeamSkills = () => {
             </div>
           </div>
 
-          {/* Pagination */}
-          {pagination && (
-            <Pagination
-              pagination={pagination}
-              onPageChange={handlePageChange}
-            />
-          )}
+          {/* Updated Pagination with new props */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[6, 12, 24, 48]}
+          />
         </>
       )}
 

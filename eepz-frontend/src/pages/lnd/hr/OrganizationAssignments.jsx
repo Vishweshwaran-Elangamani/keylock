@@ -10,19 +10,36 @@ import { toast } from "sonner";
 
 const OrganizationAssignments = () => {
   const [assignments, setAssignments] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [expandedNotes, setExpandedNotes] = useState({});
+
+  // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
+
+  // Filter
   const [statusFilter, setStatusFilter] = useState("");
+
+  // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
-  const [expandedNotes, setExpandedNotes] = useState({});
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     fetchAssignments();
-  }, [currentPage, searchTerm, statusFilter, sortField, sortOrderAsc]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    searchTerm,
+    statusFilter,
+    sortField,
+    sortOrderAsc,
+  ]);
 
   const fetchAssignments = async () => {
     try {
@@ -33,19 +50,13 @@ const OrganizationAssignments = () => {
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc",
-        10
+        itemsPerPage // Pass itemsPerPage to API
       );
 
       if (response.data.success) {
         setAssignments(response.data.data.items);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
+        setTotalItems(response.data.data.totalCount);
+        setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
       console.error("Failed to fetch assignments:", error);
@@ -65,6 +76,12 @@ const OrganizationAssignments = () => {
     setCurrentPage(1);
   };
 
+  const handleCancelSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearchSubmit(e);
@@ -73,6 +90,13 @@ const OrganizationAssignments = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDownloadProof = async (assignment) => {
@@ -133,7 +157,8 @@ const OrganizationAssignments = () => {
     );
   };
 
-  if (loading) {
+  // Show initial loading spinner only when no data
+  if (loading && assignments.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
         <div className="spinner-border text-primary" role="status">
@@ -149,7 +174,7 @@ const OrganizationAssignments = () => {
         items={[
           { label: "", path: "/dashboard", icon: "house-door" },
           { label: "LnD Dashboard", path: "/lnd/dashboard", icon: "" },
-          { label: "Organizational Assignments"},
+          { label: "Organizational Assignments" },
         ]}
       />
 
@@ -171,43 +196,31 @@ const OrganizationAssignments = () => {
             minWidth: 250,
           }}
         >
-          <div style={{ position: "relative", flexGrow: 1 }}>
+          <div className="input-group">
             <input
               type="text"
-              placeholder="Search by employee or skill... (Press Enter)"
+              className="form-control"
+              placeholder="Search by employee or skill..."
               value={searchInput}
               onChange={handleSearchInputChange}
               onKeyPress={handleKeyPress}
-              style={{
-                padding: "0.625rem 1rem",
-                paddingRight: "2.5rem",
-                border: "1px solid #e5e7eb",
-                borderRadius: 8,
-                fontSize: "0.875rem",
-                outline: "none",
-                width: "100%",
-              }}
+              style={{ minHeight: "35.7px" }}
             />
-            <button
-              type="submit"
-              style={{
-                position: "absolute",
-                right: "0.5rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.25rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#6c757d",
-              }}
-              title="Search"
-            >
-              <Search size={18} />
-            </button>
+            {searchTerm ? (
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={handleCancelSearch}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button type="submit" className="btn btn-primary">
+                <i className="bi bi-search me-1"></i>
+                Search
+              </button>
+            )}
           </div>
         </form>
         <select
@@ -238,7 +251,7 @@ const OrganizationAssignments = () => {
         </select>
       </div>
 
-      {assignments.length === 0 ? (
+      {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
           title="No Assignments Found"
@@ -250,7 +263,13 @@ const OrganizationAssignments = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "65vh" }}>
+          <div
+            style={{
+              minHeight: "65vh",
+              opacity: loading ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
             <div
               style={{
                 background: "#fff",
@@ -430,12 +449,17 @@ const OrganizationAssignments = () => {
             </div>
           </div>
 
-          {pagination && (
-            <Pagination
-              pagination={pagination}
-              onPageChange={handlePageChange}
-            />
-          )}
+          {/* Updated Pagination with new props */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[5, 10, 25, 50]}
+          />
         </>
       )}
     </div>

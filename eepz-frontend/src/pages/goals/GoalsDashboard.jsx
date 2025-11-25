@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import goalService from "../../services/goals/goalService";
@@ -21,14 +21,12 @@ const GoalsDashboard = () => {
   const [loadingGoals, setLoadingGoals] = useState(false);
   const [alert, setAlert] = useState(null);
   const [summary, setSummary] = useState(null);
-  const [ongoingGoals, setOngoingGoals] = useState([]);
+  const [allOngoingGoals, setAllOngoingGoals] = useState([]);
   const [selectedType, setSelectedType] = useState(GOAL_TYPES.SELF);
 
-  // Pagination
+  // Pagination - now with state for itemsPerPage
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6;
-  const [totalCount, setTotalCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -39,16 +37,31 @@ const GoalsDashboard = () => {
   const isEmployee = user.role === "Employee";
   const isManager = ["Manager", "Department Head"].includes(user.role);
   const isLeader = user.role === "Leadership";
-  const canCreateTeamGoals = isManager || isLeader;
-  const canCreateOrgGoals = isLeader;
 
+  // Calculate paginated goals from all goals (memoized)
+  const paginatedData = useMemo(() => {
+    const totalCount = allOngoingGoals.length;
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentGoals = allOngoingGoals.slice(startIndex, endIndex);
+
+    return {
+      goals: currentGoals,
+      totalCount,
+      totalPages,
+    };
+  }, [allOngoingGoals, currentPage, itemsPerPage]);
+
+  // Load dashboard summary on mount
   useEffect(() => {
     loadDashboardData();
   }, []);
 
+  // Load ongoing goals only when selectedType changes
   useEffect(() => {
     loadOngoingGoals();
-  }, [selectedType, currentPage]);
+  }, [selectedType]);
 
   const loadDashboardData = async () => {
     setLoading(true);
@@ -66,19 +79,20 @@ const GoalsDashboard = () => {
     }
   };
 
-  const loadOngoingGoals = async () => {
+  const loadOngoingGoals = useCallback(async () => {
     setLoadingGoals(true);
+    setAlert(null);
+
     try {
-      // Fetch goals for ongoing statuses: open, inprogress, reopened
       const statuses = ["open", "inprogress", "reopened"];
 
-      // Fetch more items per status to ensure we have enough after combining
+      // Fetch ALL goals for each status
       const requests = statuses.map((status) =>
         goalService.queryGoals({
           type: selectedType,
           status: status,
-          page: currentPage,
-          pageSize: pageSize * 2, // Fetch more to account for deduplication
+          page: 1,
+          pageSize: 100, // Fetch all at once
         })
       );
 
@@ -97,24 +111,19 @@ const GoalsDashboard = () => {
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
 
-      // Calculate pagination for combined results
-      const startIndex = (currentPage - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      const paginatedGoals = sortedGoals.slice(startIndex, endIndex);
-
-      setOngoingGoals(paginatedGoals);
-      setTotalCount(sortedGoals.length);
-      setTotalPages(Math.ceil(sortedGoals.length / pageSize));
+      setAllOngoingGoals(sortedGoals);
+      setCurrentPage(1); // Reset to page 1 when data changes
     } catch (error) {
       console.error("Error loading ongoing goals:", error);
       setAlert({
         type: "danger",
         message: "Failed to load ongoing goals",
       });
+      setAllOngoingGoals([]);
     } finally {
       setLoadingGoals(false);
     }
-  };
+  }, [selectedType]);
 
   const handleCreateGoal = () => {
     setShowCreateModal(true);
@@ -122,7 +131,6 @@ const GoalsDashboard = () => {
 
   const handleGoalCreated = () => {
     loadDashboardData();
-    setCurrentPage(1); // Reset to first page
     loadOngoingGoals();
   };
 
@@ -143,6 +151,15 @@ const GoalsDashboard = () => {
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    // Page reset is handled by the Pagination component itself
+  };
+
+  const handleTypeChange = (type) => {
+    setSelectedType(type);
   };
 
   return (
@@ -184,7 +201,7 @@ const GoalsDashboard = () => {
                   background:
                     "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
                   whiteSpace: "nowrap",
-                  height: "55px"
+                  height: "55px",
                 }}
               >
                 <i className="bi bi-plus-circle me-2"></i>
@@ -197,7 +214,7 @@ const GoalsDashboard = () => {
                   backgroundColor: "rgb(39, 35, 92)",
                   color: "white",
                   whiteSpace: "nowrap",
-                  height: "50px"
+                  height: "50px",
                 }}
               >
                 <i className="bi bi-list-ul me-2"></i>
@@ -209,10 +226,7 @@ const GoalsDashboard = () => {
           {/* Goal Type Toggle */}
           <GoalTypeToggle
             selectedType={selectedType}
-            onTypeChange={(type) => {
-              setSelectedType(type);
-              setCurrentPage(1); // Reset to first page when changing type
-            }}
+            onTypeChange={handleTypeChange}
           />
 
           {/* Ongoing Goals Section */}
@@ -224,12 +238,13 @@ const GoalsDashboard = () => {
                   style={{ color: "#0d6efd" }}
                 ></i>
                 Ongoing Goals
-                {totalCount > 0 && (
+                {paginatedData.totalCount > 0 && (
                   <span
                     className="text-muted ms-2"
                     style={{ fontSize: "0.9rem", fontWeight: 400 }}
                   >
-                    ({totalCount} {totalCount === 1 ? "goal" : "goals"})
+                    ({paginatedData.totalCount}{" "}
+                    {paginatedData.totalCount === 1 ? "goal" : "goals"})
                   </span>
                 )}
               </h5>
@@ -242,7 +257,7 @@ const GoalsDashboard = () => {
                 </div>
                 <p className="mt-3 text-muted">Loading goals...</p>
               </div>
-            ) : ongoingGoals.length === 0 ? (
+            ) : paginatedData.goals.length === 0 ? (
               <div
                 className="card text-center"
                 style={{ padding: "3rem", backgroundColor: "#f8f9fa" }}
@@ -257,30 +272,50 @@ const GoalsDashboard = () => {
               </div>
             ) : (
               <>
-                <div className="row g-3 mb-4">
-                  {ongoingGoals.map((goal) => (
-                    <div key={goal.goalId} className="col-12 col-md-6 col-xl-4">
-                      <GoalCard
-                        goal={goal}
-                        onComment={handleCommentClick}
-                        showActions={true}
-                      />
-                    </div>
-                  ))}
-                </div>
+              <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      minHeight: "60vh",
+    }}
+  >
+     <div style={{ flexGrow: 1 }}>
+  <div className="row g-3 mb-4">
+    {paginatedData.goals.map((goal) => (
+      <div key={goal.goalId} className="col-12 col-md-6 col-xl-4">
+        <GoalCard
+          goal={goal}
+          onComment={handleCommentClick}
+          showActions={true}
+        />
+      </div>
+    ))}
+  </div>
+  </div>
 
-                {/* Pagination */}
-                {totalCount > 0 && (
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    loading={loadingGoals}
-                    currentPageItems={ongoingGoals.length}
-                    pageSize={pageSize}
-                  />
-                )}
-              </>
+  {/* Sticky Pagination */}
+  <Pagination
+    currentPage={currentPage}
+    totalPages={paginatedData.totalPages}
+    onPageChange={handlePageChange}
+    loading={loadingGoals}
+    totalItems={paginatedData.totalCount}
+    itemsPerPage={itemsPerPage}
+    onItemsPerPageChange={handleItemsPerPageChange}
+    pageSizeOptions={[6, 12, 24, 48]}
+    style={{
+      position: "fixed",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      background: "#fff",
+      padding: "0.75rem 1rem",
+      borderTop: "1px solid #ddd",
+      zIndex: 1000,
+    }}
+  />
+  </div>
+</>
             )}
           </div>
         </>

@@ -93,7 +93,6 @@ const QuickCommentModal = ({
           alignItems: "center",
           justifyContent: "center",
           padding: "1rem",
-          animation: "fadeIn 0.2s ease-in-out",
         }}
         onClick={handleClose}
       >
@@ -105,6 +104,7 @@ const QuickCommentModal = ({
             boxShadow: "0 10px 40px rgba(0, 0, 0, 0.2)",
             width: "100%",
             maxWidth: "550px",
+            animation: "fadeIn 0.2s ease-in-out",
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -118,6 +118,7 @@ const QuickCommentModal = ({
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              animation: "slideUp 0.3s ease-out",
             }}
           >
             <h5 style={{ margin: 0, fontWeight: 600, color: "white" }}>

@@ -13,19 +13,29 @@ import { toast } from "sonner";
 
 const ApprovalHistory = () => {
   const [approvals, setApprovals] = useState([]);
-  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
   const [expandedNotes, setExpandedNotes] = useState({});
+
+  // Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+
+  // Filters
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -50,6 +60,7 @@ const ApprovalHistory = () => {
     fetchApprovalHistory();
   }, [
     currentPage,
+    itemsPerPage,
     searchTerm,
     roleFilter,
     typeFilter,
@@ -68,18 +79,13 @@ const ApprovalHistory = () => {
         statusFilter,
         searchTerm,
         sortField,
-        sortOrderAsc ? "asc" : "desc"
+        sortOrderAsc ? "asc" : "desc",
+        itemsPerPage
       );
       if (response.data.success) {
         setApprovals(response.data.data.items);
-        setPagination({
-          totalCount: response.data.data.totalCount,
-          pageNumber: response.data.data.pageNumber,
-          pageSize: response.data.data.pageSize,
-          totalPages: response.data.data.totalPages,
-          hasPreviousPage: response.data.data.hasPreviousPage,
-          hasNextPage: response.data.data.hasNextPage,
-        });
+        setTotalItems(response.data.data.totalCount);
+        setTotalPages(response.data.data.totalPages);
       }
     } catch (error) {
       console.error("Failed to fetch approval history:", error);
@@ -113,6 +119,13 @@ const ApprovalHistory = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newSize) => {
+    setItemsPerPage(newSize);
+    setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDownload = async (approval) => {
@@ -139,13 +152,6 @@ const ApprovalHistory = () => {
     return labels[type] || type;
   };
 
-  const toggleNotes = (approvalId) => {
-    setExpandedNotes((prev) => ({
-      ...prev,
-      [approvalId]: !prev[approvalId],
-    }));
-  };
-
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -158,7 +164,6 @@ const ApprovalHistory = () => {
 
   const renderSortIcon = (field) => {
     if (sortField !== field) {
-      // Show a neutral/inactive sort icon when not sorted
       return (
         <ChevronUp
           size={14}
@@ -170,7 +175,6 @@ const ApprovalHistory = () => {
         />
       );
     }
-    // Show active sort direction
     return sortOrderAsc ? (
       <ChevronUp
         size={14}
@@ -192,7 +196,8 @@ const ApprovalHistory = () => {
     );
   };
 
-  if (loading) {
+  // Show initial loading spinner only when no data
+  if (loading && approvals.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
         <div className="spinner-border text-primary" role="status">
@@ -243,6 +248,7 @@ const ApprovalHistory = () => {
             />
             {searchTerm ? (
               <button
+                type="button"
                 className="btn btn-outline-secondary"
                 onClick={handleCancelSearch}
               >
@@ -250,7 +256,7 @@ const ApprovalHistory = () => {
                 Cancel
               </button>
             ) : (
-              <button className="btn btn-primary" onClick={handleSearchSubmit}>
+              <button type="submit" className="btn btn-primary">
                 <i className="bi bi-search me-1"></i>
                 Search
               </button>
@@ -329,7 +335,7 @@ const ApprovalHistory = () => {
       </div>
 
       {/* Approval History Table */}
-      {approvals.length === 0 ? (
+      {approvals.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
           title="No Approvals Found"
@@ -337,7 +343,13 @@ const ApprovalHistory = () => {
         />
       ) : (
         <>
-          <div style={{ minHeight: "65vh" }}>
+          <div
+            style={{
+              minHeight: "65vh",
+              opacity: loading ? 0.6 : 1,
+              transition: "opacity 0.2s",
+            }}
+          >
             <div
               style={{
                 background: "#fff",
@@ -596,8 +608,17 @@ const ApprovalHistory = () => {
             </div>
           </div>
 
-          {/*Pagination*/}
-          <Pagination pagination={pagination} onPageChange={handlePageChange} />
+          {/* Updated Pagination with new props */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            loading={loading}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            pageSizeOptions={[5, 10, 25, 50]}
+          />
         </>
       )}
     </div>
