@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Loader, AlertCircle, X, CheckCircle } from "lucide-react";
+import { Plus, Loader, AlertCircle, X } from "lucide-react";
+import { toast } from "sonner";
 import slaService from "../../../services/sla/slaService";
 
 const CreateSLAModal = ({ onClose, onSuccess }) => {
@@ -35,10 +36,12 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           setEmployeeCount(uniqueEmployees.size);
           console.log(`${uniqueEmployees.size} employees found`);
         } else {
+          toast.error("Failed to load employee count");
           setError("Failed to load employee count");
         }
       } catch (err) {
         console.error("Error:", err);
+        toast.error("Failed to load employee count");
         setError("Failed to load employee count");
       } finally {
         setFetchLoading(false);
@@ -58,17 +61,19 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     setError(null);
   };
 
-  // ========== SUBMIT ==========
+  // ========== SUBMIT (BULK CREATE WITH TOAST) ==========
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     // Validation
     if (!formData.reviewType.trim()) {
+      toast.error("Please enter a review type");
       setError("Please enter a review type");
       return;
     }
     if (!formData.deadline) {
+      toast.error("Please select a deadline");
       setError("Please select a deadline");
       return;
     }
@@ -78,74 +83,91 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (deadline < today) {
+      toast.error("Deadline must be in the future");
       setError("Deadline must be in the future");
       return;
     }
 
     setLoading(true);
 
+    // Show loading toast
+    const loadingToast = toast.loading("Creating SLAs...");
+
     try {
       const deadlineIso = new Date(formData.deadline).toISOString();
 
-      // Fetch all employees
+      // Step 1: Fetch all employees
       const res = await slaService.getAllEmployees();
 
       if (!res?.success || !Array.isArray(res.data)) {
+        toast.dismiss(loadingToast);
+        toast.error("Failed to fetch employees");
         setError("Failed to fetch employees");
         setLoading(false);
         return;
       }
 
+      // Step 2: Build unique employees map
       const uniqueEmployees = new Map();
       res.data.forEach((item) => {
         if (item.employeeId && !uniqueEmployees.has(item.employeeId)) {
           uniqueEmployees.set(item.employeeId, {
-            id: item.employeeId,
-            name: item.employeeName,
+            employeeId: item.employeeId,
+            employeeName:
+              item.employeeName ||
+              (item.firstName && item.lastName
+                ? `${item.firstName} ${item.lastName}`
+                : "Unknown"),
+            departmentId: item.departmentId || 2,
           });
         }
       });
 
-      let successCount = 0;
-      let failedCount = 0;
+      // Step 3: Build bulk SLA requests array
+      const bulkRequests = Array.from(uniqueEmployees.values()).map((emp) => ({
+        slatype: formData.reviewType,
+        employeeId: emp.employeeId,
+        assignedToEmployeeId: null,
+        departmentId: emp.departmentId,
+        deadline: deadlineIso,
+        relatedEntityType: null,
+        relatedEntityId: null,
+        createdByEmployeeId: user?.empId || 1,
+        creationReason: formData.reason || `${formData.reviewType} assigned`,
+      }));
 
-      console.log(`Creating SLA for ${uniqueEmployees.size} employees...`);
+      // Step 4: Call bulk create endpoint
+      const response = await slaService.createBulkSLA(bulkRequests);
 
-      // Create SLA for each employee
-      for (const [empId, empData] of uniqueEmployees) {
-        try {
-          const requestData = {
-            slatype: formData.reviewType,
-            employeeId: empId,
-            assignedToEmployeeId: user?.empId || 1,
-            departmentId: 2,
-            deadline: deadlineIso,
-            creationReason:
-              formData.reason || `${formData.reviewType} assigned`,
-            createdByEmployeeId: user?.empId || 1,
-          };
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
 
-          const response = await slaService.createSLA(requestData);
+      if (response?.success) {
+        const resultData = response.data;
 
-          if (response?.success) {
-            successCount++;
-            console.log(`SLA created for ${empData.name}`);
-          } else {
-            failedCount++;
+        // Show success toast with count only
+        toast.success(
+          `SLA Created Successfully`,
+          {
+            duration: 3000,
           }
-        } catch (err) {
-          failedCount++;
-        }
-      }
+        );
 
-      console.log(`Summary: ${successCount} created, ${failedCount} failed`);
-
-      if (successCount > 0) {
-        onSuccess?.();
-        onClose?.();
+        // Close modal after short delay
+        setTimeout(() => {
+          if (resultData.successfulInserts > 0) {
+            onSuccess?.();
+            onClose?.();
+          }
+        }, 1500);
+      } else {
+        toast.error("Failed to create SLAs");
+        setError(response?.message || "Failed to create SLAs");
       }
     } catch (err) {
       console.error("Error:", err);
+      toast.dismiss(loadingToast);
+      toast.error("Failed to create SLAs");
       setError(err?.message || "Error creating SLAs");
     } finally {
       setLoading(false);
@@ -180,7 +202,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/*   UPDATED HEADER - Dark Purple Theme */}
+        {/* HEADER */}
         <div
           style={{
             display: "flex",
@@ -191,38 +213,41 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
             borderBottom: "none",
           }}
         >
-          <h5 
-            style={{ 
-              margin: 0, 
-              fontWeight: 600, 
+          <h5
+            style={{
+              margin: 0,
+              fontWeight: 600,
               fontSize: "1.1rem",
               color: "white",
-              textAlign: "left"
+              textAlign: "left",
             }}
           >
             Create SLA
           </h5>
           <button
             onClick={onClose}
+            disabled={loading}
             style={{
               border: "none",
               backgroundColor: "transparent",
-              cursor: "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
               padding: "0.5rem",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              opacity: 0.8,
+              opacity: loading ? 0.5 : 0.8,
               transition: "opacity 0.2s ease",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = "1"}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = "0.8"}
+            onMouseEnter={(e) =>
+              !loading && (e.currentTarget.style.opacity = "1")
+            }
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.8")}
           >
             <X size={24} color="white" />
           </button>
         </div>
 
-        {/*   UPDATED BODY - Light Gray Background */}
+        {/* BODY */}
         <div style={{ padding: "1.75rem", backgroundColor: "#f8f9fa" }}>
           {fetchLoading ? (
             <div
@@ -242,11 +267,13 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                   animation: "spin 1s linear infinite",
                 }}
               />
-              <p style={{ color: "#666", fontSize: "0.95rem" }}>Loading employee count...</p>
+              <p style={{ color: "#666", fontSize: "0.95rem" }}>
+                Loading employee count...
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              {/*   UPDATED ERROR ALERT */}
+              {/* ERROR ALERT */}
               {error && (
                 <div
                   style={{
@@ -262,13 +289,25 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                 >
                   <AlertCircle
                     size={20}
-                    style={{ color: "#E01950", flexShrink: 0, marginTop: "2px" }}
+                    style={{
+                      color: "#E01950",
+                      flexShrink: 0,
+                      marginTop: "2px",
+                    }}
                   />
-                  <p style={{ margin: 0, color: "#991b1b", fontSize: "0.95rem" }}>{error}</p>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#991b1b",
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    {error}
+                  </p>
                 </div>
               )}
 
-              {/*   UPDATED REVIEW TYPE INPUT */}
+              {/* REVIEW TYPE INPUT */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -289,6 +328,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                   onChange={handleChange}
                   placeholder="E.g., Performance Form, Quarterly Review"
                   required
+                  disabled={loading}
                   style={{
                     width: "100%",
                     padding: "0.65rem 0.75rem",
@@ -297,24 +337,14 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                     fontSize: "0.95rem",
                     fontFamily: "inherit",
                     boxSizing: "border-box",
-                    backgroundColor: "white",
+                    backgroundColor: loading ? "#f3f4f6" : "white",
                     textAlign: "left",
+                    cursor: loading ? "not-allowed" : "text",
                   }}
                 />
-                {/* <small
-                  style={{
-                    color: "#6b7280",
-                    display: "block",
-                    marginTop: "0.375rem",
-                    fontSize: "0.85rem",
-                    textAlign: "left",
-                  }}
-                >
-                  Type any review type name
-                </small> */}
               </div>
 
-              {/*   UPDATED DEADLINE INPUT */}
+              {/* DEADLINE INPUT */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -335,6 +365,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                   onChange={handleChange}
                   min={new Date().toISOString().split("T")[0]}
                   required
+                  disabled={loading}
                   style={{
                     width: "100%",
                     padding: "0.65rem 0.75rem",
@@ -343,13 +374,14 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                     fontSize: "0.95rem",
                     fontFamily: "inherit",
                     boxSizing: "border-box",
-                    backgroundColor: "white",
+                    backgroundColor: loading ? "#f3f4f6" : "white",
                     textAlign: "left",
+                    cursor: loading ? "not-allowed" : "text",
                   }}
                 />
               </div>
 
-              {/*   UPDATED REASON INPUT */}
+              {/* REASON INPUT */}
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
                   style={{
@@ -369,6 +401,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                   value={formData.reason}
                   onChange={handleChange}
                   placeholder="Why assign this SLA?"
+                  disabled={loading}
                   style={{
                     width: "100%",
                     padding: "0.65rem 0.75rem",
@@ -377,13 +410,14 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                     fontSize: "0.95rem",
                     fontFamily: "inherit",
                     boxSizing: "border-box",
-                    backgroundColor: "white",
+                    backgroundColor: loading ? "#f3f4f6" : "white",
                     textAlign: "left",
+                    cursor: loading ? "not-allowed" : "text",
                   }}
                 />
               </div>
 
-              {/*   UPDATED EMPLOYEE COUNT INFO */}
+              {/* EMPLOYEE COUNT INFO */}
               <div
                 style={{
                   backgroundColor: "rgba(13, 110, 253, 0.1)",
@@ -400,8 +434,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
                     fontWeight: 600,
                     fontSize: "1.25rem",
                     lineHeight: 1.2,
-                    textAlign: "left"
-                    
+                    textAlign: "left",
                   }}
                 >
                   {employeeCount} Employees
@@ -414,7 +447,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           )}
         </div>
 
-        {/*   UPDATED FOOTER */}
+        {/* FOOTER */}
         <div
           style={{
             display: "flex",
@@ -451,8 +484,7 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
           >
             Cancel
           </button>
-          
-          {/*   UPDATED CREATE BUTTON - Gradient Theme */}
+
           <button
             onClick={handleSubmit}
             disabled={loading || fetchLoading || employeeCount === 0}
@@ -478,12 +510,14 @@ const CreateSLAModal = ({ onClose, onSuccess }) => {
             onMouseEnter={(e) => {
               if (!(loading || fetchLoading || employeeCount === 0)) {
                 e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = "0 6px 16px rgba(151, 36, 126, 0.4)";
+                e.currentTarget.style.boxShadow =
+                  "0 6px 16px rgba(151, 36, 126, 0.4)";
               }
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(151, 36, 126, 0.3)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(151, 36, 126, 0.3)";
             }}
           >
             {loading ? (
