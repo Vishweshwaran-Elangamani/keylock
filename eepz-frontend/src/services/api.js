@@ -14,6 +14,27 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // CRITICAL FIX: Remove Content-Type for FormData
+    // Browser will automatically set multipart/form-data with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+      
+      // Also remove from other header types if present
+      if (config.headers.common) {
+        delete config.headers.common["Content-Type"];
+      }
+      if (config.headers.put) {
+        delete config.headers.put["Content-Type"];
+      }
+      if (config.headers.post) {
+        delete config.headers.post["Content-Type"];
+      }
+      
+      console.log("✓ FormData detected - Content-Type header removed");
+      console.log("✓ Browser will set: multipart/form-data with boundary");
+    }
+
     return config;
   },
   (error) => {
@@ -30,6 +51,7 @@ api.interceptors.response.use(
     console.error("Response error:", error);
     console.error("Status:", error.response?.status);
     console.error("URL:", error.config?.url);
+    console.error("Data:", error.response?.data);
 
     const originalRequest = error.config;
 
@@ -69,8 +91,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-// Add this new function!
-
-
 
 export default api;

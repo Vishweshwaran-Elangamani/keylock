@@ -1,18 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/auth/AuthContext";
 import { toast } from "sonner";
-
 import {
   getUserDisplayName,
   getUserInitials,
   getUserEmail,
 } from "../utils/auth/helpers";
+import ProfilePhotoUploadModal from "../components/auth/Modal/common/ProfilePhotoUploadModal";
+import EmployeeProfileService from "../services/auth/EmployeeProfileService";
 
 const Navbar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Fetch profile photo on mount
+  useEffect(() => {
+    const fetchProfilePhoto = async () => {
+      try {
+        const response = await EmployeeProfileService.getProfile();
+        if (response.success && response.data?.profilePhotoBase64) {
+          setProfilePhoto(`data:image/jpeg;base64,${response.data.profilePhotoBase64}`);
+        }
+      } catch (error) {
+        console.error("Error fetching profile photo:", error);
+      }
+    };
+
+    fetchProfilePhoto();
+  }, []);
 
   const handleLogout = () => {
     toast.success("You have been logged out successfully!");
@@ -30,6 +49,15 @@ const Navbar = () => {
   const handleProfile = () => {
     navigate("/profile");
     setShowProfileMenu(false);
+  };
+
+  const handleCameraClick = (e) => {
+    e.stopPropagation();
+    setShowPhotoModal(true);
+  };
+
+  const handlePhotoUpdate = (newPhotoUrl) => {
+    setProfilePhoto(newPhotoUrl);
   };
 
   const formatDate = (date, locale = navigator.language || "en-IN") => {
@@ -66,7 +94,7 @@ const Navbar = () => {
             alignItems: "center",
             justifyContent: "space-between",
             padding: "1.15rem 1.5rem",
-            maxHeight: "100px"
+            maxHeight: "100px",
           }}
         >
           {/* Left Section */}
@@ -109,14 +137,30 @@ const Navbar = () => {
                   justifyContent: "center",
                   fontWeight: "bold",
                   cursor: "pointer",
-                  background:
-                    "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                  border: "none",
+                  background: profilePhoto
+                    ? "transparent"
+                    : "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
+                  border: profilePhoto ? "3px solid #97247E" : "none",
                   boxShadow: "0 2px 8px rgba(151, 36, 126, 0.3)",
                   fontSize: "0.875rem",
+                  padding: 0,
+                  overflow: "hidden",
                 }}
               >
-                {initials}
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    alt="Profile"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius: "50%",
+                    }}
+                  />
+                ) : (
+                  initials
+                )}
               </button>
 
               {/* Profile Dropdown Menu */}
@@ -143,26 +187,52 @@ const Navbar = () => {
                       borderBottom: "1px solid #e5e7eb",
                     }}
                   >
+                    {/* Avatar with Camera Icon */}
                     <div
                       style={{
+                        position: "relative",
                         width: "72px",
                         height: "72px",
-                        borderRadius: "50%",
-                        color: "#FFFFFF",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontWeight: "bold",
                         margin: "0 auto 1rem",
-                        background:
-                          "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
-                        border: "4px solid #e5e7eb",
-                        fontSize: "1.5rem",
-                        boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
+                        display: "inline-block",
                       }}
                     >
-                      {initials}
+                      <div
+                        style={{
+                          width: "72px",
+                          height: "72px",
+                          borderRadius: "50%",
+                          color: "#FFFFFF",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: "bold",
+                          background: profilePhoto
+                            ? "transparent"
+                            : "linear-gradient(135deg, #AC5098 0%, #97247E 100%)",
+                          border: "4px solid #e5e7eb",
+                          fontSize: "1.5rem",
+                          boxShadow: "0 4px 12px rgba(151, 36, 126, 0.3)",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {profilePhoto ? (
+                          <img
+                            src={profilePhoto}
+                            alt="Profile"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: "50%",
+                            }}
+                          />
+                        ) : (
+                          initials
+                        )}
+                      </div>
                     </div>
+
                     <h5
                       style={{
                         fontWeight: "bold",
@@ -273,6 +343,14 @@ const Navbar = () => {
             zIndex: 999,
           }}
           onClick={() => setShowProfileMenu(false)}
+        />
+      )}
+
+      {/* Photo Upload Modal */}
+      {showPhotoModal && (
+        <ProfilePhotoUploadModal
+          onClose={() => setShowPhotoModal(false)}
+          onPhotoUpdate={handlePhotoUpdate}
         />
       )}
     </>

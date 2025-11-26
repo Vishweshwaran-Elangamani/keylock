@@ -998,4 +998,52 @@
       border: 1px solid #dee2e6;
     }
   }
-  
+  /* Profile Photo Display */
+.avatar-photo-modern {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-avatar-wrapper-modern {
+  position: relative;
+  display: inline-block;
+}
+
+.camera-icon-btn-modern {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
+  border: 3px solid linear-gradient(135deg, #97247e 0%, #e01950 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.camera-icon-btn-modern:hover {
+  background: linear-gradient(135deg, #97247e 0%, #e01950 100%);
+  transform: scale(1.1);
+}
+
+.camera-icon-btn-modern i {
+  font-size: 16px;
+  color: linear-gradient(135deg, #97247e 0%, #e01950 100%);
+  transition: color 0.2s ease;
+}
+
+.camera-icon-btn-modern i {
+  color: #fff;
+}
+
+.camera-icon-btn-modern:active {
+  transform: scale(0.95);
+}

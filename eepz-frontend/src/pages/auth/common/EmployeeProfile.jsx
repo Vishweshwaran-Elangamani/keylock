@@ -3,6 +3,7 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 import EmployeeProfileService from "../../../services/auth/EmployeeProfileService";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
 import ChangeRequestModal from "../../../components/auth/Modal/common/ChangeRequestModal";
+import ProfilePhotoUploadModal from "../../../components/auth/Modal/common/ProfilePhotoUploadModal";
 import { toast } from "sonner";
 import "../../../styles/auth/common/EmployeeProfile.css";
 
@@ -28,6 +29,10 @@ const EmployeeProfile = () => {
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [pendingRequestId, setPendingRequestId] = useState(null);
   const [checkingPending, setCheckingPending] = useState(false);
+
+  // NEW: Profile photo states
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState(null);
 
   // Nationality dropdown options
   const nationalityOptions = [
@@ -90,6 +95,17 @@ const EmployeeProfile = () => {
   }, []);
 
   /**
+   * NEW: Update profile photo when profile data loads
+   */
+  useEffect(() => {
+    if (profileData?.profilePhotoBase64) {
+      setProfilePhoto(
+        `data:image/jpeg;base64,${profileData.profilePhotoBase64}`
+      );
+    }
+  }, [profileData]);
+
+  /**
    * Fetches employee profile data from backend
    */
   const fetchProfileData = async () => {
@@ -142,6 +158,23 @@ const EmployeeProfile = () => {
     } finally {
       setCheckingPending(false);
     }
+  };
+
+  /**
+   * NEW: Handles camera icon click to open photo upload modal
+   */
+  const handleCameraClick = () => {
+    setShowPhotoModal(true);
+  };
+
+  /**
+   * NEW: Handles photo update callback from modal
+   * Updates the profile photo state with new image
+   */
+  const handlePhotoUpdate = async (newPhotoUrl) => {
+    setProfilePhoto(newPhotoUrl);
+    // Refresh profile data to get updated photo
+    await fetchProfileData();
   };
 
   /**
@@ -219,7 +252,7 @@ const EmployeeProfile = () => {
     } else {
       setSameAsCurrentAddress(false);
     }
-    
+
     // Reset errors and touched state
     setErrors({});
     setTouched({});
@@ -673,7 +706,10 @@ const EmployeeProfile = () => {
 
       case "state":
         // State is required if city is filled
-        if (formData[addressType]?.city && (!stringValue || stringValue === "")) {
+        if (
+          formData[addressType]?.city &&
+          (!stringValue || stringValue === "")
+        ) {
           error = "State is required when city is provided";
         }
         break;
@@ -810,16 +846,37 @@ const EmployeeProfile = () => {
   };
 
   /**
-   * Auto-sync permanent address when current address changes
+   * Upload/Update profile photo only
+   * Uses dedicated endpoint: PUT /Profile/upload-photo
    */
-  useEffect(() => {
-    if (sameAsCurrentAddress && isEditing) {
-      setFormData((prev) => ({
-        ...prev,
-        permanentAddress: { ...prev.currentAddress },
-      }));
+  updateProfilePhoto: async (formData) => {
+    try {
+      console.log("Uploading photo to: /Profile/upload-photo");
+
+      const response = await api.put("/Profile/upload-photo", formData);
+
+      console.log("Photo upload successful:", response.data);
+
+      return response.data;
+    } catch (error) {
+      console.error("Error updating profile photo:", error);
+      console.error("Error response:", error.response?.data);
+      throw (
+        error.response?.data || { message: "Failed to update profile photo" }
+      );
     }
-  }, [formData.currentAddress, sameAsCurrentAddress, isEditing]);
+  },
+    /**
+     * Auto-sync permanent address when current address changes
+     */
+    useEffect(() => {
+      if (sameAsCurrentAddress && isEditing) {
+        setFormData((prev) => ({
+          ...prev,
+          permanentAddress: { ...prev.currentAddress },
+        }));
+      }
+    }, [formData.currentAddress, sameAsCurrentAddress, isEditing]);
 
   /**
    * Validates entire form before submission with 360° coverage
@@ -841,7 +898,10 @@ const EmployeeProfile = () => {
     // Validate required fields
     requiredFields.forEach((field) => {
       const fieldValue = formData[field];
-      if (!fieldValue || (typeof fieldValue === 'string' && !fieldValue.trim())) {
+      if (
+        !fieldValue ||
+        (typeof fieldValue === "string" && !fieldValue.trim())
+      ) {
         newErrors[field] = `${field
           .replace(/([A-Z])/g, " $1")
           .trim()} is required`;
@@ -943,16 +1003,16 @@ const EmployeeProfile = () => {
       if (response.success) {
         toast.dismiss();
         toast.success("Profile updated successfully!");
-        
+
         // Update profileData with fresh data from response
         setProfileData(response.data);
-        
+
         // Reinitialize form with updated data
         initializeFormData(response.data);
-        
+
         // Exit edit mode
         setIsEditing(false);
-        
+
         // Reset the sameAsCurrentAddress flag based on new data
         if (
           response.data.currentAddress &&
@@ -973,7 +1033,8 @@ const EmployeeProfile = () => {
     } catch (error) {
       toast.dismiss();
       toast.error(
-        error.message || "Verify all the fields that have been entered are valid!"
+        error.message ||
+          "Verify all the fields that have been entered are valid!"
       );
     } finally {
       setSaving(false);
@@ -1103,11 +1164,28 @@ const EmployeeProfile = () => {
         <div className="profile-header-content">
           {/* Avatar and Basic Info Section */}
           <div className="profile-avatar-section">
-            <div className="profile-avatar-modern">
-              <span className="avatar-initials">
-                {getInitials(profileData.firstName, profileData.lastName)}
-              </span>
-              <div className="avatar-status-ring"></div>
+            <div className="profile-avatar-wrapper-modern">
+              <div className="profile-avatar-modern">
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    alt="Profile"
+                    className="avatar-photo-modern"
+                  />
+                ) : (
+                  <span className="avatar-initials">
+                    {getInitials(profileData.firstName, profileData.lastName)}
+                  </span>
+                )}
+              </div>
+              {/* Camera Icon Button */}
+              <button
+                className="camera-icon-btn-modern"
+                onClick={handleCameraClick}
+                title="Upload profile photo"
+              >
+                <i className="bi bi-camera-fill"></i>
+              </button>
             </div>
             <div className="profile-basic-info">
               <h1 className="profile-name-modern">
@@ -1402,7 +1480,9 @@ const EmployeeProfile = () => {
 
                   {/* Middle Name - OPTIONAL */}
                   <div className="form-field">
-                    <label>Middle Name<span className="required">*</span></label>
+                    <label>
+                      Middle Name<span className="required">*</span>
+                    </label>
                     <input
                       type="text"
                       className={`form-control-modern ${
@@ -1573,7 +1653,9 @@ const EmployeeProfile = () => {
                     <div className="form-grid address-grid">
                       {/* All address fields are OPTIONAL */}
                       <div className="form-field">
-                        <label>Door/Flat Number<span className="required">*</span></label>
+                        <label>
+                          Door/Flat Number<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1599,7 +1681,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Street<span className="required">*</span></label>
+                        <label>
+                          Street<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1623,7 +1707,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Landmark<span className="required">*</span></label>
+                        <label>
+                          Landmark<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1647,7 +1733,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Area<span className="required">*</span></label>
+                        <label>
+                          Area<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1671,7 +1759,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>City<span className="required">*</span></label>
+                        <label>
+                          City<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1695,7 +1785,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>State<span className="required">*</span></label>
+                        <label>
+                          State<span className="required">*</span>
+                        </label>
                         <select
                           className={`form-control-modern ${
                             showError("currentAddress.state") ? "error" : ""
@@ -1724,7 +1816,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>PIN Code<span className="required">*</span></label>
+                        <label>
+                          PIN Code<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1776,7 +1870,9 @@ const EmployeeProfile = () => {
                   ) : (
                     <div className="form-grid address-grid">
                       <div className="form-field">
-                        <label>Door/Flat Number<span className="required">*</span></label>
+                        <label>
+                          Door/Flat Number<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1803,7 +1899,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Street<span className="required">*</span></label>
+                        <label>
+                          Street<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1828,7 +1926,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Landmark<span className="required">*</span></label>
+                        <label>
+                          Landmark<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1855,7 +1955,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>Area<span className="required">*</span></label>
+                        <label>
+                          Area<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1880,7 +1982,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>City<span className="required">*</span></label>
+                        <label>
+                          City<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1905,7 +2009,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>State<span className="required">*</span></label>
+                        <label>
+                          State<span className="required">*</span>
+                        </label>
                         <select
                           className={`form-control-modern ${
                             showError("permanentAddress.state") ? "error" : ""
@@ -1935,7 +2041,9 @@ const EmployeeProfile = () => {
                       </div>
 
                       <div className="form-field">
-                        <label>PIN Code<span className="required">*</span></label>
+                        <label>
+                          PIN Code<span className="required">*</span>
+                        </label>
                         <input
                           type="text"
                           className={`form-control-modern ${
@@ -1975,7 +2083,6 @@ const EmployeeProfile = () => {
           </div>
         </div>
       </div>
-
       {/* Change Request Modal */}
       <ChangeRequestModal
         show={showChangeRequestModal}
@@ -1985,6 +2092,14 @@ const EmployeeProfile = () => {
         hasPendingRequest={hasPendingRequest}
         pendingRequestId={pendingRequestId}
       />
+
+      {/* NEW: Profile Photo Upload Modal */}
+      {showPhotoModal && (
+        <ProfilePhotoUploadModal
+          onClose={() => setShowPhotoModal(false)}
+          onPhotoUpdate={handlePhotoUpdate}
+        />
+      )}
     </div>
   );
 };
