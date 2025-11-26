@@ -1,0 +1,21 @@
+2025-11-23 18:43:08.444 +05:30 [INF] Database migration completed successfully
+2025-11-23 18:51:13.902 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-23 18:51:13.913 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/3 responded 204 in 19.2738 ms
+2025-11-23 18:51:13.914 +05:30 [INF] HTTP OPTIONS /api/Sla/employee/3 responded 204 in 19.2934 ms
+2025-11-23 18:51:14.196 +05:30 [INF] Getting SLAs for employee 3
+2025-11-23 18:51:14.197 +05:30 [INF] Retrieving SLAs for employee 3
+2025-11-23 18:51:15.537 +05:30 [INF] HTTP GET /api/Sla/employee/3 responded 200 in 1597.2916 ms
+2025-11-23 18:51:15.563 +05:30 [INF] Getting SLAs for employee 3
+2025-11-23 18:51:15.563 +05:30 [INF] Retrieving SLAs for employee 3
+2025-11-23 18:51:15.693 +05:30 [INF] HTTP GET /api/Sla/employee/3 responded 200 in 156.4982 ms
+2025-11-23 19:21:18.106 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/2/escalations responded 204 in 0.4375 ms
+2025-11-23 19:21:18.106 +05:30 [INF] HTTP OPTIONS /api/Sla/manager/2/escalations responded 204 in 0.4144 ms
+2025-11-23 19:21:18.166 +05:30 [INF] Getting escalations for manager 2
+2025-11-23 19:21:18.370 +05:30 [INF] HTTP GET /api/Sla/manager/2/escalations responded 200 in 260.1255 ms
+2025-11-23 19:21:18.376 +05:30 [INF] HTTP OPTIONS /api/Sla/all responded 204 in 0.0603 ms
+2025-11-23 19:21:18.397 +05:30 [INF] Getting escalations for manager 2
+2025-11-23 19:21:18.404 +05:30 [INF] Getting all SLAs
+2025-11-23 19:21:18.411 +05:30 [INF] HTTP GET /api/Sla/manager/2/escalations responded 200 in 38.9934 ms
+2025-11-23 19:21:18.462 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 84.7814 ms
+2025-11-23 19:21:18.478 +05:30 [INF] Getting all SLAs
+2025-11-23 19:21:18.482 +05:30 [INF] HTTP GET /api/Sla/all responded 200 in 18.8581 ms

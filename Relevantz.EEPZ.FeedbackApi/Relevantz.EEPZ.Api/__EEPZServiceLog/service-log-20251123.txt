@@ -1,0 +1,8 @@
+2025-11-23 18:42:16.302 +05:30 [INF] Database migration completed successfully
+2025-11-23 21:27:47.815 +05:30 [WRN] Failed to determine the https port for redirect.
+2025-11-23 21:27:49.455 +05:30 [INF] HTTP GET /api/sme/active responded 200 in 1644.9342 ms
+2025-11-23 21:27:49.604 +05:30 [INF] HTTP GET /api/sme/active responded 200 in 146.7718 ms
+2025-11-23 21:27:49.664 +05:30 [INF] HTTP GET /api/employeemanagement/all responded 200 in 192.6982 ms
+2025-11-23 21:27:49.692 +05:30 [INF] HTTP GET /api/employeemanagement/all responded 200 in 23.3801 ms
+2025-11-23 21:27:49.965 +05:30 [INF] HTTP GET /api/peerfeedbackqueue/all responded 200 in 293.9573 ms
+2025-11-23 21:27:50.002 +05:30 [INF] HTTP GET /api/peerfeedbackqueue/all responded 200 in 32.9277 ms
