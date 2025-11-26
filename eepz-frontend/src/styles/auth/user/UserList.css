@@ -729,3 +729,32 @@
     font-size: 0.875rem;
   }
 }
+/* Perfectly Aligned, Matching Buttons for Action Row */
+.btn-action-row {
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 16px;
+  height: 56px;
+  padding: 0 42px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: all 0.18s;
+}
+.btn-action-row:active,
+.btn-action-row:focus {
+  outline: none;
+}
+.btn-action-row.btn-search {
+  background: #27235c;
+  color: #fff;
+}
+
+.btn-action-row.btn-clear {
+  background: #edeef3;
+  color: #27235c;
+  box-shadow: 0 0 0 4px #edeef3;
+}
+

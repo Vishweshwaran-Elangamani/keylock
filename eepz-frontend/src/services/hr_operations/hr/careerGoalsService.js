@@ -1,4 +1,4 @@
-import hrApi from "../../hrApi";
+import hrApi from "../hr/hrApi";
 
 const careerGoalsService = {
   // Get career goals overview/statistics for dashboard
