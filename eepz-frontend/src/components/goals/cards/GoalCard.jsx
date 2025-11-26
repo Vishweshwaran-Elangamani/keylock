@@ -71,7 +71,7 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
         overflow: "hidden",
         position: "relative",
         background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
-        width: "100%" 
+        width: "100%",
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.52)";
@@ -95,7 +95,6 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
       >
         <div className="d-flex justify-content-between align-items-start">
           <div className="d-flex gap-2 flex-wrap align-items-center">
-
             {showTaskStatus ? (
               // Show both badges for employee assignees
               <>
@@ -105,11 +104,16 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
                   isAcknowledged={isUserAcknowledged}
                   size="sm"
                 />
-                <GoalStatusBadge status={goal.status} size="sm" />
+                {!isOverdue && (
+                  <GoalStatusBadge status={goal.status} size="sm" />
+                )}
               </>
             ) : (
-              // Show only goal status for creators
-              <GoalStatusBadge status={goal.status} size="sm" />
+              <>
+                {!isOverdue && (
+                  <GoalStatusBadge status={goal.status} size="sm" />
+                )}
+              </>
             )}
           </div>
 

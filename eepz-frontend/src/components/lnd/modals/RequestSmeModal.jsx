@@ -21,9 +21,6 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
 
       if (response.data.success) {
         setAvailableSmes(response.data.data.items);
-        if (response.data.data.items.length > 0) {
-          setSelectedSmeId(response.data.data.items[0].smeId);
-        }
       }
     } catch (error) {
       console.error("Failed to fetch SMEs:", error);
@@ -69,6 +66,9 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
       setLoading(false);
     }
   };
+
+  const isSubmitEnabled =
+    !loading && availableSmes.length > 0 && selectedSmeId && deadline;
 
   // Get minimum date (today)
   const getMinDate = () => {
@@ -153,7 +153,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
             background: "#fff",
             borderRadius: "12px",
             width: "100%",
-            maxWidth: "600px",
+            maxWidth: "650px",
             maxHeight: "90vh",
             overflow: "auto",
             boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
@@ -255,6 +255,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                         color: "#212529",
                         marginBottom: "0.75rem",
                         display: "block",
+                        textAlign: "left",
                       }}
                     >
                       Available SMEs ({availableSmes.length})
@@ -274,7 +275,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                             border:
                               selectedSmeId === sme.employeeId
                                 ? "2px solid #97247E"
-                                : "1px solid #e5e7eb",
+                                : "1px solid rgba(39, 35, 92, 0.5)",
                             borderRadius: "8px",
                             background:
                               selectedSmeId === sme.employeeId
@@ -300,6 +301,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                                   color: "#212529",
                                   margin: 0,
                                   marginBottom: "0.25rem",
+                                  textAlign: "left",
                                 }}
                               >
                                 {sme.employeeName}
@@ -328,7 +330,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                     </div>
                   </div>
 
-                  {/* Deadline (Optional) */}
+                  {/* Deadline */}
                   <div style={{ marginBottom: "1.5rem" }}>
                     <label
                       style={{
@@ -342,17 +344,18 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                       }}
                     >
                       <Calendar size={16} />
-                      Deadline (Optional)
+                      Deadline <span style={{ color: "#dc3545" }}>*</span>
                     </label>
                     <input
                       type="date"
-                      value={deadline}
+                      value={deadline || ""}
                       onChange={(e) => setDeadline(e.target.value)}
                       min={getMinDate()}
+                      required
                       style={{
                         width: "100%",
                         padding: "0.625rem",
-                        border: "1px solid #e5e7eb",
+                        border: "1px solid rgba(39, 35, 92, 0.5)",
                         borderRadius: "8px",
                         fontSize: "0.875rem",
                         outline: "none",
@@ -400,9 +403,7 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
               </button>
               <button
                 type="submit"
-                disabled={
-                  loading || availableSmes.length === 0 || !selectedSmeId
-                }
+                disabled={isSubmitEnabled}
                 style={{
                   padding: "0.625rem 1.25rem",
                   border: "none",
