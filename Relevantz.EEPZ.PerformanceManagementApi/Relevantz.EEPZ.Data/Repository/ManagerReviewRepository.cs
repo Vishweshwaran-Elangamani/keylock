@@ -303,241 +303,249 @@ WHERE ad.assessment_id = @assessmentId
   // =========================================================
   // L2 READ: full assessment view
   // =========================================================
-  public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(int reviewerUserId, int assessmentId)
 
-  {
-
-    const string sql = @"
-
+    public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(int reviewerUserId, int assessmentId)
+    {
+        const string sql = @"
 WITH l2 AS (
-
   SELECT e.EmployeeId AS L2EmployeeId
-
   FROM UserAuthentication ua
-
   JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-
   WHERE ua.UserId = @reviewerUserId
-
 ),
-
 scope AS (
-
   SELECT DISTINCT sa.assessment_id
-
   FROM SelfAssessment sa
-
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-
   JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-
   JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-
   JOIN Project p ON p.ProjectId = pe.ProjectId
-
   JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
-
   WHERE sa.assessment_id = @assessmentId
-
     AND sa.status = 'Submitted'
-
     AND (
-
          p.L1ApproverEmployeeId IS NULL
-
          OR EXISTS (
-
              SELECT 1
-
              FROM AssessmentReview ar
-
              JOIN AssessmentDetail ad2 ON ad2.detail_id = ar.detail_id
-
              WHERE ar.reviewer_role = 'Approver' AND ar.detail_id IS NOT NULL
-
                AND ad2.assessment_id = sa.assessment_id
-
          )
-
     )
-
 ),
-
 latest_l1 AS (
-
   SELECT ar.*
-
   FROM AssessmentReview ar
-
   JOIN (
-
     SELECT detail_id, MAX(review_id) AS max_id
-
     FROM AssessmentReview
-
     WHERE reviewer_role = 'Approver'
-
       AND detail_id IS NOT NULL
-
       AND rating > 0
-
     GROUP BY detail_id
-
   ) t ON t.max_id = ar.review_id
-
 ),
-
 latest_l2 AS (
-
   SELECT ar.*
-
   FROM AssessmentReview ar
-
   JOIN (
-
     SELECT detail_id, MAX(review_id) AS max_id
-
     FROM AssessmentReview
-
     WHERE reviewer_role = 'Reviewer'
-
       AND detail_id IS NOT NULL
-
-      AND rating > 0  -- ✅ FIXED: Exclude decision records
-
+      AND rating > 0
     GROUP BY detail_id
-
   ) t ON t.max_id = ar.review_id
-
 ),
-
 header AS (
-
   SELECT
-
     sa.assessment_id AS AssessmentId,
-
     COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, e.EmployeeCompanyId) AS EmployeeName,
-
     f.name AS FormName,
-
     sa.submitted_at AS SubmittedAt,
-
     GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-
   FROM SelfAssessment sa
-
   JOIN scope s ON s.assessment_id = sa.assessment_id
-
   JOIN AssessmentForm f ON f.form_id = sa.form_id
-
   JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-
   JOIN Employee e ON e.EmployeeId = emp_ua.EmployeeId
-
   LEFT JOIN UserProfile up ON up.EmployeeId = e.EmployeeId
-
   JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = e.EmployeeId
-
   JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-
   JOIN Project p ON p.ProjectId = pe.ProjectId
-
   GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
-
 )
-
 SELECT 
-
   h.AssessmentId,
-
   h.EmployeeName,
-
   h.FormName,
-
   h.SubmittedAt,
-
   h.Project,
-
   ad.detail_id       AS DetailId,
-
   c.name             AS CompetencyName,
-
   ad.employee_rating AS EmployeeRating,
-
   ad.employee_comments AS EmployeeComments,
-
   l1.rating          AS ApproverRating,
-
   l1.comments        AS ApproverComments,
-
   l2.rating          AS ReviewerRating,
-
   l2.comments        AS ReviewerComments
-
 FROM header h
-
 JOIN AssessmentDetail ad ON ad.assessment_id = h.AssessmentId
-
 JOIN Competency c ON c.competency_id = ad.competency_id
-
 LEFT JOIN latest_l1 l1 ON l1.detail_id = ad.detail_id
-
 LEFT JOIN latest_l2 l2 ON l2.detail_id = ad.detail_id
-
 ORDER BY c.display_order IS NULL, c.display_order, c.name;";
 
-    var conn = _ctx.Database.GetDbConnection();
+        var conn = _ctx.Database.GetDbConnection();
+        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
-    if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+        var rows = (await conn.QueryAsync(sql, new { reviewerUserId, assessmentId })).ToList();
+        if (!rows.Any()) return null;
 
-    var rows = (await conn.QueryAsync(sql, new { reviewerUserId, assessmentId }))
+        var head = rows[0];
+        var items = rows.Select(r => new CompetencyReviewRowDto(
+            DetailId: (int)r.DetailId,
+            CompetencyName: (string)r.CompetencyName,
+            EmployeeRating: (int?)r.EmployeeRating,
+            EmployeeComments: (string?)r.EmployeeComments,
+            ApproverRating: (int?)r.ApproverRating,
+            ApproverComments: (string?)r.ApproverComments,
+            ReviewerRating: (int?)r.ReviewerRating,
+            ReviewerComments: (string?)r.ReviewerComments
+        )).ToList();
 
-        .ToList();
+        // ✅ NEW: Fetch attachments
+        var attachments = await GetAssessmentAttachmentsAsync(assessmentId);
 
-    if (!rows.Any()) return null;
+        return new ReviewerAssessmentViewDto(
+            AssessmentId: (int)head.AssessmentId,
+            EmployeeName: (string)head.EmployeeName,
+            FormName: (string)head.FormName,
+            SubmittedAt: (DateTime)head.SubmittedAt,
+            Project: (string)head.Project,
+            Items: items,
+            Attachments: attachments  // ✅ NEW: Include attachments
+        );
+    }
 
-    var head = rows[0];
+    // ✅ UPDATED: GetAssessmentForApproverAsync - now includes attachments
+    public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(int approverUserId, int assessmentId)
+    {
+        const string sql = @"
+WITH l1 AS (
+  SELECT e.EmployeeId AS L1EmployeeId
+  FROM UserAuthentication ua
+  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
+  WHERE ua.UserId = @approverUserId
+),
+scope AS (
+  SELECT DISTINCT sa.assessment_id
+  FROM SelfAssessment sa
+  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
+  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
+  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
+  JOIN Project p ON p.ProjectId = pe.ProjectId
+  JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
+  WHERE sa.assessment_id = @assessmentId
+    AND sa.status = 'Submitted'
+),
+latest_l1 AS (
+  SELECT ar.*
+  FROM AssessmentReview ar
+  JOIN (
+    SELECT detail_id, MAX(review_id) AS max_id
+    FROM AssessmentReview
+    WHERE reviewer_role = 'Approver'
+    GROUP BY detail_id
+  ) t ON t.max_id = ar.review_id
+),
+latest_l2 AS (
+  SELECT ar.*
+  FROM AssessmentReview ar
+  JOIN (
+    SELECT detail_id, MAX(review_id) AS max_id
+    FROM AssessmentReview
+    WHERE reviewer_role = 'Reviewer'
+      AND detail_id IS NOT NULL
+      AND rating >= 0
+    GROUP BY detail_id
+  ) t ON t.max_id = ar.review_id
+),
+header AS (
+  SELECT
+    sa.assessment_id AS AssessmentId,
+    COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, e.EmployeeCompanyId) AS EmployeeName,
+    f.name AS FormName,
+    sa.submitted_at AS SubmittedAt,
+    GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
+  FROM SelfAssessment sa
+  JOIN scope s ON s.assessment_id = sa.assessment_id
+  JOIN AssessmentForm f ON f.form_id = sa.form_id
+  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
+  JOIN Employee e ON e.EmployeeId = emp_ua.EmployeeId
+  LEFT JOIN UserProfile up ON up.EmployeeId = e.EmployeeId
+  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = e.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
+  JOIN Project p ON p.ProjectId = pe.ProjectId
+  GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
+)
+SELECT 
+  h.AssessmentId,
+  h.EmployeeName,
+  h.FormName,
+  h.SubmittedAt,
+  h.Project,
+  ad.detail_id       AS DetailId,
+  c.name             AS CompetencyName,
+  ad.employee_rating AS EmployeeRating,
+  ad.employee_comments AS EmployeeComments,
+  l1.rating          AS ApproverRating,
+  l1.comments        AS ApproverComments,
+  l2.rating          AS ReviewerRating,
+  l2.comments        AS ReviewerComments
+FROM header h
+JOIN AssessmentDetail ad ON ad.assessment_id = h.AssessmentId
+JOIN Competency c ON c.competency_id = ad.competency_id
+LEFT JOIN latest_l1 l1 ON l1.detail_id = ad.detail_id
+LEFT JOIN latest_l2 l2 ON l2.detail_id = ad.detail_id
+ORDER BY c.display_order IS NULL, c.display_order, c.name;";
 
-    var items = rows.Select(r => new CompetencyReviewRowDto(
+        var conn = _ctx.Database.GetDbConnection();
+        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
-        DetailId: (int)r.DetailId,
+        var rows = (await conn.QueryAsync(sql, new { approverUserId, assessmentId })).ToList();
+        if (!rows.Any()) return null;
 
-        CompetencyName: (string)r.CompetencyName,
+        var head = rows[0];
+        var items = rows.Select(r => new CompetencyReviewRowDto(
+            DetailId: (int)r.DetailId,
+            CompetencyName: (string)r.CompetencyName,
+            EmployeeRating: (int?)r.EmployeeRating,
+            EmployeeComments: (string?)r.EmployeeComments,
+            ApproverRating: (int?)r.ApproverRating,
+            ApproverComments: (string?)r.ApproverComments,
+            ReviewerRating: (int?)r.ReviewerRating,
+            ReviewerComments: (string?)r.ReviewerComments
+        )).ToList();
 
-        EmployeeRating: (int?)r.EmployeeRating,
+        // ✅ NEW: Fetch attachments
+        var attachments = await GetAssessmentAttachmentsAsync(assessmentId);
 
-        EmployeeComments: (string?)r.EmployeeComments,
+        return new ReviewerAssessmentViewDto(
+            AssessmentId: (int)head.AssessmentId,
+            EmployeeName: (string)head.EmployeeName,
+            FormName: (string)head.FormName,
+            SubmittedAt: (DateTime)head.SubmittedAt,
+            Project: (string)head.Project,
+            Items: items,
+            Attachments: attachments  // ✅ NEW: Include attachments
+        );
+    }
 
-        ApproverRating: (int?)r.ApproverRating,
 
-        ApproverComments: (string?)r.ApproverComments,
-
-        ReviewerRating: (int?)r.ReviewerRating,
-
-        ReviewerComments: (string?)r.ReviewerComments
-
-    )).ToList();
-
-    return new ReviewerAssessmentViewDto(
-
-        AssessmentId: (int)head.AssessmentId,
-
-        EmployeeName: (string)head.EmployeeName,
-
-        FormName: (string)head.FormName,
-
-        SubmittedAt: (DateTime)head.SubmittedAt,
-
-        Project: (string)head.Project,
-
-        Items: items
-
-    );
-
-  }
 
 
 
@@ -977,118 +985,6 @@ LIMIT @pageSize OFFSET @offset;";
         sql, new { approverUserId, pageSize, offset });
   }
 
-    // =========================================================
-    // L1 (Approver) — get single assessment for review
-    // =========================================================
-    public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(int approverUserId, int assessmentId)
-    {
-        const string sql = @"
-WITH l1 AS (
-  SELECT e.EmployeeId AS L1EmployeeId
-  FROM UserAuthentication ua
-  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
-  WHERE ua.UserId = @approverUserId
-),
-scope AS (
-  SELECT DISTINCT sa.assessment_id
-  FROM SelfAssessment sa
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
-  WHERE sa.assessment_id = @assessmentId
-    AND sa.status = 'Submitted'
-),
-latest_l1 AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Approver'
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-latest_l2 AS (
-  SELECT ar.*
-  FROM AssessmentReview ar
-  JOIN (
-    SELECT detail_id, MAX(review_id) AS max_id
-    FROM AssessmentReview
-    WHERE reviewer_role = 'Reviewer'
-      AND detail_id IS NOT NULL
-      AND rating >= 0
-    GROUP BY detail_id
-  ) t ON t.max_id = ar.review_id
-),
-header AS (
-  SELECT
-    sa.assessment_id AS AssessmentId,
-    COALESCE(NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''), emp_ua.Email, e.EmployeeCompanyId) AS EmployeeName,
-    f.name AS FormName,
-    sa.submitted_at AS SubmittedAt,
-    GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
-  FROM SelfAssessment sa
-  JOIN scope s ON s.assessment_id = sa.assessment_id
-  JOIN AssessmentForm f ON f.form_id = sa.form_id
-  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
-  JOIN Employee e ON e.EmployeeId = emp_ua.EmployeeId
-  LEFT JOIN UserProfile up ON up.EmployeeId = e.EmployeeId
-  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = e.EmployeeId
-  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
-  JOIN Project p ON p.ProjectId = pe.ProjectId
-  GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt
-)
-SELECT 
-  h.AssessmentId,
-  h.EmployeeName,
-  h.FormName,
-  h.SubmittedAt,
-  h.Project,
-  ad.detail_id       AS DetailId,
-  c.name             AS CompetencyName,
-  ad.employee_rating AS EmployeeRating,
-  ad.employee_comments AS EmployeeComments,
-  l1.rating          AS ApproverRating,
-  l1.comments        AS ApproverComments,
-  l2.rating          AS ReviewerRating,
-  l2.comments        AS ReviewerComments
-FROM header h
-JOIN AssessmentDetail ad ON ad.assessment_id = h.AssessmentId
-JOIN Competency c ON c.competency_id = ad.competency_id
-LEFT JOIN latest_l1 l1 ON l1.detail_id = ad.detail_id
-LEFT JOIN latest_l2 l2 ON l2.detail_id = ad.detail_id
-ORDER BY c.display_order IS NULL, c.display_order, c.name;";
-
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
-
-        var rows = (await conn.QueryAsync(sql, new { approverUserId, assessmentId })).ToList();
-        if (!rows.Any()) return null;
-
-        var head = rows[0];
-        var items = rows.Select(r => new CompetencyReviewRowDto(
-            DetailId: (int)r.DetailId,
-            CompetencyName: (string)r.CompetencyName,
-            EmployeeRating: (int?)r.EmployeeRating,
-            EmployeeComments: (string?)r.EmployeeComments,
-            ApproverRating: (int?)r.ApproverRating,
-            ApproverComments: (string?)r.ApproverComments,
-            ReviewerRating: (int?)r.ReviewerRating,
-            ReviewerComments: (string?)r.ReviewerComments
-        )).ToList();
-
-        return new ReviewerAssessmentViewDto(
-            AssessmentId: (int)head.AssessmentId,
-            EmployeeName: (string)head.EmployeeName,
-            FormName: (string)head.FormName,
-            SubmittedAt: (DateTime)head.SubmittedAt,
-            Project: (string)head.Project,
-            Items: items
-        );
-    }
 
     // =========================================================
     // L1 (Approver) — get assessments with details (FIXED)
@@ -1439,5 +1335,39 @@ LIMIT 1;";
             Note:      (string?)row.Note,
             DecidedAt: (DateTime?)row.DecidedAt
         );
+    }
+
+
+    public async Task<List<AttachmentInfoDto>> GetAssessmentAttachmentsAsync(int assessmentId)
+    {
+        const string sql = @"
+SELECT 
+    saa.attachment_id AS AttachmentId,
+    saa.file_name AS FileName,
+    saa.file_path AS FilePath,
+    saa.file_type AS FileType,
+    saa.file_size AS FileSize,
+    saa.attachment_note AS AttachmentNote,
+    saa.display_order AS DisplayOrder,
+    saa.uploaded_at AS UploadedAt
+FROM SelfAssessmentAttachment saa
+WHERE saa.assessment_id = @assessmentId
+ORDER BY saa.display_order IS NULL, saa.display_order, saa.uploaded_at;";
+
+        var conn = _ctx.Database.GetDbConnection();
+        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+
+        var rows = await conn.QueryAsync(sql, new { assessmentId });
+        
+        return rows.Select(r => new AttachmentInfoDto(
+            AttachmentId: (int)r.AttachmentId,
+            FileName: (string)r.FileName,
+            FilePath: (string)r.FilePath,
+            FileType: (string?)r.FileType,
+            FileSize: (long?)r.FileSize,
+            AttachmentNote: (string?)r.AttachmentNote,
+            DisplayOrder: (int?)r.DisplayOrder,
+            UploadedAt: (DateTime?)r.UploadedAt
+        )).ToList();
     }
 }

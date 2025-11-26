@@ -838,19 +838,18 @@ public async Task<IActionResult> ApproveDeptHeadEmployee([FromBody] ApprovalRequ
     }
 }
  
-  [HttpGet("depthead/submitted-ratings")]
+[HttpGet("depthead/submitted-ratings")]
 public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? departmentHeadId)
 {
     try
     {
         _logger.LogInformation($"GetDeptHeadSubmittedRatings called with departmentHeadId: {departmentHeadId}");
  
-        // ✅ NEW: Get department head ID from either query parameter or JWT token
+        // Get department head ID from either query parameter or JWT token
         int? deptHeadEmployeeId = departmentHeadId;
        
         if (!deptHeadEmployeeId.HasValue)
         {
-            // Fallback to JWT token if not provided
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
             {
@@ -872,10 +871,9 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
         var projects = await _context.Projects.AsNoTracking().ToListAsync();
         var projectEmployees = await _context.Projectemployees.AsNoTracking().ToListAsync();
  
-        // ✅ NEW: If departmentHeadId is provided, filter project employees by department
+        // Filter by department if departmentHeadId is provided
         if (deptHeadEmployeeId.HasValue)
         {
-            // ✅ NEW: Get department head's department via Employeedetailsmaster
             var deptHeadDeptId = await _context.Employeedetailsmasters
                 .Where(edm => edm.EmployeeId == deptHeadEmployeeId.Value)
                 .Select(edm => edm.DepartmentId)
@@ -885,13 +883,11 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
             {
                 _logger.LogInformation($"Filtering by Department ID: {deptHeadDeptId}");
                
-                // Get all employee IDs in the department head's department
                 var departmentEmployeeIds = await _context.Employeedetailsmasters
                     .Where(edm => edm.DepartmentId == deptHeadDeptId)
                     .Select(edm => edm.EmployeeId)
                     .ToListAsync();
                
-                // Only get project employees from the department head's department
                 projectEmployees = projectEmployees
                     .Where(pe => departmentEmployeeIds.Contains(pe.EmployeeId))
                     .ToList();
@@ -907,206 +903,229 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
  
         var reviews = await _context.Assessmentreviews.AsNoTracking().ToListAsync();
  
-        // Fetch ALL goals at once (not in loop) - FIXED for nullable int
+        // Fetch goals
         var allEmployeeIds = projectEmployees.Select(pe => pe.EmployeeId).Distinct().ToList();
+        
         var allGoalAssignments = await _context.GoalAssignments
             .Where(ga => ga.AssignedTo.HasValue && allEmployeeIds.Contains(ga.AssignedTo.Value))
             .ToListAsync();
  
         var allGoalIds = allGoalAssignments.Select(ga => ga.GoalId).Distinct().ToList();
-        var allGoals = await _context.Goals
-            .Where(g => allGoalIds.Contains(g.GoalId))
-            .Include(g => g.GoalComments)
-            .Include(g => g.Goalprogresslogs)
-            .Include(g => g.GoalAssignments)
-            .Include(g => g.GoalChecklists)
-                .ThenInclude(cl => cl.Goalchecklistprogresses)
-            .Include(g => g.GoalAttachments)
-            .ToListAsync();
+        
+        var allGoals = allGoalIds.Any() 
+            ? await _context.Goals
+                .Where(g => allGoalIds.Contains(g.GoalId))
+                .Include(g => g.GoalComments)
+                .Include(g => g.Goalprogresslogs)
+                .Include(g => g.GoalAssignments)
+                .Include(g => g.GoalChecklists)
+                    .ThenInclude(cl => cl.Goalchecklistprogresses)
+                .Include(g => g.GoalAttachments)
+                .ToListAsync()
+            : new List<Goal>();
  
         var results = new List<object>();
- 
+
         foreach (var pe in projectEmployees)
- 
         {
             try
             {
                 var profile = profiles.FirstOrDefault(up => up.EmployeeId == pe.EmployeeId);
-                if (profile == null) {
-                    _logger.LogDebug($"Skipping EmployeeId {pe.EmployeeId}: No profile");
-                    continue;
-                }
- 
+                if (profile == null) continue;
+
                 var userAuth = userAuths.FirstOrDefault(ua => ua.EmployeeId == pe.EmployeeId);
-                if (userAuth == null) {
-                    _logger.LogDebug($"Skipping EmployeeId {pe.EmployeeId}: No userAuth");
-                    continue;
-                }
- 
+                if (userAuth == null) continue;
+
                 var project = projects.FirstOrDefault(p => p.ProjectId == pe.ProjectId);
-                if (project == null) {
-                    _logger.LogDebug($"Skipping EmployeeId {pe.EmployeeId}: No project");
-                    continue;
-                }
- 
-                // Check if this assessment is already approved by department head
-                var selfAssessment = selfAssessments
-                    .Where(sa => sa.EmployeeId == userAuth.UserId)
+                if (project == null) continue;
+
+                // Get ALL submitted assessments for this employee
+                var employeeAssessments = selfAssessments
+                    .Where(sa => sa.EmployeeId == userAuth.UserId && 
+                                 sa.Assessmentdetails != null && 
+                                 sa.Assessmentdetails.Any())
                     .OrderByDescending(sa => sa.SubmittedAt)
-                    .FirstOrDefault();
- 
-                if (selfAssessment == null || !selfAssessment.Assessmentdetails.Any()) {
-                    _logger.LogDebug($"Skipping EmployeeId {pe.EmployeeId}: No selfAssessment or no details");
-                    continue;
-                }
- 
-                var approval = await _context.Departmentheadapprovals
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(a => a.EmployeeId == pe.EmployeeId && a.ProjectId == pe.ProjectId && a.AssessmentId == selfAssessment.AssessmentId && a.Status == "Approved");
-                if (approval != null)
-                {
-                    _logger.LogDebug($"Skipping EmployeeId {pe.EmployeeId}: Already approved for AssessmentId {selfAssessment.AssessmentId}");
-                    continue;
-                }
- 
-                var l1Auth = project.L1approverEmployeeId.HasValue
-                    ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L1approverEmployeeId)
-                    : null;
- 
-                var l2Auth = project.L2approverEmployeeId.HasValue
-                    ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L2approverEmployeeId)
-                    : null;
- 
-                bool hasL1 = l1Auth != null;
-                bool hasL2 = l2Auth != null;
- 
-                bool allL1Approved = hasL1 && selfAssessment.Assessmentdetails.All(d =>
-                    reviews.Any(r => r.DetailId == d.DetailId && r.ReviewerId == l1Auth.UserId && r.ReviewStatus == "Approved"));
- 
-                bool allL2Approved = hasL2 && selfAssessment.Assessmentdetails.All(d =>
-                    reviews.Any(r => r.DetailId == d.DetailId && r.ReviewerId == l2Auth.UserId && r.ReviewStatus == "Approved"));
- 
-                bool showRecord =
-                    (hasL1 && hasL2 && (allL1Approved || allL2Approved)) ||
-                    (hasL1 && !hasL2 && allL1Approved) ||
-                    (!hasL1 && hasL2 && allL2Approved) ||
-                    (!hasL1 && !hasL2);
- 
-                if (!showRecord) {
-                    _logger.LogDebug($"Skipping EmployeeId {pe.EmployeeId}: Not all reviews approved (hasL1={hasL1}, hasL2={hasL2}, allL1Approved={allL1Approved}, allL2Approved={allL2Approved})");
-                    continue;
-                }
- 
-                string l1ReviewerName = "No L1";
-                if (hasL1 && project.L1approverEmployeeId.HasValue)
-                {
-                    var l1Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L1approverEmployeeId);
-                    if (l1Profile != null)
-                    {
-                        l1ReviewerName = $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim();
-                        if (string.IsNullOrEmpty(l1ReviewerName))
-                            l1ReviewerName = "L1 Reviewer";
-                    }
-                }
- 
-                string l2ReviewerName = "No L2";
-                if (hasL2 && project.L2approverEmployeeId.HasValue)
-                {
-                    var l2Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L2approverEmployeeId);
-                    if (l2Profile != null)
-                    {
-                        l2ReviewerName = $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim();
-                        if (string.IsNullOrEmpty(l2ReviewerName))
-                            l2ReviewerName = "L2 Reviewer";
-                    }
-                }
- 
-                var competencies = selfAssessment.Assessmentdetails.Select(detail => new
-                {
-                    CompetencyName = detail.Competency?.Name ?? "Unknown",
-                    EmployeeRating = detail.EmployeeRating,
-                    EmployeeComments = detail.EmployeeComments,
-                    L1ReviewerName = l1ReviewerName,
-                    L1Rating = hasL1 ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l1Auth?.UserId)?.Rating : null,
-                    L1Comments = hasL1 ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l1Auth?.UserId)?.Comments : null,
-                    L1ReviewStatus = hasL1 ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l1Auth?.UserId)?.ReviewStatus : null,
-                    L2ReviewerName = l2ReviewerName,
-                    L2Rating = hasL2 ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l2Auth?.UserId)?.Rating : null,
-                    L2Comments = hasL2 ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l2Auth?.UserId)?.Comments : null,
-                    L2ReviewStatus = hasL2 ? reviews.FirstOrDefault(r => r.DetailId == detail.DetailId && r.ReviewerId == l2Auth?.UserId)?.ReviewStatus : null,
-                    Status = "Completed"
-                }).ToList();
- 
-                // Get goals for THIS employee from pre-fetched data - FIXED for nullable int
-                var employeeGoalIds = allGoalAssignments
-                    .Where(ga => ga.AssignedTo.HasValue && ga.AssignedTo.Value == pe.EmployeeId)
-                    .Select(ga => ga.GoalId)
-                    .Distinct()
                     .ToList();
- 
-                var employeeGoals = allGoals
-                    .Where(g => employeeGoalIds.Contains(g.GoalId))
-                    .ToList();
- 
-                var formattedGoals = employeeGoals.Select(g => new
+
+                if (!employeeAssessments.Any()) continue;
+
+                // Process EACH assessment separately
+                foreach (var selfAssessment in employeeAssessments)
                 {
-                    g.GoalId,
-                    g.GoalTitle,
-                    g.GoalDescription,
-                    g.Goalstatus,
-                    GoalComments = g.GoalComments.Select(c => new
+                    // Check if already approved by department head
+                    var approval = await _context.Departmentheadapprovals
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(a => 
+                            a.EmployeeId == pe.EmployeeId &&
+                            a.ProjectId == pe.ProjectId &&
+                            a.AssessmentId == selfAssessment.AssessmentId &&
+                            a.Status == "Approved");
+
+                    if (approval != null)
                     {
-                        c.Goalcommentid,
-                        Comment = c.GoalComment1,
-                        c.CommentedOn
-                    }),
-                    GoalProgressLogs = g.Goalprogresslogs.Select(p => new
+                        _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId}: Already department head approved");
+                        continue;
+                    }
+
+                    // Get L1 and L2 approvers
+                    var l1Auth = project.L1approverEmployeeId.HasValue 
+                        ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L1approverEmployeeId) 
+                        : null;
+                    
+                    var l2Auth = project.L2approverEmployeeId.HasValue 
+                        ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L2approverEmployeeId) 
+                        : null;
+
+                    bool hasL1 = l1Auth != null;
+                    bool hasL2 = l2Auth != null;
+
+                    // ✅ FIXED LOGIC: Check if ALL detail reviews by L2 (Reviewer role) are "Approved"
+                    bool allL2Approved = false;
+                    
+                    if (hasL2)
                     {
-                        p.ProgressId,
-                        p.ProgressPercent,
-                        p.UpdatedOn
-                    }),
-                    GoalAssignments = g.GoalAssignments.Select(a => new
+                        // Check if ALL assessment details have L2 reviews with "Approved" status
+                        allL2Approved = selfAssessment.Assessmentdetails.All(detail =>
+                            reviews.Any(r => 
+                                r.DetailId == detail.DetailId && 
+                                r.ReviewerId == l2Auth.UserId && 
+                                r.ReviewerRole == "Reviewer" &&  // ✅ Must be Reviewer role
+                                r.ReviewStatus == "Approved")     // ✅ Must be Approved status
+                        );
+                    }
+
+                    // ✅ CRITICAL: Show record ONLY if L2 (Reviewer) has approved ALL details
+                    // We don't care about L1 (Approver) status for Department Head view
+                    if (!hasL2)
                     {
-                        a.AssignmentId,
-                        a.AssignedBy,
-                        a.AssignedOn
-                    }),
-                    GoalChecklists = g.GoalChecklists.Select(cl => new
+                        _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId}: No L2 reviewer configured");
+                        continue;
+                    }
+
+                    if (!allL2Approved)
                     {
-                        cl.ChecklistId,
-                        cl.ItemTitle,
-                        cl.ItemDescription,
-                        Progresses = cl.Goalchecklistprogresses.Select(p => new
+                        _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId}: L2 has not approved all details");
+                        continue;
+                    }
+
+                    // ✅ At this point, L2 has approved - show it to department head
+                    _logger.LogInformation($"✅ Including AssessmentId {selfAssessment.AssessmentId} - L2 approved");
+
+                    // Get reviewer names
+                    string l1ReviewerName = "No L1";
+                    if (hasL1 && project.L1approverEmployeeId.HasValue)
+                    {
+                        var l1Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L1approverEmployeeId);
+                        if (l1Profile != null)
                         {
-                            p.ChecklistProgressId,
-                            p.IsCompleted,
-                            p.CompletedOn
-                        })
-                    }),
-                    GoalAttachments = g.GoalAttachments.Select(att => new
+                            l1ReviewerName = $"{l1Profile.FirstName ?? ""} {l1Profile.LastName ?? ""}".Trim();
+                        }
+                        if (string.IsNullOrEmpty(l1ReviewerName))
+                        {
+                            l1ReviewerName = "L1 Reviewer";
+                        }
+                    }
+
+                    string l2ReviewerName = "No L2";
+                    if (hasL2 && project.L2approverEmployeeId.HasValue)
                     {
-                        att.Goalattachmentsid,
-                        att.AttachmentTitle,
-                        att.Attachments,
-                        att.AttachedOn
-                    })
-                }).ToList();
- 
-                string employeeName = $"{profile.FirstName ?? ""} {profile.LastName ?? ""}".Trim();
-                if (string.IsNullOrEmpty(employeeName))
-                    employeeName = $"Employee {pe.EmployeeId}";
- 
-                results.Add(new
-                {
-                    EmployeeId = pe.EmployeeId,
-                    EmployeeName = employeeName,
-                    ProjectId = project.ProjectId,
-                    ProjectName = project.ProjectName ?? "Unknown",
-                    AssessmentId = selfAssessment.AssessmentId,
-                    Competencies = competencies,
-                    Goals = formattedGoals
-                });
+                        var l2Profile = profiles.FirstOrDefault(p => p.EmployeeId == project.L2approverEmployeeId);
+                        if (l2Profile != null)
+                        {
+                            l2ReviewerName = $"{l2Profile.FirstName ?? ""} {l2Profile.LastName ?? ""}".Trim();
+                        }
+                        if (string.IsNullOrEmpty(l2ReviewerName))
+                        {
+                            l2ReviewerName = "L2 Reviewer";
+                        }
+                    }
+
+                    // Build competencies with L1 and L2 reviews
+                    var competencies = selfAssessment.Assessmentdetails.Select(detail =>
+                    {
+                        var l1Review = hasL1 
+                            ? reviews.FirstOrDefault(r => 
+                                r.DetailId == detail.DetailId && 
+                                r.ReviewerId == l1Auth.UserId &&
+                                r.ReviewerRole == "Approver")
+                            : null;
+
+                        var l2Review = hasL2 
+                            ? reviews.FirstOrDefault(r => 
+                                r.DetailId == detail.DetailId && 
+                                r.ReviewerId == l2Auth.UserId &&
+                                r.ReviewerRole == "Reviewer")
+                            : null;
+
+                        return new
+                        {
+                            CompetencyName = detail.Competency?.Name ?? "Unknown",
+                            EmployeeRating = detail.EmployeeRating,
+                            EmployeeComments = detail.EmployeeComments,
+                            L1ReviewerName = l1ReviewerName,
+                            L1Rating = l1Review?.Rating,
+                            L1Comments = l1Review?.Comments,
+                            L1ReviewStatus = l1Review?.ReviewStatus,
+                            L2ReviewerName = l2ReviewerName,
+                            L2Rating = l2Review?.Rating,
+                            L2Comments = l2Review?.Comments,
+                            L2ReviewStatus = l2Review?.ReviewStatus,
+                            Status = "Completed"
+                        };
+                    }).ToList();
+
+                    // Get goals for this employee
+                    var employeeGoalIds = allGoalAssignments
+                        .Where(ga => ga.AssignedTo.HasValue && ga.AssignedTo.Value == pe.EmployeeId)
+                        .Select(ga => ga.GoalId)
+                        .Distinct()
+                        .ToList();
+
+                    var employeeGoals = allGoals
+                        .Where(g => employeeGoalIds.Contains(g.GoalId))
+                        .ToList();
+
+                    var formattedGoals = employeeGoals.Select(g => new
+                    {
+                        g.GoalId,
+                        g.GoalTitle,
+                        g.GoalDescription,
+                        g.Goalstatus,
+                        GoalComments = g.GoalComments.Select(c => new { c.Goalcommentid, Comment = c.GoalComment1, c.CommentedOn }),
+                        GoalProgressLogs = g.Goalprogresslogs.Select(p => new { p.ProgressId, p.ProgressPercent, p.UpdatedOn }),
+                        GoalAssignments = g.GoalAssignments.Select(a => new { a.AssignmentId, a.AssignedBy, a.AssignedOn }),
+                        GoalChecklists = g.GoalChecklists.Select(cl => new
+                        {
+                            cl.ChecklistId,
+                            cl.ItemTitle,
+                            cl.ItemDescription,
+                            Progresses = cl.Goalchecklistprogresses.Select(p => new { p.ChecklistProgressId, p.IsCompleted, p.CompletedOn })
+                        }),
+                        GoalAttachments = g.GoalAttachments.Select(att => new { att.Goalattachmentsid, att.AttachmentTitle, att.Attachments, att.AttachedOn })
+                    }).ToList();
+
+                    string employeeName = $"{profile.FirstName ?? ""} {profile.LastName ?? ""}".Trim();
+                    if (string.IsNullOrEmpty(employeeName))
+                    {
+                        employeeName = $"Employee {pe.EmployeeId}";
+                    }
+
+                    var employeeDetails = await _context.Employeedetailsmasters
+                        .Where(edm => edm.EmployeeId == pe.EmployeeId)
+                        .FirstOrDefaultAsync();
+
+                    results.Add(new
+                    {
+                        EmployeeId = pe.EmployeeId,
+                        EmployeeName = employeeName,
+                        EmployeeCompanyId = employeeDetails?.EmployeeMasterId.ToString() ?? "",
+                        ProjectId = project.ProjectId,
+                        ProjectName = project.ProjectName ?? "Unknown",
+                        AssessmentId = selfAssessment.AssessmentId,
+                        Competencies = competencies,
+                        Goals = formattedGoals
+                    });
+                }
             }
             catch (Exception innerEx)
             {
@@ -1114,23 +1133,18 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
                 continue;
             }
         }
- 
-        _logger.LogInformation($"Returning {results.Count} employees for department head review");
+
+        _logger.LogInformation($"Returning {results.Count} assessments for department head review");
         return Ok(new { success = true, data = results });
     }
     catch (Exception ex)
     {
         _logger.LogError($"Error in GetDeptHeadSubmittedRatings: {ex.Message}");
         _logger.LogError($"Stack trace: {ex.StackTrace}");
-        return StatusCode(500, new
-        {
-            success = false,
-            message = "Failed to fetch submitted ratings",
-            error = ex.Message
-        });
+        return StatusCode(500, new { success = false, message = "Failed to fetch submitted ratings", error = ex.Message });
     }
 }
- 
+
  
  
  
@@ -1776,5 +1790,198 @@ public async Task<IActionResult> GetAllDetails()
                 return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
             }
         }
+
+
+
+        // ============================================================
+        // ✅ NEW: ATTACHMENT VIEWING FOR DEPARTMENT HEAD
+        // ============================================================
+
+        /// <summary>
+        /// Get attachments for a specific assessment (Department Head view)
+        /// GET: /api/AppraisalProcess/depthead/{deptHeadEmployeeId}/assessment/{assessmentId}/attachments
+        /// </summary>
+        [HttpGet("depthead/{deptHeadEmployeeId}/assessment/{assessmentId}/attachments")]
+        public async Task<IActionResult> GetDeptHeadAssessmentAttachments(int deptHeadEmployeeId, int assessmentId)
+        {
+            try
+            {
+                _logger.LogInformation($"[DH_ATTACHMENTS] DeptHeadId: {deptHeadEmployeeId}, AssessmentId: {assessmentId}");
+
+                // Verify Department Head has access to this assessment
+                var deptHeadDetails = await _context.Employeedetailsmasters
+                    .Where(edm => edm.EmployeeId == deptHeadEmployeeId)
+                    .Include(edm => edm.Department)
+                    .FirstOrDefaultAsync();
+
+                if (deptHeadDetails == null || deptHeadDetails.Department == null)
+                {
+                    return NotFound(new 
+                    { 
+                        success = false, 
+                        message = "Department Head not found or not assigned to a department" 
+                    });
+                }
+
+                // Get the assessment and verify it belongs to the department
+                var assessment = await _context.Selfassessments
+                    .Where(sa => sa.AssessmentId == assessmentId)
+                    .FirstOrDefaultAsync();
+
+                if (assessment == null)
+                {
+                    return NotFound(new { success = false, message = "Assessment not found" });
+                }
+
+                // Convert UserId to EmployeeId to check department
+                var employeeAuth = await _context.Userauthentications
+                    .FirstOrDefaultAsync(ua => ua.UserId == assessment.EmployeeId);
+
+                if (employeeAuth == null)
+                {
+                    return NotFound(new { success = false, message = "Employee not found" });
+                }
+
+                // Check if the employee belongs to the Department Head's department
+                var employeeDept = await _context.Employeedetailsmasters
+                    .Where(edm => edm.EmployeeId == employeeAuth.EmployeeId)
+                    .FirstOrDefaultAsync();
+
+                if (employeeDept?.DepartmentId != deptHeadDetails.DepartmentId)
+                {
+                    return Forbid(); // Employee not in Department Head's department
+                }
+
+                // Get attachments
+                var attachments = await _context.Selfassessmentattachments
+                    .Where(a => a.AssessmentId == assessmentId)
+                    .OrderBy(a => a.DisplayOrder)
+                    .ThenBy(a => a.UploadedAt)
+                    .Select(a => new
+                    {
+                        a.AttachmentId,
+                        a.FileName,
+                        a.FilePath,
+                        a.FileType,
+                        a.FileSize,
+                        a.AttachmentNote,
+                        a.DisplayOrder,
+                        a.UploadedAt,
+                        a.UploadedBy
+                    })
+                    .ToListAsync();
+
+                _logger.LogInformation($"[DH_ATTACHMENTS] Found {attachments.Count} attachments");
+
+                return Ok(new { success = true, data = attachments });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[DH_ATTACHMENTS] Error: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error retrieving attachments: {ex.Message}"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Download attachment file (Department Head)
+        /// GET: /api/AppraisalProcess/depthead/{deptHeadEmployeeId}/attachments/{attachmentId}/download
+        /// </summary>
+        [HttpGet("depthead/{deptHeadEmployeeId}/attachments/{attachmentId}/download")]
+        public async Task<IActionResult> DownloadDeptHeadAttachment(int deptHeadEmployeeId, int attachmentId)
+        {
+            try
+            {
+                _logger.LogInformation($"[DH_DOWNLOAD] DeptHeadId: {deptHeadEmployeeId}, AttachmentId: {attachmentId}");
+
+                // Verify Department Head exists and has a department
+                var deptHeadDetails = await _context.Employeedetailsmasters
+                    .Where(edm => edm.EmployeeId == deptHeadEmployeeId)
+                    .Include(edm => edm.Department)
+                    .FirstOrDefaultAsync();
+
+                if (deptHeadDetails == null || deptHeadDetails.Department == null)
+                {
+                    return NotFound(new 
+                    { 
+                        success = false, 
+                        message = "Department Head not found or not assigned to a department" 
+                    });
+                }
+
+                // Get the attachment
+                var attachment = await _context.Selfassessmentattachments
+                    .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+
+                if (attachment == null)
+                {
+                    return NotFound(new { success = false, message = "Attachment not found." });
+                }
+
+                // Verify the attachment's assessment belongs to someone in the Department Head's department
+                var assessment = await _context.Selfassessments
+                    .Where(sa => sa.AssessmentId == attachment.AssessmentId)
+                    .FirstOrDefaultAsync();
+
+                if (assessment == null)
+                {
+                    return NotFound(new { success = false, message = "Assessment not found." });
+                }
+
+                // Convert UserId to EmployeeId
+                var employeeAuth = await _context.Userauthentications
+                    .FirstOrDefaultAsync(ua => ua.UserId == assessment.EmployeeId);
+
+                if (employeeAuth == null)
+                {
+                    return NotFound(new { success = false, message = "Employee not found." });
+                }
+
+                var employeeDept = await _context.Employeedetailsmasters
+                    .Where(edm => edm.EmployeeId == employeeAuth.EmployeeId)
+                    .FirstOrDefaultAsync();
+
+                if (employeeDept?.DepartmentId != deptHeadDetails.DepartmentId)
+                {
+                    return Forbid(); // Not authorized to access this attachment
+                }
+
+                if (string.IsNullOrWhiteSpace(attachment.FilePath))
+                {
+                    return NotFound(new { success = false, message = "File path missing." });
+                }
+
+                var filePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    attachment.FilePath
+                );
+
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return NotFound(new { success = false, message = "File not found on server." });
+                }
+
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var contentType = attachment.FileType ?? "application/octet-stream";
+
+                _logger.LogInformation($"[DH_DOWNLOAD] Success - File: {attachment.FileName}");
+
+                return File(fileBytes, contentType, attachment.FileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"[DH_DOWNLOAD] Error: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error downloading file: {ex.Message}"
+                });
+            }
+        }
+
+
     }
 }

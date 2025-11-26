@@ -181,7 +181,8 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .WithExposedHeaders("Content-Disposition", "Content-Type"); // ✅ THIS IS THE KEY FIX!
     });
 });
  

@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.EntityFrameworkCore;
-
-
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace eepzbackend.Controllers
 {
@@ -17,9 +17,15 @@ namespace eepzbackend.Controllers
     public class ReviewerController : ControllerBase
     {
         private readonly IManagerReviewRepository _repo;
-        public ReviewerController(IManagerReviewRepository repo) => _repo = repo;
- 
-        // GET /api/reviewer/3/submitted-forms
+        private readonly EEPZDbContext _context;
+
+        // ✅ FIXED: Must inject BOTH dependencies
+       public ReviewerController(IManagerReviewRepository repo, EEPZDbContext context)
+{
+    _repo = repo;
+    _context = context;
+}
+
         [HttpGet("submitted-forms")]
         public async Task<IActionResult> GetSubmittedForms(
             int reviewerUserId,
@@ -29,35 +35,30 @@ namespace eepzbackend.Controllers
             var rows = await _repo.GetReviewerSubmittedFormsAsync(reviewerUserId, page, pageSize);
             return Ok(rows);
         }
- 
-        // GET /api/reviewer/3/assessment/1
+
         [HttpGet("assessment/{assessmentId:int}")]
         public async Task<IActionResult> GetAssessment(int reviewerUserId, int assessmentId)
         {
             var dto = await _repo.GetAssessmentForReviewerAsync(reviewerUserId, assessmentId);
             if (dto is null)
                 return NotFound();
- 
+
             return Ok(dto);
         }
- 
 
-       // POST /api/reviewer/3/reviews
-[HttpPost("reviews")]
-public async Task<IActionResult> PostReviewerReviews(
-    int reviewerUserId,
-    [FromBody] SubmitReviewDto body)
-{
-    if (body is null || body.Items is null || body.Items.Count == 0)
-        return BadRequest(new { success = false, message = "No review items provided." });
- 
-    // ✅ FIXED: Call the correct method
-    await _repo.SubmitReviewerReviewsAsync(reviewerUserId, body.AssessmentId, body.Items);
- 
-    return Ok(new { success = true, message = "Reviews submitted successfully" });
-}
- 
-        // POST /api/reviewer/3/decision?assessmentId=1&decision=Approved
+        [HttpPost("reviews")]
+        public async Task<IActionResult> PostReviewerReviews(
+            int reviewerUserId,
+            [FromBody] SubmitReviewDto body)
+        {
+            if (body is null || body.Items is null || body.Items.Count == 0)
+                return BadRequest(new { success = false, message = "No review items provided." });
+
+            await _repo.SubmitReviewerReviewsAsync(reviewerUserId, body.AssessmentId, body.Items);
+
+            return Ok(new { success = true, message = "Reviews submitted successfully" });
+        }
+
         [HttpPost("decision")]
         public async Task<IActionResult> PostDecision(
             int reviewerUserId,
@@ -67,10 +68,10 @@ public async Task<IActionResult> PostReviewerReviews(
         {
             var ok = await _repo.SetReviewerDecisionAsync(
                 reviewerUserId, assessmentId, decision, reviewerComment);
- 
+
             if (!ok)
                 return Forbid();
- 
+
             return Ok(new
             {
                 assessmentId,
@@ -78,8 +79,7 @@ public async Task<IActionResult> PostReviewerReviews(
                 message = "Decision recorded successfully."
             });
         }
- 
-        // GET /api/reviewer/3/assessments/full?page=1&pageSize=25
+
         [HttpGet("assessments/full")]
         public async Task<IActionResult> GetAllAssessmentsWithDetails(
             int reviewerUserId,
@@ -89,14 +89,65 @@ public async Task<IActionResult> PostReviewerReviews(
             var list = await _repo.GetReviewerAssessmentsWithDetailsAsync(reviewerUserId, page, pageSize);
             return Ok(list);
         }
- 
-        // GET /api/reviewer/3/assessment/3/decision
+
         [HttpGet("assessment/{assessmentId:int}/decision")]
         public async Task<IActionResult> GetL2Decision(int reviewerUserId, int assessmentId)
         {
             var dto = await _repo.GetLatestReviewerDecisionAsync(assessmentId);
             return Ok(dto);
         }
+
+        [HttpGet("assessment/{assessmentId:int}/attachments")]
+        public async Task<IActionResult> GetAssessmentAttachments(int reviewerUserId, int assessmentId)
+        {
+            try
+            {
+                var attachments = await _repo.GetAssessmentAttachmentsAsync(assessmentId);
+                return Ok(new { success = true, data = attachments });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error retrieving attachments: {ex.Message}"
+                });
+            }
+        }
+
+        // ✅ FIXED: Now _context is properly initialized
+        [HttpGet("attachments/{attachmentId:int}/download")]
+        public async Task<IActionResult> DownloadAttachment(int reviewerUserId, int attachmentId)
+        {
+            try
+            {
+                var attachment = await _context.Selfassessmentattachments
+                    .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+
+                if (attachment == null)
+                    return NotFound(new { success = false, message = "Attachment not found." });
+
+                var filePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    attachment.FilePath
+                );
+
+                if (!System.IO.File.Exists(filePath))
+                    return NotFound(new { success = false, message = "File not found on server." });
+
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var contentType = attachment.FileType ?? "application/octet-stream";
+
+                return File(fileBytes, contentType, attachment.FileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error downloading file: {ex.Message}"
+                });
+            }
+        }
     }
 }
- 

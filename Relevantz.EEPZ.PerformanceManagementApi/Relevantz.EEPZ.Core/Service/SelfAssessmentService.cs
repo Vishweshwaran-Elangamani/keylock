@@ -6,19 +6,28 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class SelfAssessmentService : ISelfAssessmentService
     {
         private readonly EEPZDbContext _context;
+        private readonly string _uploadBasePath; // Configure in appsettings.json
 
         public SelfAssessmentService(EEPZDbContext context)
         {
             _context = context;
+            // TODO: Get from configuration
+            _uploadBasePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "assessments");
+            
+            // Ensure directory exists
+            if (!Directory.Exists(_uploadBasePath))
+            {
+                Directory.CreateDirectory(_uploadBasePath);
+            }
         }
 
         public async Task<ApiResponse<SelfAssessmentResponseDto>> SubmitSelfAssessmentAsync(SubmitSelfAssessmentRequestDto request)
@@ -48,6 +57,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     existingAssessment.SubmittedAt = request.Status == "Submitted" ? DateTime.Now : existingAssessment.SubmittedAt;
                     assessment = existingAssessment;
 
+                    // Remove existing details
                     var existingDetails = await _context.Assessmentdetails
                         .Where(ad => ad.AssessmentId == existingAssessment.AssessmentId)
                         .ToListAsync();
@@ -67,6 +77,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 await _context.SaveChangesAsync();
 
+                // ✅ Save assessment details
                 var details = request.AssessmentDetails.Select(d => new Assessmentdetail
                 {
                     AssessmentId = assessment.AssessmentId,
@@ -78,6 +89,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 _context.Assessmentdetails.AddRange(details);
                 await _context.SaveChangesAsync();
 
+                // ✅ NEW: Handle attachments
+                if (request.Attachments != null && request.Attachments.Any())
+                {
+                    await ProcessAttachmentsAsync(assessment.AssessmentId, request.UserId, request.Attachments);
+                }
+
+                // ✅ Update progress tracker if submitted
                 if (request.Status == "Submitted")
                 {
                     var assignment = await _context.Assignments
@@ -94,6 +112,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         await _context.SaveChangesAsync();
                     }
                 }
+
                 await transaction.CommitAsync();
 
                 var responseData = await GetSelfAssessmentAsync(assessment.AssessmentId);
@@ -106,46 +125,124 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        public async Task<ApiResponse<List<SelfAssessmentResponseDto>>> GetAssessmentsByUserAsync(int userId)
-{
-    var result = new ApiResponse<List<SelfAssessmentResponseDto>>();
-
-    try
-    {
-        var assessments = await _context.Selfassessments
-            .Where(a => a.EmployeeId == userId)
-            .Include(a => a.Form) // Assuming navigation property exists
-            .ToListAsync();
-
-        if (assessments == null || !assessments.Any())
+        // ✅ NEW: Process and save attachments
+        private async Task ProcessAttachmentsAsync(int assessmentId, int userId, List<AttachmentRequestDto> attachments)
         {
-            result.Success = true;
-            result.Data = new List<SelfAssessmentResponseDto>();
-            return result;
+            var savedAttachments = new List<Selfassessmentattachment>();
+
+            foreach (var attachment in attachments)
+            {
+                string filePath = attachment.FilePath ?? string.Empty;
+
+                // If Base64 content is provided, save the file
+                if (!string.IsNullOrEmpty(attachment.Base64Content))
+                {
+                    filePath = await SaveFileFromBase64Async(
+                        assessmentId, 
+                        attachment.FileName, 
+                        attachment.Base64Content
+                    );
+                }
+
+                var dbAttachment = new Selfassessmentattachment
+                {
+                    AssessmentId = assessmentId,
+                    UploadedBy = userId,
+                    FileName = attachment.FileName,
+                    FilePath = filePath,
+                    FileType = attachment.FileType,
+                    FileSize = attachment.FileSize,
+                    AttachmentNote = attachment.AttachmentNote,
+                    DisplayOrder = attachment.DisplayOrder ?? 0,
+                    UploadedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                };
+
+                savedAttachments.Add(dbAttachment);
+            }
+
+            if (savedAttachments.Any())
+            {
+                _context.Selfassessmentattachments.AddRange(savedAttachments);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        var dtoList = assessments.Select(a => new SelfAssessmentResponseDto
+        // ✅ NEW: Save Base64 file to disk
+        private async Task<string> SaveFileFromBase64Async(int assessmentId, string fileName, string base64Content)
         {
-            AssessmentId = a.AssessmentId,
-            FormName = a.Form?.Name ?? $"Form #{a.FormId}",
-            Status = a.Status ?? string.Empty,
-            SubmittedAt = a.SubmittedAt
-        }).ToList();
+            try
+            {
+                // Remove data URL prefix if present (e.g., "data:image/png;base64,")
+                var base64Data = base64Content;
+                if (base64Content.Contains(","))
+                {
+                    base64Data = base64Content.Split(',')[1];
+                }
 
-        result.Success = true;
-        result.Data = dtoList;
-    }
-    catch (Exception ex)
-    {
-        result.Success = false;
-        result.Errors.Add("Failed to retrieve assessments.");
-        result.Errors.Add(ex.Message);
-    }
+                var bytes = Convert.FromBase64String(base64Data);
+                
+                // Create assessment-specific directory
+                var assessmentDir = Path.Combine(_uploadBasePath, assessmentId.ToString());
+                if (!Directory.Exists(assessmentDir))
+                {
+                    Directory.CreateDirectory(assessmentDir);
+                }
 
-    return result;
-}
+                // Generate unique filename
+                var fileExtension = Path.GetExtension(fileName);
+                var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                var fullPath = Path.Combine(assessmentDir, uniqueFileName);
 
+                await File.WriteAllBytesAsync(fullPath, bytes);
 
+                // Return relative path for storage
+                return Path.Combine("uploads", "assessments", assessmentId.ToString(), uniqueFileName);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error saving file {fileName}: {ex.Message}");
+            }
+        }
+
+        public async Task<ApiResponse<List<SelfAssessmentResponseDto>>> GetAssessmentsByUserAsync(int userId)
+        {
+            var result = new ApiResponse<List<SelfAssessmentResponseDto>>();
+
+            try
+            {
+                var assessments = await _context.Selfassessments
+                    .Where(a => a.EmployeeId == userId)
+                    .Include(a => a.Form)
+                    .ToListAsync();
+
+                if (assessments == null || !assessments.Any())
+                {
+                    result.Success = true;
+                    result.Data = new List<SelfAssessmentResponseDto>();
+                    return result;
+                }
+
+                var dtoList = assessments.Select(a => new SelfAssessmentResponseDto
+                {
+                    AssessmentId = a.AssessmentId,
+                    FormName = a.Form?.Name ?? $"Form #{a.FormId}",
+                    Status = a.Status ?? string.Empty,
+                    SubmittedAt = a.SubmittedAt
+                }).ToList();
+
+                result.Success = true;
+                result.Data = dtoList;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Errors.Add("Failed to retrieve assessments.");
+                result.Errors.Add(ex.Message);
+            }
+
+            return result;
+        }
 
         public async Task<ApiResponse<SelfAssessmentResponseDto>> GetSelfAssessmentAsync(int assessmentId)
         {
@@ -156,6 +253,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .Include(sa => sa.Employee)
                     .Include(sa => sa.Assessmentdetails)
                         .ThenInclude(ad => ad.Competency)
+                    .Include(sa => sa.Selfassessmentattachments) // ✅ Include attachments
                     .FirstOrDefaultAsync(sa => sa.AssessmentId == assessmentId);
 
                 if (assessment == null)
@@ -179,6 +277,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .Include(sa => sa.Employee)
                     .Include(sa => sa.Assessmentdetails)
                         .ThenInclude(ad => ad.Competency)
+                    .Include(sa => sa.Selfassessmentattachments) // ✅ Include attachments
                     .FirstOrDefaultAsync(sa => sa.FormId == formId && sa.EmployeeId == userId);
 
                 if (assessment == null)
@@ -262,6 +361,70 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+        // ✅ NEW: Get attachments for specific assessment
+        public async Task<ApiResponse<List<AttachmentResponseDto>>> GetAssessmentAttachmentsAsync(int assessmentId)
+        {
+            try
+            {
+                var attachments = await _context.Selfassessmentattachments
+                    .Where(a => a.AssessmentId == assessmentId)
+                    .OrderBy(a => a.DisplayOrder)
+                    .ThenBy(a => a.UploadedAt)
+                    .ToListAsync();
+
+                var response = attachments.Select(a => new AttachmentResponseDto
+                {
+                    AttachmentId = a.AttachmentId,
+                    FileName = a.FileName,
+                    FilePath = a.FilePath,
+                    FileType = a.FileType,
+                    FileSize = a.FileSize,
+                    AttachmentNote = a.AttachmentNote,
+                    DisplayOrder = a.DisplayOrder,
+                    UploadedAt = a.UploadedAt,
+                    UploadedBy = a.UploadedBy
+                }).ToList();
+
+                return ApiResponse<List<AttachmentResponseDto>>.SuccessResponse(response);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<List<AttachmentResponseDto>>.ErrorResponse($"Error fetching attachments: {ex.Message}");
+            }
+        }
+
+        // ✅ NEW: Delete attachment
+        public async Task<ApiResponse<bool>> DeleteAttachmentAsync(int attachmentId)
+        {
+            try
+            {
+                var attachment = await _context.Selfassessmentattachments.FindAsync(attachmentId);
+                if (attachment == null)
+                {
+                    return ApiResponse<bool>.ErrorResponse("Attachment not found");
+                }
+
+                // Delete physical file if exists
+                if (!string.IsNullOrEmpty(attachment.FilePath))
+                {
+                    var fullPath = Path.Combine(Directory.GetCurrentDirectory(), attachment.FilePath);
+                    if (File.Exists(fullPath))
+                    {
+                        File.Delete(fullPath);
+                    }
+                }
+
+                _context.Selfassessmentattachments.Remove(attachment);
+                await _context.SaveChangesAsync();
+
+                return ApiResponse<bool>.SuccessResponse(true, "Attachment deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.ErrorResponse($"Error deleting attachment: {ex.Message}");
+            }
+        }
+
         private SelfAssessmentResponseDto MapToSelfAssessmentResponse(Selfassessment assessment)
         {
             var userName = assessment.Employee?.Email ?? "Unknown";
@@ -283,7 +446,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     CompetencyDescription = ad.Competency?.Description,
                     EmployeeRating = ad.EmployeeRating,
                     EmployeeComments = ad.EmployeeComments
-                }).ToList()
+                }).ToList(),
+                // ✅ NEW: Map attachments
+                Attachments = assessment.Selfassessmentattachments?.Select(a => new AttachmentResponseDto
+                {
+                    AttachmentId = a.AttachmentId,
+                    FileName = a.FileName,
+                    FilePath = a.FilePath,
+                    FileType = a.FileType,
+                    FileSize = a.FileSize,
+                    AttachmentNote = a.AttachmentNote,
+                    DisplayOrder = a.DisplayOrder,
+                    UploadedAt = a.UploadedAt,
+                    UploadedBy = a.UploadedBy
+                }).OrderBy(a => a.DisplayOrder).ToList()
             };
         }
     }

@@ -5,6 +5,8 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using System;
+using System.Threading.Tasks;
 
 namespace PerformanceManagement.Controllers
 {
@@ -22,7 +24,7 @@ namespace PerformanceManagement.Controllers
         }
 
         /// <summary>
-        /// Submit self-assessment (converts EmployeeId to UserId)
+        /// Submit self-assessment with attachments (converts EmployeeId to UserId)
         /// </summary>
         [HttpPost("submit")]
         public async Task<IActionResult> SubmitSelfAssessment([FromBody] SubmitSelfAssessmentRequestDto request)
@@ -56,7 +58,8 @@ namespace PerformanceManagement.Controllers
                     FormId = request.FormId,
                     UserId = actualUserId,
                     Status = request.Status,
-                    AssessmentDetails = request.AssessmentDetails
+                    AssessmentDetails = request.AssessmentDetails,
+                    Attachments = request.Attachments // ✅ Pass through attachments
                 };
 
                 // Call service with converted request
@@ -89,7 +92,7 @@ namespace PerformanceManagement.Controllers
         }
 
         /// <summary>
-        /// ✅ UPDATED: Get submitted assessment details (converts EmployeeId to UserId)
+        /// ✅ Get submitted assessment details with attachments (converts EmployeeId to UserId)
         /// </summary>
         [HttpGet("view/{formId}/user/{employeeId}")]
         public async Task<IActionResult> GetSubmittedAssessment(int formId, int employeeId)
@@ -116,6 +119,7 @@ namespace PerformanceManagement.Controllers
                     .Include(sa => sa.Form)
                     .Include(sa => sa.Assessmentdetails)
                         .ThenInclude(ad => ad.Competency)
+                    .Include(sa => sa.Selfassessmentattachments) // ✅ Include attachments
                     .FirstOrDefaultAsync(sa =>
                         sa.FormId == formId &&
                         sa.EmployeeId == userId &&
@@ -137,7 +141,20 @@ namespace PerformanceManagement.Controllers
                         competencyDescription = ad.Competency.Description,
                         rating = ad.EmployeeRating,
                         comments = ad.EmployeeComments
-                    }).ToList()
+                    }).ToList(),
+                    // ✅ Include attachments in response
+                    attachments = assessment.Selfassessmentattachments
+                        .OrderBy(a => a.DisplayOrder)
+                        .Select(a => new
+                        {
+                            attachmentId = a.AttachmentId,
+                            fileName = a.FileName,
+                            filePath = a.FilePath,
+                            fileType = a.FileType,
+                            fileSize = a.FileSize,
+                            note = a.AttachmentNote,
+                            uploadedAt = a.UploadedAt
+                        }).ToList()
                 };
 
                 return Ok(new { success = true, data = result });
@@ -167,7 +184,7 @@ namespace PerformanceManagement.Controllers
         }
 
         /// <summary>
-        /// ✅ UPDATED: Get self-assessment by form and user (converts EmployeeId to UserId)
+        /// ✅ Get self-assessment by form and user (converts EmployeeId to UserId)
         /// </summary>
         [HttpGet("form/{formId}/user/{employeeId}")]
         public async Task<IActionResult> GetSelfAssessmentByFormAndUser(int formId, int employeeId)
@@ -222,7 +239,7 @@ namespace PerformanceManagement.Controllers
         }
 
         /// <summary>
-        /// ✅ UPDATED: Get all assessments assigned to a specific user (converts EmployeeId to UserId)
+        /// ✅ Get all assessments assigned to a specific user (converts EmployeeId to UserId)
         /// </summary>
         [HttpGet("user/{employeeId}/assignments")]
         public async Task<IActionResult> GetAssessmentsByUser(int employeeId)
@@ -277,6 +294,87 @@ namespace PerformanceManagement.Controllers
                 return Ok(new { success = true, data = result.Data, message = "Status updated successfully." });
 
             return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
+        }
+
+        // ✅ NEW: Get attachments for an assessment
+        [HttpGet("{assessmentId}/attachments")]
+        public async Task<IActionResult> GetAssessmentAttachments(int assessmentId)
+        {
+            try
+            {
+                var result = await _assessmentService.GetAssessmentAttachmentsAsync(assessmentId);
+
+                if (result.Success)
+                    return Ok(new { success = true, data = result.Data });
+
+                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error: {ex.Message}"
+                });
+            }
+        }
+
+        // ✅ NEW: Delete specific attachment
+        [HttpDelete("attachments/{attachmentId}")]
+        public async Task<IActionResult> DeleteAttachment(int attachmentId)
+        {
+            try
+            {
+                var result = await _assessmentService.DeleteAttachmentAsync(attachmentId);
+
+                if (result.Success)
+                    return Ok(new { success = true, message = "Attachment deleted successfully." });
+
+                return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error: {ex.Message}"
+                });
+            }
+        }
+
+        // ✅ NEW: Download attachment file
+        [HttpGet("attachments/{attachmentId}/download")]
+        public async Task<IActionResult> DownloadAttachment(int attachmentId)
+        {
+            try
+            {
+                var attachment = await _context.Selfassessmentattachments
+                    .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+
+                if (attachment == null)
+                    return NotFound(new { success = false, message = "Attachment not found." });
+
+                var filePath = System.IO.Path.Combine(
+                    System.IO.Directory.GetCurrentDirectory(), 
+                    attachment.FilePath
+                );
+
+                if (!System.IO.File.Exists(filePath))
+                    return NotFound(new { success = false, message = "File not found on server." });
+
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var contentType = attachment.FileType ?? "application/octet-stream";
+
+                return File(fileBytes, contentType, attachment.FileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error downloading file: {ex.Message}"
+                });
+            }
         }
     }
 

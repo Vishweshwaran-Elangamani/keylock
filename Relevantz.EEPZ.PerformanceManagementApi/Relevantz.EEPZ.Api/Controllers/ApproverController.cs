@@ -1,16 +1,14 @@
-
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-
-
 using Microsoft.EntityFrameworkCore;
-
-
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.Services.Interfaces;
+using System;
+using System.IO;
+using System.Threading.Tasks;
  
 namespace eepzbackend.Controllers
 {
@@ -19,7 +17,14 @@ namespace eepzbackend.Controllers
     public class ApproverController : ControllerBase
     {
         private readonly IManagerReviewRepository _repo;
-        public ApproverController(IManagerReviewRepository repo) => _repo = repo;
+        private readonly EEPZDbContext _context;
+        
+        // ✅ FIXED: Must inject both dependencies
+        public ApproverController(IManagerReviewRepository repo, EEPZDbContext context)
+        {
+            _repo = repo;
+            _context = context;  // ✅ THIS IS THE FIX!
+        }
  
         // GET /api/approver/7/submitted-forms?page=1&pageSize=25
         [HttpGet("submitted-forms")]
@@ -31,7 +36,62 @@ namespace eepzbackend.Controllers
             var rows = await _repo.GetApproverSubmittedFormsAsync(approverUserId, page, pageSize);
             return Ok(rows);
         }
- 
+
+        [HttpGet("assessment/{assessmentId:int}/attachments")]
+        public async Task<IActionResult> GetAssessmentAttachments(int approverUserId, int assessmentId)
+        {
+            try
+            {
+                var attachments = await _repo.GetAssessmentAttachmentsAsync(assessmentId);
+                return Ok(new { success = true, data = attachments });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error retrieving attachments: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpGet("attachments/{attachmentId:int}/download")]
+        public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
+        {
+            try
+            {
+                var attachment = await _context.Selfassessmentattachments
+                    .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+
+                if (attachment == null)
+                    return NotFound(new { success = false, message = "Attachment not found." });
+
+                if (string.IsNullOrWhiteSpace(attachment.FilePath))
+                    return NotFound(new { success = false, message = "File path missing." });
+
+                var filePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    attachment.FilePath
+                );
+
+                if (!System.IO.File.Exists(filePath))
+                    return NotFound(new { success = false, message = "File not found on server." });
+
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var contentType = attachment.FileType ?? "application/octet-stream";
+
+                return File(fileBytes, contentType, attachment.FileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Error downloading file: {ex.Message}"
+                });
+            }
+        }
+
         // POST /api/approver/7/reviews
         [HttpPost("reviews")]
         public async Task<IActionResult> PostApproverReviews(
@@ -88,4 +148,3 @@ namespace eepzbackend.Controllers
         }
     }
 }
- 
