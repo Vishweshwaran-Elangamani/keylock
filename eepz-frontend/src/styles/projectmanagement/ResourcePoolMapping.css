@@ -146,7 +146,7 @@
 .rp-table-header th {
   padding: 0.875rem 1rem !important;
   font-weight: 600 !important;
-  font-size: 0.875rem !important;
+  font-size: 1rem !important;
   color: #27235C !important;
   border-bottom: 2px solid #dee2e6 !important;
   text-align: left !important;
@@ -219,10 +219,16 @@
   padding: 4rem 2rem !important;
 }
 
+.rp-empty-state td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
 .rp-empty-icon {
   opacity: 0.25 !important;
-  margin-bottom: 1rem !important;
+  margin: 0 auto 1rem auto !important;
   color: #6c757d !important;
+  display: block !important;
 }
 
 .rp-empty-title {
@@ -230,12 +236,14 @@
   font-size: 1.125rem !important;
   font-weight: 600 !important;
   color: #212529 !important;
+  text-align: center ;
 }
 
 .rp-empty-text {
   margin: 0 !important;
   color: #6c757d !important;
   font-size: 0.9375rem !important;
+  text-align: center;
 }
 
 /* ========================================
@@ -245,6 +253,7 @@
 .rp-selected-body {
   display: flex !important;
   flex-direction: column !important;
+  
 }
 
 .rp-selected-list {
@@ -293,7 +302,7 @@
 
 .rp-selected-meta {
   color: #6c757d !important;
-  font-size: 0.75rem !important;
+  font-size: 0.8rem !important;
 }
 
 .rp-selected-footer {

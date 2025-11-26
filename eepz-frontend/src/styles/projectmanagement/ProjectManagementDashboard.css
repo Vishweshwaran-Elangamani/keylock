@@ -1,0 +1,322 @@
+/* ==========================================
+   PROJECT MANAGEMENT DASHBOARD STYLES
+   BEM Naming: pm-dashboard
+   ========================================== */
+
+/* Main Container */
+.pm-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* ==========================================
+   STATISTICS GRID
+   ========================================== */
+
+.pm-dashboard__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Stat Card */
+.pm-dashboard__stat-card {
+  background: white;
+  border: 2px solid #27235c;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.pm-dashboard__stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Stat Icon */
+.pm-dashboard__stat-icon {
+  border-radius: 8px;
+  padding: 0.75rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pm-dashboard__stat-icon--primary {
+  background-color: rgba(82, 79, 125, 0.1);
+  color: #524f7d;
+}
+
+.pm-dashboard__stat-icon--success {
+  background-color: rgba(36, 161, 72, 0.1);
+  color: #24a148;
+}
+
+.pm-dashboard__stat-icon--info {
+  background-color: rgba(15, 98, 254, 0.1);
+  color: #0f62fe;
+}
+
+.pm-dashboard__stat-icon--accent {
+  background-color: rgba(151, 36, 126, 0.1);
+  color: #97247e;
+}
+
+/* Stat Content */
+.pm-dashboard__stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pm-dashboard__stat-value {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #27235c;
+  line-height: 1.2;
+}
+
+.pm-dashboard__stat-label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Spinner */
+.pm-dashboard__spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(39, 35, 92, 0.2);
+  border-top-color: #27235c;
+  border-radius: 50%;
+  animation: pm-dashboard-spin 0.6s linear infinite;
+}
+
+@keyframes pm-dashboard-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   MAIN ACTION CARD
+   ========================================== */
+
+.pm-dashboard__main-card {
+  background: white;
+  border: 2px solid #27235c;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.pm-dashboard__main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem;
+  max-width: 600px;
+}
+
+.pm-dashboard__main-icon {
+  color: #524f7d;
+  opacity: 0.5;
+  margin-bottom: 1.5rem;
+}
+
+.pm-dashboard__main-title {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #27235c;
+}
+
+.pm-dashboard__main-description {
+  margin: 0 0 2rem 0;
+  font-size: 1.125rem;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   ACTION BUTTONS
+   ========================================== */
+
+.pm-dashboard__actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pm-dashboard__btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.5rem !important;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+/* Primary Button */
+.pm-dashboard__btn--primary {
+  background: linear-gradient(90deg, #97247e 0%, #e01950 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(151, 36, 126, 0.3);
+}
+
+.pm-dashboard__btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.4);
+}
+
+.pm-dashboard__btn--primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary Button */
+.pm-dashboard__btn--secondary {
+  background-color: transparent;
+  color: #27235c;
+  border: 2px solid #27235c;
+}
+
+.pm-dashboard__btn--secondary:hover {
+  background-color: #27235c;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
+}
+
+.pm-dashboard__btn--secondary:active {
+  transform: translateY(0);
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 1200px) {
+  .pm-dashboard__stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .pm-dashboard__stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .pm-dashboard__stat-card {
+    padding: 1.25rem;
+  }
+
+  .pm-dashboard__stat-value {
+    font-size: 1.25rem;
+  }
+
+  .pm-dashboard__main-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .pm-dashboard__main-title {
+    font-size: 1.5rem;
+  }
+
+  .pm-dashboard__main-description {
+    font-size: 1rem;
+  }
+
+  .pm-dashboard__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .pm-dashboard__btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .pm-dashboard__stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .pm-dashboard__stat-icon {
+    margin-bottom: 0.5rem;
+  }
+
+  .pm-dashboard__main-card {
+    min-height: 350px;
+  }
+
+  .pm-dashboard__main-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .pm-dashboard__main-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .pm-dashboard__main-title {
+    font-size: 1.25rem;
+  }
+
+  .pm-dashboard__main-description {
+    font-size: 0.9375rem;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+.pm-dashboard__btn:focus {
+  outline: 2px solid #97247e;
+  outline-offset: 2px;
+}
+
+.pm-dashboard__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Print Styles */
+@media print {
+  .pm-dashboard__actions {
+    display: none;
+  }
+
+  .pm-dashboard__stat-card {
+    break-inside: avoid;
+  }
+}

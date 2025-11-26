@@ -1,6 +1,11 @@
 // src/pages/feedback_management/feedback/MySubmissions.jsx
 
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+} from "react";
 import {
   RefreshCw,
   AlertTriangle,
@@ -16,8 +21,10 @@ import {
   Inbox,
   Home,
   User,
+  X,
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
+import { toast } from "sonner";
 import {
   mentorFeedbackApi,
   peerQueueApi,
@@ -27,6 +34,9 @@ import {
 } from "../../../services/feedbackmanagement/feedbackApi";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
+import FeedbackDeleteConfirmModal from "../../../components/feedback_management/modals/FeedbackDeleteConfirmModal";
+import Breadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+import "../../../styles/feedback/MySubmissions.css";
 
 // Format date helper
 const formatDate = (dateInput) => {
@@ -56,7 +66,7 @@ const formatDate = (dateInput) => {
       month: "short",
       day: "numeric",
     });
-  } catch (err) {
+  } catch {
     return "Invalid Date";
   }
 };
@@ -80,6 +90,18 @@ const getDaysAgo = (dateInput) => {
   }
 };
 
+// Helper function to get role-based feedback dashboard path
+const getFeedbackDashboardPath = (roleName) => {
+  const routes = {
+    Employee: "/employee/dashboard/feedback",
+    Manager: "/manager/dashboard/feedback",
+    DepartmentHead: "/depthead/dashboard/feedback",
+    "Department Head": "/depthead/dashboard/feedback",
+    HR: "/hr/dashboard/feedback",
+  };
+  return routes[roleName] || "/employee/dashboard/feedback";
+};
+
 const RATING_LABELS = {
   1: "Poor",
   2: "Fair",
@@ -96,8 +118,15 @@ export default function MySubmissions() {
         empId: 1004,
         firstName: "Dave",
         lastName: "Dev",
+        roleName: "Employee",
       },
     []
+  );
+
+  // Get role-based dashboard path
+  const feedbackDashboardPath = useMemo(
+    () => getFeedbackDashboardPath(user?.roleName || "Employee"),
+    [user?.roleName]
   );
 
   const [loading, setLoading] = useState(false);
@@ -113,24 +142,55 @@ export default function MySubmissions() {
   const [showModal, setShowModal] = useState(false);
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
-  const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
-  // Show toast notification
-  const showToast = (message, type = "success") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "" }), 3000);
+  // Error modal (for fetch errors)
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+
+  // Confirmation modal (for delete actions)
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({
+    title: "",
+    message: "",
+    itemName: "",
+    onConfirm: null,
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Error modal helpers
+  const openErrorModal = (message) => {
+    setError(message || "Failed to fetch submissions");
+    setErrorModalOpen(true);
+  };
+
+  const closeErrorModal = () => {
+    setError("");
+    setErrorModalOpen(false);
+  };
+
+  // Confirmation modal helpers
+  const openConfirmModal = (config) => {
+    setConfirmConfig(
+      config || { title: "", message: "", itemName: "", onConfirm: null }
+    );
+    setConfirmModalOpen(true);
+  };
+
+  const closeConfirmModal = () => {
+    setConfirmModalOpen(false);
+    setConfirmConfig({ title: "", message: "", itemName: "", onConfirm: null });
+    setIsDeleting(false);
   };
 
   // Fetch employee map using service
   const fetchEmployeeMap = useCallback(async () => {
     try {
       const response = await employeeApi.getAll();
-      
+
       if (response?.data) {
         const employees = Array.isArray(response.data)
           ? response.data
           : response.data.data || [];
-        
+
         const map = {};
         employees.forEach((emp) => {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
@@ -146,7 +206,6 @@ export default function MySubmissions() {
   const fetchObjectives = useCallback(async () => {
     try {
       const response = await goalsApi.getAll(1, 100);
-
       const goalsData = response?.data || [];
 
       if (Array.isArray(goalsData)) {
@@ -174,11 +233,11 @@ export default function MySubmissions() {
     try {
       const userEmpId = Number(user?.empId) || 1004;
 
-      // Fetch HR Forms responses
+      // HR Forms
       try {
         const hrRes = await hrFormApi.getResponsesByEmployee(userEmpId);
         const hrData = hrRes?.data || [];
-        
+
         const enriched = hrData.map((hr) => ({
           ...hr,
           submittedAtFormatted: formatDate(hr.submittedAt),
@@ -190,17 +249,18 @@ export default function MySubmissions() {
         setHrForms([]);
       }
 
-      // Fetch Mentor Feedback
+      // Mentor feedback
       try {
         const mentorRes = await mentorFeedbackApi.myFeedback(userEmpId);
         const mentorData = Array.isArray(mentorRes?.data)
           ? mentorRes.data
           : mentorRes?.data?.data || [];
-        
+
         const enriched = mentorData.map((m) => ({
           ...m,
           mentorNameFull:
-            employeeMap[m.mentorEmployeeId] || `Employee ${m.mentorEmployeeId}`,
+            employeeMap[m.mentorEmployeeId] ||
+            `Employee ${m.mentorEmployeeId}`,
           createdAtFormatted: formatDate(m.createdAt),
           trackingId: m.mentorFeedbackId || m.trackingId || m.id,
         }));
@@ -210,17 +270,17 @@ export default function MySubmissions() {
         setMentor([]);
       }
 
-      // Fetch Peer Feedback
+      // Peer feedback
       try {
         const peerRes = await peerQueueApi.list(1, 100);
         const allPeer = Array.isArray(peerRes?.data)
           ? peerRes.data
           : peerRes?.data?.data || [];
-        
+
         const peerData = allPeer.filter(
           (p) => Number(p.submittedByEmployeeId) === userEmpId
         );
-        
+
         const enriched = peerData.map((p) => ({
           ...p,
           recipientNameFull:
@@ -235,10 +295,9 @@ export default function MySubmissions() {
         setPeer([]);
       }
 
-      // Fetch Goal Feedback
+      // Goal feedback
       try {
         const goalRes = await orgGoalFeedbackApi.list(1, 100);
-
         const goalData = goalRes?.data || [];
 
         if (Array.isArray(goalData)) {
@@ -265,113 +324,138 @@ export default function MySubmissions() {
         setGoalFeedback([]);
       }
     } catch (err) {
-      setError(err?.message || "Failed to fetch submissions");
+      openErrorModal(err?.message || "Failed to fetch submissions");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, [user?.empId, employeeMap, objectives]);
 
-  // Initialize data on mount
   useEffect(() => {
     fetchEmployeeMap();
     fetchObjectives();
   }, [fetchEmployeeMap, fetchObjectives]);
 
-  // Fetch data after employee map is loaded
   useEffect(() => {
     if (Object.keys(employeeMap).length > 0) {
       fetchData();
     }
   }, [employeeMap, fetchData]);
 
-  // View response handler
+  // View response
   const handleViewResponse = (data, type) => {
     setSelectedResponse(data);
     setSelectedType(type);
     setShowModal(true);
   };
 
-  // Close modal handler
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedResponse(null);
     setSelectedType(null);
   };
 
-  // Delete HR Form using service
-  const deleteHRForm = async (responseId) => {
+  // Delete actions using confirmation modal
+  const deleteHRForm = (responseId, formName) => {
     if (!responseId) {
-      showToast("Invalid response ID", "error");
+      toast.error("Invalid response ID");
       return;
     }
 
-    if (!window.confirm("Delete this HR form submission?")) return;
-
-    try {
-      await hrFormApi.deleteResponse(responseId);
-      showToast("HR form deleted successfully!", "success");
-      await fetchData();
-    } catch (err) {
-      showToast(err?.message || "Failed to delete", "error");
-    }
+    openConfirmModal({
+      title: "Delete HR Form",
+      message: "Are you sure you want to delete this HR form submission?",
+      itemName: formName || "HR Form Submission",
+      onConfirm: async () => {
+        setIsDeleting(true);
+        try {
+          await hrFormApi.deleteResponse(responseId);
+          toast.success("HR form deleted successfully!");
+          await fetchData();
+          closeConfirmModal();
+        } catch (err) {
+          toast.error(err?.message || "Failed to delete");
+          setIsDeleting(false);
+        }
+      },
+    });
   };
 
-  // Delete Mentor Feedback using service
-  const deleteMentor = async (trackingId) => {
+  const deleteMentor = (trackingId, mentorName) => {
     if (!trackingId) {
-      showToast("Invalid mentor feedback ID", "error");
+      toast.error("Invalid mentor feedback ID");
       return;
     }
 
-    if (!window.confirm("Delete this mentor feedback?")) return;
-
-    try {
-      await mentorFeedbackApi.remove(trackingId);
-      showToast("Mentor feedback deleted successfully!", "success");
-      await fetchData();
-    } catch (err) {
-      showToast(err?.message || "Failed to delete", "error");
-    }
+    openConfirmModal({
+      title: "Delete Mentor Feedback",
+      message: "Are you sure you want to delete this mentor feedback?",
+      itemName: `Feedback for ${mentorName}`,
+      onConfirm: async () => {
+        setIsDeleting(true);
+        try {
+          await mentorFeedbackApi.remove(trackingId);
+          toast.success("Mentor feedback deleted successfully!");
+          await fetchData();
+          closeConfirmModal();
+        } catch (err) {
+          toast.error(err?.message || "Failed to delete");
+          setIsDeleting(false);
+        }
+      },
+    });
   };
 
-  // Delete Peer Feedback using service
-  const deletePeer = async (queueId) => {
+  const deletePeer = (queueId, recipientName) => {
     if (!queueId) {
-      showToast("Invalid peer feedback ID", "error");
+      toast.error("Invalid peer feedback ID");
       return;
     }
 
-    if (!window.confirm("Delete this peer feedback?")) return;
-
-    try {
-      await peerQueueApi.remove(queueId);
-      showToast("Peer feedback deleted successfully!", "success");
-      await fetchData();
-    } catch (err) {
-      showToast(err?.message || "Failed to delete", "error");
-    }
+    openConfirmModal({
+      title: "Delete Peer Feedback",
+      message: "Are you sure you want to delete this peer feedback?",
+      itemName: `Feedback for ${recipientName}`,
+      onConfirm: async () => {
+        setIsDeleting(true);
+        try {
+          await peerQueueApi.remove(queueId);
+          toast.success("Peer feedback deleted successfully!");
+          await fetchData();
+          closeConfirmModal();
+        } catch (err) {
+          toast.error(err?.message || "Failed to delete");
+          setIsDeleting(false);
+        }
+      },
+    });
   };
 
-  // Delete Goal Feedback using service
-  const deleteGoalFeedback = async (feedbackId) => {
+  const deleteGoalFeedback = (feedbackId, goalTitle) => {
     if (!feedbackId) {
-      showToast("Invalid goal feedback ID", "error");
+      toast.error("Invalid goal feedback ID");
       return;
     }
 
-    if (!window.confirm("Delete this goal feedback?")) return;
-
-    try {
-      await orgGoalFeedbackApi.remove(feedbackId);
-      showToast("Goal feedback deleted successfully!", "success");
-      await fetchData();
-    } catch (err) {
-      showToast(err?.message || "Failed to delete", "error");
-    }
+    openConfirmModal({
+      title: "Delete Goal Feedback",
+      message: "Are you sure you want to delete this goal feedback?",
+      itemName: goalTitle,
+      onConfirm: async () => {
+        setIsDeleting(true);
+        try {
+          await orgGoalFeedbackApi.remove(feedbackId);
+          toast.success("Goal feedback deleted successfully!");
+          await fetchData();
+          closeConfirmModal();
+        } catch (err) {
+          toast.error(err?.message || "Failed to delete");
+          setIsDeleting(false);
+        }
+      },
+    });
   };
 
-  // Get data for current tab
   const getTabData = () => {
     switch (tab) {
       case "HR Forms":
@@ -387,7 +471,6 @@ export default function MySubmissions() {
     }
   };
 
-  // Get empty state icon for current tab
   const getEmptyStateIcon = () => {
     switch (tab) {
       case "HR Forms":
@@ -403,508 +486,240 @@ export default function MySubmissions() {
     }
   };
 
+  const refresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  };
+
   return (
-    <div
-      style={{
-        padding: "1.25rem 1.75rem",
-        maxWidth: "100%",
-        minHeight: "100vh",
-        backgroundColor: "#f8f9fa",
-      }}
-    >
-      {/* Breadcrumb Navigation */}
-      <nav aria-label="breadcrumb" style={{ marginBottom: "1.5rem" }}>
-        <ol
-          style={{
-            display: "flex",
-            alignItems: "center",
-            listStyle: "none",
-            padding: 0,
-            margin: 0,
-            fontSize: "1rem",
-          }}
-        >
-          <li>
-            <Link
-              to="/employee/dashboard"
-              style={{
-                color: "#97247E",
-                display: "flex",
-                alignItems: "center",
-                textDecoration: "none",
-                fontWeight: 500,
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
-            >
-              <Home size={18} style={{ marginRight: "5px" }} />
-              Dashboard
-            </Link>
-          </li>
-          <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
-          <li>
-            <Link
-              to="/employee/dashboard/feedback"
-              style={{
-                color: "#97247E",
-                textDecoration: "none",
-                fontWeight: 500,
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#E01950")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
-            >
-              Feedback Dashboard
-            </Link>
-          </li>
-          <li style={{ margin: "0 0.75rem", color: "#97247E", fontWeight: 400 }}>/</li>
-          <li>
-            <Link
-              to="/employee/dashboard/feedback/submissions"
-              style={{
-                color: "#97247E",
-                textDecoration: "none",
-                fontWeight: 600,
-              }}
-            >
-              My Submissions
-            </Link>
-          </li>
-        </ol>
-      </nav>
-
-      {/* Toast Notification */}
-      {toast.show && (
-        <div
-          className={`alert ${
-            toast.type === "success" ? "alert-success" : "alert-danger"
-          } alert-dismissible fade show position-fixed`}
-          style={{
-            top: "20px",
-            right: "20px",
-            zIndex: 9999,
-            minWidth: "300px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-            borderRadius: "8px",
-            border: "none",
-            padding: "0.75rem 1rem",
-            fontSize: "0.875rem",
-          }}
-        >
-          {toast.message}
-          <button
-            type="button"
-            className="btn-close"
-            style={{ fontSize: "0.75rem" }}
-            onClick={() => setToast({ show: false, message: "", type: "" })}
-          />
-        </div>
-      )}
-
-      {/* Error Alert */}
+    <>
+      {/* Error Modal */}
       {error && (
         <div
-          className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-          style={{
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#fee2e2",
-            padding: "0.75rem 1rem",
-          }}
+          className={`fm-mysub-error-modal-backdrop ${
+            errorModalOpen ? "fm-mysub-error-modal-backdrop--show" : ""
+          }`}
+          onClick={closeErrorModal}
         >
-          <AlertTriangle
-            size={16}
-            className="flex-shrink-0"
-            style={{ marginTop: "2px", color: "#dc2626" }}
-          />
-          <div className="flex-grow-1">
-            <p
-              className="mb-0"
-              style={{ fontSize: "0.875rem", color: "#991b1b" }}
-            >
-              {error}
-            </p>
+          <div
+            className="fm-mysub-error-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="fm-mysub-error-modal__header">
+              <h6 className="fm-mysub-error-modal__title">Error</h6>
+              <button
+                type="button"
+                className="fm-mysub-modal-close-btn"
+                onClick={closeErrorModal}
+                aria-label="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="fm-mysub-error-modal__body">
+              <p>{error}</p>
+            </div>
+            <div className="fm-mysub-error-modal__footer">
+              <button
+                type="button"
+                className="fm-mysub-modal-btn fm-mysub-modal-btn--secondary"
+                onClick={closeErrorModal}
+              >
+                Close
+              </button>
+            </div>
           </div>
-          <button
-            type="button"
-            className="btn-close"
-            style={{ fontSize: "0.75rem" }}
-            onClick={() => setError("")}
-          />
         </div>
       )}
 
-      {/* PILL-STYLE TOGGLE NAVIGATION */}
-      <div className="d-flex justify-content-center mb-3">
-        <div
-          className="toggle-container"
-          style={{
-            backgroundColor: "#27235c",
-            borderRadius: "55px",
-            padding: "7px",
-            display: "inline-flex",
-            gap: "2px",
-            boxShadow: "0 5px 15px rgba(39, 35, 92, 0.22)",
-            minHeight: "54px",
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => setTab("HR Forms")}
-            style={{
-              background: tab === "HR Forms" ? "#ffffff" : "transparent",
-              color: tab === "HR Forms" ? "#27235c" : "#ffffff",
-              border: "none",
-              borderRadius: "55px",
-              padding: "12px 30px",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              whiteSpace: "nowrap",
-              minHeight: "40px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-            }}
-          >
-            <FileText size={15} />
-            HR Forms
-            {hrForms.length > 0 && (
-              <span
-                style={{
-                  backgroundColor:
-                    tab === "HR Forms" ? "#27235c" : "rgba(255,255,255,0.3)",
-                  color: "#ffffff",
-                  padding: "2px 8px",
-                  borderRadius: "12px",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  minWidth: "24px",
-                  textAlign: "center",
-                }}
-              >
-                {hrForms.length}
-              </span>
-            )}
-          </button>
+      {/* Delete Confirm Modal */}
+      <FeedbackDeleteConfirmModal
+        isOpen={confirmModalOpen}
+        onClose={closeConfirmModal}
+        onConfirm={confirmConfig.onConfirm || (() => {})}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        itemName={confirmConfig.itemName}
+        isDeleting={isDeleting}
+      />
 
-          <button
-            type="button"
-            onClick={() => setTab("Goal Feedback")}
-            style={{
-              background: tab === "Goal Feedback" ? "#ffffff" : "transparent",
-              color: tab === "Goal Feedback" ? "#27235c" : "#ffffff",
-              border: "none",
-              borderRadius: "55px",
-              padding: "12px 30px",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              whiteSpace: "nowrap",
-              minHeight: "40px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-            }}
-          >
-            <Target size={15} />
-            Goal Feedback
-            {goalFeedback.length > 0 && (
-              <span
-                style={{
-                  backgroundColor:
-                    tab === "Goal Feedback"
-                      ? "#27235c"
-                      : "rgba(255,255,255,0.3)",
-                  color: "#ffffff",
-                  padding: "2px 8px",
-                  borderRadius: "12px",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  minWidth: "24px",
-                  textAlign: "center",
-                }}
-              >
-                {goalFeedback.length}
-              </span>
-            )}
-          </button>
+      <div className="fm-mysub-page-wrapper">
+        {/* Breadcrumb */}
+        <Breadcrumb
+          items={[
+            { label: "Feedback Management", path: feedbackDashboardPath },
+            { label: "My Submissions" },
+          ]}
+        />
 
-          <button
-            type="button"
-            onClick={() => setTab("Mentor")}
-            style={{
-              background: tab === "Mentor" ? "#ffffff" : "transparent",
-              color: tab === "Mentor" ? "#27235c" : "#ffffff",
-              border: "none",
-              borderRadius: "55px",
-              padding: "12px 30px",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              whiteSpace: "nowrap",
-              minHeight: "40px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-            }}
-          >
-            <Send size={15} />
-            Mentor
-            {mentor.length > 0 && (
-              <span
-                style={{
-                  backgroundColor:
-                    tab === "Mentor" ? "#27235c" : "rgba(255,255,255,0.3)",
-                  color: "#ffffff",
-                  padding: "2px 8px",
-                  borderRadius: "12px",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  minWidth: "24px",
-                  textAlign: "center",
-                }}
-              >
-                {mentor.length}
-              </span>
-            )}
-          </button>
+        {/* Tabs */}
+        <div className="fm-mysub-tabs-wrapper d-flex justify-content-center mb-3">
+          <div className="fm-mysub-tabs">
+            <button
+              type="button"
+              className={`fm-mysub-tab-btn ${
+                tab === "HR Forms" ? "fm-mysub-tab-btn--active" : ""
+              }`}
+              onClick={() => setTab("HR Forms")}
+            >
+              <FileText size={15} />
+              <span>HR Forms</span>
+              {hrForms.length > 0 && (
+                <span className="fm-mysub-tab-btn__badge">
+                  {hrForms.length}
+                </span>
+              )}
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setTab("Peer")}
-            style={{
-              background: tab === "Peer" ? "#ffffff" : "transparent",
-              color: tab === "Peer" ? "#27235c" : "#ffffff",
-              border: "none",
-              borderRadius: "55px",
-              padding: "12px 30px",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              whiteSpace: "nowrap",
-              minHeight: "40px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-            }}
-          >
-            <Users size={15} />
-            Peer
-            {peer.length > 0 && (
-              <span
-                style={{
-                  backgroundColor:
-                    tab === "Peer" ? "#27235c" : "rgba(255,255,255,0.3)",
-                  color: "#ffffff",
-                  padding: "2px 8px",
-                  borderRadius: "12px",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  minWidth: "24px",
-                  textAlign: "center",
-                }}
-              >
-                {peer.length}
-              </span>
-            )}
-          </button>
+            <button
+              type="button"
+              className={`fm-mysub-tab-btn ${
+                tab === "Goal Feedback" ? "fm-mysub-tab-btn--active" : ""
+              }`}
+              onClick={() => setTab("Goal Feedback")}
+            >
+              <Target size={15} />
+              <span>Goal Feedback</span>
+              {goalFeedback.length > 0 && (
+                <span className="fm-mysub-tab-btn__badge">
+                  {goalFeedback.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className={`fm-mysub-tab-btn ${
+                tab === "Mentor" ? "fm-mysub-tab-btn--active" : ""
+              }`}
+              onClick={() => setTab("Mentor")}
+            >
+              <Send size={15} />
+              <span>Mentor</span>
+              {mentor.length > 0 && (
+                <span className="fm-mysub-tab-btn__badge">
+                  {mentor.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              className={`fm-mysub-tab-btn ${
+                tab === "Peer" ? "fm-mysub-tab-btn--active" : ""
+              }`}
+              onClick={() => setTab("Peer")}
+            >
+              <Users size={15} />
+              <span>Peer</span>
+              {peer.length > 0 && (
+                <span className="fm-mysub-tab-btn__badge">
+                  {peer.length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Content Area */}
-      <div
-        style={{
-          backgroundColor: "transparent",
-          minHeight: "400px",
-        }}
-      >
-        {loading ? (
-          <div
-            className="d-flex justify-content-center align-items-center"
-            style={{ minHeight: "300px" }}
-          >
-            <div
-              className="spinner-border text-primary"
-              style={{ width: "3rem", height: "3rem" }}
-            >
-              <span className="visually-hidden">Loading...</span>
+        {/* Content */}
+        <div className="fm-mysub-content">
+          {loading ? (
+            <div className="d-flex justify-content-center align-items-center fm-mysub-loading">
+              <div
+                className="spinner-border text-primary"
+                style={{ width: "3rem", height: "3rem" }}
+              >
+                <span className="visually-hidden">Loading...</span>
+              </div>
             </div>
-          </div>
-        ) : getTabData().length === 0 ? (
-          <div className="text-center py-5">
-            {React.createElement(getEmptyStateIcon(), {
-              size: 56,
-              style: { color: "#cbd5e1", opacity: 0.5, marginBottom: "1rem" },
-            })}
-            <h6
-              className="fw-bold mb-2"
-              style={{ color: "#64748b", fontSize: "1.125rem" }}
-            >
-              No {tab} submissions yet
-            </h6>
-            <p className="text-muted mb-0" style={{ fontSize: "0.875rem" }}>
-              You haven't submitted any {tab.toLowerCase()} feedback
-            </p>
-          </div>
-        ) : (
-          <div className="row g-3">
-            {/* HR Forms Cards */}
-            {tab === "HR Forms" &&
-              hrForms.map((hr) => {
-                return (
+          ) : getTabData().length === 0 ? (
+            <div className="fm-mysub-empty text-center">
+              {React.createElement(getEmptyStateIcon(), {
+                size: 56,
+                className: "fm-mysub-empty__icon mb-3",
+              })}
+              <h6 className="fm-mysub-empty__title fw-bold mb-2">
+                No {tab} submissions yet
+              </h6>
+              <p className="fm-mysub-empty__subtitle mb-0">
+                You haven't submitted any {tab.toLowerCase()} feedback
+              </p>
+            </div>
+          ) : (
+            <div className="row g-3">
+              {/* HR Forms */}
+              {tab === "HR Forms" &&
+                hrForms.map((hr) => (
                   <div className="col-md-6 col-lg-4" key={hr.responseId}>
-                    <div
-                      className="card h-100"
-                      style={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #E5E7EB",
-                        borderLeft: "4px solid #27235C",
-                        borderRadius: "12px",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-                        e.currentTarget.style.transform = "translateY(-2px)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
-                        e.currentTarget.style.transform = "translateY(0)";
-                      }}
-                    >
-                      <div className="card-body" style={{ padding: "1.25rem" }}>
-                        {/* Header Section */}
+                    <div className="fm-mysub-card fm-mysub-card--hr card h-100">
+                      <div className="fm-mysub-card__body card-body">
                         <div className="d-flex align-items-start justify-content-between mb-3">
                           <div className="d-flex align-items-start gap-2 flex-grow-1">
-                            <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
-                            <div className="flex-grow-1" style={{ textAlign: "left" }}>
-                              <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                            <User
+                              size={18}
+                              className="fm-mysub-card__icon-muted"
+                            />
+                            <div className="flex-grow-1 text-start">
+                              <div className="fm-mysub-card__label-small mb-1">
                                 From
                               </div>
-                              <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                              <div className="fm-mysub-card__primary-text">
                                 {user.firstName} {user.lastName}
                               </div>
                             </div>
                           </div>
-                          <span
-                            className="badge"
-                            style={{
-                              backgroundColor: "#D1FAE5",
-                              color: "#065F46",
-                              padding: "4px 12px",
-                              fontSize: "0.75rem",
-                              borderRadius: "6px",
-                              fontWeight: 600,
-                              flexShrink: 0,
-                            }}
-                          >
+                          <span className="fm-mysub-status-badge fm-mysub-status-badge--success">
                             {hr.status || "Approved"}
                           </span>
                         </div>
 
-                        {/* To Section - Always HR */}
                         <div className="d-flex align-items-start gap-2 mb-3">
-                          <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
-                          <div style={{ textAlign: "left" }}>
-                            <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
+                          <User
+                            size={18}
+                            className="fm-mysub-card__icon-muted"
+                          />
+                          <div className="text-start">
+                            <div className="fm-mysub-card__label-small mb-1">
                               To
                             </div>
-                            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
+                            <div className="fm-mysub-card__primary-text">
                               HR
                             </div>
                           </div>
                         </div>
 
-                        {/* Date Section */}
                         <div className="d-flex align-items-center gap-2 mb-4">
-                          <Clock size={16} style={{ color: "#6B7280", flexShrink: 0 }} />
-                          <div style={{ fontSize: "0.813rem", color: "#6B7280", textAlign: "left" }}>
+                          <Clock
+                            size={16}
+                            className="fm-mysub-card__icon-muted"
+                          />
+                          <div className="fm-mysub-card__meta-text">
                             {hr.submittedAtFormatted}
                           </div>
                         </div>
 
-                        {/* Content Preview */}
-                        <div
-                          style={{
-                            backgroundColor: "#F9FAFB",
-                            borderRadius: "8px",
-                            padding: "0.75rem",
-                            marginBottom: "1rem",
-                            minHeight: "60px",
-                            textAlign: "left",
-                          }}
-                        >
-                          <p
-                            style={{
-                              fontSize: "0.813rem",
-                              color: "#4B5563",
-                              margin: 0,
-                              lineHeight: "1.5",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                            }}
-                          >
+                        <div className="fm-mysub-card__preview mb-3">
+                          <p className="fm-mysub-card__preview-text">
                             {hr.formName || "[sample] sample..."}
                           </p>
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="d-flex gap-2">
                           <button
-                            className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                            type="button"
+                            className="btn fm-mysub-btn-primary flex-grow-1 d-flex align-items-center justify-content-center gap-2"
                             onClick={() => handleViewResponse(hr, "HR")}
-                            style={{
-                              backgroundColor: "#27235C",
-                              color: "#fff",
-                              border: "none",
-                              borderRadius: "8px",
-                              padding: "8px 16px",
-                              fontSize: "0.813rem",
-                              fontWeight: 600,
-                              transition: "all 0.2s ease",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = "#1a1840";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = "#27235C";
-                            }}
                           >
                             <Eye size={16} />
                             View
                           </button>
                           <button
-                            className="btn d-flex align-items-center justify-content-center"
-                            onClick={() => deleteHRForm(hr.responseId)}
-                            style={{
-                              backgroundColor: "transparent",
-                              color: "#EF4444",
-                              border: "1px solid #FEE2E2",
-                              borderRadius: "8px",
-                              padding: "8px 12px",
-                              fontSize: "0.813rem",
-                              fontWeight: 600,
-                              transition: "all 0.2s ease",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = "#FEE2E2";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = "transparent";
-                            }}
+                            type="button"
+                            className="btn fm-mysub-btn-danger-ghost d-flex align-items-center justify-content-center"
+                            onClick={() =>
+                              deleteHRForm(hr.responseId, hr.formName)
+                            }
                           >
                             <Trash2 size={16} />
                           </button>
@@ -912,505 +727,292 @@ export default function MySubmissions() {
                       </div>
                     </div>
                   </div>
-                );
-              })}
+                ))}
 
-            {/* Goal Feedback Cards */}
-            {tab === "Goal Feedback" &&
-              goalFeedback.map((goal) => (
-                <div className="col-md-6 col-lg-4" key={goal.orgGoalFeedbackId}>
+              {/* Goal Feedback */}
+              {tab === "Goal Feedback" &&
+                goalFeedback.map((goal) => (
                   <div
-                    className="card h-100"
-                    style={{
-                      backgroundColor: "#fff",
-                      border: "1px solid #E5E7EB",
-                      borderLeft: "4px solid #27235C",
-                      borderRadius: "12px",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                      transition: "all 0.2s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
+                    className="col-md-6 col-lg-4"
+                    key={goal.orgGoalFeedbackId}
                   >
-                    <div className="card-body" style={{ padding: "1.25rem" }}>
-                      {/* Header Section */}
-                      <div className="d-flex align-items-start justify-content-between mb-3">
-                        <div className="d-flex align-items-start gap-2 flex-grow-1">
-                          <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
-                          <div className="flex-grow-1" style={{ textAlign: "left" }}>
-                            <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
-                              From
+                    <div className="fm-mysub-card fm-mysub-card--goal card h-100">
+                      <div className="fm-mysub-card__body card-body">
+                        <div className="d-flex align-items-start justify-content-between mb-3">
+                          <div className="d-flex align-items-start gap-2 flex-grow-1">
+                            <User
+                              size={18}
+                              className="fm-mysub-card__icon-muted"
+                            />
+                            <div className="flex-grow-1 text-start">
+                              <div className="fm-mysub-card__label-small mb-1">
+                                From
+                              </div>
+                              <div className="fm-mysub-card__primary-text">
+                                {user.firstName} {user.lastName}
+                              </div>
                             </div>
-                            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
-                              {user.firstName} {user.lastName}
+                          </div>
+                          <span className="fm-mysub-status-badge fm-mysub-status-badge--success">
+                            Approved
+                          </span>
+                        </div>
+
+                        <div className="d-flex align-items-start gap-2 mb-3">
+                          <Target
+                            size={18}
+                            className="fm-mysub-card__icon-muted"
+                          />
+                          <div className="text-start">
+                            <div className="fm-mysub-card__label-small mb-1">
+                              To
+                            </div>
+                            <div className="fm-mysub-card__primary-text">
+                              {goal.objectiveTitle}
                             </div>
                           </div>
                         </div>
-                        <span
-                          className="badge"
-                          style={{
-                            backgroundColor: "#D1FAE5",
-                            color: "#065F46",
-                            padding: "4px 12px",
-                            fontSize: "0.75rem",
-                            borderRadius: "6px",
-                            fontWeight: 600,
-                            flexShrink: 0,
-                          }}
-                        >
-                          Approved
-                        </span>
-                      </div>
 
-                      {/* To Section */}
-                      <div className="d-flex align-items-start gap-2 mb-3">
-                        <Target size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
-                        <div style={{ textAlign: "left" }}>
-                          <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
-                            To
-                          </div>
-                          <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
-                            {goal.objectiveTitle}
+                        <div className="d-flex align-items-center gap-2 mb-2">
+                          <Clock
+                            size={16}
+                            className="fm-mysub-card__icon-muted"
+                          />
+                          <div className="fm-mysub-card__meta-text">
+                            {goal.submittedAtFormatted}
                           </div>
                         </div>
-                      </div>
 
-                      {/* Date Section */}
-                      <div className="d-flex align-items-center gap-2 mb-4">
-                        <Clock size={16} style={{ color: "#6B7280", flexShrink: 0 }} />
-                        <div style={{ fontSize: "0.813rem", color: "#6B7280", textAlign: "left" }}>
-                          {goal.submittedAtFormatted}
+                        {goal.rating > 0 && (
+                          <div className="d-flex align-items-center gap-1 mb-3">
+                            <Star
+                              size={14}
+                              className="fm-mysub-rating-star"
+                              fill="#fbbf24"
+                            />
+                            <span className="fm-mysub-rating-text">
+                              {RATING_LABELS[goal.rating] || "Rated"} (
+                              {goal.rating}/5)
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="fm-mysub-card__preview mb-3">
+                          <p className="fm-mysub-card__preview-text">
+                            {goal.feedbackComments || "No comments provided"}
+                          </p>
                         </div>
-                      </div>
 
-                      {/* Content Preview */}
-                      <div
-                        style={{
-                          backgroundColor: "#F9FAFB",
-                          borderRadius: "8px",
-                          padding: "0.75rem",
-                          marginBottom: "1rem",
-                          minHeight: "60px",
-                          textAlign: "left",
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontSize: "0.813rem",
-                            color: "#4B5563",
-                            margin: 0,
-                            lineHeight: "1.5",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
-                          {goal.feedbackComments || "No comments provided"}
-                        </p>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="d-flex gap-2">
-                        <button
-                          className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-                          onClick={() => handleViewResponse(goal, "Goal")}
-                          style={{
-                            backgroundColor: "#27235C",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "8px",
-                            padding: "8px 16px",
-                            fontSize: "0.813rem",
-                            fontWeight: 600,
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#1a1840";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "#27235C";
-                          }}
-                        >
-                          <Eye size={16} />
-                          View
-                        </button>
-                        <button
-                          className="btn d-flex align-items-center justify-content-center"
-                          onClick={() => deleteGoalFeedback(goal.orgGoalFeedbackId)}
-                          style={{
-                            backgroundColor: "transparent",
-                            color: "#EF4444",
-                            border: "1px solid #FEE2E2",
-                            borderRadius: "8px",
-                            padding: "8px 12px",
-                            fontSize: "0.813rem",
-                            fontWeight: 600,
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#FEE2E2";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                          }}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="d-flex gap-2">
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-primary flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                            onClick={() => handleViewResponse(goal, "Goal")}
+                          >
+                            <Eye size={16} />
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-danger-ghost d-flex align-items-center justify-content-center"
+                            onClick={() =>
+                              deleteGoalFeedback(
+                                goal.orgGoalFeedbackId,
+                                goal.objectiveTitle
+                              )
+                            }
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-            {/* Mentor Feedback Cards */}
-            {tab === "Mentor" &&
-              mentor.map((m) => (
-                <div
-                  className="col-md-6 col-lg-4"
-                  key={m.trackingId || `mentor-${Math.random()}`}
-                >
+              {/* Mentor Feedback */}
+              {tab === "Mentor" &&
+                mentor.map((m) => (
                   <div
-                    className="card h-100"
-                    style={{
-                      backgroundColor: "#fff",
-                      border: "1px solid #E5E7EB",
-                      borderLeft: "4px solid #27235C",
-                      borderRadius: "12px",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                      transition: "all 0.2s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
+                    className="col-md-6 col-lg-4"
+                    key={m.trackingId || `mentor-${m.mentorEmployeeId}`}
                   >
-                    <div className="card-body" style={{ padding: "1.25rem" }}>
-                      {/* Header Section */}
-                      <div className="d-flex align-items-start justify-content-between mb-3">
-                        <div className="d-flex align-items-start gap-2 flex-grow-1">
-                          <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
-                          <div className="flex-grow-1" style={{ textAlign: "left" }}>
-                            <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
-                              From
+                    <div className="fm-mysub-card fm-mysub-card--mentor card h-100">
+                      <div className="fm-mysub-card__body card-body">
+                        <div className="d-flex align-items-start justify-content-between mb-3">
+                          <div className="d-flex align-items-start gap-2 flex-grow-1">
+                            <User
+                              size={18}
+                              className="fm-mysub-card__icon-muted"
+                            />
+                            <div className="flex-grow-1 text-start">
+                              <div className="fm-mysub-card__label-small mb-1">
+                                From
+                              </div>
+                              <div className="fm-mysub-card__primary-text">
+                                {user.firstName} {user.lastName}
+                              </div>
                             </div>
-                            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
-                              {user.firstName} {user.lastName}
+                          </div>
+                          <span className="fm-mysub-status-badge fm-mysub-status-badge--success">
+                            Approved
+                          </span>
+                        </div>
+
+                        <div className="d-flex align-items-start gap-2 mb-3">
+                          <User
+                            size={18}
+                            className="fm-mysub-card__icon-muted"
+                          />
+                          <div className="text-start">
+                            <div className="fm-mysub-card__label-small mb-1">
+                              To
+                            </div>
+                            <div className="fm-mysub-card__primary-text">
+                              {m.mentorNameFull}
                             </div>
                           </div>
                         </div>
-                        <span
-                          className="badge"
-                          style={{
-                            backgroundColor: "#D1FAE5",
-                            color: "#065F46",
-                            padding: "4px 12px",
-                            fontSize: "0.75rem",
-                            borderRadius: "6px",
-                            fontWeight: 600,
-                            flexShrink: 0,
-                          }}
-                        >
-                          Approved
-                        </span>
-                      </div>
 
-                      {/* To Section */}
-                      <div className="d-flex align-items-start gap-2 mb-3">
-                        <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
-                        <div style={{ textAlign: "left" }}>
-                          <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
-                            To
-                          </div>
-                          <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
-                            {m.mentorNameFull}
+                        <div className="d-flex align-items-center gap-2 mb-4">
+                          <Clock
+                            size={16}
+                            className="fm-mysub-card__icon-muted"
+                          />
+                          <div className="fm-mysub-card__meta-text">
+                            {m.createdAtFormatted}
                           </div>
                         </div>
-                      </div>
 
-                      {/* Date Section */}
-                      <div className="d-flex align-items-center gap-2 mb-4">
-                        <Clock size={16} style={{ color: "#6B7280", flexShrink: 0 }} />
-                        <div style={{ fontSize: "0.813rem", color: "#6B7280", textAlign: "left" }}>
-                          {m.createdAtFormatted}
+                        <div className="fm-mysub-card__preview mb-3">
+                          <p className="fm-mysub-card__preview-text">
+                            {m.feedbackContent ||
+                              m.comments ||
+                              "Mentor feedback..."}
+                          </p>
                         </div>
-                      </div>
 
-                      {/* Content Preview */}
-                      <div
-                        style={{
-                          backgroundColor: "#F9FAFB",
-                          borderRadius: "8px",
-                          padding: "0.75rem",
-                          marginBottom: "1rem",
-                          minHeight: "60px",
-                          textAlign: "left",
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontSize: "0.813rem",
-                            color: "#4B5563",
-                            margin: 0,
-                            lineHeight: "1.5",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
-                          {m.feedbackContent || m.comments || "Mentor feedback..."}
-                        </p>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="d-flex gap-2">
-                        <button
-                          className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-                          onClick={() => handleViewResponse(m, "Mentor")}
-                          style={{
-                            backgroundColor: "#27235C",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "8px",
-                            padding: "8px 16px",
-                            fontSize: "0.813rem",
-                            fontWeight: 600,
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#1a1840";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "#27235C";
-                          }}
-                        >
-                          <Eye size={16} />
-                          View
-                        </button>
-                        <button
-                          className="btn d-flex align-items-center justify-content-center"
-                          onClick={() => deleteMentor(m.trackingId)}
-                          disabled={!m.trackingId}
-                          style={{
-                            backgroundColor: "transparent",
-                            color: "#EF4444",
-                            border: "1px solid #FEE2E2",
-                            borderRadius: "8px",
-                            padding: "8px 12px",
-                            fontSize: "0.813rem",
-                            fontWeight: 600,
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#FEE2E2";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                          }}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="d-flex gap-2">
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-primary flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                            onClick={() => handleViewResponse(m, "Mentor")}
+                          >
+                            <Eye size={16} />
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-danger-ghost d-flex align-items-center justify-content-center"
+                            onClick={() =>
+                              deleteMentor(m.trackingId, m.mentorNameFull)
+                            }
+                            disabled={!m.trackingId}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-            {/* Peer Feedback Cards */}
-            {tab === "Peer" &&
-              peer.map((p) => (
-                <div
-                  className="col-md-6 col-lg-4"
-                  key={p.queueId || `peer-${Math.random()}`}
-                >
+              {/* Peer Feedback */}
+              {tab === "Peer" &&
+                peer.map((p) => (
                   <div
-                    className="card h-100"
-                    style={{
-                      backgroundColor: "#fff",
-                      border: "1px solid #E5E7EB",
-                      borderLeft: "4px solid #27235C",
-                      borderRadius: "12px",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                      transition: "all 0.2s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
+                    className="col-md-6 col-lg-4"
+                    key={p.queueId || `peer-${p.recipientEmployeeId}`}
                   >
-                    <div className="card-body" style={{ padding: "1.25rem" }}>
-                      {/* Header Section */}
-                      <div className="d-flex align-items-start justify-content-between mb-3">
-                        <div className="d-flex align-items-start gap-2 flex-grow-1">
-                          <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
-                          <div className="flex-grow-1" style={{ textAlign: "left" }}>
-                            <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
-                              From
+                    <div className="fm-mysub-card fm-mysub-card--peer card h-100">
+                      <div className="fm-mysub-card__body card-body">
+                        <div className="d-flex align-items-start justify-content-between mb-3">
+                          <div className="d-flex align-items-start gap-2 flex-grow-1">
+                            <User
+                              size={18}
+                              className="fm-mysub-card__icon-muted"
+                            />
+                            <div className="flex-grow-1 text-start">
+                              <div className="fm-mysub-card__label-small mb-1">
+                                From
+                              </div>
+                              <div className="fm-mysub-card__primary-text">
+                                {user.firstName} {user.lastName}
+                              </div>
                             </div>
-                            <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
-                              {user.firstName} {user.lastName}
+                          </div>
+                          <span className="fm-mysub-status-badge fm-mysub-status-badge--success">
+                            Approved
+                          </span>
+                        </div>
+
+                        <div className="d-flex align-items-start gap-2 mb-3">
+                          <User
+                            size={18}
+                            className="fm-mysub-card__icon-muted"
+                          />
+                          <div className="text-start">
+                            <div className="fm-mysub-card__label-small mb-1">
+                              To
+                            </div>
+                            <div className="fm-mysub-card__primary-text">
+                              {p.recipientNameFull}
                             </div>
                           </div>
                         </div>
-                        <span
-                          className="badge"
-                          style={{
-                            backgroundColor: "#D1FAE5",
-                            color: "#065F46",
-                            padding: "4px 12px",
-                            fontSize: "0.75rem",
-                            borderRadius: "6px",
-                            fontWeight: 600,
-                            flexShrink: 0,
-                          }}
-                        >
-                          Approved
-                        </span>
-                      </div>
 
-                      {/* To Section */}
-                      <div className="d-flex align-items-start gap-2 mb-3">
-                        <User size={18} style={{ color: "#6B7280", marginTop: "2px", flexShrink: 0 }} />
-                        <div style={{ textAlign: "left" }}>
-                          <div style={{ fontSize: "0.75rem", color: "#6B7280", marginBottom: "2px" }}>
-                            To
-                          </div>
-                          <div style={{ fontSize: "0.875rem", fontWeight: 600, color: "#1F2937" }}>
-                            {p.recipientNameFull}
+                        <div className="d-flex align-items-center gap-2 mb-4">
+                          <Clock
+                            size={16}
+                            className="fm-mysub-card__icon-muted"
+                          />
+                          <div className="fm-mysub-card__meta-text">
+                            {p.createdAtFormatted}
                           </div>
                         </div>
-                      </div>
 
-                      {/* Date Section */}
-                      <div className="d-flex align-items-center gap-2 mb-4">
-                        <Clock size={16} style={{ color: "#6B7280", flexShrink: 0 }} />
-                        <div style={{ fontSize: "0.813rem", color: "#6B7280", textAlign: "left" }}>
-                          {p.createdAtFormatted}
+                        <div className="fm-mysub-card__preview mb-3">
+                          <p className="fm-mysub-card__preview-text">
+                            {p.feedbackContent || "Peer feedback..."}
+                          </p>
                         </div>
-                      </div>
 
-                      {/* Content Preview */}
-                      <div
-                        style={{
-                          backgroundColor: "#F9FAFB",
-                          borderRadius: "8px",
-                          padding: "0.75rem",
-                          marginBottom: "1rem",
-                          minHeight: "60px",
-                          textAlign: "left",
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontSize: "0.813rem",
-                            color: "#4B5563",
-                            margin: 0,
-                            lineHeight: "1.5",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
-                          {p.feedbackContent || "Peer feedback..."}
-                        </p>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="d-flex gap-2">
-                        <button
-                          className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
-                          onClick={() => handleViewResponse(p, "Peer")}
-                          style={{
-                            backgroundColor: "#27235C",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "8px",
-                            padding: "8px 16px",
-                            fontSize: "0.813rem",
-                            fontWeight: 600,
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#1a1840";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "#27235C";
-                          }}
-                        >
-                          <Eye size={16} />
-                          View
-                        </button>
-                        <button
-                          className="btn d-flex align-items-center justify-content-center"
-                          onClick={() => deletePeer(p.queueId)}
-                          disabled={!p.queueId}
-                          style={{
-                            backgroundColor: "transparent",
-                            color: "#EF4444",
-                            border: "1px solid #FEE2E2",
-                            borderRadius: "8px",
-                            padding: "8px 12px",
-                            fontSize: "0.813rem",
-                            fontWeight: 600,
-                            transition: "all 0.2s ease",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#FEE2E2";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                          }}
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="d-flex gap-2">
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-primary flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                            onClick={() => handleViewResponse(p, "Peer")}
+                          >
+                            <Eye size={16} />
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-danger-ghost d-flex align-items-center justify-content-center"
+                            onClick={() =>
+                              deletePeer(p.queueId, p.recipientNameFull)
+                            }
+                            disabled={!p.queueId}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-          </div>
-        )}
+                ))}
+            </div>
+          )}
+        </div>
+
+        {/* Response View Modal */}
+        <ResponseViewModal
+          show={showModal}
+          response={selectedResponse}
+          onClose={handleCloseModal}
+          type={selectedType}
+        />
       </div>
-
-      {/* Response View Modal */}
-      <ResponseViewModal
-        show={showModal}
-        response={selectedResponse}
-        onClose={handleCloseModal}
-        type={selectedType}
-      />
-
-      <style>{`
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .toggle-container button:hover {
-          opacity: 0.92;
-        }
-        
-        .toggle-container button:active {
-          transform: scale(0.98);
-        }
-      `}</style>
-    </div>
+    </>
   );
 }

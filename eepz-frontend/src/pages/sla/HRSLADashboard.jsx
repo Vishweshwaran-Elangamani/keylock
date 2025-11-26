@@ -30,7 +30,7 @@ const HRSLADashboard = () => {
   const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(5);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -183,7 +183,7 @@ const HRSLADashboard = () => {
     total: slas.length,
     open: slas.filter((s) => s.status === "Open").length,
     closed: slas.filter((s) => s.status === "Closed").length,
-    onTime: slas.filter((s) => s.complianceStatus === "OnTime").length,
+    onTime: slas.filter((s) => s.complianceStatus === "On Time").length,
   });
 
   const formatDate = (dateString) => {
@@ -201,7 +201,7 @@ const HRSLADashboard = () => {
         return "hr-sla-badge-open";
       case "Closed":
         return "hr-sla-badge-closed";
-      case "InProgress":
+      case "In Progress":
         return "hr-sla-badge-progress";
       default:
         return "hr-sla-badge-default";

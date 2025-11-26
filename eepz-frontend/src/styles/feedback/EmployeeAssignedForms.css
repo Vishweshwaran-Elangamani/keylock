@@ -104,7 +104,7 @@
 }
 
 .employee-forms-btn-primary {
-  background: #FFFFFF;
+  background-color:linear-gradient(90deg, #97247E 0%, #E01950 100%);
   color: #27235C;
   border: 1.5px solid #27235C;
 }
@@ -476,16 +476,15 @@
 }
 
 .employee-forms-card-btn-primary {
-  background: #FFFFFF;
-  color: #27235C;
-  border: 1.5px solid #27235C;
+  background:linear-gradient(90deg, #97247E 0%, #E01950 100%);
+  color: white;
+  
 }
 
 .employee-forms-card-btn-primary:hover {
-  background: #27235C;
-  color: #FFFFFF;
+  
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.3);
+ 
 }
 
 .employee-forms-card-btn-disabled {

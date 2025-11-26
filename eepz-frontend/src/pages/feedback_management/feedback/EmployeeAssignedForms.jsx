@@ -6,11 +6,10 @@ import {
   FileText,
   Calendar,
   Loader,
-  Lock,
-  Download,
+  Lock
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { hrFormApi, dateHelpers } from "../../../services/feedbackmanagement/feedbackApi";
+import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
 import Breadcrumb from "../../../components/sla/common/Breadcrumbs";
 import "../../../styles/feedback/EmployeeAssignedForms.css";
 
@@ -36,41 +35,31 @@ export default function EmployeeAssignedForms() {
       setLoading(true);
       setError("");
       try {
-        const response = await hrFormApi.listForms();
-        
-        if (response?.data?.data && Array.isArray(response.data.data)) {
-          // Sort newest first
-          const sorted = [...response.data.data].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-          setAllForms(sorted);
-          setLastFetchTime(new Date().toLocaleTimeString());
-        } else if (Array.isArray(response?.data)) {
-          // Handle direct array response
-          const sorted = [...response.data].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-          setAllForms(sorted);
-          setLastFetchTime(new Date().toLocaleTimeString());
-        } else {
-          throw new Error("Invalid response format from server");
-        }
+        const response = await hrFormApi.getAllForms(1, 1000);
+        let data = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.data?.data)
+          ? response.data.data
+          : [];
+        const sorted = [...data].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setAllForms(sorted);
+        setLastFetchTime(new Date().toLocaleTimeString());
       } catch (err) {
         let msg = "Failed to load forms.";
-        
-        if (err.response?.status === 404) {
+        if (err?.response?.status === 404) {
           msg = "Endpoint not found. Please contact support.";
-        } else if (err.code === "ECONNABORTED" || err.message?.includes('timeout')) {
+        } else if (
+          err?.code === "ECONNABORTED" ||
+          err?.message?.includes("timeout")
+        ) {
           msg = "Request timeout. Please try again.";
         } else {
-          msg = err.response?.data?.message || err.message || msg;
+          msg = err?.response?.data?.message || err?.message || msg;
         }
-        
         setError(msg);
-        
-        // Retry once for server errors (5xx)
-        if (retryCount < 1 && err.response?.status >= 500) {
-          console.log(`🔄 Retrying... (attempt ${retryCount + 1})`);
+        if (retryCount < 1 && err?.response?.status >= 500) {
           setTimeout(() => fetchForms(retryCount + 1), 2000);
         }
       } finally {
@@ -84,18 +73,14 @@ export default function EmployeeAssignedForms() {
   const fetchSubmittedForms = useCallback(async () => {
     if (!user?.empId) return;
     try {
-      const response = await hrFormApi.byEmployee?.(user.empId);
-      
-      if (response?.data?.data && Array.isArray(response.data.data)) {
-        setSubmittedFormIds(new Set(response.data.data.map((r) => r.formId)));
-      } else if (Array.isArray(response?.data)) {
-        setSubmittedFormIds(new Set(response.data.map((r) => r.formId)));
-      } else {
-        setSubmittedFormIds(new Set());
-      }
+      const response = await hrFormApi.getResponsesByEmployee(user.empId);
+      let forms = Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response?.data?.data)
+        ? response.data.data
+        : [];
+      setSubmittedFormIds(new Set(forms.map((r) => r.formId)));
     } catch (error) {
-      // Non-blocking error - just log it
-      console.warn('⚠️ Could not fetch submitted forms:', error);
       setSubmittedFormIds(new Set());
     }
   }, [user?.empId]);
@@ -104,12 +89,9 @@ export default function EmployeeAssignedForms() {
     if (user?.empId) {
       fetchForms();
       fetchSubmittedForms();
-      
-      // Auto-refresh every 30 seconds
       const interval = setInterval(() => {
         fetchForms();
       }, 30000);
-      
       return () => clearInterval(interval);
     }
   }, [user?.empId, fetchForms, fetchSubmittedForms]);
@@ -131,7 +113,7 @@ export default function EmployeeAssignedForms() {
       BiasReview: "Bias Review",
       ProfessionalismReview: "Professionalism Review",
       SurveyForm: "Survey",
-      EvaluationForm: "Evaluation",
+      EvaluationForm: "Evaluation"
     };
     return types[formType] || formType || "—";
   }, []);
@@ -145,7 +127,6 @@ export default function EmployeeAssignedForms() {
     <div className="employee-forms-container">
       <Breadcrumb items={[{ label: "Assigned Forms" }]} />
 
-     
       {/* Error Alert */}
       {error && (
         <div className="employee-forms-alert-error">
@@ -156,6 +137,8 @@ export default function EmployeeAssignedForms() {
           <button
             className="employee-forms-alert-close"
             onClick={() => setError("")}
+            title="Close"
+            type="button"
           >
             ×
           </button>
@@ -169,29 +152,27 @@ export default function EmployeeAssignedForms() {
             className="employee-forms-stat-icon"
             style={{ backgroundColor: "#EEF2FF" }}
           >
-            <FileText size={22} color="#3B82F6" strokeWidth={2.5} />
+            <FileText size={22} color="#3B82F6" />
           </div>
           <h3 className="employee-forms-stat-value">{stats.total}</h3>
           <p className="employee-forms-stat-label">Total Forms</p>
         </div>
-
         <div className="employee-forms-stat-card">
           <div
             className="employee-forms-stat-icon"
             style={{ backgroundColor: "#DCFCE7" }}
           >
-            <Eye size={22} color="#16A34A" strokeWidth={2.5} />
+            <Eye size={22} color="#16A34A" />
           </div>
           <h3 className="employee-forms-stat-value">{stats.submitted}</h3>
           <p className="employee-forms-stat-label">Submitted by You</p>
         </div>
-
         <div className="employee-forms-stat-card">
           <div
             className="employee-forms-stat-icon"
             style={{ backgroundColor: "#E0E7FF" }}
           >
-            <Calendar size={22} color="#4F46E5" strokeWidth={2.5} />
+            <Calendar size={22} color="#4F46E5" />
           </div>
           <h3 className="employee-forms-stat-value">{stats.remaining}</h3>
           <p className="employee-forms-stat-label">Not Yet Submitted</p>
@@ -215,6 +196,7 @@ export default function EmployeeAssignedForms() {
             <button
               className="employee-forms-btn employee-forms-btn-primary"
               onClick={handleRefresh}
+              type="button"
             >
               <RefreshCw size={16} />
               Refresh
@@ -228,21 +210,19 @@ export default function EmployeeAssignedForms() {
                 ? new Date(form.deadline).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
-                    year: "numeric",
+                    year: "numeric"
                   })
                 : "—";
-
-              // Use dateHelpers for urgency if available
-              const urgencyInfo = form.deadline
-                ? dateHelpers.urgency?.(form.deadline)
-                : null;
-
               return (
-                <div key={form.formId} className="employee-forms-card">
-                  {/* Card Header - Icon, Title (Left), Badge (Right) */}
+                <div
+                  key={form.formId}
+                  className="employee-forms-card"
+                  style={isSubmitted ? { opacity: 0.86 } : {}}
+                >
+                  {/* Card Header */}
                   <div className="employee-forms-card-header">
                     <div className="employee-forms-card-icon">
-                      <FileText size={20} strokeWidth={2} />
+                      <FileText size={20} />
                     </div>
                     <div className="employee-forms-card-header-text">
                       <h6 className="employee-forms-card-title">
@@ -259,13 +239,10 @@ export default function EmployeeAssignedForms() {
                       </span>
                     </div>
                   </div>
-
                   {/* Card Body - Simple Rows */}
                   <div className="employee-forms-card-body">
                     <div className="employee-forms-card-row">
-                      <span className="employee-forms-card-label">
-                        Description
-                      </span>
+                      <span className="employee-forms-card-label">Description</span>
                       <span
                         className="employee-forms-card-description"
                         title={form.formDescription}
@@ -273,51 +250,28 @@ export default function EmployeeAssignedForms() {
                         {form.formDescription || "No description"}
                       </span>
                     </div>
-
                     <div className="employee-forms-card-row">
-                      <span className="employee-forms-card-label">
-                        Form Type
-                      </span>
+                      <span className="employee-forms-card-label">Form Type</span>
                       <span className="employee-forms-card-value">
                         {getFormTypeLabel(form.formType)}
                       </span>
                     </div>
-
                     <div className="employee-forms-card-row">
-                      <span className="employee-forms-card-label">
-                        Deadline
-                      </span>
+                      <span className="employee-forms-card-label">Deadline</span>
                       <span className="employee-forms-card-deadline-value">
                         {deadlineStr}
                       </span>
                     </div>
-
-                    {urgencyInfo && (
-                      <div className="employee-forms-card-row">
-                        <span className="employee-forms-card-label">
-                          Urgency
-                        </span>
-                        <span
-                          className={`employee-forms-card-value ${
-                            urgencyInfo.status === "Overdue"
-                              ? "employee-forms-text-danger"
-                              : urgencyInfo.status === "Critical"
-                              ? "employee-forms-text-danger"
-                              : "employee-forms-text-success"
-                          }`}
-                        >
-                          {urgencyInfo.icon} {urgencyInfo.status}
-                        </span>
-                      </div>
-                    )}
                   </div>
-
                   {/* Card Footer */}
                   <div className="employee-forms-card-footer">
                     {isSubmitted ? (
                       <button
                         className="employee-forms-card-btn employee-forms-card-btn-disabled"
                         disabled
+                        title="Already Submitted"
+                        tabIndex={-1}
+                        type="button"
                       >
                         <Lock size={16} />
                         Already Submitted

@@ -5,10 +5,10 @@ import {
   FolderKanban,
   Users,
   UserCog,
-  TrendingUp,
   Activity,
 } from "lucide-react";
 import projectService from "../../services/project_management/projectService";
+import "../../styles/projectmanagement/ProjectManagementDashboard.css";
 
 const ProjectManagementDashboard = () => {
   const navigate = useNavigate();
@@ -53,259 +53,98 @@ const ProjectManagementDashboard = () => {
   };
 
   return (
-    <div
-      className="h-100 d-flex flex-column"
-      style={{ maxWidth: "100%", width: "100%" }}
-    >
+    <div className="pm-dashboard">
       {/* Statistics Cards */}
-      <div className="row g-4 mb-4">
+      <div className="pm-dashboard__stats-grid">
         {/* Total Projects Card */}
-        <div className="col-md-6 col-lg-3">
-          <div
-            className="card border-2"
-            style={{
-              boxShadow: "var(--shadow)",
-              borderRadius: "var(--radius-lg)",
-              border: "2px solid #27235C",
-            }}
-          >
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div
-                  className="rounded p-2"
-                  style={{
-                    backgroundColor: "rgba(82, 79, 125, 0.1)",
-                    flexShrink: 0,
-                  }}
-                >
-                  <FolderKanban
-                    size={20}
-                    style={{ color: "var(--color-primary-3)" }}
-                  />
-                </div>
-                <div className="flex-grow-1">
-                  <h3
-                    className="mb-0 fw-bold"
-                    style={{ color: "var(--color-primary-1)", fontSize: "1.5rem" }}
-                  >
-                    {stats.isLoading ? (
-                      <span className="spinner-border spinner-border-sm" />
-                    ) : (
-                      stats.totalProjects
-                    )}
-                  </h3>
-                  <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-                    Total Projects
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div className="pm-dashboard__stat-card pm-dashboard__stat-card--primary">
+          <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--primary">
+            <FolderKanban size={32} />
+          </div>
+          <div className="pm-dashboard__stat-content">
+            <h3 className="pm-dashboard__stat-value">
+              {stats.isLoading ? (
+                <span className="pm-dashboard__spinner" />
+              ) : (
+                stats.totalProjects
+              )}
+            </h3>
+            <p className="pm-dashboard__stat-label">Total Projects</p>
           </div>
         </div>
 
         {/* Active Projects Card */}
-        <div className="col-md-6 col-lg-3">
-          <div
-            className="card border-2"
-            style={{
-              boxShadow: "var(--shadow)",
-              borderRadius: "var(--radius-lg)",
-              border: "2px solid #27235C",
-            }}
-          >
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div
-                  className="rounded p-2"
-                  style={{
-                    backgroundColor: "rgba(36, 161, 72, 0.1)",
-                    flexShrink: 0,
-                  }}
-                >
-                  <Activity
-                    size={20}
-                    style={{ color: "var(--color-success)" }}
-                  />
-                </div>
-                <div className="flex-grow-1">
-                  <h3
-                    className="mb-0 fw-bold"
-                    style={{ color: "var(--color-primary-1)", fontSize: "1.5rem" }}
-                  >
-                    {stats.isLoading ? (
-                      <span className="spinner-border spinner-border-sm" />
-                    ) : (
-                      stats.activeProjects
-                    )}
-                  </h3>
-                  <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-                    Active Projects
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div className="pm-dashboard__stat-card pm-dashboard__stat-card--success">
+          <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--success">
+            <Activity size={32} />
+          </div>
+          <div className="pm-dashboard__stat-content">
+            <h3 className="pm-dashboard__stat-value">
+              {stats.isLoading ? (
+                <span className="pm-dashboard__spinner" />
+              ) : (
+                stats.activeProjects
+              )}
+            </h3>
+            <p className="pm-dashboard__stat-label">Active Projects</p>
           </div>
         </div>
 
         {/* Total Employees Card */}
-        <div className="col-md-6 col-lg-3">
-          <div
-            className="card border-2"
-            style={{
-              boxShadow: "var(--shadow)",
-              borderRadius: "var(--radius-lg)",
-              border: "2px solid #27235C",
-            }}
-          >
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div
-                  className="rounded p-2"
-                  style={{
-                    backgroundColor: "rgba(15, 98, 254, 0.1)",
-                    flexShrink: 0,
-                  }}
-                >
-                  <Users size={20} style={{ color: "var(--color-accent-5)" }} />
-                </div>
-                <div className="flex-grow-1">
-                  <h3
-                    className="mb-0 fw-bold"
-                    style={{ color: "var(--color-primary-1)", fontSize: "1.5rem" }}
-                  >
-                    {stats.isLoading ? (
-                      <span className="spinner-border spinner-border-sm" />
-                    ) : (
-                      stats.totalEmployees
-                    )}
-                  </h3>
-                  <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-                    Total Employees
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div className="pm-dashboard__stat-card pm-dashboard__stat-card--info">
+          <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--info">
+            <Users size={32} />
+          </div>
+          <div className="pm-dashboard__stat-content">
+            <h3 className="pm-dashboard__stat-value">
+              {stats.isLoading ? (
+                <span className="pm-dashboard__spinner" />
+              ) : (
+                stats.totalEmployees
+              )}
+            </h3>
+            <p className="pm-dashboard__stat-label">Total Employees</p>
           </div>
         </div>
 
         {/* Managed Projects Card */}
-        <div className="col-md-6 col-lg-3">
-          <div
-            className="card border-2"
-            style={{
-              boxShadow: "var(--shadow)",
-              borderRadius: "var(--radius-lg)",
-              border: "2px solid #27235C",
-            }}
-          >
-            <div className="card-body">
-              <div className="d-flex align-items-center gap-3">
-                <div
-                  className="rounded p-2"
-                  style={{
-                    backgroundColor: "rgba(151, 36, 126, 0.1)",
-                    flexShrink: 0,
-                  }}
-                >
-                  <UserCog
-                    size={20}
-                    style={{ color: "var(--color-accent-1)" }}
-                  />
-                </div>
-                <div className="flex-grow-1">
-                  <h3
-                    className="mb-0 fw-bold"
-                    style={{ color: "var(--color-primary-1)", fontSize: "1.5rem" }}
-                  >
-                    {stats.isLoading ? (
-                      <span className="spinner-border spinner-border-sm" />
-                    ) : (
-                      stats.projectsWithManagers
-                    )}
-                  </h3>
-                  <p className="mb-0 small" style={{ color: "var(--muted)" }}>
-                    Managed Projects
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div className="pm-dashboard__stat-card pm-dashboard__stat-card--accent">
+          <div className="pm-dashboard__stat-icon pm-dashboard__stat-icon--accent">
+            <UserCog size={32} />
+          </div>
+          <div className="pm-dashboard__stat-content">
+            <h3 className="pm-dashboard__stat-value">
+              {stats.isLoading ? (
+                <span className="pm-dashboard__spinner" />
+              ) : (
+                stats.projectsWithManagers
+              )}
+            </h3>
+            <p className="pm-dashboard__stat-label">Managed Projects</p>
           </div>
         </div>
       </div>
 
       {/* Main Action Card */}
-      <div
-        className="card border-0 flex-grow-1"
-        style={{
-          boxShadow: "var(--shadow)",
-          borderRadius: "var(--radius-lg)",
-          border: "2px solid #27235C",
-        }}
-      >
-        <div className="card-body d-flex flex-column align-items-center justify-content-center text-center p-5">
-          <FolderKanban
-            size={64}
-            className="mb-3"
-            style={{
-              color: "var(--color-primary-3)",
-              opacity: 0.5,
-            }}
-          />
-          <h4
-            className="fw-bold mb-2"
-            style={{ color: "var(--color-primary-1)" }}
-          >
-            Project Management
-          </h4>
-          <p className="mb-4" style={{ color: "var(--muted)" }}>
+      <div className="pm-dashboard__main-card">
+        <div className="pm-dashboard__main-content">
+          <FolderKanban size={64} className="pm-dashboard__main-icon" />
+          <h4 className="pm-dashboard__main-title">Project Management</h4>
+          <p className="pm-dashboard__main-description">
             Create new projects, assign managers, map employees, and manage all
             project activities
           </p>
-          <div className="d-flex gap-3 flex-wrap justify-content-center">
+          <div className="pm-dashboard__actions">
             <button
-              className="btn btn-lg d-flex align-items-center gap-2"
+              className="pm-dashboard__btn pm-dashboard__btn--primary"
               onClick={() => navigate("/hr/dashboard/projectmgmt/create")}
-              style={{
-                background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-                border: "none",
-                color: "white",
-                borderRadius: "9px",
-                padding: "0.6rem 1.2rem",
-                fontWeight: "600",
-                boxShadow: "var(--shadow)",
-                transition: "all 0.12s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
             >
               <FolderPlus size={20} />
               Create New Project
             </button>
             <button
-              className="btn btn-lg d-flex align-items-center gap-2"
+              className="pm-dashboard__btn pm-dashboard__btn--secondary"
               onClick={() => navigate("/hr/dashboard/projectmgmt/list")}
-              style={{
-                backgroundColor: "transparent",
-                border: "2px solid #27235C",
-                color: "var(--color-primary-3)",
-                borderRadius: "var(--radius-md)",
-                padding: "0.6rem 1.2rem",
-                fontWeight: "600",
-                transition: "all 0.12s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor =
-                  "var(--color-primary-5)";
-                e.currentTarget.style.borderColor = "#27235C";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.borderColor = "#27235C";
-              }}
             >
               <FolderKanban size={20} />
               Manage Projects

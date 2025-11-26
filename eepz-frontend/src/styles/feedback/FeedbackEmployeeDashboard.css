@@ -1,0 +1,350 @@
+/* src/pages/employee/EmployeeFeedbackDashboard.css */
+/* Namespace: fm-empdb- (feedback management, employee dashboard) */
+
+.fm-empdb-page-wrapper {
+  padding: 1.25rem 1.75rem;
+  max-width: 100%;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.fm-empdb-loading {
+  min-height: 60vh;
+}
+
+/* Toolbar */
+.fm-empdb-toolbar__right .fm-empdb-refresh-btn {
+  font-size: 0.75rem;
+  padding-inline: 0.75rem;
+}
+
+.fm-empdb-icon-spin {
+  animation: fm-empdb-spin 1s linear infinite;
+}
+
+@keyframes fm-empdb-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error alert */
+.fm-empdb-error {
+  border-radius: 8px;
+  border: none;
+  background-color: #fee2e2;
+  padding: 0.75rem 1rem;
+}
+
+.fm-empdb-error__icon {
+  margin-top: 2px;
+  color: #dc2626;
+}
+
+.fm-empdb-error__text {
+  font-size: 0.875rem;
+  color: #991b1b;
+}
+
+.fm-empdb-error__close {
+  font-size: 0.75rem;
+}
+
+/* Stat cards */
+.fm-empdb-stat-card {
+  background: white;
+  border: 2px solid #27235c !important;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  transition: all 0.2s ease;
+}
+
+.fm-empdb-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.fm-empdb-stat-card__body {
+  padding: 1.25rem 1rem;
+}
+
+.fm-empdb-stat-card__icon-wrapper {
+  border-radius: 8px;
+  padding: 0.75rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fm-empdb-stat-card__value {
+  font-size: 2rem;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.fm-empdb-stat-card__label {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Toggle navigation */
+.fm-empdb-toggle-nav-wrapper {
+  width: 100%;
+}
+
+.fm-empdb-toggle-nav {
+  background-color: #27235c;
+  border-radius: 50px;
+  padding: 6px;
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.2);
+}
+
+.fm-empdb-toggle-tab {
+  border: none;
+  background-color: transparent;
+  color: #ffffff;
+  padding: 12px 32px;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  position: relative;
+}
+
+.fm-empdb-toggle-tab:hover {
+  opacity: 0.95;
+}
+
+.fm-empdb-toggle-tab:active {
+  transform: scale(0.97);
+}
+
+.fm-empdb-toggle-tab--active {
+  background-color: #ffffff;
+  color: #27235c;
+}
+
+.fm-empdb-toggle-tab__badge {
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.fm-empdb-toggle-tab--active .fm-empdb-toggle-tab__badge {
+  background-color: #dc2626;
+}
+
+/* Content card */
+.fm-empdb-content {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+}
+
+/* Action cards */
+.fm-empdb-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #27235c;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  min-height: 100px;
+  position: relative;
+}
+
+.fm-empdb-action-card__icon-wrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* Keep pill look on click/focus */
+.fm-empdb-toggle-tab:focus,
+.fm-empdb-toggle-tab:active {
+  outline: none;
+  box-shadow: none;
+  border-radius: 50px; /* ensure it stays pill */
+}
+
+.fm-empdb-action-card__icon-wrapper--primary {
+  background-color: #dbeafe;
+}
+
+.fm-empdb-action-card__icon--primary {
+  color: #0f62fe;
+}
+
+.fm-empdb-action-card__icon-wrapper--peer {
+  background-color: #f8f0ff;
+}
+
+.fm-empdb-action-card__icon--peer {
+  color: #9d4edd;
+}
+
+.fm-empdb-action-card__icon-wrapper--submissions {
+  background-color: #f1f5f9;
+}
+
+.fm-empdb-action-card__icon--submissions {
+  color: #64748b;
+}
+
+.fm-empdb-action-card__icon-wrapper--sme {
+  background-color: #fef3c7;
+}
+
+.fm-empdb-action-card__icon--sme {
+  color: #f59e0b;
+}
+
+.fm-empdb-action-card__label {
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: center;
+}
+
+.fm-empdb-action-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Different hover themes */
+.fm-empdb-action-card:not(.fm-empdb-action-card--peer):not(.fm-empdb-action-card--submissions):not(
+    .fm-empdb-action-card--sme
+  ):hover {
+  background-color: #f8fafc;
+  border-color: #0f62fe;
+  box-shadow: 0 4px 12px rgba(15, 98, 254, 0.15);
+}
+
+.fm-empdb-action-card--peer:hover {
+  background-color: #f8f0ff;
+  border-color: #9d4edd;
+  box-shadow: 0 4px 12px rgba(157, 78, 221, 0.15);
+}
+
+.fm-empdb-action-card--submissions:hover {
+  background-color: #f8fafc;
+  border-color: #64748b;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.15);
+}
+
+.fm-empdb-action-card--sme:hover {
+  background-color: #fef3c7;
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+}
+
+/* SME badge */
+.fm-empdb-action-card__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 2px 6px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Peer feedback tab */
+.fm-empdb-peer-title {
+  color: #0f172a;
+  font-size: 1.125rem;
+}
+
+/* Empty state */
+.fm-empdb-peer-empty__icon {
+  color: #cbd5e1;
+  opacity: 0.5;
+}
+
+.fm-empdb-peer-empty__title {
+  color: #64748b;
+  font-size: 1.125rem;
+}
+
+.fm-empdb-peer-empty__subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Peer feedback cards */
+.fm-empdb-peer-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.fm-empdb-peer-card__body {
+  padding: 1rem;
+}
+
+.fm-empdb-peer-card__name {
+  font-size: 0.875rem;
+  color: #0f172a;
+}
+
+.fm-empdb-peer-card__date {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.fm-empdb-peer-card__badge {
+  background-color: #f8f0ff;
+  color: #9d4edd;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.fm-empdb-peer-card__text {
+  line-height: 1.6;
+  color: #475569;
+  font-size: 0.875rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+  .fm-empdb-page-wrapper {
+    padding: 1rem;
+  }
+
+  .fm-empdb-toggle-tab {
+    padding: 10px 18px;
+    font-size: 0.8rem;
+  }
+}

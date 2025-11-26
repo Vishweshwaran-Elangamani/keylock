@@ -385,9 +385,7 @@ const ResourcePoolMapping = () => {
           <Database size={20} className="me-2" />
           <div>
             <strong>Resource Pool:</strong> {resourcePoolProject.projectName}
-            <span className="ms-3">
-              <strong>Mapped Employees:</strong> {resourcePoolMappedEmployees.length}
-            </span>
+           
             {resourcePoolProject.l2Approver && (
               <span className="ms-3">
                 <strong>L2 Manager:</strong> {resourcePoolProject.l2Approver.firstName} {resourcePoolProject.l2Approver.lastName}
@@ -417,7 +415,7 @@ const ResourcePoolMapping = () => {
           <div className="rp-card rp-card-left">
             <div className="rp-card-header">
               <div className="rp-card-title">
-                <Database size={20} /> Employees (Role: Employee Only)
+                <Database size={20} /> Employees
               </div>
               <button
                 className="btn btn-sm rp-btn-select-all"

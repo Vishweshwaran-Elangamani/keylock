@@ -54,18 +54,16 @@
    ======================================== */
 
 .hr-sla-stat-card {
-  background: #FFFFFF !important;
-  border-radius: 12px !important;
-  padding: 1.25rem !important;
-  text-align: center !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  border: 2px solid #27235C !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  min-height: 150px !important;
-  justify-content: center !important;
+  background: white;
+  border: 2px solid #27235c;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+ 
 }
 
 .hr-sla-stat-card:hover {
@@ -74,13 +72,12 @@
 }
 
 .hr-sla-stat-icon {
-  width: 56px !important;
-  height: 56px !important;
-  border-radius: 12px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin-bottom: 1rem !important;
+  border-radius: 8px;
+  padding: 0.75rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hr-sla-stat-value {
@@ -97,6 +94,7 @@
   color: #6B7280 !important;
   margin: 0 !important;
   line-height: 1.3 !important;
+  text-transform: uppercase; 
 }
 
 /* ========================================
@@ -130,7 +128,7 @@
   padding-left: 2.75rem !important;
   border: 1.5px solid #E5E7EB !important;
   border-radius: 8px !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9rem !important;
   background: #FFFFFF !important;
   transition: all 0.2s ease !important;
 }
@@ -144,7 +142,7 @@
 .hr-sla-select {
   border: 1.5px solid #E5E7EB !important;
   border-radius: 8px !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9rem !important;
   background: #FFFFFF !important;
   transition: all 0.2s ease !important;
 }
@@ -169,7 +167,7 @@
   align-items: center !important;
   gap: 0.5rem !important;
   padding: 0.625rem 1rem !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9rem !important;
   font-weight: 600 !important;
   border-radius: 8px !important;
   transition: all 0.2s ease !important;
@@ -265,7 +263,7 @@
 .hr-sla-table-header th {
   padding: 1rem 1.25rem !important;
   font-weight: 600 !important;
-  font-size: 0.875rem !important;
+  font-size: 1rem !important;
   text-align: left !important;
   white-space: nowrap !important;
   vertical-align: middle !important;
@@ -355,13 +353,13 @@
   font-weight: 600 !important;
   color: #111827 !important;
   margin-bottom: 0.25rem !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9rem !important;
   display: block !important;
   text-align: left !important;
 }
 
 .hr-sla-employee-email {
-  font-size: 0.8125rem !important;
+  font-size: 0.875rem !important;
   color: #6B7280 !important;
   display: block !important;
   text-align: left !important;
@@ -371,13 +369,13 @@
 .hr-sla-assigned-name {
   color: #374151 !important;
   font-weight: 500 !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9rem !important;
 }
 
 .hr-sla-not-assigned {
   color: #9CA3AF !important;
   font-style: italic !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9rem !important;
 }
 
 /* Deadline Cell */
@@ -385,7 +383,7 @@
   color: #374151 !important;
   font-weight: 500 !important;
   margin-bottom: 0.25rem !important;
-  font-size: 0.875rem !important;
+  font-size: 0.9rem !important;
   display: block !important;
   text-align: left !important;
 }

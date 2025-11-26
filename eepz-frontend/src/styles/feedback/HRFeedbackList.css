@@ -1,0 +1,331 @@
+/* src/styles/feedback/HRFeedbackList.css */
+/* Namespace: fm-hrlist- (feedback management, HR list) */
+
+.fm-hrlist-page-wrapper {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 2rem 1rem;
+}
+
+.fm-hrlist-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Error Alert */
+.fm-hrlist-error-alert {
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+/* Tabs */
+.fm-hrlist-tabs-wrapper {
+  width: 100%;
+}
+
+.fm-hrlist-tabs {
+  background-color: #27235c;
+  border-radius: 55px;
+  padding: 7px;
+  display: inline-flex;
+  gap: 2px;
+  box-shadow: 0 5px 15px rgba(39, 35, 92, 0.22);
+  min-height: 54px;
+}
+
+.fm-hrlist-tab-btn {
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  border-radius: 55px;
+  padding: 12px 30px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.fm-hrlist-tab-btn:hover {
+  opacity: 0.92;
+}
+
+.fm-hrlist-tab-btn:active {
+  transform: scale(0.98);
+}
+
+.fm-hrlist-tab-btn:focus,
+.fm-hrlist-tab-btn:active {
+  outline: none;
+  box-shadow: none;
+  border-radius: 55px;
+}
+
+.fm-hrlist-tab-btn--active {
+  background: #ffffff;
+  color: #27235c;
+}
+
+.fm-hrlist-tab-btn__badge {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+.fm-hrlist-tab-btn--active .fm-hrlist-tab-btn__badge {
+  background-color: #27235c;
+  color: #ffffff;
+}
+
+/* Loading State */
+.fm-hrlist-loading {
+  padding: 3rem 0;
+}
+
+.fm-hrlist-loading__spinner {
+  width: 3rem;
+  height: 3rem;
+  color: #27235c;
+  border-width: 3px;
+}
+
+.fm-hrlist-loading__text {
+  margin-top: 1rem;
+}
+
+/* Empty State */
+.fm-hrlist-empty {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+}
+
+.fm-hrlist-empty__icon {
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+.fm-hrlist-empty__title {
+  color: #6c757d;
+  font-size: 1.125rem;
+}
+
+.fm-hrlist-empty__subtitle {
+  font-size: 0.875rem;
+}
+
+/* Badge */
+.fm-hrlist-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+/* Cards */
+.fm-hrlist-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.25rem;
+  height: 100%;
+  transition: box-shadow 0.2s ease;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fm-hrlist-card--mentor {
+  border-left: 4px solid #27235c;
+}
+
+.fm-hrlist-card--peer {
+  border-left: 4px solid #27235c;
+}
+
+.fm-hrlist-card:hover {
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.2);
+}
+
+/* Card Header */
+.fm-hrlist-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.fm-hrlist-card__header-left {
+  flex: 1;
+  text-align: left;
+}
+
+.fm-hrlist-card__header-left--peer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fm-hrlist-card__label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 4px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.fm-hrlist-card__title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.fm-hrlist-card__icon--primary {
+  color: #27235c;
+  flex-shrink: 0;
+}
+
+.fm-hrlist-card__icon--muted {
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.fm-hrlist-card__title {
+  margin: 0;
+  font-size: 0.938rem;
+  color: #212529;
+  font-weight: 700;
+  text-align: left;
+}
+
+.fm-hrlist-card__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #212529;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* Card Meta */
+.fm-hrlist-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6c757d;
+  font-size: 0.813rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+/* Anonymous Badge */
+.fm-hrlist-card__anonymous {
+  font-size: 0.813rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: left;
+}
+
+/* Card Preview */
+.fm-hrlist-card__preview {
+  background: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 6px;
+  min-height: 60px;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.fm-hrlist-card__preview-text {
+  margin: 0;
+  font-size: 0.813rem;
+  color: #495057;
+  text-align: left;
+  line-height: 1.5;
+}
+
+/* Card Actions */
+.fm-hrlist-card__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Buttons */
+.fm-hrlist-btn {
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.fm-hrlist-btn--primary {
+  background: #27235c;
+  color: white;
+}
+
+.fm-hrlist-btn--primary:hover {
+  background: #1a1840;
+  color: white;
+}
+
+.fm-hrlist-btn--danger {
+  background: transparent;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  width: 40px;
+  padding: 8px;
+}
+
+.fm-hrlist-btn--danger:hover {
+  background: #dc3545;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .fm-hrlist-page-wrapper {
+    padding: 1rem;
+  }
+
+  .fm-hrlist-tabs {
+    padding: 5px;
+  }
+
+  .fm-hrlist-tab-btn {
+    padding: 10px 20px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation */
+@keyframes fm-hrlist-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
