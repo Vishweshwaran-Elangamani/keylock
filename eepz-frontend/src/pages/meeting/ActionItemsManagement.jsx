@@ -221,6 +221,7 @@ const ActionItemsManagement = () => {
               cursor: "pointer",
               transition: "all 0.2s",
               borderWidth: filter === "all" ? "2px" : "0",
+              
             }}
           >
             <div className="card-body d-flex align-items-center p-3">

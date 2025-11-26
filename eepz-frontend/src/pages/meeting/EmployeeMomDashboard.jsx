@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
+
+
 // ✅ Import separated modal components
 import MeetingDetailsModal from '../../components/meeting/modals/MeetingDetailsModal';
 import SharedMomsModal from '../../components/meeting/modals/SharedMomsModal';
@@ -234,7 +236,7 @@ const EmployeeMomDashboard = () => {
       </nav>
 
       {/* Quick Stats */}
-      <div className="row g-3 mb-4">
+      <div className="row g-3 mb-4" >
         <StatCard 
           icon="bi-file-text" 
           bgColor="#e3f2fd" 
@@ -509,11 +511,13 @@ const EmployeeMomDashboard = () => {
 const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
   <div className="col-lg-3 col-md-6">
     <div 
-      className="card border-0 shadow-sm h-100"
+      className="card shadow-sm h-100"
       onClick={onClick}
       style={{ 
         transition: 'all 0.3s',
-        cursor: 'pointer'
+        cursor: 'pointer',
+        border: '1px solid #27235c', 
+        borderRadius: '8px'            
       }}
       onMouseOver={(e) => {
         e.currentTarget.style.transform = 'translateY(-5px)';
@@ -548,6 +552,7 @@ const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
     </div>
   </div>
 );
+
 
 // Action Button Component
 const ActionButton = ({ icon, label, color, count, onClick }) => (

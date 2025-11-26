@@ -383,10 +383,11 @@ const ManagerMomDashboard = () => {
                 upcomingMeetings.map((meeting) => (
                   <div key={meeting.meetingId} className="col-lg-4 col-md-6">
                     <div
-                      className="card border-0 h-100 shadow-sm"
+                      className="card h-100 shadow-sm"
                       style={{
                         cursor: "pointer",
                         transition: "transform 0.2s",
+                        border: '1px solid #27235c',
                       }}
                       onClick={() => openMeetingDetails(meeting)}
                       onMouseEnter={(e) =>
@@ -470,12 +471,6 @@ const ManagerMomDashboard = () => {
             >
               Recent Team MOMs
             </h5>
-            <button
-              className="btn btn-sm btn-outline-primary"
-              onClick={() => navigate("/mom/my-moms")}
-            >
-              View All
-            </button>
           </div>
 
           {recentTeamMoms.length === 0 ? (
@@ -537,10 +532,15 @@ const ManagerMomDashboard = () => {
     </div>
   );
 };
-
 const StatCard = ({ icon, bgColor, iconColor, count, label, sublabel }) => (
   <div className="col-lg-3 col-md-6">
-    <div className="card border-0 shadow-sm h-100">
+    <div
+      className="card shadow-sm h-100"   
+      style={{
+        border: "1px solid #27235c",    
+        borderRadius: "0.5rem"         
+      }}
+    >
       <div className="card-body d-flex align-items-center p-4">
         <div
           className="rounded-circle d-flex align-items-center justify-content-center me-3"
@@ -573,5 +573,6 @@ const StatCard = ({ icon, bgColor, iconColor, count, label, sublabel }) => (
     </div>
   </div>
 );
+
 
 export default ManagerMomDashboard;
