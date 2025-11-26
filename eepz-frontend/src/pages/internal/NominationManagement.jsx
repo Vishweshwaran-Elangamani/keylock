@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import nominationService from "../../services/internal/nominationService";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
@@ -18,23 +18,21 @@ const NominationManagement = () => {
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const searchInputRef = useRef(null);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
-  const [showManagerNominateModal, setShowManagerNominateModal] =
-    useState(false);
+  const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedNomination, setSelectedNomination] = useState(null);
 
-  // Get role prefix for routing
   const getRolePrefix = () => {
     const role = user?.role?.toLowerCase();
     return `/${role}`;
   };
-
   const rolePrefix = getRolePrefix();
 
   useEffect(() => {
@@ -42,8 +40,44 @@ const NominationManagement = () => {
   }, []);
 
   useEffect(() => {
-    filterNominations();
-  }, [nominations, searchTerm, selectedStatus]);
+    applyFilters();
+    // eslint-disable-next-line
+  }, [nominations, selectedStatus]);
+
+  const handleSearchInput = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      applyFilters();
+      if (searchInputRef.current) searchInputRef.current.blur();
+    }
+  };
+  const handleSearchButton = () => {
+    applyFilters();
+    if (searchInputRef.current) searchInputRef.current.blur();
+  };
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setTimeout(() => applyFilters(), 0);
+    if (searchInputRef.current) searchInputRef.current.focus();
+  };
+
+  useEffect(() => {
+    if (searchTerm === "") applyFilters();
+    // eslint-disable-next-line
+  }, [searchTerm]);
+
+  // ---------- CLEAR FILTERS BUTTON LOGIC ----------
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedStatus("");
+    setFilteredNominations(nominations);
+    setCurrentPage(1);
+    toast.info("Filters cleared");
+    if (searchInputRef.current) searchInputRef.current.value = "";
+  };
+  // ------------------------------------------------
 
   const fetchData = async () => {
     try {
@@ -52,19 +86,15 @@ const NominationManagement = () => {
       if (user?.role === "Manager") {
         nominationsResponse = await nominationService.getPendingManagerReview();
       } else if (user?.role === "Department Head") {
-        nominationsResponse =
-          await nominationService.getPendingDeptHeadReview();
+        nominationsResponse = await nominationService.getPendingDeptHeadReview();
       } else {
         nominationsResponse = await nominationService.getAllNominations();
       }
       const opportunitiesResponse =
         await internalOpportunityService.getAllOpportunities();
-
       if (nominationsResponse.success) {
         setNominations(
-          Array.isArray(nominationsResponse.data)
-            ? nominationsResponse.data
-            : []
+          Array.isArray(nominationsResponse.data) ? nominationsResponse.data : []
         );
       }
       if (opportunitiesResponse.success) {
@@ -81,7 +111,7 @@ const NominationManagement = () => {
     }
   };
 
-  const filterNominations = () => {
+  const applyFilters = () => {
     let filtered = Array.isArray(nominations) ? [...nominations] : [];
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
@@ -105,25 +135,20 @@ const NominationManagement = () => {
     }
     setShowSelfNominateModal(true);
   };
-
   const handleManagerNominate = () => setShowManagerNominateModal(true);
-
   const handleReviewNomination = (nomination) => {
     setSelectedNomination(nomination);
     setShowReviewModal(true);
   };
-
   const handleViewDetails = (nomination) => {
     setSelectedNomination(nomination);
     setShowDetailsModal(true);
   };
-
   const handleNominationSubmitted = () => {
     setShowSelfNominateModal(false);
     setShowManagerNominateModal(false);
     fetchData();
   };
-
   const handleReviewSubmitted = () => {
     setShowReviewModal(false);
     fetchData();
@@ -182,6 +207,7 @@ const NominationManagement = () => {
       />
 
       <div className="nm-stats-grid">
+        {/* ... Stats cards code unchanged ... */}
         <div className="nm-stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-hand-thumbs-up"></i>
@@ -191,7 +217,6 @@ const NominationManagement = () => {
             <p className="stat-label">Total Nominations</p>
           </div>
         </div>
-
         <div className="nm-stat-card">
           <div className="stat-icon stat-icon-success">
             <i className="bi bi-check-circle-fill"></i>
@@ -207,7 +232,6 @@ const NominationManagement = () => {
             <p className="stat-label">Approved</p>
           </div>
         </div>
-
         <div className="nm-stat-card">
           <div className="stat-icon stat-icon-warning">
             <i className="bi bi-clock-fill"></i>
@@ -223,7 +247,6 @@ const NominationManagement = () => {
             <p className="stat-label">Pending</p>
           </div>
         </div>
-
         <div className="nm-stat-card">
           <div className="stat-icon stat-icon-danger">
             <i className="bi bi-x-circle-fill"></i>
@@ -244,16 +267,49 @@ const NominationManagement = () => {
       <div className="filters-card">
         <div className="filters-content">
           <div className="filters-left">
-            <div className="search-box">
-              <i className="bi bi-search search-icon"></i>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search nominations..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            {/* --- Updated Search Bar --- */}
+            <div className="policy-search-revamp">
+              <div className="policy-search-input">
+                <div className="policy-search-inner">
+                  <span className="policy-search-icon">
+                    <i className="bi bi-search"></i>
+                  </span>
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    className="policy-search-field"
+                    placeholder="Search nominations by opportunity or nominee name..."
+                    value={searchTerm}
+                    onChange={handleSearchInput}
+                    onKeyDown={handleSearchKeyDown}
+                  />
+                  {searchTerm && (
+                    <button
+                      type="button"
+                      className="policy-clear-search-btn"
+                      onClick={handleClearSearch}
+                      aria-label="Clear search"
+                    >
+                      <i className="bi bi-x-lg"></i>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="policy-search-btn"
+                    onClick={handleSearchButton}
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
             </div>
+            {/* Clear Filters button */}
+            <button
+              className="pm-clear-btn"
+              onClick={clearFilters}
+              style={{ marginLeft: "1rem" }}>
+              Clear Filters
+            </button>
             <select
               className="filter-select"
               value={selectedStatus}
@@ -265,7 +321,6 @@ const NominationManagement = () => {
               <option value="Rejected">Rejected</option>
             </select>
           </div>
-
           <div className="filters-actions">
             {!["HR", "Department Head"].includes(user?.role) && (
               <button
@@ -309,18 +364,13 @@ const NominationManagement = () => {
                     <td>{nomination.nominatedByName}</td>
                     <td>{nomination.nominationType}</td>
                     <td>
-                      <span
-                        className={`status-badge ${getStatusBadgeClass(
-                          nomination.status
-                        )}`}
-                      >
+                      <span className={`status-badge ${getStatusBadgeClass(nomination.status)}`}>
                         {nomination.status}
                       </span>
                     </td>
                     <td>
                       <div className="action-buttons">
-                        {(user?.role === "Manager" ||
-                          user?.role === "Department Head") &&
+                        {(user?.role === "Manager" || user?.role === "Department Head") &&
                           nomination.status
                             ?.toLowerCase()
                             .includes("pending") && (
@@ -347,7 +397,6 @@ const NominationManagement = () => {
             </tbody>
           </table>
         </div>
-
         {filteredNominations.length > 0 && (
           <div className="pagination-container">
             <div className="pagination-info">
@@ -379,7 +428,6 @@ const NominationManagement = () => {
           onNominationSubmitted={handleNominationSubmitted}
         />
       )}
-
       {showManagerNominateModal && (
         <ManagerNominateModal
           show={showManagerNominateModal}
@@ -388,7 +436,6 @@ const NominationManagement = () => {
           onNominationSubmitted={handleNominationSubmitted}
         />
       )}
-
       {showReviewModal && selectedNomination && (
         <NominationReviewModal
           show={showReviewModal}
@@ -398,14 +445,12 @@ const NominationManagement = () => {
           onReviewSubmitted={handleReviewSubmitted}
         />
       )}
-
       {showGraphModal && (
         <NominationGraphModal
           show={showGraphModal}
           onHide={() => setShowGraphModal(false)}
         />
       )}
-
       {showDetailsModal && selectedNomination && (
         <NominationDetailsModal
           show={showDetailsModal}
@@ -418,3 +463,4 @@ const NominationManagement = () => {
 };
 
 export default NominationManagement;
+
