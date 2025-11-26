@@ -25,5 +25,7 @@ public partial class GoalApproval
 
     public virtual Goal Goal { get; set; } = null!;
 
+    public virtual ICollection<GoalAttachment> GoalAttachments { get; set; } = new List<GoalAttachment>();
+
     public virtual Employeedetailsmaster? RequestedByNavigation { get; set; }
 }

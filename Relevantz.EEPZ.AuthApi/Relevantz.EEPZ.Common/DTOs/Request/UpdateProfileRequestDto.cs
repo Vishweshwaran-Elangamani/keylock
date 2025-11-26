@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace Relevantz.EEPZ.Common.DTOs.Request
 {
@@ -43,6 +44,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [StringLength(100, ErrorMessage = "Nationality cannot exceed 100 characters")]
         public string? Nationality { get; set; }
+        public IFormFile? ProfilePhoto { get; set; }
+
 
         // Current Address
         public UpdateAddressDto? CurrentAddress { get; set; }

@@ -15,9 +15,6 @@ public partial class Userprofile
 
     public string LastName { get; set; } = null!;
 
-    /// <summary>
-    /// Preferred/nick name
-    /// </summary>
     public string? CallingName { get; set; }
 
     public string? ReferredBy { get; set; }
@@ -37,6 +34,8 @@ public partial class Userprofile
     public string? MaritalStatus { get; set; }
 
     public string? Nationality { get; set; }
+
+    public byte[]? ProfilePhoto { get; set; }
 
     public virtual Employee Employee { get; set; } = null!;
 }

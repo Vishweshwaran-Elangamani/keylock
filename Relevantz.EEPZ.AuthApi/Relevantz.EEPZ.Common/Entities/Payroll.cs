@@ -11,9 +11,6 @@ public partial class Payroll
 
     public int DepartmentId { get; set; }
 
-    /// <summary>
-    /// e.g., Jan-2025
-    /// </summary>
     public string PayrollPeriod { get; set; } = null!;
 
     public decimal? OldSalary { get; set; }

@@ -11,16 +11,19 @@ public partial class GoalAttachment
 
     public string? AttachmentTitle { get; set; }
 
-    /// <summary>
-    /// File path or blob reference
-    /// </summary>
     public string? Attachments { get; set; }
 
     public int? AttachedBy { get; set; }
 
     public DateTime? AttachedOn { get; set; }
 
+    public bool? IsProofOfCompletion { get; set; }
+
+    public int? LinkedApprovalId { get; set; }
+
     public virtual Employeedetailsmaster? AttachedByNavigation { get; set; }
 
     public virtual Goal Goal { get; set; } = null!;
+
+    public virtual GoalApproval? LinkedApproval { get; set; }
 }

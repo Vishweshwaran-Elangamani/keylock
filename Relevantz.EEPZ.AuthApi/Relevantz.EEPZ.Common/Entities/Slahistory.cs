@@ -9,9 +9,6 @@ public partial class Slahistory
 
     public int Slaid { get; set; }
 
-    /// <summary>
-    /// Created, Updated, StatusChanged, Escalated, Closed
-    /// </summary>
     public string ChangeType { get; set; } = null!;
 
     public string? ChangedFrom { get; set; }
@@ -24,9 +21,6 @@ public partial class Slahistory
 
     public string? Reason { get; set; }
 
-    /// <summary>
-    /// Browser, IP, request metadata
-    /// </summary>
     public string? Metadata { get; set; }
 
     public DateTime CreatedAt { get; set; }

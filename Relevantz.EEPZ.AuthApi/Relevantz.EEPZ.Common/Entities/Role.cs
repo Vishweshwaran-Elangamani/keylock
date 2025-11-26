@@ -13,9 +13,6 @@ public partial class Role
 
     public string? Description { get; set; }
 
-    /// <summary>
-    /// System-defined role (cannot be deleted)
-    /// </summary>
     public bool? IsSystemRole { get; set; }
 
     public DateTime CreatedAt { get; set; }

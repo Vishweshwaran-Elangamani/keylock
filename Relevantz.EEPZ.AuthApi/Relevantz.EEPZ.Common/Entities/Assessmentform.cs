@@ -7,9 +7,6 @@ public partial class Assessmentform
 {
     public int FormId { get; set; }
 
-    /// <summary>
-    /// Self Assessment, etc
-    /// </summary>
     public string? Name { get; set; }
 
     public string? Type { get; set; }
@@ -27,4 +24,6 @@ public partial class Assessmentform
     public virtual Userauthentication? CreatedByNavigation { get; set; }
 
     public virtual ICollection<Selfassessment> Selfassessments { get; set; } = new List<Selfassessment>();
+
+    public virtual ICollection<Slareviewtracking> Slareviewtrackings { get; set; } = new List<Slareviewtracking>();
 }

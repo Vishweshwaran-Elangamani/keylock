@@ -36,4 +36,8 @@ public partial class Slacompliance
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    public virtual Employee? CalculatedByNavigation { get; set; }
+
+    public virtual Department Department { get; set; } = null!;
 }

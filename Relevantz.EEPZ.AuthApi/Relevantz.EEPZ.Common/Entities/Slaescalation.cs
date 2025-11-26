@@ -13,14 +13,29 @@ public partial class Slaescalation
 
     public string? Description { get; set; }
 
-    /// <summary>
-    /// Legacy submitter id
-    /// </summary>
+    public string EscalationLevel { get; set; } = null!;
+
+    public int EscalatedToEmployeeId { get; set; }
+
+    public string EscalationStatus { get; set; } = null!;
+
+    public DateTime? EscalationDeadline { get; set; }
+
+    public DateTime? ResolvedAt { get; set; }
+
+    public int? ResolvedByEmployeeId { get; set; }
+
+    public string? ResolutionComments { get; set; }
+
     public int? SubmittedBy { get; set; }
 
     public int SubmittedByEmployeeId { get; set; }
 
     public DateTime? SubmittedAt { get; set; }
+
+    public virtual Employee EscalatedToEmployee { get; set; } = null!;
+
+    public virtual Employee? ResolvedByEmployee { get; set; }
 
     public virtual Sla Sla { get; set; } = null!;
 

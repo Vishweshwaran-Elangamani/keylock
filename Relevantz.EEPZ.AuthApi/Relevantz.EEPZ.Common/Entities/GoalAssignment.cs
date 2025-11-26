@@ -15,6 +15,14 @@ public partial class GoalAssignment
 
     public DateTime? AssignedOn { get; set; }
 
+    public bool? IsAcknowledged { get; set; }
+
+    public DateTime? AcknowledgedOn { get; set; }
+
+    public int? AcknowledgedBy { get; set; }
+
+    public virtual Employeedetailsmaster? AcknowledgedByNavigation { get; set; }
+
     public virtual Employeedetailsmaster? AssignedByNavigation { get; set; }
 
     public virtual Employeedetailsmaster? AssignedToNavigation { get; set; }
