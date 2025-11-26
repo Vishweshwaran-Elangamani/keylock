@@ -21,9 +21,9 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId);
         Task AddReviewMetricAsync(Nominationreviewmetric metric);
         
-        // Helper methods for manager hierarchy
-        Task<int?> GetL1ManagerUserIdAsync(int employeeUserId);
-        Task<int?> GetL2ManagerUserIdAsync(int employeeUserId); // UPDATED: Takes employeeUserId, not l1ManagerUserId
-        Task<int?> GetDeptHeadUserIdAsync(int l2ManagerUserId);
+        // NEW: Project-based hierarchy methods
+        Task<int?> GetManagerFromProjectAsync(int employeeUserId);
+        Task<int?> GetDeptHeadFromProjectAsync(int employeeUserId);
+        Task<string?> GetUserRoleNameAsync(int userId);
     }
 }

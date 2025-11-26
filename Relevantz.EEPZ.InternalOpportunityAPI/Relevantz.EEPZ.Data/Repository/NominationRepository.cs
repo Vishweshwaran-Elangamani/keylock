@@ -32,7 +32,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in CreateAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in CreateAsync: {ex.Message}");
                 throw;
             }
         }
@@ -51,7 +51,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetByIdAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in GetByIdAsync: {ex.Message}");
                 throw;
             }
         }
@@ -70,7 +70,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetAllAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in GetAllAsync: {ex.Message}");
                 throw;
             }
         }
@@ -88,7 +88,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetByOpportunityAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in GetByOpportunityAsync: {ex.Message}");
                 throw;
             }
         }
@@ -97,7 +97,7 @@ namespace Relevantz.EEPZ.Data.Repository
         {
             try
             {
-                Console.WriteLine($"Repository: GetByEmployeeAsync - UserId: {employeeUserId}");
+                Console.WriteLine($"[Repository] GetByEmployeeAsync - UserId: {employeeUserId}");
 
                 var nominations = await _context.Nominations
                     .Include(n => n.Opportunity)
@@ -108,13 +108,13 @@ namespace Relevantz.EEPZ.Data.Repository
                     .OrderByDescending(n => n.SubmittedAt)
                     .ToListAsync();
 
-                Console.WriteLine($"Repository: Found {nominations.Count} nominations");
+                Console.WriteLine($"[Repository] Found {nominations.Count} nominations");
 
                 return nominations;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetByEmployeeAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in GetByEmployeeAsync: {ex.Message}");
                 throw;
             }
         }
@@ -137,7 +137,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetByStatusAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in GetByStatusAsync: {ex.Message}");
                 throw;
             }
         }
@@ -149,13 +149,13 @@ namespace Relevantz.EEPZ.Data.Repository
                 return await _context.Nominations
                     .Include(n => n.Opportunity)
                     .Include(n => n.NomineeUser)
-                    .Where(n => n.Status == "Pending_L1_Review" || n.Status == "Pending_L2_Review")
+                    .Where(n => n.Status == "Pending_Manager_Review")
                     .OrderByDescending(n => n.SubmittedAt)
                     .ToListAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetPendingManagerReviewAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in GetPendingManagerReviewAsync: {ex.Message}");
                 throw;
             }
         }
@@ -175,7 +175,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetPendingDeptHeadApprovalAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in GetPendingDeptHeadApprovalAsync: {ex.Message}");
                 throw;
             }
         }
@@ -184,7 +184,7 @@ namespace Relevantz.EEPZ.Data.Repository
         {
             try
             {
-                Console.WriteLine($"Repository: GetPendingDeptHeadApprovalByDeptHeadIdAsync - DeptHeadUserId: {deptHeadUserId}");
+                Console.WriteLine($"[Repository] GetPendingDeptHeadApprovalByDeptHeadIdAsync - DeptHeadUserId: {deptHeadUserId}");
 
                 var nominations = await _context.Nominations
                     .Include(n => n.Opportunity)
@@ -192,19 +192,19 @@ namespace Relevantz.EEPZ.Data.Repository
                     .Include(n => n.NomineeUser)
                     .Include(n => n.NominatedByUser)
                     .Where(n => 
-                        n.CurrentApprovalLevel == 3 &&
+                        n.CurrentApprovalLevel == 2 &&
                         n.DeptHeadUserId == deptHeadUserId &&
                         n.Status == "Pending_DeptHead_Review")
                     .OrderByDescending(n => n.SubmittedAt)
                     .ToListAsync();
 
-                Console.WriteLine($"Repository: Found {nominations.Count} nominations for dept head");
+                Console.WriteLine($"[Repository] Found {nominations.Count} nominations for dept head");
 
                 return nominations;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching pending nominations for Dept Head {deptHeadUserId}: {ex.Message}");
+                Console.WriteLine($"[Repository] Error fetching pending nominations for Dept Head {deptHeadUserId}: {ex.Message}");
                 throw;
             }
         }
@@ -213,26 +213,28 @@ namespace Relevantz.EEPZ.Data.Repository
         {
             try
             {
-                Console.WriteLine($"Repository: GetPendingManagerReviewByManagerIdAsync - ManagerId: {managerId}");
+                Console.WriteLine($"[Repository] GetPendingManagerReviewByManagerIdAsync - ManagerId: {managerId}");
 
+                // NOTE: L2ManagerUserId is used as "Manager" (from Project.L2approverEmployeeId)
                 var nominations = await _context.Nominations
                     .Include(n => n.Opportunity)
                         .ThenInclude(o => o.Department)
                     .Include(n => n.NomineeUser)
                     .Include(n => n.NominatedByUser)
                     .Where(n => 
-                        (n.CurrentApprovalLevel == 1 && n.L1ManagerUserId == managerId && n.Status == "Pending_L1_Review") ||
-                        (n.CurrentApprovalLevel == 2 && n.L2ManagerUserId == managerId && n.Status == "Pending_L2_Review"))
+                        n.CurrentApprovalLevel == 1 && 
+                        n.L2ManagerUserId == managerId && 
+                        n.Status == "Pending_Manager_Review")
                     .OrderByDescending(n => n.SubmittedAt)
                     .ToListAsync();
 
-                Console.WriteLine($"Found {nominations.Count} pending nominations for manager {managerId}");
+                Console.WriteLine($"[Repository] Found {nominations.Count} pending nominations for manager {managerId}");
 
                 return nominations;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetPendingManagerReviewByManagerIdAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in GetPendingManagerReviewByManagerIdAsync: {ex.Message}");
                 throw;
             }
         }
@@ -250,7 +252,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in UpdateAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in UpdateAsync: {ex.Message}");
                 throw;
             }
         }
@@ -269,46 +271,42 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in DeleteAsync: {ex.Message}");
+                Console.WriteLine($"[Repository] Error in DeleteAsync: {ex.Message}");
                 throw;
             }
         }
 
-        // Check if user already has an active (pending/approved) nomination for this opportunity
-public async Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId)
-{
-    try
-    {
-        Console.WriteLine($"[Repository] Checking duplicate - OpportunityId: {opportunityId}, EmployeeId: {employeeId}");
-
-        // Check if user has a PENDING or APPROVED nomination (cannot reapply)
-        var existingNomination = await _context.Nominations
-            .AnyAsync(n =>
-                n.OpportunityId == opportunityId &&
-                n.NomineeUserId == employeeId &&
-                (n.Status == "Pending_L1_Review" ||
-                 n.Status == "Pending_L2_Review" ||
-                 n.Status == "Pending_DeptHead_Review" ||
-                 n.Status == "Approved_By_DeptHead"));
-
-        if (existingNomination)
+        public async Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId)
         {
-            Console.WriteLine($"[Repository] Duplicate found - User {employeeId} already has active nomination for opportunity {opportunityId}");
-        }
-        else
-        {
-            Console.WriteLine($"[Repository] No duplicate - User {employeeId} can apply for opportunity {opportunityId}");
-        }
+            try
+            {
+                Console.WriteLine($"[Repository] Checking duplicate - OpportunityId: {opportunityId}, EmployeeId: {employeeId}");
 
-        return existingNomination;
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error in ExistsDuplicateAsync: {ex.Message}");
-        throw;
-    }
-}
+                var existingNomination = await _context.Nominations
+                    .AnyAsync(n =>
+                        n.OpportunityId == opportunityId &&
+                        n.NomineeUserId == employeeId &&
+                        (n.Status == "Pending_Manager_Review" ||
+                         n.Status == "Pending_DeptHead_Review" ||
+                         n.Status == "Approved_By_DeptHead"));
 
+                if (existingNomination)
+                {
+                    Console.WriteLine($"[Repository] Duplicate found - User {employeeId} already has active nomination for opportunity {opportunityId}");
+                }
+                else
+                {
+                    Console.WriteLine($"[Repository] No duplicate - User {employeeId} can apply for opportunity {opportunityId}");
+                }
+
+                return existingNomination;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Repository] Error in ExistsDuplicateAsync: {ex.Message}");
+                throw;
+            }
+        }
 
         public async Task AddReviewMetricAsync(Nominationreviewmetric metric)
         {
@@ -316,8 +314,132 @@ public async Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId)
             await _context.SaveChangesAsync();
         }
 
-        // HELPER: Get role name for a user via Employeedetailsmaster
-        private async Task<string?> GetUserRoleNameAsync(int userId)
+        // ==================== PROJECT-BASED METHODS ====================
+
+        /// <summary>
+        /// Get Manager (L2) from employee's primary project
+        /// Uses Project.L2approverEmployeeId → converts to UserId
+        /// </summary>
+        public async Task<int?> GetManagerFromProjectAsync(int employeeUserId)
+        {
+            try
+            {
+                Console.WriteLine($"[Repository] GetManagerFromProject - EmployeeUserId: {employeeUserId}");
+
+                // Get employee's EmployeeId from Userauthentication
+                var employeeAuth = await _context.Userauthentications
+                    .FirstOrDefaultAsync(u => u.UserId == employeeUserId);
+
+                if (employeeAuth == null || employeeAuth.EmployeeId <= 0)
+                {
+                    Console.WriteLine($"[Repository] No auth record found for UserId: {employeeUserId}");
+                    return null;
+                }
+
+                // Get employee's primary project (or ANY project if no primary exists)
+                var primaryProject = await _context.Projectemployees
+                    .Include(pe => pe.Project)
+                    .Where(pe => pe.EmployeeId == employeeAuth.EmployeeId)
+                    .OrderByDescending(pe => pe.IsPrimary)  // Primary first, then any
+                    .FirstOrDefaultAsync();
+
+                if (primaryProject == null || primaryProject.Project == null)
+                {
+                    Console.WriteLine($"[Repository] No project found for EmployeeId: {employeeAuth.EmployeeId}");
+                    return null;
+                }
+
+                // ✅ CHANGED: Get L2 approver (which is the Manager in new flow)
+                if (primaryProject.Project.L2approverEmployeeId == null)
+                {
+                    Console.WriteLine($"[Repository] No L2approver (Manager) set in project {primaryProject.ProjectId}");
+                    return null;
+                }
+
+                // Convert EmployeeId to UserId
+                var managerAuth = await _context.Userauthentications
+                    .FirstOrDefaultAsync(u => u.EmployeeId == primaryProject.Project.L2approverEmployeeId.Value);
+
+                if (managerAuth == null)
+                {
+                    Console.WriteLine($"[Repository] No UserId found for Manager EmployeeId: {primaryProject.Project.L2approverEmployeeId}");
+                    return null;
+                }
+
+                Console.WriteLine($"[Repository] Found Manager UserId: {managerAuth.UserId} (from L2approver) in Project: {primaryProject.ProjectId}");
+                return managerAuth.UserId;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Repository] Error in GetManagerFromProjectAsync: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get DeptHead from employee's primary project
+        /// Uses Project.ResourceOwnerEmployeeId → converts to UserId
+        /// </summary>
+        public async Task<int?> GetDeptHeadFromProjectAsync(int employeeUserId)
+        {
+            try
+            {
+                Console.WriteLine($"[Repository] GetDeptHeadFromProject - EmployeeUserId: {employeeUserId}");
+
+                // Get employee's EmployeeId from Userauthentication
+                var employeeAuth = await _context.Userauthentications
+                    .FirstOrDefaultAsync(u => u.UserId == employeeUserId);
+
+                if (employeeAuth == null || employeeAuth.EmployeeId <= 0)
+                {
+                    Console.WriteLine($"[Repository] No auth record found for UserId: {employeeUserId}");
+                    return null;
+                }
+
+                // Get employee's primary project (or ANY project if no primary exists)
+                var primaryProject = await _context.Projectemployees
+                    .Include(pe => pe.Project)
+                    .Where(pe => pe.EmployeeId == employeeAuth.EmployeeId)
+                    .OrderByDescending(pe => pe.IsPrimary)  // Primary first, then any
+                    .FirstOrDefaultAsync();
+
+                if (primaryProject == null || primaryProject.Project == null)
+                {
+                    Console.WriteLine($"[Repository] No project found for EmployeeId: {employeeAuth.EmployeeId}");
+                    return null;
+                }
+
+                // ✅ CHANGED: Get ResourceOwner (which is the DeptHead)
+                if (primaryProject.Project.ResourceOwnerEmployeeId == null)
+                {
+                    Console.WriteLine($"[Repository] No ResourceOwner (DeptHead) set in project {primaryProject.ProjectId}");
+                    return null;
+                }
+
+                // Convert EmployeeId to UserId
+                var deptHeadAuth = await _context.Userauthentications
+                    .FirstOrDefaultAsync(u => u.EmployeeId == primaryProject.Project.ResourceOwnerEmployeeId.Value);
+
+                if (deptHeadAuth == null)
+                {
+                    Console.WriteLine($"[Repository] No UserId found for DeptHead EmployeeId: {primaryProject.Project.ResourceOwnerEmployeeId}");
+                    return null;
+                }
+
+                Console.WriteLine($"[Repository] Found DeptHead UserId: {deptHeadAuth.UserId} (from ResourceOwner) in Project: {primaryProject.ProjectId}");
+                return deptHeadAuth.UserId;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Repository] Error in GetDeptHeadFromProjectAsync: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get user's role name from Employeedetailsmaster
+        /// </summary>
+        public async Task<string?> GetUserRoleNameAsync(int userId)
         {
             try
             {
@@ -336,169 +458,6 @@ public async Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Repository] Error getting role for UserId {userId}: {ex.Message}");
-                return null;
-            }
-        }
-
-        // UPDATED: Returns null if direct manager is "Manager" role (L2), meaning no L1 exists
-        public async Task<int?> GetL1ManagerUserIdAsync(int employeeUserId)
-        {
-            try
-            {
-                Console.WriteLine($"[Repository] GetL1ManagerUserIdAsync - EmployeeUserId: {employeeUserId}");
-
-                var employeeAuth = await _context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.UserId == employeeUserId);
-
-                if (employeeAuth == null || employeeAuth.EmployeeId <= 0)
-                {
-                    Console.WriteLine($"[Repository] No auth record found for UserId: {employeeUserId}");
-                    return null;
-                }
-
-                var employee = await _context.Employees
-                    .FirstOrDefaultAsync(e => e.EmployeeId == employeeAuth.EmployeeId);
-
-                if (employee?.ReportingManagerEmployeeId == null)
-                {
-                    Console.WriteLine($"[Repository] No reporting manager found for EmployeeId: {employeeAuth.EmployeeId}");
-                    return null;
-                }
-
-                var directManagerAuth = await _context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.EmployeeId == employee.ReportingManagerEmployeeId.Value);
-
-                if (directManagerAuth == null)
-                    return null;
-
-                // Check direct manager's role
-                var managerRole = await GetUserRoleNameAsync(directManagerAuth.UserId);
-                
-                Console.WriteLine($"[Repository] Direct manager UserId {directManagerAuth.UserId} has role: {managerRole}");
-
-                // If direct manager has "Manager" role, they are L2 (no L1 exists)
-                if (managerRole == "Manager")
-                {
-                    Console.WriteLine($"[Repository] Direct manager is L2-level (Manager role), no L1 exists");
-                    return null;
-                }
-
-                // Otherwise, they are L1
-                Console.WriteLine($"[Repository] Found L1 Manager UserId: {directManagerAuth.UserId}");
-                return directManagerAuth.UserId;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Repository] Error in GetL1ManagerUserIdAsync: {ex.Message}");
-                return null;
-            }
-        }
-
-        // UPDATED: Get L2 Manager - returns direct manager if they have "Manager" role, else their manager
-        public async Task<int?> GetL2ManagerUserIdAsync(int employeeUserId)
-        {
-            try
-            {
-                Console.WriteLine($"[Repository] GetL2ManagerUserIdAsync - EmployeeUserId: {employeeUserId}");
-
-                var employeeAuth = await _context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.UserId == employeeUserId);
-
-                if (employeeAuth == null || employeeAuth.EmployeeId <= 0)
-                {
-                    Console.WriteLine($"[Repository] No auth record found for UserId: {employeeUserId}");
-                    return null;
-                }
-
-                var employee = await _context.Employees
-                    .FirstOrDefaultAsync(e => e.EmployeeId == employeeAuth.EmployeeId);
-
-                if (employee?.ReportingManagerEmployeeId == null)
-                {
-                    Console.WriteLine($"[Repository] No reporting manager found for EmployeeId: {employeeAuth.EmployeeId}");
-                    return null;
-                }
-
-                // Get direct manager
-                var directManagerAuth = await _context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.EmployeeId == employee.ReportingManagerEmployeeId.Value);
-
-                if (directManagerAuth == null)
-                    return null;
-
-                // Check if direct manager is L2-level (has "Manager" role)
-                var managerRole = await GetUserRoleNameAsync(directManagerAuth.UserId);
-                
-                Console.WriteLine($"[Repository] Direct manager UserId {directManagerAuth.UserId} has role: {managerRole}");
-
-                if (managerRole == "Manager")
-                {
-                    Console.WriteLine($"[Repository] Direct manager is L2 Manager");
-                    return directManagerAuth.UserId;
-                }
-
-                // Otherwise, get L1's manager (who should be L2)
-                var l1Manager = await _context.Employees
-                    .FirstOrDefaultAsync(e => e.EmployeeId == employee.ReportingManagerEmployeeId.Value);
-
-                if (l1Manager?.ReportingManagerEmployeeId == null)
-                {
-                    Console.WriteLine($"[Repository] L1 has no manager");
-                    return null;
-                }
-
-                var l2ManagerAuth = await _context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.EmployeeId == l1Manager.ReportingManagerEmployeeId.Value);
-
-                Console.WriteLine($"[Repository] Found L2 Manager UserId: {l2ManagerAuth?.UserId}");
-                return l2ManagerAuth?.UserId;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Repository] Error in GetL2ManagerUserIdAsync: {ex.Message}");
-                return null;
-            }
-        }
-
-        // Get DeptHead UserId (L2's manager) - should have "Department Head" role
-        public async Task<int?> GetDeptHeadUserIdAsync(int l2ManagerUserId)
-        {
-            try
-            {
-                Console.WriteLine($"[Repository] GetDeptHeadUserIdAsync - L2ManagerUserId: {l2ManagerUserId}");
-
-                var l2ManagerAuth = await _context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.UserId == l2ManagerUserId);
-
-                if (l2ManagerAuth == null || l2ManagerAuth.EmployeeId <= 0)
-                {
-                    Console.WriteLine($"[Repository] No auth record found for L2ManagerUserId: {l2ManagerUserId}");
-                    return null;
-                }
-
-                var l2Manager = await _context.Employees
-                    .FirstOrDefaultAsync(e => e.EmployeeId == l2ManagerAuth.EmployeeId);
-
-                if (l2Manager?.ReportingManagerEmployeeId == null)
-                {
-                    Console.WriteLine($"[Repository] No reporting manager found for L2Manager EmployeeId: {l2ManagerAuth.EmployeeId}");
-                    return null;
-                }
-
-                var deptHeadAuth = await _context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.EmployeeId == l2Manager.ReportingManagerEmployeeId.Value);
-
-                if (deptHeadAuth != null)
-                {
-                    var deptHeadRole = await GetUserRoleNameAsync(deptHeadAuth.UserId);
-                    Console.WriteLine($"[Repository] Found DeptHead UserId: {deptHeadAuth.UserId} with role: {deptHeadRole}");
-                }
-
-                return deptHeadAuth?.UserId;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[Repository] Error in GetDeptHeadUserIdAsync: {ex.Message}");
                 return null;
             }
         }

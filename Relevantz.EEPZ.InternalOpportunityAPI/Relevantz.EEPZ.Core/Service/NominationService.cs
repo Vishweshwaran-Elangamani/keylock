@@ -24,49 +24,31 @@ namespace Relevantz.EEPZ.Core.Service
             _mapper = mapper;
         }
 
-        // UPDATED: Handle optional L1 - if no L1, start at L2
+        /// <summary>
+        /// Self-Nomination: ALL go directly to Manager (L2), skipping L1
+        /// </summary>
         public async Task<NominationResponseDto> CreateSelfNominationAsync(int employeeId, CreateSelfNominationRequestDto request)
         {
             try
             {
                 Console.WriteLine($"[Service] CreateSelfNomination - UserId: {employeeId}, OpportunityId: {request.OpportunityId}");
+
+                // Check for duplicate
                 var isDuplicate = await _nominationRepository.ExistsDuplicateAsync(request.OpportunityId, employeeId);
-if (isDuplicate)
-{
-    Console.WriteLine($"[Service] Duplicate nomination detected - User {employeeId} already applied for opportunity {request.OpportunityId}");
-    throw new Exception("You have already applied for this opportunity. You can reapply only if your previous application was rejected.");
-}
-                // Get L1 Manager UserId
-                var l1ManagerUserId = await _nominationRepository.GetL1ManagerUserIdAsync(employeeId);
-
-                int? l2ManagerUserId = null;
-                int currentLevel;
-                string status;
-
-                if (l1ManagerUserId == null)
+                if (isDuplicate)
                 {
-                    // NO L1 MANAGER - Go directly to L2
-                    Console.WriteLine($"[Service] No L1 Manager found for user {employeeId}, checking for L2...");
-
-                    l2ManagerUserId = await _nominationRepository.GetL2ManagerUserIdAsync(employeeId);
-
-                    if (l2ManagerUserId == null)
-                        throw new Exception("Cannot find L1 or L2 manager for approval. Please contact HR.");
-
-                    // Start at Level 2 (skip L1)
-                    currentLevel = 2;
-                    status = "Pending_L2_Review";
-
-                    Console.WriteLine($"[Service] Starting at L2 Manager: {l2ManagerUserId}");
+                    Console.WriteLine($"[Service] Duplicate nomination detected - User {employeeId} already applied for opportunity {request.OpportunityId}");
+                    throw new Exception("You have already applied for this opportunity. You can reapply only if your previous application was rejected.");
                 }
-                else
+
+                // Get Manager (L2) from Project table
+                var managerUserId = await _nominationRepository.GetManagerFromProjectAsync(employeeId);
+                if (managerUserId == null)
                 {
-                    // L1 EXISTS - Normal flow
-                    currentLevel = 1;
-                    status = "Pending_L1_Review";
-
-                    Console.WriteLine($"[Service] Starting at L1 Manager: {l1ManagerUserId}");
+                    throw new Exception("Cannot find Manager (L2) from your primary project. Please contact HR.");
                 }
+
+                Console.WriteLine($"[Service] Self-nomination will go to Manager UserId: {managerUserId}");
 
                 var nomination = new Nomination
                 {
@@ -75,10 +57,14 @@ if (isDuplicate)
                     NominationType = "employee_self",
                     NominatedByUserId = employeeId,
                     Justification = request.Justification,
-                    CurrentApprovalLevel = currentLevel,
-                    Status = status,
-                    L1ManagerUserId = l1ManagerUserId,
-                    L2ManagerUserId = l2ManagerUserId,
+                    
+                    // NEW: Always start at Manager Review (Level 1)
+                    CurrentApprovalLevel = 1,
+                    Status = "Pending_Manager_Review",
+                    
+                    // L1ManagerUserId = NULL (not used in new flow)
+                    L2ManagerUserId = managerUserId.Value,  // This is the Manager (from Project.L1approver)
+                    
                     SubmittedAt = DateTime.UtcNow
                 };
 
@@ -90,59 +76,102 @@ if (isDuplicate)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in CreateSelfNominationAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
 
-        // Auto-approves L1 and starts at L2
+        /// <summary>
+        /// Manager Nomination: 
+        /// - If nominator is Manager (L2), skip to DeptHead
+        /// - If nominator is lower level, goes to Manager first
+        /// </summary>
         public async Task<NominationResponseDto> CreateManagerNominationAsync(int managerId, CreateManagerNominationRequestDto request)
         {
             try
             {
                 Console.WriteLine($"[Service] CreateManagerNomination - ManagerId: {managerId}, NomineeId: {request.NomineeEmployeeId}");
+
+                // Check for duplicate
                 var isDuplicate = await _nominationRepository.ExistsDuplicateAsync(request.OpportunityId, request.NomineeEmployeeId);
-if (isDuplicate)
-{
-    Console.WriteLine($"[Service] Duplicate nomination detected - User {request.NomineeEmployeeId} already applied for opportunity {request.OpportunityId}");
-    throw new Exception("This employee has already been nominated for this opportunity. They can be re-nominated only if the previous nomination was rejected.");
-}
-                var nomineeL1ManagerUserId = await _nominationRepository.GetL1ManagerUserIdAsync(request.NomineeEmployeeId);
-
-                if (nomineeL1ManagerUserId != managerId)
-                    throw new Exception("You can only nominate your direct reports");
-
-                var l2ManagerUserId = await _nominationRepository.GetL2ManagerUserIdAsync(request.NomineeEmployeeId);
-
-                if (l2ManagerUserId == null)
-                    throw new Exception("Cannot find L2 manager for approval");
-
-                var nomination = new Nomination
+                if (isDuplicate)
                 {
-                    OpportunityId = request.OpportunityId,
-                    NomineeUserId = request.NomineeEmployeeId,
-                    NominationType = "manager_nomination",
-                    NominatedByUserId = managerId,
-                    Justification = request.Justification,
-                    CurrentApprovalLevel = 2,
-                    Status = "Pending_L2_Review",
-                    L1ManagerUserId = managerId,
-                    L1ReviewRemarks = "Manager nominated",
-                    L1ReviewedAt = DateTime.UtcNow,
-                    L1Status = "Approved",
-                    L2ManagerUserId = l2ManagerUserId.Value,
-                    SubmittedAt = DateTime.UtcNow
-                };
+                    Console.WriteLine($"[Service] Duplicate nomination detected - User {request.NomineeEmployeeId} already applied for opportunity {request.OpportunityId}");
+                    throw new Exception("This employee has already been nominated for this opportunity. They can be re-nominated only if the previous nomination was rejected.");
+                }
 
-                var created = await _nominationRepository.CreateAsync(nomination);
-                Console.WriteLine($"[Service] Manager nomination created with ID: {created.NominationId}, skipped to L2: {l2ManagerUserId}");
+                // Get nominee's Manager and DeptHead from Project
+                var nomineeManagerUserId = await _nominationRepository.GetManagerFromProjectAsync(request.NomineeEmployeeId);
+                var nomineeDeptHeadUserId = await _nominationRepository.GetDeptHeadFromProjectAsync(request.NomineeEmployeeId);
 
-                return _mapper.Map<NominationResponseDto>(created);
+                if (nomineeManagerUserId == null || nomineeDeptHeadUserId == null)
+                {
+                    throw new Exception("Cannot find Manager or DeptHead from nominee's primary project. Please contact HR.");
+                }
+
+                Console.WriteLine($"[Service] Nominee's Manager: {nomineeManagerUserId}, DeptHead: {nomineeDeptHeadUserId}");
+
+                // Check if nominator IS the Manager (L2)
+                if (managerId == nomineeManagerUserId.Value)
+                {
+                    Console.WriteLine($"[Service] Manager is nominating their own team member - Auto-approve Manager level, go to DeptHead");
+
+                    var nomination = new Nomination
+                    {
+                        OpportunityId = request.OpportunityId,
+                        NomineeUserId = request.NomineeEmployeeId,
+                        NominationType = "manager_nomination",
+                        NominatedByUserId = managerId,
+                        Justification = request.Justification,
+                        
+                        // Auto-approve Manager level, go directly to DeptHead
+                        CurrentApprovalLevel = 2,
+                        Status = "Pending_DeptHead_Review",
+                        
+                        L2ManagerUserId = managerId,
+                        L2ReviewRemarks = "Manager nominated (auto-approved)",
+                        L2ReviewedAt = DateTime.UtcNow,
+                        L2Status = "Approved",
+                        
+                        DeptHeadUserId = nomineeDeptHeadUserId.Value,
+                        
+                        SubmittedAt = DateTime.UtcNow
+                    };
+
+                    var created = await _nominationRepository.CreateAsync(nomination);
+                    Console.WriteLine($"[Service] Manager nomination created with ID: {created.NominationId}, skipped to DeptHead: {nomineeDeptHeadUserId}");
+
+                    return _mapper.Map<NominationResponseDto>(created);
+                }
+                else
+                {
+                    // Nominator is NOT the Manager - treat as regular flow (goes to Manager first)
+                    Console.WriteLine($"[Service] Nominator {managerId} is not the nominee's Manager - going to Manager first");
+
+                    var nomination = new Nomination
+                    {
+                        OpportunityId = request.OpportunityId,
+                        NomineeUserId = request.NomineeEmployeeId,
+                        NominationType = "manager_nomination",
+                        NominatedByUserId = managerId,
+                        Justification = request.Justification,
+                        
+                        CurrentApprovalLevel = 1,
+                        Status = "Pending_Manager_Review",
+                        
+                        L2ManagerUserId = nomineeManagerUserId.Value,
+                        
+                        SubmittedAt = DateTime.UtcNow
+                    };
+
+                    var created = await _nominationRepository.CreateAsync(nomination);
+                    Console.WriteLine($"[Service] Manager nomination created with ID: {created.NominationId}, going to Manager: {nomineeManagerUserId}");
+
+                    return _mapper.Map<NominationResponseDto>(created);
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in CreateManagerNominationAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -187,7 +216,6 @@ if (isDuplicate)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in GetMyNominationsAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -204,8 +232,6 @@ if (isDuplicate)
 
                 if (nominations == null || !nominations.Any())
                 {
-                    Console.WriteLine($"[Service] No pending manager reviews found");
-
                     return new NominationListResponseDto
                     {
                         Nominations = new List<NominationResponseDto>(),
@@ -230,7 +256,6 @@ if (isDuplicate)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in GetPendingManagerReviewAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -247,8 +272,6 @@ if (isDuplicate)
 
                 if (nominations == null || !nominations.Any())
                 {
-                    Console.WriteLine($"[Service] No nominations found for dept head {deptHeadId}");
-
                     return new NominationListResponseDto
                     {
                         Nominations = new List<NominationResponseDto>(),
@@ -257,11 +280,6 @@ if (isDuplicate)
                         PageSize = 10,
                         TotalPages = 0
                     };
-                }
-
-                foreach (var nom in nominations)
-                {
-                    Console.WriteLine($"[Service] Found nomination {nom.NominationId}: Status={nom.Status}, Level={nom.CurrentApprovalLevel}");
                 }
 
                 var mapped = _mapper.Map<List<NominationResponseDto>>(nominations);
@@ -278,7 +296,6 @@ if (isDuplicate)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in GetPendingDeptHeadReviewAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -328,12 +345,14 @@ if (isDuplicate)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in GetAllNominationsAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
 
-        // UPDATED: Handle optional L1 in approval flow
+        /// <summary>
+        /// Manager Review: Approve/Reject at Manager level
+        /// If approved, moves to DeptHead
+        /// </summary>
         public async Task<NominationResponseDto> ManagerReviewNominationAsync(int nominationId, int managerId, ManagerReviewRequestDto request)
         {
             try
@@ -343,95 +362,47 @@ if (isDuplicate)
                 var nomination = await _nominationRepository.GetByIdAsync(nominationId);
                 if (nomination == null)
                 {
-                    Console.WriteLine($"[Service] Nomination not found with ID: {nominationId}");
                     throw new Exception("Nomination not found");
                 }
 
                 Console.WriteLine($"[Service] Current status: {nomination.Status}, Level: {nomination.CurrentApprovalLevel}");
-                Console.WriteLine($"[Service] Nominee: {nomination.NomineeUserId}, L1: {nomination.L1ManagerUserId}, L2: {nomination.L2ManagerUserId}");
 
-                // L1 MANAGER APPROVAL
-                if (nomination.CurrentApprovalLevel == 1 && nomination.L1ManagerUserId == managerId)
-                {
-                    if (request.ActionTaken == "Approved")
-                    {
-                        nomination.L1ReviewRemarks = request.Remarks;
-                        nomination.L1ReviewedAt = DateTime.UtcNow;
-                        nomination.L1Status = "Approved";
-
-                        // Get L2 Manager from nominee's hierarchy
-                        var l2ManagerUserId = await _nominationRepository.GetL2ManagerUserIdAsync(nomination.NomineeUserId);
-
-                        if (l2ManagerUserId == null)
-                        {
-                            Console.WriteLine($"[Service] No L2 manager found, moving directly to DeptHead");
-
-                            // No L2, go directly to DeptHead
-                            var deptHeadUserId = await _nominationRepository.GetDeptHeadUserIdAsync(managerId);
-
-                            if (deptHeadUserId == null)
-                                throw new Exception("Cannot find Department Head for approval");
-
-                            nomination.DeptHeadUserId = deptHeadUserId.Value;
-                            nomination.CurrentApprovalLevel = 3;
-                            nomination.Status = "Pending_DeptHead_Review";
-
-                            Console.WriteLine($"[Service] L1 Approved - Moving directly to DeptHead: {deptHeadUserId}");
-                        }
-                        else
-                        {
-                            // Move to L2
-                            nomination.L2ManagerUserId = l2ManagerUserId.Value;
-                            nomination.CurrentApprovalLevel = 2;
-                            nomination.Status = "Pending_L2_Review";
-
-                            Console.WriteLine($"[Service] L1 Approved - Moving to L2: {l2ManagerUserId}");
-                        }
-                    }
-                    else if (request.ActionTaken == "Rejected")
-                    {
-                        nomination.L1ReviewRemarks = request.Remarks;
-                        nomination.L1ReviewedAt = DateTime.UtcNow;
-                        nomination.L1Status = "Rejected";
-                        nomination.Status = "Rejected_By_L1";
-
-                        Console.WriteLine($"[Service] L1 Rejected");
-                    }
-                }
-                // L2 MANAGER APPROVAL
-                else if (nomination.CurrentApprovalLevel == 2 && nomination.L2ManagerUserId == managerId)
-                {
-                    if (request.ActionTaken == "Approved")
-                    {
-                        nomination.L2ReviewRemarks = request.Remarks;
-                        nomination.L2ReviewedAt = DateTime.UtcNow;
-                        nomination.L2Status = "Approved";
-
-                        // Get Department Head
-                        var deptHeadUserId = await _nominationRepository.GetDeptHeadUserIdAsync(managerId);
-
-                        if (deptHeadUserId == null)
-                            throw new Exception("Cannot find Department Head for approval");
-
-                        nomination.DeptHeadUserId = deptHeadUserId.Value;
-                        nomination.CurrentApprovalLevel = 3;
-                        nomination.Status = "Pending_DeptHead_Review";
-
-                        Console.WriteLine($"[Service] L2 Approved - Moving to DeptHead: {deptHeadUserId}");
-                    }
-                    else if (request.ActionTaken == "Rejected")
-                    {
-                        nomination.L2ReviewRemarks = request.Remarks;
-                        nomination.L2ReviewedAt = DateTime.UtcNow;
-                        nomination.L2Status = "Rejected";
-                        nomination.Status = "Rejected_By_L2";
-
-                        Console.WriteLine($"[Service] L2 Rejected");
-                    }
-                }
-                else
+                // Verify this manager is authorized (L2ManagerUserId = Manager)
+                if (nomination.CurrentApprovalLevel != 1 || nomination.L2ManagerUserId != managerId)
                 {
                     throw new UnauthorizedAccessException("You are not authorized to review this nomination at this stage");
+                }
+
+                if (request.ActionTaken == "Approved")
+                {
+                    // Update Manager review fields
+                    nomination.L2ReviewRemarks = request.Remarks;
+                    nomination.L2ReviewedAt = DateTime.UtcNow;
+                    nomination.L2Status = "Approved";
+
+                    // Get DeptHead from Project
+                    var deptHeadUserId = await _nominationRepository.GetDeptHeadFromProjectAsync(nomination.NomineeUserId);
+                    
+                    if (deptHeadUserId == null)
+                    {
+                        throw new Exception("Cannot find Department Head from nominee's primary project");
+                    }
+
+                    // Move to DeptHead review
+                    nomination.DeptHeadUserId = deptHeadUserId.Value;
+                    nomination.CurrentApprovalLevel = 2;
+                    nomination.Status = "Pending_DeptHead_Review";
+
+                    Console.WriteLine($"[Service] Manager Approved - Moving to DeptHead: {deptHeadUserId}");
+                }
+                else if (request.ActionTaken == "Rejected")
+                {
+                    nomination.L2ReviewRemarks = request.Remarks;
+                    nomination.L2ReviewedAt = DateTime.UtcNow;
+                    nomination.L2Status = "Rejected";
+                    nomination.Status = "Rejected_By_Manager";
+
+                    Console.WriteLine($"[Service] Manager Rejected");
                 }
 
                 // Update legacy fields
@@ -447,11 +418,13 @@ if (isDuplicate)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in ManagerReviewNominationAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
 
+        /// <summary>
+        /// DeptHead Review: Final approval/rejection
+        /// </summary>
         public async Task<NominationResponseDto> DepartmentHeadReviewAsync(int nominationId, int deptHeadId, DepartmentHeadReviewRequestDto request)
         {
             try
@@ -461,11 +434,11 @@ if (isDuplicate)
                 var nomination = await _nominationRepository.GetByIdAsync(nominationId);
                 if (nomination == null)
                 {
-                    Console.WriteLine($"[Service] Nomination not found with ID: {nominationId}");
                     throw new Exception("Nomination not found");
                 }
 
-                if (nomination.CurrentApprovalLevel != 3 || nomination.DeptHeadUserId != deptHeadId)
+                // Verify authorization
+                if (nomination.CurrentApprovalLevel != 2 || nomination.DeptHeadUserId != deptHeadId)
                 {
                     throw new UnauthorizedAccessException("You are not authorized to review this nomination");
                 }
@@ -477,11 +450,12 @@ if (isDuplicate)
                     nomination.DeptHeadReviewRemarks = request.ReviewRemarks;
                     nomination.DeptHeadReviewedAt = DateTime.UtcNow;
                     nomination.DeptHeadStatus = "Approved";
-                    nomination.CurrentApprovalLevel = 4;
+                    nomination.CurrentApprovalLevel = 3; // Final level
                     nomination.Status = "Approved_By_DeptHead";
 
                     Console.WriteLine($"[Service] DeptHead Approved - Nomination completed");
 
+                    // Add review metrics
                     var metric = new Nominationreviewmetric
                     {
                         NominationId = nominationId,
@@ -493,7 +467,6 @@ if (isDuplicate)
                         ReviewedAt = DateTime.UtcNow
                     };
                     await _nominationRepository.AddReviewMetricAsync(metric);
-                    Console.WriteLine($"[Service] Review metrics added");
                 }
                 else if (request.Action == "Rejected")
                 {
@@ -505,6 +478,7 @@ if (isDuplicate)
                     Console.WriteLine($"[Service] DeptHead Rejected");
                 }
 
+                // Update legacy fields
                 nomination.ReviewRemarks = request.ReviewRemarks;
                 nomination.ReviewedByUserId = deptHeadId;
                 nomination.ReviewedAt = DateTime.UtcNow;
@@ -517,7 +491,6 @@ if (isDuplicate)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in DepartmentHeadReviewAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
@@ -527,6 +500,8 @@ if (isDuplicate)
             try
             {
                 Console.WriteLine($"[Service] CheckEligibility - EmployeeId: {employeeId}, OpportunityId: {opportunityId}");
+
+                // TODO: Implement actual eligibility check logic
 
                 return new EligibilityCheckResponseDto
                 {
@@ -540,7 +515,6 @@ if (isDuplicate)
             catch (Exception ex)
             {
                 Console.WriteLine($"[Service] Error in CheckEligibilityAsync: {ex.Message}");
-                Console.WriteLine($"[Service] Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
