@@ -18,7 +18,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             _careerProgressionService = careerProgressionService;
         }
  
-        //  UPDATED: Check if employee already has pending nomination
+        // Check if employee already has pending nomination
         [HttpGet("check-pending/{employeeUserId}")]
         public async Task<IActionResult> CheckPendingNomination(int employeeUserId)
         {
@@ -56,7 +56,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
  
-        //  UPDATED: Manager creates promotion nomination
+        // Manager creates promotion nomination
         [HttpPost("create")]
         public async Task<IActionResult> CreatePromotion([FromBody] CreatePromotionRequestDto request)
         {
@@ -67,7 +67,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                     return BadRequest(ModelState);
                 }
  
-                // Validate required fields
                 if (request.EmployeeUserId <= 0)
                 {
                     return BadRequest(new
@@ -105,19 +104,13 @@ namespace Relevantz.EEPZ.Api.Controllers
                 {
                     Console.WriteLine($" Additional Justification: {request.AdditionalJustification}");
                 }
- 
-                //  PASS request and ManagerId to service
+
                 var result = await _careerProgressionService.CreatePromotionAsync(request, request.ManagerId);
-               
-                //  CHECK response status
+
                 if (result.Success)
                 {
-                    // NEW PROMOTION CREATED
                     return Ok(result);
                 }
-               
-                // FAILED - Could be duplicate or missing justification
-                // Return 400 with error message (not 500)
                 return BadRequest(result);
             }
             catch (Exception ex)
@@ -165,7 +158,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
  
-        //  UPDATED: Check for favoritism (before DeptHead approves)
+        //  Check for favoritism (before DeptHead approves)
         [HttpGet("{promotionId}/favoritism-check")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -306,7 +299,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
  
-        //  NEW: HR submits approved promotion to Leadership
+        // HR submits approved promotion to Leadership
         [HttpPut("{promotionId}/submit-to-leadership")]
         public async Task<IActionResult> SubmitToLeadership(int promotionId)
         {
@@ -520,7 +513,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
  
-        //  UPDATED: Get promotions submitted to leadership (Leadership role - VIEW ONLY)
+        // Get promotions submitted to leadership (Leadership role - VIEW ONLY)
         [HttpGet("submitted-to-leadership")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -544,7 +537,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     });
                 }
                
-                //  UPDATED FILTER: Only show if BOTH conditions are true:
+                // Only show if BOTH conditions are true:
                 // 1. NewSalary > 0 (HR updated payroll)
                 // 2. ApprovedAt is NOT NULL (HR clicked "Submit to Leadership")
                 var submittedToLeadership = result.Data

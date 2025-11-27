@@ -4,7 +4,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 {
     public class CreateUserRequestDto
     {
-        // Employee Information
         [Required(ErrorMessage = "Employee Company ID is required")]
         [StringLength(50)]
         public string EmployeeCompanyId { get; set; } = string.Empty;
@@ -30,13 +29,11 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public int NoticePeriodDays { get; set; } = 30;
 
-        // Authentication Information
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email format")]
         [StringLength(255)]
         public string Email { get; set; } = string.Empty;
 
-        // Profile Information
         [Required(ErrorMessage = "First Name is required")]
         [StringLength(100)]
         public string FirstName { get; set; } = string.Empty;
@@ -70,7 +67,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [StringLength(255)]
         public string? PersonalEmail { get; set; }
 
-        // Role and Department
         [Required(ErrorMessage = "Role ID is required")]
         public int RoleId { get; set; }
 

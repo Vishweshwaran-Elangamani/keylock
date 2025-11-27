@@ -23,23 +23,14 @@ public partial class Project
 
     public DateOnly? EndDate { get; set; }
 
-    /// <summary>
-    /// Legacy owner id
-    /// </summary>
     public int? ResourceOwnerId { get; set; }
 
     public int? ResourceOwnerEmployeeId { get; set; }
 
-    /// <summary>
-    /// Legacy L1 approver id
-    /// </summary>
     public int? L1approverId { get; set; }
 
     public int? L1approverEmployeeId { get; set; }
 
-    /// <summary>
-    /// Legacy L2 approver id
-    /// </summary>
     public int? L2approverId { get; set; }
 
     public int? L2approverEmployeeId { get; set; }

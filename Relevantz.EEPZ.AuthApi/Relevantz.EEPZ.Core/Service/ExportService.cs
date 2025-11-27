@@ -34,7 +34,6 @@ namespace Relevantz.EEPZ.Core.Service
                 using var package = new ExcelPackage();
                 var worksheet = package.Workbook.Worksheets.Add("Roles");
 
-                // Header Row
                 worksheet.Cells[1, 1].Value = "Role ID";
                 worksheet.Cells[1, 2].Value = "Role Name";
                 worksheet.Cells[1, 3].Value = "Role Code";
@@ -43,7 +42,6 @@ namespace Relevantz.EEPZ.Core.Service
                 worksheet.Cells[1, 6].Value = "Created At";
                 worksheet.Cells[1, 7].Value = "Updated At";
 
-                // Style Header
                 using (var range = worksheet.Cells[1, 1, 1, 7])
                 {
                     range.Style.Font.Bold = true;
@@ -53,7 +51,6 @@ namespace Relevantz.EEPZ.Core.Service
                     range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 }
 
-                // Data Rows
                 int row = 2;
                 foreach (var role in roles)
                 {
@@ -67,10 +64,8 @@ namespace Relevantz.EEPZ.Core.Service
                     row++;
                 }
 
-                // Auto-fit columns
                 worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
-                // Add borders
                 using (var range = worksheet.Cells[1, 1, row - 1, 7])
                 {
                     range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -100,7 +95,6 @@ namespace Relevantz.EEPZ.Core.Service
                 using var package = new ExcelPackage();
                 var worksheet = package.Workbook.Worksheets.Add("Departments");
 
-                // Header Row
                 worksheet.Cells[1, 1].Value = "Department ID";
                 worksheet.Cells[1, 2].Value = "Department Name";
                 worksheet.Cells[1, 3].Value = "Budget Allocated";
@@ -108,7 +102,6 @@ namespace Relevantz.EEPZ.Core.Service
                 worksheet.Cells[1, 5].Value = "Created At";
                 worksheet.Cells[1, 6].Value = "Updated At";
 
-                // Style Header
                 using (var range = worksheet.Cells[1, 1, 1, 6])
                 {
                     range.Style.Font.Bold = true;
@@ -118,7 +111,6 @@ namespace Relevantz.EEPZ.Core.Service
                     range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 }
 
-                // Data Rows
                 int row = 2;
                 foreach (var dept in departments)
                 {
@@ -131,10 +123,8 @@ namespace Relevantz.EEPZ.Core.Service
                     row++;
                 }
 
-                // Auto-fit columns
                 worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
 
-                // Add borders
                 using (var range = worksheet.Cells[1, 1, row - 1, 6])
                 {
                     range.Style.Border.Top.Style = ExcelBorderStyle.Thin;
@@ -164,7 +154,6 @@ namespace Relevantz.EEPZ.Core.Service
                 using var package = new ExcelPackage();
                 var worksheet = package.Workbook.Worksheets.Add("Users");
 
-                // Header Row
                 worksheet.Cells[1, 1].Value = "User ID";
                 worksheet.Cells[1, 2].Value = "Employee Company ID";
                 worksheet.Cells[1, 3].Value = "Email";
@@ -288,7 +277,6 @@ namespace Relevantz.EEPZ.Core.Service
                 }
                 rolesSheet.Cells[rolesSheet.Dimension.Address].AutoFitColumns();
 
-                // ===== DEPARTMENTS SHEET =====
                 var deptSheet = package.Workbook.Worksheets.Add("Departments");
                 
                 // Header

@@ -11,9 +11,6 @@ public partial class Department
 
     public decimal? BudgetAllocated { get; set; }
 
-    /// <summary>
-    /// Cost center code for financial tracking
-    /// </summary>
     public string? CostCenter { get; set; }
 
     public DateTime CreatedAt { get; set; }

@@ -20,8 +20,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsDuplicateAsync(int opportunityId, int employeeId);
         Task AddReviewMetricAsync(Nominationreviewmetric metric);
-        
-        // NEW: Project-based hierarchy methods
         Task<int?> GetManagerFromProjectAsync(int employeeUserId);
         Task<int?> GetDeptHeadFromProjectAsync(int employeeUserId);
         Task<string?> GetUserRoleNameAsync(int userId);

@@ -25,11 +25,11 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"📊 Service: Creating period allocation");
-                Console.WriteLine($"   BudgetId: {request.BudgetId}");
-                Console.WriteLine($"   Period: {request.Period}");
-                Console.WriteLine($"   Year: {request.PeriodYear}");
-                Console.WriteLine($"   Amount: {request.AllocatedAmount}");
+                Console.WriteLine($" Service: Creating period allocation");
+                Console.WriteLine($" BudgetId: {request.BudgetId}");
+                Console.WriteLine($" Period: {request.Period}");
+                Console.WriteLine($" Year: {request.PeriodYear}");
+                Console.WriteLine($" Amount: {request.AllocatedAmount}");
 
                 // Validate budget exists
                 var budget = await _context.Departmentbudgets
@@ -85,7 +85,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                 var response = await BuildPeriodAllocationResponse(created.PeriodAllocationId);
 
-                Console.WriteLine($"✅ Period allocation created with ID: {created.PeriodAllocationId}");
+                Console.WriteLine($" Period allocation created with ID: {created.PeriodAllocationId}");
 
                 return ApiResponseDto<PeriodAllocationResponseDto>.SuccessResponse(
                     response,
@@ -93,7 +93,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Service Error: {ex.Message}");
+                Console.WriteLine($" Service Error: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return ApiResponseDto<PeriodAllocationResponseDto>.FailureResponse(
                     $"An error occurred while creating period allocation: {ex.Message}");
@@ -104,7 +104,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"📝 Updating period allocation: {request.PeriodAllocationId}");
+                Console.WriteLine($" Updating period allocation: {request.PeriodAllocationId}");
 
                 var periodAllocation = await _periodAllocationRepository
                     .GetByIdAsync(request.PeriodAllocationId);
@@ -159,7 +159,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                 var response = await BuildPeriodAllocationResponse(periodAllocation.PeriodAllocationId);
 
-                Console.WriteLine($"✅ Period allocation updated successfully");
+                Console.WriteLine($" Period allocation updated successfully");
 
                 return ApiResponseDto<PeriodAllocationResponseDto>.SuccessResponse(
                     response,
@@ -167,7 +167,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error updating period allocation: {ex.Message}");
+                Console.WriteLine($" Error updating period allocation: {ex.Message}");
                 return ApiResponseDto<PeriodAllocationResponseDto>.FailureResponse(
                     $"An error occurred while updating period allocation: {ex.Message}");
             }
@@ -177,7 +177,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"🗑️ Deleting period allocation: {periodAllocationId}");
+                Console.WriteLine($" Deleting period allocation: {periodAllocationId}");
 
                 var periodAllocation = await _periodAllocationRepository
                     .GetByIdAsync(periodAllocationId);
@@ -214,7 +214,7 @@ namespace Relevantz.EEPZ.Core.Service
                     await _context.SaveChangesAsync();
                 }
 
-                Console.WriteLine($"✅ Period allocation deleted successfully");
+                Console.WriteLine($" Period allocation deleted successfully");
 
                 return ApiResponseDto<bool>.SuccessResponse(
                     true,
@@ -222,7 +222,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error deleting period allocation: {ex.Message}");
+                Console.WriteLine($" Error deleting period allocation: {ex.Message}");
                 return ApiResponseDto<bool>.FailureResponse(
                     $"An error occurred while deleting period allocation: {ex.Message}");
             }
@@ -248,7 +248,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error fetching period allocation: {ex.Message}");
+                Console.WriteLine($" Error fetching period allocation: {ex.Message}");
                 return ApiResponseDto<PeriodAllocationResponseDto>.FailureResponse(
                     $"An error occurred while fetching period allocation: {ex.Message}");
             }
@@ -272,7 +272,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error fetching all period allocations: {ex.Message}");
+                Console.WriteLine($" Error fetching all period allocations: {ex.Message}");
                 return ApiResponseDto<List<PeriodAllocationResponseDto>>.FailureResponse(
                     $"An error occurred while fetching period allocations: {ex.Message}");
             }
@@ -282,7 +282,7 @@ namespace Relevantz.EEPZ.Core.Service
         {
             try
             {
-                Console.WriteLine($"📊 Fetching period allocations for budget: {budgetId}");
+                Console.WriteLine($" Fetching period allocations for budget: {budgetId}");
 
                 var periodAllocations = await _periodAllocationRepository.GetByBudgetIdAsync(budgetId);
                 var response = new List<PeriodAllocationResponseDto>();
@@ -298,7 +298,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error fetching period allocations by budget: {ex.Message}");
+                Console.WriteLine($" Error fetching period allocations by budget: {ex.Message}");
                 return ApiResponseDto<List<PeriodAllocationResponseDto>>.FailureResponse(
                     $"An error occurred while fetching period allocations: {ex.Message}");
             }

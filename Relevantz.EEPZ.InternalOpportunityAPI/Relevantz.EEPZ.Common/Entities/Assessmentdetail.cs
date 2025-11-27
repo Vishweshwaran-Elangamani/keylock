@@ -11,9 +11,6 @@ public partial class Assessmentdetail
 
     public int CompetencyId { get; set; }
 
-    /// <summary>
-    /// Rating 1-5
-    /// </summary>
     public int? EmployeeRating { get; set; }
 
     public string? EmployeeComments { get; set; }

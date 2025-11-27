@@ -4,7 +4,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
 {
     public class ProfileResponseDto
     {
-        // Profile Information
         public int ProfileId { get; set; }
         public int EmployeeId { get; set; }
         public string EmployeeCompanyId { get; set; }
@@ -20,8 +19,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string? AlternateNumber { get; set; }
         public string? PersonalEmail { get; set; }
         public string Email { get; set; }
-
-        //  NEW: Employment Information
         public string? DepartmentName { get; set; }
         public string? RoleName { get; set; }
         public string EmploymentType { get; set; }
@@ -29,12 +26,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateOnly? JoiningDate { get; set; }
         public string? WorkLocation { get; set; }
         public string EmployeeType { get; set; }
-
-        //  NEW: Additional Profile Information
         public string? MaritalStatus { get; set; }
         public string? Nationality { get; set; }
-
-        //  NEW: Address Information
         public AddressDto? CurrentAddress { get; set; }
         public AddressDto? PermanentAddress { get; set; }
         public string? ProfilePhotoBase64 { get; set; }

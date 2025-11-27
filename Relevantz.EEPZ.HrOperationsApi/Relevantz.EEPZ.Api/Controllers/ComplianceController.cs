@@ -16,7 +16,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 {
      [ApiController]
     [Route("api/[controller]")]
-   // [Authorize] //  ENABLED: JWT authentication required for all endpoints
     public class ComplianceController : ControllerBase
     {
         private readonly IComplianceService _complianceService;
@@ -90,7 +89,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 //  Find users without goals AND exclude current logged-in user
                 var usersWithoutGoals = allUsers
                     .Where(u => !employeesWithGoals.Contains(u.EmployeeId)
-                             && (!currentUserId.HasValue || u.UserId != currentUserId.Value)) //  EXCLUDE CURRENT USER
+                             && (!currentUserId.HasValue || u.UserId != currentUserId.Value)) 
                     .Select(u => new EmployeeWithoutGoalsDto
                     {
                         UserId = u.UserId,
@@ -272,11 +271,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                             "Mentor a Junior Team Member"
                         };
                     }
- 
-                    // Extract user name from email or use email
+
                     var userName = user.Email.Split('@')[0];
- 
-                    // Send actual email
+
                     var emailSent = await _emailService.SendGoalReminderEmailAsync(
                         user.Email,
                         userName,
@@ -307,7 +304,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 }
                 else if (request.SendType == "multiple" && request.UserIds != null && request.UserIds.Any())
                 {
-                    // Send to multiple selected users
                     var users = await _context.Userauthentications
                         .Where(u => request.UserIds.Contains(u.UserId))
                         .ToListAsync();
@@ -354,7 +350,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                             });
                         }
  
-                        // Small delay to avoid rate limiting
                         await Task.Delay(100);
                     }
  
@@ -376,8 +371,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     var usersWithoutGoals = allUsers
                         .Where(u => !employeesWithGoals.Contains(u.EmployeeId))
                         .ToList();
- 
-                    // Optional: Filter by days
+
                     if (request.FilterByDays.HasValue)
                     {
                         usersWithoutGoals = usersWithoutGoals
@@ -426,8 +420,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                                 error = "Email delivery failed"
                             });
                         }
- 
-                        // Small delay to avoid rate limiting
+                        
                         await Task.Delay(100);
                     }
  

@@ -16,7 +16,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public string? Status { get; set; }
 
-        //  Document fields
         public string? DocumentUrl { get; set; }
         public string? DocumentName { get; set; }
         public string? DocumentType { get; set; }

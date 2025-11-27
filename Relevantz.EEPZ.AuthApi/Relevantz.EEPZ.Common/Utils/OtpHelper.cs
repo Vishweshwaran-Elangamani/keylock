@@ -4,7 +4,6 @@ namespace Relevantz.EEPZ.Common.Utils
     {
         private static readonly Random _random = new Random();
 
-        // Generate OTP
         public static string GenerateOtp(int length = 6)
         {
             if (length < 4 || length > 10)
@@ -18,13 +17,11 @@ namespace Relevantz.EEPZ.Common.Utils
             return otp;
         }
 
-        // Calculate expiration time
         public static DateTime CalculateExpirationTime(int expirationMinutes)
         {
             return DateTime.UtcNow.AddMinutes(expirationMinutes);
         }
 
-        // Check if OTP is expired
         public static bool IsExpired(DateTime expiresAt)
         {
             return DateTime.UtcNow > expiresAt;

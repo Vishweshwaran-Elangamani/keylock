@@ -32,7 +32,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Controller Error: {ex.Message}");
+                Console.WriteLine($"Controller Error: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -59,7 +59,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Controller Error: {ex.Message}");
+                Console.WriteLine($"Controller Error: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -86,7 +86,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Controller Error: {ex.Message}");
+                Console.WriteLine($"Controller Error: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -113,7 +113,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Controller Error: {ex.Message}");
+                Console.WriteLine($"Controller Error: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -136,7 +136,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Controller Error: {ex.Message}");
+                Console.WriteLine($"Controller Error: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,
@@ -159,7 +159,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Controller Error: {ex.Message}");
+                Console.WriteLine($"Controller Error: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,

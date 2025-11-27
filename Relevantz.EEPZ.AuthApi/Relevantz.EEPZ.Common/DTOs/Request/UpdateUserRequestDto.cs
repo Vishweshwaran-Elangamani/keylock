@@ -7,7 +7,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [Required(ErrorMessage = "User ID is required")]
         public int UserId { get; set; }
 
-        // Employee Information
         public string? EmploymentType { get; set; }
 
         public string? EmploymentStatus { get; set; }
@@ -27,7 +26,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public bool? IsActive { get; set; }
 
-        // Authentication Information
         public string? Status { get; set; }
     }
 }

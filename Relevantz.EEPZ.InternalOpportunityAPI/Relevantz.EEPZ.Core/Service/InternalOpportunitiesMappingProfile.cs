@@ -10,7 +10,7 @@ namespace Relevantz.EEPZ.Core.Service
     {
         public InternalOpportunitiesMappingProfile()
         {
-            // ==================== Internal Opportunity Mappings ====================
+            // Internal Opportunity Mappings
             CreateMap<Internalopportunity, InternalOpportunityResponseDto>()
                 .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.DepartmentName))
                 .ForMember(dest => dest.PostedByName, opt => opt.MapFrom(src => src.PostedByUser.Email));
@@ -19,7 +19,7 @@ namespace Relevantz.EEPZ.Core.Service
                 .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(src => src.Department.DepartmentName))
                 .ForMember(dest => dest.PostedByName, opt => opt.MapFrom(src => src.PostedByUser.Email));
 
-            // ==================== Nomination Mappings ====================
+            // Nomination Mappings
             CreateMap<Nomination, NominationResponseDto>()
                 .ForMember(dest => dest.OpportunityName, opt => opt.MapFrom(src => src.Opportunity.OpportunityName))
                 .ForMember(dest => dest.NomineeName, opt => opt.MapFrom(src => src.NomineeUser.Email))
@@ -34,7 +34,7 @@ namespace Relevantz.EEPZ.Core.Service
             CreateMap<Nominationreviewmetric, NominationReviewMetricResponseDto>()
                 .ForMember(dest => dest.ReviewedByName, opt => opt.MapFrom(src => src.ReviewedByUser.Email));
 
-            // ==================== Promotion Mappings ====================
+            // Promotion Mappings
             CreateMap<Promotion, PromotionResponseDto>()
     .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.EmployeeUser.Email ?? "N/A"))
     .ForMember(dest => dest.OpportunityName, opt => opt.MapFrom(src => 

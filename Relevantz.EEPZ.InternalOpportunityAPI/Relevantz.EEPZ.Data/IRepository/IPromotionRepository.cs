@@ -12,8 +12,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<List<Promotion>> GetByEmployeeAsync(int employeeUserId);
         Task<List<Promotion>> GetByStatusAsync(string status);
         Task<List<Promotion>> GetPendingHrApprovalAsync();
-        
-        // ✅ NEW: Get by NominationId
         Task<Promotion?> GetByNominationIdAsync(int nominationId);
         
         Task<Promotion> UpdateAsync(Promotion promotion);

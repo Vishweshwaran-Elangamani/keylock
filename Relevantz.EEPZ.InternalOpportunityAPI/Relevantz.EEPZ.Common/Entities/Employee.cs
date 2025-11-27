@@ -7,9 +7,6 @@ public partial class Employee
 {
     public int EmployeeId { get; set; }
 
-    /// <summary>
-    /// Company-assigned employee ID (e.g., EMP001)
-    /// </summary>
     public string EmployeeCompanyId { get; set; } = null!;
 
     public string EmploymentType { get; set; } = null!;
@@ -18,19 +15,10 @@ public partial class Employee
 
     public DateOnly JoiningDate { get; set; }
 
-    /// <summary>
-    /// Date of confirmation after probation
-    /// </summary>
     public DateOnly? ConfirmationDate { get; set; }
 
-    /// <summary>
-    /// Last working day
-    /// </summary>
     public DateOnly? ExitDate { get; set; }
 
-    /// <summary>
-    /// Self-referencing FK to Employee
-    /// </summary>
     public int? ReportingManagerEmployeeId { get; set; }
 
     public string? WorkLocation { get; set; }

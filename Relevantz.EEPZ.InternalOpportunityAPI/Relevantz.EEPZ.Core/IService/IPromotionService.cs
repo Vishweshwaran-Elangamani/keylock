@@ -16,8 +16,8 @@ namespace Relevantz.EEPZ.Core.IService
         Task<PromotionResponseDto> RejectPromotionAsync(int promotionId, int rejectedByUserId);
         Task<List<PromotionResponseDto>> GetPromotionHistoryByEmployeeAsync(int employeeUserId);
         Task<List<PromotionResponseDto>> GetPendingLeadershipApprovalAsync();
-Task<PromotionResponseDto> ApprovePromotionByLeadershipAsync(int promotionId, int approvedByUserId, string remarks);
-Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int promotionId, int rejectedByUserId, string remarks);
+        Task<PromotionResponseDto> ApprovePromotionByLeadershipAsync(int promotionId, int approvedByUserId, string remarks);
+        Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int promotionId, int rejectedByUserId, string remarks);
 
     }
 }

@@ -39,9 +39,8 @@ namespace Relevantz.EEPZ.Core.Service
                     Category = request.Category,
                     Description = request.Description,
                     ComplianceGuidance = request.ComplianceGuidance,
-                    Status = request.Status ?? "Draft", //  Default to Draft
+                    Status = request.Status ?? "Draft",
                     CreatedByUserId = createdByUserId,
-                    //  NEW: Document fields
                     DocumentUrl = request.DocumentUrl,
                     DocumentName = request.DocumentName,
                     DocumentType = request.DocumentType,
@@ -106,8 +105,7 @@ namespace Relevantz.EEPZ.Core.Service
                 return ApiResponseDto<List<PolicyResponseDto>>.ErrorResponse("Failed to fetch policies");
             }
         }
- 
-        //  NEW: Get published policies (visible to all employees)
+
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetPublishedPoliciesAsync()
         {
             try
@@ -123,7 +121,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  NEW: Get draft policies (HR only)
         public async Task<ApiResponseDto<List<PolicyResponseDto>>> GetDraftPoliciesAsync()
         {
             try
@@ -194,7 +191,6 @@ namespace Relevantz.EEPZ.Core.Service
                 if (!string.IsNullOrEmpty(request.Status))
                     policy.Status = request.Status;
  
-                //  NEW: Update document fields
                 if (!string.IsNullOrEmpty(request.DocumentUrl))
                 {
                     policy.DocumentUrl = request.DocumentUrl;
@@ -217,7 +213,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  NEW: Publish policy (make visible to all employees)
+        //  Publish policy (make visible to all employees)
         public async Task<ApiResponseDto<string>> PublishPolicyAsync(int policyId, int publishedBy)
         {
             try
@@ -273,7 +269,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  Helper method to map Policy to PolicyResponseDto
         private PolicyResponseDto MapToResponseDto(Organizationalpolicy policy)
         {
             return new PolicyResponseDto
@@ -289,22 +284,19 @@ namespace Relevantz.EEPZ.Core.Service
                 CreatedAt = policy.CreatedAt,
                 UpdatedAt = policy.UpdatedAt,
                 ViolationsCount = policy.Policyviolations?.Count ?? 0,
-                //  NEW: Document fields
                 DocumentUrl = policy.DocumentUrl,
                 DocumentName = policy.DocumentName,
                 DocumentType = policy.DocumentType,
                 DocumentSize = policy.DocumentSize,
                 DocumentSizeFormatted = FormatFileSize(policy.DocumentSize),
                 DocumentUploadedAt = policy.DocumentUploadedAt,
-                //  NEW: Publish fields
                 IsPublished = policy.IsPublished,
                 PublishedAt = policy.PublishedAt,
                 PublishedBy = policy.PublishedBy,
                 PublishedByEmail = policy.PublishedBy.HasValue ? "TODO: Get from PublishedBy UserId" : null
             };
         }
- 
-        //  Helper method to format file size
+
         private string FormatFileSize(long? bytes)
         {
             if (!bytes.HasValue || bytes.Value == 0)
@@ -324,26 +316,22 @@ namespace Relevantz.EEPZ.Core.Service
 {
     try
     {
-        //  USE CORRECT METHOD NAME
         var policy = await _policyRepository.GetPolicyByIdAsync(policyId);
  
         if (policy == null)
         {
             return ApiResponseDto<PolicyResponseDto>.ErrorResponse("Policy not found");
         }
- 
-        // Set back to Draft
+
         policy.IsPublished = false;
         policy.PublishedAt = null;
         policy.PublishedBy = null;
         policy.UpdatedAt = DateTime.Now;
- 
-        //  USE CORRECT METHOD NAME
+
         await _policyRepository.UpdatePolicyAsync(policy);
  
         _logger.LogInformation($" Policy {policyId} unpublished successfully");
- 
-        //  RETURN ApiResponseDto, NOT PolicyResponseDto
+
         var response = MapToResponseDto(policy);
         return ApiResponseDto<PolicyResponseDto>.SuccessResponse(response, "Policy unpublished successfully");
     }

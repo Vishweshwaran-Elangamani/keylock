@@ -34,13 +34,13 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 Console.WriteLine($"Service: CreatePromotion - EmployeeUserId: {request.EmployeeUserId}, NominationId: {request.NominationId}");
 
-                // ✅ VALIDATION 1: NominationId must be provided
+                // VALIDATION 1: NominationId must be provided
                 if (request.NominationId <= 0)
                 {
                     throw new Exception("NominationId is required for promotion");
                 }
 
-                // ✅ VALIDATION 2: Get and validate nomination
+                // VALIDATION 2: Get and validate nomination
                 var nomination = await _nominationRepository.GetByIdAsync(request.NominationId);
                 
                 if (nomination == null)
@@ -48,19 +48,19 @@ namespace Relevantz.EEPZ.Core.Service
                     throw new Exception($"Nomination ID {request.NominationId} not found");
                 }
 
-                // ✅ VALIDATION 3: Nomination MUST be approved
+                // VALIDATION 3: Nomination MUST be approved
                 if (nomination.Status != NominationStatusConstants.Approved)
                 {
                     throw new Exception($"Cannot create promotion. Nomination status is '{nomination.Status}'. Only APPROVED nominations can be promoted.");
                 }
 
-                // ✅ VALIDATION 4: Employee ID must match nominee
+                // VALIDATION 4: Employee ID must match nominee
                 if (nomination.NomineeUserId != request.EmployeeUserId)
                 {
                     throw new Exception($"Employee ID {request.EmployeeUserId} does not match the nomination nominee ID {nomination.NomineeUserId}");
                 }
 
-                // ✅ VALIDATION 5: Check if promotion already exists for this nomination
+                // VALIDATION 5: Check if promotion already exists for this nomination
                 var existingPromotion = await _promotionRepository.GetByNominationIdAsync(request.NominationId);
                 if (existingPromotion != null)
                 {
@@ -69,7 +69,7 @@ namespace Relevantz.EEPZ.Core.Service
 
                 Console.WriteLine($"✓ All validations passed for NominationId={request.NominationId}");
 
-                // ✅ Create promotion
+                // Create promotion
                 var promotion = new Promotion
                 {
                     NominationId = request.NominationId,
@@ -88,14 +88,14 @@ namespace Relevantz.EEPZ.Core.Service
 
                 var created = await _promotionRepository.CreateAsync(promotion);
                 
-                // ✅ Load related data for response
+                // Load related data for response
                 var response = await GetPromotionByIdAsync(created.PromotionId);
                 
                 return response;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in CreatePromotionAsync: {ex.Message}");
+                Console.WriteLine($" Error in CreatePromotionAsync: {ex.Message}");
                 throw;
             }
         }
@@ -117,7 +117,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetPromotionByIdAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetPromotionByIdAsync: {ex.Message}");
                 throw;
             }
         }
@@ -151,7 +151,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetAllPromotionsAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetAllPromotionsAsync: {ex.Message}");
                 throw;
             }
         }
@@ -179,7 +179,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetPromotionsByEmployeeAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetPromotionsByEmployeeAsync: {ex.Message}");
                 throw;
             }
         }
@@ -210,12 +210,12 @@ namespace Relevantz.EEPZ.Core.Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetPendingHrApprovalAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetPendingHrApprovalAsync: {ex.Message}");
                 throw;
             }
         }
 
-        // ✅ UPDATE: HR Approve - moves to leadership
+        // HR Approve - moves to leadership
 public async Task<PromotionResponseDto> ApprovePromotionAsync(int promotionId, int approvedByUserId, string remarks)
 {
     try
@@ -224,7 +224,7 @@ public async Task<PromotionResponseDto> ApprovePromotionAsync(int promotionId, i
         if (promotion == null)
             throw new Exception("Promotion not found");
 
-        // ✅ CHANGE: Set to "hr_approved" instead of "approved"
+        // Set to "hr_approved" instead of "approved"
         promotion.Status = PromotionStatusConstants.HrApproved;
         promotion.ApprovedByUserId = approvedByUserId;
         promotion.ApprovedAt = DateTime.UtcNow;
@@ -238,12 +238,12 @@ public async Task<PromotionResponseDto> ApprovePromotionAsync(int promotionId, i
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Error in ApprovePromotionAsync: {ex.Message}");
+        Console.WriteLine($" Error in ApprovePromotionAsync: {ex.Message}");
         throw;
     }
 }
 
-// ✅ NEW: Get promotions pending leadership approval
+// Get promotions pending leadership approval
 public async Task<List<PromotionResponseDto>> GetPendingLeadershipApprovalAsync()
 {
     try
@@ -272,12 +272,12 @@ public async Task<List<PromotionResponseDto>> GetPendingLeadershipApprovalAsync(
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Error in GetPendingLeadershipApprovalAsync: {ex.Message}");
+        Console.WriteLine($" Error in GetPendingLeadershipApprovalAsync: {ex.Message}");
         throw;
     }
 }
 
-// ✅ NEW: Leadership approves promotion (FINAL)
+// Leadership approves promotion (FINAL)
 public async Task<PromotionResponseDto> ApprovePromotionByLeadershipAsync(int promotionId, int approvedByUserId, string remarks)
 {
     try
@@ -291,7 +291,7 @@ public async Task<PromotionResponseDto> ApprovePromotionByLeadershipAsync(int pr
             throw new Exception($"Cannot approve. Promotion status is '{promotion.Status}'. Must be 'hr_approved'.");
         }
 
-        // ✅ FINAL STATUS: approved
+        // FINAL STATUS: approved
         promotion.Status = PromotionStatusConstants.Approved;
         promotion.ApprovedByUserId = approvedByUserId;
         promotion.ApprovedAt = DateTime.UtcNow;
@@ -319,12 +319,12 @@ await _promotionRepository.AddPromotionHistoryAsync(history);
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Error in ApprovePromotionByLeadershipAsync: {ex.Message}");
+        Console.WriteLine($" Error in ApprovePromotionByLeadershipAsync: {ex.Message}");
         throw;
     }
 }
 
-// ✅ NEW: Leadership rejects promotion
+// Leadership rejects promotion
 public async Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int promotionId, int rejectedByUserId, string remarks)
 {
     try
@@ -345,13 +345,13 @@ public async Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int pro
 
         var updated = await _promotionRepository.UpdateAsync(promotion);
 
-        Console.WriteLine($"✓ Promotion rejected by Leadership: PromotionId={promotionId}");
+        Console.WriteLine($" Promotion rejected by Leadership: PromotionId={promotionId}");
 
         return await GetPromotionByIdAsync(updated.PromotionId);
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Error in RejectPromotionByLeadershipAsync: {ex.Message}");
+        Console.WriteLine($" Error in RejectPromotionByLeadershipAsync: {ex.Message}");
         throw;
     }
 }
@@ -371,13 +371,13 @@ public async Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int pro
 
                 var updated = await _promotionRepository.UpdateAsync(promotion);
 
-                Console.WriteLine($"✓ Promotion rejected: PromotionId={promotionId}");
+                Console.WriteLine($"Promotion rejected: PromotionId={promotionId}");
 
                 return await GetPromotionByIdAsync(updated.PromotionId);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in RejectPromotionAsync: {ex.Message}");
+                Console.WriteLine($" Error in RejectPromotionAsync: {ex.Message}");
                 throw;
             }
         }
@@ -401,7 +401,7 @@ public async Task<PromotionResponseDto> RejectPromotionByLeadershipAsync(int pro
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetPromotionHistoryByEmployeeAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetPromotionHistoryByEmployeeAsync: {ex.Message}");
                 throw;
             }
         }

@@ -8,7 +8,6 @@ namespace Relevantz.EEPZ.Common.Utils
 {
     public class JwtHelper
     {
-        // Generate JWT Access Token
         public static string GenerateAccessToken(
             int userId,
             int empId,
@@ -50,7 +49,6 @@ namespace Relevantz.EEPZ.Common.Utils
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        // Generate Refresh Token
         public static string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
@@ -59,7 +57,6 @@ namespace Relevantz.EEPZ.Common.Utils
             return Convert.ToBase64String(randomNumber);
         }
 
-        // Validate Token
         public static ClaimsPrincipal? ValidateToken(
             string token,
             string issuer,

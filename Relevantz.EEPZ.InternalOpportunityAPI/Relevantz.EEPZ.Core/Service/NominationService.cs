@@ -24,9 +24,6 @@ namespace Relevantz.EEPZ.Core.Service
             _mapper = mapper;
         }
 
-        /// <summary>
-        /// Self-Nomination: ALL go directly to Manager (L2), skipping L1
-        /// </summary>
         public async Task<NominationResponseDto> CreateSelfNominationAsync(int employeeId, CreateSelfNominationRequestDto request)
         {
             try
@@ -58,11 +55,10 @@ namespace Relevantz.EEPZ.Core.Service
                     NominatedByUserId = employeeId,
                     Justification = request.Justification,
                     
-                    // NEW: Always start at Manager Review (Level 1)
+                    // Always start at Manager Review (Level 1)
                     CurrentApprovalLevel = 1,
                     Status = "Pending_Manager_Review",
                     
-                    // L1ManagerUserId = NULL (not used in new flow)
                     L2ManagerUserId = managerUserId.Value,  // This is the Manager (from Project.L1approver)
                     
                     SubmittedAt = DateTime.UtcNow

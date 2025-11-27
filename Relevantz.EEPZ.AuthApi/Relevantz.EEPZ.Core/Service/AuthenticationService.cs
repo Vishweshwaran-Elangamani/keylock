@@ -42,7 +42,6 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 var user = await _userAuthRepository.GetByEmailAsync(request.Email);
 
-                // Log login attempt
                 var loginAttempt = new Loginattempt
                 {
                     Email = request.Email,
@@ -59,7 +58,6 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<LoginResponseDto>.FailureResponse(Constants.Messages.InvalidCredentials);
                 }
 
-                // Check if account is inactive (Status field check)
                 if (user.Status == Constants.UserStatuses.Inactive)
                 {
                     loginAttempt.UserId = user.UserId;
@@ -68,26 +66,21 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<LoginResponseDto>.FailureResponse(Constants.Messages.AccountInactive);
                 }
 
-                // Verify password
                 if (!_passwordService.VerifyPassword(request.Password, user.PasswordHash))
                 {
                     loginAttempt.UserId = user.UserId;
                     loginAttempt.FailureReason = Constants.Messages.InvalidCredentials;
                     await _loginAttemptRepository.CreateAsync(loginAttempt);
 
-                    // Check failed attempts and lock account if necessary
                     await CheckAndLockAccountAsync(user);
 
                     return ApiResponseDto<LoginResponseDto>.FailureResponse(Constants.Messages.InvalidCredentials);
                 }
 
-                // Get role name
                 var roleName = user.Employee?.Employeedetailsmasters?.FirstOrDefault()?.Role?.RoleName ?? Constants.Roles.User;
 
-                // Check if first login - force password reset
                 if (user.IsFirstLogin == true)
                 {
-                    // Generate OTP for password reset
                     await _otpService.GenerateOtpAsync(user.Email, Constants.OtpTypes.ForgotPassword);
 
                     loginAttempt.IsSuccessful = false;
@@ -107,10 +100,8 @@ namespace Relevantz.EEPZ.Core.Service
                         "Password reset required");
                 }
 
-                // Check if user is Admin (requires 2FA)
                 if (roleName == Constants.Roles.Admin)
                 {
-                    // Generate OTP for 2FA
                     await _otpService.GenerateOtpAsync(user.Email, Constants.OtpTypes.Login2FA);
 
                     loginAttempt.IsSuccessful = true;
@@ -127,11 +118,9 @@ namespace Relevantz.EEPZ.Core.Service
                         Constants.Messages.OtpSent);
                 }
 
-                // Normal user login (no 2FA)
                 var accessToken = _tokenService.GenerateAccessToken(user, roleName);
                 var refreshToken = await _tokenService.GenerateRefreshTokenAsync(user.UserId, request.IpAddress);
 
-                // Update last login
                 await _userAuthRepository.UpdateLastLoginAsync(user.UserId);
 
                 loginAttempt.IsSuccessful = true;
@@ -218,7 +207,6 @@ namespace Relevantz.EEPZ.Core.Service
                 var user = await _userAuthRepository.GetByEmailAsync(request.Email);
                 if (user == null)
                 {
-                    // Return success even if user doesn't exist (security best practice)
                     return ApiResponseDto<OtpResponseDto>.SuccessResponse(
                         new OtpResponseDto
                         {
@@ -255,27 +243,23 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
-                // Verify OTP
                 var isOtpValid = await _otpService.VerifyOtpAsync(request.Email, request.OtpCode, Constants.OtpTypes.ForgotPassword);
                 if (!isOtpValid)
                 {
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.InvalidOrExpiredOtp);
                 }
 
-                // Validate password strength
                 if (!_passwordService.ValidatePasswordStrength(request.NewPassword))
                 {
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.WeakPassword);
                 }
 
-                // ✅ Update password AND reset IsFirstLogin flag
                 user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
-                user.IsFirstLogin = false; // ✅ CRITICAL FIX: Mark user as no longer first-time login
+                user.IsFirstLogin = false; 
                 user.UpdatedAt = DateTime.UtcNow;
 
                 await _userAuthRepository.UpdateAsync(user);
 
-                // Send confirmation email
                 var firstName = user.Employee?.Userprofile?.FirstName ?? "User";
                 await _emailService.SendPasswordResetConfirmationAsync(user.Email, firstName);
 
@@ -303,25 +287,21 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.UserNotFound);
                 }
 
-                // For first-time users, skip current password validation
                 if (user.IsFirstLogin == false)
                 {
-                    // Regular user - verify current password
                     if (!_passwordService.VerifyPassword(request.CurrentPassword, user.PasswordHash))
                     {
                         return ApiResponseDto<string>.FailureResponse(Constants.Messages.InvalidCurrentPassword);
                     }
                 }
 
-                // Validate new password strength
                 if (!_passwordService.ValidatePasswordStrength(request.NewPassword))
                 {
                     return ApiResponseDto<string>.FailureResponse(Constants.Messages.WeakPassword);
                 }
 
-                //  Update password AND reset IsFirstLogin flag
                 user.PasswordHash = _passwordService.HashPassword(request.NewPassword);
-                user.IsFirstLogin = false; //  CRITICAL FIX
+                user.IsFirstLogin = false;
                 user.UpdatedAt = DateTime.UtcNow;
 
                 await _userAuthRepository.UpdateAsync(user);

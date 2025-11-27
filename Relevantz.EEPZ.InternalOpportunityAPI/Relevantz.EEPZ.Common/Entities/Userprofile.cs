@@ -15,9 +15,6 @@ public partial class Userprofile
 
     public string LastName { get; set; } = null!;
 
-    /// <summary>
-    /// Preferred/nick name
-    /// </summary>
     public string? CallingName { get; set; }
 
     public string? ReferredBy { get; set; }

@@ -8,10 +8,7 @@ public partial class Address
     public int AddressId { get; set; }
 
     public int EmployeeId { get; set; }
-
-    /// <summary>
-    /// Current or Permanent
-    /// </summary>
+    
     public string AddressType { get; set; } = null!;
 
     public string? DoorNumber { get; set; }

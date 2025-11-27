@@ -16,7 +16,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _context = context;
         }
  
-        //  GET ALL DEPARTMENTS
         [HttpGet("all")]
         public async Task<IActionResult> GetAllDepartments()
         {
@@ -54,7 +53,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
  
-        //  GET DEPARTMENT BY ID
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {

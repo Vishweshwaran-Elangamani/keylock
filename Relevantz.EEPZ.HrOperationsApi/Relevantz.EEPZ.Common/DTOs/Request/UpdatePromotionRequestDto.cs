@@ -14,8 +14,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [StringLength(100, ErrorMessage = "New Role cannot exceed 100 characters")]
         public string NewRole { get; set; } = string.Empty;
  
-        //  DELETE THIS LINE: public decimal NewSalary { get; set; }
- 
         [Required(ErrorMessage = "Promotion Date is required")]
         public DateOnly PromotionDate { get; set; }
  

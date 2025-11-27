@@ -20,8 +20,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             _opportunityService = opportunityService;
         }
-
-        // ✅ SIMPLIFIED: Get all opportunities WITHOUT filters/pagination
+        
         [HttpGet]
         public async Task<IActionResult> GetAllOpportunities()
         {

@@ -7,11 +7,8 @@ namespace Relevantz.EEPZ.Core.IService
 {
     public interface IInternalOpportunityService
     {
-        // ✅ NEW: Simple methods without pagination
         Task<List<InternalOpportunityResponseDto>> GetAllOpportunitiesSimpleAsync();
         Task<List<InternalOpportunityResponseDto>> GetActiveOpportunitiesSimpleAsync();
-
-        // Existing methods
         Task<InternalOpportunityResponseDto> CreateOpportunityAsync(CreateInternalOpportunityRequestDto request, int createdByUserId);
         Task<InternalOpportunityResponseDto> UpdateOpportunityAsync(int id, UpdateInternalOpportunityRequestDto request);
         Task<InternalOpportunityDetailResponseDto> GetOpportunityByIdAsync(int id);

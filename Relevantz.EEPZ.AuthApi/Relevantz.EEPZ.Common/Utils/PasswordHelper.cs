@@ -6,19 +6,16 @@ namespace Relevantz.EEPZ.Common.Utils
     {
         private static readonly Random _random = new Random();
 
-        // Hash password using BCrypt
         public static string HashPassword(string password)
         {
             return BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt(12));
         }
 
-        // Verify password against hash
         public static bool VerifyPassword(string password, string passwordHash)
         {
             return BCrypt.Net.BCrypt.Verify(password, passwordHash);
         }
 
-        // Generate temporary password
         public static string GenerateTemporaryPassword(int length = 12)
         {
             const string uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -28,24 +25,20 @@ namespace Relevantz.EEPZ.Common.Utils
 
             var password = new StringBuilder();
 
-            // Ensure at least one of each required character type
             password.Append(uppercase[_random.Next(uppercase.Length)]);
             password.Append(lowercase[_random.Next(lowercase.Length)]);
             password.Append(digits[_random.Next(digits.Length)]);
             password.Append(special[_random.Next(special.Length)]);
 
-            // Fill remaining characters randomly
             string allChars = uppercase + lowercase + digits + special;
             for (int i = password.Length; i < length; i++)
             {
                 password.Append(allChars[_random.Next(allChars.Length)]);
             }
 
-            // Shuffle the password
             return ShuffleString(password.ToString());
         }
 
-        // Validate password strength
         public static bool ValidatePasswordStrength(string password, 
             bool requireUppercase = true, 
             bool requireLowercase = true, 
@@ -71,7 +64,6 @@ namespace Relevantz.EEPZ.Common.Utils
             return true;
         }
 
-        // Helper method to shuffle string
         private static string ShuffleString(string input)
         {
             char[] array = input.ToCharArray();

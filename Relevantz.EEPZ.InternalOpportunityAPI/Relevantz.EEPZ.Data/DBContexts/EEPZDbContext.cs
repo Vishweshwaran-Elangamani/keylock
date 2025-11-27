@@ -1507,19 +1507,19 @@ public partial class EEPZDbContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("nominations_ibfk_4");
 
-            // ✅ NEW: L1 Manager relationship
+            //  L1 Manager relationship
         entity.HasOne(d => d.L1ManagerUser)
             .WithMany()
             .HasForeignKey(d => d.L1ManagerUserId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // ✅ NEW: L2 Manager relationship
+        //  L2 Manager relationship
         entity.HasOne(d => d.L2ManagerUser)
             .WithMany()
             .HasForeignKey(d => d.L2ManagerUserId)
             .OnDelete(DeleteBehavior.SetNull);
 
-        // ✅ NEW: Department Head relationship
+        //  Department Head relationship
         entity.HasOne(d => d.DeptHeadUser)
             .WithMany()
             .HasForeignKey(d => d.DeptHeadUserId)

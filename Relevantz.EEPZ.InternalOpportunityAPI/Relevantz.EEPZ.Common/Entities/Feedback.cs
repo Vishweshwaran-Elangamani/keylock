@@ -7,14 +7,8 @@ public partial class Feedback
 {
     public int FeedbackId { get; set; }
 
-    /// <summary>
-    /// Team, Self, Org
-    /// </summary>
     public string FeedbackType { get; set; } = null!;
 
-    /// <summary>
-    /// Performance, OKR, etc
-    /// </summary>
     public string Context { get; set; } = null!;
 
     public string Comments { get; set; } = null!;
@@ -23,9 +17,6 @@ public partial class Feedback
 
     public bool IsAnonymous { get; set; }
 
-    /// <summary>
-    /// Submitter (NULL if anonymous)
-    /// </summary>
     public int? EmployeeId { get; set; }
 
     public int? ManagerEmployeeId { get; set; }

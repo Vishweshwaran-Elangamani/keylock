@@ -16,8 +16,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [StringLength(1000)]
         public string? Reason { get; set; }
-
-        // ✅ NEW: Password validation
+        
         [Required(ErrorMessage = "Current password is required for verification")]
         [StringLength(100, ErrorMessage = "Password cannot exceed 100 characters")]
         public string CurrentPassword { get; set; } = string.Empty;

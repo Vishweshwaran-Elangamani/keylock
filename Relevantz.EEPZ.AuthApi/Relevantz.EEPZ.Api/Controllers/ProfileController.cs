@@ -143,7 +143,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 }
 
                 // Validate file size (5MB max)
-                const long maxFileSize = 5 * 1024 * 1024; // 5MB
+                const long maxFileSize = 5 * 1024 * 1024; 
                 if (ProfilePhoto.Length > maxFileSize)
                 {
                     return BadRequest(new { 
@@ -152,19 +152,16 @@ namespace Relevantz.EEPZ.Api.Controllers
                     });
                 }
 
-                // Log upload attempt
                 Console.WriteLine($"Photo upload for UserId: {userId}");
                 Console.WriteLine($"  File: {ProfilePhoto.FileName}");
                 Console.WriteLine($"  Size: {ProfilePhoto.Length} bytes ({ProfilePhoto.Length / 1024.0:F2} KB)");
                 Console.WriteLine($"  Type: {ProfilePhoto.ContentType}");
 
-                // Create request DTO with only photo
                 var request = new UpdateProfileRequestDto
                 {
                     ProfilePhoto = ProfilePhoto
                 };
 
-                // Call service to update
                 var result = await _profileService.UpdateProfileAsync(userId, request);
 
                 if (!result.Success)

@@ -22,14 +22,12 @@ namespace Relevantz.EEPZ.Core.Service
             _mapper = mapper;
         }
 
-        // ✅ NEW: Simple method - return all opportunities as-is
         public async Task<List<InternalOpportunityResponseDto>> GetAllOpportunitiesSimpleAsync()
         {
             var opportunities = await _opportunityRepository.GetAllAsync();
             return _mapper.Map<List<InternalOpportunityResponseDto>>(opportunities);
         }
 
-        // ✅ NEW: Simple method - return all active opportunities
         public async Task<List<InternalOpportunityResponseDto>> GetActiveOpportunitiesSimpleAsync()
         {
             var opportunities = await _opportunityRepository.GetActiveAsync();

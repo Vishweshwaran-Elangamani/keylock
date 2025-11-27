@@ -19,7 +19,7 @@ namespace Relevantz.EEPZ.Core.Service
             _logger = logger;
         }
  
-        //  CHECK: Pending nomination for employee
+        // Pending nomination for employee
         public async Task<ApiResponseDto<PendingNominationCheckDto>> CheckPendingNominationAsync(int employeeUserId)
         {
             try
@@ -76,7 +76,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  CREATE: Manager creates promotion
         public async Task<ApiResponseDto<PromotionResponseDto>> CreatePromotionAsync(
             CreatePromotionRequestDto request,
             int managerId)
@@ -151,7 +150,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  UPDATE: Manager updates promotion
         public async Task<ApiResponseDto<PromotionResponseDto>> UpdatePromotionAsync(UpdatePromotionRequestDto request)
         {
             try
@@ -188,8 +186,7 @@ namespace Relevantz.EEPZ.Core.Service
                     $"Error updating promotion: {ex.Message}");
             }
         }
- 
-        //  CHECK: Favoritism history
+
         public async Task<ApiResponseDto<FavoritismCheckDto>> CheckFavoritismHistoryAsync(int promotionId)
         {
             try
@@ -251,7 +248,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  APPROVE: DeptHead approves
         public async Task<ApiResponseDto<PromotionResponseDto>> ApprovePromotionAsync(ApprovePromotionRequestDto request)
         {
             try
@@ -271,7 +267,7 @@ namespace Relevantz.EEPZ.Core.Service
  
                 promotion.Status = "Approved";
                 promotion.ApprovedByUserId = request.ApprovedByUserId;
-                promotion.ApprovedAt = null; //  IMPORTANT: Set to NULL when Dept Head approves
+                promotion.ApprovedAt = null; 
                
                 _context.Promotions.Update(promotion);
                 await _context.SaveChangesAsync();
@@ -291,7 +287,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  REJECT: DeptHead rejects
         public async Task<ApiResponseDto<PromotionResponseDto>> RejectPromotionAsync(RejectPromotionRequestDto request)
         {
             try
@@ -328,7 +323,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  UPDATE PAYROLL: HR updates payroll
         public async Task<ApiResponseDto<PayrollResponseDto>> UpdatePayrollForPromotionAsync(UpdatePayrollRequestDto request)
         {
             try
@@ -395,7 +389,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  UPDATED: SUBMIT TO LEADERSHIP - Sets ApprovedAt timestamp
+        // SUBMIT TO LEADERSHIP - Sets ApprovedAt timestamp
         public async Task<ApiResponseDto<PromotionResponseDto>> SubmitToLeadershipAsync(int promotionId)
         {
             try
@@ -417,7 +411,6 @@ namespace Relevantz.EEPZ.Core.Service
  
                 _logger.LogInformation($" Current promotion status: '{promotion.Status}'");
  
-                //  Check: Must be Approved
                 if (string.IsNullOrEmpty(promotion.Status) ||
                     !promotion.Status.Equals("Approved", StringComparison.OrdinalIgnoreCase))
                 {
@@ -425,16 +418,14 @@ namespace Relevantz.EEPZ.Core.Service
                     return ApiResponseDto<PromotionResponseDto>.FailureResponse(
                         $"Only approved promotions can be submitted. Current status: {promotion.Status}");
                 }
- 
-                //  Check: Payroll must be updated
+
                 if (promotion.NewSalary <= 0)
                 {
                     _logger.LogWarning($" Cannot submit - Payroll not updated yet (NewSalary = {promotion.NewSalary})");
                     return ApiResponseDto<PromotionResponseDto>.FailureResponse(
                         "Payroll must be updated before submitting to leadership");
                 }
- 
-                //  Check: Already submitted?
+
                 if (promotion.ApprovedAt.HasValue)
                 {
                     _logger.LogWarning($" Promotion already submitted to leadership at {promotion.ApprovedAt}");
@@ -442,7 +433,6 @@ namespace Relevantz.EEPZ.Core.Service
                         "This promotion has already been submitted to leadership");
                 }
  
-                //  NEW: Set ApprovedAt timestamp to mark as "submitted to leadership"
                 promotion.ApprovedAt = DateTime.UtcNow;
                 _logger.LogInformation($" Setting ApprovedAt = {promotion.ApprovedAt} to mark submission to leadership");
  
@@ -471,8 +461,7 @@ namespace Relevantz.EEPZ.Core.Service
                     $"Error submitting to leadership: {ex.Message}");
             }
         }
- 
-        //  GET: All promotions
+
         public async Task<ApiResponseDto<List<PromotionResponseDto>>> GetAllPromotionsAsync()
         {
             try
@@ -505,8 +494,7 @@ namespace Relevantz.EEPZ.Core.Service
                     $"Error fetching promotions: {ex.Message}");
             }
         }
- 
-        //  GET: Promotion by ID
+
         public async Task<ApiResponseDto<PromotionResponseDto>> GetPromotionByIdAsync(int promotionId)
         {
             try
@@ -538,8 +526,7 @@ namespace Relevantz.EEPZ.Core.Service
                     $"Error fetching promotion: {ex.Message}");
             }
         }
- 
-        //  GET: Promotions by Employee
+
         public async Task<ApiResponseDto<List<PromotionResponseDto>>> GetPromotionsByEmployeeAsync(int employeeUserId)
         {
             try
@@ -572,7 +559,6 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
  
-        //  GET: Promotions by Status - WITH PROPER INCLUDES
         public async Task<ApiResponseDto<List<PromotionResponseDto>>> GetPromotionsByStatusAsync(string status)
         {
             try
@@ -604,14 +590,12 @@ namespace Relevantz.EEPZ.Core.Service
                     $"Error fetching promotions by status: {ex.Message}");
             }
         }
- 
-        //  HELPER: Map to DTO - FIXED VERSION
+
         private PromotionResponseDto MapToPromotionResponseDto(Promotion promotion)
         {
             var firstName = "Unknown";
             var lastName = "Unknown";
  
-            //  CORRECT: Navigate through Employee to Userprofile
             if (promotion.EmployeeUser?.Employee?.Userprofile != null)
             {
                 firstName = promotion.EmployeeUser.Employee.Userprofile.FirstName ?? "Unknown";

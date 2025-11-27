@@ -36,101 +36,6 @@ namespace Relevantz.EEPZ.Core.Service
             _departmentRepository = departmentRepository;
         }
  
-        // private List<string> ValidateUserData(CreateUserRequestDto user, int rowNumber)
-        // {
-        //     var errors = new List<string>();
-        //     var rowPrefix = $"Row {rowNumber}";
- 
-        //     if (string.IsNullOrWhiteSpace(user.FirstName))
-        //     {
-        //         errors.Add($"{rowPrefix}: First name is required");
-        //     }
-        //     else if (user.FirstName.Trim().Length < 2)
-        //     {
-        //         errors.Add($"{rowPrefix}: First name must be at least 2 characters");
-        //     }
-        //     else if (!Regex.IsMatch(user.FirstName.Trim(), @"^[a-zA-Z\s]+$"))
-        //     {
-        //         errors.Add($"{rowPrefix}: First name must contain only letters");
-        //     }
- 
-        //     if (string.IsNullOrWhiteSpace(user.LastName))
-        //     {
-        //         errors.Add($"{rowPrefix}: Last name is required");
-        //     }
-        //     else if (user.LastName.Trim().Length < 2)
-        //     {
-        //         errors.Add($"{rowPrefix}: Last name must be at least 2 characters");
-        //     }
-        //     else if (!Regex.IsMatch(user.LastName.Trim(), @"^[a-zA-Z\s]+$"))
-        //     {
-        //         errors.Add($"{rowPrefix}: Last name must contain only letters");
-        //     }
- 
-        //     if (string.IsNullOrWhiteSpace(user.EmployeeCompanyId))
-        //     {
-        //         errors.Add($"{rowPrefix}: Employee Company ID is required");
-        //     }
-        //     else if (user.EmployeeCompanyId.Trim().Length < 3)
-        //     {
-        //         errors.Add($"{rowPrefix}: Employee Company ID must be at least 3 characters");
-        //     }
-        //     else if (!Regex.IsMatch(user.EmployeeCompanyId.Trim(), @"^[a-zA-Z0-9_]+$"))
-        //     {
-        //         errors.Add($"{rowPrefix}: Employee Company ID must contain only letters, numbers, and underscores");
-        //     }
- 
-        //     if (string.IsNullOrWhiteSpace(user.Email))
-        //     {
-        //         errors.Add($"{rowPrefix}: Email is required");
-        //     }
-        //     else if (!Regex.IsMatch(user.Email.Trim(), @"^[^\s@]+@[^\s@]+\.[^\s@]+$"))
-        //     {
-        //         errors.Add($"{rowPrefix}: Invalid email format");
-        //     }
- 
-        //     if (!string.IsNullOrWhiteSpace(user.MobileNumber))
-        //     {
-        //         var cleanedNumber = user.MobileNumber.Replace("+91-", "").Replace("+91", "").Trim();
-        //         if (!Regex.IsMatch(cleanedNumber, @"^[6-9][0-9]{9}$"))
-        //         {
-        //             errors.Add($"{rowPrefix}: Phone number must start with 6-9 and be exactly 10 digits");
-        //         }
-        //     }
- 
-        //     if (user.RoleId <= 0)
-        //     {
-        //         errors.Add($"{rowPrefix}: Valid Role is required");
-        //     }
- 
-        //     if (user.DepartmentId <= 0)
-        //     {
-        //         errors.Add($"{rowPrefix}: Valid Department is required");
-        //     }
- 
-        //     if (user.DateOfBirthOfficial.HasValue)
-        //     {
-        //         var dob = user.DateOfBirthOfficial.Value.ToDateTime(TimeOnly.MinValue);
-        //         var today = DateTime.Today;
-        //         var age = today.Year - dob.Year;
- 
-        //         if (dob > today)
-        //         {
-        //             errors.Add($"{rowPrefix}: Date of birth cannot be in the future");
-        //         }
-        //         else if (age < 18)
-        //         {
-        //             errors.Add($"{rowPrefix}: User must be at least 18 years old");
-        //         }
-        //         else if (age > 100)
-        //         {
-        //             errors.Add($"{rowPrefix}: Invalid date of birth");
-        //         }
-        //     }
- 
-        //     return errors;
-        // }
- 
         private List<string> ValidateUserData(CreateUserRequestDto user, int rowNumber)
         {
             var errors = new List<string>();
@@ -142,7 +47,6 @@ namespace Relevantz.EEPZ.Core.Service
  
             var rowPrefix = $"Row {rowNumber} ({userIdentifier})";
  
-            // First Name Validation
             if (string.IsNullOrWhiteSpace(user.FirstName))
             {
                 errors.Add($"{rowPrefix}: First name is required");
@@ -155,8 +59,7 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 errors.Add($"{rowPrefix}: First name must contain only letters");
             }
- 
-            // Last Name Validation
+
             if (string.IsNullOrWhiteSpace(user.LastName))
             {
                 errors.Add($"{rowPrefix}: Last name is required");
@@ -170,7 +73,6 @@ namespace Relevantz.EEPZ.Core.Service
                 errors.Add($"{rowPrefix}: Last name must contain only letters");
             }
  
-            // Employee ID Validation
             if (string.IsNullOrWhiteSpace(user.EmployeeCompanyId))
             {
                 errors.Add($"{rowPrefix}: Employee Company ID is required");
@@ -183,8 +85,7 @@ namespace Relevantz.EEPZ.Core.Service
             {
                 errors.Add($"{rowPrefix}: Employee Company ID must contain only letters, numbers, and underscores");
             }
- 
-            // Email Validation
+
             if (string.IsNullOrWhiteSpace(user.Email))
             {
                 errors.Add($"{rowPrefix}: Email is required");
@@ -194,7 +95,6 @@ namespace Relevantz.EEPZ.Core.Service
                 errors.Add($"{rowPrefix}: Invalid email format");
             }
  
-            // Phone Number Validation
             if (!string.IsNullOrWhiteSpace(user.MobileNumber))
             {
                 var cleanedNumber = user.MobileNumber.Replace("+91-", "").Replace("+91", "").Trim();
@@ -203,20 +103,17 @@ namespace Relevantz.EEPZ.Core.Service
                     errors.Add($"{rowPrefix}: Phone number must start with 6-9 and be exactly 10 digits");
                 }
             }
- 
-            // Role Validation
+
             if (user.RoleId <= 0)
             {
                 errors.Add($"{rowPrefix}: Valid Role is required");
             }
  
-            // Department Validation
             if (user.DepartmentId <= 0)
             {
                 errors.Add($"{rowPrefix}: Valid Department is required");
             }
- 
-            // Date of Birth Validation
+
             if (user.DateOfBirthOfficial.HasValue)
             {
                 var dob = user.DateOfBirthOfficial.Value.ToDateTime(TimeOnly.MinValue);

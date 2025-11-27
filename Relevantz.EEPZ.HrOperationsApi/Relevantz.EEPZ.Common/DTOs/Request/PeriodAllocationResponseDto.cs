@@ -16,8 +16,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime AllocatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string? Notes { get; set; }
-        
-        // Calculated fields
         public decimal RemainingAmount { get; set; }
         public int SubAllocationCount { get; set; }
     }

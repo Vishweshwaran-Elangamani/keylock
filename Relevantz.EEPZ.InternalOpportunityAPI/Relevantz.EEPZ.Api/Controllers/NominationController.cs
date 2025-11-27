@@ -129,7 +129,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        // ✅ MANAGER: Get nominations pending their team's review
         [HttpGet("pending-manager-review")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetPendingManagerReview()
@@ -155,7 +154,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        // ✅ DEPARTMENT HEAD: Get nominations pending their approval
         [HttpGet("pending-depthead-review")]
         [Authorize(Roles = "Department Head,DepartmentHead,DEPT_HEAD")]
         public async Task<IActionResult> GetPendingDeptHeadReview()
@@ -181,7 +179,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        // ✅ HR: Get ALL nominations with optional status filter
         [HttpGet("all-nominations")]
         [Authorize(Roles = "HR,Admin,Employee")]
         public async Task<IActionResult> GetAllNominations([FromQuery] string? status = null)

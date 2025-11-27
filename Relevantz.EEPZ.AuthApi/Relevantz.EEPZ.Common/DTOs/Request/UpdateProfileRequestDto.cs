@@ -5,7 +5,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 {
     public class UpdateProfileRequestDto
     {
-        // Personal Information
         [Required(ErrorMessage = "First name is required")]
         [StringLength(100, ErrorMessage = "First name cannot exceed 100 characters")]
         public string? FirstName { get; set; }
@@ -39,18 +38,14 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [StringLength(255, ErrorMessage = "Personal email cannot exceed 255 characters")]
         public string? PersonalEmail { get; set; }
 
-        // Additional Profile Information
         public string? MaritalStatus { get; set; }
 
         [StringLength(100, ErrorMessage = "Nationality cannot exceed 100 characters")]
         public string? Nationality { get; set; }
         public IFormFile? ProfilePhoto { get; set; }
 
-
-        // Current Address
         public UpdateAddressDto? CurrentAddress { get; set; }
 
-        // Permanent Address
         public UpdateAddressDto? PermanentAddress { get; set; }
     }
 

@@ -11,9 +11,6 @@ public partial class GoalAttachment
 
     public string? AttachmentTitle { get; set; }
 
-    /// <summary>
-    /// File path or blob reference
-    /// </summary>
     public string? Attachments { get; set; }
 
     public int? AttachedBy { get; set; }

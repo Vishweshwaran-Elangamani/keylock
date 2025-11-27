@@ -10,7 +10,6 @@ namespace Relevantz.EEPZ.Api.Controllers
     [AllowAnonymous]
     [ApiController]
     [Route("api/[controller]")]
-    // [Authorize(Roles = "all")]
     public class DepartmentController : ControllerBase
     {
         private readonly IDepartmentService _departmentService;

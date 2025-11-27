@@ -29,13 +29,13 @@ namespace Relevantz.EEPZ.Data.Repository
                 _context.Promotions.Add(promotion);
                 await _context.SaveChangesAsync();
                 
-                Console.WriteLine($"✓ Promotion created: PromotionId={promotion.PromotionId}, NominationId={promotion.NominationId}");
+                Console.WriteLine($"  Promotion created: PromotionId={promotion.PromotionId}, NominationId={promotion.NominationId}");
                 
                 return promotion;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in CreateAsync: {ex.Message}");
+                Console.WriteLine($"  Error in CreateAsync: {ex.Message}");
                 throw;
             }
         }
@@ -54,7 +54,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetByIdAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetByIdAsync: {ex.Message}");
                 throw;
             }
         }
@@ -73,7 +73,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetAllAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetAllAsync: {ex.Message}");
                 throw;
             }
         }
@@ -92,7 +92,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetByEmployeeAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetByEmployeeAsync: {ex.Message}");
                 throw;
             }
         }
@@ -114,7 +114,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetByStatusAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetByStatusAsync: {ex.Message}");
                 throw;
             }
         }
@@ -134,12 +134,11 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetPendingHrApprovalAsync: {ex.Message}");
+                Console.WriteLine($" Error in GetPendingHrApprovalAsync: {ex.Message}");
                 throw;
             }
         }
 
-        // ✅ NEW: Get promotion by NominationId
         public async Task<Promotion?> GetByNominationIdAsync(int nominationId)
         {
             try
@@ -154,7 +153,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetByNominationIdAsync: {ex.Message}");
+                Console.WriteLine($"   Error in GetByNominationIdAsync: {ex.Message}");
                 throw;
             }
         }
@@ -170,13 +169,13 @@ namespace Relevantz.EEPZ.Data.Repository
                 _context.Promotions.Update(promotion);
                 await _context.SaveChangesAsync();
                 
-                Console.WriteLine($"✓ Promotion updated: PromotionId={promotion.PromotionId}");
+                Console.WriteLine($"  Promotion updated: PromotionId={promotion.PromotionId}");
                 
                 return promotion;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in UpdateAsync: {ex.Message}");
+                Console.WriteLine($"   Error in UpdateAsync: {ex.Message}");
                 throw;
             }
         }
@@ -192,13 +191,13 @@ namespace Relevantz.EEPZ.Data.Repository
                 _context.Promotions.Remove(promotion);
                 await _context.SaveChangesAsync();
                 
-                Console.WriteLine($"✓ Promotion deleted: PromotionId={id}");
+                Console.WriteLine($"  Promotion deleted: PromotionId={id}");
                 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in DeleteAsync: {ex.Message}");
+                Console.WriteLine($"   Error in DeleteAsync: {ex.Message}");
                 throw;
             }
         }
@@ -215,11 +214,11 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetPromotionHistoryByEmployeeAsync: {ex.Message}");
+                Console.WriteLine($"   Error in GetPromotionHistoryByEmployeeAsync: {ex.Message}");
                 throw;
             }
         }
-        // ✅ NEW: Get promotions pending leadership approval
+        // Get promotions pending leadership approval
         public async Task<List<Promotion>> GetPendingLeadershipApprovalAsync()
         {
             try
@@ -237,7 +236,7 @@ namespace Relevantz.EEPZ.Data.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error in GetPendingLeadershipApprovalAsync: {ex.Message}");
+                Console.WriteLine($"   Error in GetPendingLeadershipApprovalAsync: {ex.Message}");
                 throw;
             }
         }

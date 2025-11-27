@@ -23,7 +23,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string EmployeeFirstName { get; set; }
         public string EmployeeLastName { get; set; }
  
-        //  Helper property for full name
         public string EmployeeFullName
         {
             get

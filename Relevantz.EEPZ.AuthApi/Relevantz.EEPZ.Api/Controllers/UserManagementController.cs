@@ -89,11 +89,9 @@ public async Task<IActionResult> GetEmployeesByManager(int managerId)
 {
     try
     {
-        // Verify the requesting user is the manager or has HR/Admin role
         var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
-        // If user is not HR/Admin, ensure they can only see their own employees
         if (userRole != "HR" && userRole != "Admin" && currentUserId != managerId)
         {
             return Forbid("You can only view your own employees");

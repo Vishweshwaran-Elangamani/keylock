@@ -23,8 +23,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _context = context;
         }
 
-        // ========== FUND ALLOCATION ENDPOINTS ==========
-
         [HttpPost("create")]
         public async Task<IActionResult> CreateFundAllocation([FromBody] CreateFundAllocationRequestDto request)
         {
@@ -164,8 +162,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
-        // ========== DEPARTMENT BUDGET ENDPOINTS ==========
 
         [HttpGet("department-budgets/all")]
         public async Task<IActionResult> GetAllDepartmentBudgets()
@@ -403,8 +399,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        // ========== NEW: CREATE DEPARTMENT BUDGET ==========
-
         [HttpPost("department-budgets/create")]
         public async Task<IActionResult> CreateDepartmentBudget([FromBody] CreateDepartmentBudgetDto request)
         {
@@ -517,8 +511,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        // ========== NEW: UPDATE DEPARTMENT BUDGET ==========
-
         [HttpPut("department-budgets/update")]
         public async Task<IActionResult> UpdateDepartmentBudget([FromBody] UpdateDepartmentBudgetDto request)
         {
@@ -603,8 +595,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        // ========== NEW: DELETE DEPARTMENT BUDGET ==========
-
         [HttpDelete("department-budgets/{budgetId}")]
         public async Task<IActionResult> DeleteDepartmentBudget(int budgetId)
         {
@@ -671,8 +661,6 @@ namespace Relevantz.EEPZ.Api.Controllers
                 });
             }
         }
-
-        // ========== NEW: UPDATE UTILIZED AMOUNT ==========
 
         [HttpPut("department-budgets/update-utilized")]
         public async Task<IActionResult> UpdateUtilizedAmount([FromBody] UpdateUtilizedAmountDto request)
@@ -765,14 +753,12 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        // ========== NEW: UPDATE UTILIZATION FOR ALLOCATION (DEPT HEAD) ==========
-
         [HttpPut("update-utilization")]
         public async Task<IActionResult> UpdateUtilization([FromBody] UpdateUtilizationDto request)
         {
             try
             {
-                Console.WriteLine($"📊 Controller: UpdateUtilization called for allocation {request.AllocationId}");
+                Console.WriteLine($"Controller: UpdateUtilization called for allocation {request.AllocationId}");
 
                 if (request.AllocationId <= 0)
                 {
@@ -790,13 +776,13 @@ namespace Relevantz.EEPZ.Api.Controllers
 
                 if (allocation == null)
                 {
-                    Console.WriteLine($"❌ Allocation not found: {request.AllocationId}");
+                    Console.WriteLine($"Allocation not found: {request.AllocationId}");
                     
                     // DEBUG: Check what allocations exist
                     var existingAllocations = await _context.Budgetallocations
                         .Select(a => a.AllocationId)
                         .ToListAsync();
-                    Console.WriteLine($"📋 Existing AllocationIds: {string.Join(", ", existingAllocations)}");
+                    Console.WriteLine($"Existing AllocationIds: {string.Join(", ", existingAllocations)}");
                     
                     return NotFound(new
                     {
@@ -838,9 +824,8 @@ namespace Relevantz.EEPZ.Api.Controllers
                 _context.Budgetallocations.Update(allocation);
                 await _context.SaveChangesAsync();
 
-                Console.WriteLine($"✅ Allocation {allocation.AllocationId} utilization updated successfully");
+                Console.WriteLine($"Allocation {allocation.AllocationId} utilization updated successfully");
 
-                // Update parent department budget totals
                 await UpdateDepartmentBudgetTotals(allocation.DepartmentId);
 
                 return Ok(new
@@ -859,7 +844,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Controller Error: {ex.Message}");
+                Console.WriteLine($" Controller Error: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return StatusCode(500, new
                 {
@@ -870,7 +855,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
 
-        // Helper method
         private async Task UpdateDepartmentBudgetTotals(int departmentId)
         {
             try
@@ -893,23 +877,22 @@ namespace Relevantz.EEPZ.Api.Controllers
                     _context.Departmentbudgets.Update(budget);
                     await _context.SaveChangesAsync();
 
-                    Console.WriteLine($"✅ Department budget totals updated");
+                    Console.WriteLine($" Department budget totals updated");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error updating department budget totals: {ex.Message}");
+                Console.WriteLine($" Error updating department budget totals: {ex.Message}");
             }
         }
         [HttpGet("by-budget/{budgetId}")]
 public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
 {
     try {
-        Console.WriteLine($"📊 Getting allocations for budget: {budgetId}");
+        Console.WriteLine($" Getting allocations for budget: {budgetId}");
 
-        // ✅ FIX: Use AsNoTracking and don't include circular references
         var allocations = await _context.Budgetallocations
-            .AsNoTracking()  // ✅ Important: Prevents tracking and circular refs
+            .AsNoTracking()  
             .Where(a => a.BudgetId == budgetId)
             .Select(a => new
             {
@@ -929,12 +912,12 @@ public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
                 a.UtilizedAmount,
                 a.UtilizationPercentage,
                 a.UpdatedAt,
-                a.Period,  // ✅ NEW: Include period info
-                a.PeriodYear  // ✅ NEW: Include period year
+                a.Period,
+                a.PeriodYear  
             })
             .ToListAsync();
 
-        Console.WriteLine($"✅ Found {allocations.Count} allocations for budget {budgetId}");
+        Console.WriteLine($"Found {allocations.Count} allocations for budget {budgetId}");
 
         return Ok(new
         {
@@ -945,7 +928,7 @@ public async Task<IActionResult> GetAllocationsByBudget(int budgetId)
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Error getting allocations: {ex.Message}");
+        Console.WriteLine($"Error getting allocations: {ex.Message}");
         return StatusCode(500, new
         {
             success = false,

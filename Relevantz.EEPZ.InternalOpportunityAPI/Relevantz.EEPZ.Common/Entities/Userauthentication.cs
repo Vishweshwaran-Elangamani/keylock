@@ -11,9 +11,6 @@ public partial class Userauthentication
 
     public string Email { get; set; } = null!;
 
-    /// <summary>
-    /// Hashed password (bcrypt/Argon2)
-    /// </summary>
     public string PasswordHash { get; set; } = null!;
 
     public string Status { get; set; } = null!;

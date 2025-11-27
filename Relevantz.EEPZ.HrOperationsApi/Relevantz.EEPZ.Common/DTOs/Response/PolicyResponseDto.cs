@@ -15,20 +15,15 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public int ViolationsCount { get; set; }
-
-    // Document fields - 
     public string? DocumentUrl { get; set; }
     public string? DocumentName { get; set; }
     public string? DocumentType { get; set; }
     public long? DocumentSize { get; set; }
     public string? DocumentSizeFormatted { get; set; }
     public DateTime? DocumentUploadedAt { get; set; }
-
-    // Publish fields 
     public bool IsPublished { get; set; }
     public DateTime? PublishedAt { get; set; }
     public int? PublishedBy { get; set; }
     public string? PublishedByEmail { get; set; }
 }
-
 }

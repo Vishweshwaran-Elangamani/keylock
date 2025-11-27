@@ -314,8 +314,6 @@ namespace Relevantz.EEPZ.Data.Repository
             await _context.SaveChangesAsync();
         }
 
-        // ==================== PROJECT-BASED METHODS ====================
-
         /// <summary>
         /// Get Manager (L2) from employee's primary project
         /// Uses Project.L2approverEmployeeId → converts to UserId
@@ -326,7 +324,6 @@ namespace Relevantz.EEPZ.Data.Repository
             {
                 Console.WriteLine($"[Repository] GetManagerFromProject - EmployeeUserId: {employeeUserId}");
 
-                // Get employee's EmployeeId from Userauthentication
                 var employeeAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(u => u.UserId == employeeUserId);
 
@@ -349,7 +346,7 @@ namespace Relevantz.EEPZ.Data.Repository
                     return null;
                 }
 
-                // ✅ CHANGED: Get L2 approver (which is the Manager in new flow)
+                // Get L2 approver (which is the Manager in new flow)
                 if (primaryProject.Project.L2approverEmployeeId == null)
                 {
                     Console.WriteLine($"[Repository] No L2approver (Manager) set in project {primaryProject.ProjectId}");
@@ -409,7 +406,7 @@ namespace Relevantz.EEPZ.Data.Repository
                     return null;
                 }
 
-                // ✅ CHANGED: Get ResourceOwner (which is the DeptHead)
+                // Get ResourceOwner (which is the DeptHead)
                 if (primaryProject.Project.ResourceOwnerEmployeeId == null)
                 {
                     Console.WriteLine($"[Repository] No ResourceOwner (DeptHead) set in project {primaryProject.ProjectId}");

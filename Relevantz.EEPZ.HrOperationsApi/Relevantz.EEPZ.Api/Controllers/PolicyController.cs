@@ -10,7 +10,6 @@ namespace Relevantz.EEPZ.Api.Controllers
 {
    [ApiController]
     [Route("api/[controller]")]
-    //[Authorize] //  JWT authentication enabled for all endpoints
     public class PolicyController : ControllerBase
     {
         private readonly IPolicyService _policyService;
@@ -237,14 +236,11 @@ namespace Relevantz.EEPZ.Api.Controllers
                     // Generate unique filename
                     var uniqueFileName = $"{Guid.NewGuid()}{extension}";
                     var filePath = Path.Combine(uploadsPath, uniqueFileName);
- 
-                    // Save file
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await file.CopyToAsync(stream);
                     }
- 
-                    //  FIX: Return FULL URL (not relative path)
+
                     var baseUrl = $"{Request.Scheme}://{Request.Host}";
                     var fileUrl = $"{baseUrl}/uploads/policies/{uniqueFileName}";
                     var fileName = file.FileName;
@@ -257,7 +253,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                         message = "File uploaded successfully",
                         data = new
                         {
-                            documentUrl = fileUrl, //  FULL URL
+                            documentUrl = fileUrl, 
                             documentName = fileName,
                             documentSize = file.Length,
                             documentSizeFormatted = FormatFileSize(file.Length),
@@ -265,8 +261,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                         }
                     });
                 }
- 
-                //  Handle External Link
+
                 else if (documentType == "link")
                 {
                     if (string.IsNullOrEmpty(documentUrl))
@@ -274,8 +269,7 @@ namespace Relevantz.EEPZ.Api.Controllers
  
                     if (string.IsNullOrEmpty(documentName))
                         return BadRequest(new { success = false, message = "Document name is required" });
- 
-                    // Validate URL format
+
                     if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
                         return BadRequest(new { success = false, message = "Invalid URL format" });
  
@@ -364,8 +358,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while deleting policy" });
             }
         }
- 
-        // Helper method
+        
         private string FormatFileSize(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB" };

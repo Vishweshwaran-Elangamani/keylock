@@ -19,8 +19,6 @@ namespace Relevantz.EEPZ.Api.Controllers
             _logger = logger;
         }
  
-        //  Get all PUBLISHED policies (ALL authenticated users can view)
-        // Accessible by: Employee, Manager, Department Head, Leadership (NOT HR - they use their own endpoints)
         [HttpGet("published")]
         public async Task<IActionResult> GetPublishedPolicies()
         {
@@ -43,9 +41,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "Failed to fetch policies" });
             }
         }
- 
-        //  Get single policy details (ALL authenticated users can view if published)
-        // Accessible by: Employee, Manager, Department Head, Leadership
+
         [HttpGet("{policyId}")]
         public async Task<IActionResult> GetPolicyById(int policyId)
         {
@@ -64,7 +60,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                     return NotFound(response);
                 }
  
-                //  IMPORTANT: Only return if published
+                // Only return if published
                 if (!response.Data.IsPublished)
                 {
                     _logger.LogWarning($" Policy {policyId} is not published. Access denied for user {userId}");
