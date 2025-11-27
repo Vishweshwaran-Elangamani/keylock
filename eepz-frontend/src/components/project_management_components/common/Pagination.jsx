@@ -47,11 +47,19 @@ const Pagination = ({
         <ul className="pagination pagination-sm mb-0">
           <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
             <button
-              className="page-link"
+              className="page-link d-flex align-items-center justify-content-center"
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1}
+              style={{
+                width: "32px",
+                height: "32px",
+                padding: 0,
+                border: "1px solid #dee2e6",
+                borderRadius: "6px",
+              }}
+              aria-label="Previous page"
             >
-              <ChevronLeft size={14} />
+              <ChevronLeft size={16} />
             </button>
           </li>
           {getPageNumbers().map((page, index) =>
@@ -67,6 +75,11 @@ const Pagination = ({
                 <button
                   className="page-link"
                   onClick={() => onPageChange(page)}
+                  style={{
+                    minWidth: "32px",
+                    height: "32px",
+                    borderRadius: "6px",
+                  }}
                 >
                   {page}
                 </button>
@@ -79,11 +92,19 @@ const Pagination = ({
             }`}
           >
             <button
-              className="page-link"
+              className="page-link d-flex align-items-center justify-content-center"
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
+              style={{
+                width: "32px",
+                height: "32px",
+                padding: 0,
+                border: "1px solid #dee2e6",
+                borderRadius: "6px",
+              }}
+              aria-label="Next page"
             >
-              <ChevronRight size={14} />
+              <ChevronRight size={16} />
             </button>
           </li>
         </ul>

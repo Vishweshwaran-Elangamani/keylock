@@ -1,57 +1,156 @@
 /* ========================================
-   HR MOM Dashboard - Complete Styling
+   HR MOM Dashboard - Compact Styling with Rounded Tables
    ======================================== */
 
-/* Stat Cards with Borders */
+/* Container */
+.mom-dashboard-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 1rem;
+}
+
+.mom-dashboard-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header */
+.mom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.mom-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.mom-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.813rem !important;
+  border-radius: 6px !important;
+}
+
+/* Breadcrumb */
+.mom-breadcrumb {
+  margin-bottom: 0;
+}
+
+.mom-breadcrumb .breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.mom-breadcrumb .breadcrumb-item {
+  font-size: 0.813rem;
+}
+
+.mom-breadcrumb .breadcrumb-item a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.mom-breadcrumb .breadcrumb-item a:hover {
+  color: #27235c;
+}
+
+.mom-breadcrumb .breadcrumb-item.active {
+  color: #1e293b;
+}
+
+/* Stat Cards - Compact */
 .mom-stat-card {
-  border: 1.5px solid #a21caf !important;
-  border-radius: 12px !important;
+  border: 2px solid #27235c !important;
+  border-radius: 10px !important;
   box-shadow: none !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   cursor: pointer !important;
 }
 
 .mom-stat-card:hover {
-  box-shadow: 0 4px 12px 0 rgba(163, 21, 175, 0.13) !important;
-  transform: translateY(-2px) !important;
+  box-shadow: 0 3px 10px 0 rgba(162, 28, 175, 0.12) !important;
+  transform: translateY(-1px) !important;
 }
 
-/* Filter Card */
-.mom-filter-card {
-  border: 1.5px solid #a21caf !important;
-  border-radius: 12px !important;
-  box-shadow: none !important;
+.mom-stat-card .card-body {
+  padding: 0.875rem !important;
 }
 
-/* Table Card */
+.mom-stat-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+
+.mom-stat-icon {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.mom-stat-info {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.mom-stat-value {
+  color: #1e293b !important;
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.mom-stat-label {
+  font-size: 0.75rem !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.025em !important;
+}
+
+/* Table Card - Rounded */
 .mom-table-card {
   border: none !important;
   border-radius: 12px !important;
   overflow: hidden !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Pagination Card */
-.mom-pagination-card {
-  border: none !important;
-  border-radius: 12px !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+/* Table Wrapper */
+.mom-table-wrapper {
+  overflow: hidden;
+  border-radius: 12px;
 }
 
-/* Table Styling */
+/* Table - Rounded Corners */
 .mom-table {
   margin-bottom: 0 !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
+  font-size: 0.813rem !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
 }
 
-/* Table Header - Purple Theme */
+/* Table Header - Rounded Top Corners */
 .mom-table thead {
   background-color: #27235c !important;
   color: white !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 10 !important;
 }
 
 .mom-table thead th {
@@ -59,39 +158,57 @@
   color: white !important;
   border: none !important;
   font-weight: 600 !important;
-  font-size: 0.875rem !important;
-  padding: 14px 16px !important;
+  font-size: 1rem !important;
+  padding: 0.75rem 0.875rem !important;
   vertical-align: middle !important;
   text-align: left !important;
   white-space: nowrap !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
+  text-transform: uppercase;
+}
+
+/* Rounded corners for header cells */
+.mom-table thead tr:first-child th:first-child {
+  border-top-left-radius: 12px !important;
+}
+
+.mom-table thead tr:first-child th:last-child {
+  border-top-right-radius: 12px !important;
 }
 
 /* Center align specific headers */
-.mom-table thead th:nth-child(4), /* Participants */
-.mom-table thead th:nth-child(5), /* Topics */
-.mom-table thead th:nth-child(6), /* Actions */
-.mom-table thead th:last-child {  /* View */
+.mom-table thead th:nth-child(4),
+.mom-table thead th:nth-child(5),
+.mom-table thead th:nth-child(6),
+.mom-table thead th:last-child {
   text-align: center !important;
 }
 
-/* Table Body Cells */
+/* Table Body Cells - Compact */
 .mom-table tbody td {
-  padding: 14px 16px !important;
+  padding: 0.75rem 0.875rem !important;
   vertical-align: middle !important;
   border-top: 1px solid #e9ecef !important;
   border-bottom: none !important;
-  font-size: 0.875rem !important;
+  font-size: 0.813rem !important;
   color: #1e293b !important;
   text-align: left !important;
+  background-color: white !important;
+}
+
+/* Rounded corners for last row body cells */
+.mom-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 12px !important;
+}
+
+.mom-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 12px !important;
 }
 
 /* Center align specific body columns */
-.mom-table tbody td:nth-child(4), /* Participants */
-.mom-table tbody td:nth-child(5), /* Topics */
-.mom-table tbody td:nth-child(6), /* Actions */
-.mom-table tbody td:last-child {  /* View */
+.mom-table tbody td:nth-child(4),
+.mom-table tbody td:nth-child(5),
+.mom-table tbody td:nth-child(6),
+.mom-table tbody td:last-child {
   text-align: center !important;
 }
 
@@ -109,55 +226,65 @@
   background-color: rgba(39, 35, 92, 0.04) !important;
 }
 
-/* Meeting Title */
-.mom-meeting-title {
-  font-size: 0.938rem !important;
-  color: #1e293b !important;
-  font-weight: 600 !important;
-  margin-bottom: 8px !important;
+.mom-table tbody tr:hover td {
+  background-color: rgba(39, 35, 92, 0.04) !important;
 }
 
-/* Badge Styling */
-.mom-badge {
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
-  padding: 0.35rem 0.75rem !important;
-  border-radius: 6px !important;
-}
-
-/* Stat Icon Container */
-.mom-stat-icon {
-  width: 56px !important;
-  height: 56px !important;
-  border-radius: 12px !important;
+/* Table Icon - Compact */
+.mom-table-icon {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 8px !important;
+  background-color: #e0f2fe !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0 !important;
 }
 
-/* Count Badge in Table */
+/* Meeting Title - Compact */
+.mom-meeting-title {
+  font-size: 0.875rem !important;
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.375rem !important;
+  line-height: 1.3 !important;
+}
+
+/* Badge - Compact */
+.mom-badge {
+  font-size: 0.688rem !important;
+  font-weight: 600 !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 4px !important;
+}
+
+/* Count Badge - Compact */
 .mom-count-badge {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  padding: 8px 16px !important;
-  border-radius: 8px !important;
+  gap: 0.375rem !important;
+  padding: 0.375rem 0.625rem !important;
+  border-radius: 6px !important;
   background-color: #f1f5f9 !important;
   font-weight: 600 !important;
   color: #1e293b !important;
+  font-size: 0.813rem !important;
 }
 
-/* View Button */
+/* View Button - Compact */
 .mom-view-btn {
   background-color: #27235c !important;
   color: white !important;
   border: none !important;
-  border-radius: 8px !important;
-  padding: 8px 16px !important;
-  font-size: 0.875rem !important;
+  border-radius: 6px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.813rem !important;
   font-weight: 600 !important;
   transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
 }
 
 .mom-view-btn:hover {
@@ -166,32 +293,16 @@
   transform: translateY(-1px) !important;
 }
 
-/* Empty State */
+/* Empty State - Compact */
 .mom-empty-state {
-  padding: 3rem 1.5rem !important;
+  padding: 2rem 1rem !important;
   text-align: center !important;
 }
 
-/* Filter Inputs */
-.mom-filter-input,
-.mom-filter-select {
-  border-radius: 8px !important;
-  border-color: #e2e8f0 !important;
-  font-size: 0.875rem !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-}
-
-.mom-filter-input:focus,
-.mom-filter-select:focus {
-  border-color: #27235c !important;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1) !important;
-  outline: none !important;
-}
-
-/* Submitted By Cell */
+/* Submitter Avatar - Compact */
 .mom-submitter-avatar {
-  width: 36px !important;
-  height: 36px !important;
+  width: 32px !important;
+  height: 32px !important;
   border-radius: 50% !important;
   background-color: #e0e7ff !important;
   display: flex !important;
@@ -201,39 +312,110 @@
 }
 
 .mom-submitter-name {
-  font-size: 0.875rem !important;
+  font-size: 0.813rem !important;
   color: #1e293b !important;
   font-weight: 500 !important;
   margin-bottom: 2px !important;
+  line-height: 1.2 !important;
 }
 
 .mom-submitter-role {
+  font-size: 0.688rem !important;
+  color: #64748b !important;
+}
+
+/* Meeting Date - Compact */
+.mom-meeting-date {
   font-size: 0.75rem !important;
   color: #64748b !important;
 }
 
-/* Meeting Date */
-.mom-meeting-date {
-  font-size: 0.813rem !important;
-  color: #64748b !important;
+/* Pagination Card - Compact & Rounded */
+.mom-pagination-card {
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Responsive */
+.mom-pagination-card .card-body {
+  padding: 0.625rem !important;
+}
+
+/* Pagination Buttons - Compact */
+.mom-page-btn {
+  min-width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.813rem !important;
+  border: 1px solid #dee2e6 !important;
+  background: white !important;
+  color: #1e293b !important;
+  transition: all 0.2s !important;
+}
+
+.mom-page-btn:hover:not(:disabled) {
+  background-color: #f8f9fa !important;
+  border-color: #27235c !important;
+}
+
+.page-item.active .mom-page-btn {
+  background-color: #27235c !important;
+  border-color: #27235c !important;
+  color: white !important;
+}
+
+.page-item.disabled .mom-page-btn {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+/* Responsive - Compact */
 @media (max-width: 768px) {
+  .mom-dashboard-container {
+    padding: 0.75rem;
+  }
+
+  .mom-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .mom-table thead th,
   .mom-table tbody td {
-    padding: 0.75rem 1rem !important;
-    font-size: 0.813rem !important;
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.75rem !important;
   }
 
   .mom-stat-icon {
-    width: 48px !important;
-    height: 48px !important;
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .mom-stat-value {
+    font-size: 1.5rem !important;
+  }
+
+  .mom-stat-label {
+    font-size: 0.688rem !important;
   }
 }
 
 @media (max-width: 992px) {
+  .mom-table-wrapper {
+    overflow-x: auto;
+  }
+
   .mom-table {
-    min-width: 1000px !important;
+    min-width: 900px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .mom-stat-content {
+    gap: 0.5rem !important;
   }
 }

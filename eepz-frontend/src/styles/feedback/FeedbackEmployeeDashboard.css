@@ -91,7 +91,7 @@
 }
 
 .fm-empdb-stat-card__label {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: #64748b;
   font-weight: 600;
   text-transform: uppercase;
@@ -228,7 +228,7 @@
 }
 
 .fm-empdb-action-card__label {
-  font-size: 0.813rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #0f172a;
   text-align: center;

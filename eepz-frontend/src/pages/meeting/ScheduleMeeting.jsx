@@ -458,51 +458,7 @@ const ScheduleMeeting = () => {
               </div>
             </div>
 
-            {/* Additional Options */}
-            <div className="card bg-light border-0 shadow-sm mb-4 rounded-3">
-              <div className="card-body py-4">
-                <div className="row g-4">
-                  <div className="col-md-6">
-                    <div className="form-check text-start d-flex align-items-center" style={{ minHeight: 48 }}>
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="sendCalendarInvite"
-                        id="sendCalendarInvite"
-                        checked={formData.sendCalendarInvite}
-                        onChange={handleInputChange}
-                        style={{ width: 18, height: 18 }}
-                      />
-                      <label
-                        className="form-check-label d-flex align-items-center gap-2"
-                        htmlFor="sendCalendarInvite"
-                        style={{ fontSize: "1rem", marginLeft: 8 }}
-                      >
-                        <Send size={20} /> Send calendar invite to participants
-                      </label>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold d-flex align-items-center gap-2 mb-2 text-start">
-                      <Bell size={20} /> Reminder
-                    </label>
-                    <select
-                      name="reminder"
-                      value={formData.reminder}
-                      onChange={handleInputChange}
-                      className="form-select"
-                      style={{ fontSize: "1rem", padding: "0.6rem 0.75rem" }}
-                    >
-                      <option value="0">None</option>
-                      <option value="1">1 day before</option>
-                      <option value="2">2 days before</option>
-                      <option value="7">1 week before</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            
             {/* Action Buttons */}
             <div className="d-flex gap-3 justify-content-end">
               <button

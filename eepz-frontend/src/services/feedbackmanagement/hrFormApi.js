@@ -2,7 +2,7 @@
  
 import api from "./http";
  
-const hrFormApi = {
+export const hrFormApi = {
   // ============== FORMS ENDPOINTS ==============
  
   /**

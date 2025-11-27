@@ -385,10 +385,6 @@ const HRSLADashboard = () => {
                 <Filter size={16} />
                 Clear
               </button>
-              <button className="btn btn-outline-success hr-sla-btn-export" onClick={handleExport} disabled={filteredSlas.length === 0}>
-                <Download size={16} />
-                Export
-              </button>
               <button className="btn btn-primary hr-sla-btn-create" onClick={() => setShowCreateModal(true)}>
                 <Plus size={16} />
                 Create SLA

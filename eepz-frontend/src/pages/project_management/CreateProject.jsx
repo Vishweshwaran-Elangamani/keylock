@@ -350,17 +350,7 @@ const CreateProject = () => {
         </ol>
       </nav>
 
-      {/* Header */}
-      <div className="prj-page-header">
-        <div className="prj-header-left">
-          
-          <FolderPlus size={36} className="prj-header-icon" />
-          <div className="prj-header-text">
-            <h2 className="prj-page-title">Create New Project</h2>
-            <p className="prj-page-subtitle">Initialize new project with details</p>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Alert Messages */}
       {submitStatus && (

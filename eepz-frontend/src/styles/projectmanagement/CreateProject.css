@@ -507,7 +507,7 @@
    ======================================== */
 
 .prj-modal-header {
-  background: #4A4669;
+  background: #27235C;
   color: #ffffff;
   padding: 1.25rem 1.5rem;
   display: flex;
@@ -551,7 +551,7 @@
 
 .prj-modal-tabs {
   display: flex;
-  background: #4A4669;
+  background: #27235C;
   padding: 0 1.5rem;
 }
 
@@ -834,13 +834,13 @@
 }
 
 .prj-btn-cancel {
-  background: #ffffff;
-  color: #6c757d;
+  background: #5f656b;
+  color: white;
   border: 1px solid #dee2e6;
 }
 
 .prj-btn-cancel:hover {
-  background: #f8f9fa;
+  background: #4a4b4b;
   border-color: #adb5bd;
 }
 

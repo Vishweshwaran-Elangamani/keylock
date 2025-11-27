@@ -261,8 +261,6 @@
   flex-direction: column;
   gap: 1.2rem;
 }
-.fb-hr-peer-feedback-list__col {
-}
 
 .fb-hr-peer-feedback-card {
   background: #fafbfc;

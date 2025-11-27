@@ -24,54 +24,32 @@ import {
   employeeApi,
   mentorFeedbackApi,
 } from "../../services/feedbackmanagement/feedbackApi";
+import "../../styles/feedback/FeedbackEmployeeDashboard.css";
+import  Breadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb"
+
+// Helper function to get role-based feedback dashboard path
+const getFeedbackDashboardPath = (roleName) => {
+  const routes = {
+    Employee: "/employee/dashboard/feedback",
+    Manager: "/manager/dashboard/feedback",
+    DepartmentHead: "/depthead/dashboard/feedback",
+    "Department Head": "/depthead/dashboard/feedback",
+    HR: "/hr/dashboard/feedback",
+  };
+  return routes[roleName] || "/hr/dashboard/feedback";
+};
 
 const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
-  <div
-    className="card border-0 h-100"
-    style={{
-      borderRadius: "10px",
-      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-      transition: "all 0.3s ease",
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "translateY(-2px)";
-      e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.12)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
-    }}
-  >
+  <div className="fm-empdb-stat-card">
     <div
-      className="card-body d-flex flex-column align-items-center justify-content-center text-center"
-      style={{ padding: "1.25rem 1rem" }}
+      className="fm-empdb-stat-card__icon-wrapper"
+      style={{ backgroundColor: bgColor }}
     >
-      <div
-        style={{
-          width: "56px",
-          height: "56px",
-          backgroundColor: bgColor,
-          borderRadius: "12px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "0.875rem",
-        }}
-      >
-        <Icon size={28} color={iconColor} strokeWidth={2.5} />
-      </div>
-      <h2
-        className="fw-bold mb-2"
-        style={{ fontSize: "2rem", color: "#0f172a", lineHeight: 1 }}
-      >
-        {value}
-      </h2>
-      <p
-        className="mb-0"
-        style={{ fontSize: "0.875rem", color: "#64748b", fontWeight: 600 }}
-      >
-        {label}
-      </p>
+      <Icon size={28} color={iconColor} strokeWidth={2.5} />
+    </div>
+    <div>
+      <h2 className="fm-empdb-stat-card__value fw-bold mb-2">{value}</h2>
+      <p className="fm-empdb-stat-card__label mb-0">{label}</p>
     </div>
   </div>
 );
@@ -118,7 +96,8 @@ export default function FeedbackEmployeeDashboard() {
 
         if (isSme) {
           try {
-            const feedbackResponse = await mentorFeedbackApi.getAboutMe(empId);
+            // FIXED: Changed from getAboutMe to aboutMe
+            const feedbackResponse = await mentorFeedbackApi.aboutMe(empId);
             const feedbackData = Array.isArray(feedbackResponse?.data)
               ? feedbackResponse.data
               : feedbackResponse?.data?.data || [];
@@ -165,33 +144,62 @@ export default function FeedbackEmployeeDashboard() {
         console.warn("Error fetching employee map:", err.message);
       }
 
-      // Fetch active HR forms
+      // FIXED: Changed from getActiveForms to listActive
       try {
-        const activeRes = await hrFormApi.getActiveForms();
+        const activeRes = await hrFormApi.listActive();
         const formsData = activeRes?.data || [];
         setActiveHrForms(Array.isArray(formsData) ? formsData : []);
       } catch (err) {
         console.warn("Error fetching active forms:", err.message);
+        setActiveHrForms([]);
       }
 
-      // Fetch submitted forms
+      // FIXED: Get submitted forms by getting all forms and filtering responses
       try {
-        const submittedRes = await hrFormApi.getResponsesByEmployee(empId);
-        const responsesData = submittedRes?.data || [];
-        setSubmittedForms(Array.isArray(responsesData) ? responsesData : []);
+        const allFormsRes = await hrFormApi.listForms();
+        const allForms = Array.isArray(allFormsRes?.data)
+          ? allFormsRes.data
+          : allFormsRes?.data?.data || [];
+
+        let allMyResponses = [];
+        
+        // Get responses for each form and filter by employee
+        for (const form of allForms) {
+          try {
+            const responsesRes = await hrFormApi.byForm(form.formId);
+            const responses = Array.isArray(responsesRes?.data)
+              ? responsesRes.data
+              : responsesRes?.data?.data || [];
+
+            // Filter responses for this employee
+            const myResponses = responses.filter(
+              (r) => Number(r.employeeId) === Number(empId)
+            );
+            allMyResponses = [...allMyResponses, ...myResponses];
+          } catch (err) {
+            console.warn(
+              `Error fetching responses for form ${form.formId}:`,
+              err.message
+            );
+          }
+        }
+
+        setSubmittedForms(allMyResponses);
       } catch (err) {
         console.warn("Error fetching submitted forms:", err.message);
+        setSubmittedForms([]);
       }
 
-      // Fetch my reviews
+      // FIXED: Changed from getByTargetEmployee to getForTarget
       try {
-        const reviewRes = await managerReviewApi.getByTargetEmployee(empId);
+        const reviewRes = await managerReviewApi.getForTarget(empId);
         const reviewsData = Array.isArray(reviewRes?.data)
           ? reviewRes.data
           : reviewRes?.data?.data || [];
         setMyReviews(reviewsData);
       } catch (err) {
         console.warn("Error fetching my reviews:", err.message);
+        setMyReviews([]);
       }
 
       // Fetch peer feedback
@@ -214,6 +222,7 @@ export default function FeedbackEmployeeDashboard() {
         }
       } catch (err) {
         console.warn("Error fetching peer feedback:", err.message);
+        setMyPeerFeedback([]);
       }
     } catch (err) {
       console.error("Error:", err);
@@ -278,10 +287,7 @@ export default function FeedbackEmployeeDashboard() {
   // Loading state
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
+      <div className="d-flex justify-content-center align-items-center fm-empdb-loading">
         <div
           className="spinner-border text-primary"
           role="status"
@@ -293,48 +299,38 @@ export default function FeedbackEmployeeDashboard() {
     );
   }
 
-  return (
-    <div
-      style={{
-        padding: "1.25rem 1.75rem",
-        maxWidth: "100%",
-        minHeight: "100vh",
-        backgroundColor: "#f8f9fa",
-      }}
-    >
-      
+    // Get role-based dashboard path
+  const feedbackDashboardPath = user?.roleName 
+    ? getFeedbackDashboardPath(user.roleName) 
+    : "/hr/dashboard/feedback";
 
+
+  return (
+    <div className="fm-empdb-page-wrapper">
+      {/* ========== BREADCRUMB ========== */}
+        <Breadcrumb
+          items={[
+            { label: "Feedback Management", path: feedbackDashboardPath },
+            { label: "Employee" },
+          ]}
+        />
       {/* Error Alert */}
       {error && (
-        <div
-          className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-          style={{
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#fee2e2",
-            padding: "0.75rem 1rem",
-          }}
-        >
+        <div className="alert fm-empdb-error d-flex align-items-start gap-2 mb-3">
           <AlertTriangle
             size={16}
-            className="flex-shrink-0"
-            style={{ marginTop: "2px", color: "#dc2626" }}
+            className="flex-shrink-0 fm-empdb-error__icon"
           />
           <div className="flex-grow-1">
-            <p
-              className="mb-0"
-              style={{ fontSize: "0.875rem", color: "#991b1b" }}
-            >
-              {error}
-            </p>
+            <p className="mb-0 fm-empdb-error__text">{error}</p>
           </div>
           <button
             type="button"
-            className="btn-close"
-            style={{ fontSize: "0.75rem" }}
+            className="btn-close fm-empdb-error__close"
             onClick={() => setError("")}
           />
         </div>
+        
       )}
 
       {/* Stats Cards */}
@@ -347,81 +343,27 @@ export default function FeedbackEmployeeDashboard() {
       </div>
 
       {/* Centered Rounded Toggle Navigation */}
-      <div
-        className="d-flex justify-content-center align-items-center mb-3"
-        style={{ width: "100%" }}
-      >
-        <div
-          className="toggle-tabs d-inline-flex"
-          style={{
-            backgroundColor: "#27235c",
-            borderRadius: "50px",
-            padding: "6px",
-            boxShadow: "0 4px 12px rgba(39, 35, 92, 0.2)",
-          }}
-        >
+      <div className="d-flex justify-content-center align-items-center mb-3 fm-empdb-toggle-nav-wrapper">
+        <div className="d-inline-flex fm-empdb-toggle-nav">
           <button
-            className={`toggle-tab ${activeTab === "overview" ? "active" : ""}`}
+            className={`fm-empdb-toggle-tab ${
+              activeTab === "overview" ? "fm-empdb-toggle-tab--active" : ""
+            }`}
             onClick={() => setActiveTab("overview")}
-            style={{
-              border: "none",
-              backgroundColor:
-                activeTab === "overview" ? "#ffffff" : "transparent",
-              color: activeTab === "overview" ? "#27235c" : "#ffffff",
-              padding: "12px 32px",
-              borderRadius: "50px",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              whiteSpace: "nowrap",
-            }}
           >
             <Zap size={16} />
             Quick Actions
           </button>
           <button
-            className={`toggle-tab ${
-              activeTab === "peer-feedback" ? "active" : ""
+            className={`fm-empdb-toggle-tab ${
+              activeTab === "peer-feedback" ? "fm-empdb-toggle-tab--active" : ""
             }`}
             onClick={() => setActiveTab("peer-feedback")}
-            style={{
-              border: "none",
-              backgroundColor:
-                activeTab === "peer-feedback" ? "#ffffff" : "transparent",
-              color: activeTab === "peer-feedback" ? "#27235c" : "#ffffff",
-              padding: "12px 32px",
-              borderRadius: "50px",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              whiteSpace: "nowrap",
-              position: "relative",
-            }}
           >
             <Users size={16} />
             Peer Feedback
             {myPeerFeedback.length > 0 && (
-              <span
-                style={{
-                  backgroundColor:
-                    activeTab === "peer-feedback" ? "#dc2626" : "#ef4444",
-                  color: "#ffffff",
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  padding: "2px 8px",
-                  borderRadius: "12px",
-                  minWidth: "20px",
-                  textAlign: "center",
-                }}
-              >
+              <span className="fm-empdb-toggle-tab__badge">
                 {myPeerFeedback.length}
               </span>
             )}
@@ -430,14 +372,7 @@ export default function FeedbackEmployeeDashboard() {
       </div>
 
       {/* Content Area */}
-      <div
-        style={{
-          backgroundColor: "#fff",
-          borderRadius: "10px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-          padding: "1.5rem",
-        }}
-      >
+      <div className="fm-empdb-content">
         {/* Overview Tab - Quick Actions */}
         {activeTab === "overview" && (
           <div className="row g-3">
@@ -445,56 +380,15 @@ export default function FeedbackEmployeeDashboard() {
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/submit-mentor"
-                className="action-card"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "1.25rem 1rem",
-                  backgroundColor: "#fff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  textDecoration: "none",
-                  transition: "all 0.2s ease",
-                  minHeight: "100px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f8fafc";
-                  e.currentTarget.style.borderColor = "#0f62fe";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(15, 98, 254, 0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#fff";
-                  e.currentTarget.style.borderColor = "#e2e8f0";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="fm-empdb-action-card"
               >
-                <div
-                  className="mb-2"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#dbeafe",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Send size={20} style={{ color: "#0f62fe" }} />
+                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
+                  <Send
+                    size={20}
+                    className="fm-empdb-action-card__icon--primary"
+                  />
                 </div>
-                <span
-                  style={{
-                    fontSize: "0.813rem",
-                    fontWeight: 600,
-                    color: "#0f172a",
-                    textAlign: "center",
-                  }}
-                >
+                <span className="fm-empdb-action-card__label">
                   Mentor Feedback
                 </span>
               </Link>
@@ -504,56 +398,15 @@ export default function FeedbackEmployeeDashboard() {
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/contextfeedback"
-                className="action-card"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "1.25rem 1rem",
-                  backgroundColor: "#fff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  textDecoration: "none",
-                  transition: "all 0.2s ease",
-                  minHeight: "100px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f8fafc";
-                  e.currentTarget.style.borderColor = "#0f62fe";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(15, 98, 254, 0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#fff";
-                  e.currentTarget.style.borderColor = "#e2e8f0";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="fm-empdb-action-card"
               >
-                <div
-                  className="mb-2"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#dbeafe",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <MessageSquare size={20} style={{ color: "#0f62fe" }} />
+                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
+                  <MessageSquare
+                    size={20}
+                    className="fm-empdb-action-card__icon--primary"
+                  />
                 </div>
-                <span
-                  style={{
-                    fontSize: "0.813rem",
-                    fontWeight: 600,
-                    color: "#0f172a",
-                    textAlign: "center",
-                  }}
-                >
+                <span className="fm-empdb-action-card__label">
                   Context Feedback
                 </span>
               </Link>
@@ -563,56 +416,15 @@ export default function FeedbackEmployeeDashboard() {
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/assignedform"
-                className="action-card"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "1.25rem 1rem",
-                  backgroundColor: "#fff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  textDecoration: "none",
-                  transition: "all 0.2s ease",
-                  minHeight: "100px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f8fafc";
-                  e.currentTarget.style.borderColor = "#0f62fe";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(15, 98, 254, 0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#fff";
-                  e.currentTarget.style.borderColor = "#e2e8f0";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="fm-empdb-action-card"
               >
-                <div
-                  className="mb-2"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#dbeafe",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Eye size={20} style={{ color: "#0f62fe" }} />
+                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--primary mb-2">
+                  <Eye
+                    size={20}
+                    className="fm-empdb-action-card__icon--primary"
+                  />
                 </div>
-                <span
-                  style={{
-                    fontSize: "0.813rem",
-                    fontWeight: 600,
-                    color: "#0f172a",
-                    textAlign: "center",
-                  }}
-                >
+                <span className="fm-empdb-action-card__label">
                   Assigned Forms
                 </span>
               </Link>
@@ -622,56 +434,15 @@ export default function FeedbackEmployeeDashboard() {
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/submit-peer"
-                className="action-card"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "1.25rem 1rem",
-                  backgroundColor: "#fff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  textDecoration: "none",
-                  transition: "all 0.2s ease",
-                  minHeight: "100px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f8f0ff";
-                  e.currentTarget.style.borderColor = "#9d4edd";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(157, 78, 221, 0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#fff";
-                  e.currentTarget.style.borderColor = "#e2e8f0";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="fm-empdb-action-card fm-empdb-action-card--peer"
               >
-                <div
-                  className="mb-2"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#f8f0ff",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Users size={20} style={{ color: "#9d4edd" }} />
+                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--peer mb-2">
+                  <Users
+                    size={20}
+                    className="fm-empdb-action-card__icon--peer"
+                  />
                 </div>
-                <span
-                  style={{
-                    fontSize: "0.813rem",
-                    fontWeight: 600,
-                    color: "#0f172a",
-                    textAlign: "center",
-                  }}
-                >
+                <span className="fm-empdb-action-card__label">
                   Peer Feedback Received
                 </span>
               </Link>
@@ -681,56 +452,15 @@ export default function FeedbackEmployeeDashboard() {
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/submissions"
-                className="action-card"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "1.25rem 1rem",
-                  backgroundColor: "#fff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  textDecoration: "none",
-                  transition: "all 0.2s ease",
-                  minHeight: "100px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f8fafc";
-                  e.currentTarget.style.borderColor = "#64748b";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(100, 116, 139, 0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#fff";
-                  e.currentTarget.style.borderColor = "#e2e8f0";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="fm-empdb-action-card fm-empdb-action-card--submissions"
               >
-                <div
-                  className="mb-2"
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#f1f5f9",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <Search size={20} style={{ color: "#64748b" }} />
+                <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--submissions mb-2">
+                  <Search
+                    size={20}
+                    className="fm-empdb-action-card__icon--submissions"
+                  />
                 </div>
-                <span
-                  style={{
-                    fontSize: "0.813rem",
-                    fontWeight: 600,
-                    color: "#0f172a",
-                    textAlign: "center",
-                  }}
-                >
+                <span className="fm-empdb-action-card__label">
                   My Submissions
                 </span>
               </Link>
@@ -741,75 +471,19 @@ export default function FeedbackEmployeeDashboard() {
               <div className="col-md-4 col-6">
                 <Link
                   to="/employee/dashboard/feedback/mentor"
-                  className="action-card"
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "1.25rem 1rem",
-                    backgroundColor: "#fff",
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "8px",
-                    textDecoration: "none",
-                    transition: "all 0.2s ease",
-                    minHeight: "100px",
-                    position: "relative",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#fef3c7";
-                    e.currentTarget.style.borderColor = "#f59e0b";
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(245, 158, 11, 0.15)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "#fff";
-                    e.currentTarget.style.borderColor = "#e2e8f0";
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
+                  className="fm-empdb-action-card fm-empdb-action-card--sme"
                 >
-                  <div
-                    className="mb-2"
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: "#fef3c7",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <Award size={20} style={{ color: "#f59e0b" }} />
+                  <div className="fm-empdb-action-card__icon-wrapper fm-empdb-action-card__icon-wrapper--sme mb-2">
+                    <Award
+                      size={20}
+                      className="fm-empdb-action-card__icon--sme"
+                    />
                   </div>
-                  <span
-                    style={{
-                      fontSize: "0.813rem",
-                      fontWeight: 600,
-                      color: "#0f172a",
-                      textAlign: "center",
-                    }}
-                  >
+                  <span className="fm-empdb-action-card__label">
                     SME Dashboard
                   </span>
                   {mentorFeedbackCount > 0 && (
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: "8px",
-                        right: "8px",
-                        backgroundColor: "#dc2626",
-                        color: "#fff",
-                        fontSize: "0.65rem",
-                        fontWeight: 700,
-                        borderRadius: "12px",
-                        padding: "2px 6px",
-                        minWidth: "20px",
-                        textAlign: "center",
-                      }}
-                    >
+                    <span className="fm-empdb-action-card__badge">
                       {mentorFeedbackCount}
                     </span>
                   )}
@@ -822,27 +496,17 @@ export default function FeedbackEmployeeDashboard() {
         {/* Peer Feedback Tab */}
         {activeTab === "peer-feedback" && (
           <div>
-            <h5
-              className="fw-bold mb-4"
-              style={{ color: "#0f172a", fontSize: "1.125rem" }}
-            >
+            <h5 className="fw-bold mb-4 fm-empdb-peer-title">
               All Peer Feedback ({myPeerFeedback.length})
             </h5>
 
             {myPeerFeedback.length === 0 ? (
               <div className="text-center py-5">
-                <Users
-                  size={56}
-                  style={{ color: "#cbd5e1", opacity: 0.5 }}
-                  className="mb-3"
-                />
-                <h6
-                  className="fw-bold mb-2"
-                  style={{ color: "#64748b", fontSize: "1.125rem" }}
-                >
+                <Users size={56} className="mb-3 fm-empdb-peer-empty__icon" />
+                <h6 className="fw-bold mb-2 fm-empdb-peer-empty__title">
                   No peer feedback yet
                 </h6>
-                <p className="text-muted mb-0" style={{ fontSize: "0.875rem" }}>
+                <p className="text-muted mb-0 fm-empdb-peer-empty__subtitle">
                   You haven't received any peer feedback yet
                 </p>
               </div>
@@ -853,25 +517,14 @@ export default function FeedbackEmployeeDashboard() {
                     className="col-12"
                     key={feedback.peerQueueId || feedback.contextFeedbackId}
                   >
-                    <div
-                      className="card border-0"
-                      style={{
-                        border: "1px solid #e2e8f0",
-                        borderRadius: "8px",
-                      }}
-                    >
-                      <div className="card-body" style={{ padding: "1rem" }}>
+                    <div className="card border-0 fm-empdb-peer-card">
+                      <div className="card-body fm-empdb-peer-card__body">
                         <div className="d-flex justify-content-between align-items-start mb-3">
                           <div>
-                            <h6
-                              className="fw-bold mb-1"
-                              style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                            >
+                            <h6 className="fw-bold mb-1 fm-empdb-peer-card__name">
                               {feedback.submittedByName}
                             </h6>
-                            <small
-                              style={{ fontSize: "0.75rem", color: "#64748b" }}
-                            >
+                            <small className="fm-empdb-peer-card__date">
                               {feedback.submittedDate
                                 ? new Date(
                                     feedback.submittedDate
@@ -881,28 +534,11 @@ export default function FeedbackEmployeeDashboard() {
                                   ).toLocaleDateString()}
                             </small>
                           </div>
-                          <span
-                            className="badge"
-                            style={{
-                              backgroundColor: "#f8f0ff",
-                              color: "#9d4edd",
-                              padding: "4px 10px",
-                              fontSize: "0.75rem",
-                              borderRadius: "6px",
-                              fontWeight: 600,
-                            }}
-                          >
+                          <span className="badge fm-empdb-peer-card__badge">
                             Peer Feedback
                           </span>
                         </div>
-                        <p
-                          className="mb-0"
-                          style={{
-                            lineHeight: "1.6",
-                            color: "#475569",
-                            fontSize: "0.875rem",
-                          }}
-                        >
+                        <p className="mb-0 fm-empdb-peer-card__text">
                           {feedback.feedbackContent ||
                             feedback.comment ||
                             feedback.feedbackComment ||
@@ -917,19 +553,6 @@ export default function FeedbackEmployeeDashboard() {
           </div>
         )}
       </div>
-
-      <style>{`
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .toggle-tabs button:hover {
-          opacity: 0.95;
-        }
-        
-        .toggle-tabs button:active {
-          transform: scale(0.97);
-        }
-      `}</style>
     </div>
   );
 }

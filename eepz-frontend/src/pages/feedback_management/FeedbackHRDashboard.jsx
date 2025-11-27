@@ -22,168 +22,40 @@ import { Link } from "react-router-dom";
 import {
   peerQueueApi,
   employeeApi,
-  hrFormApi,
   managerReviewApi,
 } from "../../services/feedbackmanagement/feedbackApi";
+import { hrFormApi } from "../../services/feedbackmanagement/hrFormApi";
 import FeedbackBreadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
+import "../../styles/feedback/FeedbackHRDashboard.css";
 
 const StatCard = ({ label, value, Icon, color, bgColor }) => (
-  <div
-    style={{
-      background: "white",
-      border: "none",
-      borderRadius: "12px",
-      padding: "1.5rem",
-      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-      transition: "all 0.3s ease",
-      height: "100%",
-    }}
-  >
-    <div className="d-flex align-items-start justify-content-between">
-      <div
-        style={{
-          width: "56px",
-          height: "56px",
-          borderRadius: "12px",
-          background: bgColor,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
+  <div className="fb-hr-stat-card">
+    <div className="fb-hr-stat-card__row">
+      <div className="fb-hr-stat-card__icon" style={{ background: bgColor }}>
         <Icon size={28} style={{ color }} />
       </div>
-      <div className="text-end">
-        <h2
-          className="fw-bold mb-0"
-          style={{
-            color: "#1F2937",
-            fontSize: "2rem",
-            lineHeight: 1,
-          }}
-        >
-          {value}
-        </h2>
-        <p
-          className="mb-0 mt-2"
-          style={{
-            fontSize: "0.813rem",
-            color: "#6B7280",
-            fontWeight: 500,
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-          }}
-        >
-          {label}
-        </p>
+      <div>
+        <h2 className="fb-hr-stat-card__value">{value}</h2>
+        <p className="fb-hr-stat-card__label">{label}</p>
       </div>
     </div>
   </div>
 );
 
 const HeroActionCard = ({ title, description, icon: Icon, to, iconBg, iconColor }) => (
-  <Link
-    to={to}
-    style={{
-      textDecoration: "none",
-      display: "block",
-      height: "100%",
-    }}
-  >
-    <div
-      style={{
-        background: "white",
-        border: "1.5px solid #E5E7EB",
-        borderRadius: "12px",
-        padding: "1.5rem",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-        transition: "all 0.3s ease",
-        height: "100%",
-        cursor: "pointer",
-        position: "relative",
-        overflow: "hidden",
-        minHeight: "180px",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.12)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)";
-      }}
-    >
-      {/* Background Pattern */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-30%",
-          right: "-15%",
-          width: "140px",
-          height: "140px",
-          background: "rgba(0,0,0,0.02)",
-          borderRadius: "50%",
-          zIndex: 0,
-        }}
-      />
-
-      <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Icon */}
-        <div
-          style={{
-            width: "48px",
-            height: "48px",
-            borderRadius: "12px",
-            background: iconBg,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "1rem",
-          }}
-        >
+  <Link to={to} style={{ textDecoration: "none", display: "block", height: "100%" }}>
+    <div className="fb-hr-action-card">
+      <div className="fb-hr-action-card__main">
+        <div className="fb-hr-action-card__icon" style={{ background: iconBg }}>
           <Icon size={24} style={{ color: iconColor }} />
         </div>
 
-        {/* Content */}
-        <h5
-          className="fw-bold mb-2"
-          style={{
-            color: "#1F2937",
-            fontSize: "1rem",
-          }}
-        >
-          {title}
-        </h5>
-        <p
-          className="mb-2"
-          style={{
-            color: "#6B7280",
-            fontSize: "0.813rem",
-            lineHeight: "1.5",
-          }}
-        >
-          {description}
-        </p>
+        <h5 className="fb-hr-action-card__title">{title}</h5>
+        <p className="fb-hr-action-card__desc">{description}</p>
 
-        {/* Arrow */}
-        <div className="d-flex align-items-center gap-2 mt-3">
-          <span
-            style={{
-              color: "#97247E",
-              fontSize: "0.813rem",
-              fontWeight: 600,
-            }}
-          >
-            Get Started
-          </span>
-          <ArrowRight
-            size={14}
-            style={{
-              color: "#97247E",
-              transition: "transform 0.3s",
-            }}
-          />
+        <div className="fb-hr-action-card__arrow">
+          <span>Get Started</span>
+          <ArrowRight size={14} />
         </div>
       </div>
     </div>
@@ -390,20 +262,8 @@ export default function FeedbackHRDashboard() {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div
-          className="spinner-border"
-          style={{
-            width: "3rem",
-            height: "3rem",
-            color: "#97247E",
-            borderWidth: "3px",
-          }}
-          role="status"
-        >
+      <div className="fb-hr-loading">
+        <div className="fb-hr-spinner" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
@@ -411,70 +271,55 @@ export default function FeedbackHRDashboard() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#F9FAFB",
-        padding: "1.5rem",
-      }}
-    >
-      <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+    <div className="fb-hr-dashboard">
+      <div className="fb-hr-dashboard__container">
         {/* Breadcrumb */}
         <FeedbackBreadcrumb items={[{ label: "Feedback Management" }]} />
 
         {/* Error Alert */}
         {error && (
-          <div
-            className="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2 mb-4"
-            role="alert"
-            style={{ borderRadius: "12px", border: "none" }}
-          >
-            <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
-            <div className="flex-grow-1">
+          <div className="fb-hr-alert" role="alert">
+            <div className="fb-hr-alert__icon">
+              <AlertTriangle size={18} />
+            </div>
+            <div className="fb-hr-alert__main">
               <strong>Error</strong>
-              <p className="mb-0 small mt-1">{error}</p>
+              <p style={{ margin: "0.3rem 0 0 0", fontSize: "0.95rem" }}>{error}</p>
             </div>
             <button
               type="button"
-              className="btn-close"
+              className="fb-hr-alert__close-btn"
               onClick={() => setError("")}
-            />
+              aria-label="Close"
+            >
+              <XCircle size={18} />
+            </button>
           </div>
         )}
 
         {/* Stats Cards */}
-        <div className="row g-3 mb-4">
+        <div className="fb-hr-stat-cards-row">
           {stats.map((s, idx) => (
-            <div key={idx} className="col-6 col-md-3">
+            <div key={idx} className="fb-hr-stat-cards-row__col">
               <StatCard {...s} />
             </div>
           ))}
         </div>
 
         {/* Hero Section Title */}
-        <div className="text-center mb-4">
-          <div className="d-flex align-items-center justify-content-center gap-2 mb-2">
-            <Zap size={28} style={{ color: "#97247E" }} />
-            <h3 className="mb-0 fw-bold" style={{ color: "#1F2937", fontSize: "1.5rem" }}>
-              Quick Actions
-            </h3>
+        <div className="fb-hr-hero-title">
+          <div className="fb-hr-hero-title__row">
+            <Zap size={28} className="fb-hr-hero-title__icon" />
+            <h3 className="fb-hr-hero-title__main">Quick Actions</h3>
           </div>
-          <p
-            style={{
-              color: "#6B7280",
-              fontSize: "0.938rem",
-              maxWidth: "600px",
-              margin: "0 auto",
-            }}
-          >
+          <p className="fb-hr-hero-title__desc">
             Manage feedback, create forms, and streamline your HR operations
           </p>
         </div>
 
-        {/* Hero Action Cards - 3 Cards in One Row */}
-        <div className="row g-3 mb-4">
-          {/* All Feedback Card */}
-          <div className="col-12 col-md-4">
+        {/* Hero Action Cards */}
+        <div className="fb-hr-action-cards-row">
+          <div>
             <HeroActionCard
               title="View All Feedback"
               description="Browse, search, and manage all feedback submissions from employees."
@@ -485,8 +330,7 @@ export default function FeedbackHRDashboard() {
             />
           </div>
 
-          {/* Create Form Card */}
-          <div className="col-12 col-md-4">
+          <div>
             <HeroActionCard
               title="Create New Form"
               description="Design and publish custom feedback forms for performance reviews."
@@ -497,8 +341,7 @@ export default function FeedbackHRDashboard() {
             />
           </div>
 
-          {/* Mentor Feedback Card */}
-          <div className="col-12 col-md-4">
+          <div>
             <HeroActionCard
               title="Submit Mentor Feedback"
               description="Provide valuable feedback and guidance to mentees and team members."
@@ -512,96 +355,47 @@ export default function FeedbackHRDashboard() {
 
         {/* Peer Feedback Section */}
         {myPeerFeedback.length > 0 && (
-          <div
-            style={{
-              background: "white",
-              borderRadius: "12px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-              padding: "1.5rem",
-              marginTop: "1.5rem",
-            }}
-          >
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <div style={{ textAlign: "left" }}>
-                <h5 className="fw-bold mb-1" style={{ color: "#1F2937", textAlign: "left" }}>
-                  Peer Feedback Received
-                </h5>
-                <p className="mb-0" style={{ color: "#6B7280", fontSize: "0.875rem", textAlign: "left" }}>
+          <div className="fb-hr-peer">
+            <div className="fb-hr-peer__row">
+              <div>
+                <h5 className="fb-hr-peer__title">Peer Feedback Received</h5>
+                <p className="fb-hr-peer__desc">
                   {myPeerFeedback.length} feedback{myPeerFeedback.length !== 1 ? "s" : ""} from your colleagues
                 </p>
               </div>
             </div>
 
-            <div className="row g-3">
+            <div className="fb-hr-peer-feedback-list">
               {myPeerFeedback.map((feedbackItem) => (
                 <div
-                  className="col-12"
+                  className="fb-hr-peer-feedback-list__col"
                   key={feedbackItem.peerQueueId || feedbackItem.contextFeedbackId}
                 >
-                  <div
-                    style={{
-                      background: "#FAFBFC",
-                      border: "1px solid #E5E7EB",
-                      borderLeft: "4px solid #27235C",
-                      borderRadius: "10px",
-                      padding: "1.25rem",
-                      transition: "all 0.2s",
-                      textAlign: "left",
-                    }}
-                  >
-                    <div className="d-flex justify-content-between align-items-start mb-2">
-                      <div style={{ textAlign: "left", flex: 1 }}>
-                        <h6
-                          className="fw-bold mb-1"
-                          style={{ color: "#1F2937", fontSize: "0.938rem", textAlign: "left" }}
-                        >
+                  <div className="fb-hr-peer-feedback-card">
+                    <div className="fb-hr-peer-feedback-card__row">
+                      <div>
+                        <h6 className="fb-hr-peer-feedback-card__name">
                           {feedbackItem.submittedByName}
                         </h6>
-                        <small style={{ color: "#6B7280", fontSize: "0.813rem", textAlign: "left", display: "block" }}>
+                        <small className="fb-hr-peer-feedback-card__date">
                           {feedbackItem.submittedDate
-                            ? new Date(
-                                feedbackItem.submittedDate
-                              ).toLocaleDateString("en-US", {
+                            ? new Date(feedbackItem.submittedDate).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
                               })
-                            : new Date(
-                                feedbackItem.createdAt
-                              ).toLocaleDateString("en-US", {
+                            : new Date(feedbackItem.createdAt).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
                               })}
                         </small>
                       </div>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          backgroundColor: "#F3E8FF",
-                          color: "#8B5CF6",
-                          padding: "6px 12px",
-                          fontSize: "0.688rem",
-                          fontWeight: 700,
-                          borderRadius: "6px",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.5px",
-                          flexShrink: 0,
-                          marginLeft: "1rem",
-                        }}
-                      >
+                      <span className="fb-hr-peer-feedback-card__badge">
                         Peer Feedback
                       </span>
                     </div>
-                    <p
-                      className="mb-0"
-                      style={{
-                        lineHeight: "1.6",
-                        color: "#374151",
-                        fontSize: "0.875rem",
-                        textAlign: "left",
-                      }}
-                    >
+                    <p className="fb-hr-peer-feedback-card__text">
                       {feedbackItem.feedbackContent ||
                         feedbackItem.comment ||
                         feedbackItem.feedbackComment ||
@@ -614,22 +408,6 @@ export default function FeedbackHRDashboard() {
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        
-        .btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        }
-        
-        .btn:active {
-          transform: translateY(0);
-        }
-      `}</style>
     </div>
   );
 }

@@ -791,7 +791,7 @@ const ProjectList = () => {
                               >
                                 {project.projectName}
                               </div>
-                              <small className="prj-list-engagement-type">{project.engagementModel || 'N/A'}</small>
+                             
                             </div>
                           </td>
                           <td className="py-3">

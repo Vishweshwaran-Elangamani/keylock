@@ -10,8 +10,20 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import hrFormApi from "../../../services/feedbackmanagement/hrFormApi";
-import Breadcrumb from "../../../components/sla/common/Breadcrumbs";
+import Breadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
 import "../../../styles/feedback/EmployeeAssignedForms.css";
+
+// Helper function to get role-based feedback dashboard path
+const getFeedbackDashboardPath = (roleName) => {
+  const routes = {
+    Employee: "/employee/dashboard/feedback",
+    Manager: "/manager/dashboard/feedback",
+    DepartmentHead: "/depthead/dashboard/feedback",
+    "Department Head": "/depthead/dashboard/feedback",
+    HR: "/hr/dashboard/feedback",
+  };
+  return routes[roleName] || "/hr/dashboard/feedback";
+};
 
 export default function EmployeeAssignedForms() {
   const user = useMemo(
@@ -123,9 +135,20 @@ export default function EmployeeAssignedForms() {
     fetchSubmittedForms();
   }, [fetchForms, fetchSubmittedForms]);
 
+   // Get role-based dashboard path
+  const feedbackDashboardPath = user?.roleName 
+    ? getFeedbackDashboardPath(user.roleName) 
+    : "/hr/dashboard/feedback";
+
+
   return (
     <div className="employee-forms-container">
-      <Breadcrumb items={[{ label: "Assigned Forms" }]} />
+       <Breadcrumb
+          items={[
+            { label: "Feedback Management", path: feedbackDashboardPath },
+            { label: "Assigned Forms" },
+          ]}
+        />
 
       {/* Error Alert */}
       {error && (
