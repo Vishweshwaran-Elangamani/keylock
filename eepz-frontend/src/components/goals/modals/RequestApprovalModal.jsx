@@ -186,12 +186,12 @@ const RequestApprovalModal = ({
       const successMessage = isClosure
         ? "Goal closed successfully!"
         : isReactivation
-        ? "Goal reactivated successfully!"
-        : isReopening
-        ? "Extension request submitted successfully!"
-        : isLeadershipOrgCompletion
-        ? "Goal marked as completed!"
-        : "Request submitted successfully!";
+          ? "Goal reactivated successfully!"
+          : isReopening
+            ? "Extension request submitted successfully!"
+            : isLeadershipOrgCompletion
+              ? "Goal marked as completed!"
+              : "Request submitted successfully!";
 
       setAlert({ type: "success", message: successMessage });
 
@@ -385,9 +385,8 @@ const RequestApprovalModal = ({
                   {!proofFile ? (
                     <div
                       style={{
-                        border: `2px dashed ${
-                          isDragActive ? theme.color : "#dee2e6"
-                        }`,
+                        border: `2px dashed ${isDragActive ? theme.color : "#dee2e6"
+                          }`,
                         borderRadius: "1rem",
                         padding: "3rem 1.5rem",
                         textAlign: "center",
@@ -489,46 +488,62 @@ const RequestApprovalModal = ({
                         display: "flex",
                         alignItems: "center",
                         gap: "1rem",
+                        justifyContent: "space-between"
                       }}
                     >
-                      <div
-                        style={{
-                          width: "60px",
-                          height: "60px",
-                          borderRadius: "0.75rem",
-                          background: "rgb(39, 35, 92)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
-                        }}
-                      >
-                        <i
-                          className="bi bi-file-earmark-check-fill"
-                          style={{ fontSize: "1.75rem", color: "white" }}
-                        ></i>
-                      </div>
-                      <div className="flex-1">
+
+                      {/* Left section: Icon + File details */}
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+
                         <div
                           style={{
-                            fontWeight: 600,
-                            fontSize: "1rem",
-                            color: "black",
-                            marginBottom: "0.25rem",
+                            width: "60px",
+                            height: "60px",
+                            borderRadius: "0.75rem",
+                            background: "rgb(39, 35, 92)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
                           }}
                         >
-                          {proofFile.name}
+                          <i
+                            className="bi bi-file-earmark-check-fill"
+                            style={{ fontSize: "1.75rem", color: "white" }}
+                          ></i>
                         </div>
-                        <div
-                          style={{
-                            fontSize: "0.85rem",
-                            color: "black",
-                            textAlign: "left",
-                          }}
-                        >
-                          {(proofFile.size / 1024).toFixed(2)} KB
+                        <div className="flex-1">
+                          <div
+                            style={{
+                              fontWeight: 600,
+                              fontSize: "1rem",
+                              textAlign: "left",
+                              color: "black",
+                              marginBottom: "0.25rem",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              maxWidth: "200px"
+                            }}
+                          >
+                            {proofFile.name.length > 20
+                              ? proofFile.name.substring(0, 30) + "..."
+                              : proofFile.name}
+                          </div>
+
+                          <div
+                            style={{
+                              fontSize: "0.85rem",
+                              color: "black",
+                              textAlign: "left",
+                            }}
+                          >
+                            {(proofFile.size / 1024).toFixed(2)} KB
+                          </div>
                         </div>
                       </div>
+
+                      {/* Right section: Delete button */}
                       <button
                         type="button"
                         className="btn btn-outline-danger btn-sm"
@@ -537,7 +552,6 @@ const RequestApprovalModal = ({
                         style={{
                           borderRadius: "0.5rem",
                           padding: "0.5rem 1rem",
-                          marginLeft: "300px",
                         }}
                       >
                         <i className="bi bi-trash-fill"></i>
@@ -611,12 +625,12 @@ const RequestApprovalModal = ({
                   {isClosure
                     ? "Closing..."
                     : isReactivation
-                    ? "Reactivating..."
-                    : isReopening
-                    ? "Submitting..."
-                    : isLeadershipOrgCompletion
-                    ? "Completing..."
-                    : "Submitting..."}
+                      ? "Reactivating..."
+                      : isReopening
+                        ? "Submitting..."
+                        : isLeadershipOrgCompletion
+                          ? "Completing..."
+                          : "Submitting..."}
                 </>
               ) : (
                 <>
