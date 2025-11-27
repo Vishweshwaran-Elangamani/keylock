@@ -5,50 +5,50 @@ using System.ComponentModel.DataAnnotations;
 namespace Relevantz.EEPZ.Common.DTOs.Request
 {
     /// <summary>
-    /// Request DTO for creating feedback (US032, US033, US036, US037, US039)
+    /// Request DTO for creating feedback
     /// </summary>
     public class CreateFeedbackRequestDto
     {
         [Required(ErrorMessage = "FeedbackType is required")]
         public string FeedbackType { get; set; }
-        // Values: GoalBased, ProjectBased, PeerFeedback, MentorFeedback, HRForm, OrganizationalGoal, BiasReview
+        
 
         public int? SubmittedByEmployeeId { get; set; }
-        // NULL if anonymous feedback
+       
 
         [Required(ErrorMessage = "RecipientEmployeeId is required")]
         public int RecipientEmployeeId { get; set; }
-        // Who receives the feedback
+        
 
         public int? RelatedGoalId { get; set; }
-        // For US032: Goal-based feedback
+        
 
         public int? RelatedProjectId { get; set; }
-        // For US032: Project-based feedback
+        
 
         public int? RelatedMentorId { get; set; }
-        // For US037: Mentor feedback
+        
 
         public int? RelatedOrganizationGoalId { get; set; }
-        // For US047, US049: Organization goal feedback
+        
 
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int? Rating { get; set; }
-        // 1-5 scale rating
+        
 
         [MaxLength(2000, ErrorMessage = "Comments cannot exceed 2000 characters")]
         public string Comments { get; set; }
-        // Optional end comments
+        
 
         public bool IsAnonymous { get; set; } = false;
-        // For US036: Anonymous feedback flag
+        
 
-        // Question responses
+        
         public List<FeedbackQuestionResponseRequestDto> QuestionResponses { get; set; } = new();
     }
 
     /// <summary>
-    /// Request DTO for updating feedback (US038)
+    /// Request DTO for updating feedback
     /// </summary>
     public class UpdateFeedbackRequestDto
     {
@@ -62,7 +62,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     }
 
     /// <summary>
-    /// Request DTO for individual question response (Part of CreateFeedbackRequestDto)
+    /// Request DTO for individual question response
     /// </summary>
     public class FeedbackQuestionResponseRequestDto
     {
@@ -70,20 +70,20 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int QuestionId { get; set; }
 
         public int? RatingValue { get; set; }
-        // For Rating type questions: 1-5
+      
 
         public bool? BooleanValue { get; set; }
-        // For Boolean type questions: True/False
+   
 
         public string TextValue { get; set; }
-        // For Text type questions: Free text
+  
 
         public List<int> SelectedOptions { get; set; }
-        // For Checkbox/MultipleChoice: Array of selected values
+     
     }
 
     /// <summary>
-    /// Request DTO for Manager Review Comments (US048, US050, US051)
+    /// Request DTO for Manager Review Comments
     /// </summary>
     public class CreateManagerReviewRequestDto
     {
@@ -94,10 +94,10 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int TargetEmployeeId { get; set; }
 
         public int? TargetGoalId { get; set; }
-        // For goal-specific reviews (US048)
+      
 
         public int? TargetOrganizationGoalId { get; set; }
-        // For org goal reviews (US049)
+  
 
         [Required(ErrorMessage = "Rating is required")]
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
@@ -108,52 +108,49 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     }
 
     /// <summary>
-    /// Request DTO for Mentor Feedback (US037, US121)
+    /// Request DTO for Mentor Feedback
     /// </summary>
     public class CreateMentorFeedbackRequestDto
     {
         [Required]
         public int SmeId { get; set; }
-        // Links to SME table (mentor + skill combo)
+       
 
         [Required]
         public int MentorEmployeeId { get; set; }
-        // The mentor's Employee ID
+  
 
         [Required]
         public int MenteeEmployeeId { get; set; }
-        // Person receiving mentorship
+   
 
         [Required]
         public int SkillIdReference { get; set; }
-        // Which skill is being mentored
+     
 
         [Required]
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]
         public int Rating { get; set; }
-        // Mentor effectiveness rating
+ 
 
         [MaxLength(2000)]
         public string FeedbackComments { get; set; }
 
         [Required]
         public int SubmittedByEmployeeId { get; set; }
-        // Who submitted (mentee, HR, or manager)
+   
 
         [Required]
         public string FeedbackFrom { get; set; }
-        // Values: Mentee, HR, Manager
+
 
         public bool IsAnonymous { get; set; } = false;
     }
 
-    /// <summary>
-    /// Request DTO for Organization Goal Feedback (US047, US049)
-    /// </summary>`
 
 
     /// <summary>
-    /// Request DTO for Peer Feedback (US033, US075)
+    /// Request DTO for Peer Feedback
     /// </summary>
     public class CreatePeerFeedbackRequestDto
     {
@@ -171,7 +168,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     }
 
     /// <summary>
-    /// Request DTO for HR Peer Feedback Approval (US115, US116)
+    /// Request DTO for HR Peer Feedback Approval
     /// </summary>
     public class ApprovePeerFeedbackRequestDto
     {
@@ -180,14 +177,14 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [Required]
         public bool IsProfessional { get; set; }
-        // Is feedback professional?
+
 
         [Required]
         public bool IsRelevant { get; set; }
-        // Is feedback relevant?
+
 
         public bool Approve { get; set; } = true;
-        // True = Approve, False = Reject
+
     }
 
     /// <summary>
@@ -204,7 +201,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [Required]
         public string FormType { get; set; }
-        // Values: GeneralFeedback, BiasReview, ProfessionalismReview, PerformanceReview
+        
 
         [Required]
         public int CreatedByHRId { get; set; }
@@ -215,7 +212,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     }
 
     /// <summary>
-    /// Request DTO for HR Form Response Submission (US039)
+    /// Request DTO for HR Form Response Submission
     /// </summary>
     public class SubmitHRFormResponseRequestDto
     {
@@ -231,7 +228,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
     }
 
     /// <summary>
-    /// Request DTO for updating manager review (US050)
+    /// Request DTO for updating manager review
     /// </summary>
     public class UpdateManagerReviewRequestDto
     {
@@ -283,7 +280,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
      public class CreateGoalFeedbackRequestDto
     {
         [Required]
-        public int GoalId { get; set; }  // ✅ Changed from OrganizationObjectiveId
+        public int GoalId { get; set; } 
 
         [Required]
         public int SubmittedByEmployeeId { get; set; }
@@ -315,14 +312,8 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string Status { get; set; }
     }
 
-    // ============================================================================
-// ORGANIZATION GOAL FEEDBACK REQUEST DTOs
-// ============================================================================
 
-/// <summary>
-/// Request DTO for creating organization goal feedback
-/// Uses Feedback table with RelatedGoalId filtered by Goal.GoalType
-/// </summary>
+
 public class CreateOrgGoalFeedbackRequestDto
 {
     [Required(ErrorMessage = "GoalId is required")]
@@ -333,7 +324,7 @@ public class CreateOrgGoalFeedbackRequestDto
 
     [Required(ErrorMessage = "RecipientEmployeeId is required")]
     public int RecipientEmployeeId { get; set; }
-    // Manager, Department Head, or HR who receives the feedback
+    
 
     [Required(ErrorMessage = "Rating is required")]
     [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5")]

@@ -16,7 +16,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [Required]
         public int EmployeeId { get; set; }
 
-        // New field to indicate if this is the primary project for the employee
+      
         public bool IsPrimary { get; set; }
     }
 }

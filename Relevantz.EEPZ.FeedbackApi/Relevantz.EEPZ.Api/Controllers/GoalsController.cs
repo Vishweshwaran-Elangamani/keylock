@@ -46,14 +46,13 @@ namespace eepzbackend.Controllers
                     .Include(g => g.Project)
                     .ToListAsync();
 
-                // Segregate goals by type - Team vs Organization Level
                 var teamGoals = allGoals
-                    .Where(g => g.Project != null) // Goals linked to projects are team goals
+                    .Where(g => g.Project != null)
                     .Select(MapToProjectGoalResponse)
                     .ToList();
 
                 var orgLevelGoals = allGoals
-                    .Where(g => g.Project == null) // Goals without project are organization level
+                    .Where(g => g.Project == null) 
                     .Select(MapToProjectGoalResponse)
                     .ToList();
 
@@ -274,41 +273,6 @@ namespace eepzbackend.Controllers
                 DepartmentName = employee.Department?.DepartmentName
             };
         }
-
-
-        /// <summary>
-        /// Employee Basic Information
-        /// </summary>
-    //Chnage Arul Naveen
-    // public class EmployeeBasicInfo
-        // {
-        //     [JsonPropertyName("employeeMasterId")]
-        //     public int EmployeeMasterId { get; set; }
-
-        //     [JsonPropertyName("employeeId")]
-        //     public int EmployeeId { get; set; }
-
-        //     [JsonPropertyName("employeeCompanyId")]
-        //     public string EmployeeCompanyId { get; set; }
-
-        //     [JsonPropertyName("firstName")]
-        //     public string FirstName { get; set; }
-
-        //     [JsonPropertyName("lastName")]
-        //     public string LastName { get; set; }
-
-        //     [JsonPropertyName("email")]
-        //     public string Email { get; set; }
-
-        //     [JsonPropertyName("roleName")]
-        //     public string RoleName { get; set; }
-
-        //     [JsonPropertyName("departmentName")]
-        //     public string DepartmentName { get; set; }
-        // }
-
-
-
 
         /// <summary>
         /// Generic API Response wrapper for all endpoints

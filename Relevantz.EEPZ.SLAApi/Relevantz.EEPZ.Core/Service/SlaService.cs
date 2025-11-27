@@ -92,7 +92,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 var escalations = await _slaRepository.GetEscalationsBySlaIdAsync(request.Slaid);
                 var escalation = escalations.FirstOrDefault();
 
-                // ✅ EMAIL: Send acknowledgment to employee
+                // EMAIL: Send acknowledgment to employee
                 var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
                 var employeeName = GetEmployeeName(sla.Employee);
                
@@ -107,7 +107,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     _logger.LogInformation("Escalation acknowledgment email sent to {Email}", employeeEmail);
                 }
 
-                // ✅ EMAIL: Notify Manager of escalation
+                //  EMAIL: Notify Manager of escalation
                 var manager = sla.AssignedToEmployee;
                 var managerEmail = manager?.Userprofile?.PersonalEmail;
                
@@ -157,7 +157,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 var reviews = await _slaRepository.GetReviewTrackingByReviewerIdAsync(managerId);
 
-                // ✅ Only return OPEN reviews (exclude Closed)
+                // Only return OPEN reviews (exclude Closed)
                 var filtered = reviews.Where(r => r.Status != "Closed").ToList();
 
                 var responses = filtered.Select(r => new TeamReviewTrackingResponse
@@ -245,7 +245,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 DateTime newDeadline = DateTime.Now.AddDays(request.ExtensionDays);
 
-                // ✅ EMAIL: Notify employee of SLA reopen
+                // EMAIL: Notify employee of SLA reopen
                 var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
                 var employeeName = GetEmployeeName(sla.Employee);
                
@@ -304,7 +304,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var created = await _slaRepository.CreateEscalationAsync(escalation);
 
-                // ✅ EMAIL: Notify Dept Head of escalation
+                // EMAIL: Notify Dept Head of escalation
                 var deptHead = await _slaRepository.GetEmployeeByIdAsync(request.EscalatedToEmployeeId ?? 0);
                 var deptHeadEmail = deptHead?.Userprofile?.PersonalEmail;
                 var manager = sla.AssignedToEmployee;
@@ -464,7 +464,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error in CalculateCompliance");
+                _logger.LogError(ex, "Error in CalculateCompliance");
                 return new ApiResponse<DepartmentComplianceResponse>
                 {
                     Success = false,
@@ -484,20 +484,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Slatype = s.Slatype ?? string.Empty,
                     Status = s.Status ?? string.Empty,
 
-                    // ✅ Employee info
+                    //  Employee info
                     EmployeeId = s.EmployeeId,
                     EmployeeName = GetEmployeeName(s.Employee),
                     EmployeeEmail = s.Employee?.Userprofile?.PersonalEmail ?? string.Empty,
 
-                    // ✅ Department
+                    // Department
                     DepartmentId = s.DepartmentId,
                     DepartmentName = s.Department?.DepartmentName ?? string.Empty,
 
-                    // ✅ Assigned to
+                    // Assigned to
                     AssignedToEmployeeId = s.AssignedToEmployeeId,
                     AssignedToName = GetEmployeeName(s.AssignedToEmployee),
 
-                    // ✅ Dates & Status
+                    // Dates & Status
                     Deadline = s.Deadline,
                     ClosedAt = s.ClosedAt,
                     ComplianceStatus = s.ComplianceStatus ?? string.Empty,
@@ -507,7 +507,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     ReopenExtensionDays = s.ReopenExtensionDays,
                     ReopenReason = s.ReopenReason,
 
-                    // ✅ Timestamps
+                    // Timestamps
                     CreatedAt = s.CreatedAt ?? DateTime.MinValue,
                     UpdatedAt = s.UpdatedAt ?? DateTime.MinValue
                 }).ToList();
@@ -526,7 +526,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
 {
     try
     {
-        // ✅ FIX: Fetch employee to get their reporting manager
+        //  FIX: Fetch employee to get their reporting manager
         var employee = await _slaRepository.GetEmployeeByIdAsync(request.EmployeeId);
         if (employee == null)
         {
@@ -537,7 +537,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
             };
         }
 
-        // ✅ FIX: Get the reporting manager ID from the employee record
+        // FIX: Get the reporting manager ID from the employee record
         int? reportingManagerId = employee.ReportingManagerEmployeeId;
        
         if (reportingManagerId == null || reportingManagerId == 0)
@@ -560,7 +560,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
         {
             Slatype = request.Slatype,
             EmployeeId = request.EmployeeId,
-            AssignedToEmployeeId = reportingManagerId.Value, // ✅ FIXED: Use reporting manager
+            AssignedToEmployeeId = reportingManagerId.Value, 
             DepartmentId = request.DepartmentId,
             Deadline = request.Deadline,
             Status = "Open",
@@ -573,7 +573,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
 
         var created = await _slaRepository.CreateSlaAsync(sla);
 
-        // ✅ EMAIL: Notify employee of new SLA assignment
+        //EMAIL: Notify employee of new SLA assignment
         var employeeEmail = employee.Userprofile?.PersonalEmail;
         var employeeName = GetEmployeeName(employee);
 
@@ -652,39 +652,39 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
                         Slatype = sla.Slatype ?? string.Empty,
                         Status = sla.Status ?? string.Empty,
 
-                        // ✅ Employee info
+                        // Employee info
                         EmployeeId = sla.EmployeeId,
                         EmployeeName = employeeName,
                         EmployeeEmail = sla.Employee?.Userprofile?.PersonalEmail ?? string.Empty,
 
-                        // ✅ Department info
+                        // Department info
                         DepartmentId = sla.DepartmentId,
                         DepartmentName = departmentName,
 
-                        // ✅ Assigned to info
+                        // Assigned to info
                         AssignedToEmployeeId = sla.AssignedToEmployeeId,
                         AssignedToName = GetEmployeeName(sla.AssignedToEmployee),
 
-                        // ✅ SLA details
+                        // SLA details
                         Deadline = sla.Deadline,
                         ClosedAt = sla.ClosedAt,
                         ComplianceStatus = sla.ComplianceStatus ?? string.Empty,
 
-                        // ✅ Reopen info
+                        // Reopen info
                         ReopenedAt = sla.ReopenedAt,
                         ReopenExtensionDays = sla.ReopenExtensionDays,
                         ReopenReason = sla.ReopenReason,
 
-                        // ✅ Related entity
+                        // Related entity
                         RelatedEntityType = sla.RelatedEntityType,
                         RelatedEntityId = sla.RelatedEntityId,
 
-                        // ✅ Calculated fields
+                        // Calculated fields
                         UrgencyStatus = sla.Status == "Closed" ? "Completed" :
                                        (sla.Deadline < DateTime.Now) ? "Overdue" : "OnTrack",
                         DaysUntilDeadline = (int)(sla.Deadline - DateTime.Now).TotalDays,
 
-                        // ✅ Timestamps
+                        // Timestamps
                         CreatedAt = sla.CreatedAt ?? DateTime.MinValue,
                         UpdatedAt = sla.UpdatedAt ?? DateTime.MinValue
                     }
@@ -712,16 +712,16 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
                     Reason = e.Reason,
                     SubmittedAt = e.SubmittedAt,
 
-                    // ✅ Submitted by
+                    //  Submitted by
                     SubmittedByName = GetEmployeeName(e.SubmittedByEmployee),
                     SubmittedByEmployeeId = e.SubmittedByEmployeeId,
                     EmployeeEmail = e.SubmittedByEmployee?.Userprofile?.PersonalEmail ?? string.Empty,
 
-                    // ✅ Escalated to
+                    //  Escalated to
                     EscalatedToName = GetEmployeeName(e.EscalatedToEmployee),
                     EscalatedToEmployeeId = e.EscalatedToEmployeeId,
 
-                    // ✅ Resolved by
+                    // Resolved by
                     ResolvedByName = GetEmployeeName(e.ResolvedByEmployee),
                     ResolvedByEmployeeId = e.ResolvedByEmployeeId,
 
@@ -753,7 +753,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
                 if (!result)
                     return new ApiResponse<string> { Success = false, Message = "Failed to close SLA" };
 
-                // ✅ EMAIL: Notify employee of SLA completion
+                // EMAIL: Notify employee of SLA completion
                 var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
                 var employeeName = GetEmployeeName(sla.Employee);
 
@@ -793,7 +793,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
 
                 await _slaRepository.UpdateEscalationAsync(escalation);
 
-                // ✅ EMAIL: Notify submitter of resolution
+                // EMAIL: Notify submitter of resolution
                 var submittedByEmployee = escalation.SubmittedByEmployee;
                 var submittedByEmail = submittedByEmployee?.Userprofile?.PersonalEmail;
 
@@ -827,7 +827,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
                     EscalationStatus = e.EscalationStatus ?? string.Empty,
                     SubmittedAt = e.SubmittedAt ?? DateTime.Now,
 
-                    // ✅ Employee being reviewed
+                    // Employee being reviewed
                     EmployeeId = e.Sla?.EmployeeId,
                     EmployeeName = GetEmployeeName(e.Sla?.Employee),
                     EmployeeEmail = e.Sla?.Employee?.Userprofile?.PersonalEmail ?? string.Empty,
@@ -900,11 +900,6 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
                 return new ApiResponse<string> { Success = false, Message = ex.Message };
             }
         }
-
-        /// <summary>
-        /// Bulk create multiple SLAs efficiently using AddRange
-        /// Performance: 10-20x faster than individual inserts
-        /// </summary>
         public async Task<ApiResponse<BulkCreateSlaResponse>> BulkCreateSla(List<CreateSlaRequest> requests)
         {
             try
@@ -1048,9 +1043,7 @@ public async Task<ApiResponse<CreateSlaResponse>> CreateSla(CreateSlaRequest req
 
         #region Helpers
 
-        /// <summary>
-        /// Helper method to get employee name
-        /// </summary>
+
         private string GetEmployeeName(Employee employee)
         {
             if (employee?.Userprofile != null)

@@ -4,16 +4,12 @@ using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
-    /// <summary>
-    /// Repository for Organization Goal Feedback
-    /// Uses Feedback table filtered by Goal.GoalType
-    /// </summary>
+
     public interface IOrgGoalFeedbackRepository
     {
-        // CREATE
+
         Task<int> CreateOrgGoalFeedbackAsync(Feedback feedback);
 
-        // READ
         Task<Feedback> GetOrgGoalFeedbackByIdAsync(int feedbackId);
         Task<List<Feedback>> GetFeedbackByOrgGoalAsync(int goalId);
         Task<List<Feedback>> GetFeedbackBySubmitterAsync(int employeeId);

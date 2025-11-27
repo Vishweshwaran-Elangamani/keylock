@@ -8,7 +8,7 @@ using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;  // ✅ ADD THIS for EmailService
+using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
@@ -26,9 +26,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger = logger;
         }
 
-        // ============================================================================
-        // HR FORM OPERATIONS (Return HrFeedbackFormResponseDto)
-        // ============================================================================
+
 
         public async Task<HrFeedbackFormResponseDto> CreateFormAsync(CreateHRFeedbackFormRequestDto dto)
         {
@@ -195,9 +193,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // FORM RESPONSE OPERATIONS (Return HrFeedbackFormResponseResponseDto)
-        // ============================================================================
+
 
         public async Task<HrFeedbackFormResponseResponseDto> CreateFormResponseAsync(SubmitHRFormResponseRequestDto dto)
         {
@@ -389,9 +385,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // PRIVATE HELPER METHODS
-        // ============================================================================
 
         private HrFeedbackFormResponseDto MapFormToResponseDto(Hrfeedbackform form)
         {
@@ -447,9 +440,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        /// <summary>
-        /// ✅ Distribute form to employees
-        /// </summary>
+
         public async Task<DistributeFormResponse> DistributeFormAsync(int formId, List<int> employeeIds)
         {
             try

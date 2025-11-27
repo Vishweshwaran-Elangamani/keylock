@@ -244,20 +244,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Create database and apply migrations on startup
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
-    try
-    {
-        dbContext.Database.Migrate();
-        Log.Information("Database migration completed successfully");
-    }
-    catch (Exception ex)
-    {
-        Log.Error(ex, "Database migration failed: {Message}", ex.Message);
-    }
-}
+
 
 // Log configuration details
 Log.Information("Application Configuration:");
@@ -271,12 +258,12 @@ Log.Information(
 
 try
 {
-    Log.Information("SLA Application started successfully");
+    Log.Information("SLA API started successfully");
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "SLA Application terminated unexpectedly");
+    Log.Fatal(ex, "SLA API terminated unexpectedly");
 }
 finally
 {

@@ -5,11 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs
 {
-    // ============================================================================
-    // CREATE & UPDATE MOM DTOs (US034, US076, US077)
-    // ============================================================================
-    
-    // Create MOM DTO (US034, US076)
+
     public class CreateMomDto
     {
         public int? MeetingId { get; set; }
@@ -19,7 +15,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string MeetingTitle { get; set; } = null!;
 
         [Required(ErrorMessage = "Meeting type is required")]
-        public string MeetingType { get; set; } = null!; // One-on-One, Team Meeting, Presentation, Other
+        public string MeetingType { get; set; } = null!; 
 
         [Required(ErrorMessage = "Meeting date is required")]
         public DateTime MeetingDate { get; set; }
@@ -37,7 +33,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<ActionItemDto>? ActionItems { get; set; }
     }
 
-    // Update MOM DTO (US077)
+
     public class UpdateMomDto
     {
         [Required]
@@ -61,8 +57,6 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         public List<ActionItemDto>? ActionItems { get; set; }
     }
-
-    // Discussion Point DTO
     public class DiscussionPointDto
     {
         public int? PointId { get; set; }
@@ -73,7 +67,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PointOrder { get; set; } = 1;
     }
 
-    // Action Item DTO
+
     public class ActionItemDto
     {
         public int? ActionItemId { get; set; }
@@ -91,11 +85,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string Status { get; set; } = "Pending"; // Pending, Completed
     }
 
-    // ============================================================================
-    // MOM RESPONSE DTOs
-    // ============================================================================
-    
-    // MOM Response DTO
+
     public class MomResponseDto
     {
         public int MomId { get; set; }
@@ -116,7 +106,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<ActionItemResponseDto> ActionItems { get; set; } = new();
     }
 
-    // Discussion Point Response DTO
+
     public class DiscussionPointResponseDto
     {
         public int PointId { get; set; }
@@ -124,7 +114,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PointOrder { get; set; }
     }
 
-    // Action Item Response DTO
     public class ActionItemResponseDto
     {
         public int ActionItemId { get; set; }
@@ -137,13 +126,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool IsOverdue => DueDate < DateOnly.FromDateTime(DateTime.Now) && Status != "Completed";
     }
 
-    // ============================================================================
-    // PAGINATION DTO (US119 - HR View All MOMs)
-    // ============================================================================
-    
-    /// <summary>
-    /// Paginated response for HR viewing all MOMs (US119)
-    /// </summary>
+
     public class PaginatedMomResponseDto
     {
         public List<MomResponseDto> Moms { get; set; } = new();
@@ -155,11 +138,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool HasNextPage { get; set; }
     }
 
-    // ============================================================================
-    // SHARING DTOs (US035)
-    // ============================================================================
-    
-    // Share MOM DTO (US035)
+
     public class ShareMomDto
     {
         [Required]
@@ -170,7 +149,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<int> SharedWithEmployeeIds { get; set; } = null!;
     }
 
-    // MOM Sharing Response DTO
     public class MomSharingResponseDto
     {
         public int SharingId { get; set; }
@@ -183,11 +161,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime SharedAt { get; set; }
     }
 
-    // ============================================================================
-    // MEETING DTOs (US059)
-    // ============================================================================
-    
-    // Meeting Schedule DTO (US059)
+
     public class ScheduleMeetingDto
     {
         [Required(ErrorMessage = "Meeting title is required")]
@@ -211,7 +185,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<int> ParticipantEmployeeIds { get; set; } = null!;
     }
 
-    // Meeting Response DTO
+    
     public class MeetingResponseDto
     {
         public int MeetingId { get; set; }
@@ -235,13 +209,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string EmployeeName { get; set; } = null!;
     }
 
-    // ============================================================================
-    // ONE-ON-ONE REPORTS DTOs (US060)
-    // ============================================================================
-    
-    /// <summary>
-    /// Comprehensive one-on-one meeting report for managers (US060)
-    /// </summary>
+
     public class OneOnOneReportDto
     {
         // Meeting Statistics
@@ -267,9 +235,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<EmployeeOneOnOneStatsDto> EmployeeStats { get; set; } = new();
     }
 
-    /// <summary>
-    /// Per-employee one-on-one statistics (US060)
-    /// </summary>
+
     public class EmployeeOneOnOneStatsDto
     {
         public int EmployeeId { get; set; }
@@ -285,9 +251,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool NeedsAttention => DaysSinceLastMeeting > 30 || OverdueActionItems > 0;
     }
 
-    /// <summary>
-    /// Summary dashboard for one-on-one meetings (US060)
-    /// </summary>
+
     public class OneOnOneSummaryDto
     {
         // Team Overview
@@ -314,9 +278,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<RecentMeetingDto> RecentlyCompleted { get; set; } = new();
     }
 
-    /// <summary>
-    /// Upcoming meeting information (US060)
-    /// </summary>
+
     public class UpcomingMeetingDto
     {
         public int MeetingId { get; set; }
@@ -328,9 +290,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? Agenda { get; set; }
     }
 
-    /// <summary>
-    /// Recently completed meeting summary (US060)
-    /// </summary>
     public class RecentMeetingDto
     {
         public int MeetingId { get; set; }
@@ -343,13 +302,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int DaysSinceCompletion { get; set; }
     }
 
-    // ============================================================================
-    // ACTION ITEM TRACKING DTOs
-    // ============================================================================
-    
-    /// <summary>
-    /// Filter parameters for action items
-    /// </summary>
+ 
     public class ActionItemFilterDto
     {
         public string? Status { get; set; } // Pending, Completed
@@ -359,9 +312,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public DateTime? DueDateTo { get; set; }
     }
 
-    /// <summary>
-    /// Extended action item response with MOM context
-    /// </summary>
     public class ActionItemWithContextDto
     {
         public int ActionItemId { get; set; }
@@ -380,13 +330,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string SubmittedByEmployeeName { get; set; } = null!;
     }
 
-    // ============================================================================
-    // FILTER & SEARCH DTOs (US119)
-    // ============================================================================
-    
-    /// <summary>
-    /// Filter parameters for HR viewing all MOMs (US119)
-    /// </summary>
     public class MomFilterDto
     {
         [Range(1, int.MaxValue, ErrorMessage = "Page number must be at least 1")]
@@ -408,21 +351,19 @@ namespace Relevantz.EEPZ.Common.DTOs
 
         public DateTime? EndDate { get; set; }
 
-        public string? SubmittedByRole { get; set; } // Employee, Manager, HR
+        public string? SubmittedByRole { get; set; } 
 
-        public string SortBy { get; set; } = "MeetingDate"; // MeetingDate, CreatedAt, MeetingTitle
+        public string SortBy { get; set; } = "MeetingDate";
 
-        public string SortOrder { get; set; } = "desc"; // asc, desc
+        public string SortOrder { get; set; } = "desc";
     }
 
-    /// <summary>
-    /// Filter parameters for meetings (US059, US060)
-    /// </summary>
+ 
     public class MeetingFilterDto
     {
         public string? MeetingType { get; set; }
         
-        public string? Status { get; set; } // Scheduled, Completed, Cancelled
+        public string? Status { get; set; } 
         
         public int? ParticipantEmployeeId { get; set; }
         
@@ -437,13 +378,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int PageSize { get; set; } = 20;
     }
 
-    // ============================================================================
-    // STATISTICS & ANALYTICS DTOs
-    // ============================================================================
-    
-    /// <summary>
-    /// Overall MOM statistics (useful for dashboards)
-    /// </summary>
+
     public class MomStatisticsDto
     {
         public int TotalMoms { get; set; }

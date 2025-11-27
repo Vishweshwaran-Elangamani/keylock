@@ -8,7 +8,7 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 {
     /// <summary>
     /// Service interface for MentorFeedbackTracking business logic
-    /// Handles mentor feedback operations (US037, US078, US121, US122)
+    /// Handles mentor feedback operation
     /// </summary>
     public interface IMentorFeedbackService
     {
@@ -18,7 +18,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Create mentor feedback
-        /// Used by: US037 (Employee submit), US121 (HR submit), US037 (Manager submit)
         /// </summary>
         Task<MentorFeedbackResponseDto> CreateMentorFeedbackAsync(CreateMentorFeedbackRequestDto dto);
 
@@ -33,30 +32,26 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Get all feedback ABOUT a specific mentor
-        /// Used by: US078 (Mentor views feedback about them)
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetFeedbackAboutMeAsync(int mentorEmployeeId);
 
         /// <summary>
         /// Get all feedback GIVEN BY mentee about their mentor
-        /// Used by: US037 (Mentee views feedback they gave)
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetMyMentorFeedbackAsync(int menteeEmployeeId);
 
         /// <summary>
         /// Get all mentor feedback (for HR)
-        /// Used by: US122 (HR manages mentor feedback)
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetAllMentorFeedbackAsync(int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
-        /// Get feedback by status (Submitted, Acknowledged, Reviewed, Archived)
+        /// Get feedback by status
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetFeedbackByStatusAsync(string status);
 
         /// <summary>
         /// Get pending HR review mentor feedback
-        /// Used by: US122 (HR review queue)
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetPendingHRReviewAsync();
 
@@ -82,7 +77,7 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Set HR review on mentor feedback
-        /// Used by: US122 (HR adds comments/archiving)
+
         /// </summary>
         Task<bool> SetHRReviewAsync(int trackingId, string hrComments, int reviewedByHRId);
 

@@ -9,7 +9,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 {
     /// <summary>
     /// Service interface for PeerFeedbackQueue business logic
-    /// Handles peer feedback quality control workflow (US115, US116)
     /// </summary>
     public interface IPeerFeedbackQueueService
     {
@@ -19,7 +18,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Create peer feedback in queue (pending HR review)
-        /// Used by: US033, US075 (Peer and Manager submit peer feedback)
         /// </summary>
         Task<PeerFeedbackQueueResponseDto> CreatePeerFeedbackAsync(CreatePeerFeedbackRequestDto dto);
 
@@ -34,7 +32,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Get all peer feedback pending HR approval
-        /// Used by: US115 (HR views pending peer feedback for review)
         /// </summary>
         Task<List<PeerFeedbackQueueResponseDto>> GetPendingFeedbackAsync();
 
@@ -45,7 +42,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Get all approved peer feedback
-        /// Used by: US116 (Approved feedback visible to recipient)
         /// </summary>
         Task<List<PeerFeedbackQueueResponseDto>> GetApprovedFeedbackAsync();
 
@@ -56,7 +52,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Get all peer feedback for specific recipient
-        /// Used by: US033 (View all feedback about me)
         /// </summary>
         Task<List<PeerFeedbackQueueResponseDto>> GetFeedbackByRecipientAsync(int employeeId);
 
@@ -67,12 +62,11 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Get all peer feedback (with pagination for HR)
-        /// Used by: HR views all peer feedback
         /// </summary>
         Task<List<PeerFeedbackQueueResponseDto>> GetAllPeerFeedbackAsync(int pageNumber = 1, int pageSize = 20);
 
         /// <summary>
-        /// Get peer feedback by status (Pending, UnderHRReview, Approved, Rejected)
+        /// Get peer feedback
         /// </summary>
         Task<List<PeerFeedbackQueueResponseDto>> GetFeedbackByStatusAsync(string status);
 
@@ -91,19 +85,17 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
         Task<PeerFeedbackQueueResponseDto> UpdatePeerFeedbackAsync(int queueId, UpdatePeerFeedbackRequestDto dto);
 
         /// <summary>
-        /// Approve peer feedback (set professionalism/relevance flags)
-        /// Used by: US115 (HR approves feedback)
+        /// Approve peer feedback
         /// </summary>
         Task<bool> ApprovePeerFeedbackAsync(int queueId, bool isProfessional, bool isRelevant, int approvedByHRId);
 
         /// <summary>
         /// Reject peer feedback
-        /// Used by: US116 (HR rejects feedback)
         /// </summary>
         Task<bool> RejectPeerFeedbackAsync(int queueId, int rejectedByHRId);
 
         /// <summary>
-        /// Update feedback status (Pending → UnderHRReview → Approved/Rejected)
+        /// Update feedback status
         /// </summary>
         Task<bool> UpdateFeedbackStatusAsync(int queueId, string newStatus);
 
@@ -112,7 +104,7 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
         // ============================================================================
 
         /// <summary>
-        /// Delete peer feedback from queue (only if Pending status)
+        /// Delete peer feedback from queue
         /// </summary>
         Task<bool> DeleteQueueItemAsync(int queueId);
 

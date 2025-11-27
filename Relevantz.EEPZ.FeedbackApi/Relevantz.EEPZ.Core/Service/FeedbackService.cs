@@ -9,7 +9,7 @@ using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;  // ✅ ADD THIS for EmailService
+using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
@@ -93,9 +93,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         public async Task<FeedbackResponseDto> GetFeedbackByIdAsync(int feedbackId)
         {
@@ -372,9 +369,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
 
         public async Task<FeedbackResponseDto> UpdateFeedbackAsync(int feedbackId, UpdateFeedbackRequestDto dto)
         {
@@ -479,10 +473,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteFeedbackAsync(int feedbackId)
         {
             try
@@ -500,9 +490,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // VALIDATION OPERATIONS
-        // ============================================================================
 
         public async Task<bool> CanEditFeedbackAsync(int feedbackId)
         {
@@ -517,13 +504,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // PRIVATE HELPER METHODS
-        // ============================================================================
 
-                // ============================================================================
-        // PRIVATE HELPER METHODS
-        // ============================================================================
 
         private FeedbackResponseDto MapToResponseDto(Feedback feedback, List<Feedbackquestionresponse> responses)
         {
@@ -558,12 +539,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }
             }
 
-            // Get employee names from UserProfile (joined to Employee)
+
             string submitterName = "Anonymous";
             if (feedback.SubmittedByEmployee != null)
             {
-                // Assuming Employee has a navigation property to UserProfile
-                // You may need to adjust based on actual relationship
+
                 submitterName = "Unknown";
             }
 

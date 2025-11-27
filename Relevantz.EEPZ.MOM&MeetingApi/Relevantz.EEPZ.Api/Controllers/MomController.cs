@@ -23,13 +23,6 @@ namespace eepzbackend.Controllers
             _momService = momService;
         }
 
-        // ============================================================================
-        // MOM OPERATIONS (US034, US076, US077)
-        // ============================================================================
-
-        /// <summary>
-        /// US034, US076: Submit MOM instantly after meetings
-        /// </summary>
         [HttpPost("create")]
         public async Task<ActionResult<MomResponseDto>> CreateMom([FromBody] CreateMomDto createMomDto)
         {
@@ -51,9 +44,7 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// US077: Manager modifies submitted MOM
-        /// </summary>
+
         [HttpPut("update")]
         public async Task<ActionResult<MomResponseDto>> UpdateMom([FromBody] UpdateMomDto updateMomDto)
         {
@@ -75,9 +66,7 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// US035, US077: View MOMs submitted by me
-        /// </summary>
+
         [HttpGet("my-moms")]
         [Authorize(Roles ="Manager,Employee")]
         public async Task<ActionResult<List<MomResponseDto>>> GetMyMoms()
@@ -94,9 +83,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// Get specific MOM by ID
-        /// </summary>
         [HttpGet("{momId}")]
         public async Task<ActionResult<MomResponseDto>> GetMomById(int momId)
         {
@@ -114,9 +100,7 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// Delete MOM (only submitter can delete)
-        /// </summary>
+
         [HttpDelete("{momId}")]
         public async Task<ActionResult> DeleteMom(int momId)
         {
@@ -142,13 +126,7 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // ============================================================================
-        // SHARING OPERATIONS (US035)
-        // ============================================================================
-
-        /// <summary>
-        /// US035: Share MOM with other employees
-        /// </summary>
+ 
         [HttpPost("share")]
         public async Task<ActionResult<List<MomSharingResponseDto>>> ShareMom([FromBody] ShareMomDto shareMomDto)
         {
@@ -164,9 +142,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// US035: View MOMs shared by me
-        /// </summary>
         [HttpGet("shared-by-me")]
         public async Task<ActionResult<List<MomSharingResponseDto>>> GetMomsSharedByMe()
         {
@@ -182,9 +157,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// US035: View MOMs shared with me
-        /// </summary>
         [HttpGet("shared-with-me")]
         public async Task<ActionResult<List<MomResponseDto>>> GetMomsSharedWithMe()
         {
@@ -200,15 +172,9 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // ============================================================================
-        // HR OPERATIONS (US119) - NEW
-        // ============================================================================
 
-        /// <summary>
-        /// US119: HR views all MOMs across organization (with filtering and pagination)
-        /// </summary>
         [HttpGet("all-moms")]
-        [Authorize(Roles = "HR")] // Optional: enforce HR role at controller level
+        [Authorize(Roles = "HR")] 
         public async Task<ActionResult<PaginatedMomResponseDto>> GetAllMomsForHR(
             [FromQuery] string? searchTerm = null,
             [FromQuery] string? meetingType = null,
@@ -246,13 +212,7 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // ============================================================================
-        // ACTION ITEM OPERATIONS
-        // ============================================================================
 
-        /// <summary>
-        /// Update action item status (Pending/Completed)
-        /// </summary>
         [HttpPatch("action-items/{actionItemId}/status")]
         public async Task<ActionResult> UpdateActionItemStatus(int actionItemId, [FromBody] string status)
         {
@@ -277,9 +237,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// Get all action items assigned to me
-        /// </summary>
         [HttpGet("action-items/my-tasks")]
         public async Task<ActionResult<List<ActionItemResponseDto>>> GetMyActionItems()
         {
@@ -295,9 +252,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// Get all action items I assigned to others (Manager view)
-        /// </summary>
         [HttpGet("action-items/assigned-by-me")]
         public async Task<ActionResult<List<ActionItemResponseDto>>> GetActionItemsAssignedByMe()
         {
@@ -313,9 +267,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// Get all overdue action items assigned to me
-        /// </summary>
         [HttpGet("action-items/overdue")]
         public async Task<ActionResult<List<ActionItemResponseDto>>> GetOverdueActionItems()
         {
@@ -331,9 +282,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // ============================================================================
-        // HELPER METHODS
-        // ============================================================================
         
         private int GetEmployeeIdFromClaims()
         {

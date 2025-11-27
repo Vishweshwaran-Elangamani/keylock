@@ -104,9 +104,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return true;
         }
 
-        // ============================================================================
-        // HR OPERATIONS (US119)
-        // ============================================================================
 
         public async Task<int> GetAllMomsCountAsync(
             string? searchTerm = null,
@@ -198,9 +195,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return query;
         }
 
-        // ============================================================================
-        // DISCUSSION POINTS
-        // ============================================================================
 
         public async Task<List<Momdiscussionpoint>> AddDiscussionPointsAsync(List<Momdiscussionpoint> points)
         {
@@ -220,9 +214,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return true;
         }
 
-        // ============================================================================
-        // ACTION ITEMS
-        // ============================================================================
 
         public async Task<List<Momactionitem>> AddActionItemsAsync(List<Momactionitem> actionItems)
         {
@@ -282,9 +273,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
         }
 
-        // ============================================================================
-        // SHARING
-        // ============================================================================
+
 
         public async Task<List<Momsharing>> ShareMomAsync(List<Momsharing> sharings)
         {
@@ -305,10 +294,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .OrderByDescending(ms => ms.SharedAt)
                 .ToListAsync();
         }
-
-        // ============================================================================
-        // MEETINGS
-        // ============================================================================
 
         public async Task<Meeting> CreateMeetingAsync(Meeting meeting)
         {
@@ -366,10 +351,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
         }
 
-        // ============================================================================
-        // ONE-ON-ONE REPORTS (US060)
-        // ============================================================================
-
         public async Task<List<Meeting>> GetOneOnOneMeetingsByManagerAsync(
             int managerId,
             int? employeeId = null,
@@ -380,9 +361,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .Include(m => m.Meetingparticipants)
                     .ThenInclude(mp => mp.Employee)
                         .ThenInclude(e => e.Userprofile)
-                // .Include(m => m.Meetingparticipants)
-                //     .ThenInclude(mp => mp.Employee)
-                //         // .ThenInclude(e => e.Department)
+
                 .Include(m => m.ScheduledByEmployee)
                     .ThenInclude(e => e.Userprofile)
                 .Include(m => m.Moms)
@@ -417,9 +396,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .ToListAsync();
         }
 
-        // ============================================================================
-        // EMPLOYEE OPERATIONS
-        // ============================================================================
 
         public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
         {
@@ -441,9 +417,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
         
 
-         // ============================================================================
-        // RSVP OPERATIONS (US061)
-        // ============================================================================
+
 
         public async Task<Meetingparticipant?> GetMeetingParticipantAsync(int meetingId, int employeeId)
         {

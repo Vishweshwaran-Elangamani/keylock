@@ -21,14 +21,7 @@ namespace eepzbackend.Controllers
             _momService = momService;
         }
 
-        // ============================================================================
-        // RSVP OPERATIONS (US061)
-        // ============================================================================
 
-        /// <summary>
-        /// US061: Get all meeting invitations for logged-in employee
-        /// GET /api/Rsvp/my-invitations
-        /// </summary>
         [HttpGet("my-invitations")]
         public async Task<ActionResult> GetMyMeetingInvitations()
         {
@@ -44,10 +37,7 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// US061: Submit RSVP response to meeting invitation
-        /// POST /api/Rsvp/submit
-        /// </summary>
+
         [HttpPost("submit")]
         public async Task<ActionResult<MeetingInvitationDto>> SubmitRsvp([FromBody] RsvpResponseDto rsvpDto)
         {
@@ -67,10 +57,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// US061: Update existing RSVP response (allow changes before meeting)
-        /// PUT /api/Rsvp/{meetingId}/update
-        /// </summary>
         [HttpPut("{meetingId}/update")]
         public async Task<ActionResult<MeetingInvitationDto>> UpdateRsvp(
             int meetingId, 
@@ -93,10 +79,7 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// US061: Get pending RSVP count (for dashboard badge)
-        /// GET /api/Rsvp/pending-count
-        /// </summary>
+
         [HttpGet("pending-count")]
         public async Task<ActionResult> GetPendingRsvpCount()
         {
@@ -112,10 +95,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        /// <summary>
-        /// US061: Get RSVP summary for a meeting (Manager view)
-        /// GET /api/Rsvp/meeting/{meetingId}/summary
-        /// </summary>
         [HttpGet("meeting/{meetingId}/summary")]
         [Authorize(Roles = "Manager")]
         public async Task<ActionResult<MeetingRsvpSummaryDto>> GetMeetingRsvpSummary(int meetingId)
@@ -137,9 +116,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // ============================================================================
-        // HELPER METHODS
-        // ============================================================================
 
         private int GetEmployeeIdFromClaims()
         {

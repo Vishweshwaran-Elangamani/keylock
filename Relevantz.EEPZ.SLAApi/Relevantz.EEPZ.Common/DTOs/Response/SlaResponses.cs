@@ -7,9 +7,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime CreatedAt { get; set; }
     }
 
-    /// <summary>
-    /// Response DTO for SLA details (US023)
-    /// </summary>
+
     public class SlaResponse
     {
         public int Slaid { get; set; }
@@ -46,10 +44,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string Message { get; set; } = string.Empty;
     }
 
-    /// <summary>
-    /// Response DTO for escalation submission (US022, US063, US064, US088, US100)
-    /// ✅ FIXED: Consistent naming convention
-    /// </summary>
+
    public class EscalationResponse
 {
     public int EscalationId { get; set; }
@@ -60,20 +55,19 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
     public string? EscalationStatus { get; set; }
     public DateTime? SubmittedAt { get; set; }
     
-    // ✅ Employee being reviewed
+
     public int? EmployeeId { get; set; }
-    public string? EmployeeName { get; set; }  // ← ADD THIS
+    public string? EmployeeName { get; set; }  
     public string? EmployeeEmail { get; set; }
     
-    // Manager who escalated
+    
     public int? SubmittedByEmployeeId { get; set; }
     public string? SubmittedByName { get; set; }
     
-    // Dept Head assigned to
-    public int? EscalatedToEmployeeId { get; set; }
+     public int? EscalatedToEmployeeId { get; set; }
     public string? EscalatedToName { get; set; }
     
-    // Resolution
+
     public int? ResolvedByEmployeeId { get; set; }
     public string? ResolvedByName { get; set; }
     public string? ResolutionComments { get; set; }
@@ -82,9 +76,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
     public string? Message { get; set; }
 }
 
-    /// <summary>
-    /// Response DTO for reopen operation (US062)
-    /// </summary>
+
     public class ReopenSlaResponse
     {
         public string Message { get; set; } = string.Empty;
@@ -93,9 +85,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public int ExtensionDays { get; set; }
     }
 
-    /// <summary>
-    /// Response DTO for team review tracking (US052)
-    /// </summary>
+
     public class TeamReviewTrackingResponse
     {
         public int ReviewTrackingId { get; set; }
@@ -115,9 +105,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string UrgencyStatus { get; set; } = string.Empty;
     }
 
-    /// <summary>
-    /// Response DTO for department compliance (US061, US087)
-    /// </summary>
+
     public class DepartmentComplianceResponse
 {
     public int ComplianceId { get; set; }
@@ -126,19 +114,17 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
     public string Period { get; set; } = string.Empty;
     public DateOnly PeriodStartDate { get; set; }
     public DateOnly PeriodEndDate { get; set; }
-    public int TotalSlas { get; set; }        // ✅ Match model
-    public int OnTimeSlas { get; set; }       // ✅ Match model
-    public int BreachedSlas { get; set; }     // ✅ Match model
-    public int ExtendedSlas { get; set; }     // ✅ Add this too
-    public int PendingSlas { get; set; }      // ✅ Add this too
+    public int TotalSlas { get; set; }        
+    public int OnTimeSlas { get; set; }       
+    public int BreachedSlas { get; set; }     
+    public int ExtendedSlas { get; set; }     
+    public int PendingSlas { get; set; }      
     public decimal CompliancePercentage { get; set; }
     public DateTime CalculatedAt { get; set; }
 }
 
 
-    /// <summary>
-    /// Response DTO for SLA history (US064, US088, US100)
-    /// </summary>
+
     public class SlaHistoryResponse
     {
         public int SlahistoryId { get; set; }
@@ -156,9 +142,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime CreatedAt { get; set; }
     }
 
-    /// <summary>
-    /// Generic response wrapper
-    /// </summary>
+
     public class ApiResponse<T>
     {
         public bool Success { get; set; }

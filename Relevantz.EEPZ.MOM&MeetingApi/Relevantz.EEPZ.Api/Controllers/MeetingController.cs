@@ -30,7 +30,7 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                var employeeId = GetEmployeeIdFromUserId(); // ✅ Updated logic
+                var employeeId = GetEmployeeIdFromUserId(); 
                 var role = GetRoleFromClaims();
 
                 var result = await _momService.ScheduleMeetingAsync(scheduleMeetingDto, employeeId, role);
@@ -125,7 +125,7 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // ✅ Updated method to map UserId → EmployeeId using Userauthentication table
+        
         private int GetEmployeeIdFromUserId()
         {
             var subClaim = User.FindFirst("sub") ?? User.FindFirst(ClaimTypes.NameIdentifier);

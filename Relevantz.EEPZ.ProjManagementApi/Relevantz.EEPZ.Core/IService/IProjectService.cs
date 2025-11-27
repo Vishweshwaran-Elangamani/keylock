@@ -13,8 +13,7 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
 
         Task<ApiResponse<bool>> UpdateReportingManagersAsync(UpdateReportingManagersRequest request);
 
-        //These now work with the updated DTOs
-        Task<ApiResponse<bool>> MapEmployeesToProjectAsync(MapEmployeesToProjectRequest request);
+            Task<ApiResponse<bool>> MapEmployeesToProjectAsync(MapEmployeesToProjectRequest request);
         Task<ApiResponse<bool>> UnmapEmployeesFromProjectAsync(UnmapEmployeesFromProjectRequest request);
 
         Task<ApiResponse<List<EmployeeBasicInfo>>> GetAvailableEmployeesAsync();

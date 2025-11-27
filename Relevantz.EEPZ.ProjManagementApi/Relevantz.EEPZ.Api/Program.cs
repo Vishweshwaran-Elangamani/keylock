@@ -25,7 +25,7 @@ Log.Information("Starting EEPZ Project Management Backend Application");
 // Add services to the container
 builder.Services.AddControllers();
 
-// ✅ Database Context with migrations assembly
+// Database Context with migrations assembly
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(
@@ -34,7 +34,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         b => b.MigrationsAssembly("Relevantz.EEPZ.Data") // Important for EF migrations
     ));
 
-Log.Information("📊 Database configured with migrations assembly: Relevantz.EEPZ.Data");
+Log.Information("Database configured with migrations assembly: Relevantz.EEPZ.Data");
 
 // Register Repositories
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
@@ -42,7 +42,7 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 // Register Services
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
-Log.Information("💉 Dependency Injection configured - 1 repository, 1 service");
+Log.Information("Dependency Injection configured - 1 repository, 1 service");
 
 // Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -61,11 +61,11 @@ builder.Services.AddSwaggerGen(options =>
     if (File.Exists(xmlPath))
     {
         options.IncludeXmlComments(xmlPath);
-        Log.Information("📝 XML documentation included in Swagger");
+        Log.Information("XML documentation included in Swagger");
     }
 });
 
-// ✅ CORS Policy for React App
+// CORS Policy for React App
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
@@ -77,23 +77,23 @@ builder.Services.AddCors(options =>
     });
 });
 
-Log.Information("🌐 CORS configured for React app (localhost:5173, localhost:3000)");
+Log.Information("CORS configured for React app (localhost:5173, localhost:3000)");
 
 var app = builder.Build();
 
-// ✅ Seed the database with default project
+// Seed the database with default project
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
     try
     {
-        Log.Information("🌱 Starting database seeding...");
+        Log.Information("Starting database seeding...");
         await DbInitializer.SeedAsync(dbContext);
-        Log.Information("✅ Database seeding completed successfully");
+        Log.Information("Database seeding completed successfully");
     }
     catch (Exception ex)
     {
-        Log.Error(ex, "❌ Database seeding failed: {Message}", ex.Message);
+        Log.Error(ex, "Database seeding failed: {Message}", ex.Message);
     }
 }
 
@@ -105,7 +105,7 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ Backend API V1");
     });
-    Log.Information("📚 Swagger UI enabled");
+    Log.Information("Swagger UI enabled");
 }
 
 // Enable Serilog request logging
@@ -122,7 +122,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Log configuration details
-Log.Information("🚀 Application Configuration:");
+Log.Information("   Application Configuration:");
 Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
 Log.Information(
     "   Database: {Database}",
@@ -137,7 +137,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "❌ Project Management Application terminated unexpectedly");
+    Log.Fatal(ex, "Project Management Application terminated unexpectedly");
 }
 finally
 {

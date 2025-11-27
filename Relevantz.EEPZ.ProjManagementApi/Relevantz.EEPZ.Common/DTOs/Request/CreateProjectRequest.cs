@@ -10,7 +10,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [Required]
         [StringLength(255)]
-        public string ClientName { get; set; } = null!;   //New field
+        public string ClientName { get; set; } = null!;   
 
         public string? Description { get; set; }
 

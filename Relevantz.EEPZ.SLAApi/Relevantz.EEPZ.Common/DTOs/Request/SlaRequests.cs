@@ -2,9 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs.Request
 {
-    /// <summary>
-    /// Request DTO for creating a new SLA
-    /// </summary>
+  
     public class CreateSlaRequest
     {
         [Required(ErrorMessage = "SLA Type is required")]
@@ -15,7 +13,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         [Range(1, int.MaxValue, ErrorMessage = "Invalid Employee ID")]
         public int EmployeeId { get; set; }
 
-        // ✅ FIXED: Removed [Required] and [Range] - Backend will auto-assign reporting manager
+        
         public int? AssignedToEmployeeId { get; set; }
 
         [Required(ErrorMessage = "Deadline is required")]
@@ -37,10 +35,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string? CreationReason { get; set; }
     }
 
-    /// <summary>
-    /// Request DTO for submitting SLA Escalation (US022)
-    /// ✅ FIXED: Made SubmittedByEmployeeId nullable to avoid ?? operator error
-    /// </summary>
     public class SubmitSlaEscalationRequest
     {
         [Required(ErrorMessage = "SLA ID is required")]
@@ -61,17 +55,13 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
             ErrorMessage = "Escalation level must be L1, L2, DeptHead, or Leadership")]
         public string EscalationLevel { get; set; } = "L1";
 
-        // ✅ FIXED: Made nullable for manager-as-employee escalation
+
         public int? EscalatedToEmployeeId { get; set; }
 
-        // ✅ FIXED: Made nullable to avoid ?? operator error
         [Required(ErrorMessage = "Submitted by employee ID is required")]
         public int? SubmittedByEmployeeId { get; set; }
     }
 
-    /// <summary>
-    /// Request DTO for reopening SLA (US062)
-    /// </summary>
     public class ReopenSlaRequest
     {
         [Required]
@@ -89,9 +79,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int ReopenedByEmployeeId { get; set; }
     }
 
-    /// <summary>
-    /// Request DTO for calculating department compliance (US061, US087)
-    /// </summary>
+
     public class CalculateComplianceRequest
     {
         [Required]
@@ -110,9 +98,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int? CalculatedBy { get; set; }
     }
 
-    /// <summary>
-    /// Request DTO for resolving escalation
-    /// </summary>
+
     public class ResolveEscalationRequest
     {
         [Required]
@@ -129,9 +115,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string ResolutionComments { get; set; } = string.Empty;
     }
 
-    /// <summary>
-    /// Request DTO for closing SLA
-    /// </summary>
     public class CloseSlaRequest
     {
         [Required]
@@ -143,9 +126,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string? ComplianceStatus { get; set; }
     }
 
-    /// <summary>
-    /// Request DTO for updating SLA
-    /// </summary>
+
     public class UpdateSlaRequest
     {
         public string? Slatype { get; set; }

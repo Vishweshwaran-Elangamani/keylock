@@ -230,22 +230,22 @@ namespace eepzbackend.Controllers
     public class OrgObjectiveDto
     {
         [JsonPropertyName("objectiveId")]
-        public int ObjectiveId { get; set; }  // Maps to goal_id
+        public int ObjectiveId { get; set; }
 
         [JsonPropertyName("title")]
-        public string Title { get; set; }  // Maps to goal_title
+        public string Title { get; set; }
 
         [JsonPropertyName("description")]
-        public string Description { get; set; }  // Maps to goal_description
+        public string Description { get; set; }
 
         [JsonPropertyName("goalStatus")]
-        public string GoalStatus { get; set; }  // Maps to goalstatus
+        public string GoalStatus { get; set; }
 
         [JsonPropertyName("createdAt")]
-        public DateTime? CreatedAt { get; set; }  // Maps to goalcreatedat
+        public DateTime? CreatedAt { get; set; }
 
         [JsonPropertyName("endDate")]
-        public DateTime? EndDate { get; set; }  // Maps to goalendat
+        public DateTime? EndDate { get; set; }
     }
 
     /// <summary>

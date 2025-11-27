@@ -167,7 +167,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Log configuration details
-Log.Information("🚀 Application Configuration:");
+Log.Information("Application Configuration:");
 Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
 Log.Information("   JWT Issuer: {Issuer}", issuer);
 Log.Information("   JWT Audience: {Audience}", audience);

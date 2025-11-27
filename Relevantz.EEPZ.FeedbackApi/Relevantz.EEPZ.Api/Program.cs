@@ -30,7 +30,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("🚀 Starting EEPZ Feedback Backend Application");
+    Log.Information("Starting EEPZ Feedback Backend Application");
     
     var builder = WebApplication.CreateBuilder(args);
     Console.WriteLine("Building........");
@@ -42,7 +42,7 @@ try
         .Enrich.FromLogContext()
         .WriteTo.Console());
 
-    Log.Information("✅ Serilog configured successfully");
+    Log.Information("Serilog configured successfully");
 
     // Add services to the container
     builder.Services.AddControllers();
@@ -98,7 +98,7 @@ try
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
     );
 
-    Log.Information("📊 Database connection configured");
+    Log.Information("Database connection configured");
 
     // UPDATED: Configure JWT Authentication with debugging
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -145,7 +145,7 @@ try
             {
                 OnAuthenticationFailed = context =>
                 {
-                    Log.Error("❌ JWT Authentication Failed: {Message}", context.Exception.Message);
+                    Log.Error("JWT Authentication Failed: {Message}", context.Exception.Message);
                     if (context.Exception.InnerException != null)
                     {
                         Log.Error(
@@ -161,7 +161,7 @@ try
                         context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}").ToList()
                         ?? new List<string>();
 
-                    Log.Information("✅ JWT Token Validated Successfully");
+                    Log.Information("JWT Token Validated Successfully");
                     Log.Information("   Claims: {Claims}", string.Join(", ", claims));
 
                     var empMasterIdClaim = context.Principal?.FindFirst("empMasterId");
@@ -178,7 +178,7 @@ try
 
                     if (roleClaim == null)
                     {
-                        Log.Warning("⚠ WARNING: role claim not found!");
+                        Log.Warning("WARNING: role claim not found!");
                     }
                     else
                     {
@@ -191,7 +191,7 @@ try
                 OnChallenge = context =>
                 {
                     Log.Warning(
-                        "❌ JWT Challenge: {Error}, {ErrorDescription}",
+                        "JWT Challenge: {Error}, {ErrorDescription}",
                         context.Error,
                         context.ErrorDescription
                     );
@@ -207,7 +207,7 @@ try
                     if (!string.IsNullOrEmpty(token))
                     {
                         Log.Information(
-                            "📨 JWT Token Received (first 20 chars): {Token}...",
+                            "JWT Token Received (first 20 chars): {Token}...",
                             token.Substring(0, Math.Min(20, token.Length))
                         );
                     }
@@ -218,7 +218,7 @@ try
 
     builder.Services.AddAuthorization();
 
-    Log.Information("🔐 JWT Authentication configured");
+    Log.Information("JWT Authentication configured");
 
     // ==================================================================================
     // FEEDBACK MODULE - DEPENDENCY INJECTION
@@ -239,7 +239,7 @@ try
     builder.Services.AddScoped<IPeerFeedbackQueueService, PeerFeedbackQueueService>();
     builder.Services.AddScoped<IHrFeedbackFormService, HrFeedbackFormService>();
 
-    Log.Information("💉 Dependency Injection configured - 5 repositories, 5 services");
+    Log.Information("Dependency Injection configured - 5 repositories, 5 services");
 
     // Configure CORS
     builder.Services.AddCors(options =>
@@ -253,7 +253,7 @@ try
         );
     });
 
-    Log.Information("🌐 CORS configured");
+    Log.Information("CORS configured");
 
     var app = builder.Build();
 
@@ -265,7 +265,7 @@ try
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "EEPZ Feedback API v1");
         });
-        Log.Information("📚 Swagger UI enabled");
+        Log.Information("Swagger UI enabled");
     }
 
     // Enable Serilog request logging
@@ -286,25 +286,10 @@ try
 
     app.MapControllers();
 
-    // Auto-migrate with logging
-    using (var scope = app.Services.CreateScope())
-    {
-        var dbContext = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
-        try
-        {
-            Log.Information("🗄️ Starting database migration...");
-            dbContext.Database.Migrate();
-            Log.Information("✅ Database migration completed successfully");
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "❌ Database migration failed: {Message}", ex.Message);
-        }
-    }
-
+    
     // Log configuration details
     Log.Information("========================================");
-    Log.Information("🚀 Feedback Application Configuration:");
+    Log.Information("Feedback Application Configuration:");
     Log.Information("========================================");
     Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
     Log.Information("   JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
@@ -315,18 +300,18 @@ try
     );
     Log.Information("========================================");
 
-    Log.Information("✅ Feedback Application started successfully");
-    Log.Information("🎯 Ready to accept requests...");
+    Log.Information("Feedback API started successfully");
+    Log.Information("Ready to accept requests...");
     
     app.Run();
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "❌ Feedback Application terminated unexpectedly");
+    Log.Fatal(ex, "Feedback Application terminated unexpectedly");
     throw;
 }
 finally
 {
-    Log.Information("🛑 Shutting down Feedback Application");
+    Log.Information("Shutting down Feedback Application");
     Log.CloseAndFlush();
 }

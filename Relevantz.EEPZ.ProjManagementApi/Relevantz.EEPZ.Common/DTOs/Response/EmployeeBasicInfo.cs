@@ -11,6 +11,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string? RoleName { get; set; }
         public string? DepartmentName { get; set; }
 
-         public bool IsPrimary { get; set; } // ✅ Maps to bit field in DB
+         public bool IsPrimary { get; set; } 
     }
 }

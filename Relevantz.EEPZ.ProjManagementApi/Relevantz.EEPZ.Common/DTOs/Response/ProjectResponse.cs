@@ -5,7 +5,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public int ProjectId { get; set; }
         public string ProjectName { get; set; } = null!;
 
-        public string ClientName { get; set; } = null!;   //New field added
+        public string ClientName { get; set; } = null!;
 
         public string? Description { get; set; }
         public string? BusinessUnit { get; set; }

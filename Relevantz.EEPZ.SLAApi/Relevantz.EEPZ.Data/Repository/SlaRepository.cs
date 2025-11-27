@@ -10,9 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
-    /// <summary>
-    /// Repository implementation for SLA data access
-    /// </summary>
+
     public class SlaRepository : ISlaRepository
     {
         private readonly EEPZDbContext _context;
@@ -26,9 +24,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         #region Basic CRUD Operations
 
-        /// <summary>
-        /// Get all SLAs with includes (for HR dashboard - US100)
-        /// </summary>
+
         public async Task<List<Sla>> GetAllSlasAsync()
         {
             try
@@ -48,8 +44,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // In Repository/Implementations/SlaRepository.cs - add this in BASIC CRUD OPERATIONS section
 
 public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
 {
@@ -128,9 +122,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-        /// <summary>
-        /// Create new SLA (for HR - US100)
-        /// </summary>
+  
         public async Task<Sla> CreateSlaAsync(Sla sla)
         {
             try
@@ -410,9 +402,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-        /// <summary>
-        /// Add history entry
-        /// </summary>
+
         public async Task<Slahistory> AddHistoryAsync(Slahistory history)
         {
             try
@@ -577,9 +567,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
 
         #region Automation Methods
 
-        /// <summary>
-        /// Get all overdue SLAs for auto-closure
-        /// </summary>
         public async Task<List<Sla>> GetOverdueSlas(DateTime? cutoffDate = null, int? departmentId = null)
         {
             try
@@ -608,9 +595,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-        /// <summary>
-        /// Get SLAs approaching deadline for reminders
-        /// </summary>
+
         public async Task<List<Sla>> GetSlasWithDeadline(DateTime targetDate, int? departmentId = null)
         {
             try
@@ -643,9 +628,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-        /// <summary>
-        /// Get notifications for an employee
-        /// </summary>
+
         public async Task<List<Slanotification>> GetEmployeeNotifications(int employeeId, bool unreadOnly = false)
         {
             try
@@ -670,9 +653,7 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-        /// <summary>
-        /// Get multiple employees by IDs with their profiles
-        /// </summary>
+
         public async Task<List<Employee>> GetEmployeesByIdsAsync(List<int> employeeIds)
         {
             return await _context.Employees
@@ -682,20 +663,13 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// Get database connection string from DbContext
-        /// </summary>
+
         public string GetConnectionString()
         {
             return _context.Database.GetDbConnection().ConnectionString;
         }
 
-        /// <summary>
-        /// Bulk insert SLAs using SqlBulkCopy
-        /// </summary>
-        /// <summary>
-/// Bulk insert SLAs using AddRange (optimized for MySQL)
-/// </summary>
+
 public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
 {
     try
@@ -708,12 +682,12 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
 
         _logger.LogInformation($"Starting bulk insert of {slas.Count} SLAs");
 
-        // Disable change tracking for better performance
+        
         _context.ChangeTracker.AutoDetectChangesEnabled = false;
 
         try
         {
-            // AddRange is optimized in EF Core for bulk operations
+            
             _context.Slas.AddRange(slas);
             var result = await _context.SaveChangesAsync();
             
@@ -722,7 +696,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
         }
         finally
         {
-            // Re-enable change tracking
+            
             _context.ChangeTracker.AutoDetectChangesEnabled = true;
         }
     }
@@ -734,9 +708,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
 }
 
 
-        /// <summary>
-        /// Create a new notification
-        /// </summary>
+
         public async Task<Slanotification> CreateNotificationAsync(Slanotification notification)
         {
             try
@@ -755,9 +727,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
             }
         }
 
-        /// <summary>
-        /// Mark notification as read
-        /// </summary>
+
         public async Task MarkNotificationAsRead(int notificationId)
         {
             try
@@ -778,9 +748,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
             }
         }
 
-        /// <summary>
-        /// Check if SLA can be reopened (less than max reopen count)
-        /// </summary>
+
         public async Task<bool> CanReopenSla(int slaid)
         {
             try
@@ -795,9 +763,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
             }
         }
 
-        /// <summary>
-        /// Increment reopen counter
-        /// </summary>
+
         public async Task IncrementReopenCount(int slaid)
         {
             try
@@ -818,10 +784,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
             }
         }
 
-        /// <summary>
-        /// Get all escalations assigned to a specific employee (for Manager/DeptHead dashboard)
-        /// </summary>
-      // In SlaRepository.cs - GetEscalationsByEscalatedToAsync method
+        
 
 public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int employeeId)
 {
@@ -831,13 +794,13 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
             .AsNoTracking()
             .Where(e => e.EscalatedToEmployeeId == employeeId)
             .Include(e => e.Sla)
-                .ThenInclude(s => s.Employee!)  // ✅ Add ! (null-forgiving operator)
+                .ThenInclude(s => s.Employee!)  
                 .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.EscalatedToEmployee!)  // ✅ Add !
+            .Include(e => e.EscalatedToEmployee!)  
                 .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.SubmittedByEmployee!)  // ✅ Add !
+            .Include(e => e.SubmittedByEmployee!)  
                 .ThenInclude(emp => emp.Userprofile)
-            .Include(e => e.ResolvedByEmployee!)  // ✅ Add !
+            .Include(e => e.ResolvedByEmployee!)  
                 .ThenInclude(emp => emp.Userprofile)
             .OrderByDescending(e => e.SubmittedAt)
             .ToListAsync();
@@ -908,9 +871,6 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
             }
         }
 
-        /// <summary>
-        /// Get completed SLAs ready for auto-closure
-        /// </summary>
         public async Task<List<Sla>> GetCompletedSlasAsync()
         {
             try
@@ -930,11 +890,7 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
             }
         }
         
-        // In Repository/Implementations/SlaRepository.cs - in History Operations section
 
-/// <summary>
-/// Get all SLA history records (for automation logs)
-/// </summary>
 public async Task<List<Slahistory>> GetAllSlaHistoryAsync()
 {
     try
@@ -959,6 +915,6 @@ public async Task<List<Slahistory>> GetAllSlaHistoryAsync()
      
         #endregion
 
-    } // ✅ CLASS CLOSING BRACE
+    } // CLASS CLOSING BRACE
 
-} // ✅ NAMESPACE CLOSING BRACE
+} //NAMESPACE CLOSING BRACE

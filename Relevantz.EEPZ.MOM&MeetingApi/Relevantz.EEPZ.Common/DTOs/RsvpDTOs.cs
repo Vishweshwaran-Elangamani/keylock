@@ -4,9 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs
 {
-    /// <summary>
-    /// DTO for submitting RSVP response to meeting invitation
-    /// </summary>
+
     public class RsvpResponseDto
     {
         [Required]
@@ -19,9 +17,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? RsvpComments { get; set; }
     }
 
-    /// <summary>
-    /// Response DTO for meeting invitation with RSVP details
-    /// </summary>
+
     public class MeetingInvitationDto
     {
         public int ParticipantId { get; set; }
@@ -33,8 +29,8 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string? Agenda { get; set; }
         public int ScheduledByEmployeeId { get; set; }
         public string ScheduledByEmployeeName { get; set; } = null!;
-        public string MeetingStatus { get; set; } = null!; // Scheduled, Completed, Cancelled
-        public string RsvpStatus { get; set; } = null!; // Pending, Accepted, Declined, Tentative
+        public string MeetingStatus { get; set; } = null!; 
+        public string RsvpStatus { get; set; } = null!; 
         public DateTime? RsvpResponseDate { get; set; }
         public string? RsvpComments { get; set; }
         public DateTime InvitedAt { get; set; }
@@ -42,9 +38,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public bool RequiresResponse => RsvpStatus == "Pending";
     }
 
-    /// <summary>
-    /// Summary of RSVP responses for a meeting (Manager view)
-    /// </summary>
+
     public class MeetingRsvpSummaryDto
     {
         public int MeetingId { get; set; }
@@ -60,9 +54,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<ParticipantRsvpDto> Participants { get; set; } = new();
     }
 
-    /// <summary>
-    /// Individual participant RSVP details
-    /// </summary>
+
     public class ParticipantRsvpDto
     {
         public int ParticipantId { get; set; }

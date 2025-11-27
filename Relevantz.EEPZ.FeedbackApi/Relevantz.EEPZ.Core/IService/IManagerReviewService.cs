@@ -9,7 +9,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 {
     /// <summary>
     /// Service interface for ManagerReviewComments business logic
-    /// Handles manager reviews on team/org goals (US048-US051, US083, US093)
     /// </summary>
     public interface IManagerReviewService
     {
@@ -19,7 +18,7 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Create manager review on team/org goal
-        /// Used by: US048 (Manager submit), US049 (Manager org goal review)
+       
         /// </summary>
         Task<ManagerReviewResponseDto> CreateReviewAsync(CreateManagerReviewRequestDto dto);
 
@@ -34,7 +33,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Get all reviews created BY manager (draft/pending)
-        /// Used by: US050 (Manager views own reviews to modify)
         /// </summary>
         Task<List<ManagerReviewResponseDto>> GetMyReviewsAsync(int managerId);
 
@@ -45,19 +43,16 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Get reviews on specific goal with context
-        /// Used by: US048 (View goal reviews)
         /// </summary>
         Task<List<ManagerReviewResponseDto>> GetReviewsByGoalAsync(int goalId);
 
         /// <summary>
         /// Get reviews on organization goal
-        /// Used by: US049, US051 (Org goal reviews)
         /// </summary>
         Task<List<ManagerReviewResponseDto>> GetReviewsByOrgGoalAsync(int orgGoalId);
 
         /// <summary>
         /// Get all manager reviews for HR/DeptHead
-        /// Used by: US083 (DeptHead view), US093 (HR view all)
         /// </summary>
         Task<List<ManagerReviewResponseDto>> GetAllReviewsAsync(int pageNumber = 1, int pageSize = 20);
 
@@ -72,24 +67,21 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Update review (content and rating)
-        /// Used by: US050 (Manager modify draft review)
         /// </summary>
         Task<ManagerReviewResponseDto> UpdateReviewAsync(int reviewId, UpdateManagerReviewRequestDto dto);
 
         /// <summary>
-        /// Submit review (Draft → Submitted)
-        /// Used by: US050 (Manager submit review)
+        /// Submit review
         /// </summary>
         Task<bool> SubmitReviewAsync(int reviewId);
 
         /// <summary>
-        /// Modify submitted review (Submitted → Modified)
-        /// Used by: US050 (Manager modify submitted review)
+        /// Modify submitted review
         /// </summary>
         Task<bool> ModifyReviewAsync(int reviewId);
 
         /// <summary>
-        /// Finalize review (Modified/Submitted → Finalized)
+        /// Finalize review 
         /// </summary>
         Task<bool> FinalizeReviewAsync(int reviewId);
 

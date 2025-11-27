@@ -17,7 +17,7 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         /// <summary>
         /// Create new HR feedback form template
-        /// Used by: US039 (HR creates feedback form)
+    
         /// </summary>
         Task<int> CreateFormAsync(Hrfeedbackform form);
 
@@ -51,9 +51,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         /// </summary>
         Task<bool> UpdateFormAsync(Hrfeedbackform form);
 
-        /// <summary>
-        /// Update form status (Draft → Active → Closed)
-        /// </summary>
         Task<bool> UpdateFormStatusAsync(int formId, string newStatus);
 
         /// <summary>
@@ -72,7 +69,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         /// <summary>
         /// Create form response submission
-        /// Used by: US039 (Employee submits form)
         /// </summary>
         Task<int> CreateFormResponseAsync(Hrfeedbackformresponse response);
 
@@ -83,7 +79,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         /// <summary>
         /// Get all responses for specific form
-        /// Used by: US039 (HR views all responses for form)
         /// </summary>
         Task<List<Hrfeedbackformresponse>> GetResponsesByFormAsync(int formId);
 

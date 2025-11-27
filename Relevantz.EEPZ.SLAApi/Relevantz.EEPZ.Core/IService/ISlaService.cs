@@ -24,9 +24,7 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<ApiResponse<SlaResponse>> UpdateSla(int slaid, UpdateSlaRequest request);
         Task<ApiResponse<string>> DeleteSla(int slaid);
 
-         /// <summary>
-        /// Bulk create multiple SLAs efficiently (15-85x faster than individual inserts)
-        /// </summary>
+
         Task<ApiResponse<BulkCreateSlaResponse>> BulkCreateSla(List<CreateSlaRequest> requests);
     }
 }
