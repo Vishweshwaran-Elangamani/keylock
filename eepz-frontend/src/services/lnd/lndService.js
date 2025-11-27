@@ -1,3 +1,5 @@
+
+
 import axios from "axios";
 
 // ==================== LnD MODULE BASE URL ====================
@@ -64,38 +66,38 @@ export const lndService = {
   // ==================== SKILLS ====================
 
   /**
- * Get current user's skills
- * @param {number} pageNumber - Page number (default: 1)
- * @param {string} searchTerm - Search term (optional)
- * @param {string} sortField - Sort field (optional)
- * @param {string} sortOrder - Sort order: 'asc' or 'desc' (optional)
- * @param {number} pageSize - Items per page (default: 10)
- * @returns {Promise} API response
- */
-getMySkills: async (
-  pageNumber = 1,
-  searchTerm = "",
-  sortField = "",
-  sortOrder = "asc",
-  pageSize = 10
-) => {
-  try {
-    const query = buildQueryString({
-      pageNumber,
-      searchTerm,
-      sortField,
-      sortOrder,
-      pageSize,
-    });
-    const response = await axios.get(
-      `${API_BASE_URL}/LnD/skills/my-skills${query}`,
-      { headers: getHeaders() }
-    );
-    return response;
-  } catch (error) {
-    return handleError(error);
-  }
-},
+   * Get current user's skills
+   * @param {number} pageNumber - Page number (default: 1)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortField - Sort field (optional)
+   * @param {string} sortOrder - Sort order: 'asc' or 'desc' (optional)
+   * @param {number} pageSize - Items per page (default: 10)
+   * @returns {Promise} API response
+   */
+  getMySkills: async (
+    pageNumber = 1,
+    searchTerm = "",
+    sortField = "",
+    sortOrder = "asc",
+    pageSize = 10
+  ) => {
+    try {
+      const query = buildQueryString({
+        pageNumber,
+        searchTerm,
+        sortField,
+        sortOrder,
+        pageSize,
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/skills/my-skills${query}`,
+        { headers: getHeaders() }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
 
   /**
    * Get subordinate employees' skills (Manager only)
@@ -300,6 +302,9 @@ getMySkills: async (
    * @param {number} pageNumber - Page number
    * @param {string} statusFilter - Status filter (optional)
    * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortField - Sort field (optional)
+   * @param {string} sortOrder - Sort order (optional)
+   * @param {number} pageSize - Items per page (default: 10)
    * @returns {Promise} API response
    */
   getMyAssignments: async (
@@ -308,7 +313,7 @@ getMySkills: async (
     searchTerm = "",
     sortField = "",
     sortOrder = "",
-    pageSize = 10,
+    pageSize = 10
   ) => {
     try {
       const query = buildQueryString({
@@ -317,7 +322,7 @@ getMySkills: async (
         searchTerm,
         sortField,
         sortOrder,
-    pageSize 
+        pageSize,
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/assignments/my-assignments${query}`,
@@ -334,6 +339,9 @@ getMySkills: async (
    * @param {number} pageNumber - Page number
    * @param {string} statusFilter - Status filter (optional)
    * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortField - Sort field (optional)
+   * @param {string} sortOrder - Sort order (default: asc)
+   * @param {number} pageSize - Items per page (default: 10)
    * @returns {Promise} API response
    */
   getTeamAssignments: async (
@@ -351,7 +359,7 @@ getMySkills: async (
         searchTerm,
         sortField,
         sortOrder,
-        pageSize
+        pageSize,
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/assignments/team${query}`,
@@ -368,6 +376,9 @@ getMySkills: async (
    * @param {number} pageNumber - Page number
    * @param {string} statusFilter - Status filter (optional)
    * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortField - Sort field (optional)
+   * @param {string} sortOrder - Sort order (default: asc)
+   * @param {number} pageSize - Items per page (default: 10)
    * @returns {Promise} API response
    */
   getSmeAssignments: async (
@@ -385,7 +396,7 @@ getMySkills: async (
         searchTerm,
         sortField,
         sortOrder,
-        pageSize
+        pageSize,
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/assignments/sme${query}`,
@@ -399,7 +410,7 @@ getMySkills: async (
 
   /**
    * Request SME assignment for subordinate (Manager only)
-   * @param {object} data - { skillId, menteeEmployeeId, deadline }
+   * @param {object} data - { skillId, menteeEmployeeId, mentorEmployeeId, deadline }
    * @returns {Promise} API response
    */
   requestSmeAssignment: async (data) => {
@@ -471,8 +482,35 @@ getMySkills: async (
     }
   },
 
+  /**
+   * Preview assignment completion proof in browser
+   * @param {number} assignmentId - Assignment ID
+   * @returns {Promise} Blob response for inline viewing
+   */
+  previewAssignmentProof: async (assignmentId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/assignments/${assignmentId}/proof/preview`,
+        {
+          headers: getHeaders(),
+          responseType: "blob",
+        }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
   // ==================== HR MANAGEMENT ====================
 
+  /**
+   * Get all organization employees (HR only)
+   * @param {number} pageNumber - Page number (default: 1)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {number} pageSize - Items per page (default: 12)
+   * @returns {Promise} API response
+   */
   getAllOrganizationEmployees: async (
     pageNumber = 1,
     searchTerm = "",
@@ -490,6 +528,16 @@ getMySkills: async (
     }
   },
 
+  /**
+   * Get all organization assignments (HR only)
+   * @param {number} pageNumber - Page number (default: 1)
+   * @param {string} statusFilter - Status filter (optional)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortField - Sort field (optional)
+   * @param {string} sortOrder - Sort order (optional)
+   * @param {number} pageSize - Items per page (default: 10)
+   * @returns {Promise} API response
+   */
   getAllOrganizationAssignments: async (
     pageNumber = 1,
     statusFilter = "",
@@ -517,6 +565,13 @@ getMySkills: async (
     }
   },
 
+  /**
+   * Get all active SMEs (HR only)
+   * @param {number} pageNumber - Page number (default: 1)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {number} pageSize - Items per page (default: 10)
+   * @returns {Promise} API response
+   */
   getAllActiveSmes: async (pageNumber = 1, searchTerm = "", pageSize = 10) => {
     try {
       const query = buildQueryString({ pageNumber, searchTerm, pageSize });
@@ -530,6 +585,14 @@ getMySkills: async (
     }
   },
 
+  /**
+   * Get employee skills for HR view
+   * @param {number} employeeId - Employee ID
+   * @param {number} pageNumber - Page number (default: 1)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortBy - Sort by field (default: 'skillname')
+   * @returns {Promise} API response
+   */
   getEmployeeSkillsForHR: async (
     employeeId,
     pageNumber = 1,
@@ -555,6 +618,9 @@ getMySkills: async (
    * @param {number} pageNumber - Page number
    * @param {string} approvalType - Approval type filter (optional)
    * @param {string} status - Status filter (optional)
+   * @param {string} sortField - Sort field (optional)
+   * @param {string} sortOrder - Sort order (default: asc)
+   * @param {number} pageSize - Items per page (default: 10)
    * @returns {Promise} API response
    */
   getMyApprovals: async (
@@ -572,7 +638,7 @@ getMySkills: async (
         status,
         sortField,
         sortOrder,
-        pageSize
+        pageSize,
       });
       const response = await axios.get(
         `${API_BASE_URL}/LnD/approvals/my-approvals${query}`,
@@ -608,6 +674,10 @@ getMySkills: async (
    * @param {string} role - Role filter: 'all', 'requester', 'approver'
    * @param {string} approvalType - Approval type filter (optional)
    * @param {string} status - Status filter (optional)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortField - Sort field (optional)
+   * @param {string} sortOrder - Sort order (optional)
+   * @param {number} pageSize - Items per page (default: 10)
    * @returns {Promise} API response
    */
   getApprovalHistory: async (
@@ -677,6 +747,26 @@ getMySkills: async (
       return handleError(error);
     }
   },
+
+  /**
+   * Preview approval attachment in browser
+   * @param {number} approvalId - Approval ID
+   * @returns {Promise} Blob response for inline viewing
+   */
+  previewApprovalAttachment: async (approvalId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/approvals/${approvalId}/attachment/preview`,
+        {
+          headers: getHeaders(),
+          responseType: "blob",
+        }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
 };
 
 /**
@@ -693,6 +783,37 @@ export const downloadFile = (blob, filename = "download") => {
   link.click();
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
+};
+
+
+
+/**
+ * Helper function to preview file in new browser tab
+ * @param {Blob} blob - File blob
+ * @param {string} contentType - MIME type of the file
+ */
+export const previewFile = (blob, contentType = "application/pdf") => {
+  const file = new Blob([blob], { type: contentType });
+  const fileURL = window.URL.createObjectURL(file);
+  
+  // Open in new tab for preview
+  const previewWindow = window.open(fileURL, "_blank");
+  
+  if (!previewWindow) {
+    // If popup blocked, create a link
+    const link = document.createElement("a");
+    link.href = fileURL;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+  
+  // Clean up after a delay
+  setTimeout(() => {
+    window.URL.revokeObjectURL(fileURL);
+  }, 100);
 };
 
 export default lndService;

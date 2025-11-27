@@ -396,35 +396,29 @@ const RequestSmeModal = ({ employeeId, skillId, onClose, onSuccess }) => {
                   borderRadius: "8px",
                   fontSize: "0.875rem",
                   fontWeight: "500",
-                  cursor: "pointer",
+                  cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={isSubmitEnabled}
+                disabled={!isSubmitEnabled}
                 style={{
                   padding: "0.625rem 1.25rem",
                   border: "none",
                   borderRadius: "8px",
-                  background:
-                    !loading && availableSmes.length > 0 && selectedSmeId
-                      ? "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
-                      : "#e5e7eb",
-                  color:
-                    !loading && availableSmes.length > 0 && selectedSmeId
-                      ? "#fff"
-                      : "#6c757d",
+                  background: isSubmitEnabled
+                    ? "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+                    : "#e5e7eb",
+                  color: isSubmitEnabled ? "#fff" : "#6c757d",
                   fontSize: "0.875rem",
                   fontWeight: "600",
-                  cursor:
-                    !loading && availableSmes.length > 0 && selectedSmeId
-                      ? "pointer"
-                      : "not-allowed",
+                  cursor: isSubmitEnabled ? "pointer" : "not-allowed",
                   display: "flex",
                   alignItems: "center",
                   gap: "0.5rem",
+                  transition: "all 0.2s",
                 }}
               >
                 {loading ? (

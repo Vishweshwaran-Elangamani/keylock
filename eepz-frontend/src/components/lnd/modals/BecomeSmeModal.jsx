@@ -39,18 +39,18 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
     // Validate file type
     if (!FILE_UPLOAD.ALLOWED_TYPES.includes(selectedFile.type)) {
       toast.error("Invalid file type. Allowed: PDF, DOC, DOCX, Images, ZIP");
-      return;
+      return; 
     }
 
     setFile(selectedFile);
-  };
+  }; 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!file) {
       toast.error("Please upload a proof document");
-      return;
+      return; 
     }
 
     try {
@@ -58,7 +58,7 @@ const BecomeSmeModal = ({ skill, onClose, onSuccess }) => {
 
       const formData = new FormData();
       formData.append("skillId", skill.skillId);
-      formData.append("proofDocument", file);
+      formData.append("proofDocument", file); 
 
       const response = await lndService.applyToBecomeSme(formData);
 

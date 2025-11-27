@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { X, CheckCircle, XCircle, Download } from "lucide-react";
-import { lndService, downloadFile } from "../../../services/lnd/lndService";
+import { X, CheckCircle, XCircle, Download, Eye } from "lucide-react";
+import lndService, {
+  downloadFile,
+  previewFile,
+} from "../../../services/lnd/lndService";
 import { APPROVAL_TYPE } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 
 const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
-  const [decision, setDecision] = useState(null); // 'approve' or 'reject'
+  const [decision, setDecision] = useState(null);
   const [notes, setNotes] = useState("");
-  const [newRating, setNewRating] = useState(""); // for completion flow
+  const [newRating, setNewRating] = useState("");
   const [processing, setProcessing] = useState(false);
 
   const getApprovalTypeLabel = (type) => {
@@ -20,17 +23,66 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
     return labels[type] || type;
   };
 
+  // Check if file can be previewed (only PDF and images)
+  const fileName = approval.attachmentFileName || approval.attachmentPath || "";
+  const extension = fileName.split(".").pop()?.toLowerCase();
+  const canPreview = [
+    "pdf",
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "bmp",
+    "svg",
+  ].includes(extension);
+
+  // PREVIEW HANDLER
+  const handlePreview = async () => {
+    if (!canPreview) {
+      toast.info(
+        "Preview not supported for this file type. Please download to view."
+      );
+      return;
+    }
+
+    try {
+      const response = await lndService.previewApprovalAttachment(
+        approval.approvalId
+      );
+
+      if (response?.data) {
+        const contentType =
+          response.headers["content-type"] || "application/pdf";
+        previewFile(response.data, contentType);
+        toast.success("Opening preview...");
+      }
+    } catch (error) {
+      console.error("Failed to preview:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.errors?.[0] ||
+        "Failed to preview document";
+      toast.error(errorMessage);
+    }
+  };
+
   const handleDownload = async () => {
     try {
       const response = await lndService.downloadApprovalAttachment(
         approval.approvalId
       );
-      const filename = `approval_${approval.approvalId}_attachment`;
+      const filename =
+        approval.attachmentFileName ||
+        `approval_${approval.approvalId}_attachment`;
       downloadFile(response.data, filename);
       toast.success("File downloaded successfully");
     } catch (error) {
       console.error("Failed to download:", error);
-      toast.error("Failed to download file");
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.errors?.[0] ||
+        "Failed to download file";
+      toast.error(errorMessage);
     }
   };
 
@@ -188,7 +240,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
               backgroundColor: "rgb(39, 35, 92)",
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
+              alignItems: "center", 
               flexShrink: 0,
             }}
           >
@@ -197,7 +249,7 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
             </h5>
             <button
               type="button"
-              class="btn-close-white"
+              className="btn-close-white"
               onClick={onClose}
               style={{
                 border: "none",
@@ -228,8 +280,8 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
           {/* Body */}
           <div
             style={{
-              flexGrow: 1, // take remaining space
-              overflowY: "auto", // scroll only here
+              flexGrow: 1,
+              overflowY: "auto",
               padding: "1.5rem",
             }}
           >
@@ -337,14 +389,66 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                   </p>
                 </div>
 
-                {/* Download Attachment */}
+                {/* Preview & Download Buttons */}
                 {approval.attachmentPath && (
-                  <div style={{ marginBottom: "1.5rem" }}>
+                  <div
+                    style={{
+                      marginBottom: "1.5rem",
+                      display: "flex",
+                      gap: "0.75rem",
+                    }}
+                  >
+                    {/* Preview Button */}
+                    <button
+                      type="button"
+                      onClick={handlePreview}
+                      disabled={!canPreview}
+                      title={
+                        !canPreview
+                          ? "Preview not supported for this file type"
+                          : "Preview document in browser"
+                      }
+                      style={{
+                        flex: 1,
+                        padding: "0.75rem",
+                        background: canPreview ? "#f8f9fa" : "#e5e7eb",
+                        border: "1px solid rgb(39, 35, 92, 0.5)",
+                        borderRadius: "8px",
+                        fontSize: "0.875rem",
+                        fontWeight: "600",
+                        cursor: canPreview ? "pointer" : "not-allowed",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.5rem",
+                        color: canPreview ? "#97247E" : "#6b7280",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (canPreview) {
+                          e.currentTarget.style.background = "rgb(39, 35, 92)";
+                          e.currentTarget.style.color = "#fff";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (canPreview) {
+                          e.currentTarget.style.background = "#f8f9fa";
+                          e.currentTarget.style.color = "#97247E";
+                        }
+                      }}
+                    >
+                      <Eye size={16} />
+                      {canPreview
+                        ? "Preview Document"
+                        : "Preview Not Supported"}
+                    </button>
+
+                    {/* Download Button */}
                     <button
                       type="button"
                       onClick={handleDownload}
                       style={{
-                        width: "100%",
+                        flex: 1,
                         padding: "0.75rem",
                         background: "#f8f9fa",
                         border: "1px solid rgb(39, 35, 92, 0.5)",
@@ -360,16 +464,16 @@ const ApprovalDecisionModal = ({ approval, onClose, onSuccess }) => {
                         transition: "all 0.2s",
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.background = "#97247E";
-                        e.target.style.color = "#fff";
+                        e.currentTarget.style.background = "rgb(39, 35, 92)";
+                        e.currentTarget.style.color = "#fff";
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.background = "#f8f9fa";
-                        e.target.style.color = "#97247E";
+                        e.currentTarget.style.background = "#f8f9fa";
+                        e.currentTarget.style.color = "#97247E";
                       }}
                     >
                       <Download size={16} />
-                      Download Attached Document
+                      Download Attachment
                     </button>
                   </div>
                 )}
