@@ -162,6 +162,10 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? searchTerm,
             string? sortBy
         );
+        
+        Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(int employeeId, int approvalId);
+        Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(int employeeId, int assignmentId);
+
     }
 
     public interface IFileStorageService
@@ -170,5 +174,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<bool> DeleteFileAsync(string filePath);
         Task<byte[]> GetFileAsync(string filePath);
         string GetFileUrl(string filePath);
+
+          Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string filePath);
+
     }
 }

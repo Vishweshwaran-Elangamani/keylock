@@ -106,7 +106,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Message = $"Error retrieving skills: {ex.Message}",
                 };
             }
-        }
+        } 
 
         public async Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetSubordinateSkills(
             int managerId,
@@ -1615,7 +1615,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Errors = new List<string> { ex.Message },
                 };
             }
-        }
+        } 
 
         public async Task<ApiResponse<FileDownloadDto>> GetAssignmentProof(
             int employeeId,
@@ -1699,6 +1699,117 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 ".txt" => "text/plain",
                 _ => "application/octet-stream",
             };
+        }
+
+        
+        public async Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(int employeeId, int approvalId)
+        {
+            try
+            {
+                var approval = await _repository.GetApprovalByIdAsync(approvalId);
+
+                if (approval == null)
+                    return new ApiResponse<FileDownloadDto>
+                    {
+                        Success = false,
+                        Message = "Approval not found"
+                    };
+
+                // Authorization check
+                if (approval.RequesterEmployeeId != employeeId && approval.ApproverEmployeeId != employeeId)
+                    return new ApiResponse<FileDownloadDto>
+                    {
+                        Success = false,
+                        Message = "You do not have access to this file"
+                    };
+
+                if (approval.Attachment == null)
+                    return new ApiResponse<FileDownloadDto>
+                    {
+                        Success = false,
+                        Message = "No attachment found for this approval"
+                    };
+
+                var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(approval.Attachment.FilePath);
+
+                return new ApiResponse<FileDownloadDto>
+                {
+                    Success = true,
+                    Data = new FileDownloadDto
+                    {
+                        FileBytes = fileBytes,
+                        FileName = fileName,
+                        ContentType = contentType,
+                        FileSize = approval.Attachment.FileSize ?? 0
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<FileDownloadDto>
+                {
+                    Success = false,
+                    Message = "An error occurred while previewing the file",
+                    Errors = new List<string> { ex.Message }
+                };
+            }
+        }
+
+        public async Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(int employeeId, int assignmentId)
+        {
+            try
+            {
+                var assignment = await _repository.GetAssignmentByIdAsync(assignmentId);
+
+                if (assignment == null)
+                    return new ApiResponse<FileDownloadDto>
+                    {
+                        Success = false,
+                        Message = "Assignment not found"
+                    };
+
+                // Authorization check
+                var isMentee = assignment.MenteeEmployeeId == employeeId;
+                var isSme = assignment.Sme.EmployeeId == employeeId;
+                var isManager = assignment.MenteeEmployee.ReportingManagerEmployeeId == employeeId;
+
+                if (!isMentee && !isSme && !isManager)
+                    return new ApiResponse<FileDownloadDto>
+                    {
+                        Success = false,
+                        Message = "You do not have access to this file"
+                    }; 
+
+                if (string.IsNullOrEmpty(assignment.ProofFilePath))
+                    return new ApiResponse<FileDownloadDto>
+                    {
+                        Success = false,
+                        Message = "No completion proof uploaded yet"
+                    };
+
+                var (fileBytes, contentType, fileName) = await _fileStorage.GetFileForPreviewAsync(assignment.ProofFilePath);
+
+                return new ApiResponse<FileDownloadDto>
+                {
+                    Success = true,
+                    Data = new FileDownloadDto
+                    {
+                        FileBytes = fileBytes,
+                        FileName = fileName,
+                        ContentType = contentType,
+                        FileSize = fileBytes.Length
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<FileDownloadDto>
+                {
+                    Success = false,
+                    Message = "An error occurred while previewing the file",
+                    Errors = new List<string> { ex.Message }
+                };
+            }
         }
 
         #endregion

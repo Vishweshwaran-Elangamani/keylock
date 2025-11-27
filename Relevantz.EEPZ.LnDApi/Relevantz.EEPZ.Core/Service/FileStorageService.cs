@@ -14,6 +14,38 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _environment = environment;
         }
 
+        public async Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string filePath)
+        {
+            var fullPath = Path.Combine(_environment.WebRootPath, filePath);
+            if (!File.Exists(fullPath))
+                throw new FileNotFoundException("File not found");
+
+            var fileBytes = await File.ReadAllBytesAsync(fullPath);
+            var fileName = Path.GetFileName(fullPath);
+            var contentType = GetContentType(fileName);
+
+            return (fileBytes, contentType, fileName);
+        }
+
+
+        private string GetContentType(string fileName)
+        {
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            return extension switch
+            {
+                ".pdf" => "application/pdf",
+                ".doc" => "application/msword",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".xls" => "application/vnd.ms-excel",
+                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                ".png" => "image/png",
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".gif" => "image/gif",
+                ".txt" => "text/plain",
+                _ => "application/octet-stream"
+            };
+        }
+
         public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
         {
             if (file == null || file.Length == 0)

@@ -492,6 +492,32 @@ namespace Relevantz.EEPZ.Api.Controllers
             return File(fileBytes, contentType, fileName);
         }
 
+         [HttpGet("approvals/{approvalId}/attachment/preview")]
+        public async Task<IActionResult> PreviewApprovalAttachment(int approvalId)
+        {
+            var employeeId = int.Parse(User.FindFirst("empId")?.Value ?? "0");
+            var result = await _lndService.PreviewApprovalAttachment(employeeId, approvalId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+         
+            return File(result.Data.FileBytes, result.Data.ContentType, result.Data.FileName, enableRangeProcessing: true);
+        } 
+
+        [HttpGet("assignments/{assignmentId}/proof/preview")]
+        public async Task<IActionResult> PreviewAssignmentProof(int assignmentId)
+        {
+            var employeeId = int.Parse(User.FindFirst("empId")?.Value ?? "0");
+            var result = await _lndService.PreviewAssignmentProof(employeeId, assignmentId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+      
+            return File(result.Data.FileBytes, result.Data.ContentType, result.Data.FileName, enableRangeProcessing: true);
+        } 
+
         #endregion
     }
 }
