@@ -15,6 +15,30 @@ const calculateAverageRating = (items) => {
   if (validRatings.length === 0) return 0;
   return (validRatings.reduce((a, b) => a + b, 0) / validRatings.length).toFixed(2);
 };
+
+// ✅ Helper function to get extension from content-type (MOVED TO TOP LEVEL)
+const getExtensionFromContentType = (contentType) => {
+  if (!contentType) return null;
+  
+  const mimeToExt = {
+    'application/pdf': '.pdf',
+    'application/msword': '.doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+    'application/vnd.ms-excel': '.xls',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+    'application/vnd.ms-powerpoint': '.ppt',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+    'text/plain': '.txt',
+    'text/csv': '.csv',
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'application/zip': '.zip',
+    'application/x-zip-compressed': '.zip',
+  };
+  
+  return mimeToExt[contentType.toLowerCase()] || null;
+};
  
 const isL1Complete = (assess) => {
   return (assess.items || []).every(
@@ -157,7 +181,8 @@ function TeamLeadPage() {
     }
   };
  
-  const openModal = (assess) => {
+  // ✅ UPDATED: Fetch attachments when opening modal
+  const openModal = async (assess) => {
     setModalData(assess);
     const ratings = {};
     (assess.items || []).forEach((item) => {
@@ -177,6 +202,28 @@ function TeamLeadPage() {
     setModalRatings(ratings);
     setShowRejectReason(false);
     setRejectionReason("");
+    
+    // ✅ NEW: Fetch attachments for this assessment
+    try {
+      const endpoint = active === "l1" 
+        ? `/approver/${userId}/assessment/${assess.assessmentId}/attachments`
+        : `/reviewer/${userId}/assessment/${assess.assessmentId}/attachments`;
+      
+      const attachmentsResp = await api.get(endpoint);
+      const attachments = attachmentsResp.data?.data || attachmentsResp.data || [];
+      
+      setModalData(prev => ({
+        ...assess,
+        attachments: attachments
+      }));
+    } catch (error) {
+      console.error("Error fetching attachments:", error);
+      setModalData(prev => ({
+        ...assess,
+        attachments: []
+      }));
+    }
+    
     setShowModal(true);
   };
  
@@ -297,6 +344,81 @@ function TeamLeadPage() {
       toast.error("Failed to reject.");
     } finally {
       setL2ActionLoading(false);
+    }
+  };
+
+  // ✅ COMPLETE FIX: Handle attachment download with proper header extraction
+  const handleDownloadAttachment = async (attachmentId) => {
+    try {
+      console.log(`Downloading attachment ${attachmentId} for ${active} role`);
+      
+      const endpoint = active === "l1" 
+        ? `/approver/${userId}/attachments/${attachmentId}/download`
+        : `/reviewer/${userId}/attachments/${attachmentId}/download`;
+      
+      console.log(`Download endpoint: ${endpoint}`);
+      
+      const response = await api.get(endpoint, {
+        responseType: 'blob'
+      });
+      
+      console.log('Full Response:', response);
+      console.log('Response headers object:', response.headers);
+      
+      // ✅ CRITICAL FIX: Extract filename from content-disposition header properly
+      let filename = 'attachment';
+      
+      // Try to get from response headers (Axios exposes this)
+      const contentDisposition = response.headers['content-disposition'];
+      console.log('Content-Disposition header:', contentDisposition);
+      
+      if (contentDisposition) {
+        // Match patterns: 
+        // attachment; filename="SAMPLE PDF.pdf"
+        // attachment; filename=SAMPLE PDF.pdf
+        const matches = contentDisposition.match(/filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/);
+        if (matches && (matches[1] || matches[2])) {
+          filename = matches[1] || matches[2];
+          filename = filename.trim();
+          console.log('✅ Extracted filename from header:', filename);
+        }
+      }
+      
+      // If still no filename, try content-type to infer extension
+      const contentType = response.headers['content-type'];
+      console.log('Content-Type:', contentType);
+      
+      if (!filename.includes('.') && contentType) {
+        const extension = getExtensionFromContentType(contentType);
+        if (extension) {
+          filename = `${filename}${extension}`;
+          console.log('Added extension based on content-type:', filename);
+        }
+      }
+      
+      console.log('Final filename for download:', filename);
+      
+      // ✅ Create blob and download
+      const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup after a brief delay
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+      
+      toast.success(`Downloaded: ${filename}`);
+    } catch (error) {
+      console.error("Error downloading attachment:", error);
+      console.error("Error response:", error.response);
+      toast.error("Failed to download attachment.");
     }
   };
  
@@ -586,6 +708,7 @@ function TeamLeadPage() {
           submitting={submitting}
           l2ActionLoading={l2ActionLoading}
           active={active}
+          handleDownloadAttachment={handleDownloadAttachment} // ✅ Pass download handler
         />
       )}
     </div>
@@ -593,6 +716,3 @@ function TeamLeadPage() {
 }
  
 export default TeamLeadPage;
- 
- 
- 

@@ -153,6 +153,22 @@ function FormCreate() {
         errors[`comp_${idx}_name`] = `Competency name is required`;
       }
     });
+    const newValidationErrors = {};
+
+model.competencies.forEach((comp, index) => {
+  if (!comp.name || comp.name.trim() === "") {
+    newValidationErrors[`comp_${index}_name`] = "Competency name is required";
+  }
+  if (!comp.description || comp.description.trim() === "") {
+    newValidationErrors[`comp_${index}_description`] = "Description is required";
+  }
+});
+
+if (Object.keys(newValidationErrors).length > 0) {
+  setValidationErrors(newValidationErrors);
+  return; // stop submission
+}
+
 
     setValidationErrors(errors);
 
@@ -258,29 +274,43 @@ function FormCreate() {
     <div className="hrfcper-page">
       {/* Top Bar */}
       <div className="hrfcper-top-bar">
-       <ol className="hrfcper-breadcrumb">
-  <li className="hrfcper-breadcrumb-item" onClick={() => navigate("/dashboard")}>
-    <i className="bi bi-house-door"></i>
-  </li>
-  <li className="hrfcper-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")}>
-    <span>Performance</span>
-  </li>
-  <li className="hrfcper-breadcrumb-item active" aria-current="page">
-    {isEditMode ? "Edit Form" : "Create Form"}
-  </li>
-</ol>
+  <ol
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "4px",          // tighter spacing
+      listStyle: "none",
+      padding: 0,
+      margin: 0
+    }}
+  >
+    <li
+      style={{ cursor: "pointer", display: "flex", alignItems: "center", color: "#97247E" }}
+      onClick={() => navigate("/dashboard")}
+    >
+      <i className="bi bi-house-door"></i>
+    </li>
 
-        <button
-  type="button"
-  className="hrfcper-btn-back"
-  onClick={() => navigate("/hr/dashboard/performance/formslist")}
-  disabled={busy}
->
-  <i className="bi bi-arrow-left"></i>
-  Back to Forms
-</button>
+    <span style={{ color: "#97247E" }}>/</span>
 
-      </div>
+    <li
+      style={{ cursor: "pointer", display: "flex", alignItems: "center", color: "#97247E" }}
+      onClick={() => navigate("/hr/dashboard/performance")}
+    >
+      Performance
+    </li>
+
+    <span style={{ color: "#97247E" }}>/</span>
+
+    <li
+      style={{ fontWeight: "600", display: "flex", alignItems: "center", color: "#97247E" }}
+      aria-current="page"
+    >
+      {isEditMode ? "Edit Form" : "Create Form"}
+    </li>
+  </ol>
+</div>
+
 
     
 
@@ -339,7 +369,7 @@ function FormCreate() {
                       <option value="">Select form type</option>
                       <option value="Self">Self</option>
                       <option value="Manager">Manager</option>
-                      <option value="HR Summary">HR Summary</option>
+                      
                     </select>
                     {validationErrors.type && (
                       <span className="hrfcper-error-text">
@@ -497,18 +527,39 @@ function FormCreate() {
                     </div>
                   </div>
                   <div className="hrfcper-form-group hrfcper-full-width">
-                    <label className="hrfcper-label">Description (Optional)</label>
-                    <textarea
-                      className="hrfcper-textarea"
-                      placeholder="Enter competency description..."
-                      rows="2"
-                      value={comp.description || ""}
-                      onChange={(e) => updateComp(index, "description", e.target.value)}
-                      disabled={busy}
-                    ></textarea>
+  <label className="hrfcper-label">
+    Description <span className="hrfcper-required">*</span>
+  </label>
+  <div className="hrfcper-error-wrapper">
+    <textarea
+      className={`hrfcper-textarea ${
+        validationErrors[`comp_${index}_description`] ? "hrfcper-input-error" : ""
+      }`}
+      placeholder="Enter competency description..."
+      rows="2"
+      value={comp.description || ""}
+      onChange={(e) => {
+        updateComp(index, "description", e.target.value);
+        setValidationErrors({
+          ...validationErrors,
+          [`comp_${index}_description`]: null, // clear error on change
+        });
+      }}
+      disabled={busy}
+    ></textarea>
+
+    {validationErrors[`comp_${index}_description`] && (
+      <span className="hrfcper-error-text">
+        <i className="bi bi-exclamation-circle"></i>
+        {validationErrors[`comp_${index}_description`]}
+      </span>
+    )}
+  </div>
+</div>
+
                   </div>
                 </div>
-              </div>
+              
             ))}
           </div>
         </div>

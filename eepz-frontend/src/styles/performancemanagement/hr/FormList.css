@@ -87,6 +87,9 @@
   min-height: 100px;
   display: flex;
   align-items: center;
+  border-radius: 12px;
+  border: 1px solid #27235c;
+  padding: 1.5rem;
 }
 
 /* Main Area Grid */

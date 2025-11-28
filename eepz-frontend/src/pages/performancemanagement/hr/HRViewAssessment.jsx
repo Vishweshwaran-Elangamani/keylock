@@ -5,6 +5,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import AppraisalDetailsModal from "../../../components/performance_management/modals/HRViewAssessment/AppraisalDetailsModal";
 import "../../../styles/performancemanagement/hr/HRViewAssessment.css";
 
+
 function exportToCsv(filename, rows) {
   if (!rows || !rows.length) return;
   const separator = ",";
@@ -34,11 +35,13 @@ function exportToCsv(filename, rows) {
   document.body.removeChild(link);
 }
 
+
 function average(values) {
   const arr = values.filter((v) => typeof v === "number");
   if (!arr.length) return "N/A";
   return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2);
 }
+
 
 function statusBadge(status) {
   if (typeof status !== "string") return "";
@@ -65,6 +68,7 @@ function statusBadge(status) {
   );
 }
 
+
 function HRViewAppraisals() {
   const [loading, setLoading] = useState(true);
   const [appraisals, setAppraisals] = useState([]);
@@ -73,10 +77,13 @@ function HRViewAppraisals() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterProject, setFilterProject] = useState("all");
   const [modalRow, setModalRow] = useState(null);
+  const [modalAttachments, setModalAttachments] = useState([]);
   const navigate = useNavigate();
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
 
   useEffect(() => {
     async function fetchAppraisals() {
@@ -107,6 +114,7 @@ function HRViewAppraisals() {
     fetchAppraisals();
   }, []);
 
+
   const allSummaryRows = useMemo(() => {
     return appraisals.map((a, idx) => {
       const empRatings = a.competencies
@@ -124,6 +132,7 @@ function HRViewAppraisals() {
       if (a.competencies.some((c) => c.status !== status)) status = "Mixed";
       return {
         key: `${a.employeeId}-${a.projectName}-${idx}`,
+        employeeId: a.employeeId,
         employeeName: a.employeeName,
         projectName: a.projectName,
         empAvg: average(empRatings),
@@ -133,9 +142,11 @@ function HRViewAppraisals() {
         l2Avg: average(l2Ratings),
         status,
         competencies: a.competencies,
+        attachments: a.attachments || [],
       };
     });
   }, [appraisals]);
+
 
   const uniqueProjects = useMemo(() => {
     const projects = new Set();
@@ -146,8 +157,10 @@ function HRViewAppraisals() {
     return Array.from(projects);
   }, [allSummaryRows]);
 
+
   const summaryRows = useMemo(() => {
     let filtered = [...allSummaryRows];
+
 
     if (filterStatus !== "all") {
       filtered = filtered.filter((row) => {
@@ -158,9 +171,11 @@ function HRViewAppraisals() {
       });
     }
 
+
     if (filterProject !== "all") {
       filtered = filtered.filter((row) => row.projectName === filterProject);
     }
+
 
     if (searchTerm.trim() !== "") {
       const search = searchTerm.trim().toLowerCase();
@@ -169,13 +184,16 @@ function HRViewAppraisals() {
       );
     }
 
+
     return filtered;
   }, [allSummaryRows, filterStatus, filterProject, searchTerm]);
+
 
   const totalPages = Math.ceil(summaryRows.length / rowsPerPage);
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
   const currentItems = summaryRows.slice(indexOfFirstItem, indexOfLastItem);
+
 
   function getPageNumbers() {
     const pages = [];
@@ -196,6 +214,7 @@ function HRViewAppraisals() {
     return pages;
   }
 
+
   const csvData = useMemo(() => {
     return summaryRows.map((r) => ({
       "Employee Name": r.employeeName,
@@ -208,6 +227,14 @@ function HRViewAppraisals() {
       Status: r.status,
     }));
   }, [summaryRows]);
+
+
+  // Handle modal opening with attachments
+  const handleViewDetails = (row) => {
+    setModalRow(row);
+    setModalAttachments(row.attachments || []);
+  };
+
 
   if (loading)
     return (
@@ -234,6 +261,7 @@ function HRViewAppraisals() {
       </div>
     );
 
+
   return (
     <div className="hrvasspm-page">
       <div
@@ -244,20 +272,29 @@ function HRViewAppraisals() {
           marginBottom: "2rem",
         }}
       >
-        <nav className="cg-breadcrumbs" style={{ background: "transparent" }} aria-label="breadcrumb">
-          <ol className="cg-breadcrumb" style={{ margin: 0 }}>
-            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard")} style={{ cursor: "pointer" }}>
+        <nav className="cg-breadcrumbs" aria-label="breadcrumb">
+          <ol className="cg-breadcrumb">
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard")}
+              style={{ cursor: "pointer" }}
+            >
               <i className="bi bi-house-door"></i>
             </li>
-            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")} style={{ cursor: "pointer" }}>
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard/performance")}
+              style={{ cursor: "pointer" }}
+            >
               Performance
             </li>
             <li className="cg-breadcrumb-item active" aria-current="page">
-              Form Details
+              Initiate Form
             </li>
           </ol>
         </nav>
       </div>
+
 
       <div className="hrvasspm-container">
         <div className="hrvasspm-filters">
@@ -304,19 +341,22 @@ function HRViewAppraisals() {
             </select>
           </div>
 
+
           <div className="hrvasspm-filter-group">
             <label style={{ visibility: "hidden" }}>Export</label>
             
-<button
-  className="hrvasspm-btn-export"
-  onClick={() => exportToCsv("appraisals.csv", csvData)}
-  style={{ padding: "8px 60px" }} // top, right, bottom, left
->
-  <i className="bi bi-download"></i> Export CSV
-</button>
+            <button
+              className="hrvasspm-btn-export"
+              onClick={() => exportToCsv("appraisals.csv", csvData)}
+              style={{ padding: "8px 60px" }}
+            >
+              <i className="bi bi-download"></i> Export CSV
+            </button>
+
 
           </div>
         </div>
+
 
         <div className="hrvasspm-table-card">
           <div className="hrvasspm-table-wrapper">
@@ -355,7 +395,11 @@ function HRViewAppraisals() {
                       <td>{statusBadge(row.status)}</td>
                       <td>
                         <div className="hrvasspm-action-buttons">
-                          <button className="hrvasspm-action-btn hrvasspm-btn-view" title="View Details" onClick={() => setModalRow(row)}>
+                          <button 
+                            className="hrvasspm-action-btn hrvasspm-btn-view" 
+                            title="View Details" 
+                            onClick={() => handleViewDetails(row)}
+                          >
                             <i className="bi bi-eye"></i>
                           </button>
                         </div>
@@ -366,6 +410,7 @@ function HRViewAppraisals() {
               </tbody>
             </table>
           </div>
+
 
           {/* PAGINATION - SINGLE ROW */}
           <div className="hrvasspm-pagination-container">
@@ -425,14 +470,20 @@ function HRViewAppraisals() {
       {modalRow && (
         <AppraisalDetailsModal
           show={!!modalRow}
-          onClose={() => setModalRow(null)}
+          onClose={() => {
+            setModalRow(null);
+            setModalAttachments([]);
+          }}
+          employeeId={modalRow.employeeId}
           employeeName={modalRow.employeeName}
           projectName={modalRow.projectName}
           competencies={modalRow.competencies}
+          attachments={modalAttachments}
         />
       )}
     </div>
   );
 }
+
 
 export default HRViewAppraisals;

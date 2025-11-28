@@ -24,54 +24,7 @@
     align-items: center;
     margin-bottom: 1.5rem;
   }
-  
-  /* ========================
-     BREADCRUMBS
-     ======================== */
-  .hrfcper-breadcrumb-nav {
-    flex: 1;
-  }
-  
-  .hrfcper-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    font-size: 0.875rem;
-  }
-  
-  .hrfcper-breadcrumb-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #97247E;
-    cursor: pointer;
-    transition: color 0.2s ease;
-  }
-  
-  .hrfcper-breadcrumb-item:hover {
-    color: #7a1d65;
-  }
-  
-  .hrfcper-breadcrumb-item i {
-    font-size: 1rem;
-  }
-  
-  .hrfcper-breadcrumb-item:not(:last-child)::after {
-    content: '\F285';
-    font-family: 'bootstrap-icons';
-    margin-left: 0.5rem;
-    color: #6c757d;
-  }
-  
-  .hrfcper-breadcrumb-item.active {
-    color: #97247E;
-    font-weight: 600;
-    cursor: default;
-  }
-  
+ 
   /* Back Button */
   .hrfcper-btn-back {
     display: flex;
@@ -146,6 +99,7 @@
     position: sticky;
     top: 1.5rem;
     align-self: start;
+    
   }
   
   /* ========================
@@ -161,6 +115,7 @@
   /* General Details Section */
   .hrfcper-section.hrfcper-general-details {
     display: block;
+    
   }
   
   /* Right Column - Competencies Section with Fixed Header */
@@ -182,6 +137,7 @@
     flex-shrink: 0;
     position: relative;
     z-index: 10;
+    
   }
   
   .hrfcper-section-header i {
@@ -273,6 +229,7 @@
     font-weight: 600;
     color: #27235c;
     text-align: left;
+    
   }
   
   .hrfcper-required {
@@ -291,6 +248,7 @@
     color: #27235c;
     background: #fff;
     transition: all 0.2s ease;
+    
   }
   
   .hrfcper-input:focus,
@@ -344,7 +302,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: #27235c;
+    background: linear-gradient(135deg, #97247E 0%, #E01950 100%);
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -355,11 +313,7 @@
     align-self: flex-start;
   }
   
-  .hrfcper-btn-add-comp:hover:not(:disabled) {
-    background: #97247E;
-    transform: translateY(-1px);
-  }
-  
+ 
   .hrfcper-btn-add-comp:disabled {
     opacity: 0.5;
     cursor: not-allowed;

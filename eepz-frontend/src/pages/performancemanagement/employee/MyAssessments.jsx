@@ -1,12 +1,5 @@
-// Paste your JSX component code below (replace this entire file contents with your .jsx file)
-
-/*
-  MyAssessments_updated.jsx
-  - Updated: search box now uses a separate Search button and Enter key to trigger filtering
-  - Fixed: Form Type select default value now matches filter logic ("All")
-  - Added: local input state `searchInput` so typing doesn't immediately filter results
-  - Minor: Enter key submits search, and Search button placed next to input
-*/
+// MyAssessments_updated.jsx
+// Updated: Added attachment name field with improved design
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -56,7 +49,6 @@ function Breadcrumbs({ items = [] }) {
   );
 }
 
-
 function MyAssessments() {
   const navigate = useNavigate();
   const [assignments, setAssignments] = useState([]);
@@ -68,12 +60,15 @@ function MyAssessments() {
   const [submitting, setSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState("pending");
   const [searchQuery, setSearchQuery] = useState("");
-  // NEW: local input state so typing does NOT immediately filter
   const [searchInput, setSearchInput] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [formTypeFilter, setFormTypeFilter] = useState("All");
-  const [timers, setTimers] = useState({}); // Store all pending form timers
-  const [visibleTimers, setVisibleTimers] = useState([]); // Store visible timer bars
+  const [timers, setTimers] = useState({});
+  const [visibleTimers, setVisibleTimers] = useState([]);
+
+  // ✅ Attachment states
+  const [attachments, setAttachments] = useState([]);
+  const [viewAttachments, setViewAttachments] = useState([]);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
@@ -90,7 +85,7 @@ function MyAssessments() {
     fetchAssignments();
   }, [userId, navigate]);
 
-  // TIMER EFFECT - RUNS EVERY SECOND FOR ALL PENDING FORMS
+  // TIMER EFFECT
   useEffect(() => {
     const interval = setInterval(() => {
       const pendingAssignments = assignments.filter((a) => !a.isCompleted);
@@ -113,7 +108,6 @@ function MyAssessments() {
       });
 
       setTimers(newTimers);
-      // Show all pending form timers at the top, sorted by soonest deadline
       const sorted = Object.entries(newTimers)
         .map(([key, value]) => ({ id: key, ...value }))
         .sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
@@ -133,7 +127,6 @@ function MyAssessments() {
       const { data } = await api.get(`/AppraisalProcess/employee/${userId}`);
       if (data.success) {
         setAssignments(data.data || []);
-        // toast.success("Assessments loaded successfully");
       } else {
         toast.error(data.message || "Failed to fetch assignments.");
       }
@@ -156,6 +149,7 @@ function MyAssessments() {
       comments: "",
     }));
     setAssessmentData(initialData);
+    setAttachments([]);
     setShowModal(true);
   };
 
@@ -174,6 +168,7 @@ function MyAssessments() {
           comments: detail.comments || "",
         }));
         setAssessmentData(viewData);
+        setViewAttachments(data.data.attachments || []);
         setShowModal(true);
         toast.success("Assessment loaded successfully");
       } else {
@@ -193,15 +188,62 @@ function MyAssessments() {
     );
   };
 
+  // ✅ Handle file selection
+  const handleFileSelect = (event) => {
+    const files = Array.from(event.target.files);
+    
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result;
+        
+        setAttachments((prev) => [
+          ...prev,
+          {
+            fileName: file.name,
+            customName: file.name, // ✅ NEW: Allow custom name editing
+            fileType: file.type,
+            fileSize: file.size,
+            attachmentNote: "",
+            base64Content: base64String,
+            displayOrder: prev.length + 1,
+          },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    
+    event.target.value = null;
+  };
+
+  // ✅ NEW: Update attachment custom name
+  const updateAttachmentName = (index, name) => {
+    setAttachments((prev) =>
+      prev.map((att, i) => (i === index ? { ...att, customName: name } : att))
+    );
+  };
+
+  // ✅ Update attachment note
+  const updateAttachmentNote = (index, note) => {
+    setAttachments((prev) =>
+      prev.map((att, i) => (i === index ? { ...att, attachmentNote: note } : att))
+    );
+  };
+
+  // ✅ Remove attachment
+  const removeAttachment = (index) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmitAssessment = async () => {
-    // ✅ Validate ratings
+    // Validate ratings
     const incompleteRatings = assessmentData.filter((item) => !item.rating);
     if (incompleteRatings.length > 0) {
       toast.error("Please provide ratings for all competencies.");
       return;
     }
 
-    // ✅ Validate comments
+    // Validate comments
     const incompleteComments = assessmentData.filter((item) => !item.comments || item.comments.trim() === "");
     if (incompleteComments.length > 0) {
       toast.error("Please provide comments for all competencies.");
@@ -218,6 +260,15 @@ function MyAssessments() {
         employeeRating: parseInt(item.rating),
         employeeComments: item.comments.trim(),
       })),
+      // ✅ Include attachments with custom name
+      attachments: attachments.map((att) => ({
+        fileName: att.customName || att.fileName, // Use custom name if provided
+        fileType: att.fileType,
+        fileSize: att.fileSize,
+        attachmentNote: att.attachmentNote,
+        base64Content: att.base64Content,
+        displayOrder: att.displayOrder,
+      })),
     };
 
     try {
@@ -226,7 +277,6 @@ function MyAssessments() {
         toast.success("Assessment submitted successfully!");
         setShowModal(false);
 
-        // Remove timer for submitted form
         const assignmentIdToRemove = currentAssignment.assignmentId;
         setTimers((prev) => {
           const newTimers = { ...prev };
@@ -235,6 +285,7 @@ function MyAssessments() {
         });
 
         setCurrentAssignment(null);
+        setAttachments([]);
         await fetchAssignments();
       } else {
         toast.error("Submission failed.");
@@ -275,13 +326,8 @@ function MyAssessments() {
   const filteredPending = filterAssignments(pendingAssignments);
   const filteredCompleted = filterAssignments(completedAssignments);
 
-  // ========================
-  // SEARCH HANDLER (NEW)
-  // ========================
   const handleSearch = () => {
-    // Trim input and update the actual query used for filtering
     setSearchQuery(searchInput.trim());
-    // You could also reset pagination or other UI state here if present
   };
 
   // ========================
@@ -306,7 +352,6 @@ function MyAssessments() {
               <tr key={assignment.assignmentId}>
                 <td>
                   <div className="empassper-form-name">
-                    {/* <i className="bi bi-file-earmark-text"></i> */}
                     {assignment.formName}
                   </div>
                 </td>
@@ -338,7 +383,6 @@ function MyAssessments() {
                   ) : (
                     <button className="empassper-btn empassper-btn-view" onClick={() => openViewModal(assignment)}>
                       <i className="bi bi-eye-fill"></i>
-                      
                     </button>
                   )}
                 </td>
@@ -349,10 +393,6 @@ function MyAssessments() {
       </table>
     </div>
   );
-
-  // ========================
-  // MAIN RENDER - LOADING STATE
-  // ========================
 
   if (loading) {
     return (
@@ -366,19 +406,14 @@ function MyAssessments() {
     );
   }
 
-  // ========================
-  // MAIN RENDER - PAGE CONTENT
-  // ========================
-
   return (
     <div className="empassper-container">
       <Toaster position="top-right" />
 
-      {/* Header Section with breadcrumbs */}
+      {/* Header Section */}
       <div className="empassper-header-section">
         <div className="empassper-header-content">
           <div className="empassper-header-text" style={{ flex: 1 }}>
-            {/* Breadcrumbs */}
             <Breadcrumbs
               items={[
                 { label:  <i className="bi bi-house-door"></i>, to: "/employee/dashboard", isIcon: true },
@@ -404,7 +439,7 @@ function MyAssessments() {
         )}
       </div>
 
-      {/* TIMER BARS - ALWAYS VISIBLE FOR ALL PENDING FORMS */}
+      {/* TIMER BARS */}
       {visibleTimers.length > 0 && (
         <div className="empassper-timer-bars-container">
           {visibleTimers.map((timer) => (
@@ -426,7 +461,6 @@ function MyAssessments() {
       {/* Search & Filter */}
       <div className="empassper-search-filter-container">
         <div className="empassper-search-box">
-         
           <input
             type="text"
             placeholder="Search by form name or type..."
@@ -435,7 +469,6 @@ function MyAssessments() {
             onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
             aria-label="Search assessments"
           />
-          {/* NEW: Separate Search button */}
           <button className="empassper-search-btn" onClick={handleSearch} aria-label="Search">Search</button>
         </div>
         <select
@@ -459,9 +492,7 @@ function MyAssessments() {
         />
       </div>
 
-
       {/* Tab Navigation */}
-      {/* Pill-style Tabs (replace previous .empassper-tab-container block) */}
       <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
         <div className="empassper-pill-tabs">
           <button
@@ -486,236 +517,568 @@ function MyAssessments() {
         </div>
       </div>
 
-
       {/* Content */}
-      
-        {activeTab === "pending" && (
-          <>
-            {filteredPending.length > 0 ? (
-              renderTable(filteredPending)
-            ) : (
-              <div className="empassper-empty-state">
-                <div className="empassper-empty-icon">
-                  <i className="bi bi-inbox"></i>
-                </div>
-                <h3 className="empassper-empty-title">No Pending Assessments</h3>
-                <p className="empassper-empty-text">
-                  {assignments.length === 0
-                    ? "You don't have any assessments assigned yet."
-                    : "All assessments have been completed or filtered out!"}
-                </p>
+      {activeTab === "pending" && (
+        <>
+          {filteredPending.length > 0 ? (
+            renderTable(filteredPending)
+          ) : (
+            <div className="empassper-empty-state">
+              <div className="empassper-empty-icon">
+                <i className="bi bi-inbox"></i>
               </div>
-            )}
-          </>
-        )}
-
-        {activeTab === "completed" && (
-          <>
-            {filteredCompleted.length > 0 ? (
-              renderTable(filteredCompleted)
-            ) : (
-              <div className="empassper-empty-state">
-                <div className="empassper-empty-icon">
-                  <i className="bi bi-clipboard-check"></i>
-                </div>
-                <h3 className="empassper-empty-title">No Completed Assessments</h3>
-                <p className="empassper-empty-text">
-                  Complete your pending assessments to see them here.
-                </p>
-              </div>
-            )}
-          </>
-        )}
-      
-{/*-------------------------------------------------------MODAL---------------------------------- */}
-    {showModal && currentAssignment && (
-      <div
-        className="empassper-modal-overlay"
-        onClick={() => !submitting && setShowModal(false)}
-      >
-        <div
-          className="empassper-modal-content"
-          onClick={(e) => e.stopPropagation()}
-          style={{ paddingTop: "0px", marginTop: "0px" }}
-        >
-          
-          {/* Form Header */}
-          <div className="empass-form-header" style={{ marginBottom: "0px", paddingBottom: "0px" }}>
-            <div className="empass-logo-section">
-              <img src={logoImage} alt="Logo" className="empass-logo-small" />
-              
-              <div className="empass-appraisal-label" style={{paddingBottom:"10px"}}>Appraisal Form</div>
-              
-            </div>
-            <div className="empass-form-title-container" style={{marginRight:"100px"}}>
-              <h2 className="empass-form-title">{currentAssignment?.formName}</h2>
-              <p className="empass-form-subtitle">
-                {currentAssignment?.formType} Assessment Form
-                
+              <h3 className="empassper-empty-title">No Pending Assessments</h3>
+              <p className="empassper-empty-text">
+                {assignments.length === 0
+                  ? "You don't have any assessments assigned yet."
+                  : "All assessments have been completed or filtered out!"}
               </p>
             </div>
-          </div>
+          )}
+        </>
+      )}
 
-         <div
-          className="empass-form-divider"
-          style={{
-            marginTop: "0px",
-            marginBottom: "0px",
-            padding: "0",
-            height: "0px",          // ensure it's only 1px
-            lineHeight: "0",        // remove vertical space
-          }}
-          ></div>
+      {activeTab === "completed" && (
+        <>
+          {filteredCompleted.length > 0 ? (
+            renderTable(filteredCompleted)
+          ) : (
+            <div className="empassper-empty-state">
+              <div className="empassper-empty-icon">
+                <i className="bi bi-clipboard-check"></i>
+              </div>
+              <h3 className="empassper-empty-title">No Completed Assessments</h3>
+              <p className="empassper-empty-text">
+                Complete your pending assessments to see them here.
+              </p>
+            </div>
+          )}
+        </>
+      )}
 
-          {submitting && modalMode === "view" ? (
-            <div
-              className="empass-form-body"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingTop: "0px",
-                marginTop: "0px",
-                padding:"0px"
-              }}
-            >
-              <div>
-                <div className="spinner-border"></div>
-                <p
-                  style={{
-                    marginTop: "16px",
-                    color: "var(--text-light)",
-                    textAlign: "center",
-                  }}
-                >
-                  Loading assessment...
+      {/*-------------------------------------------------------MODAL---------------------------------- */}
+      {showModal && currentAssignment && (
+        <div
+          className="empassper-modal-overlay"
+          onClick={() => !submitting && setShowModal(false)}
+        >
+          <div
+            className="empassper-modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{ paddingTop: "0px", marginTop: "0px" }}
+          >
+            {/* Form Header */}
+            <div className="empass-form-header" style={{ marginBottom: "0px", paddingBottom: "0px" }}>
+              <div className="empass-logo-section">
+                <img src={logoImage} alt="Logo" className="empass-logo-small" />
+                <div className="empass-appraisal-label" style={{paddingBottom:"10px"}}>Appraisal Form</div>
+              </div>
+              <div className="empass-form-title-container" style={{marginRight:"100px"}}>
+                <h2 className="empass-form-title">{currentAssignment?.formName}</h2>
+                <p className="empass-form-subtitle">
+                  {currentAssignment?.formType} Assessment Form
                 </p>
               </div>
             </div>
-          ) : (
-            <>
-              {/* Form Body */}
+
+            <div
+              className="empass-form-divider"
+              style={{
+                marginTop: "0px",
+                marginBottom: "0px",
+                padding: "0",
+                height: "0px",
+                lineHeight: "0",
+              }}
+            ></div>
+
+            {submitting && modalMode === "view" ? (
               <div
                 className="empass-form-body"
                 style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                   paddingTop: "0px",
                   marginTop: "0px",
+                  padding:"0px"
                 }}
               >
-                <table
-                  className="empass-form-table"
+                <div>
+                  <div className="spinner-border"></div>
+                  <p
+                    style={{
+                      marginTop: "16px",
+                      color: "var(--text-light)",
+                      textAlign: "center",
+                    }}
+                  >
+                    Loading assessment...
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Form Body */}
+                <div
+                  className="empass-form-body"
                   style={{
-                    width:"100%",
+                    paddingTop: "0px",
                     marginTop: "0px",
-                    borderCollapse: "separate",
-                    borderLeft: "none",     // REMOVE LEFT BORDER
-                    borderRadius: "12px",
-                    borderRight: "none",    // REMOVE RIGHT BORDER
-                    borderBottom: "none",   // REMOVE BOTTOM BORDER
-                    border: "1px solid black",
-                    borderSpacing: 0,
-
                   }}
                 >
-                  <thead>
-                    <tr>
-                      <th style={{ padding: "10px 6px", height: "44px", borderTopLeftRadius: "8px" }}>Competency Name</th>
-                      <th style={{ padding: "10px 6px", height: "40px" }}>Description</th>
-                      <th style={{ padding: "10px 6px", height: "40px" }}>Rating</th>
-                      <th style={{ padding: "10px 6px", height: "40px", borderTopRightRadius: "8px" }}>Comments</th>
-                    </tr>
-                  </thead>
-
-
-                  <tbody>
-                    {assessmentData.map((item) => (
-                      <tr key={item.competencyId}>
-                        <td>
-                          <strong>{item.competencyName}</strong>
-                        </td>
-                        <td>{item.competencyDescription || "N/A"}</td>
-                        <td>
-                          {modalMode === "view" ? (
-                            <span className="rating-badge">
-                              {item.rating} / 5
-                            </span>
-                          ) : (
-                            <select
-                              value={item.rating}
-                              onChange={(e) =>
-                                updateAssessmentData(
-                                  item.competencyId,
-                                  "rating",
-                                  e.target.value
-                                )
-                              }
-                              className="form-select"
-                              disabled={submitting}
-                            >
-                              <option value="">-</option>
-                              <option value="1">1</option>
-                              <option value="2">2</option>
-                              <option value="3">3</option>
-                              <option value="4">4</option>
-                              <option value="5">5</option>
-                            </select>
-                          )}
-                        </td>
-
-                        <td>
-                          {modalMode === "view" ? (
-                            <span>{item.comments || "-"}</span>
-                          ) : (
-                            <textarea
-                              value={item.comments}
-                              onChange={(e) =>
-                                updateAssessmentData(
-                                  item.competencyId,
-                                  "comments",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="Justify through comments"
-                              className="form-textarea"
-                              disabled={submitting}
-                            />
-                          )}
-                        </td>
+                  <table
+                    className="empass-form-table"
+                    style={{
+                      width:"100%",
+                      marginTop: "0px",
+                      borderCollapse: "separate",
+                      borderLeft: "none",
+                      borderRadius: "12px",
+                      borderRight: "none",
+                      borderBottom: "none",
+                      border: "1px solid black",
+                      borderSpacing: 0,
+                    }}
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ padding: "10px 6px", height: "44px", borderTopLeftRadius: "8px" }}>Competency Name</th>
+                        <th style={{ padding: "10px 6px", height: "40px" }}>Description</th>
+                        <th style={{ padding: "10px 6px", height: "40px" }}>Rating</th>
+                        <th style={{ padding: "10px 6px", height: "40px", borderTopRightRadius: "8px" }}>Comments</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
 
-              {/* Form Footer */}
-              <div className="form-footer">
-                <button
-                  className="empass-btn-cancel"
-                  onClick={() => setShowModal(false)}
-                  disabled={submitting}
-                >
-                  {modalMode === "view" ? "Close" : "Cancel"}
-                </button>
+                    <tbody>
+                      {assessmentData.map((item) => (
+                        <tr key={item.competencyId}>
+                          <td>
+                            <strong>{item.competencyName}</strong>
+                          </td>
+                          <td>{item.competencyDescription || "N/A"}</td>
+                          <td>
+                            {modalMode === "view" ? (
+                              <span className="rating-badge">
+                                {item.rating} / 5
+                              </span>
+                            ) : (
+                              <select
+                                value={item.rating}
+                                onChange={(e) =>
+                                  updateAssessmentData(
+                                    item.competencyId,
+                                    "rating",
+                                    e.target.value
+                                  )
+                                }
+                                className="form-select"
+                                disabled={submitting}
+                              >
+                                <option value="">-</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                              </select>
+                            )}
+                          </td>
 
-                {modalMode === "submit" && (
+                          <td>
+                            {modalMode === "view" ? (
+                              <span>{item.comments || "-"}</span>
+                            ) : (
+                              <textarea
+                                value={item.comments}
+                                onChange={(e) =>
+                                  updateAssessmentData(
+                                    item.competencyId,
+                                    "comments",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Justify through comments"
+                                className="form-textarea"
+                                disabled={submitting}
+                              />
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* ✅ UPDATED: Attachments Section with Name Field */}
+                  <div style={{ marginTop: "24px", padding: "0 16px" }}>
+                    <h3 style={{ 
+                      fontSize: "16px", 
+                      fontWeight: "600", 
+                      marginBottom: "12px",
+                      color: "var(--text-primary)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px"
+                    }}>
+                      <i className="bi bi-paperclip"></i>
+                      Attachments
+                    </h3>
+
+                    {/* Submit Mode: Upload Interface */}
+                    {modalMode === "submit" && (
+                      <div>
+                        <div style={{ marginBottom: "16px" }}>
+                          <label
+                            htmlFor="file-upload"
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              padding: "10px 20px",
+                              backgroundColor: "#007bff",
+                              color: "white",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              transition: "background-color 0.2s",
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
+                            onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
+                          >
+                            <i className="bi bi-cloud-upload"></i> Add Attachment
+                          </label>
+                          <input
+                            id="file-upload"
+                            type="file"
+                            multiple
+                            onChange={handleFileSelect}
+                            style={{ display: "none" }}
+                            disabled={submitting}
+                          />
+                          <span style={{ 
+                            marginLeft: "12px", 
+                            fontSize: "13px", 
+                            color: "#666" 
+                          }}>
+                            {attachments.length > 0 && `${attachments.length} file(s) selected`}
+                          </span>
+                        </div>
+
+                        {/* Display Selected Attachments */}
+                        {attachments.length > 0 && (
+                          <div style={{ marginTop: "16px" }}>
+                            {attachments.map((att, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  padding: "16px",
+                                  border: "1px solid #d1d5db",
+                                  borderRadius: "8px",
+                                  marginBottom: "16px",
+                                  backgroundColor: "#f9fafb",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                                }}
+                              >
+                                {/* Header with file icon and remove button */}
+                                <div style={{ 
+                                  display: "flex", 
+                                  justifyContent: "space-between", 
+                                  alignItems: "center",
+                                  marginBottom: "12px"
+                                }}>
+                                  <div style={{ 
+                                    display: "flex", 
+                                    alignItems: "center",
+                                    gap: "8px"
+                                  }}>
+                                    <i 
+                                      className="bi bi-file-earmark-text" 
+                                      style={{ 
+                                        fontSize: "24px", 
+                                        color: "#3b82f6" 
+                                      }}
+                                    ></i>
+                                    <div>
+                                      <div style={{ 
+                                        fontSize: "12px", 
+                                        color: "#6b7280",
+                                        marginBottom: "2px"
+                                      }}>
+                                        Original: {att.fileName}
+                                      </div>
+                                      <div style={{ 
+                                        fontSize: "12px", 
+                                        color: "#9ca3af" 
+                                      }}>
+                                        {(att.fileSize / 1024).toFixed(2)} KB • {att.fileType || 'Unknown type'}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => removeAttachment(index)}
+                                    style={{
+                                      padding: "6px 12px",
+                                      backgroundColor: "#ef4444",
+                                      color: "white",
+                                      border: "none",
+                                      borderRadius: "6px",
+                                      cursor: "pointer",
+                                      fontSize: "13px",
+                                      fontWeight: "500",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "4px",
+                                      transition: "background-color 0.2s",
+                                    }}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = "#dc2626"}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = "#ef4444"}
+                                    disabled={submitting}
+                                  >
+                                    <i className="bi bi-trash"></i> Remove
+                                  </button>
+                                </div>
+
+                                {/* ✅ NEW: Attachment Name Field */}
+                                <div style={{ marginBottom: "12px" }}>
+                                  <label style={{ 
+                                    display: "block",
+                                    fontSize: "13px",
+                                    fontWeight: "600",
+                                    color: "#374151",
+                                    marginBottom: "6px"
+                                  }}>
+                                    <i className="bi bi-tag"></i> Attachment Name *
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={att.customName}
+                                    onChange={(e) => updateAttachmentName(index, e.target.value)}
+                                    placeholder="Enter a name for this attachment"
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px 12px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: "6px",
+                                      fontSize: "14px",
+                                      backgroundColor: "white",
+                                      outline: "none",
+                                      transition: "border-color 0.2s",
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
+                                    onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
+                                    disabled={submitting}
+                                  />
+                                </div>
+
+                                {/* Attachment Description Field */}
+                                <div>
+                                  <label style={{ 
+                                    display: "block",
+                                    fontSize: "13px",
+                                    fontWeight: "600",
+                                    color: "#374151",
+                                    marginBottom: "6px"
+                                  }}>
+                                    <i className="bi bi-chat-left-text"></i> Description (Optional)
+                                  </label>
+                                  <textarea
+                                    value={att.attachmentNote}
+                                    onChange={(e) => updateAttachmentNote(index, e.target.value)}
+                                    placeholder="Add a description or notes for this attachment..."
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px 12px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: "6px",
+                                      fontSize: "13px",
+                                      minHeight: "70px",
+                                      resize: "vertical",
+                                      backgroundColor: "white",
+                                      outline: "none",
+                                      transition: "border-color 0.2s",
+                                      fontFamily: "inherit"
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
+                                    onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
+                                    disabled={submitting}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {attachments.length === 0 && (
+                          <div style={{
+                            padding: "24px",
+                            textAlign: "center",
+                            color: "#9ca3af",
+                            fontSize: "14px",
+                            fontStyle: "italic",
+                            border: "2px dashed #e5e7eb",
+                            borderRadius: "8px",
+                            backgroundColor: "#f9fafb"
+                          }}>
+                            <i className="bi bi-inbox" style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}></i>
+                            No attachments added yet. Click "Add Attachment" to upload files.
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* View Mode: Display Attachments */}
+                    {modalMode === "view" && (
+                      <div>
+                        {viewAttachments && viewAttachments.length > 0 ? (
+                          <div style={{ marginTop: "12px" }}>
+                            {viewAttachments.map((att) => (
+                              <div
+                                key={att.attachmentId}
+                                style={{
+                                  padding: "16px",
+                                  border: "1px solid #e5e7eb",
+                                  borderRadius: "8px",
+                                  marginBottom: "12px",
+                                  backgroundColor: "#f9fafb",
+                                }}
+                              >
+                                <div style={{ 
+                                  display: "flex", 
+                                  justifyContent: "space-between", 
+                                  alignItems: "flex-start"
+                                }}>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ 
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "8px",
+                                      marginBottom: "8px"
+                                    }}>
+                                      <i className="bi bi-file-earmark-check" style={{ fontSize: "20px", color: "#10b981" }}></i>
+                                      <div style={{ 
+                                        fontWeight: "600", 
+                                        fontSize: "14px",
+                                        color: "#1f2937"
+                                      }}>
+                                        {att.fileName}
+                                      </div>
+                                    </div>
+                                    
+                                    {att.attachmentNote && (
+                                      <div style={{ 
+                                        fontSize: "13px", 
+                                        color: "#4b5563",
+                                        marginTop: "8px",
+                                        padding: "8px 12px",
+                                        backgroundColor: "#ffffff",
+                                        borderRadius: "6px",
+                                        borderLeft: "3px solid #3b82f6"
+                                      }}>
+                                        <strong>Description:</strong> {att.attachmentNote}
+                                      </div>
+                                    )}
+                                    
+                                    <div style={{ 
+                                      fontSize: "12px", 
+                                      color: "#9ca3af",
+                                      marginTop: "8px",
+                                      display: "flex",
+                                      gap: "12px",
+                                      flexWrap: "wrap"
+                                    }}>
+                                      {att.fileSize && (
+                                        <span>
+                                          <i className="bi bi-hdd"></i> {(att.fileSize / 1024).toFixed(2)} KB
+                                        </span>
+                                      )}
+                                      {att.uploadedAt && (
+                                        <span>
+                                          <i className="bi bi-calendar3"></i> {new Date(att.uploadedAt).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric'
+                                          })}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  
+                                  <a
+                                    href={`${api.defaults.baseURL}/SelfAssessment/attachments/${att.attachmentId}/download`}
+                                    download
+                                    style={{
+                                      padding: "8px 16px",
+                                      backgroundColor: "#10b981",
+                                      color: "white",
+                                      border: "none",
+                                      borderRadius: "6px",
+                                      textDecoration: "none",
+                                      fontSize: "13px",
+                                      fontWeight: "500",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "6px",
+                                      transition: "background-color 0.2s",
+                                      whiteSpace: "nowrap"
+                                    }}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = "#059669"}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = "#10b981"}
+                                  >
+                                    <i className="bi bi-download"></i> Download
+                                  </a>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div style={{
+                            padding: "24px",
+                            textAlign: "center",
+                            color: "#9ca3af",
+                            fontSize: "14px",
+                            fontStyle: "italic",
+                            border: "2px dashed #e5e7eb",
+                            borderRadius: "8px",
+                            backgroundColor: "#f9fafb"
+                          }}>
+                            <i className="bi bi-inbox" style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}></i>
+                            No attachments submitted with this assessment
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Form Footer */}
+                <div className="form-footer">
                   <button
-                    className="btn-submit-form"
-                    onClick={handleSubmitAssessment}
+                    className="empass-btn-cancel"
+                    onClick={() => setShowModal(false)}
                     disabled={submitting}
                   >
-                    {submitting ? "Submitting..." : "Submit Assessment"}
+                    {modalMode === "view" ? "Close" : "Cancel"}
                   </button>
-                )}
-              </div>
-            </>
-          )}
+
+                  {modalMode === "submit" && (
+                    <button
+                      className="btn-submit-form"
+                      onClick={handleSubmitAssessment}
+                      disabled={submitting}
+                    >
+                      {submitting ? "Submitting..." : "Submit Assessment"}
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    )}
-{/*-------------------------------------------------------MODAL---------------------------------- */}
-</div>
+      )}
+      {/*-------------------------------------------------------MODAL---------------------------------- */}
+    </div>
   );
 }
 
 export default MyAssessments;
-
