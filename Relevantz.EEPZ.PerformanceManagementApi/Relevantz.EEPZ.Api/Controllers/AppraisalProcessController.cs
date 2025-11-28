@@ -1,3 +1,5 @@
+
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -1587,6 +1589,11 @@ public async Task<IActionResult> GetAllDetails()
             .AsNoTracking()
             .ToListAsync();
 
+        // ✅ FIXED: Include attachments
+        var attachments = await _context.Selfassessmentattachments
+            .AsNoTracking()
+            .ToListAsync();
+
         var results = new List<object>();
 
         foreach (var assignment in assignments)
@@ -1711,13 +1718,38 @@ public async Task<IActionResult> GetAllDetails()
                 }
             }
 
+            // ✅ FIXED: Get attachments for this assessment using correct property names
+            var assessmentAttachments = new List<object>();
+            if (selfAssessment != null)
+            {
+                var attList = attachments
+                    .Where(a => a.AssessmentId == selfAssessment.AssessmentId)
+                    .ToList();
+
+                foreach (var att in attList)
+                {
+                    assessmentAttachments.Add(new
+                    {
+                        AttachmentId = att.AttachmentId,
+                        FileName = att.FileName,
+                        FileType = att.FileType,
+                        FileSize = att.FileSize,
+                        AttachmentNote = att.AttachmentNote ?? string.Empty,
+                        UploadedAt = att.UploadedAt,
+                        DisplayOrder = att.DisplayOrder
+                    });
+                }
+            }
+
             results.Add(new
             {
                 EmployeeId = profile.EmployeeId,
                 EmployeeName = $"{profile.FirstName} {profile.LastName}",
                 ProjectName = project?.ProjectName ?? string.Empty,
                 Competencies = competencies,
-                Goals = new List<object>()
+                Goals = new List<object>(),
+                // ✅ FIXED: Include attachments
+                Attachments = assessmentAttachments
             });
         }
 
@@ -1727,6 +1759,188 @@ public async Task<IActionResult> GetAllDetails()
     {
         return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
     }
+}
+
+// ✅ NEW: Download attachment for HR dashboard
+[HttpGet("hr/attachments/{attachmentId:int}/download")]
+public async Task<IActionResult> DownloadHrAttachment(int attachmentId)
+{
+    try
+    {
+        Console.WriteLine($"DownloadHrAttachment - AttachmentId: {attachmentId}");
+        
+        var attachment = await _context.Selfassessmentattachments
+            .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+
+        if (attachment == null)
+        {
+            Console.WriteLine($"Attachment {attachmentId} not found");
+            return NotFound(new { success = false, message = "Attachment not found." });
+        }
+
+        if (string.IsNullOrWhiteSpace(attachment.FilePath))
+        {
+            Console.WriteLine($"Attachment {attachmentId} has no file path");
+            return NotFound(new { success = false, message = "File path missing." });
+        }
+
+        var filePath = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            attachment.FilePath.Replace("\\", Path.DirectorySeparatorChar.ToString())
+        );
+
+        Console.WriteLine($"Looking for file at: {filePath}");
+
+        if (!System.IO.File.Exists(filePath))
+        {
+            Console.WriteLine($"File not found at path: {filePath}");
+            return NotFound(new { success = false, message = "File not found on server." });
+        }
+
+        var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+        
+        // Determine actual extension from multiple sources
+        string actualExtension = DetermineFileExtension(attachment.FilePath, attachment.FileName, attachment.FileType);
+        
+        // Ensure filename has extension
+        string downloadFileName = EnsureFileExtension(attachment.FileName, actualExtension);
+        
+        // Get proper content type
+        var contentType = GetContentType(actualExtension);
+        
+        Console.WriteLine($"Original FileName: '{attachment.FileName}', FilePath: '{attachment.FilePath}', FileType: '{attachment.FileType}'");
+        Console.WriteLine($"Determined Extension: '{actualExtension}', Final FileName: '{downloadFileName}', ContentType: '{contentType}'");
+        Console.WriteLine($"File Size: {fileBytes.Length} bytes");
+
+        // ✅ CRITICAL: Set headers explicitly
+        Response.Headers.Clear();
+        Response.ContentType = contentType;
+        Response.Headers["Content-Disposition"] = $"attachment; filename=\"{downloadFileName}\"";
+        Response.Headers["X-Content-Type-Options"] = "nosniff";
+        Response.Headers["Access-Control-Expose-Headers"] = "Content-Disposition, Content-Type";
+        
+        Console.WriteLine($"Response Headers Set - ContentType: {Response.ContentType}");
+        Console.WriteLine($"Response Headers Set - Content-Disposition: attachment; filename=\"{downloadFileName}\"");
+        
+        return File(fileBytes, contentType, downloadFileName);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error downloading attachment {attachmentId}: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        return StatusCode(500, new { success = false, message = $"Error downloading file: {ex.Message}" });
+    }
+}
+
+// ✅ Helper method: Determine file extension
+private string DetermineFileExtension(string filePath, string fileName, string fileType)
+{
+    var pathExtension = Path.GetExtension(filePath);
+    if (!string.IsNullOrEmpty(pathExtension) && pathExtension != ".")
+    {
+        Console.WriteLine($"Extension from path: {pathExtension}");
+        return pathExtension.ToLowerInvariant();
+    }
+    
+    var nameExtension = Path.GetExtension(fileName);
+    if (!string.IsNullOrEmpty(nameExtension) && nameExtension != ".")
+    {
+        Console.WriteLine($"Extension from filename: {nameExtension}");
+        return nameExtension.ToLowerInvariant();
+    }
+    
+    if (!string.IsNullOrEmpty(fileType))
+    {
+        var inferredExt = GetExtensionFromMimeType(fileType);
+        Console.WriteLine($"Extension inferred from MIME type '{fileType}': {inferredExt}");
+        return inferredExt;
+    }
+    
+    Console.WriteLine("Using default extension: .bin");
+    return ".bin";
+}
+
+// ✅ Helper method: Ensure filename has extension
+private string EnsureFileExtension(string fileName, string extension)
+{
+    if (string.IsNullOrEmpty(fileName))
+    {
+        return $"attachment{extension}";
+    }
+    
+    fileName = fileName.Trim();
+    
+    if (fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+    {
+        return fileName;
+    }
+    
+    var currentExtension = Path.GetExtension(fileName);
+    if (!string.IsNullOrEmpty(currentExtension))
+    {
+        fileName = Path.GetFileNameWithoutExtension(fileName);
+    }
+    
+    return $"{fileName}{extension}";
+}
+
+// ✅ Helper method: Get extension from MIME type
+private string GetExtensionFromMimeType(string mimeType)
+{
+    if (string.IsNullOrEmpty(mimeType))
+        return ".bin";
+    
+    return mimeType.ToLowerInvariant() switch
+    {
+        "application/pdf" => ".pdf",
+        "application/msword" => ".doc",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => ".docx",
+        "application/vnd.ms-excel" => ".xls",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => ".xlsx",
+        "application/vnd.ms-powerpoint" => ".ppt",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation" => ".pptx",
+        "text/plain" => ".txt",
+        "text/csv" => ".csv",
+        "image/jpeg" => ".jpg",
+        "image/png" => ".png",
+        "image/gif" => ".gif",
+        "application/zip" or "application/x-zip-compressed" => ".zip",
+        "application/x-rar-compressed" => ".rar",
+        "application/x-7z-compressed" => ".7z",
+        _ => ".bin"
+    };
+}
+
+// ✅ Helper method: Get content type
+private string GetContentType(string extension)
+{
+    if (string.IsNullOrEmpty(extension))
+    {
+        return "application/octet-stream";
+    }
+
+    return extension.ToLowerInvariant() switch
+    {
+        ".pdf" => "application/pdf",
+        ".doc" => "application/msword",
+        ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".xls" => "application/vnd.ms-excel",
+        ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".ppt" => "application/vnd.ms-powerpoint",
+        ".pptx" => "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ".txt" => "text/plain",
+        ".csv" => "text/csv",
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".png" => "image/png",
+        ".gif" => "image/gif",
+        ".bmp" => "image/bmp",
+        ".svg" => "image/svg+xml",
+        ".webp" => "image/webp",
+        ".zip" => "application/zip",
+        ".rar" => "application/x-rar-compressed",
+        ".7z" => "application/x-7z-compressed",
+        _ => "application/octet-stream"
+    };
 }
 
 
