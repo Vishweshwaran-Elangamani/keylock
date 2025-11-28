@@ -1,3 +1,5 @@
+import { toast } from "sonner";
+
 const ConfirmationModal = ({
   isOpen,
   onClose,
@@ -7,8 +9,50 @@ const ConfirmationModal = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
   confirmVariant = "primary",
+  showToast = true,
+  toastMessage = null,
+  toastType = "success",
 }) => {
   if (!isOpen) return null;
+
+  const handleConfirm = async () => {
+    try {
+      await onConfirm();
+      
+      if (showToast) {
+        // Fixed: Better message generation without "ed" suffix
+        const message = toastMessage || `${confirmText} successful!`;
+        
+        switch (toastType) {
+          case "success":
+            toast.success(message, { duration: 3000 });
+            break;
+          case "error":
+            toast.error(message, { duration: 3000 });
+            break;
+          case "warning":
+            toast.warning(message, { duration: 3000 });
+            break;
+          case "info":
+            toast.info(message, { duration: 3000 });
+            break;
+          default:
+            toast.success(message, { duration: 3000 });
+        }
+      }
+      
+      onClose();
+    } catch (error) {
+      toast.error("Action Failed", {
+        description: error.message || "An error occurred",
+        duration: 4000,
+      });
+    }
+  };
+
+  const handleClose = () => {
+    onClose();
+  };
 
   return (
     <>
@@ -37,7 +81,7 @@ const ConfirmationModal = ({
           backgroundColor: "rgba(0,0,0,0.5)",
           animation: "fadeIn 0.2s ease-in-out",
         }}
-        onClick={onClose}
+        onClick={handleClose}
       >
         <div
           className="modal-dialog modal-dialog-centered"
@@ -65,8 +109,8 @@ const ConfirmationModal = ({
               </h5>
               <button
                 type="button"
-                class="btn-close-white"
-                onClick={onClose}
+                className="btn-close-white"
+                onClick={handleClose}
                 style={{
                   border: "none",
                   width: "36px",
@@ -104,14 +148,14 @@ const ConfirmationModal = ({
               <button
                 type="button"
                 className="btn btn-outline-secondary"
-                onClick={onClose}
+                onClick={handleClose}
               >
                 {cancelText}
               </button>
               <button
                 type="button"
                 className={`btn btn-${confirmVariant}`}
-                onClick={onConfirm}
+                onClick={handleConfirm}
               >
                 {confirmText}
               </button>

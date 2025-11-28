@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import goalService from "../../../services/goals/goalService";
-import Alert from "../common/Alert";
+import { toast } from "sonner";
 import {
   GOAL_TYPES,
   GOAL_TYPE_LABELS,
@@ -13,7 +13,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
   const modalBodyRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
   const [loadingData, setLoadingData] = useState(false);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
   const [completedChecklistIds, setCompletedChecklistIds] = useState(new Set());
@@ -87,7 +86,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
 
   const loadInitialData = async () => {
     setLoadingData(true);
-    setAlert(null);
     setCompletedChecklistIds(new Set());
     setTouched({
       title: false,
@@ -137,10 +135,12 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         setCompletedChecklistIds(completedIds);
 
         if (completedIds.size > 0) {
-          setAlert({
-            type: "warning",
-            message: `⚠️ ${completedIds.size} checklist item(s) are completed and locked. You must uncomplete them before editing.`,
-          });
+          toast.warning(
+            `${completedIds.size} checklist item(s) are completed and locked. You must uncomplete them before editing.`,
+            {
+              duration: 5000,
+            }
+          );
         }
 
         setFormData({
@@ -180,9 +180,8 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
       }
     } catch (error) {
       console.error("Failed to load form data:", error);
-      setAlert({
-        type: "danger",
-        message: "Failed to load form data",
+      toast.error("Failed to load form data", {
+        description: error.message || "An error occurred while loading data",
       });
     } finally {
       setLoadingData(false);
@@ -196,6 +195,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
       setProjects(projectsData);
     } catch (error) {
       console.error("Failed to load projects:", error);
+      toast.error("Failed to load projects");
     }
   };
 
@@ -224,10 +224,8 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
       setAvailableEmployees(formattedEmployees);
     } catch (error) {
       console.error("Failed to load subordinates:", error);
-      setAlert({
-        type: "warning",
-        message:
-          "Failed to load team members. Please try selecting the project again.",
+      toast.error("Failed to load team members", {
+        description: "Please try selecting the project again",
       });
       setAvailableEmployees([]);
     } finally {
@@ -329,7 +327,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           checklist: false,
           projectId: false,
         });
-        setAlert(null);
         setAvailableEmployees([]);
         setAssigneeSearchTerm("");
 
@@ -348,7 +345,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           updated.assignees = [];
           updated.projectId = "";
         } else if (value === GOAL_TYPES.ORG) {
-          // Clear project for org goals
           updated.projectId = "";
           updated.assignees = [];
           updated.checklistByAssignee = {
@@ -388,8 +384,20 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           { title: "", description: "" },
           { title: "", description: "" },
         ];
+        const emp = availableEmployees.find((e) => e.empMasterId === empMasterId);
+        if (emp) {
+          toast.success(`${emp.fullName} added to team`, {
+            duration: 2000,
+          });
+        }
       } else {
         delete newChecklistByAssignee[empMasterId];
+        const emp = availableEmployees.find((e) => e.empMasterId === empMasterId);
+        if (emp) {
+          toast.info(`${emp.fullName} removed from team`, {
+            duration: 2000,
+          });
+        }
       }
 
       return {
@@ -412,6 +420,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         ],
       },
     }));
+    toast.success("Checklist item added", { duration: 2000 });
   };
 
   const removeChecklistItem = (assigneeId, index) => {
@@ -424,6 +433,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         ),
       },
     }));
+    toast.info("Checklist item removed", { duration: 2000 });
   };
 
   const updateChecklistItem = (assigneeId, index, field, value) => {
@@ -495,31 +505,30 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
     });
 
     if (!validateForm()) {
-      setAlert({
-        type: "danger",
-        message: "Please fix the validation errors before submitting",
+      toast.error("Validation Error", {
+        description: "Please fix the errors before submitting",
+        duration: 4000,
       });
       modalBodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
     setLoading(true);
-    setAlert(null);
 
     try {
       const payload = transformToBackendFormat();
 
       if (isEdit) {
         await goalService.updateGoal(goalData.goalId, payload);
-        setAlert({
-          type: "success",
-          message: "Goal updated successfully!",
+        toast.success("Goal Updated Successfully!", {
+          description: "Your goal has been updated",
+          duration: 3000,
         });
       } else {
         await goalService.createGoal(payload);
-        setAlert({
-          type: "success",
-          message: "Goal created successfully!",
+        toast.success("Goal Created Successfully!", {
+          description: "Your new goal has been created",
+          duration: 3000,
         });
       }
 
@@ -534,9 +543,9 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         error.response?.data?.title ||
         (isEdit ? "Failed to update goal" : "Failed to create goal");
 
-      setAlert({
-        type: "danger",
-        message: errorMessage,
+      toast.error(isEdit ? "Update Failed" : "Creation Failed", {
+        description: errorMessage,
+        duration: 5000,
       });
       modalBodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
@@ -577,7 +586,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
           }
         `}
       </style>
-
       <div className="modal-backdrop fade show" style={{ zIndex: 1040 }} />
       <div
         className="modal fade show d-block"
@@ -655,14 +663,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                 overflowY: "auto",
               }}
             >
-              {alert && (
-                <Alert
-                  type={alert.type}
-                  message={alert.message}
-                  onClose={() => setAlert(null)}
-                />
-              )}
-
               {loadingData ? (
                 <div className="text-center py-5">
                   <div className="spinner-border text-primary" role="status">
@@ -745,7 +745,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                     </div>
 
                     <div className="col-md-6">
-                      {/* Disable project for org goals */}
                       <div className="mb-3">
                         <label
                           className="form-label"
@@ -770,7 +769,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                           disabled={
                             isEdit ||
                             loading ||
-                            formData.type === GOAL_TYPES.ORG // Disable for org goals
+                            formData.type === GOAL_TYPES.ORG
                           }
                           style={{ fontSize: "14px" }}
                         >
@@ -828,7 +827,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                               .toISOString()
                               .split("T")[0]
                           }
-                          // Disable deadline editing for non-org goals
                           disabled={
                             loading ||
                             (isEdit && formData.type !== GOAL_TYPES.ORG)
@@ -1070,7 +1068,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                   <i className="bi bi-person-badge me-2"></i>
                                   {assigneeName}
                                 </label>
-                                {/* Can still add items in edit mode */}
                                 {items.length < 10 && (
                                   <button
                                     type="button"
@@ -1088,7 +1085,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                               {items.map((item, index) => {
                                 const isItemCompleted =
                                   item.id && completedChecklistIds.has(item.id);
-                                // Check if item has existing ID (from DB)
                                 const isExistingItem = !!item.id;
 
                                 return (
@@ -1152,7 +1148,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                                 e.target.value
                                               )
                                             }
-                                            // Disable title editing for existing items in edit mode
                                             disabled={
                                               loading ||
                                               isItemCompleted ||
@@ -1174,7 +1169,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                                   : "text",
                                             }}
                                           />
-                                          {/* Show info message for locked titles */}
                                           {isEdit &&
                                             isExistingItem &&
                                             !isItemCompleted && (
@@ -1235,7 +1229,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                                               e.target.value
                                             )
                                           }
-                                          // Description can still be edited
                                           disabled={loading || isItemCompleted}
                                           style={{
                                             fontSize: "14px",
@@ -1298,7 +1291,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                   (formData.type === GOAL_TYPES.TEAM &&
                     formData.assignees.length === 0) ||
                   (formData.type === GOAL_TYPES.TEAM && !formData.projectId) ||
-                  getFilledChecklistCount() < 3 // CHANGED: At least 3 items
+                  getFilledChecklistCount() < 3
                 }
                 title={
                   Object.keys(errors).length > 0
@@ -1313,7 +1306,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                       formData.assignees.length === 0
                     ? "At least one team member must be assigned"
                     : getFilledChecklistCount() < 3
-                    ? `At least 3 checklist items required (${getFilledChecklistCount()}/3)` // CHANGED
+                    ? `At least 3 checklist items required (${getFilledChecklistCount()}/3)`
                     : ""
                 }
               >

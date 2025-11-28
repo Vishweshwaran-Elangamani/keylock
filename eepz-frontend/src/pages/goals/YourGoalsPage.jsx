@@ -420,16 +420,6 @@ const YourGoalsPage = () => {
                 Clear Filters
               </button>
             )}
-            <button
-              className="btn btn-primary"
-              onClick={() => setShowCreateModal(true)}
-              style={{
-                background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
-              }}
-            >
-              <i className="bi bi-plus-circle me-2"></i>
-              Create Goal
-            </button>
           </div>
         </div>
       ) : (

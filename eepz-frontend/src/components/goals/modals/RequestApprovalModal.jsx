@@ -1,6 +1,6 @@
 import { useState } from "react";
 import goalService from "../../../services/goals/goalService";
-import Alert from "../common/Alert";
+import { toast } from "sonner";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import {
   APPROVAL_TYPES,
@@ -18,7 +18,6 @@ const RequestApprovalModal = ({
 }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
   const [proofFile, setProofFile] = useState(null);
   const [isDragActive, setIsDragActive] = useState(false);
 
@@ -101,18 +100,27 @@ const RequestApprovalModal = ({
     const file = e.target.files[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        setAlert({
-          type: "danger",
-          message: "File size must be less than 10MB",
+        toast.error("File Too Large", {
+          description: "File size must be less than 10MB",
+          duration: 4000,
         });
         return;
       }
       setProofFile(file);
-      setAlert(null);
+      toast.success("File Selected", {
+        description: `${file.name} (${(file.size / 1024).toFixed(2)} KB)`,
+        duration: 2000,
+      });
     }
   };
 
   const removeFile = () => {
+    if (proofFile) {
+      toast.info("File Removed", {
+        description: `${proofFile.name} has been removed`,
+        duration: 2000,
+      });
+    }
     setProofFile(null);
     const fileInput = document.getElementById("fileInput");
     if (fileInput) fileInput.value = "";
@@ -134,28 +142,30 @@ const RequestApprovalModal = ({
     const file = e.dataTransfer.files[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        setAlert({
-          type: "danger",
-          message: "File size must be less than 10MB",
+        toast.error("File Too Large", {
+          description: "File size must be less than 10MB",
+          duration: 4000,
         });
       } else {
         setProofFile(file);
-        setAlert(null);
+        toast.success("File Added", {
+          description: `${file.name} (${(file.size / 1024).toFixed(2)} KB)`,
+          duration: 2000,
+        });
       }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAlert(null);
 
     if (requiresProof && !isLeadershipOrgCompletion && !proofFile) {
-      setAlert({
-        type: "danger",
-        message:
+      toast.error("Proof Required", {
+        description:
           approvalType === APPROVAL_TYPES.COMPLETION
-            ? "Proof of completion is required. Please upload a file."
-            : "Proof of task completion is required. Please upload a file.",
+            ? "Please upload proof of completion"
+            : "Please upload proof of task completion",
+        duration: 4000,
       });
       return;
     }
@@ -166,6 +176,7 @@ const RequestApprovalModal = ({
       let proofAttachmentId = null;
 
       if (proofFile) {
+        toast.loading("Uploading file...", { id: "upload" });
         const uploadResponse = await goalService.uploadAttachment(
           goalId,
           proofFile,
@@ -175,6 +186,7 @@ const RequestApprovalModal = ({
 
         if (uploadResponse.data?.attachmentId) {
           proofAttachmentId = uploadResponse.data.attachmentId;
+          toast.success("File uploaded successfully", { id: "upload" });
         }
       }
 
@@ -183,17 +195,32 @@ const RequestApprovalModal = ({
         proofAttachmentIds: proofAttachmentId ? [proofAttachmentId] : [],
       });
 
-      const successMessage = isClosure
-        ? "Goal closed successfully!"
-        : isReactivation
-          ? "Goal reactivated successfully!"
-          : isReopening
-            ? "Extension request submitted successfully!"
-            : isLeadershipOrgCompletion
-              ? "Goal marked as completed!"
-              : "Request submitted successfully!";
-
-      setAlert({ type: "success", message: successMessage });
+      if (isClosure) {
+        toast.success("Goal Closed Successfully!", {
+          description: "The goal has been closed",
+          duration: 3000,
+        });
+      } else if (isReactivation) {
+        toast.success("Goal Reactivated Successfully!", {
+          description: "The goal is now active again",
+          duration: 3000,
+        });
+      } else if (isReopening) {
+        toast.success("Extension Request Submitted!", {
+          description: "Your deadline extension request has been submitted",
+          duration: 3000,
+        });
+      } else if (isLeadershipOrgCompletion) {
+        toast.success("Goal Completed Successfully!", {
+          description: "The organization goal has been marked as completed",
+          duration: 3000,
+        });
+      } else {
+        toast.success("Request Submitted Successfully!", {
+          description: `Your ${approvalLabel.toLowerCase()} request has been submitted`,
+          duration: 3000,
+        });
+      }
 
       setTimeout(() => {
         if (onSuccess) onSuccess();
@@ -206,9 +233,9 @@ const RequestApprovalModal = ({
         error.response?.data?.detailedMessage ||
         "Failed to submit request";
 
-      setAlert({
-        type: "danger",
-        message: errorMessage,
+      toast.error("Request Failed", {
+        description: errorMessage,
+        duration: 5000,
       });
     } finally {
       setLoading(false);
@@ -218,7 +245,6 @@ const RequestApprovalModal = ({
   const handleClose = () => {
     if (!loading) {
       setProofFile(null);
-      setAlert(null);
       onClose();
     }
   };
@@ -317,7 +343,7 @@ const RequestApprovalModal = ({
               </div>
               <button
                 type="button"
-                class="btn-close-white"
+                className="btn-close-white"
                 onClick={onClose}
                 disabled={loading}
                 style={{
@@ -352,14 +378,6 @@ const RequestApprovalModal = ({
           </div>
 
           <div style={{ padding: "2rem", overflowY: "auto", flex: 1 }}>
-            {alert && (
-              <Alert
-                type={alert.type}
-                message={alert.message}
-                onClose={() => setAlert(null)}
-              />
-            )}
-
             <form onSubmit={handleSubmit}>
               {showProofUpload && (
                 <div>
@@ -385,8 +403,9 @@ const RequestApprovalModal = ({
                   {!proofFile ? (
                     <div
                       style={{
-                        border: `2px dashed ${isDragActive ? theme.color : "#dee2e6"
-                          }`,
+                        border: `2px dashed ${
+                          isDragActive ? theme.color : "#dee2e6"
+                        }`,
                         borderRadius: "1rem",
                         padding: "3rem 1.5rem",
                         textAlign: "center",
@@ -488,13 +507,17 @@ const RequestApprovalModal = ({
                         display: "flex",
                         alignItems: "center",
                         gap: "1rem",
-                        justifyContent: "space-between"
+                        justifyContent: "space-between",
                       }}
                     >
-
                       {/* Left section: Icon + File details */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                        }}
+                      >
                         <div
                           style={{
                             width: "60px",
@@ -523,7 +546,7 @@ const RequestApprovalModal = ({
                               whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-                              maxWidth: "200px"
+                              maxWidth: "200px",
                             }}
                           >
                             {proofFile.name.length > 20
@@ -625,12 +648,12 @@ const RequestApprovalModal = ({
                   {isClosure
                     ? "Closing..."
                     : isReactivation
-                      ? "Reactivating..."
-                      : isReopening
-                        ? "Submitting..."
-                        : isLeadershipOrgCompletion
-                          ? "Completing..."
-                          : "Submitting..."}
+                    ? "Reactivating..."
+                    : isReopening
+                    ? "Submitting..."
+                    : isLeadershipOrgCompletion
+                    ? "Completing..."
+                    : "Submitting..."}
                 </>
               ) : (
                 <>

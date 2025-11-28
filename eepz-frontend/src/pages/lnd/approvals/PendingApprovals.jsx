@@ -23,6 +23,10 @@ const PendingApprovals = () => {
   const [userRole, setUserRole] = useState("");
   const [rolePrefix, setRolePrefix] = useState("");
 
+  // Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+
   // Filter
   const [typeFilter, setTypeFilter] = useState("");
 
@@ -57,7 +61,14 @@ const PendingApprovals = () => {
 
   useEffect(() => {
     fetchPendingApprovals();
-  }, [currentPage, itemsPerPage, typeFilter, sortField, sortOrderAsc]);
+  }, [
+    currentPage,
+    itemsPerPage,
+    searchTerm,
+    typeFilter,
+    sortField,
+    sortOrderAsc,
+  ]);
 
   const fetchPendingApprovals = async () => {
     try {
@@ -68,7 +79,8 @@ const PendingApprovals = () => {
         "PENDING",
         sortField,
         sortOrderAsc ? "asc" : "desc",
-        itemsPerPage // Pass itemsPerPage to API
+        itemsPerPage,
+        searchTerm // Pass search term to API
       );
 
       if (response.data.success) {
@@ -82,6 +94,28 @@ const PendingApprovals = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearchInputChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearchTerm(searchInput);
+    setCurrentPage(1);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearchSubmit(e);
+    }
+  };
+
+  const handleCancelSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    setCurrentPage(1);
   };
 
   const handlePageChange = (page) => {
@@ -194,16 +228,55 @@ const PendingApprovals = () => {
         ]}
       />
 
-      {/* Filter */}
+      {/* Search and Filter */}
       <div
         style={{
           marginBottom: "1.5rem",
           display: "flex",
-          justifyContent: "flex-end",
+          gap: "1rem",
+          flexWrap: "wrap",
           alignItems: "center",
-          gap: "10px",
         }}
       >
+        {/* Search Bar */}
+        <form
+          onSubmit={handleSearchSubmit}
+          style={{
+            display: "flex",
+            gap: "0.5rem",
+            flexGrow: 1,
+            minWidth: 250,
+          }}
+        >
+          <div className="input-group">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search approvals..."
+              value={searchInput}
+              onChange={handleSearchInputChange}
+              onKeyPress={handleKeyPress}
+              style={{ minHeight: "35.7px" }}
+            />
+            {searchTerm ? (
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={handleCancelSearch}
+              >
+                <i className="bi bi-x-lg me-1"></i>
+                Cancel
+              </button>
+            ) : (
+              <button type="submit" className="btn btn-primary">
+                <i className="bi bi-search me-1"></i>
+                Search
+              </button>
+            )}
+          </div>
+        </form>
+
+        {/* Type Filter */}
         <select
           value={typeFilter}
           onChange={(e) => {
@@ -239,7 +312,11 @@ const PendingApprovals = () => {
         <EmptyState
           icon={CheckCircle}
           title="No Pending Approvals"
-          message="You don't have any pending approval requests at the moment."
+          message={
+            searchTerm || typeFilter
+              ? "No approvals match your current search or filters."
+              : "You don't have any pending approval requests at the moment."
+          }
         />
       ) : (
         <>
@@ -455,7 +532,7 @@ const PendingApprovals = () => {
             </div>
           </div>
 
-          {/* Updated Pagination with new props */}
+          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
