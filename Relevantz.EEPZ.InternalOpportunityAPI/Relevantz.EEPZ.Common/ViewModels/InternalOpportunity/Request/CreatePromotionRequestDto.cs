@@ -4,7 +4,6 @@ namespace Relevantz.EEPZ.Common.ViewModels.Promotion.Request
 {
     public class CreatePromotionRequestDto
     {
-        // ✅ REQUIRED: Link to approved nomination
         public int NominationId { get; set; }
         
         public int EmployeeUserId { get; set; }

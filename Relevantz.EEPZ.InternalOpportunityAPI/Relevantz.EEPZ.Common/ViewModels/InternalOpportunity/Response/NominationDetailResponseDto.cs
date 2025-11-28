@@ -42,7 +42,7 @@ namespace Relevantz.EEPZ.Common.ViewModels.Nomination.Response
         public int? L1ManagerUserId { get; set; }
         public string L1ManagerName { get; set; }
         public string ReviewRemarks { get; set; }
-        public string Status { get; set; } // Approved/Rejected/Pending
+        public string Status { get; set; } 
         public DateTime? ReviewedAt { get; set; }
     }
 
@@ -52,11 +52,10 @@ namespace Relevantz.EEPZ.Common.ViewModels.Nomination.Response
         public int? L2ManagerUserId { get; set; }
         public string L2ManagerName { get; set; }
         public string ReviewRemarks { get; set; }
-        public string Status { get; set; } // Approved/Rejected/Pending
+        public string Status { get; set; }
         public DateTime? ReviewedAt { get; set; }
     }
 
-    // Keep for backward compatibility
     [Obsolete("Use L1ManagerReviewDetailDto and L2ManagerReviewDetailDto instead")]
     public class ManagerReviewDetailDto
     {

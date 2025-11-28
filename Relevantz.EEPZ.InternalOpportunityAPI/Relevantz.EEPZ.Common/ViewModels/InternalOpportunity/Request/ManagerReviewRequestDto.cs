@@ -7,7 +7,7 @@ namespace Relevantz.EEPZ.Common.ViewModels.Nomination.Request
     {
         [Required(ErrorMessage = "Action is required")]
         [StringLength(20)]
-        public string ActionTaken { get; set; } // "Approved" or "Rejected"
+        public string ActionTaken { get; set; }
 
         [StringLength(500)]
         public string Remarks { get; set; }

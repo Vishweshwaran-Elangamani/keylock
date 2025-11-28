@@ -7,8 +7,6 @@ namespace Relevantz.EEPZ.Common.ViewModels.Promotion.Response
         public int PromotionId { get; set; }
         public int EmployeeUserId { get; set; }
         public string? EmployeeName { get; set; }
-        
-        // ✅ NEW: Show nomination details
         public int? NominationId { get; set; }
         public string? OpportunityName { get; set; }
         public string? NominationType { get; set; }
