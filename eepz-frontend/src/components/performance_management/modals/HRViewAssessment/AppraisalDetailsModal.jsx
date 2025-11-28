@@ -1,5 +1,5 @@
 import React from "react";
-
+import api from "../../../../services/performancemanagement/hr/api"; // ✅ CORRECTED IMPORT PATH
 
 function statusRender(status) {
   if (typeof status !== "string") return "-";
@@ -21,7 +21,6 @@ function statusRender(status) {
   }
   return <span>{status}</span>;
 }
-
 
 const fieldOrder = [
   ["Competency", "competencyName"],
@@ -82,29 +81,47 @@ function getFileIcon(fileType, fileName) {
   return "bi-file";
 }
 
-// Extract filename from Content-Disposition header
-function extractFilenameFromHeader(contentDisposition) {
-  if (!contentDisposition) return null;
+// Get file extension from MIME type
+function getExtensionFromMime(mimeType) {
+  if (!mimeType) return '';
   
-  // Try to extract filename* (UTF-8 encoded) first
-  const match = contentDisposition.match(/filename\*=(?:UTF-8'')?(.+?)(?:;|$)/);
-  if (match && match[1]) {
-    try {
-      // Decode if it's URL-encoded
-      return decodeURIComponent(match[1].trim().replace(/"/g, ''));
-    } catch (e) {
-      // If decoding fails, use as is
-      return match[1].trim().replace(/"/g, '');
-    }
-  }
+  const type = mimeType.toLowerCase().trim();
   
-  // Fallback to regular filename parameter
-  const fallbackMatch = contentDisposition.match(/filename=(.+?)(?:;|$)/);
-  if (fallbackMatch && fallbackMatch[1]) {
-    return fallbackMatch[1].trim().replace(/"/g, '');
-  }
+  const mimeMap = {
+    'application/pdf': '.pdf',
+    'text/csv': '.csv',
+    'text/plain': '.txt',
+    'application/msword': '.doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+    'application/vnd.ms-excel': '.xls',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+    'application/vnd.ms-powerpoint': '.ppt',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'image/webp': '.webp',
+    'application/zip': '.zip',
+    'application/x-rar-compressed': '.rar',
+    'application/x-7z-compressed': '.7z',
+    'video/mp4': '.mp4',
+    'video/x-msvideo': '.avi',
+    'video/quicktime': '.mov',
+    'audio/mpeg': '.mp3',
+    'audio/wav': '.wav',
+    'audio/m4a': '.m4a',
+    'application/json': '.json',
+    'application/xml': '.xml',
+    'text/xml': '.xml',
+    'text/html': '.html',
+  };
   
-  return null;
+  return mimeMap[type] || '';
+}
+
+// Check if filename already has an extension
+function hasExtension(filename) {
+  return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
 }
 
 const AppraisalDetailsModal = ({
@@ -120,35 +137,83 @@ const AppraisalDetailsModal = ({
   const [downloadingId, setDownloadingId] = React.useState(null);
   const [error, setError] = React.useState(null);
 
-  // Handle attachment download
+  // ✅ FIXED: Using correct API import with proper baseURL
   const handleDownloadAttachment = async (attachment) => {
     try {
+      console.log('=== DOWNLOAD START ===');
       setDownloadingId(attachment.attachmentId);
       setError(null);
 
-      // Call the download endpoint
-      const downloadUrl = `/api/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
+      // ✅ USE CORRECT API BASE URL
+      const downloadUrl = `${api.defaults.baseURL}/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
+      console.log(`[DOWNLOAD] URL: ${downloadUrl}`);
       
       const response = await fetch(downloadUrl);
       
+      console.log(`[RESPONSE] Status: ${response.status}`);
+      console.log(`[RESPONSE] OK: ${response.ok}`);
+      
+      // ✅ CRITICAL: Check response status and headers BEFORE processing
+      const contentType = response.headers.get('content-type');
+      console.log(`[HEADER] Content-Type: ${contentType}`);
+      
+      // ✅ If response not OK, show error
       if (!response.ok) {
-        throw new Error(`Download failed with status ${response.status}`);
+        const errorText = await response.text();
+        console.error(`[ERROR] HTTP ${response.status}:`, errorText);
+        throw new Error(`Download failed with status ${response.status}: ${errorText}`);
+      }
+
+      // ✅ If content-type is HTML, backend returned an error page
+      if (contentType && contentType.includes('text/html')) {
+        const errorText = await response.text();
+        console.error('[ERROR] Backend returned HTML error page:', errorText);
+        throw new Error('Backend returned error page. Check console for details.');
       }
 
       const blob = await response.blob();
+      console.log(`[BLOB] Type: ${blob.type}, Size: ${blob.size}`);
       
-      // Extract filename from Content-Disposition header
-      let filename = attachment.fileName || `attachment`;
-      const contentDisposition = response.headers.get('content-disposition');
+      // STEP 1: Get base filename
+      let filename = attachment.fileName || "attachment";
+      console.log(`[FILENAME] Original: "${filename}"`);
       
-      if (contentDisposition) {
-        const headerFilename = extractFilenameFromHeader(contentDisposition);
-        if (headerFilename) {
-          filename = headerFilename;
+      // STEP 2: Add extension if missing
+      if (!hasExtension(filename)) {
+        console.log(`[EXTENSION] Missing - detecting...`);
+        let extension = '';
+        
+        // Try Content-Type header first (MOST RELIABLE)
+        if (contentType) {
+          extension = getExtensionFromMime(contentType);
+          console.log(`[EXTENSION] From Header: "${extension}"`);
         }
+        
+        // Fallback: use fileType from attachment
+        if (!extension && attachment.fileType) {
+          extension = getExtensionFromMime(attachment.fileType);
+          console.log(`[EXTENSION] From Attachment: "${extension}"`);
+        }
+        
+        // Fallback: use blob.type
+        if (!extension && blob.type) {
+          extension = getExtensionFromMime(blob.type);
+          console.log(`[EXTENSION] From Blob: "${extension}"`);
+        }
+        
+        // Last resort
+        if (!extension) {
+          extension = '.bin';
+          console.log(`[EXTENSION] Default: ".bin"`);
+        }
+        
+        filename += extension;
+        console.log(`[FILENAME] Final: "${filename}"`);
+      } else {
+        console.log(`[EXTENSION] Already has extension`);
       }
       
-      // Create download link with correct filename
+      // STEP 3: Download
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -159,8 +224,10 @@ const AppraisalDetailsModal = ({
       document.body.removeChild(link);
       
       console.log(`✅ Downloaded: ${filename}`);
+      console.log('=== DOWNLOAD END ===');
     } catch (err) {
-      console.error("Download error:", err);
+      console.error("❌ Download error:", err);
+      console.error("Error stack:", err.stack);
       setError(`Failed to download ${attachment.fileName}: ${err.message}`);
     } finally {
       setDownloadingId(null);
@@ -486,7 +553,7 @@ const AppraisalDetailsModal = ({
                             <span>{formatFileSize(att.fileSize)}</span>
                             <span>•</span>
                             <span>{formatDate(att.uploadedAt)}</span>
-                            {att.attachmentNote && (
+                            {att.note && (
                               <>
                                 <span>•</span>
                                 <span
@@ -497,9 +564,9 @@ const AppraisalDetailsModal = ({
                                     whiteSpace: "nowrap",
                                     fontStyle: "italic",
                                   }}
-                                  title={att.attachmentNote}
+                                  title={att.note}
                                 >
-                                  {att.attachmentNote}
+                                  {att.note}
                                 </span>
                               </>
                             )}

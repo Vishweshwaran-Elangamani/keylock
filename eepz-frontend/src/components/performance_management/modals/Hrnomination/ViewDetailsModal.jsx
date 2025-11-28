@@ -25,22 +25,52 @@ const ViewDetailsModal = ({
         <div className="modal-content border-0 shadow-lg" style={{ background: THEME.card, borderRadius: 18 }}>
           {/* HEADER */}
           <div
-            className="modal-header"
-            style={{
-              background: THEME.primary,
-              color: "#fff",
-              borderBottom: "none",
-              padding: "24px 36px 15px 36px",
-              borderTopLeftRadius: 18,
-              borderTopRightRadius: 18,
-              alignItems: "center",
-              minHeight: 60,
-            }}
-          >
-            <h5 className="modal-title" style={{ fontWeight: "700", fontSize: 21, color: "#fff", margin: 0 }}>
-              Nomination Details
-            </h5>
-          </div>
+  className="modal-header"
+  style={{
+    background: THEME.primary,
+    color: "#fff",
+    borderBottom: "none",
+    padding: "24px 36px 15px 36px",
+    alignItems: "center",
+    minHeight: 60,
+    display: "flex",
+    justifyContent: "space-between"   // pushes title left, cross right
+  }}
+>
+  <h5
+    className="modal-title"
+    style={{
+      fontWeight: "700",
+      fontSize: 21,
+      color: "#fff",
+      margin: 0,
+      display: "flex",
+      alignItems: "center",
+      gap: "8px"
+    }}
+  >
+    <i className="bi bi-pencil-square" style={{ fontSize: 18 }} title="Edit Details" />
+    Nomination Details
+  </h5>
+
+  {/* Cross button on the right */}
+  <button
+    type="button"
+    onClick={() => setShowModal(false)}   // closes the modal
+    style={{
+      background: "transparent",
+      border: "none",
+      color: "#fff",
+      fontSize: 24,
+      cursor: "pointer",
+      lineHeight: 1
+    }}
+    aria-label="Close"
+  >
+    ×
+  </button>
+</div>
+
           {/* BODY */}
           <div className="modal-body" style={{ padding: "28px 38px 18px 38px" }}>
             {detailsLoading ? (
@@ -51,79 +81,63 @@ const ViewDetailsModal = ({
             ) : selectedNominationDetails ? (
               <div>
                 {/* NOMINEE INFO */}
-                <div className="row mb-4">
-                  <div className="col-md-6 mb-3 mb-md-0">
-                    <div style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: THEME.textLight,
-                      marginBottom: 3,
-                      letterSpacing: "0.1px",
-                    }}>
-                      Nominee Name
-                    </div>
-                    <div style={{
-                      fontSize: 16,
-                      color: THEME.text,
-                      fontWeight: 700,
-                    }}>
-                      {selectedNominationDetails.nomineeName ||
-                        (selectedNominationDetails.nominee?.firstName
-                          ? `${selectedNominationDetails.nominee.firstName} ${selectedNominationDetails.nominee.lastName}`
-                          : "N/A")}
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: THEME.textLight,
-                      marginBottom: 3,
-                      letterSpacing: "0.1px"
-                    }}>
-                      Employee ID
-                    </div>
-                    <div style={{ fontSize: 16, color: THEME.text, fontWeight: 700 }}>
-                      {selectedNominationDetails.nomineeEmployeeId ||
-                        selectedNominationDetails.nominee?.employeeId ||
-                        "N/A"}
-                    </div>
-                  </div>
-                </div>
-                <div className="row mb-4">
-                  <div className="col-md-7 mb-3 mb-md-0">
-                    <div style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: THEME.textLight,
-                      marginBottom: 3,
-                      letterSpacing: "0.1px"
-                    }}>
-                      Opportunity
-                    </div>
-                    <div style={{ fontSize: 16, color: THEME.text, fontWeight: 700 }}>
-                      {selectedNominationDetails.opportunityName ||
-                        selectedNominationDetails.opportunity?.opportunityName ||
-                        "N/A"}
-                    </div>
-                  </div>
-                  <div className="col-md-5">
-                    <div style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: THEME.textLight,
-                      marginBottom: 3,
-                      letterSpacing: "0.1px"
-                    }}>
-                      Submitted Date
-                    </div>
-                    <div style={{ fontSize: 15, color: THEME.text, fontWeight: 600 }}>
-                      {selectedNominationDetails.submittedAt
-                        ? new Date(selectedNominationDetails.submittedAt).toLocaleString()
-                        : "N/A"}
-                    </div>
-                  </div>
-                </div>
+                <div
+  style={{
+    background: "#fff",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    padding: "16px 20px",
+    marginBottom: "16px",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+    textAlign: "left"
+  }}
+>
+  <div style={{ marginBottom: "12px" }}>
+    <div style={{ fontSize: 13, fontWeight: 700, color: THEME.textLight, marginBottom: 3 }}>
+      Nominee Name
+    </div>
+    <div style={{ fontSize: 16, color: THEME.text, fontWeight: 700 }}>
+      {selectedNominationDetails.nomineeName ||
+        (selectedNominationDetails.nominee?.firstName
+          ? `${selectedNominationDetails.nominee.firstName} ${selectedNominationDetails.nominee.lastName}`
+          : "N/A")}
+    </div>
+  </div>
+
+  <div style={{ marginBottom: "12px" }}>
+    <div style={{ fontSize: 13, fontWeight: 700, color: THEME.textLight, marginBottom: 3 }}>
+      Employee ID
+    </div>
+    <div style={{ fontSize: 16, color: THEME.text, fontWeight: 700 }}>
+      {selectedNominationDetails.nomineeEmployeeId ||
+        selectedNominationDetails.nominee?.employeeId ||
+        "N/A"}
+    </div>
+  </div>
+
+  <div style={{ marginBottom: "12px" }}>
+    <div style={{ fontSize: 13, fontWeight: 700, color: THEME.textLight, marginBottom: 3 }}>
+      Opportunity
+    </div>
+    <div style={{ fontSize: 16, color: THEME.text, fontWeight: 700 }}>
+      {selectedNominationDetails.opportunityName ||
+        selectedNominationDetails.opportunity?.opportunityName ||
+        "N/A"}
+    </div>
+  </div>
+
+  <div>
+    <div style={{ fontSize: 13, fontWeight: 700, color: THEME.textLight, marginBottom: 3 }}>
+      Submitted Date
+    </div>
+    <div style={{ fontSize: 15, color: THEME.text, fontWeight: 600 }}>
+      {selectedNominationDetails.submittedAt
+        ? new Date(selectedNominationDetails.submittedAt).toLocaleString()
+        : "N/A"}
+    </div>
+  </div>
+</div>
+                
                 {/* Divider */}
                 <hr style={{ borderColor: "#e4e7eb", margin: "2px 0 22px 0" }} />
 
@@ -260,7 +274,7 @@ const ViewDetailsModal = ({
                 color: "#fff",
                 fontWeight: "700",
                 border: "none",
-                borderRadius: 8,
+                borderRadius: 12,
                 padding: "9px 32px",
                 fontSize: 15.5,
                 boxShadow: "0 2px 5px rgba(0,0,0,0.07)",

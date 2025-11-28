@@ -71,6 +71,7 @@ const ActionModal = ({
             >
               {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
             </h6>
+            
           </div>
 
           <div
@@ -148,7 +149,7 @@ const ActionModal = ({
                 onClick={onSubmit}
                 style={{
                   background: actionType === "approve"
-                    ? "linear-gradient(90deg, #1ab981 0%, #1bc381 95%)"
+                    ? "#27235C"
                     : "linear-gradient(90deg, #ee4947 0%, #f16f6f 95%)",
                   color: "#fff",
                   border: "none",
@@ -161,7 +162,7 @@ const ActionModal = ({
                   boxShadow: "0 2px 8px rgba(29,100,216,0.09)",
                 }}
               >
-                {actionType === "approve" ? "✓ Approve" : "✗ Reject"}
+                {actionType === "approve" ? "Approve" : "Reject"}
               </button>
             </div>
           </div>

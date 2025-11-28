@@ -289,45 +289,43 @@ function RewardConfiguration() {
           </button>
         </div>
         <div
-          style={{
-            fontSize: "13px",
-            color: "#8886b3",
-            marginTop: 6,
-            maxWidth: "100%",
-            textAlign: "justify",
-            lineHeight: 1.6,
-            wordBreak: "break-word",
-            whiteSpace: "pre-wrap",
-            minHeight: needsCollapse ? 75 : "auto",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-          }}
-        >
-          <span style={{ flex: 1 }}>
-            {visibleDesc}
-            {showReadMore && !descExpanded && <span style={{ color: RL_PURPLE }}>...</span>}
-          </span>
-          {showReadMore && (
-            <button
-              onClick={() => setDescExpanded((e) => !e)}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: RL_PURPLE,
-                fontWeight: 600,
-                fontSize: 12,
-                cursor: "pointer",
-                outline: "none",
-                padding: 0,
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-              }}
-            >
-              {descExpanded ? "Read Less" : "Read More"}
-            </button>
-          )}
-        </div>
+  style={{
+    fontSize: "13px",
+    color: "#8886b3",
+    marginTop: 6,
+    maxWidth: "100%",
+    textAlign: "justify",
+    lineHeight: 1.6,
+    wordBreak: "break-word",
+    whiteSpace: "pre-wrap",
+    minHeight: needsCollapse ? 75 : "auto",
+  }}
+>
+  <span>
+    {visibleDesc}
+    {showReadMore && !descExpanded && <span style={{ color: RL_PURPLE }}>...</span>}
+    {showReadMore && (
+      <button
+        onClick={() => setDescExpanded((e) => !e)}
+        style={{
+          background: "transparent",
+          border: "none",
+          color: RL_PURPLE,
+          fontWeight: 600,
+          fontSize: 12,
+          cursor: "pointer",
+          outline: "none",
+          padding: 0,
+          whiteSpace: "nowrap",
+          marginLeft: 2,   // small spacing after the dots
+        }}
+      >
+        {descExpanded ? "Read Less" : "Read More"}
+      </button>
+    )}
+  </span>
+</div>
+
       </>
     );
   }
@@ -374,19 +372,49 @@ function RewardConfiguration() {
           marginBottom: "1.2rem",
         }}
       >
-        <nav className="cg-breadcrumbs" style={{ marginBottom: 0, background: "transparent" }} aria-label="breadcrumb">
-          <ol className="cg-breadcrumb" style={{ margin: 0 }}>
-            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard")} style={{ cursor: "pointer" }}>
-              <i className="bi bi-house-door"></i>
-            </li>
-            <li className="cg-breadcrumb-item" onClick={() => navigate("/hr/dashboard/performance")} style={{ cursor: "pointer" }}>
-              Performance
-            </li>
-            <li className="cg-breadcrumb-item active" aria-current="page">
-              Rewards
-            </li>
-          </ol>
-        </nav>
+     <nav
+  className="cg-breadcrumbs"
+  aria-label="breadcrumb"
+  style={{
+    marginBottom: 0,
+    background: "transparent"
+  }}
+>
+  <style>
+    {`
+      .cg-breadcrumb-item + .cg-breadcrumb-item::before {
+        content: "/";
+        margin: 0 0.25rem;   /* smaller spacing */
+        color: #888;         /* lighter gray so it looks thinner */
+        font-weight: normal; /* prevents bold/thick look */
+      }
+    `}
+  </style>
+  <ol
+    className="cg-breadcrumb"
+    style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}
+  >
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard")}
+      style={{ cursor: "pointer" }}
+    >
+      <i className="bi bi-house-door"></i>
+    </li>
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard/performance")}
+      style={{ cursor: "pointer" }}
+    >
+      Performance
+    </li>
+    <li className="cg-breadcrumb-item active" aria-current="page">
+      Rewards
+    </li>
+  </ol>
+</nav>
+
+
         <button
           onClick={openAddRewardTypeModal}
           style={{
@@ -695,136 +723,151 @@ function RewardConfiguration() {
                     </div>
                   </div>
                 ) : (
-                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-                    <thead>
-                      <tr style={{ background: RL_TABLE_HEADER, borderBottom: `1.5px solid ${RL_BORDER}` }}>
-                        <th
+                  <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    fontSize: "13px",
+                    border: "2px solid #27235C",   // outer border
+                  }}
+                >
+                  <thead>
+                    <tr
+                      style={{
+                        background: "#27235C",     // header background
+                        borderBottom: "1.5px solid #27235C",
+                      }}
+                    >
+                      <th
+                        style={{
+                          textAlign: "left",
+                          padding: "11px",
+                          fontWeight: 800,
+                          color: "white",           // header text color
+                        }}
+                      >
+                        Parameter Name
+                      </th>
+                      <th
+                        style={{
+                          textAlign: "left",
+                          padding: "11px",
+                          fontWeight: 700,
+                          color: "white",           // header text color
+                        }}
+                      >
+                        Type
+                      </th>
+                      <th
+                        style={{
+                          textAlign: "left",        // left aligned
+                          padding: "11px",
+                          fontWeight: 700,
+                          color: "white",
+                        }}
+                      >
+                        Required
+                      </th>
+                      <th
+                        style={{
+                          textAlign: "left",        // left aligned
+                          padding: "11px",
+                          fontWeight: 700,
+                          color: "white",
+                        }}
+                      >
+                        Order
+                      </th>
+                      <th
+                        style={{
+                          textAlign: "left",        // left aligned
+                          padding: "11px",
+                          fontWeight: 800,
+                          color: "white",
+                        }}
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parameters.map((param) => (
+                      <tr
+                        key={param.parameterId}
+                        style={{
+                          borderBottom: "1px solid darkblue",
+                        }}
+                      >
+                        <td
                           style={{
-                            textAlign: "left",
-                            padding: "11px",
-                            fontWeight: 800,
-                            color: RL_PURPLE,
+                            padding: "13px 11px",
+                            fontWeight: "600",
+                            color: "#000",
+                            textAlign: "left",      // left aligned
                           }}
                         >
-                          Parameter Name
-                        </th>
-                        <th
+                          {param.parameterName}
+                        </td>
+                        <td
                           style={{
-                            textAlign: "left",
-                            padding: "11px",
-                            fontWeight: 700,
-                            color: RL_DARK,
+                            padding: "13px 11px",
+                            color: "#000",
+                            fontWeight: 500,
+                            textAlign: "left",      // left aligned
                           }}
                         >
-                          Type
-                        </th>
-                        <th
+                          {param.parameterType}
+                        </td>
+                        <td
                           style={{
-                            textAlign: "center",
-                            padding: "11px",
-                            fontWeight: 700,
-                            color: "#333",
+                            padding: "13px 11px",
+                            textAlign: "left",      // left aligned
+                            fontWeight: "700",
                           }}
                         >
-                          Required
-                        </th>
-                        <th
+                          {param.isRequired ? (
+                            <span style={{ color: "green" }}>Yes</span>
+                          ) : (
+                            <span style={{ color: "red" }}>No</span>
+                          )}
+                        </td>
+                        <td
                           style={{
-                            textAlign: "center",
-                            padding: "11px",
-                            fontWeight: 700,
-                            color: "#333",
+                            padding: "13px 11px",
+                            textAlign: "left",      // left aligned
+                            color: "#000",
                           }}
                         >
-                          Order
-                        </th>
-                        <th
+                          {param.sortOrder}
+                        </td>
+                        <td
                           style={{
-                            textAlign: "center",
-                            padding: "11px",
-                            fontWeight: 800,
-                            color: RL_DARK,
+                            padding: "13px 11px",
+                            textAlign: "left",      // left aligned
                           }}
                         >
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {parameters.map((param) => (
-                        <tr
-                          key={param.parameterId}
-                          style={{
-                            borderBottom: `1px solid ${RL_BORDER}`,
-                          }}
-                        >
-                          <td
+                          <button
+                            onClick={() => confirmDelete(param.parameterId, "parameter")}
                             style={{
-                              padding: "13px 11px",
-                              fontWeight: "600",
-                              color: RL_DARK,
-                            }}
-                          >
-                            {param.parameterName}
-                          </td>
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              color: RL_PURPLE,
-                              fontWeight: 500,
-                            }}
-                          >
-                            {param.parameterType}
-                          </td>
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              textAlign: "center",
+                              padding: "6px 18px",
+                              background: "#eee",
+                              color: "#27235C",
+                              borderRadius: 5,
                               fontWeight: "700",
+                              border: "1px solid #27235C",
+                              cursor: "pointer",
+                              fontSize: 13,
                             }}
+                            title="Delete Parameter"
                           >
-                            {param.isRequired ? (
-                              <span style={{ color: "#cb098f" }}>Yes</span>
-                            ) : (
-                              <span style={{ color: "#999" }}>No</span>
-                            )}
-                          </td>
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              textAlign: "center",
-                              color: "#65599b",
-                            }}
-                          >
-                            {param.sortOrder}
-                          </td>
-                          <td
-                            style={{
-                              padding: "13px 11px",
-                              textAlign: "center",
-                            }}
-                          >
-                            <button
-                              onClick={() => confirmDelete(param.parameterId, "parameter")}
-                              style={{
-                                padding: "6px 18px",
-                                background: RL_LIGHT,
-                                color: RL_PURPLE,
-                                borderRadius: 5,
-                                fontWeight: "700",
-                                border: `1px solid ${RL_PURPLE}22`,
-                                cursor: "pointer",
-                                fontSize: 13,
-                              }}
-                              title="Delete Parameter"
-                            >
-                              <i className="bi bi-trash" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            <i className="bi bi-trash" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
                 )}
               </>
             ) : (

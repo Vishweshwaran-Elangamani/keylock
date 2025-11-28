@@ -309,27 +309,46 @@ const StatCard = ({ title, value }) => (
 
       <div className="container-fluid">
         {/* BREADCRUMB */}
-        <nav className="cg-breadcrumbs" aria-label="breadcrumb" style={{ marginBottom: "16px" }}>
-          <ol className="cg-breadcrumb">
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard")}
-              style={{ cursor: "pointer" }}
-            >
-              <i className="bi bi-house-door"></i>
-            </li>
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard/performance")}
-              style={{ cursor: "pointer" }}
-            >
-              Performance
-            </li>
-            <li className="cg-breadcrumb-item active" aria-current="page">
-              Nominations
-            </li>
-          </ol>
-        </nav>
+        <nav
+  className="cg-breadcrumbs"
+  aria-label="breadcrumb"
+  style={{ marginBottom: "16px", background: "transparent" }}
+>
+  <style>
+    {`
+      .cg-breadcrumb-item + .cg-breadcrumb-item::before {
+        content: "/";
+        margin: 0 0.25rem;   /* smaller spacing */
+        color: #888;         /* lighter gray separator */
+        font-weight: normal; /* prevents thick/bold look */
+        font-size: 0.9em;    /* slightly smaller than text */
+      }
+    `}
+  </style>
+  <ol
+    className="cg-breadcrumb"
+    style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}
+  >
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard")}
+      style={{ cursor: "pointer" }}
+    >
+      <i className="bi bi-house-door"></i>
+    </li>
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard/performance")}
+      style={{ cursor: "pointer" }}
+    >
+      Performance
+    </li>
+    <li className="cg-breadcrumb-item active" aria-current="page">
+      Nominations
+    </li>
+  </ol>
+</nav>
+
 
         {/* STAT CARDS */}
         {statsLoading ? (

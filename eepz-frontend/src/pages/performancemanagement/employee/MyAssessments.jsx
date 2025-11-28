@@ -66,6 +66,9 @@ function MyAssessments() {
   const [timers, setTimers] = useState({});
   const [visibleTimers, setVisibleTimers] = useState([]);
 
+  const [downloadingAttachmentId, setDownloadingAttachmentId] = useState(null);
+
+
   // ✅ Attachment states
   const [attachments, setAttachments] = useState([]);
   const [viewAttachments, setViewAttachments] = useState([]);
@@ -120,6 +123,170 @@ function MyAssessments() {
   // ========================
   // API FUNCTIONS
   // ========================
+
+  // Get file extension from MIME type
+function getExtensionFromMime(mimeType) {
+  if (!mimeType) return '';
+  const type = mimeType.toLowerCase().trim();
+  const mimeMap = {
+    'application/pdf': '.pdf',
+    'text/csv': '.csv',
+    'text/plain': '.txt',
+    'application/msword': '.doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+    'application/vnd.ms-excel': '.xls',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/gif': '.gif',
+    'application/zip': '.zip',
+    'audio/mpeg': '.mp3',
+    'video/mp4': '.mp4',
+  };
+  return mimeMap[type] || '';
+}
+
+function hasExtension(filename) {
+  return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
+}
+
+function extractFilenameFromHeader(contentDisposition) {
+  if (!contentDisposition) return null;
+  const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
+  if (matchUtf8 && matchUtf8) {
+    try {
+      return decodeURIComponent(matchUtf8.replace(/"/g, '').trim());
+    } catch (e) {
+      return matchUtf8.replace(/"/g, '').trim();
+    }
+  }
+  const matchNormal = contentDisposition.match(/filename=([^;]+)(?:;|$)/i);
+  if (matchNormal && matchNormal) {
+    return matchNormal.replace(/"/g, '').trim();
+  }
+  return null;
+}
+
+
+// Checks if filename string contains a file extension (dot + at least 2 chars)
+function hasExtension(filename) {
+  return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
+}
+
+
+
+// ---- The corrected download handler ----
+const handleDownloadAttachment = async (attachment) => {
+  try {
+    setDownloadingId(attachment.attachmentId);
+    setError(null);
+
+    const downloadUrl = `/api/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
+    const response = await fetch(downloadUrl);
+
+    if (!response.ok) {
+      throw new Error(`Download failed with status ${response.status}`);
+    }
+
+    const blob = await response.blob();
+
+    let filename = attachment.fileName || "attachment";
+    const contentDisposition = response.headers.get("content-disposition");
+    if (contentDisposition) {
+      const parsedName = extractFilenameFromHeader(contentDisposition);
+      if (parsedName) {
+        filename = parsedName;
+      }
+    }
+
+    // If the filename does not have an extension, try to infer from Content-Type header
+    if (!hasExtension(filename)) {
+      // Try Content-Type header from response
+      let extension = '';
+      const mimeType = response.headers.get("content-type") || attachment.fileType || '';
+      extension = getExtensionFromMime(mimeType);
+      if (!extension && blob.type) {
+        extension = getExtensionFromMime(blob.type);
+      }
+      // Fallback to .bin if no match at all
+      if (!extension) extension = '.bin';
+
+      filename += extension;
+    }
+
+    // Download with final filename
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+
+    console.log(`✅ Downloaded: ${filename}`);
+  } catch (err) {
+    console.error("Download error:", err);
+    setError(`Failed to download ${attachment.fileName}: ${err.message}`);
+  } finally {
+    setDownloadingId(null);
+  }
+};
+const handleDownloadViewAttachment = async (attachment) => {
+  try {
+    setDownloadingAttachmentId(attachment.attachmentId);
+    const downloadUrl = `/api/SelfAssessment/attachments/${attachment.attachmentId}/download`;
+    const response = await fetch(downloadUrl);
+    
+    if (!response.ok) {
+      throw new Error(`Download failed with status ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    let filename = attachment.fileName || "attachment";
+    const contentDisposition = response.headers.get('content-disposition');
+    
+    if (contentDisposition) {
+      const headerFilename = extractFilenameFromHeader(contentDisposition);
+      if (headerFilename) {
+        filename = headerFilename;
+      }
+    }
+    
+    if (!hasExtension(filename)) {
+      let extension = '';
+      const contentType = response.headers.get('content-type');
+      if (contentType) {
+        extension = getExtensionFromMime(contentType);
+      }
+      if (!extension && attachment.fileType) {
+        extension = getExtensionFromMime(attachment.fileType);
+      }
+      if (!extension) {
+        extension = '.bin';
+      }
+      filename += extension;
+    }
+    
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+    
+    console.log(`✅ Downloaded: ${filename}`);
+  } catch (err) {
+    console.error("Download error:", err);
+    toast.error(`Failed to download attachment: ${err.message}`);
+  } finally {
+    setDownloadingAttachmentId(null);
+  }
+};
+
+
 
   const fetchAssignments = async () => {
     setLoading(true);
@@ -1004,29 +1171,36 @@ function MyAssessments() {
                                     </div>
                                   </div>
                                   
-                                  <a
-                                    href={`${api.defaults.baseURL}/SelfAssessment/attachments/${att.attachmentId}/download`}
-                                    download
-                                    style={{
-                                      padding: "8px 16px",
-                                      backgroundColor: "#10b981",
-                                      color: "white",
-                                      border: "none",
-                                      borderRadius: "6px",
-                                      textDecoration: "none",
-                                      fontSize: "13px",
-                                      fontWeight: "500",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "6px",
-                                      transition: "background-color 0.2s",
-                                      whiteSpace: "nowrap"
-                                    }}
-                                    onMouseOver={(e) => e.target.style.backgroundColor = "#059669"}
-                                    onMouseOut={(e) => e.target.style.backgroundColor = "#10b981"}
-                                  >
-                                    <i className="bi bi-download"></i> Download
-                                  </a>
+         {/* ✅ PASTE THIS INSTEAD: */}
+        <button
+          onClick={() => handleDownloadViewAttachment(att)}
+          disabled={downloadingAttachmentId === att.attachmentId}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: downloadingAttachmentId === att.attachmentId ? "#d1d5db" : "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: downloadingAttachmentId === att.attachmentId ? "not-allowed" : "pointer",
+            fontSize: "13px",
+            fontWeight: "600",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+          }}
+        >
+          {downloadingAttachmentId === att.attachmentId ? (
+            <>
+              <i className="bi bi-hourglass-split"></i>
+              Downloading...
+            </>
+          ) : (
+            <>
+              <i className="bi bi-download"></i>
+              Download
+            </>
+          )}
+        </button>
                                 </div>
                               </div>
                             ))}
