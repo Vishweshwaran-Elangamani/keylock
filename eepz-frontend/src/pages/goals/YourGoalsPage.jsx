@@ -167,8 +167,6 @@ const YourGoalsPage = () => {
 
       const response = await goalService.queryGoals(params);
 
-      console.log("API Response metadata:", response.metadata);
-
       const goalsData = Array.isArray(response.data)
         ? response.data
         : response.data?.goals || [];
@@ -485,7 +483,10 @@ const YourGoalsPage = () => {
       )}
 
       {/* Create Goal Modal */}
-      <GoalFormModal isOpen={showCreateModal} />
+      <GoalFormModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+      />
 
       {/* Filters Modal */}
       <GoalFilters

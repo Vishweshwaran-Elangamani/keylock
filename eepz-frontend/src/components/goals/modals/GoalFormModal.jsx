@@ -614,7 +614,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
               </h5>
               <button
                 type="button"
-                class="btn-close-white"
+                className="btn-close-white"
                 onClick={onClose}
                 disabled={loading}
                 style={{

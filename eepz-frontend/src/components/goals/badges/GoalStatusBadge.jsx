@@ -70,7 +70,7 @@ const FormatStatusKey = (status) => {
     // Backend values -> Frontend PascalCase keys
     pending: "Pending",
     open: "Open",
-    inprogress: "InProgress",
+    inprogress: "In Progress",
     completed: "Completed",
     closed: "Closed",
     reopened: "Reopened",
@@ -135,7 +135,7 @@ const GoalStatusBadge = ({ status, size = "md", showTooltip = true }) => {
             }}
           />
         )}
-        <span>{label}</span>
+        <span>Goal Status: {label}</span>
       </span>
 
       {/* Animation styles */}

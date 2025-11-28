@@ -266,10 +266,11 @@ const GoalApprovalsPage = () => {
             <div
               style={{
                 display: "flex",
+                flex: 1,
                 backgroundColor: "rgb(39, 35, 92)",
                 borderRadius: "50px",
                 padding: "5px",
-                maxWidth: "100%", 
+                maxWidth: "100%",
               }}
             >
               <button

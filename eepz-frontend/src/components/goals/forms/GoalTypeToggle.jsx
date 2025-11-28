@@ -19,6 +19,7 @@ const GoalTypeToggle = ({
     <div
       style={{
         display: "inline-flex",
+        flex: 1,
         backgroundColor: "rgb(39, 35, 92)",
         borderRadius: "50px",
         padding: "5px",

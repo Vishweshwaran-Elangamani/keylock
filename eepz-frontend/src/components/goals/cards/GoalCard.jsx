@@ -368,7 +368,7 @@ const GoalCard = ({ goal }) => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes pulse {
           0%,
           100% {

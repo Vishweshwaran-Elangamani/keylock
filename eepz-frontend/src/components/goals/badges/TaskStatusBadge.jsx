@@ -46,7 +46,7 @@ const TaskStatusBadge = ({ progress, hasPendingApproval, isAcknowledged }) => {
       className={`badge bg-${status.bg}${status.textDark ? " text-dark" : ""}`}
     >
       <i className={`bi ${status.icon} me-1`} />
-      {status.label}
+      Task Status: {status.label}
       {progressLabel}
     </span>
   );
