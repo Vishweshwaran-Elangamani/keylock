@@ -5,7 +5,6 @@ import GoalCard from "../../components/goals/cards/GoalCard";
 import GoalTypeToggle from "../../components/goals/forms/GoalTypeToggle";
 import GoalFilters from "../../components/goals/modals/GoalFilters";
 import GoalFormModal from "../../components/goals/modals/GoalFormModal";
-import QuickCommentModal from "../../components/goals/modals/QuickCommentModal";
 import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
@@ -42,8 +41,6 @@ const YourGoalsPage = () => {
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showFiltersModal, setShowFiltersModal] = useState(false);
-  const [showCommentModal, setShowCommentModal] = useState(false);
-  const [selectedGoal, setSelectedGoal] = useState(null);
 
   // Counts for type toggle
   const [typeCounts, setTypeCounts] = useState({
@@ -488,11 +485,7 @@ const YourGoalsPage = () => {
       )}
 
       {/* Create Goal Modal */}
-      <GoalFormModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSuccess={handleGoalCreated}
-      />
+      <GoalFormModal isOpen={showCreateModal} />
 
       {/* Filters Modal */}
       <GoalFilters
@@ -502,20 +495,6 @@ const YourGoalsPage = () => {
         onApply={handleFiltersApply}
         projects={projects}
       />
-
-      {/* Quick Comment Modal */}
-      {selectedGoal && (
-        <QuickCommentModal
-          isOpen={showCommentModal}
-          onClose={() => {
-            setShowCommentModal(false);
-            setSelectedGoal(null);
-          }}
-          goalId={selectedGoal.goalId}
-          goalTitle={selectedGoal.title}
-          onSuccess={loadGoals}
-        />
-      )}
     </div>
   );
 };

@@ -6,7 +6,6 @@ import GoalTracker from "../../components/goals/cards/GoalTracker";
 import GoalCard from "../../components/goals/cards/GoalCard";
 import GoalTypeToggle from "../../components/goals/forms/GoalTypeToggle";
 import GoalFormModal from "../../components/goals/modals/GoalFormModal";
-import QuickCommentModal from "../../components/goals/modals/QuickCommentModal";
 import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
@@ -92,7 +91,7 @@ const GoalsDashboard = () => {
           type: selectedType,
           status: status,
           page: 1,
-          pageSize: 100, // Fetch all at once
+          pageSize: 100,
         })
       );
 
@@ -272,50 +271,49 @@ const GoalsDashboard = () => {
               </div>
             ) : (
               <>
-              <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      minHeight: "60vh",
-    }}
-  >
-     <div style={{ flexGrow: 1 }}>
-  <div className="row g-3 mb-4">
-    {paginatedData.goals.map((goal) => (
-      <div key={goal.goalId} className="col-12 col-md-6 col-xl-4">
-        <GoalCard
-          goal={goal}
-          onComment={handleCommentClick}
-          showActions={true}
-        />
-      </div>
-    ))}
-  </div>
-  </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    minHeight: "60vh",
+                  }}
+                >
+                  <div style={{ flexGrow: 1 }}>
+                    <div className="row g-3 mb-4">
+                      {paginatedData.goals.map((goal) => (
+                        <div
+                          key={goal.goalId}
+                          className="col-12 col-md-6 col-xl-4"
+                        >
+                          <GoalCard goal={goal} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-  {/* Sticky Pagination */}
-  <Pagination
-    currentPage={currentPage}
-    totalPages={paginatedData.totalPages}
-    onPageChange={handlePageChange}
-    loading={loadingGoals}
-    totalItems={paginatedData.totalCount}
-    itemsPerPage={itemsPerPage}
-    onItemsPerPageChange={handleItemsPerPageChange}
-    pageSizeOptions={[6, 12, 24, 48]}
-    style={{
-      position: "fixed",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      background: "#fff",
-      padding: "0.75rem 1rem",
-      borderTop: "1px solid #ddd",
-      zIndex: 1000,
-    }}
-  />
-  </div>
-</>
+                  {/* Sticky Pagination */}
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={paginatedData.totalPages}
+                    onPageChange={handlePageChange}
+                    loading={loadingGoals}
+                    totalItems={paginatedData.totalCount}
+                    itemsPerPage={itemsPerPage}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                    pageSizeOptions={[6, 12, 24, 48]}
+                    style={{
+                      position: "fixed",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      background: "#fff",
+                      padding: "0.75rem 1rem",
+                      borderTop: "1px solid #ddd",
+                      zIndex: 1000,
+                    }}
+                  />
+                </div>
+              </>
             )}
           </div>
         </>
@@ -327,20 +325,6 @@ const GoalsDashboard = () => {
         onClose={() => setShowCreateModal(false)}
         onSuccess={handleGoalCreated}
       />
-
-      {/* Quick Comment Modal */}
-      {selectedGoal && (
-        <QuickCommentModal
-          isOpen={showCommentModal}
-          onClose={() => {
-            setShowCommentModal(false);
-            setSelectedGoal(null);
-          }}
-          goalId={selectedGoal.goalId}
-          goalTitle={selectedGoal.title}
-          onSuccess={loadOngoingGoals}
-        />
-      )}
     </div>
   );
 };

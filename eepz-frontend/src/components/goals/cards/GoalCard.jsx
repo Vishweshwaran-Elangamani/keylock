@@ -11,7 +11,7 @@ import {
   getDaysUntilDeadline,
 } from "../../../utils/goals/goalHelpers";
 
-const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
+const GoalCard = ({ goal }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -19,18 +19,10 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
   const isAssignee = goal.assignees?.some(
     (a) => a.employeeMasterId === user.empMasterId
   );
-  const canAssign = isCreator && goal.goalType === "team";
-
-  //  NEW: Check if user is Leadership
-  const isLeadership = user.role === "Leadership";
-  const isOrgGoal = goal.goalType === "org";
 
   const showTaskStatus = !isCreator && isAssignee && goal.goalType === "team";
   const overdueStatus = isOverdue(goal.endAt) && goal.status !== "completed";
   const daysUntil = getDaysUntilDeadline(goal.endAt);
-
-  //  NEW: Only show comment button if not org goal OR if leadership
-  const canShowCommentButton = onComment && (!isOrgGoal || isLeadership);
 
   // Get user's acknowledgment status
   const userAssignee = goal.assignees?.find(
@@ -104,15 +96,12 @@ const GoalCard = ({ goal, onComment, onAssign, showActions = true }) => {
                   isAcknowledged={isUserAcknowledged}
                   size="sm"
                 />
-                {!isOverdue && (
-                  <GoalStatusBadge status={goal.status} size="sm" />
-                )}
+
+                <GoalStatusBadge status={goal.status} size="sm" />
               </>
             ) : (
               <>
-                {!isOverdue && (
-                  <GoalStatusBadge status={goal.status} size="sm" />
-                )}
+                <GoalStatusBadge status={goal.status} size="sm" />
               </>
             )}
           </div>
