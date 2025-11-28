@@ -320,8 +320,10 @@ const HRSLADashboard = () => {
               <div className="hr-sla-stat-icon" style={{ backgroundColor: bgColor }}>
                 <Icon size={28} color={iconColor} strokeWidth={2.5} />
               </div>
-              <h3 className="hr-sla-stat-value">{value}</h3>
-              <p className="hr-sla-stat-label">{label}</p>
+              <div>
+                <h3 className="hr-sla-stat-value">{value}</h3>
+                <p className="hr-sla-stat-label">{label}</p>
+              </div>
             </div>
           </div>
         ))}
@@ -394,40 +396,52 @@ const HRSLADashboard = () => {
         </div>
       </div>
 
-      {/* SLA Table */}
-      <div className="hr-sla-table-wrapper">
-        <div className="table-responsive">
-          <table className="table table-hover mb-0 hr-sla-table">
-            <thead className="hr-sla-table-header">
-              <tr>
-                <th>Employee</th>
-                <th>Type</th>
-                <th>Assigned To</th>
-                <th>Deadline</th>
-                <th>Status</th>
-                <th>Compliance</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentSLAs.length === 0 ? (
+      {/* Empty State - Outside Table */}
+      {currentSLAs.length === 0 ? (
+        <div className="hr-sla-empty-state-wrapper">
+          <div className="hr-sla-empty-state">
+            <FileText size={64} className="hr-sla-empty-state__icon" />
+            <h5 className="hr-sla-empty-state__title">
+              {filteredSlas.length === 0 && slas.length > 0
+                ? "No SLAs match your filters"
+                : "No SLAs found"}
+            </h5>
+            <p className="hr-sla-empty-state__text">
+              {filteredSlas.length === 0 && slas.length > 0
+                ? "Try adjusting your search criteria or filters"
+                : "Get started by creating your first SLA"}
+            </p>
+            {filteredSlas.length === 0 && slas.length > 0 ? (
+              <button className="btn btn-outline-primary hr-sla-empty-state__btn" onClick={clearFilters}>
+                <Filter size={16} />
+                Clear Filters
+              </button>
+            ) : (
+              <button className="btn btn-primary hr-sla-empty-state__btn" onClick={() => setShowCreateModal(true)}>
+                <Plus size={16} />
+                Create First SLA
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* SLA Table */
+        <div className="hr-sla-table-wrapper">
+          <div className="table-responsive">
+            <table className="table table-hover mb-0 hr-sla-table">
+              <thead className="hr-sla-table-header">
                 <tr>
-                  <td colSpan="7" className="hr-sla-table-empty">
-                    <FileText size={48} className="hr-sla-empty-icon" />
-                    <p className="hr-sla-empty-text">
-                      {filteredSlas.length === 0 && slas.length > 0
-                        ? "No SLAs match your filters"
-                        : "No SLAs found"}
-                    </p>
-                    {filteredSlas.length === 0 && slas.length > 0 && (
-                      <button className="btn btn-outline-primary" onClick={clearFilters}>
-                        Clear Filters
-                      </button>
-                    )}
-                  </td>
+                  <th>Employee</th>
+                  <th>Type</th>
+                  <th>Assigned To</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th>Compliance</th>
+                  <th>Actions</th>
                 </tr>
-              ) : (
-                currentSLAs.map((sla) => (
+              </thead>
+              <tbody>
+                {currentSLAs.map((sla) => (
                   <tr 
                     key={sla.slaid} 
                     onClick={() => handleRowClick(sla.slaid)}
@@ -482,25 +496,25 @@ const HRSLADashboard = () => {
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-        {filteredSlas.length > itemsPerPage && (
-          <div className="hr-sla-pagination-wrapper">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              startIndex={startIndex}
-              endIndex={endIndex}
-              totalItems={filteredSlas.length}
-              onPageChange={setCurrentPage}
-            />
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
-        <div>
+          {filteredSlas.length > itemsPerPage && (
+            <div className="hr-sla-pagination-wrapper">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                startIndex={startIndex}
+                endIndex={endIndex}
+                totalItems={filteredSlas.length}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Modals */}
       <ConfirmationModal
         isOpen={showConfirmModal}
@@ -519,7 +533,6 @@ const HRSLADashboard = () => {
         cancelText="Cancel"
         confirmVariant="danger"
       />
-      </div>
 
       {showEditModal && selectedSLA && (
         <EditSLAModal

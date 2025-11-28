@@ -1,22 +1,25 @@
-// src/pages/feedback_management/feedback/ViewMyPeerFeedback.jsx
+// src/pages/feedback_management/feedback/ManagerPeerFeedback.jsx
 
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
   AlertTriangle,
-  ArrowLeft,
   Users,
   User,
   Calendar,
   MessageCircle,
   Lock,
   Loader,
+  Grid,
+  List,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   peerQueueApi,
   employeeApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+import "../../../styles/feedback/ManagerPeerFeedback.css";
 
 export default function ManagerPeerFeedback() {
   const navigate = useNavigate();
@@ -29,6 +32,7 @@ export default function ManagerPeerFeedback() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [employeeMap, setEmployeeMap] = useState({});
+  const [viewMode, setViewMode] = useState("card"); // "card" or "table"
 
   // Safe date formatting
   const formatDate = (dateInput) => {
@@ -36,7 +40,7 @@ export default function ManagerPeerFeedback() {
     try {
       const dateObj = new Date(dateInput);
       if (isNaN(dateObj.getTime()) || dateObj.getFullYear() < 2000) return "—";
-      return dateObj.toLocaleDateString("en-US", {
+      return dateObj.toLocaleDateString("en-GB", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -46,7 +50,7 @@ export default function ManagerPeerFeedback() {
     }
   };
 
-  // Check if feedback is anonymous - handles multiple field name variations
+  // Check if feedback is anonymous
   const checkIsAnonymous = (feedback) => {
     return Boolean(
       feedback.isAnonymous === true ||
@@ -60,7 +64,7 @@ export default function ManagerPeerFeedback() {
     );
   };
 
-  // Get sender display name - always hide if anonymous
+  // Get sender display name
   const getSenderDisplayName = (feedback) => {
     const isAnon = checkIsAnonymous(feedback);
 
@@ -75,7 +79,7 @@ export default function ManagerPeerFeedback() {
     );
   };
 
-  // Fetch peer feedback using services
+  // Fetch peer feedback
   const fetchPeerFeedback = async () => {
     setLoading(true);
     setError("");
@@ -89,9 +93,7 @@ export default function ManagerPeerFeedback() {
         return;
       }
 
-      console.log("Fetching peer feedback for employee ID:", empId);
-
-      // STEP 1: Fetch employee map for name resolution
+      // Fetch employee map
       let empMap = {};
       try {
         const empRes = await employeeApi.getAll();
@@ -105,43 +107,26 @@ export default function ManagerPeerFeedback() {
             empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
           });
           setEmployeeMap(empMap);
-          console.log(
-            "Loaded employee map:",
-            Object.keys(empMap).length,
-            "employees"
-          );
         }
       } catch (err) {
         console.warn("Error fetching employee map:", err.message);
       }
 
-      // STEP 2: Fetch ALL peer feedback
+      // Fetch peer feedback
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
-        console.log("Raw peer feedback response:", peerRes);
 
         const feedbackData = Array.isArray(peerRes?.data)
           ? peerRes.data
           : peerRes?.data?.data || [];
 
         if (Array.isArray(feedbackData)) {
-          // Filter: Only feedback where current user is the RECIPIENT
           const myFeedback = feedbackData
             .filter((p) => {
               const isRecipient =
                 Number(p.recipientEmployeeId) === Number(empId);
               const isApproved =
                 p.status === "Approved" || p.Status === "Approved";
-
-              console.log("Checking feedback:", {
-                queueId: p.queueId || p.QueueId,
-                recipientEmployeeId: p.recipientEmployeeId,
-                currentUserEmpId: empId,
-                isRecipient,
-                status: p.status || p.Status,
-                isApproved,
-                isAnonymous: checkIsAnonymous(p),
-              });
 
               return isRecipient && isApproved;
             })
@@ -174,13 +159,7 @@ export default function ManagerPeerFeedback() {
             });
 
           setPeerFeedback(myFeedback);
-          console.log(
-            "Filtered peer feedback (received by me):",
-            myFeedback.length
-          );
-          console.log("Sample feedback:", myFeedback[0]);
         } else {
-          console.warn("Invalid peer feedback data structure");
           setPeerFeedback([]);
         }
       } catch (err) {
@@ -196,7 +175,6 @@ export default function ManagerPeerFeedback() {
     }
   };
 
-  // Fetch on mount
   useEffect(() => {
     if (user?.empId) {
       fetchPeerFeedback();
@@ -206,80 +184,54 @@ export default function ManagerPeerFeedback() {
   // Loading state
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div className="text-center">
-          <Loader
-            size={40}
-            className="text-primary mb-3"
-            style={{ animation: "spin 1s linear infinite" }}
-          />
-          <p className="text-muted">Loading peer feedback...</p>
-        </div>
+      <div className="fm-mgrpeer-loading">
+        <Loader size={40} className="fm-mgrpeer-loading__spinner" />
+        <p className="fm-mgrpeer-loading__text">Loading peer feedback...</p>
       </div>
     );
   }
 
   return (
-    <div
-      className="d-flex justify-content-center py-4"
-      style={{ minHeight: "100vh", background: "#f9f9f9" }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "1000px",
-          paddingLeft: "1rem",
-          paddingRight: "1rem",
-        }}
-      >
-        {/* Header */}
-        <div className="d-flex align-items-start mb-4">
+    <div className="fm-mgrpeer-page-wrapper">
+      <div className="fm-mgrpeer-container">
+        {/* Breadcrumb */}
+        <FeedbackBreadcrumb
+          items={[
+            { label: "Feedback Management", path: "/manager/dashboard/feedback" },
+            { label: "Peer Feedback Received" },
+          ]}
+        />
+
+        {/* View Toggle */}
+        <div className="fm-mgrpeer-view-toggle">
           <button
-            className="btn btn-outline-secondary me-2"
-            onClick={() => navigate(-1)}
-            style={{ borderRadius: "8px" }}
+            className={`fm-mgrpeer-view-toggle__btn ${
+              viewMode === "card" ? "fm-mgrpeer-view-toggle__btn--active" : ""
+            }`}
+            onClick={() => setViewMode("card")}
           >
-            <ArrowLeft size={16} />
+            <Grid size={18} />
+            <span>Card View</span>
           </button>
-          <div className="flex-grow-1">
-            <h2 className="fw-bold mb-1" style={{ color: "#0F62FE" }}>
-              Peer Feedback Received
-            </h2>
-            <p className="mb-0 small text-muted">
-              Feedback from your peers - anonymity is always respected
-            </p>
-          </div>
           <button
-            className="btn btn-outline-secondary"
-            onClick={fetchPeerFeedback}
-            disabled={loading}
-            title="Refresh"
-            style={{ borderRadius: "8px" }}
+            className={`fm-mgrpeer-view-toggle__btn ${
+              viewMode === "table" ? "fm-mgrpeer-view-toggle__btn--active" : ""
+            }`}
+            onClick={() => setViewMode("table")}
           >
-            <RefreshCw
-              size={18}
-              style={{
-                animation: loading ? "spin 1s linear infinite" : "none",
-              }}
-            />
+            <List size={18} />
+            <span>Table View</span>
           </button>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div
-            className="alert alert-danger alert-dismissible fade show mb-4"
-            role="alert"
-          >
-            <AlertTriangle
-              size={18}
-              className="me-2"
-              style={{ display: "inline" }}
-            />
-            <strong>Error:</strong> {error}
+          <div className="fm-mgrpeer-error-alert alert alert-danger alert-dismissible fade show">
+            <AlertTriangle size={18} className="flex-shrink-0" />
+            <div className="flex-grow-1">
+              <strong>Error</strong>
+              <p className="mb-0 mt-1">{error}</p>
+            </div>
             <button
               type="button"
               className="btn-close"
@@ -290,174 +242,186 @@ export default function ManagerPeerFeedback() {
 
         {/* Stats Card */}
         {peerFeedback.length > 0 && (
-          <div className="row g-3 mb-4">
-            <div className="col-12">
-              <div
-                className="card border-0 shadow-sm"
-                style={{ borderRadius: "8px" }}
-              >
-                <div className="card-body text-center">
-                  <div className="d-flex justify-content-center mb-2">
-                    <div
-                      className="rounded p-2"
-                      style={{ background: "#0F62FE15" }}
-                    >
-                      <Users size={24} style={{ color: "#0F62FE" }} />
-                    </div>
-                  </div>
-                  <h3 className="fw-bold" style={{ color: "#0F62FE" }}>
-                    {peerFeedback.length}
-                  </h3>
-                  <p className="mb-0 small text-muted">
-                    Total Peer Feedback Received
-                  </p>
-                </div>
+          <div className="fm-mgrpeer-stats">
+            <div className="fm-mgrpeer-stat-card">
+              <div className="fm-mgrpeer-stat-card__icon">
+                <Users size={28} />
+              </div>
+              <div className="fm-mgrpeer-stat-card__content">
+                <h3 className="fm-mgrpeer-stat-card__value">
+                  {peerFeedback.length}
+                </h3>
+                <p className="fm-mgrpeer-stat-card__label">
+                  Peer Feedback Received
+                </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Peer Feedback List */}
+        {/* Empty State */}
         {peerFeedback.length === 0 ? (
-          <div
-            className="card border-0 shadow-sm"
-            style={{ borderRadius: "8px" }}
-          >
-            <div className="card-body text-center py-5">
-              <Users size={48} className="mb-3" style={{ color: "#ccc" }} />
-              <h5 className="text-muted mb-2">No peer feedback yet</h5>
-              <p className="small text-muted mb-0">
-                Check back later for feedback from your peers
-              </p>
-            </div>
+          <div className="fm-mgrpeer-empty">
+            <Users size={48} className="fm-mgrpeer-empty__icon" />
+            <h5 className="fm-mgrpeer-empty__title">No peer feedback yet</h5>
+            <p className="fm-mgrpeer-empty__text">
+              Check back later for feedback from your peers
+            </p>
           </div>
         ) : (
-          <div className="row g-3">
-            {peerFeedback.map((feedback) => {
-              const isAnon = checkIsAnonymous(feedback);
+          <>
+            {/* Card View */}
+            {viewMode === "card" && (
+              <div className="fm-mgrpeer-cards-grid">
+                {peerFeedback.map((feedback) => {
+                  const isAnon = checkIsAnonymous(feedback);
 
-              return (
-                <div
-                  className="col-12"
-                  key={
-                    feedback.queueId || feedback.QueueId || feedback.peerQueueId
-                  }
-                >
-                  <div
-                    className="card border-0 shadow-sm"
-                    style={{
-                      borderRadius: "8px",
-                      borderLeft: isAnon
-                        ? "4px solid #E01950"
-                        : "4px solid #0F62FE",
-                    }}
-                  >
-                    <div className="card-body">
-                      {/* Header - Sender Info & Date */}
-                      <div className="d-flex justify-content-between align-items-start mb-3">
-                        <div className="flex-grow-1">
-                          <div className="d-flex align-items-center gap-2 mb-2">
-                            {isAnon ? (
-                              <Lock size={16} style={{ color: "#E01950" }} />
-                            ) : (
-                              <User size={16} style={{ color: "#0F62FE" }} />
-                            )}
-                            <h6
-                              className="fw-bold mb-0"
-                              style={{
-                                color: isAnon ? "#E01950" : "#0F62FE",
-                              }}
-                            >
-                              {getSenderDisplayName(feedback)}
-                            </h6>
-                          </div>
-                          <div className="d-flex align-items-center gap-2">
-                            <Calendar size={14} className="text-muted" />
-                            <small className="text-muted">
-                              {feedback.formattedDate}
-                            </small>
-                          </div>
+                  return (
+                    <div
+                      className="fm-mgrpeer-card"
+                      key={
+                        feedback.queueId ||
+                        feedback.QueueId ||
+                        feedback.peerQueueId
+                      }
+                    >
+                      <div
+                        className={`fm-mgrpeer-card__indicator ${
+                          isAnon
+                            ? "fm-mgrpeer-card__indicator--anonymous"
+                            : "fm-mgrpeer-card__indicator--peer"
+                        }`}
+                      />
+
+                      <div className="fm-mgrpeer-card__header">
+                        <div className="fm-mgrpeer-card__sender">
+                          {isAnon ? (
+                            <Lock size={18} className="fm-mgrpeer-card__icon fm-mgrpeer-card__icon--anonymous" />
+                          ) : (
+                            <User size={18} className="fm-mgrpeer-card__icon fm-mgrpeer-card__icon--peer" />
+                          )}
+                          <h6 className={`fm-mgrpeer-card__name ${
+                            isAnon ? "fm-mgrpeer-card__name--anonymous" : ""
+                          }`}>
+                            {getSenderDisplayName(feedback)}
+                          </h6>
                         </div>
-                        <div className="d-flex gap-2 align-items-center">
+                        <div className="fm-mgrpeer-card__badges">
                           {isAnon && (
-                            <span
-                              className="badge"
-                              style={{
-                                backgroundColor: "#E0195020",
-                                color: "#E01950",
-                                padding: "6px 12px",
-                                fontSize: "0.75rem",
-                              }}
-                            >
-                              <Lock
-                                size={12}
-                                className="me-1"
-                                style={{ display: "inline" }}
-                              />
+                            <span className="fm-mgrpeer-badge fm-mgrpeer-badge--anonymous">
+                              <Lock size={12} />
                               Anonymous
                             </span>
                           )}
-                          <span
-                            className="badge"
-                            style={{
-                              backgroundColor: "#0F62FE20",
-                              color: "#0F62FE",
-                              padding: "6px 12px",
-                              fontSize: "0.75rem",
-                            }}
-                          >
+                          <span className="fm-mgrpeer-badge fm-mgrpeer-badge--peer">
                             Peer
                           </span>
                         </div>
                       </div>
 
-                      {/* Feedback Content */}
-                      <div className="mb-3">
-                        <div className="d-flex align-items-center gap-2 mb-2">
-                          <MessageCircle
-                            size={16}
-                            style={{ color: "#0F62FE" }}
-                          />
-                          <h6 className="small fw-bold text-muted mb-0">
-                            Feedback
-                          </h6>
+                      <div className="fm-mgrpeer-card__body">
+                        <div className="fm-mgrpeer-card__date">
+                          <Calendar size={14} />
+                          <span>{feedback.formattedDate}</span>
                         </div>
-                        <p
-                          className="mb-0 ps-4"
-                          style={{ lineHeight: "1.6", color: "#333" }}
-                        >
-                          {feedback.feedbackContent ||
-                            feedback.comment ||
-                            feedback.feedbackComment ||
-                            "No comment provided"}
-                        </p>
-                      </div>
 
-                      {/* Context if available */}
-                      {(feedback.context || feedback.feedbackContext) && (
-                        <div className="p-3 rounded bg-light">
-                          <h6 className="small fw-bold text-muted mb-2">
-                            Context
-                          </h6>
-                          <p className="small mb-0">
-                            {feedback.context || feedback.feedbackContext}
+                        <div className="fm-mgrpeer-card__feedback">
+                          <div className="fm-mgrpeer-card__feedback-header">
+                            <MessageCircle size={16} />
+                            <h6>Feedback</h6>
+                          </div>
+                          <p className="fm-mgrpeer-card__feedback-text">
+                            {feedback.feedbackContent ||
+                              feedback.comment ||
+                              feedback.feedbackComment ||
+                              "No comment provided"}
                           </p>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
 
-        <style>{`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+                        {(feedback.context || feedback.feedbackContext) && (
+                          <div className="fm-mgrpeer-card__context">
+                            <h6>Context</h6>
+                            <p>
+                              {feedback.context || feedback.feedbackContext}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Table View */}
+            {viewMode === "table" && (
+              <div className="fm-mgrpeer-table-wrapper">
+                <div className="fm-mgrpeer-table-scroll">
+                  <table className="fm-mgrpeer-table">
+                    <thead className="fm-mgrpeer-table__head">
+                      <tr>
+                        <th className="fm-mgrpeer-table__th">From</th>
+                        <th className="fm-mgrpeer-table__th">Type</th>
+                        <th className="fm-mgrpeer-table__th">Feedback</th>
+                        <th className="fm-mgrpeer-table__th">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="fm-mgrpeer-table__body">
+                      {peerFeedback.map((feedback) => {
+                        const isAnon = checkIsAnonymous(feedback);
+
+                        return (
+                          <tr
+                            key={
+                              feedback.queueId ||
+                              feedback.QueueId ||
+                              feedback.peerQueueId
+                            }
+                            className="fm-mgrpeer-table__row"
+                          >
+                            <td className="fm-mgrpeer-table__td">
+                              <div className="fm-mgrpeer-table__sender">
+                                {isAnon ? (
+                                  <Lock size={18} className="fm-mgrpeer-table__icon fm-mgrpeer-table__icon--anonymous" />
+                                ) : (
+                                  <User size={18} className="fm-mgrpeer-table__icon" />
+                                )}
+                                <span className="fm-mgrpeer-table__name">
+                                  {getSenderDisplayName(feedback)}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="fm-mgrpeer-table__td">
+                              <div className="fm-mgrpeer-table__badges">
+                                {isAnon && (
+                                  <span className="fm-mgrpeer-badge fm-mgrpeer-badge--anonymous">
+                                    Anonymous
+                                  </span>
+                                )}
+                                <span className="fm-mgrpeer-badge fm-mgrpeer-badge--peer">
+                                  Peer
+                                </span>
+                              </div>
+                            </td>
+                            <td className="fm-mgrpeer-table__td fm-mgrpeer-table__td--comment">
+                              {feedback.feedbackContent ||
+                                feedback.comment ||
+                                feedback.feedbackComment ||
+                                "No comment provided"}
+                            </td>
+                            <td className="fm-mgrpeer-table__td fm-mgrpeer-table__td--date">
+                              {feedback.formattedDate}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

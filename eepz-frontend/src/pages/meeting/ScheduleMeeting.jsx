@@ -183,6 +183,41 @@ const ScheduleMeeting = () => {
               className="breadcrumb mb-0 d-flex align-items-center"
               style={{ backgroundColor: "transparent", padding: 0, margin: 0 }}
             >
+             <li className="breadcrumb-item d-flex align-items-center">
+                <button
+                  onClick={() => navigate("/manager/dashboard/")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                >
+                   <Home size={16} /> 
+                 Dashboard
+                </button>
+              </li>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#97247E",
+                  margin: "0 8px",
+                  fontSize: "1rem",
+                }}
+              >
+                /
+              </li>
               <li className="breadcrumb-item d-flex align-items-center">
                 <button
                   onClick={() => navigate("/manager/dashboard/meetmom")}
@@ -203,7 +238,7 @@ const ScheduleMeeting = () => {
                   onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
                   onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
                 >
-                  <Home size={16} /> Dashboard
+                 Meeting and MoM
                 </button>
               </li>
               <li

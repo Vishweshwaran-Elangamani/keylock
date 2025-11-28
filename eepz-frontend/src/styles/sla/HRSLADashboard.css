@@ -657,4 +657,134 @@
     padding: 0.75rem 0.875rem !important;
     font-size: 0.75rem !important;
   }
+
+  /* ========================================
+   EMPTY STATE - OUTSIDE TABLE
+   ======================================== */
+
+.hr-sla-empty-state-wrapper {
+  background: #FFFFFF !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  border: 2px solid #27235C !important;
+  overflow: hidden !important;
+}
+
+.hr-sla-empty-state {
+  padding: 4rem 2rem !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 400px !important;
+}
+
+.hr-sla-empty-state__icon {
+  color: #D1D5DB !important;
+  margin-bottom: 1.5rem !important;
+  opacity: 0.5 !important;
+}
+
+.hr-sla-empty-state__title {
+  color: #374151 !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.hr-sla-empty-state__text {
+  color: #6B7280 !important;
+  font-size: 0.9375rem !important;
+  margin-bottom: 1.5rem !important;
+  max-width: 500px !important;
+}
+
+.hr-sla-empty-state__btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 0.75rem 1.5rem !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.hr-sla-empty-state__btn.btn-primary {
+  background: linear-gradient(135deg, #97247E 0%, #E01950 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3) !important;
+}
+
+.hr-sla-empty-state__btn.btn-primary:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 16px rgba(151, 36, 126, 0.4) !important;
+}
+
+.hr-sla-empty-state__btn.btn-outline-primary {
+  border: 1.5px solid #3B82F6 !important;
+  color: #3B82F6 !important;
+}
+
+.hr-sla-empty-state__btn.btn-outline-primary:hover {
+  background: #3B82F6 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Remove old empty state styles from table */
+.hr-sla-table-empty {
+  display: none !important;
+}
+
+.hr-sla-empty-icon {
+  display: none !important;
+}
+
+.hr-sla-empty-text {
+  display: none !important;
+}
+
+/* ========================================
+   RESPONSIVE - EMPTY STATE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .hr-sla-empty-state {
+    padding: 3rem 1.5rem !important;
+    min-height: 350px !important;
+  }
+
+  .hr-sla-empty-state__icon {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .hr-sla-empty-state__title {
+    font-size: 1.125rem !important;
+  }
+
+  .hr-sla-empty-state__text {
+    font-size: 0.875rem !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .hr-sla-empty-state {
+    padding: 2rem 1rem !important;
+    min-height: 300px !important;
+  }
+
+  .hr-sla-empty-state__icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .hr-sla-empty-state__btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
 }

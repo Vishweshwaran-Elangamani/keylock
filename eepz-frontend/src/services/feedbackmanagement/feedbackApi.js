@@ -1,5 +1,6 @@
 // src/services_api/feedbackApi.js
 import api from "./http";
+import axios from "axios";
  
 // Manager Reviews
 export const managerReviewApi = {
@@ -156,6 +157,22 @@ export const employeeApi = {
   // Search employees
   search: (query) =>
     api.get("/employeemanagement/search", { params: { q: query } }),
+
+   getSubordinates: async () => {
+    try {
+      // Get access token from storage (adjust as needed)
+      const accessToken = localStorage.getItem("accessToken");
+      const response = await axios.get("http://localhost:5307/api/LnD/employees/subordinates", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Get subordinates error:", error);
+      throw error.response?.data || error;
+    }
+  }
 };
  
  

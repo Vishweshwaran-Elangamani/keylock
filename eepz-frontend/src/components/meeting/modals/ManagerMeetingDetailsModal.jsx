@@ -215,20 +215,7 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
 
                 Close
               </button>
-              <button
-
-                className="btn btn-primary px-4 d-flex align-items-center gap-2"
-
-                onClick={() => {
-
-                  setShowMomDetails(true);
-
-                }}
-              >
-                <i className="bi bi-eye"></i>
-
-                View Full Details
-              </button>
+             
             </div>
           </div>
         </div>

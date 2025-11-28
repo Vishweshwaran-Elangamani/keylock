@@ -5,11 +5,11 @@ import {
   AlertTriangle,
   ArrowLeft,
   FileText,
+  Home
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { managerReviewApi, employeeApi} from "../../../services/feedbackmanagement/feedbackApi";
+import { managerReviewApi, employeeApi } from "../../../services/feedbackmanagement/feedbackApi";
 import axios from "axios";
-
 
 const RATING_LABELS = {
   1: "Poor",
@@ -24,15 +24,16 @@ export default function CreateManagerReview() {
   const location = useLocation();
   const prefilledEmployee = location.state?.employee;
 
-  const user = useMemo(
-    () =>
-      JSON.parse(localStorage.getItem("user") || "{}") || {
-        empId: 1002,
-        firstName: "Manager",
-        lastName: "User",
-      },
-    []
-  );
+  const user = useMemo(() => {
+    const stored = localStorage.getItem("user");
+    return stored
+      ? JSON.parse(stored)
+      : {
+          empId: 1002,
+          firstName: "Manager",
+          lastName: "User",
+        };
+  }, []);
 
   const [employees, setEmployees] = useState([]);
   const [loadingEmployees, setLoadingEmployees] = useState(true);
@@ -50,56 +51,59 @@ export default function CreateManagerReview() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // ============================================================================
-  // FETCH EMPLOYEES
-  // ============================================================================
-
   useEffect(() => {
     const fetchEmployees = async () => {
+      setLoadingEmployees(true);
       try {
-        const res = await employeeApi.getAll();
-        if (res.data?.success && Array.isArray(res.data.data)) {
-          setEmployees(res.data.data);
-        }
+        const res = await employeeApi.getSubordinates();
+        const items = Array.isArray(res)
+          ? res
+          : (res?.data?.items || res?.data || []);
+        const normalized = items.map((item) => ({
+          employeeId: item.employeeId,
+          firstName: item.firstName || item.employeeName || "",
+          lastName: item.lastName || "",
+          email: item.email || "",
+          roleName: item.roleName || "",
+          departmentName: item.departmentName || "",
+        }));
+        setEmployees(normalized);
+
+        const initialId =
+          form.targetEmployeeId ||
+          prefilledEmployee?.empId ||
+          (normalized[0]?.employeeId ?? "");
+        setForm((prev) => ({ ...prev, targetEmployeeId: initialId }));
       } catch (err) {
-        console.error("Error fetching employees:", err.message);
+        console.error("Error fetching subordinates:", err);
+        setError("Failed to load subordinates. Please try again.");
       } finally {
         setLoadingEmployees(false);
       }
     };
 
     fetchEmployees();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ============================================================================
-  // UPDATE SELECTED EMPLOYEE
-  // ============================================================================
-
   useEffect(() => {
-    if (form.targetEmployeeId) {
-      const emp = employees.find(
-        (e) => e.employeeId === Number(form.targetEmployeeId)
-      );
-      setSelectedEmployee(emp);
+    if (!form.targetEmployeeId) {
+      setSelectedEmployee(null);
+      return;
     }
+    const found = employees.find(
+      (e) => String(e.employeeId) === String(form.targetEmployeeId)
+    );
+    setSelectedEmployee(found || null);
   }, [form.targetEmployeeId, employees]);
-
-  // ============================================================================
-  // HANDLE SUBMIT
-  // ============================================================================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
     setSuccess("");
 
-    if (!form.targetEmployeeId || !form.reviewComment?.trim()) {
-      setError("Please select target employee and enter review comment");
-      return;
-    }
-
-    // Create payload with 'Submitted' status directly
-    const payload = {
+     const payload = {
       managerEmployeeId: Number(user?.empId),
       targetEmployeeId: Number(form.targetEmployeeId),
       rating: Number(form.rating),
@@ -110,120 +114,163 @@ export default function CreateManagerReview() {
       submittedDate: new Date().toISOString(),
     };
 
-    console.log("Creating review:", payload);
-
-    setLoading(true);
     try {
-      const response = await managerReviewApi.create(payload);
+      await managerReviewApi.create(payload);
 
-      if (response.data?.success === true) {
-        setSuccess("Review created successfully!");
-        setTimeout(() => navigate("/manager/dashboard/feedback"), 1500);
-      } else {
-        setError(response.data?.message || "Failed to create review");
-      }
+      setSuccess("Review created successfully.");
     } catch (err) {
-      console.error(" Error creating review:", err);
-      setError(
-        err?.response?.data?.message || err.message || "Failed to create review"
-      );
+      console.error(err);
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to create review. Please try again.";
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      className="d-flex justify-content-center py-4"
-      style={{ minHeight: "100vh", background: "#f9f9f9" }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "700px",
-          paddingLeft: "1rem",
-          paddingRight: "1rem",
-        }}
-      >
+    <div className="fm-page">
+      <div className="fm-container">
+        
         {/* HEADER */}
-        <div className="d-flex align-items-start mb-4">
-          <button
-            className="btn btn-outline-secondary me-2"
-            onClick={() => navigate(-1)}
-            style={{ borderRadius: "var(--radius-md)" }}
-          >
-            <ArrowLeft size={16} />
-          </button>
-          <div className="flex-grow-1">
-            <h2
-              className="fw-bold mb-1"
-              style={{ color: "var(--color-primary-1)" }}
+        <div className="fm-header">
+          {/* Breadcrumb */}
+          <nav aria-label="breadcrumb" className="mb-4">
+            <ol
+              className="breadcrumb mb-0 d-flex align-items-center"
+              style={{ backgroundColor: "transparent", padding: 0, margin: 0 }}
             >
-              Create Review
-            </h2>
-            <p className="mb-0 small text-muted">
-              Manager: {user?.firstName} {user?.lastName}
-            </p>
-          </div>
+             <li className="breadcrumb-item d-flex align-items-center">
+                <button
+                  onClick={() => navigate("/manager/dashboard/")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                >
+                   <Home size={16} /> 
+                 Dashboard
+                </button>
+              </li>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#97247E",
+                  margin: "0 8px",
+                  fontSize: "1rem",
+                }}
+              >
+                /
+              </li>
+              <li className="breadcrumb-item d-flex align-items-center">
+                <button
+                  onClick={() => navigate("/manager/dashboard/feedback")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                >
+                 Feedback Management
+                </button>
+              </li>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#97247E",
+                  margin: "0 8px",
+                  fontSize: "1rem",
+                }}
+              >
+                /
+              </li>
+              <li className="breadcrumb-item active d-flex align-items-center" aria-current="page">
+                <span style={{ color: "#97247E", fontSize: "0.875rem", fontWeight: 600 }}>
+                  Create Review
+                </span>
+              </li>
+            </ol>
+          </nav>
+         
         </div>
 
         {/* ERROR ALERT */}
         {error && (
-          <div
-            className="alert alert-danger d-flex align-items-start gap-2 mb-3"
-            style={{ borderRadius: "var(--radius-md)" }}
-          >
-            <AlertTriangle size={18} className="mt-1 flex-shrink-0" />
+          <div className="alert fm-alert fm-alert-error">
+            <AlertTriangle size={18} className="flex-shrink-0" />
             <div className="flex-grow-1">
-              <strong>Error</strong>
-              <p className="mb-0 small mt-1">{error}</p>
+              <strong className="fm-alert-title">Error</strong>
+              <p className="fm-alert-text">{error}</p>
             </div>
-            <button className="btn-close" onClick={() => setError("")} />
+            <button className="btn-close fm-close" onClick={() => setError("")} />
           </div>
         )}
 
         {/* SUCCESS ALERT */}
         {success && (
-          <div
-            className="alert alert-success d-flex align-items-center gap-2 mb-3"
-            style={{ borderRadius: "var(--radius-md)" }}
-          >
+          <div className="alert fm-alert fm-alert-success">
             <CheckCircle size={18} className="flex-shrink-0" />
             <div className="small flex-grow-1">{success}</div>
-            <button className="btn-close" onClick={() => setSuccess("")} />
+            <button className="btn-close fm-close" onClick={() => setSuccess("")} />
           </div>
         )}
 
         {/* FORM CARD */}
-        <div
-          className="card border-0"
-          style={{
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius-lg)",
-            boxShadow: "var(--shadow)",
-          }}
-        >
-          <div className="card-body p-4">
+        <div className="card fm-card">
+          <div className="card-body fm-card-body">
             <form onSubmit={handleSubmit} className="row g-4">
               {/* SELECT EMPLOYEE */}
               <div className="col-12">
-                <label className="form-label small fw-bold">
+                <label className="form-label fm-label">
                   Select Employee <span className="text-danger">*</span>
                 </label>
                 <select
-                  className="form-select"
+                  className="form-select fm-select"
                   value={form.targetEmployeeId}
                   onChange={(e) =>
-                    setForm({ ...form, targetEmployeeId: e.target.value })
+                    setForm((prev) => ({
+                      ...prev,
+                      targetEmployeeId: e.target.value,
+                    }))
                   }
                   required
-                  style={{ borderRadius: "var(--radius-md)" }}
                   disabled={loadingEmployees}
                 >
-                  <option value="">-- Choose an employee --</option>
-                  {employees.map((emp) => (
-                    <option key={emp.employeeId} value={emp.employeeId}>
-                      {emp.firstName} {emp.lastName} ({emp.email})
+                  <option value="">
+                    {loadingEmployees
+                      ? "Loading employees..."
+                      : "-- Choose an employee --"}
+                  </option>
+                  {employees.map(({ employeeId, firstName, lastName, email }) => (
+                    <option key={employeeId} value={employeeId}>
+                      {firstName} {lastName} {email ? `(${email})` : ""}
                     </option>
                   ))}
                 </select>
@@ -232,23 +279,18 @@ export default function CreateManagerReview() {
               {/* SELECTED EMPLOYEE INFO */}
               {selectedEmployee && (
                 <div className="col-12">
-                  <div
-                    className="alert alert-info small mb-0"
-                    style={{ borderRadius: "var(--radius-md)" }}
-                  >
+                  <div className="alert fm-info">
                     <strong>Reviewing:</strong> {selectedEmployee.firstName}{" "}
                     {selectedEmployee.lastName}
                     <br />
-                    <small className="text-muted">
-                      {selectedEmployee.email} • {selectedEmployee.roleName}
-                    </small>
+                    
                   </div>
                 </div>
               )}
 
               {/* RATING BUTTONS */}
               <div className="col-12">
-                <label className="form-label small fw-bold mb-2">
+                <label className="form-label fm-label mb-2">
                   Rating <span className="text-danger">*</span>
                 </label>
                 <div className="d-flex gap-2">
@@ -256,18 +298,12 @@ export default function CreateManagerReview() {
                     <button
                       key={rating}
                       type="button"
-                      className={`btn flex-grow-1 ${
-                        form.rating === rating
-                          ? "btn-primary"
-                          : "btn-outline-secondary"
+                      className={`btn fm-rating-btn ${
+                        form.rating === rating ? "active" : ""
                       }`}
-                      onClick={() => setForm({ ...form, rating })}
-                      style={{
-                        borderRadius: "var(--radius-md)",
-                        padding: "0.5rem 0.25rem",
-                      }}
+                      onClick={() => setForm((prev) => ({ ...prev, rating }))}
                     >
-                      <div style={{ fontSize: "0.75rem", lineHeight: "1" }}>
+                      <div className="fm-rating-content">
                         <div className="fw-bold">{rating}</div>
                         <div>{RATING_LABELS[rating]}</div>
                       </div>
@@ -278,79 +314,79 @@ export default function CreateManagerReview() {
 
               {/* REVIEW COMMENT */}
               <div className="col-12">
-                <label className="form-label small fw-bold">
+                <label className="form-label fm-label">
                   Review Comment <span className="text-danger">*</span>
                 </label>
                 <textarea
-                  className="form-control"
+                  className="form-control fm-textarea"
                   rows={4}
                   value={form.reviewComment}
                   onChange={(e) =>
-                    setForm({ ...form, reviewComment: e.target.value })
+                    setForm((prev) => ({
+                      ...prev,
+                      reviewComment: e.target.value,
+                    }))
                   }
                   placeholder="Provide detailed feedback on the employee's performance..."
                   required
-                  style={{ borderRadius: "var(--radius-md)" }}
                 />
-                <small className="text-muted">
+                <small className="fm-helper">
                   {form.reviewComment.length} / 2000 characters
                 </small>
               </div>
 
               {/* PROJECT CONTEXT */}
               <div className="col-12">
-                <label className="form-label small fw-bold">
+                <label className="form-label fm-label">
                   Project Context <span className="text-muted">(Optional)</span>
                 </label>
                 <textarea
-                  className="form-control"
+                  className="form-control fm-textarea"
                   rows={2}
                   value={form.projectContext}
                   onChange={(e) =>
-                    setForm({ ...form, projectContext: e.target.value })
+                    setForm((prev) => ({
+                      ...prev,
+                      projectContext: e.target.value,
+                    }))
                   }
                   placeholder="Mention any relevant projects..."
-                  style={{ borderRadius: "var(--radius-md)" }}
                 />
               </div>
 
               {/* GOAL CONTEXT */}
               <div className="col-12">
-                <label className="form-label small fw-bold">
+                <label className="form-label fm-label">
                   Goal Context <span className="text-muted">(Optional)</span>
                 </label>
                 <textarea
-                  className="form-control"
+                  className="form-control fm-textarea"
                   rows={2}
                   value={form.goalContext}
                   onChange={(e) =>
-                    setForm({ ...form, goalContext: e.target.value })
+                    setForm((prev) => ({
+                      ...prev,
+                      goalContext: e.target.value,
+                    }))
                   }
                   placeholder="Mention any relevant goals or objectives..."
-                  style={{ borderRadius: "var(--radius-md)" }}
                 />
               </div>
 
               {/* ACTION BUTTONS */}
-              <div className="col-12 d-flex gap-2">
+              <div className="col-12 d-flex justify-content-end gap-2">
                 <button
                   type="submit"
-                  className="btn btn-primary flex-grow-1"
+                  className="btn fm-btn-primary"
                   disabled={loading || loadingEmployees}
-                  style={{ borderRadius: "var(--radius-md)" }}
                 >
-                  <Send
-                    size={16}
-                    className="me-2"
-                    style={{ display: "inline" }}
-                  />
-                  {loading ? "Creating Review..." : "Create Review"}
+                  <Send size={16} className="me-2" />
+                  {loading ? "Submitting Review..." : "Submit Review"}
                 </button>
                 <button
                   type="button"
-                  className="btn btn-outline-secondary"
+                  className="btn fm-btn-outline"
                   onClick={() => navigate(-1)}
-                  style={{ borderRadius: "var(--radius-md)" }}
                 >
                   Cancel
                 </button>
@@ -360,7 +396,210 @@ export default function CreateManagerReview() {
         </div>
       </div>
 
-      <style>{`@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
+      <style>{`
+        .fm-page {
+          min-height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: start;
+          padding: 3rem 0;
+          font-family: var(--font-sans);
+          color: var(--color-gray-9);
+        }
+
+        .fm-container {
+          width: 100%;
+          max-width: 760px;
+          padding: 0 1rem;
+        }
+
+        .fm-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .fm-title {
+          margin: 0 0 0.25rem 0;
+          font-weight: 700;
+          font-size: 1.5rem;
+          color: var(--color-primary-1);
+        }
+
+        .fm-subtitle {
+          margin: 0;
+          font-size: 0.85rem;
+          color: var(--color-gray-6);
+        }
+
+        .fm-card {
+          border: 1px solid var(--color-gray-2);
+          border-radius: 16px;
+          box-shadow: 0 6px 24px rgba(27,25,63,0.08);
+          background: var(--color-white);
+        }
+
+        .fm-card-body {
+          padding: 1.5rem;
+        }
+
+        .fm-label {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--color-primary-1);
+          text-align:left;
+        }
+
+        .fm-select,
+        .fm-textarea {
+          border-radius: 12px;
+          border: 1px solid var(--color-gray-2);
+          background: var(--color-white);
+          color: var(--color-gray-9);
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .fm-select:focus,
+        .fm-textarea:focus {
+          border-color: var(--color-primary-3);
+          box-shadow: 0 0 0 4px rgba(151,36,126,0.12);
+        }
+
+        .fm-select:disabled {
+          background: var(--color-gray-1);
+          color: var(--color-gray-5);
+          cursor: not-allowed;
+        }
+
+        .fm-info {
+          border-radius: 12px;
+          padding: 0.75rem 1rem;
+          background: rgba(12, 80, 255, 0.06);
+          border: 1px solid var(--color-accent-5);
+          color: var(--color-gray-8);
+          text-align: left
+        }
+
+        .fm-alert {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          padding: 0.75rem 1rem;
+          border-radius: 12px;
+          border: 1px solid transparent;
+        }
+
+        .fm-alert-title {
+          font-weight: 700;
+          font-size: 0.9rem;
+        }
+
+        .fm-alert-text {
+          margin: 0.25rem 0 0 0;
+          font-size: 0.85rem;
+        }
+
+        .fm-alert-error {
+          background: rgba(224, 25, 80, 0.08);
+          border-color: var(--color-error);
+          color: var(--color-error);
+        }
+
+        .fm-alert-success {
+          background: rgba(36, 161, 72, 0.08);
+          border-color: var(--color-success);
+          color: var(--color-success);
+        }
+
+        .fm-close {
+          margin-left: auto;
+          filter: grayscale(40%);
+        }
+
+        .fm-back-btn {
+          border-radius: 12px;
+          height: 36px;
+          width: 36px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .fm-btn-primary {
+          border-radius: 12px;
+          min-width: 160px;
+          font-weight: 600;
+          color: var(--color-white);
+          background: var(--gradient-primary);
+          border: none;
+          box-shadow: 0 6px 16px rgba(224, 25, 80, 0.18);
+          transition: transform 0.05s ease, box-shadow 0.2s ease;
+        }
+
+        
+
+        .fm-btn-primary:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        .fm-btn-primary:hover:not(:disabled) {
+          box-shadow: 0 10px 24px rgba(224, 25, 80, 0.24);
+        }
+
+       
+
+        .fm-btn-primary:active {
+          transform: translateY(1px);
+        }
+
+        .fm-btn-outline,
+        .fm-btn-outline.fm-back-btn {
+          border-radius: 12px;
+          min-width: 120px;
+          font-weight: 600;
+          color: var(--color-primary-1);
+          background: var(--color-white);
+          border: 1px solid var(--color-primary-3);
+          transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .fm-btn-outline:hover {
+          background: var(--color-primary-4);
+          color: var(--color-white);
+          box-shadow: 0 6px 16px rgba(27,25,63,0.12);
+        }
+
+        .fm-rating-btn {
+          border-radius: 12px;
+          padding: 0.5rem 0.25rem;
+          flex: 1 1 0;
+          border: 1px solid var(--color-gray-2);
+          background: var(--color-white);
+          color: var(--color-gray-8);
+          transition: all 0.2s ease;
+        }
+
+        .fm-rating-btn.active {
+        
+          color: var(--color-white);
+          background: var(--color-primary-1);
+          
+        }
+
+        .fm-rating-content {
+          font-size: 0.8rem;
+          line-height: 1.1;
+        }
+
+        .fm-helper {
+          display: inline-block;
+          margin-top: 0.25rem;
+          font-size: 0.75rem;
+          color: var(--color-gray-6);
+        }
+      `}</style>
     </div>
   );
 }
