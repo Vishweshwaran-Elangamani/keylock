@@ -15,7 +15,7 @@ public partial class EEPZDbContext : DbContext
     public EEPZDbContext(DbContextOptions<EEPZDbContext> options)
         : base(options)
     {
-    }
+    } 
 
     public virtual DbSet<Address> Addresses { get; set; }
 

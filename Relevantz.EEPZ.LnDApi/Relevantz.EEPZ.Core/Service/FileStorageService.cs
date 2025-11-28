@@ -84,7 +84,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return false;
             }
         }
-
+                           
         public async Task<byte[]> GetFileAsync(string filePath)
         {
             var fullPath = Path.Combine(_environment.WebRootPath, filePath);

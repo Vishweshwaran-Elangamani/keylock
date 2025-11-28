@@ -828,6 +828,73 @@ namespace Relevantz.EEPZ.Api.Controllers
         /// <summary>
         /// Upload a file attachment to a goal
         /// </summary>
+        /// 
+        /// <summary>
+/// Preview attachment without downloading (inline display)
+/// </summary>
+/// <summary>
+/// Preview attachment without downloading (inline display)
+/// </summary>
+/// <summary>
+/// Preview attachment without downloading (inline display)
+/// </summary>
+[HttpGet("attachments/{attachmentId:int}/preview")]
+public async Task<IActionResult> PreviewAttachment(int attachmentId)
+{
+    try
+    {
+        var userId = GetEmpMasterId();
+        var result = await _service.PreviewFileAsync(attachmentId, userId);
+        
+        if (result == null)
+        {
+            var response = ApiResponseDto<object>.ErrorResponse(
+                ResponseMessages.Codes.FILE_NOT_FOUND,
+                "Attachment not found or access denied");
+            return NotFound(response);
+        }
+        
+        byte[] fileBytes = result.Value.fileBytes;
+        string contentType = result.Value.contentType;
+        string fileName = result.Value.fileName;
+        
+        // ===  CRITICAL FIX: Set proper headers for inline preview ===
+        
+        // 1. Set Content-Disposition to "inline" (not attachment)
+        Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
+        
+        // 2. Set Cache headers for better performance
+        Response.Headers["Cache-Control"] = "public, max-age=3600";
+        
+        // 3. Set Content-Length
+        Response.Headers["Content-Length"] = fileBytes.Length.ToString();
+        
+        // 4. Enable range requests for large files
+        Response.Headers["Accept-Ranges"] = "bytes";
+        
+        // Return the file with proper content type
+        return File(fileBytes, contentType, enableRangeProcessing: true);
+    }
+    catch (UnauthorizedAccessException)
+    {
+        var response = ApiResponseDto<object>.ErrorResponse(
+            ResponseMessages.Codes.FILE_ACCESS_DENIED);
+        return Forbid(response.Message);
+    }
+    catch (FileNotFoundException)
+    {
+        var response = ApiResponseDto<object>.ErrorResponse(
+            ResponseMessages.Codes.FILE_NOT_FOUND);
+        return NotFound(response);
+    }
+    catch (Exception)
+    {
+        var response = ApiResponseDto<object>.ErrorResponse(
+            ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+        return StatusCode(500, response);
+    }
+}
+
         [HttpPost("{id:int}/attachments/upload")]
         public async Task<IActionResult> UploadFile(int id, IFormFile file, [FromForm] string title)
         {

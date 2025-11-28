@@ -190,6 +190,31 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         #region HR Management
 
+        [HttpGet("hr/assignments/organization/export")]
+        [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
+        public async Task<IActionResult> ExportOrganizationAssignments(
+    [FromQuery] string? statusFilter,
+    [FromQuery] string? searchTerm,
+    [FromQuery] string? sortField,
+    [FromQuery] string? sortOrder
+)
+        {
+            var result = await _lndService.ExportOrganizationAssignmentsToExcel(
+                statusFilter,
+                searchTerm,
+                sortField,
+                sortOrder
+            );
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            var fileName = $"OrganizationalAssignments_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            return File(result.Data,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
+
         [HttpGet("hr/employees/organization")]
         [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> GetAllOrganizationEmployees(
@@ -492,7 +517,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             return File(fileBytes, contentType, fileName);
         }
 
-         [HttpGet("approvals/{approvalId}/attachment/preview")]
+        [HttpGet("approvals/{approvalId}/attachment/preview")]
         public async Task<IActionResult> PreviewApprovalAttachment(int approvalId)
         {
             var employeeId = int.Parse(User.FindFirst("empId")?.Value ?? "0");
@@ -501,9 +526,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-         
+
             return File(result.Data.FileBytes, result.Data.ContentType, result.Data.FileName, enableRangeProcessing: true);
-        } 
+        }
 
         [HttpGet("assignments/{assignmentId}/proof/preview")]
         public async Task<IActionResult> PreviewAssignmentProof(int assignmentId)
@@ -514,9 +539,9 @@ namespace Relevantz.EEPZ.Api.Controllers
             if (!result.Success)
                 return BadRequest(result);
 
-      
+
             return File(result.Data.FileBytes, result.Data.ContentType, result.Data.FileName, enableRangeProcessing: true);
-        } 
+        }
 
         #endregion
     }

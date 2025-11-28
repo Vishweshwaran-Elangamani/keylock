@@ -126,6 +126,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         #endregion
 
         #region HR Management
+        Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExportAsync(
+    string? statusFilter,
+    string? searchTerm,
+    string? sortField,
+    string? sortOrder
+);
         Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployeesAsync(
             string? searchTerm,
             int pageNumber,

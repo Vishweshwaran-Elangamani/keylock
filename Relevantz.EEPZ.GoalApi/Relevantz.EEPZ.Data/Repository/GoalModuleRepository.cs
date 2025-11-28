@@ -5,6 +5,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Interface;
+using Microsoft.AspNetCore.Hosting;
 using Serilog;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
@@ -12,8 +13,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
     public class GoalModuleRepository : IGoalModuleRepository
     {
         private readonly EEPZDbContext _db;
+            private readonly IWebHostEnvironment environment;
 
-        public GoalModuleRepository(EEPZDbContext db) => _db = db;
+     
+
+    public GoalModuleRepository(EEPZDbContext db, IWebHostEnvironment _environment)
+    {
+            _db = db;
+           environment = _environment;
+    }
 
         // ==================== GOALS ====================
         public async Task<Goal?> GetGoalByIdAsync(int goalId)
@@ -1158,6 +1166,144 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
 
         // ==================== ATTACHMENTS ====================
+    public async Task<(byte[] fileBytes, string contentType, string fileName)?> 
+    GetAttachmentForPreviewAsync(int attachmentId, int currentUserEmployeeMasterId)
+{
+    try
+    {
+        Log.Information("=== PREVIEW DEBUG START ===");
+        Log.Information("GetAttachmentForPreviewAsync: Fetching attachment {AttachmentId} for user {UserId}", 
+            attachmentId, currentUserEmployeeMasterId);
+        
+        var attachment = await _db.GoalAttachments
+            .Include(a => a.Goal)
+            .FirstOrDefaultAsync(a => a.Goalattachmentsid == attachmentId);
+        
+        if (attachment == null)
+        {
+            Log.Warning("GetAttachmentForPreviewAsync: Attachment NOT FOUND in database - ID: {AttachmentId}", 
+                attachmentId);
+            return null;
+        }
+        
+        Log.Information("GetAttachmentForPreviewAsync: Attachment found - GoalId: {GoalId}, Path: {Path}", 
+            attachment.GoalId, attachment.Attachments);
+        
+        // Check access permission
+        var canView = await CanViewGoalAsync(attachment.GoalId, currentUserEmployeeMasterId);
+        Log.Information("GetAttachmentForPreviewAsync: Access check result - CanView: {CanView}", canView);
+        
+        if (!canView)
+        {
+            Log.Warning("GetAttachmentForPreviewAsync: ACCESS DENIED for user {UserId} on goal {GoalId}", 
+                currentUserEmployeeMasterId, attachment.GoalId);
+            return null;
+        }
+        
+        // Build file path
+        string webRootPath = environment.WebRootPath;
+        if (string.IsNullOrEmpty(webRootPath))
+        {
+            webRootPath = Path.Combine(environment.ContentRootPath, "wwwroot");
+            Log.Information("GetAttachmentForPreviewAsync: Using ContentRootPath - {Path}", webRootPath);
+        }
+        else
+        {
+            Log.Information("GetAttachmentForPreviewAsync: Using WebRootPath - {Path}", webRootPath);
+        }
+        
+        var relativePath = attachment.Attachments?.TrimStart('/') ?? "";
+        var fullPath = Path.Combine(webRootPath, relativePath);
+        
+        Log.Information("GetAttachmentForPreviewAsync: Full file path - {Path}", fullPath);
+        Log.Information("GetAttachmentForPreviewAsync: File exists? {Exists}", File.Exists(fullPath));
+        
+        if (!File.Exists(fullPath))
+        {
+            Log.Warning("GetAttachmentForPreviewAsync: FILE NOT FOUND at path: {Path}", fullPath);
+            
+            // List what files ARE in that directory
+            var directory = Path.GetDirectoryName(fullPath);
+            if (Directory.Exists(directory))
+            {
+                var filesInDir = Directory.GetFiles(directory);
+                Log.Information("GetAttachmentForPreviewAsync: Files in directory: {Files}", 
+                    string.Join(", ", filesInDir.Select(Path.GetFileName)));
+            }
+            else
+            {
+                Log.Warning("GetAttachmentForPreviewAsync: Directory doesn't exist: {Dir}", directory);
+            }
+            
+            return null;
+        }
+        
+        var fileBytes = await File.ReadAllBytesAsync(fullPath);
+        var contentType = GetContentType(attachment.Attachments ?? "");
+        var fileName = !string.IsNullOrEmpty(attachment.AttachmentTitle) 
+            ? attachment.AttachmentTitle 
+            : Path.GetFileName(attachment.Attachments ?? "download");
+        
+        // Ensure filename has extension
+        if (!Path.HasExtension(fileName) && !string.IsNullOrEmpty(attachment.Attachments))
+        {
+            var extension = Path.GetExtension(attachment.Attachments);
+            fileName += extension;
+        }
+        
+        Log.Information("GetAttachmentForPreviewAsync: SUCCESS - FileName: {FileName}, ContentType: {ContentType}, Size: {Size} bytes", 
+            fileName, contentType, fileBytes.Length);
+        Log.Information("=== PREVIEW DEBUG END ===");
+        
+        return (fileBytes, contentType, fileName);
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "GetAttachmentForPreviewAsync: EXCEPTION occurred");
+        throw;
+    }
+}
+
+private async Task<bool> CanViewGoalAsync(int goalId, int employeeMasterId)
+{
+    var goal = await _db.Goals
+        .Include(g => g.GoalAssignments)
+        .FirstOrDefaultAsync(g => g.GoalId == goalId);
+    
+    if (goal == null) return false;
+    
+    // Creator can view
+    if (goal.CreatedBy == employeeMasterId) return true;
+    
+    // Assignee can view
+    if (goal.GoalAssignments.Any(a => a.AssignedTo == employeeMasterId)) return true;
+    
+    // Check if user role allows viewing
+    var userRole = await GetUserRoleAsync(employeeMasterId);
+    if (userRole == USER_ROLE.LEADERSHIP) return true;
+    
+    return false;
+}
+
+private string GetContentType(string fileName)
+{
+    var extension = Path.GetExtension(fileName).ToLowerInvariant();
+    return extension switch
+    {
+        ".pdf" => "application/pdf",
+        ".doc" => "application/msword",
+        ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".xls" => "application/vnd.ms-excel",
+        ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".png" => "image/png",
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".txt" => "text/plain",
+        ".zip" => "application/zip",
+        _ => "application/octet-stream",
+    };
+}
+
+
         public async Task AddAttachmentAsync(GoalAttachment attachment)
         {
             try
@@ -1174,7 +1320,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 Log.Error(ex, "[AddAttachmentAsync] Error adding attachment");
                 throw;
             }
-        }
+        } 
+
+
 
         public async Task<List<GoalAttachment>> GetAttachmentsByGoalAsync(int goalId)
         {

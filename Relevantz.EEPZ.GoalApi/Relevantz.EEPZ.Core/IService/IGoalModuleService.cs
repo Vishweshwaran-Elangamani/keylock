@@ -91,10 +91,16 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<GoalProgressHierarchyDto> GetProgressHierarchyAsync(int goalId, int userId);
 
         // Attachments
+
+        Task<(byte[] fileBytes, string contentType, string fileName)?> PreviewFileAsync(
+    int attachmentId, 
+    int currentUserEmployeeMasterId);
+
         Task<List<GoalAttachment>> ListAttachmentsAsync(int goalId);
         Task<GoalAttachment> GetAttachmentAsync(int attachmentId);
 
         // File management
+        
         Task<FileUploadResponseDto> UploadFileAsync(
             int goalId,
             IFormFile file,

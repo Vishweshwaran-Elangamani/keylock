@@ -1,9 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\Relevantz.EEPZ.Data\Relevantz.EEPZ.Data.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,8 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-  <FrameworkReference Include="Microsoft.AspNetCore.App" />
-</ItemGroup>
+    <!-- Project reference -->
+    <ProjectReference Include="..\Relevantz.EEPZ.Data\Relevantz.EEPZ.Data.csproj" />
+  </ItemGroup>
 
+  <ItemGroup>
+    <!-- Framework reference -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- EPPlus package reference -->
+    <PackageReference Include="EPPlus" Version="6.3.0" />
+     <PackageReference Include="ClosedXML" Version="0.102.1" />
+  </ItemGroup>
 
 </Project>

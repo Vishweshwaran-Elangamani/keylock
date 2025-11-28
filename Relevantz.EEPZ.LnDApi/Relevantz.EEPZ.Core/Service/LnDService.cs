@@ -4,6 +4,10 @@ using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
 using Relevantz.EEPZ.Data.Repositories.Interface;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
+using ClosedXML.Excel;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -106,7 +110,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Message = $"Error retrieving skills: {ex.Message}",
                 };
             }
-        } 
+        }
 
         public async Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetSubordinateSkills(
             int managerId,
@@ -178,6 +182,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+
 
         public async Task<ApiResponse<EmployeeSkillDto>> RecordEmployeeSkill(
             int managerId,
@@ -845,6 +850,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetTeamAssignments(
             int managerId,
@@ -1615,7 +1621,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     Errors = new List<string> { ex.Message },
                 };
             }
-        } 
+        }
 
         public async Task<ApiResponse<FileDownloadDto>> GetAssignmentProof(
             int employeeId,
@@ -1701,7 +1707,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             };
         }
 
-        
+
         public async Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(int employeeId, int approvalId)
         {
             try
@@ -1778,7 +1784,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     {
                         Success = false,
                         Message = "You do not have access to this file"
-                    }; 
+                    };
 
                 if (string.IsNullOrEmpty(assignment.ProofFilePath))
                     return new ApiResponse<FileDownloadDto>
@@ -2036,5 +2042,102 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+        public async Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
+    string? statusFilter,
+    string? searchTerm,
+    string? sortField,
+    string? sortOrder)
+        {
+            try
+            {
+                // Get ALL assignments without pagination for export
+                var allAssignments = await _repository.GetAllOrganizationAssignmentsForExportAsync(
+                    statusFilter,
+                    searchTerm,
+                    sortField,
+                    sortOrder
+                );
+
+                // Set the license context for EPPlus
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                using (var package = new ExcelPackage())
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("Organizational Assignments");
+
+                    // Add headers
+                    worksheet.Cells[1, 1].Value = "Employee Name";
+                    worksheet.Cells[1, 2].Value = "Skill Name";
+                    worksheet.Cells[1, 3].Value = "SME Assigned";
+                    worksheet.Cells[1, 4].Value = "Assignment Status";
+                    worksheet.Cells[1, 5].Value = "Start Date";
+                    worksheet.Cells[1, 6].Value = "Due Date";
+                    worksheet.Cells[1, 7].Value = "Score";
+
+                    // Style headers
+                    using (var range = worksheet.Cells[1, 1, 1, 7])
+                    {
+                        range.Style.Font.Bold = true;
+                        range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        range.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(79, 129, 189));
+                        range.Style.Font.Color.SetColor(Color.White);
+                        range.Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                    }
+
+                    // Add data rows - CORRECTED TO ACCESS NAVIGATION PROPERTIES
+                    int row = 2;
+                    foreach (var assignment in allAssignments)
+                    {
+                        // Access through navigation properties
+                        var menteeName = $"{assignment.MenteeEmployee?.Userprofile?.FirstName} {assignment.MenteeEmployee?.Userprofile?.LastName}".Trim();
+                        var skillName = assignment.Skill?.SkillName ?? "N/A";
+                        var smeName = $"{assignment.Sme?.Employee?.Userprofile?.FirstName} {assignment.Sme?.Employee?.Userprofile?.LastName}".Trim();
+
+                        worksheet.Cells[row, 1].Value = menteeName;
+                        worksheet.Cells[row, 2].Value = skillName;
+                        worksheet.Cells[row, 3].Value = smeName;
+                        worksheet.Cells[row, 4].Value = assignment.Status ?? "N/A";
+                        worksheet.Cells[row, 5].Value = assignment.CreatedOn?.ToString("MM/dd/yyyy") ?? "";
+                        worksheet.Cells[row, 6].Value = assignment.Deadline?.ToString("MM/dd/yyyy") ?? "";
+                        worksheet.Cells[row, 7].Value = assignment.CompletionRating?.ToString() ?? "N/A";
+
+                        row++;
+                    }
+
+                    // Auto-fit columns
+                    worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+
+                    // Add borders to all cells
+                    if (row > 2) // Only add borders if there's data
+                    {
+                        var dataRange = worksheet.Cells[1, 1, row - 1, 7];
+                        dataRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                        dataRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                        dataRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                        dataRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    }
+
+                    var excelBytes = package.GetAsByteArray();
+
+                    return new ApiResponse<byte[]>
+                    {
+                        Success = true,
+                        Message = $"Successfully exported {allAssignments.Count} assignments",
+                        Data = excelBytes
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<byte[]>
+                {
+                    Success = false,
+                    Message = "An error occurred while exporting assignments",
+                    Errors = new List<string> { ex.Message }
+                };
+            }
+        }
+
+
     }
 }

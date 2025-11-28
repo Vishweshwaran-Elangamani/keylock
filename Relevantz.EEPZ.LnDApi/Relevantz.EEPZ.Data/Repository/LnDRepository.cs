@@ -947,6 +947,49 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #endregion
 
         #region HR Management
+        public async Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExportAsync(
+    string? statusFilter,
+    string? searchTerm,
+    string? sortField,
+    string? sortOrder)
+        {
+            var query = _context
+                .Lndassignments
+                .Include(a => a.MenteeEmployee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(a => a.Skill)
+                .Include(a => a.Sme)
+                    .ThenInclude(s => s.Employee)
+                        .ThenInclude(e => e.Userprofile)
+                .AsQueryable();
+
+            // Apply status filter
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                query = query.Where(a => a.Status == statusFilter);
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                var lowerSearchTerm = searchTerm.ToLower();
+                query = query.Where(a =>
+                    (a.MenteeEmployee.Userprofile.FirstName ?? "").ToLower().Contains(lowerSearchTerm) ||
+                    (a.MenteeEmployee.Userprofile.LastName ?? "").ToLower().Contains(lowerSearchTerm) ||
+                    ((a.MenteeEmployee.Userprofile.FirstName ?? "") + " " + (a.MenteeEmployee.Userprofile.LastName ?? ""))
+                        .ToLower().Contains(lowerSearchTerm) ||
+                    (a.Sme.Employee.Userprofile.FirstName ?? "").ToLower().Contains(lowerSearchTerm) ||
+                    (a.Sme.Employee.Userprofile.LastName ?? "").ToLower().Contains(lowerSearchTerm) ||
+                    (a.Skill.SkillName ?? "").ToLower().Contains(lowerSearchTerm)
+                );
+            }
+
+            // Apply sorting
+            query = ApplyAssignmentSorting(query, sortField, sortOrder);
+
+            // Return all results (no pagination for export)
+            return await query.ToListAsync();
+        }
 
         public async Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployeesAsync(
             string? searchTerm,

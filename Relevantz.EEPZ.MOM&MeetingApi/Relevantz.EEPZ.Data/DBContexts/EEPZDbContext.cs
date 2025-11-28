@@ -8,6 +8,7 @@ namespace Relevantz.EEPZ.Data.DBContexts;
 
 public partial class EEPZDbContext : DbContext
 {
+
     public EEPZDbContext()
     {
     }

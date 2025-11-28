@@ -593,6 +593,8 @@ namespace Relevantz.EEPZ.Common.Enums
     // HTTP route constants
     public static class ROUTES
     {
+        public const string ATTACHMENTPREVIEW = "attachments/{attachmentId:int}/preview";
+
         public const string GOAL_CONTROLLER = "api/[controller]";
         public const string GOAL_BY_ID = "{id:int}";
         public const string GOAL_QUERY = "query";

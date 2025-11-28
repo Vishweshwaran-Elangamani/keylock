@@ -162,7 +162,14 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? searchTerm,
             string? sortBy
         );
-        
+
+        Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
+            string? statusFilter,
+            string? searchTerm,
+            string? sortField,
+            string? sortOrder
+        );
+
         Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(int employeeId, int approvalId);
         Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(int employeeId, int assignmentId);
 
@@ -175,7 +182,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<byte[]> GetFileAsync(string filePath);
         string GetFileUrl(string filePath);
 
-          Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string filePath);
+        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string filePath);
 
     }
 }

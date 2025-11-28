@@ -60,6 +60,11 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string FILE_UPLOADED_SUCCESS = "FILE_UPLOADED_SUCCESS";
             public const string FILE_DOWNLOADED_SUCCESS = "FILE_DOWNLOADED_SUCCESS";
             public const string FILE_DELETED_SUCCESS = "FILE_DELETED_SUCCESS";
+            // File Management - Success section
+            public const string FILEPREVIEWEDSUCCESS = "FILEPREVIEWEDSUCCESS";
+
+
+
 
             // File Management - Errors
             public const string FILE_NOT_FOUND = "FILE_NOT_FOUND";
@@ -150,6 +155,8 @@ namespace Relevantz.EEPZ.Common.Constants
                 "Progress updated successfully",
                 "Goal progress has been updated and logged."
             ),
+              [Codes.FILEPREVIEWEDSUCCESS] = new("File preview ready", 
+             "The file is ready for preview."),
 
             [Codes.GOAL_COMPLETED_SUCCESS] = new(
                 "Goal marked as completed",
@@ -270,6 +277,8 @@ namespace Relevantz.EEPZ.Common.Constants
                 "File not found",
                 "The requested file does not exist or may have been deleted."
             ),
+            // In Messages dictionary, add: 
+         
 
             [Codes.FILE_ACCESS_DENIED] = new(
                 "File access denied",

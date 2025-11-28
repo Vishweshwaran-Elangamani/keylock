@@ -1209,6 +1209,64 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // ==================== FILE STORAGE METHODS ====================
+     public async Task<(byte[] fileBytes, string contentType, string fileName)?> PreviewFileAsync(
+    int attachmentId, 
+    int currentUserEmployeeMasterId)
+{
+    // USE EXACT SAME LOGIC AS DownloadFileAsync
+    var attachment = await _repo.GetAttachmentByIdAsync(attachmentId);
+    
+    if (attachment == null)
+    {
+        return null;
+    }
+    
+    // Check access
+    var goal = await _repo.GetGoalByIdAsync(attachment.GoalId);
+    if (goal == null)
+    {
+        return null;
+    }
+    
+    var canView = await CanViewGoalAsync(attachment.GoalId, currentUserEmployeeMasterId);
+    if (!canView)
+    {
+        return null;
+    }
+    
+    // === USE EXACT SAME FILE PATH LOGIC AS DownloadFileAsync ===
+    string webRootPath = _environment.WebRootPath;
+    if (string.IsNullOrEmpty(webRootPath))
+    {
+        webRootPath = Path.Combine(_environment.ContentRootPath, "wwwroot");
+    }
+    
+    var fullPath = Path.Combine(webRootPath, attachment.Attachments?.TrimStart('/') ?? "");
+    
+    if (!File.Exists(fullPath))
+    {
+        Log.Error("File not found: {Path}", fullPath);
+        return null;
+    }
+    
+    var fileBytes = await File.ReadAllBytesAsync(fullPath);
+    var contentType = GetContentType(attachment.Attachments ?? "");
+    var fileName = !string.IsNullOrEmpty(attachment.AttachmentTitle) 
+        ? attachment.AttachmentTitle 
+        : Path.GetFileName(attachment.Attachments ?? "download");
+    
+    // Ensure extension
+    if (!Path.HasExtension(fileName) && !string.IsNullOrEmpty(attachment.Attachments))
+    {
+        var extension = Path.GetExtension(attachment.Attachments);
+        fileName += extension;
+    }
+    
+    return (fileBytes, contentType, fileName);
+}
+
+
+
 
         public async Task<FileUploadResponseDto> UploadFileAsync(
             int goalId,

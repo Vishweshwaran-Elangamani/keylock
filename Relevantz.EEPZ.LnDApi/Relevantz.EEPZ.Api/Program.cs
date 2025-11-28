@@ -138,7 +138,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         options.EnableSensitiveDataLogging();
         options.EnableDetailedErrors();
     }
-});
+});  
 
 // ===================================
 // Configure JWT Authentication
@@ -201,22 +201,13 @@ builder.Services.AddAuthorization();
 // File Storage Service
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
-// Add this line to register the repository
+
 builder.Services.AddScoped<ILnDRepository, LnDRepository>();
 
 // Existing service registration
 builder.Services.AddScoped<ILnDService, LnDService>();
 
-// Add your other services here as needed
-// Example:
-// builder.Services.AddScoped<IAuthService, AuthService>();
-// builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-// builder.Services.AddScoped<IAttendanceService, AttendanceService>();
-// builder.Services.AddScoped<ILeaveService, LeaveService>();
 
-// ===================================
-// Configure CORS
-// ===================================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>

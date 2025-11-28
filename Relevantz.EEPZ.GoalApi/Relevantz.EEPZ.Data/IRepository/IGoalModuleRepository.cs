@@ -70,6 +70,9 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
         Task DeleteAttachmentAsync(int attachmentId);
         Task<List<GoalAttachment>> GetProofAttachmentsForApprovalAsync(int approvalId);
         Task UnmarkProofAttachmentsAsync(int approvalId);
+      
+
+
 
         // Comments
         Task AddCommentAsync(GoalComment comment);
