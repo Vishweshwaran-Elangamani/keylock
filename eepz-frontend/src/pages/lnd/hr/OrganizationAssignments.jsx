@@ -8,27 +8,34 @@ import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 
+
 const OrganizationAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedNotes, setExpandedNotes] = useState({});
+  const [exporting, setExporting] = useState(false);
+
 
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
+
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
+
 
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
+
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
 
   useEffect(() => {
     fetchAssignments();
@@ -41,6 +48,7 @@ const OrganizationAssignments = () => {
     sortOrderAsc,
   ]);
 
+
   const fetchAssignments = async () => {
     try {
       setLoading(true);
@@ -50,8 +58,9 @@ const OrganizationAssignments = () => {
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc",
-        itemsPerPage // Pass itemsPerPage to API
+        itemsPerPage
       );
+
 
       if (response.data.success) {
         setAssignments(response.data.data.items);
@@ -66,9 +75,41 @@ const OrganizationAssignments = () => {
     }
   };
 
+
+  const handleExportToExcel = async () => {
+    try {
+      setExporting(true);
+      toast.loading("Preparing Excel export...");
+      
+      const response = await lndService.exportOrganizationAssignments(
+        statusFilter,
+        searchTerm,
+        sortField,
+        sortOrderAsc ? "asc" : "desc"
+      );
+
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+      const filename = `OrganizationalAssignments_${timestamp}.xlsx`;
+      
+      downloadFile(response.data, filename);
+      
+      toast.dismiss();
+      toast.success("Excel file downloaded successfully!");
+    } catch (error) {
+      console.error("Failed to export:", error);
+      toast.dismiss();
+      toast.error("Failed to export assignments to Excel");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
+
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -76,11 +117,13 @@ const OrganizationAssignments = () => {
     setCurrentPage(1);
   };
 
+
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
+
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -88,16 +131,19 @@ const OrganizationAssignments = () => {
     }
   };
 
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
 
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
 
   const handleDownloadProof = async (assignment) => {
     try {
@@ -113,6 +159,7 @@ const OrganizationAssignments = () => {
     }
   };
 
+
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -122,6 +169,7 @@ const OrganizationAssignments = () => {
     }
     setCurrentPage(1);
   };
+
 
   const renderSortIcon = (field) => {
     if (sortField !== field) {
@@ -157,7 +205,7 @@ const OrganizationAssignments = () => {
     );
   };
 
-  // Show initial loading spinner only when no data
+
   if (loading && assignments.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
@@ -167,6 +215,7 @@ const OrganizationAssignments = () => {
       </div>
     );
   }
+
 
   return (
     <div>
@@ -178,6 +227,7 @@ const OrganizationAssignments = () => {
         ]}
       />
 
+
       <div
         style={{
           marginBottom: "1.5rem",
@@ -185,71 +235,115 @@ const OrganizationAssignments = () => {
           gap: "1rem",
           flexWrap: "wrap",
           alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <form
-          onSubmit={handleSearchSubmit}
+        <div
           style={{
             display: "flex",
-            gap: "0.5rem",
+            gap: "1rem",
+            flexWrap: "wrap",
+            alignItems: "center",
             flexGrow: 1,
-            minWidth: 250,
           }}
         >
-          <div className="input-group">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search by employee or skill..."
-              value={searchInput}
-              onChange={handleSearchInputChange}
-              onKeyPress={handleKeyPress}
-              style={{ minHeight: "35.7px" }}
-            />
-            {searchTerm ? (
-              <button
-                type="button"
-                className="btn btn-outline-secondary"
-                onClick={handleCancelSearch}
-              >
-                <i className="bi bi-x-lg me-1"></i>
-                Cancel
-              </button>
-            ) : (
-              <button type="submit" className="btn btn-primary">
-                <i className="bi bi-search me-1"></i>
-                Search
-              </button>
-            )}
-          </div>
-        </form>
-        <select
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value);
-            setCurrentPage(1);
-          }}
+          <form
+            onSubmit={handleSearchSubmit}
+            style={{
+              display: "flex",
+              gap: "0.5rem",
+              flexGrow: 1,
+              minWidth: 250,
+            }}
+          >
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search by employee or skill..."
+                value={searchInput}
+                onChange={handleSearchInputChange}
+                onKeyPress={handleKeyPress}
+                style={{ minHeight: "35.7px" }}
+              />
+              {searchTerm ? (
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={handleCancelSearch}
+                >
+                  <i className="bi bi-x-lg me-1"></i>
+                  Cancel
+                </button>
+              ) : (
+                <button type="submit" className="btn btn-primary">
+                  <i className="bi bi-search me-1"></i>
+                  Search
+                </button>
+              )}
+            </div>
+          </form>
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+            style={{
+              padding: "0.625rem 1rem",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              fontSize: "0.875rem",
+              outline: "none",
+              cursor: "pointer",
+              background: "#fff",
+            }}
+          >
+            <option value="">All Statuses</option>
+            <option value={ASSIGNMENT_STATUS.IN_PROGRESS}>In Progress</option>
+            <option value={ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT}>
+              SME Review
+            </option>
+            <option value={ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT}>
+              Manager Review
+            </option>
+            <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
+          </select>
+        </div>
+
+
+        <button
+          onClick={handleExportToExcel}
+          disabled={exporting || assignments.length === 0}
+          className="btn btn-success"
           style={{
-            padding: "0.625rem 1rem",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            padding: "0.625rem 1.25rem",
             fontSize: "0.875rem",
-            outline: "none",
-            cursor: "pointer",
-            background: "#fff",
+            fontWeight: 500,
+            whiteSpace: "nowrap",
           }}
         >
-          <option value="">All Statuses</option>
-          <option value={ASSIGNMENT_STATUS.IN_PROGRESS}>In Progress</option>
-          <option value={ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT}>
-            SME Review
-          </option>
-          <option value={ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT}>
-            Manager Review
-          </option>
-          <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
-        </select>
+          {exporting ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Exporting...
+            </>
+          ) : (
+            <>
+              <Download size={16} />
+              Export to Excel
+            </>
+          )}
+        </button>
       </div>
+
 
       {assignments.length === 0 && !loading ? (
         <EmptyState
@@ -344,6 +438,7 @@ const OrganizationAssignments = () => {
                   </div>
                 ))}
               </div>
+
 
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
@@ -449,7 +544,7 @@ const OrganizationAssignments = () => {
             </div>
           </div>
 
-          {/* Updated Pagination with new props */}
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -465,5 +560,6 @@ const OrganizationAssignments = () => {
     </div>
   );
 };
+
 
 export default OrganizationAssignments;

@@ -1,9 +1,10 @@
 
-
 import axios from "axios";
+
 
 // ==================== LnD MODULE BASE URL ====================
 const API_BASE_URL = import.meta.env.VITE_LND_API_URL + "/api";
+
 
 /**
  * Get auth token from localStorage
@@ -13,6 +14,7 @@ const getAuthToken = () => {
   return token || "";
 };
 
+
 /**
  * Get headers with auth token
  */
@@ -21,6 +23,7 @@ const getHeaders = () => ({
   "Content-Type": "application/json",
 });
 
+
 /**
  * Get headers for multipart form data
  */
@@ -28,11 +31,13 @@ const getMultipartHeaders = () => ({
   Authorization: `Bearer ${getAuthToken()}`,
 });
 
+
 /**
  * Build query string from params object
  */
 const buildQueryString = (params) => {
   const queryParams = new URLSearchParams();
+
 
   Object.keys(params).forEach((key) => {
     if (
@@ -44,9 +49,11 @@ const buildQueryString = (params) => {
     }
   });
 
+
   const queryString = queryParams.toString();
   return queryString ? `?${queryString}` : "";
 };
+
 
 /**
  * Handle API errors
@@ -59,11 +66,13 @@ const handleError = (error) => {
   throw error;
 };
 
+
 /**
  * L&D Service - All API calls for Learning & Development module
  */
 export const lndService = {
   // ==================== SKILLS ====================
+
 
   /**
    * Get current user's skills
@@ -99,6 +108,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Get subordinate employees' skills (Manager only)
    * @param {number} pageNumber - Page number
@@ -130,6 +140,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Record a single skill for an employee (Manager only)
    * @param {object} data - { employeeId, skillId, rating }
@@ -147,6 +158,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Record multiple skills for an employee (Manager only)
@@ -166,6 +178,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Update employee skill rating (Manager only)
    * @param {object} data - { mapperId, rating }
@@ -184,6 +197,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Delete employee skill (Manager only)
    * @param {number} mapperId - Skill mapper ID
@@ -200,6 +214,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Get subordinate employees for manager with pagination and search
@@ -225,6 +240,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Get all available skills for dropdown
    * @returns {Promise} List of all skills
@@ -240,7 +256,9 @@ export const lndService = {
     }
   },
 
+
   // ==================== SME ====================
+
 
   /**
    * Check if current user is an SME
@@ -256,6 +274,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Apply to become SME
@@ -274,6 +293,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Get available SMEs for a skill
@@ -295,7 +315,9 @@ export const lndService = {
     }
   },
 
+
   // ==================== ASSIGNMENTS ====================
+
 
   /**
    * Get current user's assignments (as mentee)
@@ -334,6 +356,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Get team assignments (Manager only)
    * @param {number} pageNumber - Page number
@@ -370,6 +393,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Get SME assignments (SME only)
@@ -408,6 +432,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Request SME assignment for subordinate (Manager only)
    * @param {object} data - { skillId, menteeEmployeeId, mentorEmployeeId, deadline }
@@ -425,6 +450,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Upload assignment completion proof (Employee only)
@@ -444,6 +470,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Complete assignment with new rating (Manager only)
    * @param {object} data - { assignmentId, newRating, notes }
@@ -461,6 +488,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Download assignment completion proof
@@ -482,6 +510,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Preview assignment completion proof in browser
    * @param {number} assignmentId - Assignment ID
@@ -502,7 +531,9 @@ export const lndService = {
     }
   },
 
+
   // ==================== HR MANAGEMENT ====================
+
 
   /**
    * Get all organization employees (HR only)
@@ -527,6 +558,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Get all organization assignments (HR only)
@@ -565,6 +597,42 @@ export const lndService = {
     }
   },
 
+
+  /**
+   * Export all organization assignments to Excel (HR only)
+   * @param {string} statusFilter - Status filter (optional)
+   * @param {string} searchTerm - Search term (optional)
+   * @param {string} sortField - Sort field (optional)
+   * @param {string} sortOrder - Sort order (optional)
+   * @returns {Promise} Blob response
+   */
+  exportOrganizationAssignments: async (
+    statusFilter = "",
+    searchTerm = "",
+    sortField = "",
+    sortOrder = ""
+  ) => {
+    try {
+      const query = buildQueryString({
+        statusFilter,
+        searchTerm,
+        sortField,
+        sortOrder,
+      });
+      const response = await axios.get(
+        `${API_BASE_URL}/LnD/hr/assignments/organization/export${query}`,
+        {
+          headers: getHeaders(),
+          responseType: "blob",
+        }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+
   /**
    * Get all active SMEs (HR only)
    * @param {number} pageNumber - Page number (default: 1)
@@ -584,6 +652,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Get employee skills for HR view
@@ -611,7 +680,9 @@ export const lndService = {
     }
   },
 
+
   // ==================== APPROVALS ====================
+
 
   /**
    * Get current user's pending approvals (as approver)
@@ -650,6 +721,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Process approval (approve/reject)
    * @param {object} data - { approvalId, isApproved, notes }
@@ -667,6 +739,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Get approval history
@@ -711,6 +784,7 @@ export const lndService = {
     }
   },
 
+
   /**
    * Get detailed approval information
    * @param {number} approvalId - Approval ID
@@ -727,6 +801,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Download approval attachment
@@ -747,6 +822,7 @@ export const lndService = {
       return handleError(error);
     }
   },
+
 
   /**
    * Preview approval attachment in browser
@@ -769,6 +845,7 @@ export const lndService = {
   },
 };
 
+
 /**
  * Helper function to trigger file download from blob
  * @param {Blob} blob - File blob
@@ -786,7 +863,6 @@ export const downloadFile = (blob, filename = "download") => {
 };
 
 
-
 /**
  * Helper function to preview file in new browser tab
  * @param {Blob} blob - File blob
@@ -796,11 +872,9 @@ export const previewFile = (blob, contentType = "application/pdf") => {
   const file = new Blob([blob], { type: contentType });
   const fileURL = window.URL.createObjectURL(file);
   
-  // Open in new tab for preview
   const previewWindow = window.open(fileURL, "_blank");
   
   if (!previewWindow) {
-    // If popup blocked, create a link
     const link = document.createElement("a");
     link.href = fileURL;
     link.target = "_blank";
@@ -810,10 +884,10 @@ export const previewFile = (blob, contentType = "application/pdf") => {
     document.body.removeChild(link);
   }
   
-  // Clean up after a delay
   setTimeout(() => {
     window.URL.revokeObjectURL(fileURL);
   }, 100);
 };
+
 
 export default lndService;
