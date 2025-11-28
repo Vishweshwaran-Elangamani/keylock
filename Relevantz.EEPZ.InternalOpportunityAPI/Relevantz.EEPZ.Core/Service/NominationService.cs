@@ -16,11 +16,16 @@ namespace Relevantz.EEPZ.Core.Service
     public class NominationService : INominationService
     {
         private readonly INominationRepository _nominationRepository;
+        private readonly INotificationService _notificationService;
         private readonly IMapper _mapper;
 
-        public NominationService(INominationRepository nominationRepository, IMapper mapper)
+        public NominationService(
+            INominationRepository nominationRepository,
+            INotificationService notificationService,
+            IMapper mapper)
         {
             _nominationRepository = nominationRepository;
+            _notificationService = notificationService;
             _mapper = mapper;
         }
 
@@ -59,13 +64,15 @@ namespace Relevantz.EEPZ.Core.Service
                     CurrentApprovalLevel = 1,
                     Status = "Pending_Manager_Review",
                     
-                    L2ManagerUserId = managerUserId.Value,  // This is the Manager (from Project.L1approver)
+                    L2ManagerUserId = managerUserId.Value,
                     
                     SubmittedAt = DateTime.UtcNow
                 };
 
                 var created = await _nominationRepository.CreateAsync(nomination);
                 Console.WriteLine($"[Service] Self-nomination created with ID: {created.NominationId}");
+
+                // No email sent for self-nomination per your requirement
 
                 return _mapper.Map<NominationResponseDto>(created);
             }
@@ -136,6 +143,27 @@ namespace Relevantz.EEPZ.Core.Service
                     var created = await _nominationRepository.CreateAsync(nomination);
                     Console.WriteLine($"[Service] Manager nomination created with ID: {created.NominationId}, skipped to DeptHead: {nomineeDeptHeadUserId}");
 
+                    // Send email to nominee - fetch details with navigation properties
+                    var nominationDetail = await _nominationRepository.GetByIdAsync(created.NominationId);
+                    if (nominationDetail != null && 
+                        nominationDetail.NomineeUser != null && 
+                        nominationDetail.NominatedByUser != null &&
+                        nominationDetail.Opportunity != null)
+                    {
+                        var nomineeProfile = nominationDetail.NomineeUser.Employee?.Userprofile;
+                        var nominatorProfile = nominationDetail.NominatedByUser.Employee?.Userprofile;
+                        
+                        if (nomineeProfile != null && nominatorProfile != null)
+                        {
+                            await _notificationService.SendNominationCreatedEmailAsync(
+                                nominationDetail.NomineeUser.Email,
+                                $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                                nominationDetail.Opportunity .OpportunityName,
+                                $"{nominatorProfile.FirstName} {nominatorProfile.LastName}"
+                            );
+                        }
+                    }
+
                     return _mapper.Map<NominationResponseDto>(created);
                 }
                 else
@@ -161,6 +189,27 @@ namespace Relevantz.EEPZ.Core.Service
 
                     var created = await _nominationRepository.CreateAsync(nomination);
                     Console.WriteLine($"[Service] Manager nomination created with ID: {created.NominationId}, going to Manager: {nomineeManagerUserId}");
+
+                    // Send email to nominee - fetch details with navigation properties
+                    var nominationDetail = await _nominationRepository.GetByIdAsync(created.NominationId);
+                    if (nominationDetail != null && 
+                        nominationDetail.NomineeUser != null && 
+                        nominationDetail.NominatedByUser != null &&
+                        nominationDetail.Opportunity != null)
+                    {
+                        var nomineeProfile = nominationDetail.NomineeUser.Employee?.Userprofile;
+                        var nominatorProfile = nominationDetail.NominatedByUser.Employee?.Userprofile;
+                        
+                        if (nomineeProfile != null && nominatorProfile != null)
+                        {
+                            await _notificationService.SendNominationCreatedEmailAsync(
+                                nominationDetail.NomineeUser.Email,
+                                $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                                nominationDetail.Opportunity .OpportunityName,
+                                $"{nominatorProfile.FirstName} {nominatorProfile.LastName}"
+                            );
+                        }
+                    }
 
                     return _mapper.Map<NominationResponseDto>(created);
                 }
@@ -399,6 +448,21 @@ namespace Relevantz.EEPZ.Core.Service
                     nomination.Status = "Rejected_By_Manager";
 
                     Console.WriteLine($"[Service] Manager Rejected");
+
+                    // Send rejection email to nominee
+                    if (nomination.NomineeUser != null && nomination.Opportunity != null)
+                    {
+                        var nomineeProfile = nomination.NomineeUser.Employee?.Userprofile;
+                        if (nomineeProfile != null)
+                        {
+                            await _notificationService.SendNominationRejectedEmailAsync(
+                                nomination.NomineeUser.Email,
+                                $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                                nomination.Opportunity .OpportunityName,
+                                request.Remarks ?? "No reason provided"
+                            );
+                        }
+                    }
                 }
 
                 // Update legacy fields
@@ -463,6 +527,20 @@ namespace Relevantz.EEPZ.Core.Service
                         ReviewedAt = DateTime.UtcNow
                     };
                     await _nominationRepository.AddReviewMetricAsync(metric);
+
+                    // Send approval email to nominee
+                    if (nomination.NomineeUser != null && nomination.Opportunity != null)
+                    {
+                        var nomineeProfile = nomination.NomineeUser.Employee?.Userprofile;
+                        if (nomineeProfile != null)
+                        {
+                            await _notificationService.SendNominationApprovedEmailAsync(
+                                nomination.NomineeUser.Email,
+                                $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                                nomination.Opportunity .OpportunityName
+                            );
+                        }
+                    }
                 }
                 else if (request.Action == "Rejected")
                 {
@@ -472,6 +550,21 @@ namespace Relevantz.EEPZ.Core.Service
                     nomination.Status = "Rejected_By_DeptHead";
 
                     Console.WriteLine($"[Service] DeptHead Rejected");
+
+                    // Send rejection email to nominee
+                    if (nomination.NomineeUser != null && nomination.Opportunity != null)
+                    {
+                        var nomineeProfile = nomination.NomineeUser.Employee?.Userprofile;
+                        if (nomineeProfile != null)
+                        {
+                            await _notificationService.SendNominationRejectedEmailAsync(
+                                nomination.NomineeUser.Email,
+                                $"{nomineeProfile.FirstName} {nomineeProfile.LastName}",
+                                nomination.Opportunity .OpportunityName,
+                                request.ReviewRemarks ?? "No reason provided"
+                            );
+                        }
+                    }
                 }
 
                 // Update legacy fields
@@ -491,7 +584,7 @@ namespace Relevantz.EEPZ.Core.Service
             }
         }
 
-        public async Task<EligibilityCheckResponseDto> CheckEligibilityAsync(int employeeId, int opportunityId)
+        public Task<EligibilityCheckResponseDto> CheckEligibilityAsync(int employeeId, int opportunityId)
         {
             try
             {
@@ -499,14 +592,14 @@ namespace Relevantz.EEPZ.Core.Service
 
                 // TODO: Implement actual eligibility check logic
 
-                return new EligibilityCheckResponseDto
+                return Task.FromResult(new EligibilityCheckResponseDto
                 {
                     OpportunityId = opportunityId,
                     OpportunityName = "Opportunity Name",
                     IsEligible = true,
                     Message = "Employee is eligible",
                     EligibilityCriteria = "Criteria"
-                };
+                });
             }
             catch (Exception ex)
             {

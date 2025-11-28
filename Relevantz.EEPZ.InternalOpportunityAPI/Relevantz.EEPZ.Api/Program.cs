@@ -113,6 +113,7 @@ builder.Services.AddScoped<IInternalOpportunityService, InternalOpportunityServi
 builder.Services.AddScoped<INominationService, NominationService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // ============================================================================
 // CONFIGURE AUTOMAPPER
