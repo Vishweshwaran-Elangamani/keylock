@@ -11,15 +11,20 @@ using ClosedXML.Excel;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    public class LnDService : ILnDService
+    public class LnDService : ILnDService  
     {
+     
         private readonly ILnDRepository _repository;
-        private readonly IFileStorageService _fileStorage;
+        private readonly IFileStorageService _fileStorage;// NEW
 
-        public LnDService(ILnDRepository repository, IFileStorageService fileStorage)
+        public LnDService(
+            ILnDRepository repository,
+            IFileStorageService fileStorage
+           ) //  NEW
         {
             _repository = repository;
             _fileStorage = fileStorage;
+             //
         }
 
         #region Employee Skills Management
@@ -642,12 +647,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
+      
+
         public async Task<ApiResponse<PaginatedResponse<SmeDto>>> GetAvailableSmes(
-            int skillId,
-            string searchTerm,
-            int pageNumber,
-            int pageSize
-        )
+    int skillId,
+    string searchTerm,
+    int pageNumber,
+    int pageSize
+)
         {
             try
             {
@@ -782,16 +789,18 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+ 
+
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetMyAssignments(
-            int employeeId,
-            string? statusFilter,
-            string? searchTerm,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
-        )
+        int employeeId,
+        string? statusFilter,
+        string? searchTerm,
+        string? sortField,
+        string? sortOrder,
+        int pageNumber,
+        int pageSize
+    )
         {
             try
             {
@@ -850,6 +859,184 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+        public async Task<ApiResponse<byte[]>> ExportTeamAssignmentsToExcel(
+    int managerId,
+    string? statusFilter,
+    string? searchTerm,
+    string? sortField,
+    string? sortOrder)
+        {
+            try
+            {
+
+                var allAssignments = await _repository.GetAllTeamAssignmentsForExportAsync(
+                    managerId,
+                    statusFilter,
+                    searchTerm,
+                    sortField,
+                    sortOrder
+                );
+
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("Team Assignments");
+
+                    // Add headers
+                    worksheet.Cell(1, 1).Value = "Employee Name";
+                    worksheet.Cell(1, 2).Value = "Skill Name";
+                    worksheet.Cell(1, 3).Value = "SME Assigned";
+                    worksheet.Cell(1, 4).Value = "Assignment Status";
+                    worksheet.Cell(1, 5).Value = "Start Date";
+                    worksheet.Cell(1, 6).Value = "Due Date";
+                    worksheet.Cell(1, 7).Value = "Score";
+                    worksheet.Cell(1, 8).Value = "Comments";
+
+
+                    var headerRange = worksheet.Range(1, 1, 1, 8);
+                    headerRange.Style.Font.Bold = true;
+                    headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(39, 35, 92);
+                    headerRange.Style.Font.FontColor = XLColor.White;
+                    headerRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+
+                    int row = 2;
+                    foreach (var assignment in allAssignments)
+                    {
+                        // Access through navigation properties
+                        var menteeName = $"{assignment.MenteeEmployee?.Userprofile?.FirstName ?? ""} {assignment.MenteeEmployee?.Userprofile?.LastName ?? ""}".Trim();
+                        var skillName = assignment.Skill?.SkillName ?? "N/A";
+                        var smeName = $"{assignment.Sme?.Employee?.Userprofile?.FirstName ?? ""} {assignment.Sme?.Employee?.Userprofile?.LastName ?? ""}".Trim();
+
+                        worksheet.Cell(row, 1).Value = menteeName;
+                        worksheet.Cell(row, 2).Value = skillName;
+                        worksheet.Cell(row, 3).Value = smeName;
+                        worksheet.Cell(row, 4).Value = assignment.Status ?? "N/A";
+                        worksheet.Cell(row, 5).Value = assignment.CreatedOn?.ToString("MM/dd/yyyy") ?? "";
+                        worksheet.Cell(row, 6).Value = assignment.Deadline?.ToString("MM/dd/yyyy") ?? "";
+                        worksheet.Cell(row, 7).Value = assignment.CompletionRating?.ToString() ?? "N/A";
+                        worksheet.Cell(row, 8).Value = assignment.CompletionNotes ?? "";
+
+                        row++;
+                    }
+
+                    // Auto-fit columns
+                    worksheet.Columns().AdjustToContents();
+
+
+                    if (row > 2)
+                    {
+                        var dataRange = worksheet.Range(1, 1, row - 1, 8);
+                        dataRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                        dataRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    }
+
+                    // Save to memory stream
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        var excelBytes = stream.ToArray();
+
+                        return new ApiResponse<byte[]>
+                        {
+                            Success = true,
+                            Message = $"Successfully exported {allAssignments.Count} team assignments",
+                            Data = excelBytes
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<byte[]>
+                {
+                    Success = false,
+                    Message = "An error occurred while exporting team assignments",
+                    Errors = new List<string> { ex.Message }
+                };
+            }
+        }
+        public async Task<ApiResponse<byte[]>> ExportAllActiveSmesToExcel(string? searchTerm)
+        {
+            try
+            {
+                // Get ALL active SMEs without pagination for export
+                var allSmes = await _repository.GetAllActiveSmesForExportAsync(searchTerm);
+
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("SME Directory");
+
+                    // Add headers
+                    worksheet.Cell(1, 1).Value = "SME Name";
+                    worksheet.Cell(1, 2).Value = "Skill";
+                    worksheet.Cell(1, 3).Value = "Department";
+                    worksheet.Cell(1, 4).Value = "Approved Date";
+
+                    // Style headers
+                    var headerRange = worksheet.Range(1, 1, 1, 4);
+                    headerRange.Style.Font.Bold = true;
+                    headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(39, 35, 92);
+                    headerRange.Style.Font.FontColor = XLColor.White;
+                    headerRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    // Add data rows
+                    int row = 2;
+                    foreach (var sme in allSmes)
+                    {
+                        var smeName = $"{sme.Employee?.Userprofile?.FirstName ?? ""} {sme.Employee?.Userprofile?.LastName ?? ""}".Trim();
+                        var skillName = sme.Skill?.SkillName ?? "N/A";
+                        var departmentName = sme.Employee?.Employeedetailsmasters?.FirstOrDefault()?.Department?.DepartmentName ?? "N/A";
+                        var approvedDate = sme.ApprovedOn?.ToString("MM/dd/yyyy") ?? "";
+
+                        worksheet.Cell(row, 1).Value = smeName;
+                        worksheet.Cell(row, 2).Value = skillName;
+                        worksheet.Cell(row, 3).Value = departmentName;
+                        worksheet.Cell(row, 4).Value = approvedDate;
+
+                        row++;
+                    }
+
+                    // Auto-fit columns
+                    worksheet.Columns().AdjustToContents();
+
+                    // Add borders to all cells with data
+                    if (row > 2)
+                    {
+                        var dataRange = worksheet.Range(1, 1, row - 1, 4);
+                        dataRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+                        dataRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                    }
+
+                    // Save to memory stream
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        var excelBytes = stream.ToArray();
+
+                        return new ApiResponse<byte[]>
+                        {
+                            Success = true,
+                            Message = $"Successfully exported {allSmes.Count} SMEs",
+                            Data = excelBytes
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponse<byte[]>
+                {
+                    Success = false,
+                    Message = "An error occurred while exporting SME directory",
+                    Errors = new List<string> { ex.Message }
+                };
+            }
+        }
+
+
+
 
 
         public async Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetTeamAssignments(
@@ -1069,8 +1256,105 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+    //     public async Task<ApiResponse<bool>> UploadCompletionProof(
+    // int employeeId, UploadCompletionProofRequest request)
+    //     {
+    //         try
+    //         {
+    //             var assignment = await _repository.GetAssignmentByIdAsync(request.AssignmentId);
+    //             if (assignment == null || assignment.MenteeEmployeeId != employeeId)
+    //             {
+    //                 return new ApiResponse<bool>
+    //                 {
+    //                     Success = false,
+    //                     Message = "Assignment not found",
+    //                 };
+    //             }
 
-        public async Task<ApiResponse<bool>> CompleteAssignment(
+    //             if (assignment.Status != LnDConstants.ASSIGNMENT_STATUS.IN_PROGRESS)
+    //             {
+    //                 return new ApiResponse<bool>
+    //                 {
+    //                     Success = false,
+    //                     Message = "Assignment is not in progress",
+    //                 };
+    //             }
+
+    //             var filePath = await _fileStorage.SaveFileAsync(request.ProofDocument, "completion-proofs");
+
+    //             var attachment = new Lndattachment
+    //             {
+    //                 FileName = request.ProofDocument.FileName,
+    //                 FilePath = filePath,
+    //                 FileSize = request.ProofDocument.Length,
+    //                 AttachmentType = LnDConstants.ATTACHMENT_TYPE.COMPLETION_PROOF,
+    //                 CreatedByEmployeeId = employeeId,
+    //                 CreatedOn = DateOnly.FromDateTime(DateTime.Now),
+    //             };
+
+    //             await _repository.AddAttachmentAsync(attachment);
+    //             await _repository.SaveChangesAsync();
+
+    //             assignment.ProofFilePath = filePath;
+    //             assignment.CompletionNotes = request.CompletionNotes;
+    //             assignment.Status = LnDConstants.ASSIGNMENT_STATUS.PENDING_SME_ACKNOWLEDGEMENT;
+    //             assignment.UpdatedByEmployeeId = employeeId;
+    //             assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
+
+    //             var approval = new Lndapproval
+    //             {
+    //                 ApprovalType = LnDConstants.APPROVAL_TYPE.ASSIGNMENT_ACKNOWLEDGEMENT,
+    //                 AssignmentId = assignment.AssignmentId,
+    //                 SkillId = assignment.SkillId,
+    //                 AttachmentId = attachment.AttachmentId,
+    //                 RequesterEmployeeId = employeeId,
+    //                 ApproverEmployeeId = assignment.Sme.EmployeeId,
+    //                 Status = LnDConstants.APPROVAL_STATUS.PENDING,
+    //                 RequestedOn = DateOnly.FromDateTime(DateTime.Now),
+    //             };
+
+    //             await _repository.AddApprovalAsync(approval);
+    //             await _repository.UpdateAssignmentAsync(assignment);
+    //             await _repository.SaveChangesAsync();
+
+    //             // ✅ NEW: Send email to SME
+    //             var sme = assignment.Sme?.Employee;
+    //             var employee = assignment.MenteeEmployee;
+    //             var skill = assignment.Skill;
+
+    //             if (sme?.Userauthentication?.Email != null)
+    //             {
+    //                 var smeName = $"{sme.Userprofile?.FirstName} {sme.Userprofile?.LastName}";
+    //                 var employeeName = $"{employee?.Userprofile?.FirstName} {employee?.Userprofile?.LastName}";
+
+    //                 await _emailService.SendProofSubmittedEmailAsync(
+    //                     sme.Userauthentication.Email,
+    //                     smeName,
+    //                     employeeName,
+    //                     skill?.SkillName ?? "Unknown Skill"
+    //                 );
+    //             }
+
+    //             return new ApiResponse<bool>
+    //             {
+    //                 Success = true,
+    //                 Message = "Completion proof uploaded successfully. Awaiting SME acknowledgement.",
+    //                 Data = true,
+    //             };
+    //         }
+    //         catch (Exception ex)
+    //         {
+    //             return new ApiResponse<bool>
+    //             {
+    //                 Success = false,
+    //                 Message = "An error occurred",
+    //                 Errors = new List<string> { ex.Message }
+    //             };
+    //         }
+    //     }
+
+
+            public async Task<ApiResponse<bool>> CompleteAssignment(
             int managerId,
             CompleteAssignmentRequest request
         )
@@ -1155,7 +1439,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
-
+     
         #endregion
 
         #region Approvals Management
@@ -1314,7 +1598,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
-
+    
         private async Task HandleSmeRegistrationApproval(Lndapproval approval)
         {
             var sme = new Lndsme
@@ -2042,11 +2326,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+
+
         public async Task<ApiResponse<byte[]>> ExportOrganizationAssignmentsToExcel(
-    string? statusFilter,
-    string? searchTerm,
-    string? sortField,
-    string? sortOrder)
+       string? statusFilter,
+       string? searchTerm,
+       string? sortField,
+       string? sortOrder)
         {
             try
             {
@@ -2140,4 +2426,5 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
 
     }
+
 }

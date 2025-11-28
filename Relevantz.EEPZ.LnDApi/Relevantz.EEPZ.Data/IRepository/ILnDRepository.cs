@@ -152,6 +152,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageNumber,
             int pageSize
         );
+        Task<List<Lndsme>> GetAllActiveSmesForExportAsync(string? searchTerm);
+
 
         Task<(List<Lndemployeeskillmapper> Items, int TotalCount)> GetEmployeeSkillsByIdAsync(
             int employeeId,
@@ -159,7 +161,17 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             string? sortBy,
             int pageNumber,
             int pageSize
-        );
+        ); 
+
+        Task<List<Lndassignment>> GetAllTeamAssignmentsForExportAsync(
+    int managerId,
+    string? statusFilter,
+    string? searchTerm,
+    string? sortField,
+    string? sortOrder
+);
+
+
 
         #endregion
 

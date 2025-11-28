@@ -19,6 +19,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Employee Management
 
+
         public async Task<Employee?> GetEmployeeByIdAsync(int employeeId)
         {
             return await _context
@@ -38,6 +39,54 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
             return await _context.Lndsmes.FirstOrDefaultAsync(s => s.EmployeeId == SmeEmployeeId);
         }
+        public async Task<List<Lndassignment>> GetAllTeamAssignmentsForExportAsync(
+      int managerId,
+      string? statusFilter,
+      string? searchTerm,
+      string? sortField,
+      string? sortOrder)
+        {
+            var query = _context
+                .Lndassignments
+                .Include(a => a.MenteeEmployee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(a => a.MenteeEmployee)
+                    .ThenInclude(e => e.Employeedetailsmasters)
+                        .ThenInclude(ed => ed.Department)
+                .Include(a => a.Skill)
+                .Include(a => a.Sme)
+                    .ThenInclude(s => s.Employee)
+                        .ThenInclude(e => e.Userprofile)
+                .Where(a => a.MenteeEmployee.ReportingManagerEmployeeId == managerId)
+                .AsQueryable();
+
+            // Apply status filter
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                query = query.Where(a => a.Status == statusFilter);
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(a =>
+                    (a.Skill.SkillName ?? "").Contains(searchTerm) ||
+                    (a.MenteeEmployee.Userprofile.FirstName ?? "").Contains(searchTerm) ||
+                    (a.MenteeEmployee.Userprofile.LastName ?? "").Contains(searchTerm) ||
+                    ((a.MenteeEmployee.Userprofile.FirstName ?? "") + " " + (a.MenteeEmployee.Userprofile.LastName ?? "")).Contains(searchTerm) ||
+                    (a.Sme.Employee.Userprofile.FirstName ?? "").Contains(searchTerm) ||
+                    (a.Sme.Employee.Userprofile.LastName ?? "").Contains(searchTerm)
+                );
+            }
+
+            // Apply sorting - reuse existing ApplyAssignmentSorting method
+            query = ApplyAssignmentSorting(query, sortField, sortOrder);
+
+            // Return all results (no pagination for export)
+            return await query.ToListAsync();
+        }
+
+
 
         public async Task<(List<Employee> Items, int TotalCount)> GetSubordinateEmployeesAsync(
             int managerId,
@@ -898,7 +947,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     ? query
                         .OrderBy(a =>
                             a.ApproverEmployee != null
-                                ? a.ApproverEmployee.Userprofile.FirstName
+                                ? a.ApproverEmployee.Userprofile.FirstName 
                                 : ""
                         )
                         .ThenBy(a =>
@@ -947,6 +996,43 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
         #endregion
 
         #region HR Management
+
+        public async Task<List<Lndsme>> GetAllActiveSmesForExportAsync(
+    string? searchTerm)
+        {
+            var query = _context
+                .Lndsmes
+                .Where(s => s.IsActive.Value == true)
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Userprofile)
+                .Include(s => s.Employee)
+                    .ThenInclude(e => e.Employeedetailsmasters)
+                        .ThenInclude(ed => ed.Department)
+                .Include(s => s.Skill)
+                .AsQueryable();
+
+            // Apply search filter if provided
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                var lowerSearchTerm = searchTerm.ToLower();
+                query = query.Where(s =>
+                    (s.Employee.Userprofile.FirstName ?? "").ToLower().Contains(lowerSearchTerm) ||
+                    (s.Employee.Userprofile.LastName ?? "").ToLower().Contains(lowerSearchTerm) ||
+                    ((s.Employee.Userprofile.FirstName ?? "") + " " + (s.Employee.Userprofile.LastName ?? ""))
+                        .ToLower().Contains(lowerSearchTerm) ||
+                    (s.Skill.SkillName ?? "").ToLower().Contains(lowerSearchTerm) ||
+                    (s.Employee.Employeedetailsmasters.FirstOrDefault().Department.DepartmentName ?? "")
+                        .ToLower().Contains(lowerSearchTerm)
+                );
+            }
+
+            // Return all results without pagination
+            return await query
+                .OrderBy(s => s.Employee.Userprofile.FirstName)
+                .ThenBy(s => s.Employee.Userprofile.LastName)
+                .ToListAsync();
+        }
+
         public async Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExportAsync(
     string? statusFilter,
     string? searchTerm,
@@ -990,6 +1076,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
             // Return all results (no pagination for export)
             return await query.ToListAsync();
         }
+
+
 
         public async Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployeesAsync(
             string? searchTerm,

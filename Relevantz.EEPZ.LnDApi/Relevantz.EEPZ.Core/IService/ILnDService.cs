@@ -139,7 +139,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? searchTerm,
             int pageNumber,
             int pageSize
-        );
+        ); 
 
         Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetAllOrganizationAssignments(
             string? statusFilter,
@@ -148,13 +148,16 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? sortOrder,
             int pageNumber,
             int pageSize
-        );
+        ); 
+
 
         Task<ApiResponse<PaginatedResponse<SmeDto>>> GetAllActiveSmes(
             string? searchTerm,
             int pageNumber,
             int pageSize
         );
+        Task<ApiResponse<byte[]>> ExportAllActiveSmesToExcel(string? searchTerm);
+
 
         Task<ApiResponse<PaginatedResponse<EmployeeSkillDto>>> GetEmployeeSkillsById(
             int employeeId,
@@ -169,12 +172,18 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? sortField,
             string? sortOrder
         );
+        Task<ApiResponse<byte[]>> ExportTeamAssignmentsToExcel(
+            int managerId,
+            string? statusFilter,
+            string? searchTerm,
+            string? sortField,
+            string? sortOrder
+        );
 
         Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(int employeeId, int approvalId);
         Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(int employeeId, int assignmentId);
 
     }
-
     public interface IFileStorageService
     {
         Task<string> SaveFileAsync(IFormFile file, string subFolder);

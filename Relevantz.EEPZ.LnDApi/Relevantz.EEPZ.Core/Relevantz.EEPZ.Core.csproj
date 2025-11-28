@@ -19,7 +19,8 @@
   <ItemGroup>
     <!-- EPPlus package reference -->
     <PackageReference Include="EPPlus" Version="6.3.0" />
-     <PackageReference Include="ClosedXML" Version="0.102.1" />
+    <PackageReference Include="ClosedXML" Version="0.102.1" />
+    <PackageReference Include="MailKit" Version="4.14.1" />
   </ItemGroup>
 
 </Project>

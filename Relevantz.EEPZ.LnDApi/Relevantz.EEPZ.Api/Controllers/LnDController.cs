@@ -231,6 +231,22 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
+        [HttpGet("hr/smes/export")]
+        [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
+        public async Task<IActionResult> ExportAllActiveSmes(
+    [FromQuery] string? searchTerm
+)
+        {
+            var result = await _lndService.ExportAllActiveSmesToExcel(searchTerm);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            var fileName = $"SMEDirectory_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            return File(result.Data,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
 
         [HttpGet("hr/assignments/organization")]
         [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
@@ -324,8 +340,37 @@ namespace Relevantz.EEPZ.Api.Controllers
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
+        [HttpGet("assignments/team/export")]
+        [Authorize(Roles = LnDConstants.USER_ROLES.MANAGER)]
+        public async Task<IActionResult> ExportTeamAssignments(
+            [FromQuery] string? statusFilter,
+            [FromQuery] string? searchTerm,
+            [FromQuery] string? sortField,
+            [FromQuery] string? sortOrder
+        )
+        {
+            var managerId = GetCurrentEmployeeId();
+            var result = await _lndService.ExportTeamAssignmentsToExcel(
+                managerId,
+                statusFilter,
+                searchTerm,
+                sortField,
+                sortOrder
+            );
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            var fileName = $"TeamAssignments_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+            return File(result.Data,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName);
+        }
+
+
 
         [HttpGet("assignments/team")]
+
         public async Task<IActionResult> GetTeamAssignments(
             [FromQuery] string? statusFilter,
             [FromQuery] string? searchTerm,
@@ -541,8 +586,11 @@ namespace Relevantz.EEPZ.Api.Controllers
 
 
             return File(result.Data.FileBytes, result.Data.ContentType, result.Data.FileName, enableRangeProcessing: true);
-        }
+        }        
 
         #endregion
     }
 }
+
+
+
