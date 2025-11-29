@@ -10,6 +10,7 @@ import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
 import { GOAL_TYPES } from "../../constants/goals/goalConstants";
 import Breadcrumb from "../../components/goals/common/Breadcrumb";
+import { toast } from "sonner";
 
 const YourGoalsPage = () => {
   const { user } = useAuth();
@@ -49,38 +50,15 @@ const YourGoalsPage = () => {
     org: 0,
   });
 
-  // Debounce timer
-  const debounceTimerRef = useRef(null);
-
   useEffect(() => {
     loadCounts();
     loadProjects();
   }, []);
 
-  // Added itemsPerPage to dependencies for server-side pagination
+  // Changed to only depend on searchTerm (not searchInput for debouncing)
   useEffect(() => {
     loadGoals();
   }, [selectedType, currentPage, itemsPerPage, filters, searchTerm]);
-
-  // Debounced search
-  useEffect(() => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-
-    debounceTimerRef.current = setTimeout(() => {
-      if (searchInput !== searchTerm) {
-        setSearchTerm(searchInput);
-        setCurrentPage(1);
-      }
-    }, 500);
-
-    return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current);
-      }
-    };
-  }, [searchInput]);
 
   const loadProjects = async () => {
     try {
@@ -93,6 +71,7 @@ const YourGoalsPage = () => {
       setProjects(formattedProjects);
     } catch (error) {
       console.error("Failed to load projects:", error);
+      toast.error("Failed to load projects");
     }
   };
 
@@ -156,7 +135,7 @@ const YourGoalsPage = () => {
       const params = {
         type: selectedType,
         page: currentPage,
-        pageSize: itemsPerPage, // Changed from pageSize constant
+        pageSize: itemsPerPage,
         viewMode: getViewMode(),
         ...filters,
       };
@@ -201,10 +180,9 @@ const YourGoalsPage = () => {
       }
     } catch (error) {
       console.error("Failed to load goals:", error);
-      setAlert({
-        type: "danger",
-        message: error.response?.data?.message || "Failed to load goals",
-      });
+      toast.error(
+        error.response?.data?.message || "Failed to load goals"
+      );
       setGoals([]);
       setTotalCount(0);
       setTotalPages(0);
@@ -230,27 +208,34 @@ const YourGoalsPage = () => {
 
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleSearch = () => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-    setSearchTerm(searchInput);
-    setCurrentPage(1);
+  // Updated search handlers - similar to PendingApprovals
+  const handleSearchInputChange = (e) => {
+    setSearchInput(e.target.value);
   };
 
-  const handleClearSearch = () => {
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearchTerm(searchInput);
+    setCurrentPage(1);
+    if (searchInput.trim()) {
+      toast.success("Search applied");
+    }
+  };
+
+  const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
+    toast.info("Search cleared");
   };
 
-  const handleSearchKeyPress = (e) => {
+  const handleKeyPress = (e) => {
     if (e.key === "Enter") {
-      handleSearch();
+      handleSearchSubmit(e);
     }
   };
 
@@ -263,6 +248,7 @@ const YourGoalsPage = () => {
     setFilters(newFilters);
     setCurrentPage(1);
     setShowFiltersModal(false);
+    toast.success("Filters applied");
   };
 
   const handleClearFilters = () => {
@@ -276,6 +262,7 @@ const YourGoalsPage = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
+    toast.info("All filters cleared");
   };
 
   const activeFilterCount =
@@ -310,36 +297,43 @@ const YourGoalsPage = () => {
           counts={typeCounts}
         />
 
-        {/* Search Bar */}
+        {/* Search Bar - Updated to match PendingApprovals */}
         <div className="flex-grow-1">
-          <div className="input-group">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search by goal title or requester..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyPress={handleSearchKeyPress}
-              style={{ minHeight: "36px", border: "1px solid rgb(39, 35, 92)" }}
-            />
-            {searchInput && (
-              <button
-                className="btn btn-outline-secondary flex-shrink-0"
-                onClick={handleClearSearch}
-                title="Clear search"
-              >
-                <i className="bi bi-x-lg"></i>
-              </button>
-            )}
-            <button
-              className="btn btn-primary flex-shrink-0"
-              onClick={handleSearch}
-              disabled={loading}
-              style={{ backgroundColor: "rgb(39, 35, 92)" }}
-            >
-              <i className="bi bi-search"></i>
-            </button>
-          </div>
+          <form onSubmit={handleSearchSubmit}>
+            <div className="input-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search by goal title or requester..."
+                value={searchInput}
+                onChange={handleSearchInputChange}
+                onKeyPress={handleKeyPress}
+                style={{
+                  minHeight: "36px",
+                  border: "1px solid rgb(39, 35, 92)",
+                }}
+              />
+              {searchTerm ? (
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={handleCancelSearch}
+                >
+                  <i className="bi bi-x-lg me-1"></i>
+                  Cancel
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ backgroundColor: "rgb(39, 35, 92)" }}
+                >
+                  <i className="bi bi-search me-1"></i>
+                  Search
+                </button>
+              )}
+            </div>
+          </form>
         </div>
 
         {/* Filter Button */}
@@ -376,7 +370,7 @@ const YourGoalsPage = () => {
         </button>
       </div>
 
-      {/* Results Summary - Removed since Pagination now shows this info */}
+      {/* Clear Filters */}
       {activeFilterCount > 0 && (
         <div className="d-flex justify-content-end align-items-center mb-3">
           <button
@@ -443,6 +437,7 @@ const YourGoalsPage = () => {
                       goal={goal}
                       onComment={handleCommentClick}
                       showActions={true}
+                      onUpdate={loadGoals}
                     />
                   </div>
                 ))}
@@ -476,6 +471,7 @@ const YourGoalsPage = () => {
       <GoalFormModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
+        onSuccess={handleGoalCreated}
       />
 
       {/* Filters Modal */}

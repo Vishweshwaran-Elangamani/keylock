@@ -10,7 +10,7 @@ import LoadingSpinner from "../../components/goals/common/LoadingSpinner";
 import Alert from "../../components/goals/common/Alert";
 import Pagination from "../../components/goals/common/Pagination";
 import Breadcrumb from "../../components/goals/common/Breadcrumb";
-import { GOAL_TYPES } from "../../constants/goals/goalConstants";
+import { GOAL_TYPES } from "../../constants/goals/goalConstants"; 
 
 const GoalsDashboard = () => {
   const { user } = useAuth();
@@ -329,4 +329,4 @@ const GoalsDashboard = () => {
   );
 };
 
-export default GoalsDashboard;
+export default GoalsDashboard; 
