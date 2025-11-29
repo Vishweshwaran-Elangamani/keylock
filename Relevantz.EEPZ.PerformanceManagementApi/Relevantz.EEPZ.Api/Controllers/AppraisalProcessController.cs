@@ -1536,9 +1536,9 @@ public async Task<IActionResult> GetEmployeeAcknowledgedComments()
         int.TryParse(managerIdClaim, out managerId);
     }
  
-    // Find all employees who report to this manager as L2 only
+    // Find all employees who report to this manager as L1 only
     var employeeIds = await _context.Projects
-        .Where(p => p.L2approverEmployeeId == managerId)
+        .Where(p => p.L1approverEmployeeId == managerId)
         .SelectMany(p => _context.Projectemployees.Where(pe => pe.ProjectId == p.ProjectId).Select(pe => pe.EmployeeId))
         .Distinct()
         .ToListAsync();

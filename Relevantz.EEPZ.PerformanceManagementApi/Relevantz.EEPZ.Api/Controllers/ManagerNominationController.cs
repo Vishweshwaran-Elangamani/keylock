@@ -1,23 +1,26 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
-
+using System.Security.Claims;
+ 
 namespace Relevantz.EEPZ.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ManagerNominationController : ControllerBase
     {
         private readonly EEPZDbContext _context;
         private readonly ILogger<ManagerNominationController> _logger;
-
+ 
         public ManagerNominationController(EEPZDbContext context, ILogger<ManagerNominationController> logger)
         {
             _context = context;
             _logger = logger;
         }
-
+ 
         /// <summary>
         /// Get all active reward types (Recognition, Promotion, etc.)
         /// </summary>
@@ -27,7 +30,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 _logger.LogInformation("[GET_REWARD_TYPES] Fetching all active reward types");
-
+ 
                 var rewardTypes = await _context.Rewardtypes
                     .Where(rt => rt.IsActive == true)
                     .Select(rt => new
@@ -39,9 +42,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                         rt.IsActive
                     })
                     .ToListAsync();
-
+ 
                 _logger.LogInformation($"[GET_REWARD_TYPES] Found {rewardTypes.Count} active reward types");
-
+ 
                 return Ok(new
                 {
                     success = true,
@@ -55,10 +58,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
+ 
         /// <summary>
         /// Get all active opportunities
-        /// ✅ FIXED: Removed broken Include navigation
         /// </summary>
         [HttpGet("opportunities")]
         public async Task<IActionResult> GetOpportunities()
@@ -66,21 +68,20 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 _logger.LogInformation("[GET_OPPORTUNITIES] Fetching all active opportunities");
-
+ 
                 var opportunities = await _context.Recognitiondetails
                     .Where(o => o.Status == "Active" && o.Deadline >= DateOnly.FromDateTime(DateTime.Today))
                     .ToListAsync();
-
+ 
                 var result = new List<object>();
                 foreach (var o in opportunities)
                 {
-                    // ✅ Fetch RewardType and Department separately
                     var rewardType = await _context.Rewardtypes
                         .FirstOrDefaultAsync(rt => rt.RewardTypeId == o.RewardTypeId);
-                    
+                   
                     var department = await _context.Departments
                         .FirstOrDefaultAsync(d => d.DepartmentId == o.DepartmentId);
-
+ 
                     result.Add(new
                     {
                         o.OpportunityId,
@@ -102,9 +103,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                         } : null
                     });
                 }
-
+ 
                 _logger.LogInformation($"[GET_OPPORTUNITIES] Found {result.Count} active opportunities");
-
+ 
                 return Ok(new
                 {
                     success = true,
@@ -118,10 +119,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
+ 
         /// <summary>
         /// Get opportunities by specific reward type
-        /// ✅ FIXED: Removed broken Include navigation
         /// </summary>
         [HttpGet("opportunities/{rewardTypeId}")]
         public async Task<IActionResult> GetOpportunitiesByRewardType(int rewardTypeId)
@@ -129,20 +129,19 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 _logger.LogInformation($"[GET_OPPORTUNITIES_BY_REWARD] Fetching opportunities for Reward Type: {rewardTypeId}");
-
+ 
                 var opportunities = await _context.Recognitiondetails
                     .Where(o => o.Status == "Active"
                         && o.Deadline >= DateOnly.FromDateTime(DateTime.Today)
                         && o.RewardTypeId == rewardTypeId)
                     .ToListAsync();
-
+ 
                 var result = new List<object>();
                 foreach (var o in opportunities)
                 {
-                    // ✅ Fetch RewardType separately
                     var rewardType = await _context.Rewardtypes
                         .FirstOrDefaultAsync(rt => rt.RewardTypeId == o.RewardTypeId);
-
+ 
                     result.Add(new
                     {
                         o.OpportunityId,
@@ -152,9 +151,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                         RewardTypeName = rewardType?.RewardName ?? "Unknown"
                     });
                 }
-
+ 
                 _logger.LogInformation($"[GET_OPPORTUNITIES_BY_REWARD] Found {result.Count} opportunities for Reward Type {rewardTypeId}");
-
+ 
                 return Ok(new
                 {
                     success = true,
@@ -168,10 +167,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
+ 
         /// <summary>
         /// Get nomination parameters for a specific reward type
-        /// HR-CREATED PARAMETERS are stored in NominationParameter table with RewardTypeId
         /// </summary>
         [HttpGet("parameters/{rewardTypeId}")]
         public async Task<IActionResult> GetNominationParameters(int rewardTypeId)
@@ -179,7 +177,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 _logger.LogInformation($"[GET_PARAMETERS] Fetching parameters for Reward Type: {rewardTypeId}");
-
+ 
                 var parameters = await _context.Nominationparameters
                     .Where(p => p.RewardTypeId == rewardTypeId)
                     .OrderBy(p => p.SortOrder)
@@ -195,9 +193,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                         p.SortOrder
                     })
                     .ToListAsync();
-
+ 
                 _logger.LogInformation($"[GET_PARAMETERS] Found {parameters.Count} parameters for Reward Type {rewardTypeId}");
-
+ 
                 return Ok(new
                 {
                     success = true,
@@ -211,218 +209,308 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
+ 
         /// <summary>
         /// Get team members for a specific manager
-        /// Retrieves employees from projects where manager is ResourceOwner, L1 Approver, or L2 Approver
+        /// UPDATED: Only returns employees from projects where manager is L1 (ResourceOwner or L1 Approver)
+        /// L2 managers will NOT see employees from projects where they are only L2
         /// </summary>
-        [HttpGet("team/{managerId}")]
-        public async Task<IActionResult> GetTeamMembers(int managerId)
+      /// <summary>
+/// Get team members for a specific manager
+/// UPDATED: Only returns regular employees (excludes L1, L2, Resource Owners)
+/// </summary>
+/// <summary>
+/// Get team members for a specific manager
+/// UPDATED: Only returns regular employees (excludes L1, L2, Resource Owners)
+/// </summary>
+[HttpGet("team/{managerId}")]
+public async Task<IActionResult> GetTeamMembers(int managerId)
+{
+    try
+    {
+        _logger.LogInformation($"[GET_TEAM_MEMBERS] Fetching team members for Manager ID: {managerId}");
+ 
+        var userRole = User.FindFirstValue(ClaimTypes.Role);
+        _logger.LogInformation($"[GET_TEAM_MEMBERS] User Role from token: {userRole ?? "Not found"}");
+ 
+        // Get projects where this manager is L1 (ResourceOwner or L1 Approver)
+        var managerProjectsAsL1 = await _context.Projects
+            .Where(p => p.ResourceOwnerEmployeeId == managerId || p.L1approverEmployeeId == managerId)
+            .Select(p => p.ProjectId)
+            .ToListAsync();
+ 
+        _logger.LogInformation($"[GET_TEAM_MEMBERS] Manager {managerId} is L1 on {managerProjectsAsL1.Count} projects");
+ 
+        if (!managerProjectsAsL1.Any())
         {
-            try
+            _logger.LogInformation($"[GET_TEAM_MEMBERS] No L1 projects found for Manager {managerId}");
+            return Ok(new
             {
-                _logger.LogInformation($"[GET_TEAM_MEMBERS] Fetching team members for Manager ID: {managerId}");
-
-                var managerProjects = await _context.Projects
-                    .Where(p => p.ResourceOwnerEmployeeId == managerId
-                             || p.L1approverEmployeeId == managerId
-                             || p.L2approverEmployeeId == managerId)
-                    .Select(p => p.ProjectId)
-                    .ToListAsync();
-
-                _logger.LogInformation($"[GET_TEAM_MEMBERS] Manager {managerId} is associated with {managerProjects.Count} projects");
-
-                if (!managerProjects.Any())
-                {
-                    _logger.LogInformation($"[GET_TEAM_MEMBERS] No projects found for Manager {managerId}");
-                    return Ok(new
-                    {
-                        success = true,
-                        data = new List<object>(),
-                        message = "No team members found for this manager"
-                    });
-                }
-
-                var teamMembers = await _context.Projectemployees
-                    .Where(pe => managerProjects.Contains(pe.ProjectId))
-                    .Include(pe => pe.Employee)
-                        .ThenInclude(edm => edm.Employee)
-                            .ThenInclude(e => e.Userprofile)
-                    .Include(pe => pe.Employee)
-                        .ThenInclude(edm => edm.Department)
-                    .Where(pe => pe.Employee.Employee.EmploymentStatus == "Active")
-                    .Select(pe => new
-                    {
-                        pe.Employee.Employee.EmployeeId,
-                        FirstName = pe.Employee.Employee.Userprofile.FirstName,
-                        LastName = pe.Employee.Employee.Userprofile.LastName,
-                        Email = pe.Employee.Employee.Userprofile.PersonalEmail,
-                        Department = new
-                        {
-                            pe.Employee.Department.DepartmentId,
-                            pe.Employee.Department.DepartmentName
-                        }
-                    })
-                    .Distinct()
-                    .ToListAsync();
-
-                _logger.LogInformation($"[GET_TEAM_MEMBERS] Found {teamMembers.Count} team members for Manager {managerId}");
-
-                return Ok(new
-                {
-                    success = true,
-                    data = teamMembers,
-                    message = $"Found {teamMembers.Count} team members"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[GET_TEAM_MEMBERS] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
+                success = true,
+                data = new List<object>(),
+                message = "No team members found. You must be an L1 manager on a project to nominate employees."
+            });
         }
-
+ 
+        // Get Resource Owner IDs
+        var resourceOwnerIds = await _context.Projects
+            .Where(p => p.ResourceOwnerEmployeeId != null)
+            .Select(p => p.ResourceOwnerEmployeeId.Value)
+            .Distinct()
+            .ToListAsync();
+ 
+        // Get L1 Approver IDs
+        var l1ApproverIds = await _context.Projects
+            .Where(p => p.L1approverEmployeeId != null)
+            .Select(p => p.L1approverEmployeeId.Value)
+            .Distinct()
+            .ToListAsync();
+ 
+        // Get L2 Approver IDs
+        var l2ApproverIds = await _context.Projects
+            .Where(p => p.L2approverEmployeeId != null)
+            .Select(p => p.L2approverEmployeeId.Value)
+            .Distinct()
+            .ToListAsync();
+ 
+        // Combine all manager IDs
+        var allManagerIds = new HashSet<int>();
+        allManagerIds.UnionWith(resourceOwnerIds);
+        allManagerIds.UnionWith(l1ApproverIds);
+        allManagerIds.UnionWith(l2ApproverIds);
+ 
+        _logger.LogInformation($"[GET_TEAM_MEMBERS] Found {allManagerIds.Count} employees who are managers/approvers");
+ 
+        // Get team members EXCLUDING those who are managers/approvers
+        var teamMembers = await _context.Projectemployees
+            .Where(pe => managerProjectsAsL1.Contains(pe.ProjectId))
+            .Include(pe => pe.Employee)
+                .ThenInclude(edm => edm.Employee)
+                    .ThenInclude(e => e.Userprofile)
+            .Include(pe => pe.Employee)
+                .ThenInclude(edm => edm.Department)
+            .Where(pe => pe.Employee.Employee.EmploymentStatus == "Active")
+            .Where(pe => !allManagerIds.Contains(pe.Employee.EmployeeId))  // EXCLUDE managers/approvers
+            .Select(pe => new
+            {
+                pe.Employee.Employee.EmployeeId,
+                FirstName = pe.Employee.Employee.Userprofile.FirstName,
+                LastName = pe.Employee.Employee.Userprofile.LastName,
+                Email = pe.Employee.Employee.Userprofile.PersonalEmail,
+                Department = new
+                {
+                    pe.Employee.Department.DepartmentId,
+                    pe.Employee.Department.DepartmentName
+                }
+            })
+            .Distinct()
+            .ToListAsync();
+ 
+        _logger.LogInformation($"[GET_TEAM_MEMBERS] Found {teamMembers.Count} regular employees for Manager {managerId}");
+ 
+        return Ok(new
+        {
+            success = true,
+            data = teamMembers,
+            message = $"Found {teamMembers.Count} team members"
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[GET_TEAM_MEMBERS] Error: {ex.Message}");
+        return StatusCode(500, new { success = false, message = ex.Message });
+    }
+}
+ 
         /// <summary>
         /// Submit a nomination for a team member
-        /// Manager selects reward type (Recognition/Promotion) and fills HR-created parameters
-        /// OpportunityId is REQUIRED (from RecognitionDetails table)
+        /// UPDATED: Only L1 managers can submit nominations
         /// </summary>
-        [HttpPost("submit")]
-        public async Task<IActionResult> SubmitNomination([FromBody] NominationSubmitDto dto)
+[HttpPost("submit")]
+public async Task<IActionResult> SubmitNomination([FromBody] NominationSubmitDto dto)
+{
+    try
+    {
+        _logger.LogInformation($"[SUBMIT_NOMINATION] Submitting nomination for Employee {dto.NomineeEmployeeId}");
+ 
+        // Validate
+        if (dto.NomineeEmployeeId <= 0 || dto.NominatedByEmployeeId <= 0)
+            return BadRequest(new { success = false, message = "Invalid employee IDs" });
+ 
+        if (string.IsNullOrEmpty(dto.Justification))
+            return BadRequest(new { success = false, message = "Justification is required" });
+ 
+        if (dto.RewardTypeId == null || dto.RewardTypeId <= 0)
+            return BadRequest(new { success = false, message = "Reward Type is required" });
+ 
+        // ROLE CHECK: Verify the nominating manager is L1 on at least one project
+        var isL1Manager = await _context.Projects
+            .AnyAsync(p => p.ResourceOwnerEmployeeId == dto.NominatedByEmployeeId
+                        || p.L1approverEmployeeId == dto.NominatedByEmployeeId);
+ 
+        if (!isL1Manager)
         {
-            try
+            _logger.LogWarning($"[SUBMIT_NOMINATION] Employee {dto.NominatedByEmployeeId} is not an L1 manager on any project");
+            return StatusCode(403, new { success = false, message = "Only L1 managers can submit nominations" });
+        }
+ 
+        // Verify nominee is in the nominating manager's L1 projects
+        var managerProjectsAsL1 = await _context.Projects
+            .Where(p => p.ResourceOwnerEmployeeId == dto.NominatedByEmployeeId
+                     || p.L1approverEmployeeId == dto.NominatedByEmployeeId)
+            .Select(p => p.ProjectId)
+            .ToListAsync();
+ 
+        var nomineeInManagerProjects = await _context.Projectemployees
+            .AnyAsync(pe => managerProjectsAsL1.Contains(pe.ProjectId)
+                         && pe.Employee.EmployeeId == dto.NomineeEmployeeId);
+ 
+        if (!nomineeInManagerProjects)
+        {
+            _logger.LogWarning($"[SUBMIT_NOMINATION] Nominee {dto.NomineeEmployeeId} is not in manager's L1 projects");
+            return StatusCode(403, new { success = false, message = "You can only nominate employees from projects where you are L1 manager" });
+        }
+ 
+        // Verify reward type exists
+        var rewardType = await _context.Rewardtypes
+            .FirstOrDefaultAsync(rt => rt.RewardTypeId == dto.RewardTypeId && rt.IsActive == true);
+ 
+        if (rewardType == null)
+            return BadRequest(new { success = false, message = "Invalid reward type" });
+ 
+        _logger.LogInformation($"[SUBMIT_NOMINATION] Reward Type: {rewardType.RewardName}");
+ 
+        // Find or create a default opportunity for this reward type
+        var defaultOpportunity = await _context.Recognitiondetails
+            .FirstOrDefaultAsync(o => o.RewardTypeId == dto.RewardTypeId
+                && o.OpportunityName.Contains("Manager"));
+ 
+        int opportunityId;
+ 
+        if (defaultOpportunity == null)
+        {
+            _logger.LogInformation($"[SUBMIT_NOMINATION] Creating default opportunity for RewardType {dto.RewardTypeId}");
+ 
+            defaultOpportunity = new Recognitiondetail
             {
-                _logger.LogInformation($"[SUBMIT_NOMINATION] Submitting nomination for Employee {dto.NomineeEmployeeId}");
-
-                // Validate
-                if (dto.NomineeEmployeeId <= 0 || dto.NominatedByEmployeeId <= 0)
-                    return BadRequest(new { success = false, message = "Invalid employee IDs" });
-
-                if (string.IsNullOrEmpty(dto.Justification))
-                    return BadRequest(new { success = false, message = "Justification is required" });
-
-                if (dto.RewardTypeId == null || dto.RewardTypeId <= 0)
-                    return BadRequest(new { success = false, message = "Reward Type is required" });
-
-                // Verify reward type exists
-                var rewardType = await _context.Rewardtypes
-                    .FirstOrDefaultAsync(rt => rt.RewardTypeId == dto.RewardTypeId && rt.IsActive == true);
-
-                if (rewardType == null)
-                    return BadRequest(new { success = false, message = "Invalid reward type" });
-
-                _logger.LogInformation($"[SUBMIT_NOMINATION] Reward Type: {rewardType.RewardName}");
-
-                // Find or create a default opportunity for this reward type
-                var defaultOpportunity = await _context.Recognitiondetails
-                    .FirstOrDefaultAsync(o => o.RewardTypeId == dto.RewardTypeId
-                        && o.OpportunityName.Contains("Manager"));
-
-                int opportunityId;
-
-                if (defaultOpportunity == null)
+                RewardTypeId = dto.RewardTypeId.Value,
+                OpportunityName = $"Manager Direct Nomination - {rewardType.RewardName}",
+                Description = "Direct nomination by manager for this reward type",
+                DepartmentId = 1,
+                Deadline = DateOnly.FromDateTime(DateTime.Now.AddYears(10)),
+                Status = "Active",
+                PostedByUserId = 1,
+                CreatedAt = DateTime.UtcNow,
+                Requirements = "Nominated by direct manager",
+                EligibilityCriteria = "Active employees"
+            };
+ 
+            _context.Recognitiondetails.Add(defaultOpportunity);
+            await _context.SaveChangesAsync();
+ 
+            opportunityId = defaultOpportunity.OpportunityId;
+            _logger.LogInformation($"[SUBMIT_NOMINATION] Default opportunity created: {opportunityId}");
+        }
+        else
+        {
+            opportunityId = defaultOpportunity.OpportunityId;
+        }
+ 
+        // Create nomination
+        var recognitionstatus = new Recognitionstatus
+        {
+            OpportunityId = opportunityId,
+            NomineeEmployeeId = dto.NomineeEmployeeId,
+            NominationType = "ManagerNomination",
+            NominatedByEmployeeId = dto.NominatedByEmployeeId,
+            Justification = dto.Justification,
+            Status = "Pending",
+            SubmittedAt = DateTime.UtcNow,
+            ReviewRemarks = $"DirectManagerNomination|RewardType:{dto.RewardTypeId}|User-Submitted"
+        };
+ 
+        _context.Recognitionstatuses.Add(recognitionstatus);
+        await _context.SaveChangesAsync();
+ 
+        _logger.LogInformation($"[SUBMIT_NOMINATION] Nomination created: {recognitionstatus.NominationId}");
+ 
+        // Add parameter values - WITH DUPLICATE CHECK
+        if (dto.ParameterValues != null && dto.ParameterValues.Any())
+        {
+            // Group by ParameterId to avoid duplicates in the request itself
+            var uniqueParams = dto.ParameterValues
+                .GroupBy(p => p.ParameterId)
+                .Select(g => g.First())
+                .ToList();
+ 
+            foreach (var param in uniqueParams)
+            {
+                if (param.ParameterId <= 0) continue;
+ 
+                var parameterExists = await _context.Nominationparameters
+                    .AnyAsync(np => np.ParameterId == param.ParameterId
+                        && np.RewardTypeId == dto.RewardTypeId);
+ 
+                if (!parameterExists) continue;
+ 
+                // CHECK IF THIS PARAMETER VALUE ALREADY EXISTS FOR THIS NOMINATION
+                var existingParamValue = await _context.Nominationparametervalues
+                    .FirstOrDefaultAsync(npv => npv.NominationId == recognitionstatus.NominationId
+                                              && npv.ParameterId == param.ParameterId);
+ 
+                if (existingParamValue != null)
                 {
-                    _logger.LogInformation($"[SUBMIT_NOMINATION] Creating default opportunity for RewardType {dto.RewardTypeId}");
-
-                    defaultOpportunity = new Recognitiondetail
-                    {
-                        RewardTypeId = dto.RewardTypeId.Value,
-                        OpportunityName = $"Manager Direct Nomination - {rewardType.RewardName}",
-                        Description = "Direct nomination by manager for this reward type",
-                        DepartmentId = 1,
-                        Deadline = DateOnly.FromDateTime(DateTime.Now.AddYears(10)),
-                        Status = "Active",
-                        PostedByUserId = 1,
-                        CreatedAt = DateTime.UtcNow,
-                        Requirements = "Nominated by direct manager",
-                        EligibilityCriteria = "Active employees"
-                    };
-
-                    _context.Recognitiondetails.Add(defaultOpportunity);
-                    await _context.SaveChangesAsync();
-
-                    opportunityId = defaultOpportunity.OpportunityId;
-                    _logger.LogInformation($"[SUBMIT_NOMINATION] Default opportunity created: {opportunityId}");
+                    // Update existing value instead of inserting duplicate
+                    existingParamValue.ParameterValue = param.Value ?? "";
+                    existingParamValue.CreatedAt = DateTime.UtcNow;
+                    _context.Nominationparametervalues.Update(existingParamValue);
                 }
                 else
                 {
-                    opportunityId = defaultOpportunity.OpportunityId;
-                }
-
-                // Create nomination
-                var recognitionstatus = new Recognitionstatus
-                {
-                    OpportunityId = opportunityId,
-                    NomineeEmployeeId = dto.NomineeEmployeeId,
-                    NominationType = "ManagerNomination",
-                    NominatedByEmployeeId = dto.NominatedByEmployeeId,
-                    Justification = dto.Justification,
-                    Status = "Pending",
-                    SubmittedAt = DateTime.UtcNow,
-                    ReviewRemarks = $"DirectManagerNomination|RewardType:{dto.RewardTypeId}|User-Submitted"
-                };
-
-                _context.Recognitionstatuses.Add(recognitionstatus);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation($"[SUBMIT_NOMINATION] Nomination created: {recognitionstatus.NominationId}");
-
-                // Add parameter values
-                if (dto.ParameterValues != null && dto.ParameterValues.Any())
-                {
-                    foreach (var param in dto.ParameterValues)
+                    // Insert new parameter value
+                    var paramValue = new Nominationparametervalue
                     {
-                        if (param.ParameterId <= 0) continue;
-
-                        var parameterExists = await _context.Nominationparameters
-                            .AnyAsync(np => np.ParameterId == param.ParameterId
-                                && np.RewardTypeId == dto.RewardTypeId);
-
-                        if (!parameterExists) continue;
-
-                        var paramValue = new Nominationparametervalue
-                        {
-                            NominationId = recognitionstatus.NominationId,
-                            ParameterId = param.ParameterId,
-                            ParameterValue = param.Value ?? "",
-                            CreatedAt = DateTime.UtcNow
-                        };
-
-                        _context.Nominationparametervalues.Add(paramValue);
-                    }
-
-                    await _context.SaveChangesAsync();
+                        NominationId = recognitionstatus.NominationId,
+                        ParameterId = param.ParameterId,
+                        ParameterValue = param.Value ?? "",
+                        CreatedAt = DateTime.UtcNow
+                    };
+ 
+                    _context.Nominationparametervalues.Add(paramValue);
                 }
-
-                // Add tracking
-                var tracking = new Nominationvisibilitytracking
-                {
-                    NominationId = recognitionstatus.NominationId,
-                    ViewedByEmployeeId = dto.NominatedByEmployeeId,
-                    ActionTaken = "Submitted",
-                    ViewedAt = DateTime.UtcNow
-                };
-
-                _context.Nominationvisibilitytrackings.Add(tracking);
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    success = true,
-                    data = new { nominationId = recognitionstatus.NominationId },
-                    message = "Nomination submitted successfully"
-                });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[SUBMIT_NOMINATION] Error: {ex.Message}\n{ex.InnerException?.Message}");
-                return StatusCode(500, new { success = false, message = ex.InnerException?.Message ?? ex.Message });
-            }
+ 
+            await _context.SaveChangesAsync();
         }
-
+ 
+        // Add tracking
+        var tracking = new Nominationvisibilitytracking
+        {
+            NominationId = recognitionstatus.NominationId,
+            ViewedByEmployeeId = dto.NominatedByEmployeeId,
+            ActionTaken = "Submitted",
+            ViewedAt = DateTime.UtcNow
+        };
+ 
+        _context.Nominationvisibilitytrackings.Add(tracking);
+        await _context.SaveChangesAsync();
+ 
+        return Ok(new
+        {
+            success = true,
+            data = new { nominationId = recognitionstatus.NominationId },
+            message = "Nomination submitted successfully"
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[SUBMIT_NOMINATION] Error: {ex.Message}\n{ex.InnerException?.Message}");
+        return StatusCode(500, new { success = false, message = ex.InnerException?.Message ?? ex.Message });
+    }
+}
+ 
         /// <summary>
         /// Get all nominations submitted by a specific manager
-        /// ✅ FIXED: Removed broken Include navigation
         /// </summary>
         [HttpGet("my-nominations/{managerId}")]
         public async Task<IActionResult> GetMyNominations(int managerId)
@@ -430,39 +518,38 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 _logger.LogInformation($"[GET_MY_NOMINATIONS] Fetching nominations for Manager {managerId}");
-
+ 
                 var nominations = await _context.Recognitionstatuses
                     .Where(n => n.NominatedByEmployeeId == managerId)
                     .ToListAsync();
-
+ 
                 _logger.LogInformation($"[GET_MY_NOMINATIONS] Found {nominations.Count} nominations for Manager {managerId}");
-
+ 
                 var result = new List<object>();
                 foreach (var n in nominations)
                 {
-                    // ✅ Fetch related data separately
                     var opportunity = await _context.Recognitiondetails
                         .FirstOrDefaultAsync(o => o.OpportunityId == n.OpportunityId);
-
+ 
                     var rewardType = opportunity != null
                         ? await _context.Rewardtypes.FirstOrDefaultAsync(rt => rt.RewardTypeId == opportunity.RewardTypeId)
                         : null;
-
+ 
                     var nomineeEmployee = await _context.Employees
                         .FirstOrDefaultAsync(e => e.EmployeeId == n.NomineeEmployeeId);
-
+ 
                     var userProfile = nomineeEmployee != null
                         ? await _context.Userprofiles.FirstOrDefaultAsync(up => up.EmployeeId == nomineeEmployee.EmployeeId)
                         : null;
-
+ 
                     var dept = await _context.Employeedetailsmasters
                         .Where(edm => edm.EmployeeId == n.NomineeEmployeeId)
                         .FirstOrDefaultAsync();
-
+ 
                     var department = dept != null
                         ? await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentId == dept.DepartmentId)
                         : null;
-
+ 
                     result.Add(new
                     {
                         n.NominationId,
@@ -471,12 +558,18 @@ namespace Relevantz.EEPZ.Api.Controllers
                         n.SubmittedAt,
                         n.ReviewedAt,
                         n.ReviewRemarks,
+                        RewardTypeId = opportunity?.RewardTypeId,
                         Nominee = new
                         {
                             EmployeeId = nomineeEmployee?.EmployeeId ?? 0,
                             FirstName = userProfile?.FirstName ?? "Unknown",
                             LastName = userProfile?.LastName ?? "",
-                            DepartmentName = department?.DepartmentName ?? "Unknown"
+                            DepartmentName = department?.DepartmentName ?? "Unknown",
+                            Department = department != null ? new
+                            {
+                                DepartmentId = department.DepartmentId,
+                                DepartmentName = department.DepartmentName
+                            } : null
                         },
                         Opportunity = new
                         {
@@ -486,7 +579,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                         }
                     });
                 }
-
+ 
                 return Ok(new
                 {
                     success = true,
@@ -500,11 +593,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
-
+ 
         /// <summary>
         /// Get detailed information about a specific nomination
-        /// Including all HR-created parameters filled by manager
-        /// ✅ FIXED: Removed broken Include navigation
         /// </summary>
         [HttpGet("nomination-details/{nominationId}")]
         public async Task<IActionResult> GetNominationDetails(int nominationId)
@@ -512,49 +603,47 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 _logger.LogInformation($"[GET_NOMINATION_DETAILS] Fetching details for Nomination {nominationId}");
-
+ 
                 var nomination = await _context.Recognitionstatuses
                     .FirstOrDefaultAsync(n => n.NominationId == nominationId);
-
+ 
                 if (nomination == null)
                 {
                     _logger.LogWarning($"[GET_NOMINATION_DETAILS] Nomination {nominationId} not found");
                     return NotFound(new { success = false, message = "Nomination not found" });
                 }
-
-                // ✅ Fetch related data separately
+ 
                 var opportunity = await _context.Recognitiondetails
                     .FirstOrDefaultAsync(o => o.OpportunityId == nomination.OpportunityId);
-
+ 
                 var rewardType = opportunity != null
                     ? await _context.Rewardtypes.FirstOrDefaultAsync(rt => rt.RewardTypeId == opportunity.RewardTypeId)
                     : null;
-
+ 
                 var nomineeEmployee = await _context.Employees
                     .FirstOrDefaultAsync(e => e.EmployeeId == nomination.NomineeEmployeeId);
-
+ 
                 var nomineeProfile = nomineeEmployee != null
                     ? await _context.Userprofiles.FirstOrDefaultAsync(up => up.EmployeeId == nomineeEmployee.EmployeeId)
                     : null;
-
+ 
                 var nominatorEmployee = await _context.Employees
                     .FirstOrDefaultAsync(e => e.EmployeeId == nomination.NominatedByEmployeeId);
-
+ 
                 var nominatorProfile = nominatorEmployee != null
                     ? await _context.Userprofiles.FirstOrDefaultAsync(up => up.EmployeeId == nominatorEmployee.EmployeeId)
                     : null;
-
-                // Get all parameter values
+ 
                 var parameterValues = await _context.Nominationparametervalues
                     .Where(pv => pv.NominationId == nominationId)
                     .ToListAsync();
-
+ 
                 var parameterResults = new List<object>();
                 foreach (var pv in parameterValues)
                 {
                     var parameter = await _context.Nominationparameters
                         .FirstOrDefaultAsync(p => p.ParameterId == pv.ParameterId);
-
+ 
                     if (parameter != null)
                     {
                         parameterResults.Add(new
@@ -566,7 +655,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                         });
                     }
                 }
-
+ 
                 var result = new
                 {
                     nomination.NominationId,
@@ -595,9 +684,9 @@ namespace Relevantz.EEPZ.Api.Controllers
                     },
                     ParameterValues = parameterResults
                 };
-
+ 
                 _logger.LogInformation($"[GET_NOMINATION_DETAILS] Nomination {nominationId} details retrieved with {parameterResults.Count} parameters");
-
+ 
                 return Ok(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -607,7 +696,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             }
         }
     }
-
+ 
     public class NominationSubmitDto
     {
         public int? RewardTypeId { get; set; }
@@ -616,10 +705,12 @@ namespace Relevantz.EEPZ.Api.Controllers
         public string Justification { get; set; }
         public List<ParameterValueDto> ParameterValues { get; set; }
     }
-
+ 
     public class ParameterValueDto
     {
         public int ParameterId { get; set; }
         public string Value { get; set; }
     }
 }
+ 
+ 
