@@ -18,19 +18,11 @@ import {
 import CountUp from "react-countup";
 import {
   Users,
-  Target,
   Briefcase,
   Award,
-  BookOpen,
+  UserCheck,
   TrendingUp,
   Shield,
-  UserCheck,
-  Settings,
-  Layers,
-  BarChart2,
-  FileText,
-  MessageSquare,
-  Clock,
 } from "lucide-react";
 import careerGoalsService from "../../services/hr_operations/hr/careerGoalsService";
 import budgetAllocationService from "../../services/hr_operations/hr/budgetAllocationService";
@@ -46,7 +38,7 @@ import {
   getAllManagerNominations,
   getDashboardSummary,
   getApprovedProfiles,
-  getStatistics
+  getStatistics,
 } from "../../services/performancemanagement/hr/hrnominationapi";
 import { getAllForms } from "../../services/performancemanagement/hr/formsapi";
 import { listSubmitted } from "../../services/performancemanagement/hr/selfassessmentapi";
@@ -54,10 +46,17 @@ import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/auth/AdminDashboard.css";
 
+const formatStatusLabel = (raw) => {
+  if (!raw) return "";
+  const lower = String(raw).toLowerCase().replace(/_/g, " ");
+  return lower.replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
 const HRDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
+  const [selectedDepartment, setSelectedDepartment] =
+    useState("All Departments");
   const [dashboardData, setDashboardData] = useState({
     employees: [],
     budgets: [],
@@ -130,12 +129,22 @@ const HRDashboard = () => {
       ] = await Promise.all([
         employeeApi.getAll().catch(() => ({ data: [] })),
         careerGoalsService.getAllGoals().catch(() => ({ data: [] })),
-        budgetAllocationService.getAllDepartmentBudgets().catch(() => ({ data: [] })),
-        budgetAllocationService.getAllDepartments().catch(() => ({ data: [] })),
+        budgetAllocationService
+          .getAllDepartmentBudgets()
+          .catch(() => ({ data: [] })),
+        budgetAllocationService
+          .getAllDepartments()
+          .catch(() => ({ data: [] })),
         violationService.getAllViolations().catch(() => ({ data: [] })),
-        internalOpportunityService.getAllOpportunities().catch(() => ({ success: false, data: [] })),
-        nominationService.getAllNominations().catch(() => ({ success: false, data: [] })),
-        lndService.getAllOrganizationAssignments(1, "", "", "", "", 1000).catch(() => ({ data: { items: [], totalCount: 0 } })),
+        internalOpportunityService
+          .getAllOpportunities()
+          .catch(() => ({ success: false, data: [] })),
+        nominationService
+          .getAllNominations()
+          .catch(() => ({ success: false, data: [] })),
+        lndService
+          .getAllOrganizationAssignments(1, "", "", "", "", 1000)
+          .catch(() => ({ data: { items: [], totalCount: 0 } })),
         projectService.getAllProjects().catch(() => ({ data: [] })),
         getDeptHeadRatings().catch(() => ({ data: [] })),
         getAllManagerNominations().catch(() => ({ data: [] })),
@@ -143,7 +152,9 @@ const HRDashboard = () => {
         getApprovedProfiles().catch(() => ({ data: [] })),
         getStatistics().catch(() => ({ data: null })),
         getAllForms().catch(() => ({ data: [] })),
-        listSubmitted().catch(() => ({ data: { data: { assessments: [] } } })),
+        listSubmitted().catch(() => ({
+          data: { data: { assessments: [] } },
+        })),
       ]);
 
       const extractedEmployees = extractData(employeesRes);
@@ -174,13 +185,15 @@ const HRDashboard = () => {
         if (Array.isArray(selfAssessmentsRes.data.data.assessments)) {
           extractedSelfAssessments = selfAssessmentsRes.data.data.assessments;
         } else if (selfAssessmentsRes.data.data.assessments.$values) {
-          extractedSelfAssessments = selfAssessmentsRes.data.data.assessments.$values;
+          extractedSelfAssessments =
+            selfAssessmentsRes.data.data.assessments.$values;
         }
       } else if (selfAssessmentsRes?.data?.assessments) {
         if (Array.isArray(selfAssessmentsRes.data.assessments)) {
           extractedSelfAssessments = selfAssessmentsRes.data.assessments;
         } else if (selfAssessmentsRes.data.assessments.$values) {
-          extractedSelfAssessments = selfAssessmentsRes.data.assessments.$values;
+          extractedSelfAssessments =
+            selfAssessmentsRes.data.assessments.$values;
         }
       } else {
         extractedSelfAssessments = extractData(selfAssessmentsRes);
@@ -189,12 +202,15 @@ const HRDashboard = () => {
       let allPeriodAllocations = [];
       for (const budget of extractedBudgets) {
         try {
-          const periodRes = await periodAllocationService.getPeriodAllocationsByBudget(budget.budgetId);
+          const periodRes =
+            await periodAllocationService.getPeriodAllocationsByBudget(
+              budget.budgetId
+            );
           if (periodRes.success) {
             const periods = extractData(periodRes);
             allPeriodAllocations = [...allPeriodAllocations, ...periods];
           }
-        } catch (err) {
+        } catch {
           console.log("Period allocations error");
         }
       }
@@ -227,10 +243,16 @@ const HRDashboard = () => {
   };
 
   const getEmployeeStatus = () => {
-    const statusCount = { fulltime: 0, contract: 0, probation: 0, parttime: 0 };
+    const statusCount = {
+      fulltime: 0,
+      contract: 0,
+      probation: 0,
+      parttime: 0,
+    };
     dashboardData.employees.forEach((emp) => {
       const status = (emp.employmentType || emp.status || "").toLowerCase();
-      if (status.includes("full") || status.includes("permanent")) statusCount.fulltime++;
+      if (status.includes("full") || status.includes("permanent"))
+        statusCount.fulltime++;
       else if (status.includes("contract")) statusCount.contract++;
       else if (status.includes("probation")) statusCount.probation++;
       else if (status.includes("part")) statusCount.parttime++;
@@ -252,23 +274,35 @@ const HRDashboard = () => {
   };
 
   const getKPIStats = () => {
-    const totalBudget = dashboardData.budgets.reduce((sum, b) => sum + (parseFloat(b.totalBudget) || 0), 0);
-    const pendingNominations = dashboardData.nominations.filter(n =>
-      n.status?.toLowerCase().includes("pending") || n.managerApprovalStatus === "Pending" ||
-      n.deptHeadApprovalStatus === "Pending" || n.hrApprovalStatus === "Pending"
+    const totalBudget = dashboardData.budgets.reduce(
+      (sum, b) => sum + (parseFloat(b.totalBudget) || 0),
+      0
+    );
+    const pendingNominations = dashboardData.nominations.filter(
+      (n) =>
+        n.status?.toLowerCase().includes("pending") ||
+        n.managerApprovalStatus === "Pending" ||
+        n.deptHeadApprovalStatus === "Pending" ||
+        n.hrApprovalStatus === "Pending"
     ).length;
 
-    const activeEmployees = dashboardData.employees.filter(e => e.isActive === true).length;
+    const activeEmployees = dashboardData.employees.filter(
+      (e) => e.isActive === true
+    ).length;
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const newEmployeesThisMonth = dashboardData.employees.filter(e => {
-      const joinDate = new Date(e.joiningDate || e.createdDate || e.createdAt);
+    const newEmployeesThisMonth = dashboardData.employees.filter((e) => {
+      const joinDate = new Date(
+        e.joiningDate || e.createdDate || e.createdAt
+      );
       return joinDate > thirtyDaysAgo;
     }).length;
 
     const totalLndAssignments = dashboardData.lndAssignments.length;
-    const activeLndAssignments = dashboardData.lndAssignments.filter(a => {
-      const status = (a.assignmentStatus || a.status || "").toLowerCase().replace(/\s/g, '');
+    const activeLndAssignments = dashboardData.lndAssignments.filter((a) => {
+      const status = (a.assignmentStatus || a.status || "")
+        .toLowerCase()
+        .replace(/\s/g, "");
       return status === "inprogress" || status === "active";
     }).length;
 
@@ -279,7 +313,7 @@ const HRDashboard = () => {
       pendingNominations,
       totalLndAssignments,
       activeLndAssignments,
-      activeProjects: dashboardData.projects.filter(p => p.isActive).length,
+      activeProjects: dashboardData.projects.filter((p) => p.isActive).length,
       newEmployeesThisMonth,
       totalBudget,
     };
@@ -289,83 +323,116 @@ const HRDashboard = () => {
     let filteredBudgets = dashboardData.budgets;
 
     if (selectedDepartment !== "All Departments") {
-      filteredBudgets = dashboardData.budgets.filter(budget => {
-        const dept = dashboardData.departments.find(d => d.departmentId === budget.departmentId);
+      filteredBudgets = dashboardData.budgets.filter((budget) => {
+        const dept = dashboardData.departments.find(
+          (d) => d.departmentId === budget.departmentId
+        );
         const deptName = dept?.departmentName || dept?.name || "";
         return deptName === selectedDepartment;
       });
     }
 
     return filteredBudgets
-      .map(budget => {
-        const dept = dashboardData.departments.find(d => d.departmentId === budget.departmentId);
+      .map((budget) => {
+        const dept = dashboardData.departments.find(
+          (d) => d.departmentId === budget.departmentId
+        );
         const deptName = dept?.departmentName || dept?.name || "Unknown";
         return {
-          name: deptName.length > 10 ? deptName.substring(0, 10) + "..." : deptName,
+          name:
+            deptName.length > 10
+              ? deptName.substring(0, 10) + "..."
+              : deptName,
           Total: parseFloat(budget.totalBudget) || 0,
           Allocated: parseFloat(budget.allocatedAmount) || 0,
           Utilized: parseFloat(budget.utilizedAmount) || 0,
         };
       })
-      .filter(b => b.Total > 0)
+      .filter((b) => b.Total > 0)
       .slice(0, 5);
   };
 
   const getPeriodAllocations = () => {
     const periodMap = {};
-    dashboardData.periodAllocations.forEach(pa => {
+    dashboardData.periodAllocations.forEach((pa) => {
       const key = pa.period || "Unknown";
       if (!periodMap[key]) periodMap[key] = 0;
       periodMap[key] += parseFloat(pa.allocatedAmount) || 0;
     });
-    return Object.entries(periodMap).map(([period, amount]) => ({ period, amount })).slice(0, 6);
+    return Object.entries(periodMap)
+      .map(([period, amount]) => ({ period, amount }))
+      .slice(0, 6);
   };
 
   const getProjectStatus = () => {
     const statusCount = {};
-    dashboardData.projects.forEach(p => {
-      const status = p.projectStatus || p.status || "Unknown";
-      statusCount[status] = (statusCount[status] || 0) + 1;
+    dashboardData.projects.forEach((p) => {
+      const raw = p.projectStatus || p.status || "Unknown";
+      const key = formatStatusLabel(raw);
+      statusCount[key] = (statusCount[key] || 0) + 1;
     });
-    return Object.entries(statusCount).map(([name, value]) => ({ name, value })).filter(item => item.value > 0);
+    return Object.entries(statusCount)
+      .map(([name, value]) => ({ name, value }))
+      .filter((item) => item.value > 0);
   };
 
   const getNominationStatus = () => {
     const statusCount = {};
-    dashboardData.nominations.forEach(nom => {
-      const status = nom.status || "Pending";
-      statusCount[status] = (statusCount[status] || 0) + 1;
+    dashboardData.nominations.forEach((nom) => {
+      const raw = nom.status || "Pending";
+      const key = formatStatusLabel(raw);
+      statusCount[key] = (statusCount[key] || 0) + 1;
     });
-    return Object.entries(statusCount).map(([name, value]) => ({ name, value })).filter(item => item.value > 0);
+    return Object.entries(statusCount)
+      .map(([name, value]) => ({ name, value }))
+      .filter((item) => item.value > 0);
   };
 
   const getLndOverview = () => {
-    if (!dashboardData.lndAssignments || dashboardData.lndAssignments.length === 0) {
+    if (
+      !dashboardData.lndAssignments ||
+      dashboardData.lndAssignments.length === 0
+    ) {
       return [];
     }
 
-    const completed = dashboardData.lndAssignments.filter(a => {
-      const status = (a.assignmentStatus || a.status || "").toLowerCase().replace(/\s/g, '');
+    const completed = dashboardData.lndAssignments.filter((a) => {
+      const status = (a.assignmentStatus || a.status || "")
+        .toLowerCase()
+        .replace(/\s/g, "");
       return status === "completed";
     }).length;
 
-    const active = dashboardData.lndAssignments.filter(a => {
-      const status = (a.assignmentStatus || a.status || "").toLowerCase().replace(/\s/g, '');
+    const active = dashboardData.lndAssignments.filter((a) => {
+      const status = (a.assignmentStatus || a.status || "")
+        .toLowerCase()
+        .replace(/\s/g, "");
       return status === "inprogress" || status === "active";
     }).length;
 
-    const pending = dashboardData.lndAssignments.filter(a => {
-      const status = (a.assignmentStatus || a.status || "").toLowerCase().replace(/\s/g, '');
+    const pending = dashboardData.lndAssignments.filter((a) => {
+      const status = (a.assignmentStatus || a.status || "")
+        .toLowerCase()
+        .replace(/\s/g, "");
       return status === "pending" || status === "requested";
     }).length;
 
     const result = [];
-    if (completed > 0) result.push({ name: "Completed", value: completed, color: "#10b981" });
-    if (active > 0) result.push({ name: "In Progress", value: active, color: "#0F62FE" });
-    if (pending > 0) result.push({ name: "Pending", value: pending, color: "#f59e0b" });
+    if (completed > 0)
+      result.push({ name: "Completed", value: completed, color: "#10b981" });
+    if (active > 0)
+      result.push({ name: "In Progress", value: active, color: "#0F62FE" });
+    if (pending > 0)
+      result.push({ name: "Pending", value: pending, color: "#f59e0b" });
 
     if (result.length === 0 && dashboardData.lndAssignments.length > 0) {
-      return [{ name: "Total Assignments", value: dashboardData.lndAssignments.length, color: "#0F62FE" }];
+      return [
+        {
+          name: "Total Assignments",
+          value: dashboardData.lndAssignments.length,
+          color: "#0F62FE",
+        },
+      ];
     }
 
     return result;
@@ -377,22 +444,32 @@ const HRDashboard = () => {
     const totalAssessments = dashboardData.selfAssessments.length;
     const totalRatings = dashboardData.performanceRatings.length;
 
-    const pendingNominations = dashboardData.managerNominations.filter(n => {
-      const status = (n.hrApprovalStatus || n.approvalStatus || n.status || "").toLowerCase();
+    const pendingNominations = dashboardData.managerNominations.filter((n) => {
+      const status = (
+        n.hrApprovalStatus ||
+        n.approvalStatus ||
+        n.status ||
+        ""
+      ).toLowerCase();
       return status === "pending" || status === "submitted";
     }).length;
 
-    const approvedNominations = dashboardData.managerNominations.filter(n => {
-      const status = (n.hrApprovalStatus || n.approvalStatus || n.status || "").toLowerCase();
+    const approvedNominations = dashboardData.managerNominations.filter((n) => {
+      const status = (
+        n.hrApprovalStatus ||
+        n.approvalStatus ||
+        n.status ||
+        ""
+      ).toLowerCase();
       return status === "approved";
     }).length;
 
-    const pendingAssessments = dashboardData.selfAssessments.filter(a => {
+    const pendingAssessments = dashboardData.selfAssessments.filter((a) => {
       const status = (a.status || "").toLowerCase();
       return status === "pending" || status === "submitted";
     }).length;
 
-    const completedAssessments = dashboardData.selfAssessments.filter(a => {
+    const completedAssessments = dashboardData.selfAssessments.filter((a) => {
       const status = (a.status || "").toLowerCase();
       return status === "approved" || status === "completed";
     }).length;
@@ -413,11 +490,27 @@ const HRDashboard = () => {
     const overview = getPerformanceOverview();
 
     const data = [
-      { name: "Pending Nominations", value: overview.pendingNominations, color: "#f59e0b" },
-      { name: "Approved Nominations", value: overview.approvedNominations, color: "#10b981" },
-      { name: "Pending Assessments", value: overview.pendingAssessments, color: "#ef4444" },
-      { name: "Completed Assessments", value: overview.completedAssessments, color: "#0F62FE" },
-    ].filter(item => item.value > 0);
+      {
+        name: "Pending Nominations",
+        value: overview.pendingNominations,
+        color: "#f59e0b",
+      },
+      {
+        name: "Approved Nominations",
+        value: overview.approvedNominations,
+        color: "#10b981",
+      },
+      {
+        name: "Pending Assessments",
+        value: overview.pendingAssessments,
+        color: "#ef4444",
+      },
+      {
+        name: "Completed Assessments",
+        value: overview.completedAssessments,
+        color: "#0F62FE",
+      },
+    ].filter((item) => item.value > 0);
 
     return data;
   };
@@ -441,79 +534,115 @@ const HRDashboard = () => {
   const lndOverview = getLndOverview();
   const perfOverview = getPerformanceOverview();
 
-  const CHART_COLORS = ["#97247E", "#0F62FE", "#10b981", "#f59e0b", "#E01950", "#8b5cf6"];
+  const CHART_COLORS = [
+    "#97247E",
+    "#0F62FE",
+    "#10b981",
+    "#f59e0b",
+    "#E01950",
+    "#8b5cf6",
+  ];
 
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "HR Dashboard" }]} />
 
       <div className="admin-kpi-grid">
-        <div className="admin-kpi-card" onClick={() => navigate("/auth/admin/users")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("/auth/admin/users")}
+        >
           <div className="admin-kpi-icon admin-pink">
             <Users size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={kpiStats.totalEmployees} duration={2} /></h2>
+            <h2>
+              <CountUp end={kpiStats.totalEmployees} duration={2} />
+            </h2>
             <p>Total Users</p>
             <span className="admin-kpi-subtitle">
-              <TrendingUp size={12} /> {kpiStats.newEmployeesThisMonth > 0 ? '100%' : '0%'} vs last month
+              <TrendingUp size={12} />{" "}
+              {kpiStats.newEmployeesThisMonth > 0 ? "100%" : "0%"} vs last month
             </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => navigate("/auth/admin/users")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("/auth/admin/users")}
+        >
           <div className="admin-kpi-icon admin-green">
             <UserCheck size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={kpiStats.activeEmployees} duration={2} /></h2>
+            <h2>
+              <CountUp end={kpiStats.activeEmployees} duration={2} />
+            </h2>
             <p>Active Users</p>
             <span className="admin-kpi-subtitle">100% active rate</span>
           </div>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => navigate("/performancemanagement/hr/hrnomination")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() =>
+            navigate("/performancemanagement/hr/hrnomination")
+          }
+        >
           <div className="admin-kpi-icon admin-yellow">
             <Award size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={perfOverview.pendingNominations} duration={2} /></h2>
+            <h2>
+              <CountUp end={perfOverview.pendingNominations} duration={2} />
+            </h2>
             <p>Pending Nominations</p>
-            <span className="admin-kpi-subtitle">{perfOverview.totalNominations} total</span>
+            <span className="admin-kpi-subtitle">
+              {perfOverview.totalNominations} total
+            </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => navigate("/hr/departments")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("/hr/departments")}
+        >
           <div className="admin-kpi-icon admin-blue">
             <Briefcase size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={kpiStats.totalDepartments} duration={2} /></h2>
+            <h2>
+              <CountUp end={kpiStats.totalDepartments} duration={2} />
+            </h2>
             <p>Departments</p>
-            <span className="admin-kpi-subtitle">{kpiStats.activeProjects} projects</span>
+            <span className="admin-kpi-subtitle">
+              {kpiStats.activeProjects} projects
+            </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => navigate("/performancemanagement/hr/formslist")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() =>
+            navigate("/performancemanagement/hr/formslist")
+          }
+        >
           <div className="admin-kpi-icon admin-purple">
             <Shield size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={perfOverview.totalForms} duration={2} /></h2>
+            <h2>
+              <CountUp end={perfOverview.totalForms} duration={2} />
+            </h2>
             <p>Appraisal Forms</p>
             <span className="admin-kpi-subtitle">Performance tracking</span>
           </div>
         </div>
-
-
       </div>
 
-
-
       <div className="dashboard-cards-container">
-
         <div className="dashboard-row">
-
+          {/* Employee Status */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -531,48 +660,95 @@ const HRDashboard = () => {
                   <h2>{employeeStatus.total}</h2>
                 </div>
                 <div className="status-bar">
-                  <div className="status-segment" style={{ width: `${employeeStatus.fulltimePercent}%`, backgroundColor: '#f59e0b' }}></div>
-                  <div className="status-segment" style={{ width: `${employeeStatus.contractPercent}%`, backgroundColor: '#374151' }}></div>
-                  <div className="status-segment" style={{ width: `${employeeStatus.probationPercent}%`, backgroundColor: '#ef4444' }}></div>
-                  <div className="status-segment" style={{ width: `${employeeStatus.parttimePercent}%`, backgroundColor: '#ec4899' }}></div>
+                  <div
+                    className="status-segment"
+                    style={{
+                      width: `${employeeStatus.fulltimePercent}%`,
+                      backgroundColor: "#f59e0b",
+                    }}
+                  ></div>
+                  <div
+                    className="status-segment"
+                    style={{
+                      width: `${employeeStatus.contractPercent}%`,
+                      backgroundColor: "#374151",
+                    }}
+                  ></div>
+                  <div
+                    className="status-segment"
+                    style={{
+                      width: `${employeeStatus.probationPercent}%`,
+                      backgroundColor: "#ef4444",
+                    }}
+                  ></div>
+                  <div
+                    className="status-segment"
+                    style={{
+                      width: `${employeeStatus.parttimePercent}%`,
+                      backgroundColor: "#ec4899",
+                    }}
+                  ></div>
                 </div>
               </div>
 
               <div className="status-grid">
                 <div className="status-card">
                   <div className="status-legend">
-                    <span className="legend-dot" style={{ backgroundColor: '#f59e0b' }}></span>
-                    <span>Fulltime ({employeeStatus.fulltimePercent}%)</span>
+                    <span
+                      className="legend-dot"
+                      style={{ backgroundColor: "#f59e0b" }}
+                    ></span>
+                    <span>
+                      Fulltime ({employeeStatus.fulltimePercent}
+                      %)
+                    </span>
                   </div>
                   <h3>{employeeStatus.fulltime}</h3>
                 </div>
                 <div className="status-card">
                   <div className="status-legend">
-                    <span className="legend-dot" style={{ backgroundColor: '#374151' }}></span>
-                    <span>Contract ({employeeStatus.contractPercent}%)</span>
+                    <span
+                      className="legend-dot"
+                      style={{ backgroundColor: "#374151" }}
+                    ></span>
+                    <span>
+                      Contract ({employeeStatus.contractPercent}
+                      %)
+                    </span>
                   </div>
                   <h3>{employeeStatus.contract}</h3>
                 </div>
                 <div className="status-card">
                   <div className="status-legend">
-                    <span className="legend-dot" style={{ backgroundColor: '#ef4444' }}></span>
-                    <span>Probation ({employeeStatus.probationPercent}%)</span>
+                    <span
+                      className="legend-dot"
+                      style={{ backgroundColor: "#ef4444" }}
+                    ></span>
+                    <span>
+                      Probation ({employeeStatus.probationPercent}
+                      %)
+                    </span>
                   </div>
                   <h3>{employeeStatus.probation}</h3>
                 </div>
                 <div className="status-card">
                   <div className="status-legend">
-                    <span className="legend-dot" style={{ backgroundColor: '#ec4899' }}></span>
-                    <span>Part-time ({employeeStatus.parttimePercent}%)</span>
+                    <span
+                      className="legend-dot"
+                      style={{ backgroundColor: "#ec4899" }}
+                    ></span>
+                    <span>
+                      Part-time ({employeeStatus.parttimePercent}
+                      %)
+                    </span>
                   </div>
                   <h3>{employeeStatus.parttime}</h3>
                 </div>
               </div>
-
-
             </div>
           </div>
 
+          {/* Budget Allocation */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -585,8 +761,11 @@ const HRDashboard = () => {
                 onChange={(e) => setSelectedDepartment(e.target.value)}
               >
                 <option>All Departments</option>
-                {dashboardData.departments.map(d => (
-                  <option key={d.departmentId} value={d.departmentName || d.name}>
+                {dashboardData.departments.map((d) => (
+                  <option
+                    key={d.departmentId}
+                    value={d.departmentName || d.name}
+                  >
                     {d.departmentName || d.name}
                   </option>
                 ))}
@@ -596,17 +775,40 @@ const HRDashboard = () => {
               {budgetByDept.length > 0 ? (
                 <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={budgetByDept}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#f3f4f6"
+                      vertical={false}
+                    />
                     <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} />
                     <YAxis stroke="#9ca3af" fontSize={11} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '12px' }}
-                      formatter={(value) => `₹${value.toLocaleString()}`}
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                      }}
+                      formatter={(value) =>
+                        `₹${Number(value).toLocaleString()}`
+                      }
                     />
-                    <Legend wrapperStyle={{ fontSize: '12px' }} />
-                    <Bar dataKey="Total" fill="#27235c" radius={[6, 6, 0, 0]} />
-                    <Bar dataKey="Allocated" fill="#0F62FE" radius={[6, 6, 0, 0]} />
-                    <Bar dataKey="Utilized" fill="#10b981" radius={[6, 6, 0, 0]} />
+                    <Legend wrapperStyle={{ fontSize: "12px" }} />
+                    <Bar
+                      dataKey="Total"
+                      fill="#27235c"
+                      radius={[6, 6, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="Allocated"
+                      fill="#0F62FE"
+                      radius={[6, 6, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="Utilized"
+                      fill="#10b981"
+                      radius={[6, 6, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
@@ -615,6 +817,7 @@ const HRDashboard = () => {
             </div>
           </div>
 
+          {/* Period Allocations */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -627,30 +830,65 @@ const HRDashboard = () => {
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={periodAllocations}>
                     <defs>
-                      <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#27235c" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#27235c" stopOpacity={0} />
+                      <linearGradient
+                        id="colorAmount"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                      >
+                        <stop
+                          offset="5%"
+                          stopColor="#27235c"
+                          stopOpacity={0.3}
+                        />
+                        <stop
+                          offset="95%"
+                          stopColor="#27235c"
+                          stopOpacity={0}
+                        />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#f3f4f6"
+                      vertical={false}
+                    />
                     <XAxis dataKey="period" stroke="#9ca3af" fontSize={11} />
                     <YAxis stroke="#9ca3af" fontSize={11} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '12px' }}
-                      formatter={(value) => `₹${value.toLocaleString()}`}
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                      }}
+                      formatter={(value) =>
+                        `₹${Number(value).toLocaleString()}`
+                      }
                     />
-                    <Area type="monotone" dataKey="amount" stroke="#27235c" strokeWidth={2} fillOpacity={1} fill="url(#colorAmount)" />
+                    <Area
+                      type="monotone"
+                      dataKey="amount"
+                      stroke="#27235c"
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorAmount)"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="no-data-message">No period allocation data</div>
+                <div className="no-data-message">
+                  No period allocation data
+                </div>
               )}
             </div>
           </div>
         </div>
 
+        {/* SECOND ROW: project, nominations, performance, L&D */}
         <div className="dashboard-row">
-
+          {/* Project Status */}
           <div className="dashboard-card card-small">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -663,15 +901,28 @@ const HRDashboard = () => {
                 <>
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
-                      <Pie data={projectStatus} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                      <Pie
+                        data={projectStatus}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={70}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
                         {projectStatus.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={CHART_COLORS[index % CHART_COLORS.length]}
+                          />
                         ))}
                       </Pie>
                       <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
-                  <button className="card-view-btn" onClick={() => navigate("/hr/dashboard/projectmgmt")}>
+                  <button
+                    className="card-view-btn"
+                    onClick={() => navigate("/hr/dashboard/projectmgmt")}
+                  >
                     View All Projects
                   </button>
                 </>
@@ -681,6 +932,7 @@ const HRDashboard = () => {
             </div>
           </div>
 
+          {/* Nominations */}
           <div className="dashboard-card card-small">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -693,15 +945,30 @@ const HRDashboard = () => {
                 <>
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
-                      <Pie data={nominationStatus} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={3} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                      <Pie
+                        data={nominationStatus}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={70}
+                        paddingAngle={3}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
                         {nominationStatus.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={CHART_COLORS[index % CHART_COLORS.length]}
+                          />
                         ))}
                       </Pie>
                       <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
-                  <button className="card-view-btn" onClick={() => navigate("/internal/nominations")}>
+                  <button
+                    className="card-view-btn"
+                    onClick={() => navigate("/internal/nominations")}
+                  >
                     View All Nominations
                   </button>
                 </>
@@ -711,6 +978,7 @@ const HRDashboard = () => {
             </div>
           </div>
 
+          {/* Performance Management */}
           <div className="dashboard-card card-small">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -721,33 +989,110 @@ const HRDashboard = () => {
             <div className="card-body">
               {(() => {
                 const chartData = getPerformanceChartData();
-                const totalItems = perfOverview.totalNominations + perfOverview.totalAssessments + perfOverview.totalForms;
+                const totalItems =
+                  perfOverview.totalNominations +
+                  perfOverview.totalAssessments +
+                  perfOverview.totalForms;
 
                 if (totalItems === 0) {
-                  return <div className="no-data-message">No performance data available</div>;
+                  return (
+                    <div className="no-data-message">
+                      No performance data available
+                    </div>
+                  );
                 }
 
                 return (
                   <>
-                    <div style={{ marginBottom: '1rem' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', marginBottom: '1rem' }}>
-                        <div style={{ background: '#f0f9ff', padding: '0.5rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe' }}>
-                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#0F62FE' }}>
+                    <div style={{ marginBottom: "1rem" }}>
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr 1fr",
+                          gap: "0.5rem",
+                          marginBottom: "1rem",
+                        }}
+                      >
+                        <div
+                          style={{
+                            background: "#f0f9ff",
+                            padding: "0.5rem",
+                            borderRadius: "6px",
+                            textAlign: "center",
+                            border: "1px solid #bfdbfe",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "1.25rem",
+                              fontWeight: "bold",
+                              color: "#0F62FE",
+                            }}
+                          >
                             {perfOverview.totalNominations}
                           </div>
-                          <div style={{ fontSize: '0.65rem', color: '#1e40af' }}>Nominations</div>
+                          <div
+                            style={{
+                              fontSize: "0.65rem",
+                              color: "#1e40af",
+                            }}
+                          >
+                            Nominations
+                          </div>
                         </div>
-                        <div style={{ background: '#f0fdf4', padding: '0.5rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac' }}>
-                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#10b981' }}>
+                        <div
+                          style={{
+                            background: "#f0fdf4",
+                            padding: "0.5rem",
+                            borderRadius: "6px",
+                            textAlign: "center",
+                            border: "1px solid #86efac",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "1.25rem",
+                              fontWeight: "bold",
+                              color: "#10b981",
+                            }}
+                          >
                             {perfOverview.totalAssessments}
                           </div>
-                          <div style={{ fontSize: '0.65rem', color: '#047857' }}>Assessments</div>
+                          <div
+                            style={{
+                              fontSize: "0.65rem",
+                              color: "#047857",
+                            }}
+                          >
+                            Assessments
+                          </div>
                         </div>
-                        <div style={{ background: '#fef3c7', padding: '0.5rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fcd34d' }}>
-                          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#d97706' }}>
+                        <div
+                          style={{
+                            background: "#fef3c7",
+                            padding: "0.5rem",
+                            borderRadius: "6px",
+                            textAlign: "center",
+                            border: "1px solid #fcd34d",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "1.25rem",
+                              fontWeight: "bold",
+                              color: "#d97706",
+                            }}
+                          >
                             {perfOverview.totalForms}
                           </div>
-                          <div style={{ fontSize: '0.65rem', color: '#b45309' }}>Forms</div>
+                          <div
+                            style={{
+                              fontSize: "0.65rem",
+                              color: "#b45309",
+                            }}
+                          >
+                            Forms
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -766,19 +1111,33 @@ const HRDashboard = () => {
                             label={({ value }) => value}
                           >
                             {chartData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={entry.color}
+                              />
                             ))}
                           </Pie>
                           <Tooltip />
                         </PieChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div style={{ textAlign: 'center', padding: '1rem', fontSize: '0.875rem', color: '#6b7280' }}>
-                        {perfOverview.totalForms} form{perfOverview.totalForms !== 1 ? 's' : ''} available
+                      <div
+                        style={{
+                          textAlign: "center",
+                          padding: "1rem",
+                          fontSize: "0.875rem",
+                          color: "#6b7280",
+                        }}
+                      >
+                        {perfOverview.totalForms} form
+                        {perfOverview.totalForms !== 1 ? "s" : ""} available
                       </div>
                     )}
 
-                    <button className="card-view-btn" onClick={() => navigate("/hr/dashboard/performance")}>
+                    <button
+                      className="card-view-btn"
+                      onClick={() => navigate("/hr/dashboard/performance")}
+                    >
                       View Performance Dashboard
                     </button>
                   </>
@@ -787,6 +1146,7 @@ const HRDashboard = () => {
             </div>
           </div>
 
+          {/* Learning & Development */}
           <div className="dashboard-card card-small">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -796,19 +1156,32 @@ const HRDashboard = () => {
             </div>
             <div className="card-body">
               {(() => {
-                const lndData = getLndOverview();
-                const totalAssignments = dashboardData.lndAssignments?.length || 0;
+                const lndData = lndOverview;
+                const totalAssignments =
+                  dashboardData.lndAssignments?.length || 0;
 
                 if (totalAssignments === 0) {
-                  return <div className="no-data-message">No L&D assignments available</div>;
+                  return (
+                    <div className="no-data-message">
+                      No L&D assignments available
+                    </div>
+                  );
                 }
 
                 if (lndData.length === 0) {
                   return (
                     <div className="no-data-message">
-                      {totalAssignments} assignment{totalAssignments !== 1 ? 's' : ''} found
+                      {totalAssignments} assignment
+                      {totalAssignments !== 1 ? "s" : ""} found
                       <br />
-                      <small style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.5rem', display: 'block' }}>
+                      <small
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "#6b7280",
+                          marginTop: "0.5rem",
+                          display: "block",
+                        }}
+                      >
                         Status data not available
                       </small>
                     </div>
@@ -830,13 +1203,19 @@ const HRDashboard = () => {
                           label={({ name, value }) => `${name}: ${value}`}
                         >
                           {lndData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={entry.color}
+                            />
                           ))}
                         </Pie>
                         <Tooltip />
                       </PieChart>
                     </ResponsiveContainer>
-                    <button className="card-view-btn" onClick={() => navigate("/hr/lnd/dashboard")}>
+                    <button
+                      className="card-view-btn"
+                      onClick={() => navigate("/hr/lnd/dashboard")}
+                    >
                       View All Assignments ({totalAssignments})
                     </button>
                   </>
@@ -845,7 +1224,6 @@ const HRDashboard = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

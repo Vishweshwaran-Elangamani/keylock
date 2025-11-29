@@ -858,40 +858,40 @@ const handleDownloadViewAttachment = async (attachment) => {
                 </tr>
               </thead>
 
-              <tbody>
-                {assessmentData.map((item) => (
-                  <tr key={item.competencyId}>
-                    <td>
-                      <strong>{item.competencyName}</strong>
-                    </td>
-                    <td>{item.competencyDescription || "N/A"}</td>
-                    <td>
-                      {modalMode === "view" ? (
-                        <span className="rating-badge">
-                          {item.rating} / 5
-                        </span>
-                      ) : (
-                        <select
-                          value={item.rating}
-                          onChange={(e) =>
-                            updateAssessmentData(
-                              item.competencyId,
-                              "rating",
-                              e.target.value
-                            )
-                          }
-                          className="form-select"
-                          disabled={submitting}
-                        >
-                          <option value="">-</option>
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3">3</option>
-                          <option value="4">4</option>
-                          <option value="5">5</option>
-                        </select>
-                      )}
-                    </td>
+                    <tbody>
+                      {assessmentData.map((item) => (
+                        <tr key={item.competencyId}>
+                          <td>
+                            <strong>{item.competencyName}</strong>
+                          </td>
+                          <td>{item.competencyDescription || "N/A"}</td>
+                          <td>
+                            {modalMode === "view" ? (
+                              <span className="rating-badge">
+                                {item.rating} / 5
+                              </span>
+                            ) : (
+                              <select
+                                value={item.rating}
+                                onChange={(e) =>
+                                  updateAssessmentData(
+                                    item.competencyId,
+                                    "rating",
+                                    e.target.value
+                                  )
+                                }
+                                className="ma-form-select"
+                                disabled={submitting}
+                              >
+                                <option value="">-</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                              </select>
+                            )}
+                          </td>
 
                     <td>
                       {modalMode === "view" ? (

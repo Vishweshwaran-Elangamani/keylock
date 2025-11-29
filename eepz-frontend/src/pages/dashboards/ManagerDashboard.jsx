@@ -18,7 +18,6 @@ import CountUp from "react-countup";
 import {
   Users,
   Target,
-  Award,
   Shield,
   TrendingUp,
   Calendar,
@@ -27,14 +26,21 @@ import {
 import goalService from "../../services/goals/goalService";
 import nominationService from "../../services/internal/nominationService";
 import lndService from "../../services/lnd/lndService";
-import { 
-  getTeamMembers 
+import {
+  getTeamMembers,
 } from "../../services/performancemanagement/manager/managerNominationApi";
 import meetingService from "../../services/meeting/meetingService";
 import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/auth/AdminDashboard.css";
+
+const formatStatusLabel = (raw) => {
+  if (!raw) return "";
+  // Normalize string like "IN_PROGRESS" or "in_progress"
+  const lower = String(raw).toLowerCase().replace(/_/g, " ");
+  return lower.replace(/\b\w/g, (c) => c.toUpperCase());
+};
 
 const ManagerDashboard = () => {
   const navigate = useNavigate();
@@ -72,7 +78,7 @@ const ManagerDashboard = () => {
   const extractData = (response) => {
     if (!response) return [];
     if (Array.isArray(response)) return response;
-    
+
     if (response.success === true || response.success === false) {
       if (response.data) {
         if (Array.isArray(response.data)) return response.data;
@@ -83,16 +89,19 @@ const ManagerDashboard = () => {
         }
       }
     }
-    
+
     if (response.data) {
       if (Array.isArray(response.data)) return response.data;
       if (response.data.$values) return response.data.$values;
       if (response.data.data) {
         if (Array.isArray(response.data.data)) return response.data.data;
         if (response.data.data.$values) return response.data.data.$values;
+        if (response.data.data.items?.$values)
+          return response.data.data.items.$values;
+        if (response.data.data.items) return response.data.data.items;
       }
     }
-    
+
     if (response.$values) return response.$values;
     return [];
   };
@@ -101,7 +110,7 @@ const ManagerDashboard = () => {
     try {
       setLoading(true);
       const user = getUserData();
-      
+
       if (!user) {
         toast.error("User not found. Please login again.");
         navigate("/login");
@@ -109,8 +118,6 @@ const ManagerDashboard = () => {
       }
 
       const managerId = user.empMasterId || user.employeeMasterId || user.id;
-
-      console.log("Fetching all data for manager:", managerId);
 
       const [
         dashboardSummaryRes,
@@ -127,40 +134,51 @@ const ManagerDashboard = () => {
         managerEscalationsRes,
       ] = await Promise.all([
         goalService.getDashboardSummary().catch(() => ({ data: null })),
-        goalService.queryGoals({ pageSize: 1000, status: '' }).catch(() => ({ data: [] })),
+        goalService
+          .queryGoals({ pageSize: 1000, status: "" })
+          .catch(() => ({ data: [] })),
         goalService.getUserProjects().catch(() => ({ data: [] })),
         goalService.getPendingApprovals().catch(() => ({ data: [] })),
-        nominationService.getMyNominations().catch(() => ({ success: false, data: [] })),
-        nominationService.getPendingManagerReview().catch(() => ({ success: false, data: [] })),
+        nominationService
+          .getMyNominations()
+          .catch(() => ({ success: false, data: [] })),
+        nominationService
+          .getPendingManagerReview()
+          .catch(() => ({ success: false, data: [] })),
         getTeamMembers(managerId).catch(() => ({ data: [] })),
-        lndService.getTeamAssignments(1).catch(() => ({ data: { data: { items: [] } } })),
-        lndService.getSubordinateEmployees(1).catch(() => ({ data: { data: { items: [] } } })),
+        lndService
+          .getTeamAssignments(1)
+          .catch(() => ({ data: { data: { items: [] } } })),
+        lndService
+          .getSubordinateEmployees(1)
+          .catch(() => ({ data: { data: { items: [] } } })),
         meetingService.getMyMeetings().catch(() => ({ data: [] })),
         meetingService.getOneOnOneReports().catch(() => ({ data: [] })),
         slaService.getManagerEscalations(managerId).catch(() => ({ data: [] })),
       ]);
 
       const allGoalsExtracted = extractData(allGoalsRes);
-      
-      console.log("Raw goals from API:", allGoalsExtracted);
-      
-      const extractedSelfGoals = allGoalsExtracted.filter(g => {
-        const title = (g.title || '').toLowerCase();
-        const type = (g.goalType || g.type || '').toLowerCase();
-        return title.includes('self') || title.includes('personal') || type === 'self';
+
+      const extractedSelfGoals = allGoalsExtracted.filter((g) => {
+        const title = (g.title || "").toLowerCase();
+        const type = (g.goalType || g.type || "").toLowerCase();
+        return title.includes("self") || title.includes("personal") || type === "self";
       });
-      
-      const extractedTeamGoals = allGoalsExtracted.filter(g => {
-        const title = (g.title || '').toLowerCase();
-        const type = (g.goalType || g.type || '').toLowerCase();
-        return (title.includes('team') || type === 'team') && 
-               !title.includes('self') && !title.includes('personal');
+
+      const extractedTeamGoals = allGoalsExtracted.filter((g) => {
+        const title = (g.title || "").toLowerCase();
+        const type = (g.goalType || g.type || "").toLowerCase();
+        return (
+          (title.includes("team") || type === "team") &&
+          !title.includes("self") &&
+          !title.includes("personal")
+        );
       });
-      
-      const extractedOrgGoals = allGoalsExtracted.filter(g => {
-        const title = (g.title || '').toLowerCase();
-        const type = (g.goalType || g.type || '').toLowerCase();
-        return title.includes('org') || type === 'org' || type === 'organization';
+
+      const extractedOrgGoals = allGoalsExtracted.filter((g) => {
+        const title = (g.title || "").toLowerCase();
+        const type = (g.goalType || g.type || "").toLowerCase();
+        return title.includes("org") || type === "org" || type === "organization";
       });
 
       const extractedProjects = extractData(myProjectsRes);
@@ -168,30 +186,26 @@ const ManagerDashboard = () => {
       const extractedMyNominationsPerfMgmt = extractData(myNominationsPerfMgmtRes);
       const extractedPendingManagerReviews = extractData(pendingManagerReviewsRes);
       const extractedTeamMembers = extractData(teamMembersRes);
-      
-      const extractedTeamAssignments = teamAssignmentsRes?.data?.data?.items?.$values || 
-                                        teamAssignmentsRes?.data?.data?.items || 
-                                        extractData(teamAssignmentsRes);
-      
-      const extractedSubordinateEmployees = subordinateEmployeesRes?.data?.data?.items?.$values || 
-                                             subordinateEmployeesRes?.data?.data?.items || 
-                                             extractData(subordinateEmployeesRes);
-      
+
+      const extractedTeamAssignments =
+        teamAssignmentsRes?.data?.data?.items?.$values ||
+        teamAssignmentsRes?.data?.data?.items ||
+        extractData(teamAssignmentsRes);
+
+      const extractedSubordinateEmployees =
+        subordinateEmployeesRes?.data?.data?.items?.$values ||
+        subordinateEmployeesRes?.data?.data?.items ||
+        extractData(subordinateEmployeesRes);
+
       const extractedMeetings = extractData(myMeetingsRes);
       const extractedOneOnOneReports = extractData(oneOnOneReportsRes);
       const extractedManagerEscalations = extractData(managerEscalationsRes);
 
       const allGoalsCombined = [
-        ...extractedSelfGoals.map(g => ({...g, goalType: 'self'})),
-        ...extractedTeamGoals.map(g => ({...g, goalType: 'team'})),
-        ...extractedOrgGoals.map(g => ({...g, goalType: 'org'})),
+        ...extractedSelfGoals.map((g) => ({ ...g, goalType: "self" })),
+        ...extractedTeamGoals.map((g) => ({ ...g, goalType: "team" })),
+        ...extractedOrgGoals.map((g) => ({ ...g, goalType: "org" })),
       ];
-
-      console.log("Self Goals:", extractedSelfGoals.length);
-      console.log("Team Goals:", extractedTeamGoals.length);
-      console.log("Org Goals:", extractedOrgGoals.length);
-      console.log("Pending Approvals:", extractedPendingApprovals.length);
-      console.log("All Goals Combined:", allGoalsCombined.length);
 
       let summaryData = null;
       if (dashboardSummaryRes) {
@@ -225,20 +239,27 @@ const ManagerDashboard = () => {
   };
 
   const getKPIStats = () => {
-    const totalTeamMembers = dashboardData.subordinateEmployees.length || dashboardData.teamMembers.length;
+    const totalTeamMembers =
+      dashboardData.subordinateEmployees.length || dashboardData.teamMembers.length;
     const pendingApprovals = dashboardData.pendingApprovals.length;
     const pendingNominationReviews = dashboardData.pendingManagerReviews.length;
-    
-    const ongoingGoalsCount = dashboardData.allGoals.filter(g => 
-      g.status?.toLowerCase() === 'inprogress' || g.goalStatus?.toLowerCase() === 'inprogress'
-    ).length;
-    
+
+    const ongoingGoalsCount = dashboardData.allGoals.filter((g) => {
+      const status = (g.status || g.goalStatus || "").toLowerCase();
+      return (
+        status === "inprogress" ||
+        status === "pending" ||
+        status === "approved" ||
+        status === "open"
+      );
+    }).length;
+
     const myProjectsCount = dashboardData.myProjects.length;
     const teamAssignmentsCount = dashboardData.teamAssignments.length;
-    const pendingEscalations = dashboardData.managerEscalations.filter(e => 
-      e.escalationStatus?.toLowerCase() === "pending"
+    const pendingEscalations = dashboardData.managerEscalations.filter(
+      (e) => e.escalationStatus?.toLowerCase() === "pending"
     ).length;
-    const upcomingMeetings = dashboardData.myMeetings.filter(m => {
+    const upcomingMeetings = dashboardData.myMeetings.filter((m) => {
       const meetingDate = new Date(m.meetingDate || m.date);
       const now = new Date();
       return meetingDate > now;
@@ -260,53 +281,66 @@ const ManagerDashboard = () => {
   };
 
   const getGoalsByType = () => {
-    const goals = dashboardData.allGoals.filter(g => {
-      const goalTypeLower = (g.goalType || g.type || '').toLowerCase();
-      
-      if (goalType === 'self') {
-        return goalTypeLower === 'self' || goalTypeLower === 'personal';
+    const goals = dashboardData.allGoals.filter((g) => {
+      const goalTypeLower = (g.goalType || g.type || "").toLowerCase();
+
+      if (goalType === "self") {
+        return goalTypeLower === "self" || goalTypeLower === "personal";
       }
-      if (goalType === 'team') {
-        return goalTypeLower === 'team';
+      if (goalType === "team") {
+        return goalTypeLower === "team";
       }
-      if (goalType === 'org') {
-        return goalTypeLower === 'org' || goalTypeLower === 'organization';
+      if (goalType === "org") {
+        return goalTypeLower === "org" || goalTypeLower === "organization";
       }
-      
+
       return false;
     });
 
     if (!goals || goals.length === 0) {
-      return { total: 0, completed: 0, inProgress: 0, pending: 0, overdue: 0, chartData: [] };
+      return {
+        total: 0,
+        completed: 0,
+        inProgress: 0,
+        pending: 0,
+        overdue: 0,
+        chartData: [],
+      };
     }
 
     const now = new Date();
-    const completed = goals.filter(g => 
-      g.status?.toLowerCase() === 'completed' || g.goalStatus?.toLowerCase() === 'completed'
+    const completed = goals.filter(
+      (g) =>
+        g.status?.toLowerCase() === "completed" ||
+        g.goalStatus?.toLowerCase() === "completed"
     ).length;
-    
-    const inProgress = goals.filter(g => 
-      g.status?.toLowerCase() === 'inprogress' || g.goalStatus?.toLowerCase() === 'inprogress'
+
+    const inProgress = goals.filter(
+      (g) =>
+        g.status?.toLowerCase() === "inprogress" ||
+        g.goalStatus?.toLowerCase() === "inprogress"
     ).length;
-    
-    const pending = goals.filter(g => {
-      const status = (g.status || g.goalStatus || '').toLowerCase();
-      return status === 'pending' || status === 'open' || status === 'approved';
+
+    const pending = goals.filter((g) => {
+      const status = (g.status || g.goalStatus || "").toLowerCase();
+      return status === "pending" || status === "open" || status === "approved";
     }).length;
-    
-    const overdue = goals.filter(g => {
+
+    const overdue = goals.filter((g) => {
       const deadline = new Date(g.deadline || g.endDate);
-      const status = (g.status || g.goalStatus || '').toLowerCase();
-      return deadline < now && status !== 'completed';
+      const status = (g.status || g.goalStatus || "").toLowerCase();
+      return deadline < now && status !== "completed";
     }).length;
 
     const total = goals.length;
 
     const chartData = [];
-    if (completed > 0) chartData.push({ name: 'Completed', value: completed, fill: '#10b981' });
-    if (inProgress > 0) chartData.push({ name: 'In Progress', value: inProgress, fill: '#0F62FE' });
-    if (pending > 0) chartData.push({ name: 'Pending', value: pending, fill: '#f59e0b' });
-    if (overdue > 0) chartData.push({ name: 'Overdue', value: overdue, fill: '#ef4444' });
+    if (completed > 0)
+      chartData.push({ name: "Completed", value: completed, fill: "#10b981" });
+    if (inProgress > 0)
+      chartData.push({ name: "In Progress", value: inProgress, fill: "#0F62FE" });
+    if (pending > 0) chartData.push({ name: "Pending", value: pending, fill: "#f59e0b" });
+    if (overdue > 0) chartData.push({ name: "Overdue", value: overdue, fill: "#ef4444" });
 
     return {
       total,
@@ -314,123 +348,118 @@ const ManagerDashboard = () => {
       inProgress,
       pending,
       overdue,
-      chartData: chartData.length > 0 ? chartData : [{ name: 'No Data', value: 1, fill: '#e5e7eb' }],
+      chartData:
+        chartData.length > 0
+          ? chartData
+          : [{ name: "No Data", value: 1, fill: "#e5e7eb" }],
     };
   };
 
   const getTeamAssignmentStatus = () => {
-    const CHART_COLORS_LOCAL = ["#2c2c54", "#0F62FE", "#10b981", "#f59e0b", "#E01950", "#8b5cf6"];
+    const CHART_COLORS_LOCAL = [
+      "#2c2c54",
+      "#0F62FE",
+      "#10b981",
+      "#f59e0b",
+      "#E01950",
+      "#8b5cf6",
+    ];
     const statusCount = {};
-    dashboardData.teamAssignments.forEach(assignment => {
-      const status = assignment.assignmentStatus || assignment.status || "Unknown";
-      statusCount[status] = (statusCount[status] || 0) + 1;
+    dashboardData.teamAssignments.forEach((assignment) => {
+      const rawStatus = assignment.assignmentStatus || assignment.status || "Unknown";
+      const key = formatStatusLabel(rawStatus);
+      statusCount[key] = (statusCount[key] || 0) + 1;
     });
-    return Object.entries(statusCount).map(([name, value], index) => ({ 
-      name, 
-      value, 
-      fill: CHART_COLORS_LOCAL[index % CHART_COLORS_LOCAL.length] 
-    })).filter(item => item.value > 0);
+    return Object.entries(statusCount)
+      .map(([name, value], index) => ({
+        name,
+        value,
+        fill: CHART_COLORS_LOCAL[index % CHART_COLORS_LOCAL.length],
+      }))
+      .filter((item) => item.value > 0);
   };
 
   const getEscalationHistory = () => {
     const escalations = dashboardData.managerEscalations;
-    
+
     const statusCount = {};
-    escalations.forEach(esc => {
-      const status = esc.escalationStatus || "Unknown";
-      statusCount[status] = (statusCount[status] || 0) + 1;
+    escalations.forEach((esc) => {
+      const rawStatus = esc.escalationStatus || "Unknown";
+      const key = formatStatusLabel(rawStatus);
+      statusCount[key] = (statusCount[key] || 0) + 1;
     });
 
-    const chartData = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
-    
+    const chartData = Object.entries(statusCount).map(([name, value]) => ({
+      name,
+      value,
+    }));
+
     return {
       total: escalations.length,
-      pending: escalations.filter(e => e.escalationStatus?.toLowerCase() === "pending").length,
-      resolved: escalations.filter(e => e.escalationStatus?.toLowerCase() === "resolved").length,
-      rejected: escalations.filter(e => e.escalationStatus?.toLowerCase() === "rejected").length,
-      chartData: chartData.filter(item => item.value > 0),
+      pending: escalations.filter(
+        (e) => e.escalationStatus?.toLowerCase() === "pending"
+      ).length,
+      resolved: escalations.filter(
+        (e) => e.escalationStatus?.toLowerCase() === "resolved"
+      ).length,
+      rejected: escalations.filter(
+        (e) => e.escalationStatus?.toLowerCase() === "rejected"
+      ).length,
+      chartData: chartData.filter((item) => item.value > 0),
     };
   };
 
   const getNominationHistory = () => {
-  const nominations = dashboardData.myNominationsPerfMgmt;
+    const nominations = dashboardData.myNominationsPerfMgmt;
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth(); // 0–11
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
 
-  const user = getUserData();
-  const currentUserId = user?.empMasterId || user?.employeeMasterId || user?.id;
+    const thisMonthNominations = nominations.filter((nom) => {
+      const dateFields = [
+        nom.createdDate,
+        nom.submittedDate,
+        nom.nominationDate,
+        nom.createdAt,
+        nom.submittedAt,
+        nom.dateCreated,
+        nom.dateSubmitted,
+        nom.created,
+        nom.submitted,
+      ];
 
-  // Filter nominations for current month
-  const thisMonthNominations = nominations.filter(nom => {
-    const dateFields = [
-      nom.createdDate,
-      nom.submittedDate,
-      nom.nominationDate,
-      nom.createdAt,
-      nom.submittedAt,
-      nom.dateCreated,
-      nom.dateSubmitted,
-      nom.created,
-      nom.submitted,
-    ];
-
-    for (const df of dateFields) {
-      if (df) {
-        const d = new Date(df);
-        if (!isNaN(d.getTime())) {
-          return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+      for (const df of dateFields) {
+        if (df) {
+          const d = new Date(df);
+          if (!isNaN(d.getTime())) {
+            return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+          }
         }
       }
-    }
-    return false;
-  });
+      return false;
+    });
 
-  let managerSelfNominated = 0;
-  let managerTeamNominated = 0;
+    const chartData = [
+      { category: "Total Nominations", count: nominations.length },
+    ];
 
-  nominations.forEach(nom => {
-    const nomineeUserId = nom.nomineeUserId;
-    const nominatedByUserId = nom.nominatedByUserId;
-
-    const isSelfNomination =
-      nominatedByUserId === currentUserId &&
-      nomineeUserId === currentUserId;
-
-    const isTeamNomination =
-      nominatedByUserId === currentUserId &&
-      nomineeUserId !== currentUserId;
-
-    if (isSelfNomination) {
-      managerSelfNominated++;
-    } else if (isTeamNomination) {
-      managerTeamNominated++;
-    }
-  });
-
-  const chartData = [
-    { category: "Manager Nominated (Self)", count: managerSelfNominated },
-    { category: "Manager Nominated (Team)", count: managerTeamNominated },
-  ];
-
-  return {
-    total: nominations.length,
-    thisMonth: thisMonthNominations.length,
-    managerSelfNominated,
-    managerTeamNominated,
-    chartData,
+    return {
+      total: nominations.length,
+      thisMonth: thisMonthNominations.length,
+      chartData,
+    };
   };
-};
-
 
   const getMeetingScheduleData = () => {
     const meetings = dashboardData.myMeetings;
-    
+
     const monthlyData = {};
-    meetings.forEach(meeting => {
+    meetings.forEach((meeting) => {
       const date = new Date(meeting.meetingDate || meeting.date || meeting.createdDate);
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const monthKey = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}`;
       monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
     });
 
@@ -438,8 +467,11 @@ const ManagerDashboard = () => {
       .sort((a, b) => a[0].localeCompare(b[0]))
       .slice(-6)
       .map(([month, count]) => ({
-        month: new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-        count
+        month: new Date(month + "-01").toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        }),
+        count,
       }));
 
     return {
@@ -451,11 +483,11 @@ const ManagerDashboard = () => {
 
   const getMeetingOverview = () => {
     const total = dashboardData.myMeetings.length;
-    const upcoming = dashboardData.myMeetings.filter(m => {
+    const upcoming = dashboardData.myMeetings.filter((m) => {
       const meetingDate = new Date(m.meetingDate || m.date);
       return meetingDate > new Date();
     }).length;
-    const completed = dashboardData.myMeetings.filter(m => {
+    const completed = dashboardData.myMeetings.filter((m) => {
       const meetingDate = new Date(m.meetingDate || m.date);
       return meetingDate <= new Date();
     }).length;
@@ -485,19 +517,32 @@ const ManagerDashboard = () => {
   const meetingScheduleData = getMeetingScheduleData();
   const meetingOverview = getMeetingOverview();
 
-  const CHART_COLORS = ["#2c2c54", "#0F62FE", "#10b981", "#f59e0b", "#E01950", "#8b5cf6"];
+  const CHART_COLORS = [
+    "#2c2c54",
+    "#0F62FE",
+    "#10b981",
+    "#f59e0b",
+    "#E01950",
+    "#8b5cf6",
+  ];
 
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Manager Dashboard" }]} />
 
+      {/* KPI CARDS */}
       <div className="admin-kpi-grid">
-        <div className="admin-kpi-card" onClick={() => navigate("/manager/lnd/dashboard")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
           <div className="admin-kpi-icon admin-pink">
             <Users size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={kpiStats.totalTeamMembers} duration={2} /></h2>
+            <h2>
+              <CountUp end={kpiStats.totalTeamMembers} duration={2} />
+            </h2>
             <p>Team Members</p>
             <span className="admin-kpi-subtitle">
               <TrendingUp size={12} /> Your team size
@@ -505,106 +550,152 @@ const ManagerDashboard = () => {
           </div>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => navigate("/manager/dashboard/goals")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
           <div className="admin-kpi-icon admin-blue">
             <Target size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={kpiStats.ongoingGoalsCount} duration={2} /></h2>
+            <h2>
+              <CountUp end={kpiStats.ongoingGoalsCount} duration={2} />
+            </h2>
             <p>Ongoing Goals</p>
-            <span className="admin-kpi-subtitle">{kpiStats.myProjectsCount} projects</span>
+            <span className="admin-kpi-subtitle">
+              {kpiStats.myProjectsCount} projects
+            </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => navigate("/internal/nominations")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
           <div className="admin-kpi-icon admin-purple">
             <Shield size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={kpiStats.totalNominations} duration={2} /></h2>
+            <h2>
+              <CountUp end={kpiStats.totalNominations} duration={2} />
+            </h2>
             <p>Nominations</p>
-            <span className="admin-kpi-subtitle">{kpiStats.pendingNominationReviews} pending</span>
+            <span className="admin-kpi-subtitle">
+              {kpiStats.pendingNominationReviews} pending
+            </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => navigate("/manager/dashboard/meetmom")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
           <div className="admin-kpi-icon admin-green">
             <Calendar size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={kpiStats.totalMeetings} duration={2} /></h2>
+            <h2>
+              <CountUp end={kpiStats.totalMeetings} duration={2} />
+            </h2>
             <p>Meetings</p>
-            <span className="admin-kpi-subtitle">{kpiStats.upcomingMeetings} upcoming</span>
+            <span className="admin-kpi-subtitle">
+              {kpiStats.upcomingMeetings} upcoming
+            </span>
           </div>
         </div>
 
-        <div className="admin-kpi-card" onClick={() => navigate("/manager/dashboard/sla")}>
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
           <div className="admin-kpi-icon admin-cyan">
             <AlertTriangle size={28} />
           </div>
           <div className="admin-kpi-content">
-            <h2><CountUp end={kpiStats.totalEscalations} duration={2} /></h2>
+            <h2>
+              <CountUp end={kpiStats.totalEscalations} duration={2} />
+            </h2>
             <p>Escalations</p>
-            <span className="admin-kpi-subtitle">{kpiStats.pendingEscalations} pending</span>
+            <span className="admin-kpi-subtitle">
+              {kpiStats.pendingEscalations} pending
+            </span>
           </div>
         </div>
       </div>
 
       <div className="dashboard-cards-container">
-        
+        {/* ROW 1: Goals + Nominations */}
         <div className="dashboard-row">
-          
+          {/* Goals Overview */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-bullseye"></i>
                 <h3>Goals Overview</h3>
               </div>
-              <div style={{display: 'flex', gap: '0.5rem'}}>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button
-                  onClick={() => setGoalType('self')}
+                  onClick={() => setGoalType("self")}
                   style={{
-                    padding: '0.4rem 0.75rem',
-                    fontSize: '0.75rem',
-                    borderRadius: '6px',
-                    border: goalType === 'self' ? '1px solid #fff' : '1px solid rgba(255,255,255,0.3)',
-                    background: goalType === 'self' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontWeight: goalType === 'self' ? '600' : '500',
-                    transition: 'all 0.2s',
+                    padding: "0.4rem 0.75rem",
+                    fontSize: "0.75rem",
+                    borderRadius: "6px",
+                    border:
+                      goalType === "self"
+                        ? "1px solid #fff"
+                        : "1px solid rgba(255,255,255,0.3)",
+                    background:
+                      goalType === "self"
+                        ? "rgba(255,255,255,0.25)"
+                        : "rgba(255,255,255,0.1)",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontWeight: goalType === "self" ? "600" : "500",
+                    transition: "all 0.2s",
                   }}
                 >
                   Self
                 </button>
                 <button
-                  onClick={() => setGoalType('team')}
+                  onClick={() => setGoalType("team")}
                   style={{
-                    padding: '0.4rem 0.75rem',
-                    fontSize: '0.75rem',
-                    borderRadius: '6px',
-                    border: goalType === 'team' ? '1px solid #fff' : '1px solid rgba(255,255,255,0.3)',
-                    background: goalType === 'team' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontWeight: goalType === 'team' ? '600' : '500',
-                    transition: 'all 0.2s',
+                    padding: "0.4rem 0.75rem",
+                    fontSize: "0.75rem",
+                    borderRadius: "6px",
+                    border:
+                      goalType === "team"
+                        ? "1px solid #fff"
+                        : "1px solid rgba(255,255,255,0.3)",
+                    background:
+                      goalType === "team"
+                        ? "rgba(255,255,255,0.25)"
+                        : "rgba(255,255,255,0.1)",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontWeight: goalType === "team" ? "600" : "500",
+                    transition: "all 0.2s",
                   }}
                 >
                   Team
                 </button>
                 <button
-                  onClick={() => setGoalType('org')}
+                  onClick={() => setGoalType("org")}
                   style={{
-                    padding: '0.4rem 0.75rem',
-                    fontSize: '0.75rem',
-                    borderRadius: '6px',
-                    border: goalType === 'org' ? '1px solid #fff' : '1px solid rgba(255,255,255,0.3)',
-                    background: goalType === 'org' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontWeight: goalType === 'org' ? '600' : '500',
-                    transition: 'all 0.2s',
+                    padding: "0.4rem 0.75rem",
+                    fontSize: "0.75rem",
+                    borderRadius: "6px",
+                    border:
+                      goalType === "org"
+                        ? "1px solid #fff"
+                        : "1px solid rgba(255,255,255,0.3)",
+                    background:
+                      goalType === "org"
+                        ? "rgba(255,255,255,0.25)"
+                        : "rgba(255,255,255,0.1)",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontWeight: goalType === "org" ? "600" : "500",
+                    transition: "all 0.2s",
                   }}
                 >
                   Org
@@ -614,37 +705,93 @@ const ManagerDashboard = () => {
             <div className="card-body">
               {goalsData.total > 0 ? (
                 <>
-                  <div style={{marginBottom: '1.5rem'}}>
-                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem'}}>
-                      <div style={{background: '#f0f9ff', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe'}}>
-                        <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#0F62FE'}}>
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr 1fr",
+                        gap: "0.75rem",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          background: "#f0f9ff",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #bfdbfe",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#0F62FE",
+                          }}
+                        >
                           {goalsData.total}
                         </div>
-                        <div style={{fontSize: '0.7rem', color: '#1e40af'}}>Total</div>
+                        <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                          Total
+                        </div>
                       </div>
-                      <div style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac'}}>
-                        <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981'}}>
+                      <div
+                        style={{
+                          background: "#f0fdf4",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #86efac",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#10b981",
+                          }}
+                        >
                           {goalsData.completed}
                         </div>
-                        <div style={{fontSize: '0.7rem', color: '#047857'}}>Completed</div>
+                        <div style={{ fontSize: "0.7rem", color: "#047857" }}>
+                          Completed
+                        </div>
                       </div>
-                      <div style={{background: '#fef3c7', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fcd34d'}}>
-                        <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706'}}>
+                      <div
+                        style={{
+                          background: "#fef3c7",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #fcd34d",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#d97706",
+                          }}
+                        >
                           {goalsData.inProgress}
                         </div>
-                        <div style={{fontSize: '0.7rem', color: '#b45309'}}>In Progress</div>
-                      </div>
-                      <div style={{background: '#fee2e2', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fca5a5'}}>
-                        <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444'}}>
-                          {goalsData.pending}
+                        <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
+                          In Progress
                         </div>
-                        <div style={{fontSize: '0.7rem', color: '#dc2626'}}>Pending</div>
                       </div>
                     </div>
                   </div>
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
-                      <Pie data={goalsData.chartData} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                      <Pie
+                        data={goalsData.chartData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={70}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
                         {goalsData.chartData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
                         ))}
@@ -656,12 +803,16 @@ const ManagerDashboard = () => {
               ) : (
                 <div className="no-data-message">No goal data</div>
               )}
-              <button className="card-view-btn" onClick={() => navigate("/manager/dashboard/goals")}>
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/manager/dashboard/goals")}
+              >
                 View All Goals
               </button>
             </div>
           </div>
 
+          {/* Nomination History (single bar) */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -670,34 +821,99 @@ const ManagerDashboard = () => {
               </div>
             </div>
             <div className="card-body">
-              <div style={{marginBottom: '1rem'}}>
-                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem'}}>
-                  <div style={{background: '#f0f9ff', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#0F62FE'}}>
+              <div style={{ marginBottom: "1rem" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "0.75rem",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "#f0f9ff",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #bfdbfe",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#0F62FE",
+                      }}
+                    >
                       {nominationHistory.total}
                     </div>
-                    <div style={{fontSize: '0.75rem', color: '#1e40af'}}>Total All Time</div>
+                    <div style={{ fontSize: "0.75rem", color: "#1e40af" }}>
+                      Total All Time
+                    </div>
                   </div>
-                  <div style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981'}}>
+                  <div
+                    style={{
+                      background: "#f0fdf4",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #86efac",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#10b981",
+                      }}
+                    >
                       {nominationHistory.thisMonth}
                     </div>
-                    <div style={{fontSize: '0.75rem', color: '#047857'}}>This Month (Nov)</div>
+                    <div style={{ fontSize: "0.75rem", color: "#047857" }}>
+                      This Month
+                    </div>
                   </div>
                 </div>
               </div>
-              {nominationHistory.chartData.length > 0 && nominationHistory.total > 0 ? (
-                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f5f5', borderRadius: '8px', padding: '1rem 0'}}>
-                  <div style={{width: '65%'}}>
+              {nominationHistory.total > 0 ? (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    background: "#f5f5f5",
+                    borderRadius: "8px",
+                    padding: "1rem 0",
+                  }}
+                >
+                  <div style={{ width: "65%" }}>
                     <ResponsiveContainer width="100%" height={180}>
                       <BarChart data={nominationHistory.chartData} barSize={50}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-                        <XAxis dataKey="category" stroke="#6b7280" fontSize={10} />
-                        <YAxis stroke="#6b7280" fontSize={11} />
-                        <Tooltip 
-                          contentStyle={{backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '12px'}}
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke="#e5e7eb"
+                          vertical={false}
                         />
-                        <Bar dataKey="count" fill="#97247E" radius={[6, 6, 0, 0]} />
+                        <XAxis
+                          dataKey="category"
+                          stroke="#6b7280"
+                          fontSize={10}
+                        />
+                        <YAxis stroke="#6b7280" fontSize={11} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "1px solid #e5e7eb",
+                            borderRadius: "6px",
+                            fontSize: "12px",
+                          }}
+                        />
+                        <Bar
+                          dataKey="count"
+                          fill="#97247E"
+                          radius={[6, 6, 0, 0]}
+                        />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -705,15 +921,19 @@ const ManagerDashboard = () => {
               ) : (
                 <div className="no-data-message">No nominations yet</div>
               )}
-              <button className="card-view-btn" onClick={() => navigate("/internal/nominations")}>
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/internal/nominations")}
+              >
                 View All Nominations
               </button>
             </div>
           </div>
         </div>
 
+        {/* ROW 2: Meetings + Escalations + L&D */}
         <div className="dashboard-row">
-          
+          {/* Meetings */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -722,49 +942,124 @@ const ManagerDashboard = () => {
               </div>
             </div>
             <div className="card-body">
-              <div style={{marginBottom: '1rem'}}>
-                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem'}}>
-                  <div style={{background: '#f0f9ff', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#0F62FE'}}>
-                      {meetingScheduleData.total}
+              <div style={{ marginBottom: "1rem" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr",
+                    gap: "0.75rem",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "#f0f9ff",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #bfdbfe",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#0F62FE",
+                      }}
+                    >
+                      {meetingOverview.total}
                     </div>
-                    <div style={{fontSize: '0.7rem', color: '#1e40af'}}>Total</div>
+                    <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                      Total
+                    </div>
                   </div>
-                  <div style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981'}}>
+                  <div
+                    style={{
+                      background: "#f0fdf4",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #86efac",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#10b981",
+                      }}
+                    >
                       {meetingOverview.upcoming}
                     </div>
-                    <div style={{fontSize: '0.7rem', color: '#047857'}}>Upcoming</div>
+                    <div style={{ fontSize: "0.7rem", color: "#047857" }}>
+                      Upcoming
+                    </div>
                   </div>
-                  <div style={{background: '#fef3c7', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fcd34d'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706'}}>
+                  <div
+                    style={{
+                      background: "#fef3c7",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #fcd34d",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#d97706",
+                      }}
+                    >
                       {meetingOverview.completed}
                     </div>
-                    <div style={{fontSize: '0.7rem', color: '#b45309'}}>Completed</div>
+                    <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
+                      Completed
+                    </div>
                   </div>
                 </div>
               </div>
               {meetingScheduleData.chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <LineChart data={meetingScheduleData.chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#f3f4f6"
+                      vertical={false}
+                    />
                     <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
                     <YAxis stroke="#9ca3af" fontSize={11} />
-                    <Tooltip 
-                      contentStyle={{backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '12px'}}
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                      }}
                     />
-                    <Line type="monotone" dataKey="count" stroke="#2c2c54" strokeWidth={2} dot={{ fill: '#2c2c54', r: 4 }} activeDot={{ r: 6 }} />
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke="#2c2c54"
+                      strokeWidth={2}
+                      dot={{ fill: "#2c2c54", r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="no-data-message">No meeting data</div>
               )}
-              <button className="card-view-btn" onClick={() => navigate("/manager/dashboard/meetmom")}>
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/manager/dashboard/meetmom")}
+              >
                 View All Meetings
               </button>
             </div>
           </div>
 
+          {/* Escalations */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -773,40 +1068,123 @@ const ManagerDashboard = () => {
               </div>
             </div>
             <div className="card-body">
-              <div style={{marginBottom: '1rem'}}>
-                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem'}}>
-                  <div style={{background: '#f0f9ff', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#0F62FE'}}>
+              <div style={{ marginBottom: "1rem" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                    gap: "0.75rem",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "#f0f9ff",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #bfdbfe",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#0F62FE",
+                      }}
+                    >
                       {escalationHistory.total}
                     </div>
-                    <div style={{fontSize: '0.7rem', color: '#1e40af'}}>Total</div>
+                    <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                      Total
+                    </div>
                   </div>
-                  <div style={{background: '#fef3c7', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fcd34d'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706'}}>
+                  <div
+                    style={{
+                      background: "#fef3c7",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #fcd34d",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#d97706",
+                      }}
+                    >
                       {escalationHistory.pending}
                     </div>
-                    <div style={{fontSize: '0.7rem', color: '#b45309'}}>Pending</div>
+                    <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
+                      Pending
+                    </div>
                   </div>
-                  <div style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981'}}>
+                  <div
+                    style={{
+                      background: "#f0fdf4",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #86efac",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#10b981",
+                      }}
+                    >
                       {escalationHistory.resolved}
                     </div>
-                    <div style={{fontSize: '0.7rem', color: '#047857'}}>Resolved</div>
+                    <div style={{ fontSize: "0.7rem", color: "#047857" }}>
+                      Resolved
+                    </div>
                   </div>
-                  <div style={{background: '#fee2e2', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fca5a5'}}>
-                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444'}}>
+                  <div
+                    style={{
+                      background: "#fee2e2",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #fca5a5",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#ef4444",
+                      }}
+                    >
                       {escalationHistory.rejected}
                     </div>
-                    <div style={{fontSize: '0.7rem', color: '#dc2626'}}>Rejected</div>
+                    <div style={{ fontSize: "0.7rem", color: "#dc2626" }}>
+                      Rejected
+                    </div>
                   </div>
                 </div>
               </div>
               {escalationHistory.chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
-                    <Pie data={escalationHistory.chartData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={3} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                    <Pie
+                      data={escalationHistory.chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={70}
+                      paddingAngle={3}
+                      dataKey="value"
+                      label={({ name, value }) => `${name}: ${value}`}
+                    >
                       {escalationHistory.chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={CHART_COLORS[index % CHART_COLORS.length]}
+                        />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -815,12 +1193,16 @@ const ManagerDashboard = () => {
               ) : (
                 <div className="no-data-message">No escalation data</div>
               )}
-              <button className="card-view-btn" onClick={() => navigate("/manager/dashboard/sla")}>
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/manager/dashboard/sla")}
+              >
                 View All Escalations
               </button>
             </div>
           </div>
 
+          {/* L&D Assignments */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -833,12 +1215,12 @@ const ManagerDashboard = () => {
                 <>
                   <ResponsiveContainer width="100%" height={220}>
                     <PieChart>
-                      <Pie 
-                        data={teamAssignmentStatus} 
-                        cx="50%" 
-                        cy="50%" 
-                        outerRadius={70} 
-                        dataKey="value" 
+                      <Pie
+                        data={teamAssignmentStatus}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={70}
+                        dataKey="value"
                         label={({ name, value }) => `${name}: ${value}`}
                       >
                         {teamAssignmentStatus.map((entry, index) => (
@@ -848,7 +1230,10 @@ const ManagerDashboard = () => {
                       <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
-                  <button className="card-view-btn" onClick={() => navigate("/manager/lnd/dashboard")}>
+                  <button
+                    className="card-view-btn"
+                    onClick={() => navigate("/manager/lnd/dashboard")}
+                  >
                     View All Assignments
                   </button>
                 </>
@@ -858,7 +1243,6 @@ const ManagerDashboard = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

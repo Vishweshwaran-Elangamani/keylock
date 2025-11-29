@@ -1,120 +1,1275 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+} from "recharts";
+import CountUp from "react-countup";
+import {
+  Target,
+  BookOpen,
+  Calendar,
+  AlertTriangle,
+  TrendingUp,
+} from "lucide-react";
+
+import goalService from "../../services/goals/goalService";
+import lndService from "../../services/lnd/lndService";
+import meetingService from "../../services/meeting/meetingService";
+import rsvpService from "../../services/meeting/rsvpService";
+import slaService from "../../services/sla/slaService";
+import {
+  getApprovedProfiles,
+  getStatistics,
+} from "../../services/performancemanagement/hr/hrnominationapi";
+
+import Breadcrumb from "../../components/common/Breadcrumb";
+import { toast } from "sonner";
+import "../../styles/auth/AdminDashboard.css";
 import "../../styles/common/Dashboard.css";
+
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
-  const [hoveredCard, setHoveredCard] = useState(null);
-  const handleNavigation = (path) => {
-    navigate(path);
+  const [loading, setLoading] = useState(true);
+
+  const [dashboardData, setDashboardData] = useState({
+    goals: [],
+    lndAssignments: [],
+    lndSkills: [],
+    meetings: [],
+    slas: [],
+    performance: {
+      myRecognitions: [],
+      stats: null,
+    },
+  });
+
+  useEffect(() => {
+    fetchAllData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getUserData = () => {
+    const raw = localStorage.getItem("user");
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
   };
-  const cards = [
-    {
-      title: "Internal Opportunities",
-      description: "View and apply for internal job openings",
-      icon: "bi-briefcase",
-      gradient: "gradient-green",
-      path: "/internal/opportunities",
-    },
-    {
-      title: "My Nominations",
-      description: "Track your nominations and status",
-      icon: "bi-hand-thumbs-up",
-      gradient: "gradient-green",
-      path: "/internal/nominations",
-    },
-    {
-      title: "Company Policies",
-      description: "View organizational policies",
-      icon: "bi bi-shield-check",
-      gradient: "gradient-orange",
-      path: "/employee/policies",
-    },
-    {
-      title: "Employee Acknowledgement",
-      description: "Performance Management",
-      icon: "bi bi-building-check",
-      gradient: "gradient-orange",
-      path: "/employee/dashboard/employee-acknowledgments",
-    },
 
-    {
-      title: "Performance",
-      description: "Performance Management",
-      icon: "bi bi-graph-up",
-      gradient: "gradient-blue",
-      path: "/employee/dashboard/performance",
-    },
-    {
-      title: "SLA Compliance",
-      description: "Service Level Agreement",
-      icon: "bi bi-file-earmark-check",
-      gradient: "gradient-teal",
-      path: "/employee/dashboard/sla",
-    },
-    {
-      title: "Goals",
-      description: "Goal Management",
-      icon: "bi bi-bullseye",
-      gradient: "gradient-pink",
-      path: "/employee/dashboard/goals",
-    },
-    {
-      title: "Learning and Development",
-      description: "Time For An Upgrade",
-      icon: "bi bi-book",
-      gradient: "gradient-pink",
-      path: "/employee/lnd/dashboard",
-    },
-    {
-      title: "Feedback Management",
-      description: "Submit Feedback Forms",
-      icon: "bi bi-chat-left-text",
-      gradient: "gradient-teal",
-      path: "/employee/dashboard/feedback",
-    },
+  const extractData = (response) => {
+    if (!response) return [];
+    if (Array.isArray(response)) return response;
 
-    {
-      title: "Meeting & MOM Management",
-      description: "Manage Meetings & MOMs",
-      icon: "bi bi-journal-bookmark",
-      gradient: "gradient-teal",
-      path: "/employee/dashboard/meetmom",
-    },
+    if (response.success === true || response.success === false) {
+      if (response.data) {
+        if (Array.isArray(response.data)) return response.data;
+        if (response.data.$values) return response.data.$values;
+      }
+    }
+
+    if (response.data) {
+      if (Array.isArray(response.data)) return response.data;
+      if (response.data.$values) return response.data.$values;
+      if (response.data.data) {
+        if (Array.isArray(response.data.data)) return response.data.data;
+        if (response.data.data.$values) return response.data.data.$values;
+        if (response.data.data.items?.$values)
+          return response.data.data.items.$values;
+        if (response.data.data.items) return response.data.data.items;
+      }
+    }
+
+    if (response.$values) return response.$values;
+    return [];
+  };
+
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      const user = getUserData();
+      if (!user) {
+        toast.error("User not found. Please login again.");
+        navigate("/login");
+        return;
+      }
+
+      const empId = user.empMasterId || user.employeeMasterId || user.id;
+
+      const [
+        selfGoalsRes,
+        orgGoalsRes,
+        teamGoalsRes,
+        myLndAssignmentsRes,
+        myLndSkillsRes,
+        myMeetingsRes,
+        mySlasRes,
+        approvedProfilesRes,
+        statsRes,
+      ] = await Promise.all([
+        goalService
+          .queryGoals({ type: "self", pageSize: 1000 })
+          .catch(() => ({ data: [] })),
+        goalService
+          .queryGoals({ type: "org", pageSize: 1000 })
+          .catch(() => ({ data: [] })),
+        goalService.getMyAssignments().catch(() => ({ data: [] })),
+        lndService.getMyAssignments().catch(() => ({ data: [] })),
+        lndService.getMySkills().catch(() => ({ data: [] })),
+        rsvpService.getMyInvitations().catch(() => []),
+        slaService.getEmployeeSLAs(empId).catch(() => ({ data: [] })),
+        getApprovedProfiles().catch(() => ({ data: [] })),
+        getStatistics().catch(() => ({ data: null })),
+      ]);
+
+      const selfGoals = extractData(selfGoalsRes);
+      const orgGoals = extractData(orgGoalsRes);
+      const teamGoals = extractData(teamGoalsRes);
+      const lndAssignments = extractData(myLndAssignmentsRes);
+      const lndSkills = extractData(myLndSkillsRes);
+
+      const meetings = Array.isArray(myMeetingsRes)
+        ? myMeetingsRes
+        : extractData(myMeetingsRes);
+
+      const slas = extractData(mySlasRes);
+
+      const allGoals = [
+        ...selfGoals.map((g) => ({ ...g, goalType: "self" })),
+        ...orgGoals.map((g) => ({ ...g, goalType: "org" })),
+        ...teamGoals.map((g) => ({ ...g, goalType: "team" })),
+      ];
+
+      const allApprovedProfiles = extractData(approvedProfilesRes);
+      const myRecognitions = allApprovedProfiles.filter((p) => {
+        const nomineeId =
+          p.employeeId || p.employeeMasterId || p.nomineeEmployeeId;
+        return nomineeId === empId;
+      });
+
+      const stats = statsRes?.data || statsRes?.data?.data || null;
+
+      setDashboardData({
+        goals: allGoals,
+        lndAssignments,
+        lndSkills,
+        meetings,
+        slas,
+        performance: {
+          myRecognitions,
+          stats,
+        },
+      });
+    } catch (err) {
+      console.error("Error fetching employee dashboard data:", err);
+      toast.error("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isOverdue = (deadline) => {
+    if (!deadline) return false;
+    if (!slaService || typeof slaService.isOverdue !== "function") return false;
+    return slaService.isOverdue(deadline);
+  };
+
+  const getKPIStats = () => {
+    const now = new Date();
+
+    const totalGoals = dashboardData.goals.length;
+    const totalLndAssignments = dashboardData.lndAssignments.length;
+    const totalMeetings = dashboardData.meetings.length;
+    const totalSlas = dashboardData.slas.length;
+
+    const upcomingMeetings = dashboardData.meetings.filter((m) => {
+      const d = new Date(m.meetingDate || m.date);
+      return d > now;
+    }).length;
+
+    const overdueSlas = dashboardData.slas.filter((s) =>
+      isOverdue(s.deadline || s.dueDate)
+    ).length;
+
+    return {
+      totalGoals,
+      totalLndAssignments,
+      totalMeetings,
+      upcomingMeetings,
+      totalSlas,
+      overdueSlas,
+    };
+  };
+
+  const getPerformanceOverview = () => {
+    const { myRecognitions, stats } = dashboardData.performance;
+
+    const totalRecognitions = myRecognitions.length;
+
+    const byRewardType = {};
+    myRecognitions.forEach((r) => {
+      const type =
+        r.rewardTypeName ||
+        r.rewardType ||
+        (r.rewardTypeId ? `Type ${r.rewardTypeId}` : "Other");
+      byRewardType[type] = (byRewardType[type] || 0) + 1;
+    });
+
+    const chartData = Object.entries(byRewardType).map(
+      ([name, value]) => ({
+        name,
+        value,
+      })
+    );
+
+    const orgTotalNoms =
+      stats?.totalNominations || stats?.total || stats?.count || 0;
+
+    return {
+      totalRecognitions,
+      chartData,
+      orgTotalNoms,
+    };
+  };
+
+  const getGoalsOverview = () => {
+    const goals = dashboardData.goals;
+    if (!goals || goals.length === 0) {
+      return {
+        total: 0,
+        completed: 0,
+        inProgress: 0,
+        pending: 0,
+        chartData: [],
+      };
+    }
+
+    const completed = goals.filter(
+      (g) =>
+        g.status?.toLowerCase() === "completed" ||
+        g.goalStatus?.toLowerCase() === "completed"
+    ).length;
+
+    const inProgress = goals.filter(
+      (g) =>
+        g.status?.toLowerCase() === "inprogress" ||
+        g.goalStatus?.toLowerCase() === "inprogress"
+    ).length;
+
+    const pending = goals.filter((g) => {
+      const status = (g.status || g.goalStatus || "").toLowerCase();
+      return (
+        status === "pending" ||
+        status === "open" ||
+        status === "approved"
+      );
+    }).length;
+
+    const chartData = [];
+    if (completed > 0)
+      chartData.push({
+        name: "Completed",
+        value: completed,
+        fill: "#10b981",
+      });
+    if (inProgress > 0)
+      chartData.push({
+        name: "In Progress",
+        value: inProgress,
+        fill: "#0F62FE",
+      });
+    if (pending > 0)
+      chartData.push({
+        name: "Pending",
+        value: pending,
+        fill: "#f59e0b",
+      });
+
+    return {
+      total: goals.length,
+      completed,
+      inProgress,
+      pending,
+      chartData,
+    };
+  };
+
+  // L&D overview based on skills (lndSkills)
+  const getLndOverview = () => {
+    const skills = dashboardData.lndSkills || [];
+
+    if (!skills.length) {
+      return {
+        total: 0,
+        low: 0,
+        medium: 0,
+        high: 0,
+        chartData: [],
+      };
+    }
+
+    let low = 0;
+    let medium = 0;
+    let high = 0;
+
+    skills.forEach((s) => {
+      const rating =
+        s.rating ||
+        s.proficiency ||
+        s.proficiencyLevel ||
+        s.score ||
+        0;
+      const r = Number(rating);
+      if (isNaN(r)) return;
+      if (r <= 4) low += 1;
+      else if (r <= 7) medium += 1;
+      else high += 1;
+    });
+
+    const chartData = [];
+    if (low > 0) chartData.push({ name: "Level 1–4", value: low, fill: "#f97316" });
+    if (medium > 0) chartData.push({ name: "Level 5–7", value: medium, fill: "#0F62FE" });
+    if (high > 0) chartData.push({ name: "Level 8–10", value: high, fill: "#10b981" });
+
+    return {
+      total: skills.length,
+      low,
+      medium,
+      high,
+      chartData,
+    };
+  };
+
+  const getMeetingsOverview = () => {
+    const meetings = dashboardData.meetings;
+    const now = new Date();
+
+    const upcoming = meetings.filter((m) => {
+      const d = new Date(m.meetingDate || m.date);
+      return d > now;
+    }).length;
+    const completed = meetings.filter((m) => {
+      const d = new Date(m.meetingDate || m.date);
+      return d <= now;
+    }).length;
+
+    const monthlyData = {};
+    meetings.forEach((m) => {
+      const date = new Date(
+        m.meetingDate || m.date || m.createdDate
+      );
+      if (isNaN(date.getTime())) return;
+      const key = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}`;
+      monthlyData[key] = (monthlyData[key] || 0) + 1;
+    });
+
+    const chartData = Object.entries(monthlyData)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .slice(-6)
+      .map(([month, count]) => ({
+        month: new Date(month + "-01").toLocaleDateString("en-US", {
+          month: "short",
+          year: "numeric",
+        }),
+        count,
+      }));
+
+    return {
+      total: meetings.length,
+      upcoming,
+      completed,
+      chartData,
+    };
+  };
+
+  const getSlaOverview = () => {
+    const slas = dashboardData.slas;
+
+    if (!slas || slas.length === 0) {
+      return {
+        total: 0,
+        open: 0,
+        overdue: 0,
+        closed: 0,
+        chartData: [],
+      };
+    }
+
+    const closed = slas.filter(
+      (s) => (s.status || "").toLowerCase() === "closed"
+    ).length;
+    const open = slas.length - closed;
+    const overdue = slas.filter((s) =>
+      isOverdue(s.deadline || s.dueDate)
+    ).length;
+
+    const chartData = [];
+    if (open > 0)
+      chartData.push({
+        name: "Open / In Progress",
+        value: open,
+        fill: "#0F62FE",
+      });
+    if (overdue > 0)
+      chartData.push({
+        name: "Overdue",
+        value: overdue,
+        fill: "#ef4444",
+      });
+    if (closed > 0)
+      chartData.push({
+        name: "Closed",
+        value: closed,
+        fill: "#10b981",
+      });
+
+    return {
+      total: slas.length,
+      open,
+      overdue,
+      closed,
+      chartData,
+    };
+  };
+
+  if (loading) {
+    return (
+      <div className="ada-loading-container">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const kpiStats = getKPIStats();
+  const perfOverview = getPerformanceOverview();
+  const goalsData = getGoalsOverview();
+  const lndData = getLndOverview();
+  const meetingsData = getMeetingsOverview();
+  const slaData = getSlaOverview();
+
+  const CHART_COLORS = [
+    "#2c2c54",
+    "#0F62FE",
+    "#10b981",
+    "#f59e0b",
+    "#E01950",
+    "#8b5cf6",
   ];
+
   return (
-    <div className="dashboard-container">
-      {/* Main Content Grid */}
-      <div className="main-content-grid">
-        {/* Left Column - Management Cards */}
-        <div className="left-column">
-          <div className="section-header"></div>
-          <div className="management-cards-grid">
-            {cards.map((card, index) => (
-              <div
-                key={index}
-                className={`management-card ${
-                  hoveredCard === index ? "hovered" : ""
-                }`}
-                onMouseEnter={() => setHoveredCard(index)}
-                onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => handleNavigation(card.path)}
+    <div className="hr-dashboard-container">
+      <Breadcrumb items={[{ label: "Employee Dashboard" }]} />
+
+      {/* KPI CARDS */}
+      <div className="admin-kpi-grid">
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
+          <div className="admin-kpi-icon admin-purple">
+            <i className="bi bi-trophy"></i>
+          </div>
+          <div className="admin-kpi-content">
+            <h2>
+              <CountUp end={perfOverview.totalRecognitions} duration={2} />
+            </h2>
+            <p>My Recognitions</p>
+            <span className="admin-kpi-subtitle">
+              Organization nominations: {perfOverview.orgTotalNoms}
+            </span>
+          </div>
+        </div>
+
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
+          <div className="admin-kpi-icon admin-blue">
+            <Target size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2>
+              <CountUp end={kpiStats.totalGoals} duration={2} />
+            </h2>
+            <p>My Goals</p>
+            <span className="admin-kpi-subtitle">
+              <TrendingUp size={12} /> Self / Team / Org
+            </span>
+          </div>
+        </div>
+
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
+          <div className="admin-kpi-icon admin-pink">
+            <BookOpen size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2>
+              <CountUp end={dashboardData.lndSkills.length} duration={2} />
+            </h2>
+            <p>My Skills</p>
+            <span className="admin-kpi-subtitle">
+              From L&D module
+            </span>
+          </div>
+        </div>
+
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
+          <div className="admin-kpi-icon admin-green">
+            <Calendar size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2>
+              <CountUp end={kpiStats.totalMeetings} duration={2} />
+            </h2>
+            <p>Meetings</p>
+            <span className="admin-kpi-subtitle">
+              {kpiStats.upcomingMeetings} upcoming
+            </span>
+          </div>
+        </div>
+
+        <div
+          className="admin-kpi-card"
+          onClick={() => navigate("")}
+        >
+          <div className="admin-kpi-icon admin-cyan">
+            <AlertTriangle size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2>
+              <CountUp end={kpiStats.totalSlas} duration={2} />
+            </h2>
+            <p>My SLAs</p>
+            <span className="admin-kpi-subtitle">
+              {kpiStats.overdueSlas} overdue
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ANALYTICS CARDS */}
+      <div className="dashboard-cards-container">
+        {/* ROW 1: Performance + Goals */}
+        <div className="dashboard-row">
+          {/* Performance card */}
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-graph-up"></i>
+                <h3>Performance & Recognition</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              {perfOverview.totalRecognitions > 0 ? (
+                <>
+                  <div style={{ marginBottom: "1rem" }}>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "0.75rem",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          background: "#f0f9ff",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #bfdbfe",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#0F62FE",
+                          }}
+                        >
+                          {perfOverview.totalRecognitions}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#1e40af",
+                          }}
+                        >
+                          My Recognitions
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#f0fdf4",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #86efac",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#10b981",
+                          }}
+                        >
+                          {perfOverview.orgTotalNoms}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#047857",
+                          }}
+                        >
+                          Org Nominations
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {perfOverview.chartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={perfOverview.chartData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={40}
+                          outerRadius={60}
+                          paddingAngle={2}
+                          dataKey="value"
+                          label={({ name, value }) => `${name}: ${value}`}
+                        >
+                          {perfOverview.chartData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={CHART_COLORS[index % CHART_COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="no-data-message">
+                      No breakdown by reward type
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="no-data-message">
+                  No approved recognitions yet
+                </div>
+              )}
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/employee/dashboard/performance")}
               >
-                <div className={`card-icon-wrapper ${card.gradient}`}>
-                  <i className={`bi ${card.icon}`}></i>
-                </div>
-                <div className="card-content">
-                  <h3 className="card-title">{card.title}</h3>
-                  <p className="card-description">{card.description}</p>
-                </div>
-                <div className="card-arrow">
-                  <i className="bi bi-arrow-right"></i>
+                View Performance Details
+              </button>
+            </div>
+          </div>
+
+          {/* Goals card */}
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-bullseye"></i>
+                <h3>Goals Overview</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              {goalsData.total > 0 ? (
+                <>
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr 1fr",
+                        gap: "0.75rem",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          background: "#f0f9ff",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #bfdbfe",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#0F62FE",
+                          }}
+                        >
+                          {goalsData.total}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#1e40af",
+                          }}
+                        >
+                          Total
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#f0fdf4",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #86efac",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#10b981",
+                          }}
+                        >
+                          {goalsData.completed}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#047857",
+                          }}
+                        >
+                          Completed
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#fef3c7",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #fcd34d",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#d97706",
+                          }}
+                        >
+                          {goalsData.inProgress}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#b45309",
+                          }}
+                        >
+                          In Progress
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={goalsData.chartData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={70}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
+                        {goalsData.chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </>
+              ) : (
+                <div className="no-data-message">No goal data</div>
+              )}
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/employee/dashboard/goals")}
+              >
+                View All Goals
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ROW 2: Meetings + L&D + SLAs */}
+        <div className="dashboard-row">
+          {/* Meetings */}
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-calendar-check"></i>
+                <h3>Meetings Scheduled</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              <div style={{ marginBottom: "1rem" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr",
+                    gap: "0.75rem",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "#f0f9ff",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #bfdbfe",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#0F62FE",
+                      }}
+                    >
+                      {meetingsData.total}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.7rem",
+                        color: "#1e40af",
+                      }}
+                    >
+                      Total
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      background: "#f0fdf4",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #86efac",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#10b981",
+                      }}
+                    >
+                      {meetingsData.upcoming}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.7rem",
+                        color: "#047857",
+                      }}
+                    >
+                      Upcoming
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      background: "#fef3c7",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #fcd34d",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#d97706",
+                      }}
+                    >
+                      {meetingsData.completed}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "0.7rem",
+                        color: "#b45309",
+                      }}
+                    >
+                      Completed
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+              {meetingsData.chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={meetingsData.chartData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#f3f4f6"
+                      vertical={false}
+                    />
+                    <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
+                    <YAxis stroke="#9ca3af" fontSize={11} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke="#2c2c54"
+                      strokeWidth={2}
+                      dot={{ fill: "#2c2c54", r: 4 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="no-data-message">No meeting data</div>
+              )}
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/employee/dashboard/meetmom")}
+              >
+                View All Meetings
+              </button>
+            </div>
+          </div>
+
+          {/* L&D (skills based) */}
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-book"></i>
+                <h3>Learning & Development</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              {lndData.total > 0 ? (
+                <>
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                        gap: "0.75rem",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          background: "#f0f9ff",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #bfdbfe",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#0F62FE",
+                          }}
+                        >
+                          {lndData.total}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#1e40af",
+                          }}
+                        >
+                          Total Skills
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#fee2e2",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #fecaca",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#f97316",
+                          }}
+                        >
+                          {lndData.low}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#c2410c",
+                          }}
+                        >
+                          Level 1–4
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#dbeafe",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #93c5fd",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#0F62FE",
+                          }}
+                        >
+                          {lndData.medium}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#1d4ed8",
+                          }}
+                        >
+                          Level 5–7
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#f0fdf4",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #86efac",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#10b981",
+                          }}
+                        >
+                          {lndData.high}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#047857",
+                          }}
+                        >
+                          Level 8–10
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={lndData.chartData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={70}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
+                        {lndData.chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </>
+              ) : (
+                <div className="no-data-message">
+                  No skills recorded in L&D
+                </div>
+              )}
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/employee/lnd/dashboard")}
+              >
+                View My Skills
+              </button>
+            </div>
+          </div>
+
+          {/* SLAs */}
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-file-earmark-check"></i>
+                <h3>My SLAs</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              {slaData.total > 0 ? (
+                <>
+                  <div style={{ marginBottom: "1rem" }}>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr 1fr",
+                        gap: "0.75rem",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          background: "#f0f9ff",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #bfdbfe",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#0F62FE",
+                          }}
+                        >
+                          {slaData.total}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#1e40af",
+                          }}
+                        >
+                          Total
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#fee2e2",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #fca5a5",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#ef4444",
+                          }}
+                        >
+                          {slaData.overdue}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#dc2626",
+                          }}
+                        >
+                          Overdue
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          background: "#f0fdf4",
+                          padding: "0.75rem",
+                          borderRadius: "6px",
+                          textAlign: "center",
+                          border: "1px solid #86efac",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            color: "#10b981",
+                          }}
+                        >
+                          {slaData.closed}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#047857",
+                          }}
+                        >
+                          Closed
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={slaData.chartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={70}
+                        paddingAngle={3}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
+                        {slaData.chartData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={CHART_COLORS[index % CHART_COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </>
+              ) : (
+                <div className="no-data-message">No SLA data</div>
+              )}
+              <button
+                className="card-view-btn"
+                onClick={() => navigate("/employee/dashboard/sla")}
+              >
+                View All SLAs
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 export default EmployeeDashboard;
