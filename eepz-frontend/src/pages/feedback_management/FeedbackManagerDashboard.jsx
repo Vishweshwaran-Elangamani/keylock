@@ -1,11 +1,11 @@
+// src/pages/feedback_management/dashboard/FeedbackManagerDashboard.jsx
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   RefreshCw,
   AlertTriangle,
   FileText,
   Plus,
-  Clock,
   Send,
   Search,
   Eye,
@@ -14,275 +14,299 @@ import {
   Target,
   Briefcase,
   MessageSquare,
+  Loader,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   peerQueueApi,
-  employeeApi,
   hrFormApi,
   managerReviewApi,
 } from "../../services/feedbackmanagement/feedbackApi";
 import FeedbackBreadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
 import "../../styles/feedback/FeedbackManagerDashboard.css";
 
-const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
-  <div className="fm-mgrdash-stat-card">
-    <div className="fm-mgrdash-stat-card__body">
-      <div
-        className="fm-mgrdash-stat-card__icon"
-        style={{ backgroundColor: bgColor }}
-      >
-        <Icon size={28} color={iconColor} strokeWidth={2.5} />
-      </div>
-      <h2 className="fm-mgrdash-stat-card__value">{value}</h2>
-      <p className="fm-mgrdash-stat-card__label">{label}</p>
-    </div>
-  </div>
-);
+// Helper function to get role-based feedback dashboard path
+const getFeedbackDashboardPath = (roleName) => {
+  const routes = {
+    Employee: "/employee/dashboard/feedback",
+    Manager: "/manager/dashboard/feedback",
+    DepartmentHead: "/depthead/dashboard/feedback",
+    "Department Head": "/depthead/dashboard/feedback",
+    HR: "/hr/dashboard/feedback",
+  };
+  return routes[roleName] || "/hr/dashboard/feedback";
+};
 
 export default function FeedbackManagerDashboard() {
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [user] = useState(
+  const user = useMemo(
     () =>
       JSON.parse(localStorage.getItem("user") || "{}") || {
         empId: 1002,
         firstName: "Manager",
         lastName: "User",
         roleName: "Manager",
-      }
+      },
+    []
   );
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [activeTab] = useState("overview");
+
+  // State for each stat
   const [myReviews, setMyReviews] = useState([]);
-  const [draftReviews, setDraftReviews] = useState([]);
-  const [targetReviews, setTargetReviews] = useState([]);
   const [myPeerFeedback, setMyPeerFeedback] = useState([]);
-  const [submittedForms, setSubmittedForms] = useState([]);
-  const [activeHrForms, setActiveHrForms] = useState([]);
-  const [employeeMap, setEmployeeMap] = useState({});
+  const [allForms, setAllForms] = useState([]);
+  const [submittedFormIds, setSubmittedFormIds] = useState(new Set());
 
-  // Enrich reviews with employee names
-  const enrichReviews = (reviews, empMap) => {
-    return reviews.map((review) => ({
-      ...review,
-      targetEmployeeName:
-        empMap[review.targetEmployeeId] ||
-        review.targetEmployeeName ||
-        `Employee ${review.targetEmployeeId}`,
-      managerName:
-        empMap[review.managerEmployeeId] ||
-        `Manager ${review.managerEmployeeId}`,
-    }));
-  };
-
-  // Fetch dashboard data using services
-  const fetchDashboardData = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const managerId = user?.empId || 1002;
-
-      // Fetch employee map
-      let empMap = {};
+  // Fetch MY reviews (reviews I created as a manager)
+  const fetchMyReviews = useCallback(
+    async (retryCount = 0) => {
+      if (!user?.empId) return;
       try {
-        const empRes = await employeeApi.getAll();
-        if (empRes?.data) {
-          const employees = Array.isArray(empRes.data)
-            ? empRes.data
-            : empRes.data.data || [];
-
-          employees.forEach((emp) => {
-            empMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
-          });
-          setEmployeeMap(empMap);
-        }
-      } catch (err) {
-        console.warn("Error fetching employee map:", err.message);
-      }
-
-      // Fetch my reviews
-      try {
-        const myRes = await managerReviewApi.getByManager(managerId);
+        const myRes = await managerReviewApi.getByManager(user.empId);
         const reviewsData = Array.isArray(myRes?.data)
           ? myRes.data
-          : myRes?.data?.data || [];
-
-        if (Array.isArray(reviewsData)) {
-          const enriched = enrichReviews(reviewsData, empMap);
-          setMyReviews(enriched);
+          : Array.isArray(myRes?.data?.data)
+          ? myRes.data.data
+          : [];
+        setMyReviews(reviewsData);
+      } catch (err) {
+        console.error("Error fetching my reviews:", err);
+        setMyReviews([]);
+        if (retryCount < 1 && err?.response?.status >= 500) {
+          setTimeout(() => fetchMyReviews(retryCount + 1), 2000);
         }
-      } catch (err) {
-        console.warn("Error fetching my reviews:", err.message);
       }
+    },
+    [user?.empId]
+  );
 
-      // Fetch draft reviews
+  // Fetch peer feedback RECEIVED by me (approved feedback only)
+  const fetchPeerFeedback = useCallback(
+    async (retryCount = 0) => {
+      if (!user?.empId) return;
       try {
-        const draftRes = await managerReviewApi.getByStatus("Draft");
-        const draftData = Array.isArray(draftRes?.data)
-          ? draftRes.data
-          : draftRes?.data?.data || [];
+        const approvedRes = await peerQueueApi.approved();
+        const approvedData = Array.isArray(approvedRes?.data)
+          ? approvedRes.data
+          : Array.isArray(approvedRes?.data?.data)
+          ? approvedRes.data.data
+          : [];
 
-        if (Array.isArray(draftData)) {
-          const myDrafts = draftData.filter(
-            (r) => Number(r.managerEmployeeId) === Number(managerId)
-          );
-          const enriched = enrichReviews(myDrafts, empMap);
-          setDraftReviews(enriched);
+        const myFeedback = approvedData.filter(
+          (p) => Number(p.recipientEmployeeId) === Number(user.empId)
+        );
+        setMyPeerFeedback(myFeedback);
+      } catch (err) {
+        console.error("Error fetching peer feedback:", err);
+        setMyPeerFeedback([]);
+        if (retryCount < 1 && err?.response?.status >= 500) {
+          setTimeout(() => fetchPeerFeedback(retryCount + 1), 2000);
         }
-      } catch (err) {
-        console.warn("Error fetching drafts:", err.message);
       }
+    },
+    [user?.empId]
+  );
 
-      // Fetch reviews about me
+  // Fetch ALL forms (active and inactive)
+  const fetchAllForms = useCallback(
+    async (retryCount = 0) => {
+      if (!user?.empId) return;
       try {
-        const targetRes = await managerReviewApi.getByTargetEmployee(managerId);
-        const targetData = Array.isArray(targetRes?.data)
-          ? targetRes.data
-          : targetRes?.data?.data || [];
-
-        if (Array.isArray(targetData)) {
-          const enriched = enrichReviews(targetData, empMap);
-          setTargetReviews(enriched);
+        const formsRes = await hrFormApi.listForms();
+        const formsData = Array.isArray(formsRes?.data)
+          ? formsRes.data
+          : Array.isArray(formsRes?.data?.data)
+          ? formsRes.data.data
+          : [];
+        setAllForms(formsData);
+      } catch (err) {
+        console.error("Error fetching all forms:", err);
+        setAllForms([]);
+        if (retryCount < 1 && err?.response?.status >= 500) {
+          setTimeout(() => fetchAllForms(retryCount + 1), 2000);
         }
-      } catch (err) {
-        console.warn("Error fetching reviews about me:", err.message);
       }
+    },
+    [user?.empId]
+  );
 
-      // Fetch peer feedback
+  // Fetch submitted forms by THIS manager
+  const fetchSubmittedForms = useCallback(
+    async (retryCount = 0) => {
+      if (!user?.empId || allForms.length === 0) return;
       try {
-        const peerRes = await peerQueueApi.list(1, 1000);
-        const peerData = Array.isArray(peerRes?.data)
-          ? peerRes.data
-          : peerRes?.data?.data || [];
+        const submittedIds = new Set();
 
-        if (Array.isArray(peerData)) {
-          const myFeedback = peerData
-            .filter((p) => Number(p.recipientEmployeeId) === Number(managerId))
-            .map((p) => ({
-              ...p,
-              submittedByName:
-                empMap[p.submittedByEmployeeId] ||
-                `Employee ${p.submittedByEmployeeId}`,
-            }));
-          setMyPeerFeedback(myFeedback);
+        for (const form of allForms) {
+          try {
+            const responsesRes = await hrFormApi.byForm(form.formId);
+            const responses = Array.isArray(responsesRes?.data)
+              ? responsesRes.data
+              : Array.isArray(responsesRes?.data?.data)
+              ? responsesRes.data.data
+              : [];
+
+            const hasSubmitted = responses.some(
+              (r) => Number(r.submittedByEmployeeId) === Number(user.empId)
+            );
+
+            if (hasSubmitted) {
+              submittedIds.add(form.formId);
+            }
+          } catch (formErr) {
+            console.warn(`Error checking form ${form.formId}:`, formErr.message);
+          }
         }
-      } catch (err) {
-        console.warn("Error fetching peer feedback:", err.message);
-      }
 
-      // Fetch active HR forms
-      try {
-        const activeRes = await hrFormApi.getActiveForms();
-        const forms = activeRes?.data || [];
-        setActiveHrForms(Array.isArray(forms) ? forms : []);
+        setSubmittedFormIds(submittedIds);
       } catch (err) {
-        console.warn("Error fetching active forms:", err.message);
+        console.error("Error fetching submitted forms:", err);
+        setSubmittedFormIds(new Set());
+        if (retryCount < 1 && err?.response?.status >= 500) {
+          setTimeout(() => fetchSubmittedForms(retryCount + 1), 2000);
+        }
       }
+    },
+    [user?.empId, allForms]
+  );
 
-      // Fetch submitted forms
-      try {
-        const submittedRes = await hrFormApi.getResponsesByEmployee(managerId);
-        const responses = submittedRes?.data || [];
-        setSubmittedForms(Array.isArray(responses) ? responses : []);
-      } catch (err) {
-        console.warn("Error fetching submitted forms:", err.message);
-      }
+  // Fetch all dashboard data
+  const fetchDashboardData = useCallback(async () => {
+    if (!user?.empId) {
+      setError("User not authenticated. Please log in.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      // Fetch reviews and peer feedback in parallel
+      await Promise.all([fetchMyReviews(), fetchPeerFeedback()]);
+      
+      // Fetch forms first
+      await fetchAllForms();
     } catch (err) {
-      console.error("Error:", err);
-      setError("Failed to load dashboard");
+      let msg = "Failed to load dashboard data.";
+      if (err?.response?.status === 404) {
+        msg = "Endpoint not found. Please contact support.";
+      } else if (
+        err?.code === "ECONNABORTED" ||
+        err?.message?.includes("timeout")
+      ) {
+        msg = "Request timeout. Please try again.";
+      } else {
+        msg = err?.response?.data?.message || err?.message || msg;
+      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.empId, fetchMyReviews, fetchPeerFeedback, fetchAllForms]);
 
-  // Load data on mount
+  // Fetch submitted forms after allForms is populated
   useEffect(() => {
-    fetchDashboardData();
-  }, [user?.empId]);
+    if (allForms.length > 0) {
+      fetchSubmittedForms();
+    }
+  }, [allForms, fetchSubmittedForms]);
 
-  // Refresh handler
-  const refresh = async () => {
-    setRefreshing(true);
-    await fetchDashboardData();
-    setRefreshing(false);
-  };
+  // Initial data fetch
+  useEffect(() => {
+    if (user?.empId) {
+      fetchDashboardData();
+    }
+  }, [user?.empId, fetchDashboardData]);
 
   // Calculate stats
   const stats = useMemo(() => {
-    const submittedFormIds = new Set(submittedForms.map((f) => f.formId));
-    const pendingForms = activeHrForms.filter(
-      (f) => !submittedFormIds.has(f.formId)
-    ).length;
+    const pending = allForms.filter((f) => !submittedFormIds.has(f.formId)).length;
 
-    return [
-      {
-        label: "My Reviews",
-        value: myReviews.length,
-        Icon: Star,
-        bgColor: "#dbeafe",
-        iconColor: "#0F62FE",
-      },
-      
-      {
-        label: "Pending Forms",
-        value: pendingForms,
-        Icon: FileText,
-        bgColor: "#fee2e2",
-        iconColor: "#E01950",
-      },
-      {
-        label: "Peer Feedback",
-        value: myPeerFeedback.length,
-        Icon: Users,
-        bgColor: "#f8f0ff",
-        iconColor: "#9D4EDD",
-      },
-    ];
-  }, [myReviews, draftReviews, activeHrForms, submittedForms, myPeerFeedback]);
+    return {
+      myReviews: myReviews.length,
+      pendingForms: pending,
+      peerFeedback: myPeerFeedback.length,
+    };
+  }, [myReviews, myPeerFeedback, allForms, submittedFormIds]);
 
-  if (loading) {
-    return (
-      <div className="fm-mgrdash-loading">
-        <div className="spinner-border fm-mgrdash-loading__spinner">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchDashboardData();
+    setRefreshing(false);
+  }, [fetchDashboardData]);
+
+  const feedbackDashboardPath = user?.roleName
+    ? getFeedbackDashboardPath(user.roleName)
+    : "/manager/dashboard/feedback";
 
   return (
     <div className="fm-mgrdash-page-wrapper">
-      {/* Breadcrumb */}
       <FeedbackBreadcrumb
         items={[
-          { label: "Feedback Management", path: "/manager/dashboard/feedback" },
+          { label: "Feedback Management", path: feedbackDashboardPath },
           { label: "Manager Dashboard" },
         ]}
       />
 
       {/* Error Alert */}
       {error && (
-        <div className="fm-mgrdash-error-alert alert alert-danger alert-dismissible fade show">
-          <AlertTriangle size={16} className="flex-shrink-0 fm-mgrdash-error-alert__icon" />
-          <div className="flex-grow-1">
-            <p className="mb-0 fm-mgrdash-error-alert__text">{error}</p>
+        <div className="fm-mgrdash-error-alert">
+          <AlertTriangle size={18} className="fm-mgrdash-error-alert__icon" />
+          <div className="fm-mgrdash-error-alert__content">
+            <strong>Error:</strong> {error}
           </div>
           <button
-            type="button"
-            className="btn-close"
+            className="fm-mgrdash-error-alert__close"
             onClick={() => setError("")}
-          />
+            title="Close"
+            type="button"
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* Stats Cards */}
+      {/* Stats Grid */}
       <div className="fm-mgrdash-stats">
-        {stats.map((s, idx) => (
-          <StatCard key={idx} {...s} />
-        ))}
+        <div className="fm-mgrdash-stat-card">
+          <div className="fm-mgrdash-stat-card__body">
+            <div
+              className="fm-mgrdash-stat-card__icon"
+              style={{ backgroundColor: "#EEF2FF" }}
+            >
+              <Star size={28} color="#3B82F6" strokeWidth={2.5} />
+            </div>
+            <h2 className="fm-mgrdash-stat-card__value">{stats.myReviews}</h2>
+            <p className="fm-mgrdash-stat-card__label">My Reviews</p>
+          </div>
+        </div>
+
+        <div className="fm-mgrdash-stat-card">
+          <div className="fm-mgrdash-stat-card__body">
+            <div
+              className="fm-mgrdash-stat-card__icon"
+              style={{ backgroundColor: "#FEE2E2" }}
+            >
+              <FileText size={28} color="#E01950" strokeWidth={2.5} />
+            </div>
+            <h2 className="fm-mgrdash-stat-card__value">{stats.pendingForms}</h2>
+            <p className="fm-mgrdash-stat-card__label">Pending Forms</p>
+          </div>
+        </div>
+
+        <div className="fm-mgrdash-stat-card">
+          <div className="fm-mgrdash-stat-card__body">
+            <div
+              className="fm-mgrdash-stat-card__icon"
+              style={{ backgroundColor: "#DCFCE7" }}
+            >
+              <Users size={28} color="#16A34A" strokeWidth={2.5} />
+            </div>
+            <h2 className="fm-mgrdash-stat-card__value">{stats.peerFeedback}</h2>
+            <p className="fm-mgrdash-stat-card__label">Peer Feedback</p>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -293,19 +317,23 @@ export default function FeedbackManagerDashboard() {
               className={`fm-mgrdash-tabs__button ${
                 activeTab === "overview" ? "fm-mgrdash-tabs__button--active" : ""
               }`}
-              onClick={() => setActiveTab("overview")}
             >
               <Briefcase size={16} />
               <span>Quick Actions</span>
             </button>
           </li>
         </ul>
+       
       </div>
 
       {/* Content Area */}
       <div className="fm-mgrdash-content">
-        {/* Overview Tab - Quick Actions */}
-        {activeTab === "overview" && (
+        {loading ? (
+          <div className="fm-mgrdash-loading">
+            <Loader size={48} className="fm-mgrdash-loading__spinner" />
+            <p className="fm-mgrdash-loading__text">Loading dashboard...</p>
+          </div>
+        ) : (
           <div className="fm-mgrdash-actions-grid">
             {/* Manager Functions */}
             <Link
@@ -315,9 +343,7 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
                 <Plus size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">
-                Create Review
-              </span>
+              <span className="fm-mgrdash-action-card__label">Create Review</span>
             </Link>
 
             <Link
@@ -327,9 +353,7 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
                 <Eye size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">
-                All Reviews
-              </span>
+              <span className="fm-mgrdash-action-card__label">All Reviews</span>
             </Link>
 
             <Link
@@ -344,18 +368,6 @@ export default function FeedbackManagerDashboard() {
               </span>
             </Link>
 
-            <Link
-              to="/manager/dashboard/feedback/team-submissions"
-              className="fm-mgrdash-action-card"
-            >
-              <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
-                <FileText size={20} />
-              </div>
-              <span className="fm-mgrdash-action-card__label">
-                Team Submissions
-              </span>
-            </Link>
-
             {/* Employee-like actions */}
             <Link
               to="/manager/dashboard/feedback/submit-mentor"
@@ -364,9 +376,7 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Send size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">
-                Mentor Feedback
-              </span>
+              <span className="fm-mgrdash-action-card__label">Mentor Feedback</span>
             </Link>
 
             <Link
@@ -376,9 +386,7 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <MessageSquare size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">
-                Context Feedback
-              </span>
+              <span className="fm-mgrdash-action-card__label">Context Feedback</span>
             </Link>
 
             <Link
@@ -388,9 +396,7 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Target size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">
-                Assigned Forms
-              </span>
+              <span className="fm-mgrdash-action-card__label">Assigned Forms</span>
             </Link>
 
             <Link
@@ -400,9 +406,7 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Search size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">
-                My Submissions
-              </span>
+              <span className="fm-mgrdash-action-card__label">My Submissions</span>
             </Link>
           </div>
         )}

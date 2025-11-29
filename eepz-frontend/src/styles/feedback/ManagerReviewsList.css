@@ -1,3 +1,4 @@
+
 /* src/styles/feedback/ManagerReviewsList.css */
 /* Namespace: fm-mgrrev- (feedback management, manager reviews) */
 
@@ -164,6 +165,7 @@
 .fm-mgrrev-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* Ensures consistent column widths */
 }
 
 .fm-mgrrev-table__head {
@@ -171,16 +173,21 @@
   color: white;
 }
 
-.fm-mgrrev-table__th {
-  padding: 1.25rem 1.5rem;
-  text-align: left;
-  font-weight: 600;
+.fm-mgrrev-table__th,
+.fm-mgrrev-table__td {
+  padding: 1rem 1.25rem; /* Unified padding */
   font-size: 0.875rem;
-  white-space: nowrap;
+  text-align: left;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
-.fm-mgrrev-table__th--center {
+.fm-mgrrev-table__th {
+  font-weight: 600;
+}
+
+.fm-mgrrev-table__th--center,
+.fm-mgrrev-table__td--center {
   text-align: center;
 }
 
@@ -201,14 +208,8 @@
   border-bottom: none;
 }
 
-.fm-mgrrev-table__td {
-  padding: 1.25rem 1.5rem;
-  font-size: 0.875rem;
-  vertical-align: middle;
-}
-
 .fm-mgrrev-table__td--comment {
-  max-width: 350px;
+  max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -220,6 +221,7 @@
   white-space: nowrap;
 }
 
+/* Employee Cell */
 .fm-mgrrev-table__employee {
   display: flex;
   align-items: center;
@@ -261,6 +263,20 @@
   align-items: center;
   gap: 0.5rem;
 }
+
+/* Column Widths for Alignment */
+.fm-mgrrev-table__th:nth-child(1),
+.fm-mgrrev-table__td:nth-child(1) { width: 25%; }
+.fm-mgrrev-table__th:nth-child(2),
+.fm-mgrrev-table__td:nth-child(2) { width: 15%; }
+.fm-mgrrev-table__th:nth-child(3),
+.fm-mgrrev-table__td:nth-child(3) { width: 15%; }
+.fm-mgrrev-table__th:nth-child(4),
+.fm-mgrrev-table__td:nth-child(4) { width: 25%; }
+.fm-mgrrev-table__th:nth-child(5),
+.fm-mgrrev-table__td:nth-child(5) { width: 10%; }
+.fm-mgrrev-table__th:nth-child(6),
+.fm-mgrrev-table__td:nth-child(6) { width: 10%; }
 
 /* Badges */
 .fm-mgrrev-badge {
@@ -454,28 +470,23 @@
   .fm-mgrrev-page-wrapper {
     padding: 1rem;
   }
-
   .fm-mgrrev-header {
     flex-direction: column;
     align-items: stretch;
   }
-
   .fm-mgrrev-actions {
     width: 100%;
     flex-direction: column;
   }
-
   .fm-mgrrev-btn {
     width: 100%;
     justify-content: center;
   }
-
   .fm-mgrrev-table__th,
   .fm-mgrrev-table__td {
     padding: 1rem 0.75rem;
     font-size: 0.813rem;
   }
-
   .fm-mgrrev-table__td--comment {
     max-width: 200px;
   }
@@ -486,15 +497,12 @@
   .fm-mgrrev-table__td {
     padding: 0.875rem 0.5rem;
   }
-
   .fm-mgrrev-table__employee {
     gap: 0.375rem;
   }
-
   .fm-mgrrev-table__name {
     font-size: 0.813rem;
   }
-
   .fm-mgrrev-badge {
     padding: 0.375rem 0.75rem;
     font-size: 0.688rem;

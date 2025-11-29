@@ -60,7 +60,7 @@ export const peerQueueApi = {
     api.post(`/peerfeedbackqueue/${id}/reject`, null, {
       params: { rejectedByHRId },
     }),
-  remove: (id) => api.delete(`/peerfeedbackqueue/${id}`),
+  remove: (id) => api.delete(`/PeerFeedbackQueue/{queueId}${id}`),
   pending: () => api.get("/peerfeedbackqueue/pending"),
   approved: () => api.get("/peerfeedbackqueue/approved"),
   list: (page = 1, size = 20) =>

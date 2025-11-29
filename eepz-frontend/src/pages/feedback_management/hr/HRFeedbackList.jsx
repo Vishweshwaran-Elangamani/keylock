@@ -9,6 +9,7 @@ import {
   Users,
   Send,
   Clock,
+  ChartLineIcon,
   Lock,
   User,
   Brain,
@@ -23,6 +24,7 @@ import {
   BarChart,
   Shield,
   Lightbulb,
+  ChartLine,
 } from "lucide-react";
 import {
   mentorFeedbackApi,
@@ -33,6 +35,7 @@ import {
 } from "../../../services/feedbackmanagement/feedbackApi";
 import ResponseViewModal from "../../../components/feedback_management/modals/ResponseViewModal";
 import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb";
+import FeedbackDeleteConfirmModal from "../../../components/feedback_management/modals/FeedbackDeleteConfirmModal";
 
 const Badge = ({ text, color = "#525252" }) => (
   <span
@@ -69,6 +72,14 @@ export default function HRFeedbackList() {
   const [analysisData, setAnalysisData] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+
+
+  // State declarations
+const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [deleteFeedbackData, setDeleteFeedbackData] = useState(null);
+const [deleteFeedbackType, setDeleteFeedbackType] = useState("");
 
   // Fetch employee map using service
   const fetchEmployeeMap = async () => {
@@ -269,50 +280,79 @@ export default function HRFeedbackList() {
     setAnalysisError("");
   };
 
-  // Delete HR Form using service
-  const deleteHRForm = async (responseId) => {
-    if (
-      !window.confirm(
-        "Delete this HR form submission? This action cannot be undone."
-      )
-    )
-      return;
-    setError("");
+  const handleDeleteSuccess = async () => {
+  // Force refresh by calling fetchData directly
+  setRefreshing(true);
+  setLoading(true);
+  
+  try {
+    await fetchData();
+  } finally {
+    setRefreshing(false);
+    setLoading(false);
+  }
+};
 
-    try {
-      await hrFormApi.deleteResponse(responseId);
-      fetchData();
-    } catch (err) {
-      console.error("Delete error:", err);
-      setError(err?.message || "Failed to delete HR form");
-    }
-  };
 
-  // Delete Mentor Feedback using service
-  const deleteMentor = async (trackingId) => {
-    if (!window.confirm("Delete this mentor feedback submission?")) return;
-    setError("");
 
-    try {
-      await mentorFeedbackApi.remove(trackingId);
-      fetchData();
-    } catch (err) {
-      setError(err?.message || "Failed to delete mentor feedback");
-    }
-  };
+// ✅ KEEP ONLY THESE THREE HANDLERS:
 
-  // Delete Peer Feedback using service
-  const deletePeer = async (queueId) => {
-    if (!window.confirm("Delete this peer feedback submission?")) return;
-    setError("");
+const handleDeleteClick = (item, type) => {
+  console.log("Delete clicked:", { type, item }); // Debug log
+  setDeleteFeedbackData(item);
+  setDeleteFeedbackType(type);
+  setShowDeleteModal(true);
+};
 
-    try {
-      await peerQueueApi.remove(queueId);
-      fetchData();
-    } catch (err) {
-      setError(err?.message || "Failed to delete peer feedback");
-    }
-  };
+const handleCloseDeleteModal = () => {
+  setShowDeleteModal(false);
+  setDeleteFeedbackData(null);
+  setDeleteFeedbackType("");
+};
+
+
+
+const getDeleteItemName = () => {
+  if (!deleteFeedbackData) return "";
+
+  if (deleteFeedbackType === "Mentor") {
+    return (
+      deleteFeedbackData.mentorNameFull ||
+      deleteFeedbackData.mentorName ||
+      `Employee ${deleteFeedbackData.mentorEmployeeId}`
+    );
+  } else if (deleteFeedbackType === "Peer") {
+    const submitter =
+      deleteFeedbackData.submitterNameFull ||
+      deleteFeedbackData.submitterName ||
+      `Employee ${deleteFeedbackData.submittedByEmployeeId}`;
+    const recipient =
+      deleteFeedbackData.recipientNameFull ||
+      deleteFeedbackData.recipientName ||
+      `Employee ${deleteFeedbackData.recipientEmployeeId}`;
+    return `From ${submitter} to ${recipient}`;
+  } else if (deleteFeedbackType === "HR") {
+    return deleteFeedbackData.formName || "HR Form";
+  }
+  return "";
+};
+
+const getDeleteTitle = () => {
+  if (deleteFeedbackType === "Mentor") return "Delete Mentor Feedback";
+  if (deleteFeedbackType === "Peer") return "Delete Peer Feedback";
+  if (deleteFeedbackType === "HR") return "Delete HR Form";
+  return "Delete Submission";
+};
+
+const getDeleteMessage = () => {
+  if (deleteFeedbackType === "Mentor")
+    return "Are you sure you want to delete this mentor feedback submission?";
+  if (deleteFeedbackType === "Peer")
+    return "Are you sure you want to delete this peer feedback submission?";
+  if (deleteFeedbackType === "HR")
+    return "Are you sure you want to delete this HR form submission?";
+  return "Are you sure you want to delete this submission?";
+};
 
   // Helper functions
   const getMentorName = (m) => {
@@ -374,13 +414,25 @@ export default function HRFeedbackList() {
     return "#6c757d";
   };
 
-  const inputText = analysisData.input_text || "";
-// Regex to capture [Project] and the rest
-const match = inputText.match(/^\[(.*?)\]\s*(.*)$/);
+  // Parse analysis input - FIXED
+  const parseAnalysisInput = () => {
+    if (!analysisData || !analysisData.input_text) {
+      return {
+        projectTitle: "No project title",
+        comment: "No comment available",
+      };
+    }
 
-const projectTitle = match ? match[1] : "No project title";
-const comment = match ? match[2] : "No comment available";
+    const inputText = analysisData.input_text;
+    const match = inputText.match(/^\[(.*?)\]\s*(.*)$/);
 
+    return {
+      projectTitle: match ? match[1] : "No project title",
+      comment: match ? match[2] : inputText || "No comment available",
+    };
+  };
+
+  const { projectTitle, comment } = parseAnalysisInput();
 
   return (
     <div className="hrfeedback-list-container">
@@ -393,31 +445,7 @@ const comment = match ? match[2] : "No comment available";
           ]}
         />
 
-        {/* Header */}
-        <div className="hrfeedback-list-header">
-          <div>
-            <h2 className="hrfeedback-list-title">
-              All Feedback Submissions
-            </h2>
-            <p className="hrfeedback-list-subtitle">
-              View and manage all feedback submissions (Mentor & Peer)
-            </p>
-          </div>
-          <button
-            className="hrfeedback-refresh-btn"
-            onClick={() => {
-              fetchEmployeeMap();
-              fetchData();
-            }}
-            disabled={refreshing || loading}
-          >
-            <RefreshCw
-              size={18}
-              className={refreshing ? "hrfeedback-spin" : ""}
-            />
-            Refresh
-          </button>
-        </div>
+        
 
         {/* Error Alert */}
         {error && (
@@ -543,12 +571,7 @@ const comment = match ? match[2] : "No comment available";
                             <Eye size={16} />
                             View
                           </button>
-                          <button
-                            className="hrfeedback-btn-delete"
-                            onClick={() => deleteMentor(m.trackingId || m.id)}
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          
                         </div>
 
                         {/* Analyze Feedback Button */}
@@ -556,7 +579,7 @@ const comment = match ? match[2] : "No comment available";
                           className="hrfeedback-btn-analyze"
                           onClick={() => handleAnalyzeFeedback(m, "Mentor")}
                         >
-                          <Brain size={16} />
+                          <ChartLine size={16} />
                           Analyze Feedback
                         </button>
                       </div>
@@ -580,12 +603,7 @@ const comment = match ? match[2] : "No comment available";
               ) : (
                 <div className="row g-3">
                   {peer.map((p) => {
-                    const statusColor =
-                      p.status === "Approved"
-                        ? "#198754"
-                        : p.status === "Rejected"
-                        ? "#dc3545"
-                        : "#27235C";
+                    
 
                     return (
                       <div
@@ -594,16 +612,13 @@ const comment = match ? match[2] : "No comment available";
                       >
                         <div
                           className="hrfeedback-card"
-                          style={{ borderLeftColor: statusColor }}
+                          
                         >
                           <div className="hrfeedback-card-header">
                             <div style={{ flex: 1 }}>
                               <div className="hrfeedback-card-label">From</div>
                               <div className="hrfeedback-card-name-row hrfeedback-mb-2">
-                                <User
-                                  size={14}
-                                  style={{ color: "#6c757d" }}
-                                />
+                                <User size={14} style={{ color: "#6c757d" }} />
                                 <h6 className="hrfeedback-card-name-small">
                                   {getSubmitterName(p)}
                                 </h6>
@@ -619,10 +634,7 @@ const comment = match ? match[2] : "No comment available";
                                 </h6>
                               </div>
                             </div>
-                            <Badge
-                              text={p.status || "Pending"}
-                              color={statusColor}
-                            />
+                            
                           </div>
 
                           <div className="hrfeedback-card-date">
@@ -657,12 +669,7 @@ const comment = match ? match[2] : "No comment available";
                               <Eye size={16} />
                               View
                             </button>
-                            <button
-                              className="hrfeedback-btn-delete"
-                              onClick={() => deletePeer(p.queueId || p.id)}
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                           
                           </div>
 
                           {/* Analyze Feedback Button */}
@@ -670,7 +677,7 @@ const comment = match ? match[2] : "No comment available";
                             className="hrfeedback-btn-analyze"
                             onClick={() => handleAnalyzeFeedback(p, "Peer")}
                           >
-                            <Brain size={16} />
+                            <ChartLine size={16} />
                             Analyze Feedback
                           </button>
                         </div>
@@ -691,6 +698,19 @@ const comment = match ? match[2] : "No comment available";
         type={selectedType}
       />
 
+      {/* Delete Confirmation Modal */}
+<FeedbackDeleteConfirmModal
+  isOpen={showDeleteModal}
+  onClose={handleCloseDeleteModal}
+  onSuccess={handleDeleteSuccess}
+  feedbackType={deleteFeedbackType}
+  feedbackData={deleteFeedbackData}
+  title={getDeleteTitle()}           
+  message={getDeleteMessage()}       
+  itemName={getDeleteItemName()}     
+/>
+
+
       {/* ========== ANALYSIS MODAL (COMPLETE IMPLEMENTATION) ========== */}
       {showAnalysisModal && (
         <div
@@ -704,9 +724,9 @@ const comment = match ? match[2] : "No comment available";
             {/* Modal Header */}
             <div className="hrfeedback-modal-header">
               <div className="hrfeedback-modal-header-content">
-                <Brain size={24} />
-                <h5 className="hrfeedback-modal-title" >
-                  AI Feedback Analysis
+                <ChartLineIcon size={24} />
+                <h5 className="hrfeedback-modal-title">
+                  Feedback Analysis
                 </h5>
               </div>
               <button
@@ -752,9 +772,16 @@ const comment = match ? match[2] : "No comment available";
                     <label className="hrfeedback-analysis-label">
                       Original Feedback
                     </label>
-                    <div className="hrfeedback-analysis-feedback-box" style={{ textAlign: "left" }}>
-                      <div><strong>Project:</strong> {projectTitle}</div>
-                      <div><strong>Feedback:</strong> {comment}</div>
+                    <div
+                      className="hrfeedback-analysis-feedback-box"
+                      style={{ textAlign: "left" }}
+                    >
+                      <div>
+                        <strong>Project:</strong> {projectTitle}
+                      </div>
+                      <div>
+                        <strong>Feedback:</strong> {comment}
+                      </div>
                     </div>
                   </div>
 
@@ -765,7 +792,10 @@ const comment = match ? match[2] : "No comment available";
                         <Sparkles size={14} />
                         Summary
                       </label>
-                      <div className="hrfeedback-summary-box" style={{textAlign:"left"}}>
+                      <div
+                        className="hrfeedback-summary-box"
+                        style={{ textAlign: "left" }}
+                      >
                         {analysisData.summary}
                       </div>
                     </div>
@@ -859,8 +889,8 @@ const comment = match ? match[2] : "No comment available";
                     )}
 
                     {/* Professionalism Score */}
-                    {analysisData.feedback_metrics
-                      ?.professionalism_score !== undefined && (
+                    {analysisData.feedback_metrics?.professionalism_score !==
+                      undefined && (
                       <div
                         className="hrfeedback-metric-card"
                         style={{
@@ -1066,7 +1096,7 @@ const comment = match ? match[2] : "No comment available";
 
                         {/* VADER Scores */}
                         <div className="hrfeedback-vader-section">
-                          <div className="hrfeedback-vader-label" >
+                          <div className="hrfeedback-vader-label">
                             VADER Scores
                           </div>
                           <div className="hrfeedback-vader-bars">
@@ -1094,6 +1124,7 @@ const comment = match ? match[2] : "No comment available";
                                 %
                               </span>
                             </div>
+
                             <div className="hrfeedback-vader-bar-item">
                               <span className="hrfeedback-vader-bar-label">
                                 Neutral
@@ -1118,6 +1149,7 @@ const comment = match ? match[2] : "No comment available";
                                 %
                               </span>
                             </div>
+
                             <div className="hrfeedback-vader-bar-item">
                               <span className="hrfeedback-vader-bar-label">
                                 Negative
@@ -1179,9 +1211,10 @@ const comment = match ? match[2] : "No comment available";
                             )}
                           </div>
                         )}
+
                         <div className="hrfeedback-emotion-grid">
                           {Object.entries(analysisData.emotion_scores)
-                            .filter(([_, score]) => score > 0)
+                            .filter(([, score]) => score > 0)
                             .sort(([, a], [, b]) => b - a)
                             .map(([emotion, score]) => (
                               <div
@@ -1231,8 +1264,8 @@ const comment = match ? match[2] : "No comment available";
                           <div>
                             <span className="hrfeedback-bias-status">
                               {analysisData.bias_analysis.has_bias
-                                ? "⚠️ Bias Detected"
-                                : "✓ No Bias Detected"}
+                                ? "Bias Detected"
+                                : "No Bias Detected"}
                             </span>
                             {analysisData.bias_analysis.bias_level && (
                               <span
@@ -1356,7 +1389,7 @@ const comment = match ? match[2] : "No comment available";
                             }}
                           >
                             {analysisData.toxicity_analysis.is_toxic
-                              ? "⚠️ Toxic Content Detected"
+                              ? "⚠ Toxic Content Detected"
                               : "✓ No Toxic Content"}
                           </span>
                           <span
@@ -1374,10 +1407,10 @@ const comment = match ? match[2] : "No comment available";
                                 : "1px solid #19875440",
                             }}
                           >
-                            Severity:{" "}
-                            {analysisData.toxicity_analysis.severity}
+                            Severity: {analysisData.toxicity_analysis.severity}
                           </span>
                         </div>
+
                         {analysisData.toxicity_analysis.toxic_elements &&
                           analysisData.toxicity_analysis.toxic_elements.length >
                             0 && (
@@ -1482,7 +1515,8 @@ const comment = match ? match[2] : "No comment available";
                             .positive_elements.length > 0 && (
                             <div className="hrfeedback-constructiveness-elements">
                               <div className="hrfeedback-constructiveness-elements-label">
-                                <ThumbsUp size={14} /> Positive Elements:
+                                <ThumbsUp size={14} />
+                                Positive Elements:
                               </div>
                               <ul className="hrfeedback-constructiveness-list">
                                 {analysisData.constructiveness_analysis.positive_elements.map(
@@ -1500,7 +1534,8 @@ const comment = match ? match[2] : "No comment available";
                             .negative_elements.length > 0 && (
                             <div className="hrfeedback-constructiveness-elements">
                               <div className="hrfeedback-constructiveness-elements-label">
-                                <ThumbsDown size={14} /> Negative Elements:
+                                <ThumbsDown size={14} />
+                                Negative Elements:
                               </div>
                               <ul className="hrfeedback-constructiveness-list">
                                 {analysisData.constructiveness_analysis.negative_elements.map(
@@ -1557,7 +1592,10 @@ const comment = match ? match[2] : "No comment available";
                           <CheckCircle size={14} />
                           Key Insights
                         </label>
-                        <ul className="hrfeedback-insights-list" style={{textAlign:"left"}}>
+                        <ul
+                          className="hrfeedback-insights-list"
+                          style={{ textAlign: "left" }}
+                        >
                           {analysisData.key_insights.map((insight, idx) => (
                             <li key={idx}>{insight}</li>
                           ))}
@@ -1575,10 +1613,16 @@ const comment = match ? match[2] : "No comment available";
                         {analysisData.suggestions.suggestions &&
                           analysisData.suggestions.suggestions.length > 0 && (
                             <div>
-                              <div className="hrfeedback-suggestions-subtitle" style={{textAlign:"left"}}>
+                              <div
+                                className="hrfeedback-suggestions-subtitle"
+                                style={{ textAlign: "left" }}
+                              >
                                 Actionable Recommendations:
                               </div>
-                              <ul className="hrfeedback-suggestions-list" style={{textAlign:"left"}}>
+                              <ul
+                                className="hrfeedback-suggestions-list"
+                                style={{ textAlign: "left" }}
+                              >
                                 {analysisData.suggestions.suggestions.map(
                                   (suggestion, idx) => (
                                     <li key={idx}>{suggestion}</li>
@@ -1590,10 +1634,16 @@ const comment = match ? match[2] : "No comment available";
 
                         {analysisData.suggestions.rewritten_example && (
                           <div className="hrfeedback-rewritten-example">
-                            <div className="hrfeedback-rewritten-label "style={{textAlign:"left"}}>
-                              💡 Example Rewrite:
+                            <div
+                              className="hrfeedback-rewritten-label"
+                              style={{ textAlign: "left" }}
+                            >
+                              💬 Example Rewrite:
                             </div>
-                            <div className="hrfeedback-rewritten-content" style={{textAlign:"left"}}>
+                            <div
+                              className="hrfeedback-rewritten-content"
+                              style={{ textAlign: "left" }}
+                            >
                               {analysisData.suggestions.rewritten_example}
                             </div>
                           </div>
@@ -1603,7 +1653,10 @@ const comment = match ? match[2] : "No comment available";
                           analysisData.suggestions.improvement_areas.length >
                             0 && (
                             <div className="hrfeedback-improvement-areas">
-                              <div className="hrfeedback-improvement-label" style={{textAlign:"left"}}>
+                              <div
+                                className="hrfeedback-improvement-label"
+                                style={{ textAlign: "left" }}
+                              >
                                 Focus Areas for Improvement:
                               </div>
                               <div className="hrfeedback-improvement-tags">
@@ -1706,8 +1759,12 @@ const comment = match ? match[2] : "No comment available";
         }
 
         @keyframes hrfeedback-spin-animation {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         /* ========== ALERT ========== */
@@ -1804,7 +1861,7 @@ const comment = match ? match[2] : "No comment available";
         }
 
         .hrfeedback-toggle-badge {
-          background-color: rgba(255,255,255,0.3);
+          background-color: rgba(255, 255, 255, 0.3);
           color: #ffffff;
           padding: 2px 8px;
           border-radius: 12px;
@@ -1868,8 +1925,8 @@ const comment = match ? match[2] : "No comment available";
         /* ========== FEEDBACK CARDS ========== */
         .hrfeedback-card {
           background: white;
-          border: 1px solid #e5e7eb;
-          border-left: 4px solid #27235C;
+       
+          border: 2px solid #27235C;
           border-radius: 10px;
           padding: 1.25rem;
           height: 100%;
@@ -2051,8 +2108,12 @@ const comment = match ? match[2] : "No comment available";
         }
 
         @keyframes hrfeedback-fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
 
         .hrfeedback-modal-container {
@@ -2099,7 +2160,7 @@ const comment = match ? match[2] : "No comment available";
           margin: 0;
           font-weight: 700;
           font-size: 1.25rem;
-          color:white
+          color: white;
         }
 
         .hrfeedback-modal-close-btn {
@@ -2116,7 +2177,7 @@ const comment = match ? match[2] : "No comment available";
         }
 
         .hrfeedback-modal-close-btn:hover {
-          background: rgba(255,255,255,0.1);
+          background: rgba(255, 255, 255, 0.1);
         }
 
         /* ========== MODAL BODY ========== */
@@ -2168,8 +2229,8 @@ const comment = match ? match[2] : "No comment available";
 
         .hrfeedback-analysis-label {
           font-size: 0.75rem;
-          font-weight: 700;
           color: #6c757d;
+          font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.5px;
           display: flex;
@@ -2241,7 +2302,7 @@ const comment = match ? match[2] : "No comment available";
           background: #fff;
           padding: 1.25rem;
           border-radius: 8px;
-          border: 2px solid;
+          border: 2px solid #e5e7eb;
         }
 
         .hrfeedback-sentiment-header {
@@ -2412,23 +2473,23 @@ const comment = match ? match[2] : "No comment available";
         }
 
         .hrfeedback-emotion-score {
-          font-size: 0.813rem;
+          font-size: 0.875rem;
           font-weight: 700;
           color: #27235C;
         }
 
         .hrfeedback-emotion-bar-bg {
           background: #e9ecef;
-          height: 8px;
-          border-radius: 4px;
+          height: 6px;
+          border-radius: 3px;
           overflow: hidden;
         }
 
         .hrfeedback-emotion-bar-fill {
           height: 100%;
-          background: linear-gradient(90deg, #27235C 0%, #3d3a70 100%);
+          background: linear-gradient(90deg, #27235C 0%, #5a52a3 100%);
+          border-radius: 3px;
           transition: width 0.3s ease;
-          border-radius: 4px;
         }
 
         /* ========== BIAS CARD ========== */
@@ -2442,7 +2503,7 @@ const comment = match ? match[2] : "No comment available";
         .hrfeedback-bias-header {
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
+          align-items: center;
           margin-bottom: 1rem;
           flex-wrap: wrap;
           gap: 0.75rem;
@@ -2451,15 +2512,12 @@ const comment = match ? match[2] : "No comment available";
         .hrfeedback-bias-status {
           font-size: 1.125rem;
           font-weight: 700;
-          color: #212529;
-          display: block;
-          margin-bottom: 0.25rem;
         }
 
         .hrfeedback-bias-level {
           font-size: 0.875rem;
           font-weight: 600;
-          display: block;
+          margin-left: 0.5rem;
         }
 
         .hrfeedback-bias-score-badge {
@@ -2471,13 +2529,15 @@ const comment = match ? match[2] : "No comment available";
 
         .hrfeedback-bias-words-section {
           margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid #e5e7eb;
         }
 
         .hrfeedback-bias-words-label {
-          font-size: 0.813rem;
-          font-weight: 700;
+          font-size: 0.875rem;
+          font-weight: 600;
           color: #495057;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
         }
 
         .hrfeedback-bias-words-container {
@@ -2489,8 +2549,8 @@ const comment = match ? match[2] : "No comment available";
         .hrfeedback-bias-word-tag {
           background: #dc354515;
           color: #dc3545;
-          padding: 6px 14px;
-          border-radius: 20px;
+          padding: 4px 12px;
+          border-radius: 16px;
           font-size: 0.813rem;
           font-weight: 600;
           border: 1.5px solid #dc354540;
@@ -2503,17 +2563,16 @@ const comment = match ? match[2] : "No comment available";
         }
 
         .hrfeedback-bias-categories-label {
-          font-size: 0.813rem;
-          font-weight: 700;
+          font-size: 0.875rem;
+          font-weight: 600;
           color: #495057;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
         }
 
         .hrfeedback-bias-category-item {
           font-size: 0.875rem;
           color: #495057;
           margin-bottom: 0.5rem;
-          line-height: 1.5;
         }
 
         /* ========== TOXICITY CARD ========== */
@@ -2528,6 +2587,7 @@ const comment = match ? match[2] : "No comment available";
           display: flex;
           justify-content: space-between;
           align-items: center;
+          margin-bottom: 1rem;
           flex-wrap: wrap;
           gap: 0.75rem;
         }
@@ -2546,13 +2606,20 @@ const comment = match ? match[2] : "No comment available";
 
         .hrfeedback-toxic-elements {
           margin-top: 1rem;
-          font-size: 0.875rem;
-          color: #495057;
+          padding-top: 1rem;
+          border-top: 1px solid #e5e7eb;
         }
 
         .hrfeedback-toxic-list {
-          margin: 0.5rem 0 0 1.5rem;
+          margin: 0.5rem 0 0 1.25rem;
           padding: 0;
+          list-style: disc;
+          color: #495057;
+          font-size: 0.875rem;
+        }
+
+        .hrfeedback-toxic-list li {
+          margin-bottom: 0.5rem;
         }
 
         /* ========== CONSTRUCTIVENESS CARD ========== */
@@ -2564,9 +2631,9 @@ const comment = match ? match[2] : "No comment available";
         }
 
         .hrfeedback-constructiveness-flags {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-          gap: 0.75rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
           margin-bottom: 1rem;
         }
 
@@ -2576,45 +2643,44 @@ const comment = match ? match[2] : "No comment available";
         }
 
         .hrfeedback-constructiveness-action-count {
-          background: #f8f9fa;
-          padding: 0.75rem;
-          border-radius: 6px;
           font-size: 0.875rem;
           font-weight: 600;
-          color: #495057;
+          color: #27235C;
           margin-bottom: 1rem;
         }
 
         .hrfeedback-constructiveness-elements {
           margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid #e5e7eb;
         }
 
         .hrfeedback-constructiveness-elements-label {
-          font-size: 0.813rem;
-          font-weight: 700;
+          font-size: 0.875rem;
+          font-weight: 600;
           color: #495057;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
           display: flex;
           align-items: center;
           gap: 6px;
         }
 
         .hrfeedback-constructiveness-list {
-          margin: 0;
-          padding-left: 1.5rem;
+          margin: 0.5rem 0 0 1.25rem;
+          padding: 0;
+          list-style: disc;
+          color: #495057;
+          font-size: 0.875rem;
         }
 
         .hrfeedback-constructiveness-list li {
-          font-size: 0.875rem;
-          color: #495057;
-          line-height: 1.5;
-          margin-bottom: 0.25rem;
+          margin-bottom: 0.5rem;
         }
 
         /* ========== FEEDBACK METRICS GRID ========== */
         .hrfeedback-feedback-metrics-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
           gap: 1rem;
         }
 
@@ -2639,19 +2705,17 @@ const comment = match ? match[2] : "No comment available";
           color: #212529;
         }
 
-        /* ========== INSIGHTS LIST ========== */
+        /* ========== KEY INSIGHTS ========== */
         .hrfeedback-insights-list {
-          margin: 0;
-          padding-left: 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
+          margin: 0 0 0 1.25rem;
+          padding: 0;
+          list-style: disc;
+          color: #495057;
+          font-size: 0.875rem;
         }
 
         .hrfeedback-insights-list li {
-          font-size: 0.875rem;
-          line-height: 1.6;
-          color: #495057;
+          margin-bottom: 0.75rem;
         }
 
         /* ========== SUGGESTIONS CARD ========== */
@@ -2659,46 +2723,46 @@ const comment = match ? match[2] : "No comment available";
           background: #fff;
           padding: 1.25rem;
           border-radius: 8px;
-          border: 2px solid #27235C20;
+          border: 2px solid #e5e7eb;
         }
 
         .hrfeedback-suggestions-subtitle {
           font-size: 0.875rem;
-          font-weight: 700;
+          font-weight: 600;
           color: #495057;
           margin-bottom: 0.75rem;
         }
 
         .hrfeedback-suggestions-list {
-          margin: 0 0 1rem 1.5rem;
+          margin: 0 0 1rem 1.25rem;
           padding: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
+          list-style: decimal;
+          color: #495057;
+          font-size: 0.875rem;
         }
 
         .hrfeedback-suggestions-list li {
-          font-size: 0.875rem;
-          line-height: 1.6;
-          color: #495057;
+          margin-bottom: 0.75rem;
         }
 
         .hrfeedback-rewritten-example {
-          background: #e7f3ff;
-          padding: 1rem;
-          border-radius: 8px;
-          border: 1px solid #b3d9ff;
           margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid #e5e7eb;
         }
 
         .hrfeedback-rewritten-label {
-          font-size: 0.813rem;
-          font-weight: 700;
+          font-size: 0.875rem;
+          font-weight: 600;
           color: #495057;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.75rem;
         }
 
         .hrfeedback-rewritten-content {
+          background: #e7f3ff;
+          padding: 1rem;
+          border-radius: 6px;
+          border: 1px solid #b3d9ff;
           font-size: 0.875rem;
           color: #212529;
           line-height: 1.6;
@@ -2711,8 +2775,8 @@ const comment = match ? match[2] : "No comment available";
         }
 
         .hrfeedback-improvement-label {
-          font-size: 0.813rem;
-          font-weight: 700;
+          font-size: 0.875rem;
+          font-weight: 600;
           color: #495057;
           margin-bottom: 0.75rem;
         }

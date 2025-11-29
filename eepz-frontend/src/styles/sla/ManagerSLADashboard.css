@@ -13,7 +13,6 @@
    ======================================== */
 
 .mgr-sla-breadcrumb {
-
   font-size: 0.875rem !important;
   color: #97247E !important;
 }
@@ -131,12 +130,16 @@
 }
 
 .mgr-sla-select {
-  border: 1.5px solid #E5E7EB !important;
-  border-radius: 8px !important;
-  font-size: 0.875rem !important;
-  background: #FFFFFF !important;
-  transition: all 0.2s ease !important;
+  appearance: none;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 1rem center !important;
+  background-color: #fff;
+  padding-right: 2.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
 }
+
 
 .mgr-sla-select:focus {
   outline: none !important;
@@ -348,49 +351,11 @@
   background-color: #F9FAFB !important;
 }
 
-/* Employee Cell with Avatar */
+/* Employee Cell */
 .mgr-sla-employee-cell {
   display: flex !important;
   align-items: center !important;
   gap: 0.625rem !important;
-}
-
-.mgr-sla-table-avatar {
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 50% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-shrink: 0 !important;
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
-  color: #FFFFFF !important;
-  text-transform: uppercase !important;
-}
-
-.mgr-sla-avatar-pink {
-  background-color: #C2185B !important;
-}
-
-.mgr-sla-avatar-purple {
-  background-color: #7B1FA2 !important;
-}
-
-.mgr-sla-avatar-indigo {
-  background-color: #303F9F !important;
-}
-
-.mgr-sla-avatar-blue {
-  background-color: #1976D2 !important;
-}
-
-.mgr-sla-avatar-teal {
-  background-color: #00897B !important;
-}
-
-.mgr-sla-avatar-green {
-  background-color: #388E3C !important;
 }
 
 .mgr-sla-employee-info {
@@ -473,7 +438,7 @@
 }
 
 /* ========================================
-   ACTION BUTTONS - VIEW & ESCALATE
+   ACTION BUTTONS
    ======================================== */
 
 .mgr-sla-actions {
@@ -559,29 +524,32 @@
 }
 
 /* ========================================
-   EMPTY STATE - FIXED
+   EMPTY STATE - STANDALONE
    ======================================== */
 
-.mgr-sla-table-empty {
-  padding: 4rem 1.5rem !important;
+.mgr-sla-empty-state-standalone {
+  padding: 4rem 2rem !important;
   text-align: center !important;
   background: #FFFFFF !important;
-  vertical-align: middle !important;
+  min-height: 400px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 12px !important;
 }
 
 .mgr-sla-empty-icon {
   color: #D1D5DB !important;
-  margin-bottom: 1rem !important;
-  opacity: 0.4 !important;
-  display: inline-block !important;
+  margin-bottom: 1.5rem !important;
+  opacity: 0.5 !important;
 }
 
 .mgr-sla-empty-text {
   color: #6B7280 !important;
   font-weight: 600 !important;
+  font-size: 1.125rem !important;
   margin: 0 !important;
-  font-size: 0.9375rem !important;
-  display: block !important;
 }
 
 /* Pagination */
@@ -595,53 +563,32 @@
    SCROLLBAR
    ======================================== */
 
-.mgr-sla-table-wrapper::-webkit-scrollbar {
-  width: 10px !important;
-  height: 10px !important;
-}
-
-.mgr-sla-table-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1 !important;
-  border-radius: 5px !important;
-  margin: 0.5rem 0 !important;
-}
-
-.mgr-sla-table-wrapper::-webkit-scrollbar-thumb {
-  background: #27235C !important;
-  border-radius: 5px !important;
-  border: 2px solid #f1f1f1 !important;
-}
-
-.mgr-sla-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #1b193f !important;
-}
-
+.mgr-sla-table-wrapper::-webkit-scrollbar,
 .table-responsive::-webkit-scrollbar {
   width: 10px !important;
   height: 10px !important;
 }
 
+.mgr-sla-table-wrapper::-webkit-scrollbar-track,
 .table-responsive::-webkit-scrollbar-track {
   background: #f1f1f1 !important;
   border-radius: 5px !important;
 }
 
+.mgr-sla-table-wrapper::-webkit-scrollbar-thumb,
 .table-responsive::-webkit-scrollbar-thumb {
   background: #27235C !important;
   border-radius: 5px !important;
   border: 2px solid #f1f1f1 !important;
 }
 
+.mgr-sla-table-wrapper::-webkit-scrollbar-thumb:hover,
 .table-responsive::-webkit-scrollbar-thumb:hover {
   background: #1b193f !important;
 }
 
 /* Firefox */
-.mgr-sla-table-wrapper {
-  scrollbar-width: thin !important;
-  scrollbar-color: #27235C #f1f1f1 !important;
-}
-
+.mgr-sla-table-wrapper,
 .table-responsive {
   scrollbar-width: thin !important;
   scrollbar-color: #27235C #f1f1f1 !important;
@@ -714,12 +661,6 @@
     min-width: 50px !important;
     height: 28px !important;
   }
-
-  .mgr-sla-table-avatar {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 0.6875rem !important;
-  }
 }
 
 @media (max-width: 576px) {
@@ -740,5 +681,10 @@
   .mgr-sla-table tbody td {
     padding: 0.75rem 0.875rem !important;
     font-size: 0.75rem !important;
+  }
+
+  .mgr-sla-empty-state-standalone {
+    min-height: 300px !important;
+    padding: 2rem 1rem !important;
   }
 }

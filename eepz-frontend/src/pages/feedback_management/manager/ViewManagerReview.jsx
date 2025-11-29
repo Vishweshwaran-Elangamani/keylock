@@ -13,6 +13,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { employeeApi, managerReviewApi } from "../../../services/feedbackmanagement/feedbackApi";
+import FeedbackBreadcrumb from "../../../components/feedback_management/common/FeedbackBreadcrumb"
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -185,59 +186,13 @@ export default function ViewManagerReview() {
           className="d-flex justify-content-between align-items-center mb-4"
           style={{ flexWrap: "wrap", gap: "1rem" }}
         >
-          <div className="d-flex align-items-center gap-3">
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => navigate(-1)}
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 0,
-                border: "2px solid #dee2e6",
-              }}
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div>
-              <h2
-                className="mb-1 fw-bold"
-                style={{ fontSize: "1.75rem", color: "#212529" }}
-              >
-                Review Details
-              </h2>
-              <p className="mb-0 text-muted" style={{ fontSize: "0.875rem" }}>
-                {review.targetEmployeeName} •{" "}
-                {new Date(review.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-          <button
-            className="btn btn-outline-secondary"
-            onClick={fetchReviewData}
-            disabled={loading}
-            title="Refresh"
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 0,
-              border: "2px solid #dee2e6",
-            }}
-          >
-            <RefreshCw
-              size={18}
-              style={{
-                animation: loading ? "spin 1s linear infinite" : "none",
-              }}
+         
+           <FeedbackBreadcrumb
+              items={[
+                { label: "Feedback Management", path: "/manager/dashboard/feedback" },
+                { label: "My Reviews" },
+              ]}
             />
-          </button>
         </div>
 
         {/* ERROR ALERT */}
@@ -300,6 +255,7 @@ export default function ViewManagerReview() {
                     fontSize: "0.813rem",
                     fontWeight: 600,
                     textTransform: "uppercase",
+                    fontStyle : "normal",
                     letterSpacing: "0.5px",
                     color: "white",
                   }}

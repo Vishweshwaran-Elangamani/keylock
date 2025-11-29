@@ -300,44 +300,7 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
                       {response.formName || "N/A"}
                     </div>
                   </div>
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Status
-                    </div>
-                    <div style={{ textAlign: "left" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "4px 12px",
-                          borderRadius: "6px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          backgroundColor:
-                            response.status === "Reviewed"
-                              ? "#D1FAE5"
-                              : response.status === "Submitted"
-                              ? "#DBEAFE"
-                              : "#FEF3C7",
-                          color:
-                            response.status === "Reviewed"
-                              ? "#10B981"
-                              : response.status === "Submitted"
-                              ? "#3B82F6"
-                              : "#F59E0B",
-                        }}
-                      >
-                        {response.status || "Draft"}
-                      </span>
-                    </div>
-                  </div>
+                 
                   <div className="col-md-6">
                     <div
                       style={{
@@ -791,44 +754,7 @@ const ResponseViewModal = ({ show, response, onClose, type }) => {
                         "N/A"}
                     </div>
                   </div>
-                  <div className="col-md-6">
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "#6B7280",
-                        marginBottom: "0.25rem",
-                        fontWeight: 600,
-                        textAlign: "left",
-                      }}
-                    >
-                      Status
-                    </div>
-                    <div style={{ textAlign: "left" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "4px 12px",
-                          borderRadius: "6px",
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          backgroundColor:
-                            response.status === "Approved"
-                              ? "#D1FAE5"
-                              : response.status === "Rejected"
-                              ? "#FEE2E2"
-                              : "#FEF3C7",
-                          color:
-                            response.status === "Approved"
-                              ? "#10B981"
-                              : response.status === "Rejected"
-                              ? "#EF4444"
-                              : "#F59E0B",
-                        }}
-                      >
-                        {response.status || "Pending"}
-                      </span>
-                    </div>
-                  </div>
+                  
                   <div className="col-12">
                     <div
                       style={{

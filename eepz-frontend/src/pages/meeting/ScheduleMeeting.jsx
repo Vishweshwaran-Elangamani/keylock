@@ -553,6 +553,12 @@ const ScheduleMeeting = () => {
         .breadcrumb-item + .breadcrumb-item::before {
           display: none;
         }
+
+        .form-select{
+                    -webkit-appearance: auto !important;
+            -moz-appearance: auto !important;
+             appearance: auto !important;
+        }
       `}</style>
     </div>
   );

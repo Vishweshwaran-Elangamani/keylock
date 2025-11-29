@@ -53,25 +53,6 @@ const ManagerSLADashboard = () => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, complianceFilter, activeTab]);
 
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    const parts = name.trim().split(' ');
-    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  };
-
-  const getAvatarClass = (index) => {
-    const classes = [
-      'mgr-sla-avatar-pink',
-      'mgr-sla-avatar-purple',
-      'mgr-sla-avatar-indigo',
-      'mgr-sla-avatar-blue',
-      'mgr-sla-avatar-teal',
-      'mgr-sla-avatar-green',
-    ];
-    return classes[index % classes.length];
-  };
-
   const loadData = async () => {
     setLoading(true);
     try {
@@ -262,19 +243,16 @@ const ManagerSLADashboard = () => {
               <Home size={14} /> Dashboard
             </a>
           </li>
-           <li className="breadcrumb-item">
-            
-              <span className="mgr-sla-breadcrumb">SLA Compliance</span>
-    
+          <li className="breadcrumb-item">
+            <span className="mgr-sla-breadcrumb">SLA Compliance</span>
           </li>
-          
           <li className="breadcrumb-item active" aria-current="page">
             <span className="mgr-sla-breadcrumb-active">Manager</span>
           </li>
         </ol>
       </nav>
 
-      {/* Stats Cards - Only 4 */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-3">
         {[
           {
@@ -382,7 +360,7 @@ const ManagerSLADashboard = () => {
         </div>
       </div>
 
-      {/* Tabs Below Filters */}
+      {/* Tabs */}
       <div className="mgr-sla-tabs-wrapper">
         <div className="mgr-sla-tabs-container">
           {[
@@ -404,168 +382,166 @@ const ManagerSLADashboard = () => {
 
       {/* Table */}
       <div className="mgr-sla-table-wrapper">
-        <div className="table-responsive">
-          <table className="table table-hover mb-0 mgr-sla-table">
-            <thead className="mgr-sla-table-header">
-              <tr>
-                {activeTab === 'escalations' ? (
-                  <>
-                    <th>Employee</th>
-                    <th>Reason</th>
-                    <th>Level</th>
-                    <th>Status</th>
-                    <th>Submitted</th>
-                    <th>Actions</th>
-                  </>
-                ) : (
-                  <>
-                    <th>Employee</th>
-                    <th>Department</th>
-                    <th>Deadline</th>
-                    <th>Status</th>
-                    <th>Compliance</th>
-                    <th>Actions</th>
-                  </>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedData.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="mgr-sla-table-empty">
-                    <FileText size={48} className="mgr-sla-empty-icon" />
-                    <p className="mgr-sla-empty-text">
-                      No {activeTab === 'escalations' ? 'escalations' : 'SLAs'} found
-                    </p>
-                    {filteredSlas.length === 0 && getTabData().length > 0 && (
-                      <button className="btn btn-outline-primary" onClick={clearFilters}>
-                        Clear Filters
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ) : activeTab === 'escalations' ? (
-                paginatedData.map((esc, index) => (
-                  <tr
-                    key={esc.escalationId}
-                    onClick={() => handleRowClick(esc.slaid)}
-                    className="mgr-sla-clickable-row"
-                  >
-                    <td>
-                      <div className="mgr-sla-employee-cell">
-                        
-                        <div className="mgr-sla-employee-info">
-                          <div className="mgr-sla-employee-name">{esc.employeeName || '—'}</div>
-                          <div className="mgr-sla-employee-email">{esc.employeeEmail || 'No email'}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{esc.reason || '—'}</td>
-                    <td>
-                      <span className="mgr-sla-badge mgr-sla-badge-info">{esc.escalationLevel}</span>
-                    </td>
-                    <td>
-                      <span
-                        className={`mgr-sla-badge ${
-                          esc.escalationStatus === 'Resolved'
-                            ? 'mgr-sla-badge-success'
-                            : 'mgr-sla-badge-primary'
-                        }`}
-                      >
-                        {esc.escalationStatus}
-                      </span>
-                    </td>
-                    <td>{formatDate(esc.submittedAt)}</td>
-                    <td>
-                      <div className="mgr-sla-actions">
-                        <button
-                          className="btn btn-sm mgr-sla-action-btn mgr-sla-action-view-text"
-                          onClick={(e) => handleViewClick(e, esc.slaid)}
-                          title="View details"
-                        >
-                          View
-                        </button>
-                        {esc.escalationStatus === 'Pending' && (
-                          <button
-                            className="btn btn-sm mgr-sla-action-btn mgr-sla-action-resolve"
-                            onClick={(e) => handleResolveClick(e, esc)}
-                            title="Resolve escalation"
-                          >
-                            <CheckCircle size={14} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                paginatedData.map((sla, index) => (
-                  <tr
-                    key={sla.slaid}
-                    onClick={() => handleRowClick(sla.slaid)}
-                    className="mgr-sla-clickable-row"
-                  >
-                    <td>
-                      <div className="mgr-sla-employee-cell">
-                        
-                        <div className="mgr-sla-employee-info">
-                          <div className="mgr-sla-employee-name">{sla.employeeName || '—'}</div>
-                          <div className="mgr-sla-employee-email">{sla.employeeEmail || 'No email'}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{sla.departmentName || '—'}</td>
-                    <td>{formatDate(sla.deadline)}</td>
-                    <td>
-                      <span className={`mgr-sla-badge mgr-sla-badge-${sla.status?.toLowerCase()}`}>
-                        {sla.status}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`mgr-sla-badge mgr-sla-badge-compliance-${sla.complianceStatus?.toLowerCase()}`}
-                      >
-                        {sla.complianceStatus}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="mgr-sla-actions">
-                        <button
-                          className="btn btn-sm mgr-sla-action-btn mgr-sla-action-view"
-                          onClick={(e) => handleViewClick(e, sla.slaid)}
-                          title="View details"
-                        >
-                          <Eye size={14} />
-                        </button>
-                        {sla.status !== 'Closed' && (
-                          <button
-                            className="btn btn-sm mgr-sla-action-btn mgr-sla-action-escalate"
-                            onClick={(e) => handleEscalateClick(e, sla)}
-                            title="Escalate SLA"
-                          >
-                            <Send size={14} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {filteredSlas.length > itemsPerPage && (
-          <div className="mgr-sla-pagination-wrapper">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              startIndex={startIndex}
-              endIndex={endIndex}
-              totalItems={filteredSlas.length}
-              onPageChange={setCurrentPage}
-            />
+        {filteredSlas.length === 0 ? (
+          <div className="mgr-sla-empty-state-standalone">
+            <FileText size={64} className="mgr-sla-empty-icon" />
+            <p className="mgr-sla-empty-text">
+              No {activeTab === 'escalations' ? 'escalations' : 'SLAs'} found
+            </p>
+            {searchTerm || statusFilter !== 'All' || complianceFilter !== 'All' ? (
+              <button className="btn btn-outline-primary mt-2" onClick={clearFilters}>
+                Clear Filters
+              </button>
+            ) : null}
           </div>
+        ) : (
+          <>
+            <div className="table-responsive">
+              <table className="table table-hover mb-0 mgr-sla-table">
+                <thead className="mgr-sla-table-header">
+                  <tr>
+                    {activeTab === 'escalations' ? (
+                      <>
+                        <th>Employee</th>
+                        <th>Reason</th>
+                        <th>Level</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                      </>
+                    ) : (
+                      <>
+                        <th>Employee</th>
+                        <th>Department</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
+                        <th>Compliance</th>
+                        <th>Actions</th>
+                      </>
+                    )}
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeTab === 'escalations'
+                    ? paginatedData.map((esc, index) => (
+                        <tr
+                          key={esc.escalationId}
+                          onClick={() => handleRowClick(esc.slaid)}
+                          className="mgr-sla-clickable-row"
+                        >
+                          <td>
+                            <div className="mgr-sla-employee-cell">
+                              <div className="mgr-sla-employee-info">
+                                <div className="mgr-sla-employee-name">{esc.employeeName || '—'}</div>
+                                <div className="mgr-sla-employee-email">{esc.employeeEmail || 'No email'}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>{esc.reason || '—'}</td>
+                          <td>
+                            <span className="mgr-sla-badge mgr-sla-badge-info">{esc.escalationLevel}</span>
+                          </td>
+                          <td>
+                            <span
+                              className={`mgr-sla-badge ${
+                                esc.escalationStatus === 'Resolved'
+                                  ? 'mgr-sla-badge-success'
+                                  : 'mgr-sla-badge-primary'
+                              }`}
+                            >
+                              {esc.escalationStatus}
+                            </span>
+                          </td>
+                          <td>{formatDate(esc.submittedAt)}</td>
+                          <td>
+                            <div className="mgr-sla-actions">
+                              <button
+                                className="btn btn-sm mgr-sla-action-btn mgr-sla-action-view-text"
+                                onClick={(e) => handleViewClick(e, esc.slaid)}
+                                title="View details"
+                              >
+                                View
+                              </button>
+                              {esc.escalationStatus === 'Pending' && (
+                                <button
+                                  className="btn btn-sm mgr-sla-action-btn mgr-sla-action-resolve"
+                                  onClick={(e) => handleResolveClick(e, esc)}
+                                  title="Resolve escalation"
+                                >
+                                  <CheckCircle size={14} />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    : paginatedData.map((sla, index) => (
+                        <tr
+                          key={sla.slaid}
+                          onClick={() => handleRowClick(sla.slaid)}
+                          className="mgr-sla-clickable-row"
+                        >
+                          <td>
+                            <div className="mgr-sla-employee-cell">
+                              <div className="mgr-sla-employee-info">
+                                <div className="mgr-sla-employee-name">{sla.employeeName || '—'}</div>
+                                <div className="mgr-sla-employee-email">{sla.employeeEmail || 'No email'}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>{sla.departmentName || '—'}</td>
+                          <td>{formatDate(sla.deadline)}</td>
+                          <td>
+                            <span className={`mgr-sla-badge mgr-sla-badge-${sla.status?.toLowerCase()}`}>
+                              {sla.status}
+                            </span>
+                          </td>
+                          <td>
+                            <span
+                              className={`mgr-sla-badge mgr-sla-badge-compliance-${sla.complianceStatus?.toLowerCase()}`}
+                            >
+                              {sla.complianceStatus}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="mgr-sla-actions">
+                              <button
+                                className="btn btn-sm mgr-sla-action-btn mgr-sla-action-view"
+                                onClick={(e) => handleViewClick(e, sla.slaid)}
+                                title="View details"
+                              >
+                                <Eye size={14} />
+                              </button>
+                              {sla.status !== 'Closed' && (
+                                <button
+                                  className="btn btn-sm mgr-sla-action-btn mgr-sla-action-escalate"
+                                  onClick={(e) => handleEscalateClick(e, sla)}
+                                  title="Escalate SLA"
+                                >
+                                  <Send size={14} />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                </tbody>
+              </table>
+            </div>
+
+            {filteredSlas.length > itemsPerPage && (
+              <div className="mgr-sla-pagination-wrapper">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  startIndex={startIndex}
+                  endIndex={endIndex}
+                  totalItems={filteredSlas.length}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 

@@ -232,6 +232,7 @@ const ActionItemsManagement = () => {
                   height: "50px",
                   backgroundColor: "#e3f2fd",
                   flexShrink: 0,
+                  border : "2px solid #25235c "
                 }}
               >
                 <i

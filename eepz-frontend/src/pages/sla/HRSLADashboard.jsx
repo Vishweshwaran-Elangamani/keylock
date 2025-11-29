@@ -411,17 +411,7 @@ const HRSLADashboard = () => {
                 ? "Try adjusting your search criteria or filters"
                 : "Get started by creating your first SLA"}
             </p>
-            {filteredSlas.length === 0 && slas.length > 0 ? (
-              <button className="btn btn-outline-primary hr-sla-empty-state__btn" onClick={clearFilters}>
-                <Filter size={16} />
-                Clear Filters
-              </button>
-            ) : (
-              <button className="btn btn-primary hr-sla-empty-state__btn" onClick={() => setShowCreateModal(true)}>
-                <Plus size={16} />
-                Create First SLA
-              </button>
-            )}
+           
           </div>
         </div>
       ) : (

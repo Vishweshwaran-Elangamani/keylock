@@ -1,24 +1,72 @@
+// src/components/feedback_management/modals/FeedbackDeleteConfirmModal.jsx
 
-import React from "react";
+import React, { useState } from "react";
 import { AlertTriangle, X, Trash2 } from "lucide-react";
+import {
+  mentorFeedbackApi,
+  peerQueueApi,
+  hrFormApi,
+} from "../../../services/feedbackmanagement/feedbackApi";
 
 const FeedbackDeleteConfirmModal = ({
   isOpen,
   onClose,
-  onConfirm,
+  onSuccess,
+  feedbackType = "Mentor", // "Mentor", "Peer", or "HR"
+  feedbackData = null,
   title = "Delete Submission",
   message = "Are you sure you want to delete this submission?",
   itemName = "",
-  isDeleting = false,
 }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState("");
+
   if (!isOpen) return null;
 
-  const handleConfirm = () => {
-    onConfirm();
+  const handleConfirm = async () => {
+    if (!feedbackData) {
+      setError("No feedback data provided");
+      return;
+    }
+
+    setIsDeleting(true);
+    setError("");
+
+    try {
+      // Delete based on feedback type
+      if (feedbackType === "Mentor") {
+        const id = feedbackData.trackingId || feedbackData.id;
+        await mentorFeedbackApi.remove(id);
+        console.log(`Mentor feedback ${id} deleted successfully`);
+      } else if (feedbackType === "Peer") {
+        const id = feedbackData.queueId || feedbackData.id;
+        await peerQueueApi.remove(id);
+        console.log(`Peer feedback ${id} deleted successfully`);
+      } else if (feedbackType === "HR") {
+        const id = feedbackData.responseId;
+        await hrFormApi.deleteResponse(id);
+        console.log(`HR Form response ${id} deleted successfully`);
+      }
+
+      // Call success callback
+      if (onSuccess) {
+        await onSuccess();
+      }
+
+      // Reset states and close modal
+      setIsDeleting(false);
+      setError("");
+      onClose();
+    } catch (err) {
+      console.error("Delete error:", err);
+      setError(err?.message || `Failed to delete ${feedbackType} feedback`);
+      setIsDeleting(false);
+    }
   };
 
   const handleCancel = () => {
     if (!isDeleting) {
+      setError("");
       onClose();
     }
   };
@@ -147,6 +195,24 @@ const FeedbackDeleteConfirmModal = ({
             </div>
           )}
 
+          {/* Error Display */}
+          {error && (
+            <div
+              style={{
+                padding: "10px 12px",
+                backgroundColor: "#fee2e2",
+                border: "1px solid #fecaca",
+                borderRadius: "6px",
+                marginBottom: "12px",
+                fontSize: "12px",
+                color: "#991b1b",
+                textAlign: "center",
+              }}
+            >
+              <strong>Error:</strong> {error}
+            </div>
+          )}
+
           {/* Warning Box */}
           <div
             style={{
@@ -159,7 +225,15 @@ const FeedbackDeleteConfirmModal = ({
               textAlign: "center",
             }}
           >
-            <div style={{ marginBottom: "4px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+            <div
+              style={{
+                marginBottom: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+              }}
+            >
               <AlertTriangle size={14} />
               <strong>Warning</strong>
             </div>
@@ -203,14 +277,14 @@ const FeedbackDeleteConfirmModal = ({
             }}
             onMouseEnter={(e) => {
               if (!isDeleting) {
-                e.target.style.background = "#5a6268";
-                e.target.style.borderColor = "#5a6268";
+                e.currentTarget.style.background = "#5a6268";
+                e.currentTarget.style.borderColor = "#5a6268";
               }
             }}
             onMouseLeave={(e) => {
               if (!isDeleting) {
-                e.target.style.background = "#6c757d";
-                e.target.style.borderColor = "#6c757d";
+                e.currentTarget.style.background = "#6c757d";
+                e.currentTarget.style.borderColor = "#6c757d";
               }
             }}
           >
@@ -240,14 +314,14 @@ const FeedbackDeleteConfirmModal = ({
             }}
             onMouseEnter={(e) => {
               if (!isDeleting) {
-                e.target.style.background = "#bb2d3b";
-                e.target.style.borderColor = "#bb2d3b";
+                e.currentTarget.style.background = "#bb2d3b";
+                e.currentTarget.style.borderColor = "#bb2d3b";
               }
             }}
             onMouseLeave={(e) => {
               if (!isDeleting) {
-                e.target.style.background = "#dc3545";
-                e.target.style.borderColor = "#dc3545";
+                e.currentTarget.style.background = "#dc3545";
+                e.currentTarget.style.borderColor = "#dc3545";
               }
             }}
           >
