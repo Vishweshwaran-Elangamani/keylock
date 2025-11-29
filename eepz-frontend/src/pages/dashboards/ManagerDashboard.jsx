@@ -1,111 +1,867 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/common/Dashboard.css";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
+import CountUp from "react-countup";
+import {
+  Users,
+  Target,
+  Award,
+  Shield,
+  TrendingUp,
+  Calendar,
+  AlertTriangle,
+} from "lucide-react";
+import goalService from "../../services/goals/goalService";
+import nominationService from "../../services/internal/nominationService";
+import lndService from "../../services/lnd/lndService";
+import { 
+  getTeamMembers 
+} from "../../services/performancemanagement/manager/managerNominationApi";
+import meetingService from "../../services/meeting/meetingService";
+import slaService from "../../services/sla/slaService";
+import Breadcrumb from "../../components/common/Breadcrumb";
+import { toast } from "sonner";
+import "../../styles/auth/AdminDashboard.css";
+
 const ManagerDashboard = () => {
   const navigate = useNavigate();
-  const [hoveredCard, setHoveredCard] = useState(null);
-  const handleNavigation = (path) => {
-    navigate(path);
+  const [loading, setLoading] = useState(true);
+  const [goalType, setGoalType] = useState("team");
+  const [dashboardData, setDashboardData] = useState({
+    dashboardSummary: null,
+    allGoals: [],
+    pendingApprovals: [],
+    myProjects: [],
+    myNominationsPerfMgmt: [],
+    pendingManagerReviews: [],
+    teamMembers: [],
+    teamAssignments: [],
+    subordinateEmployees: [],
+    myMeetings: [],
+    oneOnOneReports: [],
+    managerEscalations: [],
+  });
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const getUserData = () => {
+    const userStr = localStorage.getItem("user");
+    if (!userStr) return null;
+    try {
+      return JSON.parse(userStr);
+    } catch {
+      return null;
+    }
   };
-  const cards = [
-    {
-      title: "Internal Opportunities",
-      description: "View opportunities and nominate yourself or team members",
-      icon: "bi-briefcase",
-      gradient: "gradient-green",
-      path: "/internal/opportunities",
-    },
-    {
-      title: "Nomination Reviews",
-      description: "Review and approve nominations from your team",
-      icon: "bi-clipboard-check",
-      gradient: "gradient-green",
-      path: "/internal/nominations",
-    },
-    // {
-    //   title: "Career Progression",
-    //   description: "Create and manage employee promotion proposals",
-    //   icon: "bi bi-arrow-up-circle",
-    //   gradient: "gradient-green",
-    //   path: "/hr/operations/promotions",
-    // },
-    {
-      title: "Company Policies",
-      description: "View organizational policies",
-      icon: "bi bi-shield-check",
-      gradient: "gradient-orange",
-      path: "/manager/policies",
-    },
-    {
-      title: "Performance",
-      description: "Employee Performance Management",
-      icon: "bi bi-graph-up",
-      gradient: "gradient-blue",
-      path: "/manager/dashboard/performance",
-    },
-    {
-      title: "Goals",
-      description: "Goal Management",
-      icon: "bi bi-bullseye",
-      gradient: "gradient-pink",
-      path: "/manager/dashboard/goals",
-    },
-    {
-      title: "Learning and Development",
-      description: "Time For An Upgrade",
-      icon: "bi bi-book",
-      gradient: "gradient-pink",
-      path: "/manager/lnd/dashboard",
-    },
-    {
-      title: "Feedback Management",
-      description: "Submit feedback",
-      icon: "bi bi-chat-left-text",
-      gradient: "gradient-teal",
-      path: "/manager/dashboard/feedback",
-    },
-    {
-      title: "SLA Management",
-      description: "Manage Service Level Agreement",
-      icon: "bi bi-file-earmark-check",
-      gradient: "gradient-teal",
-      path: "/manager/dashboard/sla",
-    },
-    {
-      title: "Meeting & MOM Management",
-      description: "Manage Meetings & MOMs",
-      icon: "bi bi-journal-bookmark",
-      gradient: "gradient-teal",
-      path: "/manager/dashboard/meetmom",
-    },
+
+  const extractData = (response) => {
+    if (!response) return [];
+    if (Array.isArray(response)) return response;
+    
+    if (response.success === true || response.success === false) {
+      if (response.data) {
+        if (Array.isArray(response.data)) return response.data;
+        if (response.data.$values) return response.data.$values;
+        if (response.data.items) {
+          if (Array.isArray(response.data.items)) return response.data.items;
+          if (response.data.items.$values) return response.data.items.$values;
+        }
+      }
+    }
+    
+    if (response.data) {
+      if (Array.isArray(response.data)) return response.data;
+      if (response.data.$values) return response.data.$values;
+      if (response.data.data) {
+        if (Array.isArray(response.data.data)) return response.data.data;
+        if (response.data.data.$values) return response.data.data.$values;
+      }
+    }
+    
+    if (response.$values) return response.$values;
+    return [];
+  };
+
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      const user = getUserData();
+      
+      if (!user) {
+        toast.error("User not found. Please login again.");
+        navigate("/login");
+        return;
+      }
+
+      const managerId = user.empMasterId || user.employeeMasterId || user.id;
+
+      console.log("Fetching all data for manager:", managerId);
+
+      const [
+        dashboardSummaryRes,
+        allGoalsRes,
+        myProjectsRes,
+        pendingApprovalsRes,
+        myNominationsPerfMgmtRes,
+        pendingManagerReviewsRes,
+        teamMembersRes,
+        teamAssignmentsRes,
+        subordinateEmployeesRes,
+        myMeetingsRes,
+        oneOnOneReportsRes,
+        managerEscalationsRes,
+      ] = await Promise.all([
+        goalService.getDashboardSummary().catch(() => ({ data: null })),
+        goalService.queryGoals({ pageSize: 1000, status: '' }).catch(() => ({ data: [] })),
+        goalService.getUserProjects().catch(() => ({ data: [] })),
+        goalService.getPendingApprovals().catch(() => ({ data: [] })),
+        nominationService.getMyNominations().catch(() => ({ success: false, data: [] })),
+        nominationService.getPendingManagerReview().catch(() => ({ success: false, data: [] })),
+        getTeamMembers(managerId).catch(() => ({ data: [] })),
+        lndService.getTeamAssignments(1).catch(() => ({ data: { data: { items: [] } } })),
+        lndService.getSubordinateEmployees(1).catch(() => ({ data: { data: { items: [] } } })),
+        meetingService.getMyMeetings().catch(() => ({ data: [] })),
+        meetingService.getOneOnOneReports().catch(() => ({ data: [] })),
+        slaService.getManagerEscalations(managerId).catch(() => ({ data: [] })),
+      ]);
+
+      const allGoalsExtracted = extractData(allGoalsRes);
+      
+      console.log("Raw goals from API:", allGoalsExtracted);
+      
+      const extractedSelfGoals = allGoalsExtracted.filter(g => {
+        const title = (g.title || '').toLowerCase();
+        const type = (g.goalType || g.type || '').toLowerCase();
+        return title.includes('self') || title.includes('personal') || type === 'self';
+      });
+      
+      const extractedTeamGoals = allGoalsExtracted.filter(g => {
+        const title = (g.title || '').toLowerCase();
+        const type = (g.goalType || g.type || '').toLowerCase();
+        return (title.includes('team') || type === 'team') && 
+               !title.includes('self') && !title.includes('personal');
+      });
+      
+      const extractedOrgGoals = allGoalsExtracted.filter(g => {
+        const title = (g.title || '').toLowerCase();
+        const type = (g.goalType || g.type || '').toLowerCase();
+        return title.includes('org') || type === 'org' || type === 'organization';
+      });
+
+      const extractedProjects = extractData(myProjectsRes);
+      const extractedPendingApprovals = extractData(pendingApprovalsRes);
+      const extractedMyNominationsPerfMgmt = extractData(myNominationsPerfMgmtRes);
+      const extractedPendingManagerReviews = extractData(pendingManagerReviewsRes);
+      const extractedTeamMembers = extractData(teamMembersRes);
+      
+      const extractedTeamAssignments = teamAssignmentsRes?.data?.data?.items?.$values || 
+                                        teamAssignmentsRes?.data?.data?.items || 
+                                        extractData(teamAssignmentsRes);
+      
+      const extractedSubordinateEmployees = subordinateEmployeesRes?.data?.data?.items?.$values || 
+                                             subordinateEmployeesRes?.data?.data?.items || 
+                                             extractData(subordinateEmployeesRes);
+      
+      const extractedMeetings = extractData(myMeetingsRes);
+      const extractedOneOnOneReports = extractData(oneOnOneReportsRes);
+      const extractedManagerEscalations = extractData(managerEscalationsRes);
+
+      const allGoalsCombined = [
+        ...extractedSelfGoals.map(g => ({...g, goalType: 'self'})),
+        ...extractedTeamGoals.map(g => ({...g, goalType: 'team'})),
+        ...extractedOrgGoals.map(g => ({...g, goalType: 'org'})),
+      ];
+
+      console.log("Self Goals:", extractedSelfGoals.length);
+      console.log("Team Goals:", extractedTeamGoals.length);
+      console.log("Org Goals:", extractedOrgGoals.length);
+      console.log("Pending Approvals:", extractedPendingApprovals.length);
+      console.log("All Goals Combined:", allGoalsCombined.length);
+
+      let summaryData = null;
+      if (dashboardSummaryRes) {
+        if (dashboardSummaryRes.data) {
+          summaryData = dashboardSummaryRes.data;
+        } else {
+          summaryData = dashboardSummaryRes;
+        }
+      }
+
+      setDashboardData({
+        dashboardSummary: summaryData,
+        allGoals: allGoalsCombined,
+        pendingApprovals: extractedPendingApprovals,
+        myProjects: extractedProjects,
+        myNominationsPerfMgmt: extractedMyNominationsPerfMgmt,
+        pendingManagerReviews: extractedPendingManagerReviews,
+        teamMembers: extractedTeamMembers,
+        teamAssignments: extractedTeamAssignments,
+        subordinateEmployees: extractedSubordinateEmployees,
+        myMeetings: extractedMeetings,
+        oneOnOneReports: extractedOneOnOneReports,
+        managerEscalations: extractedManagerEscalations,
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      toast.error("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getKPIStats = () => {
+    const totalTeamMembers = dashboardData.subordinateEmployees.length || dashboardData.teamMembers.length;
+    const pendingApprovals = dashboardData.pendingApprovals.length;
+    const pendingNominationReviews = dashboardData.pendingManagerReviews.length;
+    
+    const ongoingGoalsCount = dashboardData.allGoals.filter(g => 
+      g.status?.toLowerCase() === 'inprogress' || g.goalStatus?.toLowerCase() === 'inprogress'
+    ).length;
+    
+    const myProjectsCount = dashboardData.myProjects.length;
+    const teamAssignmentsCount = dashboardData.teamAssignments.length;
+    const pendingEscalations = dashboardData.managerEscalations.filter(e => 
+      e.escalationStatus?.toLowerCase() === "pending"
+    ).length;
+    const upcomingMeetings = dashboardData.myMeetings.filter(m => {
+      const meetingDate = new Date(m.meetingDate || m.date);
+      const now = new Date();
+      return meetingDate > now;
+    }).length;
+
+    return {
+      totalTeamMembers,
+      pendingApprovals,
+      pendingNominationReviews,
+      ongoingGoalsCount,
+      myProjectsCount,
+      teamAssignmentsCount,
+      pendingEscalations,
+      upcomingMeetings,
+      totalEscalations: dashboardData.managerEscalations.length,
+      totalMeetings: dashboardData.myMeetings.length,
+      totalNominations: dashboardData.myNominationsPerfMgmt.length,
+    };
+  };
+
+  const getGoalsByType = () => {
+    const goals = dashboardData.allGoals.filter(g => {
+      const goalTypeLower = (g.goalType || g.type || '').toLowerCase();
+      
+      if (goalType === 'self') {
+        return goalTypeLower === 'self' || goalTypeLower === 'personal';
+      }
+      if (goalType === 'team') {
+        return goalTypeLower === 'team';
+      }
+      if (goalType === 'org') {
+        return goalTypeLower === 'org' || goalTypeLower === 'organization';
+      }
+      
+      return false;
+    });
+
+    if (!goals || goals.length === 0) {
+      return { total: 0, completed: 0, inProgress: 0, pending: 0, overdue: 0, chartData: [] };
+    }
+
+    const now = new Date();
+    const completed = goals.filter(g => 
+      g.status?.toLowerCase() === 'completed' || g.goalStatus?.toLowerCase() === 'completed'
+    ).length;
+    
+    const inProgress = goals.filter(g => 
+      g.status?.toLowerCase() === 'inprogress' || g.goalStatus?.toLowerCase() === 'inprogress'
+    ).length;
+    
+    const pending = goals.filter(g => {
+      const status = (g.status || g.goalStatus || '').toLowerCase();
+      return status === 'pending' || status === 'open' || status === 'approved';
+    }).length;
+    
+    const overdue = goals.filter(g => {
+      const deadline = new Date(g.deadline || g.endDate);
+      const status = (g.status || g.goalStatus || '').toLowerCase();
+      return deadline < now && status !== 'completed';
+    }).length;
+
+    const total = goals.length;
+
+    const chartData = [];
+    if (completed > 0) chartData.push({ name: 'Completed', value: completed, fill: '#10b981' });
+    if (inProgress > 0) chartData.push({ name: 'In Progress', value: inProgress, fill: '#0F62FE' });
+    if (pending > 0) chartData.push({ name: 'Pending', value: pending, fill: '#f59e0b' });
+    if (overdue > 0) chartData.push({ name: 'Overdue', value: overdue, fill: '#ef4444' });
+
+    return {
+      total,
+      completed,
+      inProgress,
+      pending,
+      overdue,
+      chartData: chartData.length > 0 ? chartData : [{ name: 'No Data', value: 1, fill: '#e5e7eb' }],
+    };
+  };
+
+  const getTeamAssignmentStatus = () => {
+    const CHART_COLORS_LOCAL = ["#2c2c54", "#0F62FE", "#10b981", "#f59e0b", "#E01950", "#8b5cf6"];
+    const statusCount = {};
+    dashboardData.teamAssignments.forEach(assignment => {
+      const status = assignment.assignmentStatus || assignment.status || "Unknown";
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    });
+    return Object.entries(statusCount).map(([name, value], index) => ({ 
+      name, 
+      value, 
+      fill: CHART_COLORS_LOCAL[index % CHART_COLORS_LOCAL.length] 
+    })).filter(item => item.value > 0);
+  };
+
+  const getEscalationHistory = () => {
+    const escalations = dashboardData.managerEscalations;
+    
+    const statusCount = {};
+    escalations.forEach(esc => {
+      const status = esc.escalationStatus || "Unknown";
+      statusCount[status] = (statusCount[status] || 0) + 1;
+    });
+
+    const chartData = Object.entries(statusCount).map(([name, value]) => ({ name, value }));
+    
+    return {
+      total: escalations.length,
+      pending: escalations.filter(e => e.escalationStatus?.toLowerCase() === "pending").length,
+      resolved: escalations.filter(e => e.escalationStatus?.toLowerCase() === "resolved").length,
+      rejected: escalations.filter(e => e.escalationStatus?.toLowerCase() === "rejected").length,
+      chartData: chartData.filter(item => item.value > 0),
+    };
+  };
+
+  const getNominationHistory = () => {
+  const nominations = dashboardData.myNominationsPerfMgmt;
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0–11
+
+  const user = getUserData();
+  const currentUserId = user?.empMasterId || user?.employeeMasterId || user?.id;
+
+  // Filter nominations for current month
+  const thisMonthNominations = nominations.filter(nom => {
+    const dateFields = [
+      nom.createdDate,
+      nom.submittedDate,
+      nom.nominationDate,
+      nom.createdAt,
+      nom.submittedAt,
+      nom.dateCreated,
+      nom.dateSubmitted,
+      nom.created,
+      nom.submitted,
+    ];
+
+    for (const df of dateFields) {
+      if (df) {
+        const d = new Date(df);
+        if (!isNaN(d.getTime())) {
+          return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+        }
+      }
+    }
+    return false;
+  });
+
+  let managerSelfNominated = 0;
+  let managerTeamNominated = 0;
+
+  nominations.forEach(nom => {
+    const nomineeUserId = nom.nomineeUserId;
+    const nominatedByUserId = nom.nominatedByUserId;
+
+    const isSelfNomination =
+      nominatedByUserId === currentUserId &&
+      nomineeUserId === currentUserId;
+
+    const isTeamNomination =
+      nominatedByUserId === currentUserId &&
+      nomineeUserId !== currentUserId;
+
+    if (isSelfNomination) {
+      managerSelfNominated++;
+    } else if (isTeamNomination) {
+      managerTeamNominated++;
+    }
+  });
+
+  const chartData = [
+    { category: "Manager Nominated (Self)", count: managerSelfNominated },
+    { category: "Manager Nominated (Team)", count: managerTeamNominated },
   ];
+
+  return {
+    total: nominations.length,
+    thisMonth: thisMonthNominations.length,
+    managerSelfNominated,
+    managerTeamNominated,
+    chartData,
+  };
+};
+
+
+  const getMeetingScheduleData = () => {
+    const meetings = dashboardData.myMeetings;
+    
+    const monthlyData = {};
+    meetings.forEach(meeting => {
+      const date = new Date(meeting.meetingDate || meeting.date || meeting.createdDate);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
+    });
+
+    const chartData = Object.entries(monthlyData)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .slice(-6)
+      .map(([month, count]) => ({
+        month: new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        count
+      }));
+
+    return {
+      total: meetings.length,
+      thisMonth: Object.values(monthlyData).slice(-1)[0] || 0,
+      chartData,
+    };
+  };
+
+  const getMeetingOverview = () => {
+    const total = dashboardData.myMeetings.length;
+    const upcoming = dashboardData.myMeetings.filter(m => {
+      const meetingDate = new Date(m.meetingDate || m.date);
+      return meetingDate > new Date();
+    }).length;
+    const completed = dashboardData.myMeetings.filter(m => {
+      const meetingDate = new Date(m.meetingDate || m.date);
+      return meetingDate <= new Date();
+    }).length;
+
+    return {
+      total,
+      upcoming,
+      completed,
+    };
+  };
+
+  if (loading) {
+    return (
+      <div className="ada-loading-container">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const kpiStats = getKPIStats();
+  const goalsData = getGoalsByType();
+  const teamAssignmentStatus = getTeamAssignmentStatus();
+  const escalationHistory = getEscalationHistory();
+  const nominationHistory = getNominationHistory();
+  const meetingScheduleData = getMeetingScheduleData();
+  const meetingOverview = getMeetingOverview();
+
+  const CHART_COLORS = ["#2c2c54", "#0F62FE", "#10b981", "#f59e0b", "#E01950", "#8b5cf6"];
+
   return (
-    <div className="dashboard-container">
-      <div className="management-cards-grid">
-        {cards.map((card, index) => (
-          <div
-            key={index}
-            className={`management-card ${
-              hoveredCard === index ? "hovered" : ""
-            }`}
-            onMouseEnter={() => setHoveredCard(index)}
-            onMouseLeave={() => setHoveredCard(null)}
-            onClick={() => handleNavigation(card.path)}
-          >
-            <div className={`card-icon-wrapper ${card.gradient}`}>
-              <i className={`bi ${card.icon}`}></i>
+    <div className="hr-dashboard-container">
+      <Breadcrumb items={[{ label: "Manager Dashboard" }]} />
+
+      <div className="admin-kpi-grid">
+        <div className="admin-kpi-card" onClick={() => navigate("/manager/lnd/dashboard")}>
+          <div className="admin-kpi-icon admin-pink">
+            <Users size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2><CountUp end={kpiStats.totalTeamMembers} duration={2} /></h2>
+            <p>Team Members</p>
+            <span className="admin-kpi-subtitle">
+              <TrendingUp size={12} /> Your team size
+            </span>
+          </div>
+        </div>
+
+        <div className="admin-kpi-card" onClick={() => navigate("/manager/dashboard/goals")}>
+          <div className="admin-kpi-icon admin-blue">
+            <Target size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2><CountUp end={kpiStats.ongoingGoalsCount} duration={2} /></h2>
+            <p>Ongoing Goals</p>
+            <span className="admin-kpi-subtitle">{kpiStats.myProjectsCount} projects</span>
+          </div>
+        </div>
+
+        <div className="admin-kpi-card" onClick={() => navigate("/internal/nominations")}>
+          <div className="admin-kpi-icon admin-purple">
+            <Shield size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2><CountUp end={kpiStats.totalNominations} duration={2} /></h2>
+            <p>Nominations</p>
+            <span className="admin-kpi-subtitle">{kpiStats.pendingNominationReviews} pending</span>
+          </div>
+        </div>
+
+        <div className="admin-kpi-card" onClick={() => navigate("/manager/dashboard/meetmom")}>
+          <div className="admin-kpi-icon admin-green">
+            <Calendar size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2><CountUp end={kpiStats.totalMeetings} duration={2} /></h2>
+            <p>Meetings</p>
+            <span className="admin-kpi-subtitle">{kpiStats.upcomingMeetings} upcoming</span>
+          </div>
+        </div>
+
+        <div className="admin-kpi-card" onClick={() => navigate("/manager/dashboard/sla")}>
+          <div className="admin-kpi-icon admin-cyan">
+            <AlertTriangle size={28} />
+          </div>
+          <div className="admin-kpi-content">
+            <h2><CountUp end={kpiStats.totalEscalations} duration={2} /></h2>
+            <p>Escalations</p>
+            <span className="admin-kpi-subtitle">{kpiStats.pendingEscalations} pending</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-cards-container">
+        
+        <div className="dashboard-row">
+          
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-bullseye"></i>
+                <h3>Goals Overview</h3>
+              </div>
+              <div style={{display: 'flex', gap: '0.5rem'}}>
+                <button
+                  onClick={() => setGoalType('self')}
+                  style={{
+                    padding: '0.4rem 0.75rem',
+                    fontSize: '0.75rem',
+                    borderRadius: '6px',
+                    border: goalType === 'self' ? '1px solid #fff' : '1px solid rgba(255,255,255,0.3)',
+                    background: goalType === 'self' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    cursor: 'pointer',
+                    fontWeight: goalType === 'self' ? '600' : '500',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  Self
+                </button>
+                <button
+                  onClick={() => setGoalType('team')}
+                  style={{
+                    padding: '0.4rem 0.75rem',
+                    fontSize: '0.75rem',
+                    borderRadius: '6px',
+                    border: goalType === 'team' ? '1px solid #fff' : '1px solid rgba(255,255,255,0.3)',
+                    background: goalType === 'team' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    cursor: 'pointer',
+                    fontWeight: goalType === 'team' ? '600' : '500',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  Team
+                </button>
+                <button
+                  onClick={() => setGoalType('org')}
+                  style={{
+                    padding: '0.4rem 0.75rem',
+                    fontSize: '0.75rem',
+                    borderRadius: '6px',
+                    border: goalType === 'org' ? '1px solid #fff' : '1px solid rgba(255,255,255,0.3)',
+                    background: goalType === 'org' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    cursor: 'pointer',
+                    fontWeight: goalType === 'org' ? '600' : '500',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  Org
+                </button>
+              </div>
             </div>
-            <div className="card-content">
-              <h3 className="card-title">{card.title}</h3>
-              <p className="card-description">{card.description}</p>
-            </div>
-            <div className="card-arrow">
-              <i className="bi bi-arrow-right"></i>
+            <div className="card-body">
+              {goalsData.total > 0 ? (
+                <>
+                  <div style={{marginBottom: '1.5rem'}}>
+                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem'}}>
+                      <div style={{background: '#f0f9ff', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe'}}>
+                        <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#0F62FE'}}>
+                          {goalsData.total}
+                        </div>
+                        <div style={{fontSize: '0.7rem', color: '#1e40af'}}>Total</div>
+                      </div>
+                      <div style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac'}}>
+                        <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981'}}>
+                          {goalsData.completed}
+                        </div>
+                        <div style={{fontSize: '0.7rem', color: '#047857'}}>Completed</div>
+                      </div>
+                      <div style={{background: '#fef3c7', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fcd34d'}}>
+                        <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706'}}>
+                          {goalsData.inProgress}
+                        </div>
+                        <div style={{fontSize: '0.7rem', color: '#b45309'}}>In Progress</div>
+                      </div>
+                      <div style={{background: '#fee2e2', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fca5a5'}}>
+                        <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444'}}>
+                          {goalsData.pending}
+                        </div>
+                        <div style={{fontSize: '0.7rem', color: '#dc2626'}}>Pending</div>
+                      </div>
+                    </div>
+                  </div>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie data={goalsData.chartData} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                        {goalsData.chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </>
+              ) : (
+                <div className="no-data-message">No goal data</div>
+              )}
+              <button className="card-view-btn" onClick={() => navigate("/manager/dashboard/goals")}>
+                View All Goals
+              </button>
             </div>
           </div>
-        ))}
+
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-award"></i>
+                <h3>Nomination History</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              <div style={{marginBottom: '1rem'}}>
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem'}}>
+                  <div style={{background: '#f0f9ff', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#0F62FE'}}>
+                      {nominationHistory.total}
+                    </div>
+                    <div style={{fontSize: '0.75rem', color: '#1e40af'}}>Total All Time</div>
+                  </div>
+                  <div style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981'}}>
+                      {nominationHistory.thisMonth}
+                    </div>
+                    <div style={{fontSize: '0.75rem', color: '#047857'}}>This Month (Nov)</div>
+                  </div>
+                </div>
+              </div>
+              {nominationHistory.chartData.length > 0 && nominationHistory.total > 0 ? (
+                <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f5f5', borderRadius: '8px', padding: '1rem 0'}}>
+                  <div style={{width: '65%'}}>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <BarChart data={nominationHistory.chartData} barSize={50}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                        <XAxis dataKey="category" stroke="#6b7280" fontSize={10} />
+                        <YAxis stroke="#6b7280" fontSize={11} />
+                        <Tooltip 
+                          contentStyle={{backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '12px'}}
+                        />
+                        <Bar dataKey="count" fill="#97247E" radius={[6, 6, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              ) : (
+                <div className="no-data-message">No nominations yet</div>
+              )}
+              <button className="card-view-btn" onClick={() => navigate("/internal/nominations")}>
+                View All Nominations
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="dashboard-row">
+          
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-calendar-check"></i>
+                <h3>Meetings Scheduled</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              <div style={{marginBottom: '1rem'}}>
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem'}}>
+                  <div style={{background: '#f0f9ff', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#0F62FE'}}>
+                      {meetingScheduleData.total}
+                    </div>
+                    <div style={{fontSize: '0.7rem', color: '#1e40af'}}>Total</div>
+                  </div>
+                  <div style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981'}}>
+                      {meetingOverview.upcoming}
+                    </div>
+                    <div style={{fontSize: '0.7rem', color: '#047857'}}>Upcoming</div>
+                  </div>
+                  <div style={{background: '#fef3c7', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fcd34d'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706'}}>
+                      {meetingOverview.completed}
+                    </div>
+                    <div style={{fontSize: '0.7rem', color: '#b45309'}}>Completed</div>
+                  </div>
+                </div>
+              </div>
+              {meetingScheduleData.chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={meetingScheduleData.chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+                    <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
+                    <YAxis stroke="#9ca3af" fontSize={11} />
+                    <Tooltip 
+                      contentStyle={{backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '12px'}}
+                    />
+                    <Line type="monotone" dataKey="count" stroke="#2c2c54" strokeWidth={2} dot={{ fill: '#2c2c54', r: 4 }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="no-data-message">No meeting data</div>
+              )}
+              <button className="card-view-btn" onClick={() => navigate("/manager/dashboard/meetmom")}>
+                View All Meetings
+              </button>
+            </div>
+          </div>
+
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-exclamation-triangle"></i>
+                <h3>Escalation History</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              <div style={{marginBottom: '1rem'}}>
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1rem'}}>
+                  <div style={{background: '#f0f9ff', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #bfdbfe'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#0F62FE'}}>
+                      {escalationHistory.total}
+                    </div>
+                    <div style={{fontSize: '0.7rem', color: '#1e40af'}}>Total</div>
+                  </div>
+                  <div style={{background: '#fef3c7', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fcd34d'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#d97706'}}>
+                      {escalationHistory.pending}
+                    </div>
+                    <div style={{fontSize: '0.7rem', color: '#b45309'}}>Pending</div>
+                  </div>
+                  <div style={{background: '#f0fdf4', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #86efac'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981'}}>
+                      {escalationHistory.resolved}
+                    </div>
+                    <div style={{fontSize: '0.7rem', color: '#047857'}}>Resolved</div>
+                  </div>
+                  <div style={{background: '#fee2e2', padding: '0.75rem', borderRadius: '6px', textAlign: 'center', border: '1px solid #fca5a5'}}>
+                    <div style={{fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444'}}>
+                      {escalationHistory.rejected}
+                    </div>
+                    <div style={{fontSize: '0.7rem', color: '#dc2626'}}>Rejected</div>
+                  </div>
+                </div>
+              </div>
+              {escalationHistory.chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie data={escalationHistory.chartData} cx="50%" cy="50%" innerRadius={50} outerRadius={70} paddingAngle={3} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
+                      {escalationHistory.chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="no-data-message">No escalation data</div>
+              )}
+              <button className="card-view-btn" onClick={() => navigate("/manager/dashboard/sla")}>
+                View All Escalations
+              </button>
+            </div>
+          </div>
+
+          <div className="dashboard-card card-medium">
+            <div className="card-header-dark">
+              <div className="card-header-content">
+                <i className="bi bi-book"></i>
+                <h3>L&D Team Assignments</h3>
+              </div>
+            </div>
+            <div className="card-body">
+              {teamAssignmentStatus.length > 0 ? (
+                <>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie 
+                        data={teamAssignmentStatus} 
+                        cx="50%" 
+                        cy="50%" 
+                        outerRadius={70} 
+                        dataKey="value" 
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
+                        {teamAssignmentStatus.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <button className="card-view-btn" onClick={() => navigate("/manager/lnd/dashboard")}>
+                    View All Assignments
+                  </button>
+                </>
+              ) : (
+                <div className="no-data-message">No team assignments</div>
+              )}
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
 };
+
 export default ManagerDashboard;

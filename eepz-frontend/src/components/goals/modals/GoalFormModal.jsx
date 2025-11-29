@@ -563,13 +563,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
     <>
       <style>
         {`
-          .form-select {
-            appearance: auto;
-            -webkit-appearance: auto;
-            -moz-appearance: auto;
-            text-align: left;
-          }
-
           @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }

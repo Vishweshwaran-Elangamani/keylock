@@ -525,30 +525,26 @@
   min-height: 100vh;
 }
 
-/* KPI CARDS - EXACTLY LIKE ADMIN */
-/* KPI GRID: fixed 5 cards per row, responsive downscaling */
+/* KPI GRID */
 .admin-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 cards */
+  grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
 .admin-kpi-card {
   background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #27235c;
-    padding: 1.125rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    transition: all 0.3s 
-ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  border: 1px solid #27235c;
+  padding: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
-
-
 
 .admin-kpi-card:hover {
   transform: translateY(-3px);
@@ -600,41 +596,6 @@ ease;
   gap: 0.25rem;
 }
 
-/* QUICK ACCESS */
-.admin-quick-access {
-  display: flex;
-  gap: 0.875rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.admin-quick-btn {
-  background: white;
-  border: 2px solid #8b5cf6;
-  border-radius: 10px;
-  padding: 0.8125rem 1.125rem;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #8b5cf6;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(139, 92, 246, 0.1);
-}
-
-.admin-quick-btn:hover {
-  background: #8b5cf6;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
-}
-
-.admin-quick-btn svg {
-  color: inherit;
-}
-
 /* DASHBOARD CARDS CONTAINER */
 .dashboard-cards-container {
   display: flex;
@@ -670,13 +631,23 @@ ease;
   min-height: 400px;
 }
 
-/* DARK CARD HEADER */
+/* CARD HEADER - HR (BLUE) */
 .card-header-dark {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
   background: #2c2c54;
+  border-bottom: none;
+}
+
+/* CARD HEADER - MANAGER (PURPLE #97247E) */
+.card-header-manager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #97247E;
   border-bottom: none;
 }
 
@@ -821,8 +792,8 @@ ease;
 
 .card-view-btn:hover {
   background: #f9fafb;
-  border-color: #8b5cf6;
-  color: #8b5cf6;
+  border-color: #97247E;
+  color: #97247E;
 }
 
 /* NO DATA MESSAGE */
@@ -834,10 +805,25 @@ ease;
   font-weight: 500;
 }
 
-/* RESPONSIVE BREAKPOINTS FOR KPI GRID */
+/* LOADING CONTAINER */
+.ada-loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 1600px) {
+  .admin-kpi-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
 @media (max-width: 1400px) {
   .admin-kpi-grid {
-    grid-template-columns: repeat(4, 1fr); /* 4 cards */
+    grid-template-columns: repeat(4, 1fr);
   }
   .dashboard-row {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -846,16 +832,13 @@ ease;
 
 @media (max-width: 1024px) {
   .admin-kpi-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 cards */
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .admin-kpi-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 cards */
-  }
-  .admin-quick-access {
-    flex-direction: column;
+    grid-template-columns: repeat(2, 1fr);
   }
   .dashboard-row {
     grid-template-columns: 1fr;
@@ -864,6 +847,6 @@ ease;
 
 @media (max-width: 480px) {
   .admin-kpi-grid {
-    grid-template-columns: 1fr; /* 1 card */
+    grid-template-columns: 1fr;
   }
 }

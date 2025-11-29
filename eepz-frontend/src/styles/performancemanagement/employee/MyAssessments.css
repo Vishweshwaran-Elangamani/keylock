@@ -828,7 +828,7 @@
     vertical-align: middle;       /* Added for better alignment */
   }
   
-  .form-select {
+  .ma-form-select {
     width: 100%;
     padding: 6px;                 /* Reduced from 8px */
     border: 1px solid var(--border);

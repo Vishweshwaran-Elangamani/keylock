@@ -232,17 +232,6 @@ const GoalApprovalsPage = () => {
 
   return (
     <>
-      <style>
-        {`
-          .form-select {
-            appearance: auto;
-            -webkit-appearance: auto;
-            -moz-appearance: auto;
-            text-align: left;
-          }
-        `}
-      </style>
-
       <div className="container-fluid">
         <Breadcrumb
           items={[
