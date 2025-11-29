@@ -1,11 +1,6 @@
 // src/services/feedbackmanagement/feedbackApi.js
 import api from "./http";
-<<<<<<< Updated upstream
-import axios from "axios";
- 
-=======
 
->>>>>>> Stashed changes
 // Manager Reviews
 export const managerReviewApi = {
   create: (body) => api.post("/managerreview/create", body),
