@@ -1,4 +1,4 @@
-// src/components/Meeting/SharedMomsModal.jsx
+
 import React, { useState, useEffect } from 'react';
 import momService from '../../../services/meeting/momService';
 import toastr from 'toastr';
@@ -58,7 +58,7 @@ const SharedMomsModal = ({ onClose }) => {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-            {/* ✅ UPDATED: Dark purple header with white text */}
+            {/*  UPDATED: Dark purple header with white text */}
             <div 
               className="modal-header border-0" 
               style={{ 
@@ -71,7 +71,7 @@ const SharedMomsModal = ({ onClose }) => {
                 <h5 className="modal-title fw-bold mb-3" style={{ color: 'white', fontSize: '1.25rem', textAlign: 'left' }}>
                   Shared MOMs
                 </h5>
-                {/* ✅ UPDATED: Tab navigation with updated styling */}
+                {/* UPDATED: Tab navigation with updated styling */}
                 <ul className="nav nav-pills">
                   <li className="nav-item">
                     <button 
@@ -114,7 +114,7 @@ const SharedMomsModal = ({ onClose }) => {
               ></button>
             </div>
 
-            {/* ✅ UPDATED: Body with left-aligned content */}
+            {/* UPDATED: Body with left-aligned content */}
             <div className="modal-body p-0" style={{ textAlign: 'left' }}>
               {loading ? (
                 <div className="text-center py-5">
@@ -138,7 +138,7 @@ const SharedMomsModal = ({ onClose }) => {
               ) : (
                 <div className="table-responsive">
                   <table className="table table-hover mb-0">
-                    {/* ✅ UPDATED: Left-aligned table headers */}
+                    {/* UPDATED: Left-aligned table headers */}
                     <thead style={{ backgroundColor: '#f8f9fa', position: 'sticky', top: 0, zIndex: 1 }}>
                       <tr style={{ textAlign: 'left' }}>
                         <th className="px-4 py-3 fw-semibold" style={{ textAlign: 'left' }}>Meeting Title</th>
@@ -150,7 +150,7 @@ const SharedMomsModal = ({ onClose }) => {
                         <th className="px-4 py-3 fw-semibold text-center">Actions</th>
                       </tr>
                     </thead>
-                    {/* ✅ UPDATED: Left-aligned table body */}
+                    {/*  UPDATED: Left-aligned table body */}
                     <tbody>
                       {currentMoms.map((mom, index) => (
                         <tr 
@@ -208,7 +208,7 @@ const SharedMomsModal = ({ onClose }) => {
               )}
             </div>
 
-            {/* ✅ UPDATED: Footer with consistent styling */}
+            {/*UPDATED: Footer with consistent styling */}
             <div 
               className="modal-footer border-0" 
               style={{ 
@@ -232,7 +232,7 @@ const SharedMomsModal = ({ onClose }) => {
         </div>
       </div>
 
-      {/* ✅ UNCHANGED: Nested MOM Details Modal */}
+      {/* UNCHANGED: Nested MOM Details Modal */}
       {selectedMom && (
         <div 
           className="modal fade show d-block" 

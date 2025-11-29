@@ -1,4 +1,4 @@
-// src/components/project_management_components/modals/EmployeeMappingModal.jsx
+
 
 import React, { useEffect } from 'react';
 import { Users, CheckCircle, AlertCircle, Info, Search, Check } from 'lucide-react';
@@ -63,12 +63,12 @@ const EmployeeMappingModal = ({
     return managerIds;
   };
 
-  // ✅ NEW: Filter out employees with "Admin" role
+  //  NEW: Filter out employees with "Admin" role
   const displayEmployees = filteredEmployees.filter(
     emp => emp.roleName && emp.roleName.toLowerCase() !== 'admin'
   );
 
-  // ✅ NEW: Filter out "Admin" role from unique roles
+  // NEW: Filter out "Admin" role from unique roles
   const displayUniqueRoles = uniqueRoles.filter(
     role => role && role.toLowerCase() !== 'admin'
   );
@@ -265,7 +265,7 @@ const EmployeeMappingModal = ({
                         }}
                       >
                         <option value="All">All Roles</option>
-                        {/* ✅ UPDATED: Use filtered roles without Admin */}
+                        {/* UPDATED: Use filtered roles without Admin */}
                         {displayUniqueRoles.map((role, idx) => (
                           <option key={idx} value={role}>
                             {role}

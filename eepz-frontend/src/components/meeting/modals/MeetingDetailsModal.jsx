@@ -1,4 +1,4 @@
-// src/components/Meeting/MeetingDetailsModal.jsx
+
 import React, { useState } from 'react';
 import CreateMomModal from './CreateMomModal';
 

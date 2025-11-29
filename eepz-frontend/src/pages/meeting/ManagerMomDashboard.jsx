@@ -8,8 +8,6 @@ import rsvpService from "../../services/meeting/rsvpService";
 import toastr from "toastr";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
-// ✅ Import the separated modal component
 import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerMeetingDetailsModal";
 
 const ManagerMomDashboard = () => {
@@ -522,7 +520,7 @@ const ManagerMomDashboard = () => {
         </div>
       </div>
 
-      {/* ✅ Modal Component */}
+      {/*  Modal Component */}
       {selectedMeeting && (
         <ManagerMeetingDetailsModal 
           meeting={selectedMeeting}

@@ -1,4 +1,4 @@
-// src/components/project_management_components/modals/EditProjectModal.jsx
+
 
 import React, { useEffect } from 'react';
 import { Edit, CheckCircle, AlertCircle, X, MessageSquare } from 'lucide-react';

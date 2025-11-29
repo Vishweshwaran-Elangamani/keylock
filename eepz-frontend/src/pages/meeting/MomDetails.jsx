@@ -79,7 +79,7 @@ const MomDetails = () => {
         </ul>
       </section>
 
-      {/* Additional buttons like Share MOM, Download PDF can be added here */}
+      
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// src/components/project_management_components/modals/ManagerSelectionModal.jsx
 
 import React, { useEffect } from 'react';
 import { X, Search, Filter, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, UserCog, Info } from 'lucide-react';

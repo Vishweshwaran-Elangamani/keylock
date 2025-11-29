@@ -145,21 +145,21 @@ const EscalationForm = ({ sla, onClose, onSuccess }) => {
       });
 
       if (response?.success) {
-        console.log("✅ Escalation successful");
+        console.log(" Escalation successful");
         toast.success("SLA Escalated Successfully", {
           description: `Escalated to ${managerName} for review`,
           duration: 4000,
         });
         onSuccess();
       } else {
-        console.error("❌ Escalation failed:", response?.message);
+        console.error("Escalation failed:", response?.message);
         toast.error("Escalation Failed", {
           description: response?.message || "Unable to escalate SLA",
           duration: 5000,
         });
       }
     } catch (error) {
-      console.error("❌ Escalation error:", error);
+      console.error(" Escalation error:", error);
       toast.error("Error Escalating SLA", {
         description: error.message || "An unexpected error occurred",
         duration: 5000,

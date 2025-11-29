@@ -1,4 +1,3 @@
-// src/components/Meeting/ManagerMeetingDetailsModal.jsx
 
 import React, { useState } from 'react';
 
@@ -128,7 +127,6 @@ const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
 
                       className="text-primary text-decoration-none d-flex align-items-center gap-2 fw-medium"
                     >
-
                       Join Meeting <i className="bi bi-box-arrow-up-right small"></i>
                     </a>
                   </div>

@@ -1,5 +1,3 @@
-// src/pages/feedback_management/dashboard/FeedbackHRDashboard.jsx
-
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,

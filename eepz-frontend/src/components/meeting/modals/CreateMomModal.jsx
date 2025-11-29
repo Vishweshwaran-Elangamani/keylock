@@ -1,4 +1,4 @@
-// src/components/Meeting/CreateMomModal.jsx
+
 import React, { useState, useEffect } from 'react';
 import employeeService from '../../../services/meeting/employeeservice';
 import momService from '../../../services/meeting/momService';
@@ -45,7 +45,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
       try {
         const response = await employeeService.getAllEmployees();
         if (response.success && response.data) {
-          // ✅ EXCLUDE System Administrator
+          //  EXCLUDE System Administrator
           const filteredEmployees = response.data.filter(
             emp => emp.roleName !== 'System Administrator'
           );
@@ -202,7 +202,7 @@ const CreateMomModal = ({ meetingData, onClose }) => {
                     style={{ backgroundColor: '#ffffff' }}
                   />
                 </div>
-                {/* ✅ NEW: Attendees Field */}
+                {/* NEW: Attendees Field */}
                 <div className="col-12">
                   <label className="form-label fw-semibold small text-muted d-flex align-items-center gap-2">
                     <i className="bi bi-people"></i>

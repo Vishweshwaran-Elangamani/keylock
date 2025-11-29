@@ -143,17 +143,16 @@ export default function ManagerGoalFeedbackView() {
         console.log(" My goal feedback count:", myFeedback.length);
 
         // Filter: Team feedback (submitted by my team members where I'm the manager)
+        
         if (isManager) {
           const teamFeedback = allFeedback
             .filter((f) => {
-              // Option 1: If managerEmployeeId is set in the feedback
+             
               if (f.managerEmployeeId) {
                 return Number(f.managerEmployeeId) === Number(empId);
               }
 
-              // Option 2: If no managerEmployeeId, you can check if submitter reports to this manager
-              // This would require an additional API call to get team members
-              // For now, we'll show all feedback except the manager's own
+             
               return Number(f.submittedByEmployeeId) !== Number(empId);
             })
             .map((f) => ({
