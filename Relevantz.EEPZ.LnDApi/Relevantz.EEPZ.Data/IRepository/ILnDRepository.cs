@@ -15,6 +15,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         );
         Task<Lndsme?> GetSmeFromEmployeeId(Dictionary<string, object> assignmentDetails);
         #endregion
+        
 
         #region Skills Management
         Task<List<MasterSkill>> GetAllSkillsAsync();
@@ -59,6 +60,9 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
         #endregion
 
         #region Assignment Management
+        Task<List<Lndassignment>> GetOverdueAssignmentsAsync();
+        Task<int> MarkAssignmentsAsOverdueAsync();
+
         Task<Lndassignment?> GetAssignmentByIdAsync(int assignmentId);
         Task<Lndassignment> AddAssignmentAsync(Lndassignment assignment);
         Task UpdateAssignmentAsync(Lndassignment assignment);
@@ -127,11 +131,11 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
 
         #region HR Management
         Task<List<Lndassignment>> GetAllOrganizationAssignmentsForExportAsync(
-    string? statusFilter,
-    string? searchTerm,
-    string? sortField,
-    string? sortOrder
-);
+            string? statusFilter,
+            string? searchTerm,
+            string? sortField,
+            string? sortOrder
+        );
         Task<(List<Employee> Items, int TotalCount)> GetAllOrganizationEmployeesAsync(
             string? searchTerm,
             int pageNumber,
@@ -152,6 +156,8 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             int pageNumber,
             int pageSize
         );
+
+
         Task<List<Lndsme>> GetAllActiveSmesForExportAsync(string? searchTerm);
 
 
@@ -161,20 +167,19 @@ namespace Relevantz.EEPZ.Data.Repositories.Interface
             string? sortBy,
             int pageNumber,
             int pageSize
-        ); 
+        );
 
         Task<List<Lndassignment>> GetAllTeamAssignmentsForExportAsync(
-    int managerId,
-    string? statusFilter,
-    string? searchTerm,
-    string? sortField,
-    string? sortOrder
-);
+            int managerId,
+            string? statusFilter,
+            string? searchTerm,
+            string? sortField,
+            string? sortOrder
+        );
 
 
 
         #endregion
-
 
         #region Unit of Work
         Task<int> SaveChangesAsync();

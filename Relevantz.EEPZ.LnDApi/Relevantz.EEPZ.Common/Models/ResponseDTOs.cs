@@ -6,7 +6,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<T> Items { get; set; }
         public int TotalCount { get; set; }
         public int PageNumber { get; set; }
-        public int PageSize { get; set; }
+        public int PageSize { get; set; } 
         public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
         public bool HasPreviousPage => PageNumber > 1;
         public bool HasNextPage => PageNumber < TotalPages;
@@ -98,6 +98,8 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int? CompletionRating { get; set; }
         public DateOnly? CreatedOn { get; set; }
         public DateOnly? UpdatedOn { get; set; }
+        public bool IsOverdue { get; set; }
+        public int? DaysOverdue { get; set; }
     }
 
     // Employee skill responses

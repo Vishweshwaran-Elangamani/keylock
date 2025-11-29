@@ -139,7 +139,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? searchTerm,
             int pageNumber,
             int pageSize
-        ); 
+        );
 
         Task<ApiResponse<PaginatedResponse<AssignmentDto>>> GetAllOrganizationAssignments(
             string? statusFilter,
@@ -148,7 +148,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? sortOrder,
             int pageNumber,
             int pageSize
-        ); 
+        );
 
 
         Task<ApiResponse<PaginatedResponse<SmeDto>>> GetAllActiveSmes(
@@ -182,6 +182,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
 
         Task<ApiResponse<FileDownloadDto>> PreviewApprovalAttachment(int employeeId, int approvalId);
         Task<ApiResponse<FileDownloadDto>> PreviewAssignmentProof(int employeeId, int assignmentId);
+        Task<ApiResponse<int>> CheckAndMarkOverdueAssignments(); 
 
     }
     public interface IFileStorageService
@@ -191,7 +192,7 @@ namespace Relevantz.EEPZ.Core.Services.Interface
         Task<byte[]> GetFileAsync(string filePath);
         string GetFileUrl(string filePath);
 
-        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string filePath);
+        Task<(byte[] fileBytes, string contentType, string fileName)> GetFileForPreviewAsync(string filePath); 
 
-    }
+    } 
 }

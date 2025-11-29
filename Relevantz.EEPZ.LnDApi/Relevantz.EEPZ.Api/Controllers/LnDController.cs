@@ -193,11 +193,11 @@ namespace Relevantz.EEPZ.Api.Controllers
         [HttpGet("hr/assignments/organization/export")]
         [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> ExportOrganizationAssignments(
-    [FromQuery] string? statusFilter,
-    [FromQuery] string? searchTerm,
-    [FromQuery] string? sortField,
-    [FromQuery] string? sortOrder
-)
+            [FromQuery] string? statusFilter,
+            [FromQuery] string? searchTerm,
+            [FromQuery] string? sortField,
+            [FromQuery] string? sortOrder
+        )
         {
             var result = await _lndService.ExportOrganizationAssignmentsToExcel(
                 statusFilter,
@@ -307,6 +307,22 @@ namespace Relevantz.EEPZ.Api.Controllers
 
 
         #region Assignment Management
+
+        /// <summary>
+        /// Check and mark overdue assignments (can be called by scheduled job)
+        /// </summary>
+        [HttpPost("assignments/check-overdue")]
+        [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
+        public async Task<IActionResult> CheckOverdueAssignments()
+        {
+            var result = await _lndService.CheckAndMarkOverdueAssignments();
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
 
         [HttpPost("assignments/request-sme")]
         public async Task<IActionResult> RequestSmeAssignment([FromBody] SmeRequestDto request)
@@ -586,7 +602,7 @@ namespace Relevantz.EEPZ.Api.Controllers
 
 
             return File(result.Data.FileBytes, result.Data.ContentType, result.Data.FileName, enableRangeProcessing: true);
-        }        
+        }
 
         #endregion
     }

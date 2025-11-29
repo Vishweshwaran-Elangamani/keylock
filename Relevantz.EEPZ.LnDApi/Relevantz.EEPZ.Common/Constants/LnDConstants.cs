@@ -78,7 +78,7 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string PENDING = "PENDING";
             public const string APPROVED = "APPROVED";
             public const string REJECTED = "REJECTED";
-        } 
+        }
 
         /// <summary>
         /// Attachment types
@@ -96,7 +96,7 @@ namespace Relevantz.EEPZ.Common.Constants
         {
             public const string SME_PROOFS = "sme-proofs";
             public const string COMPLETION_PROOFS = "completion-proofs";
-        } 
+        }
 
         /// <summary>
         /// Sort fields
@@ -136,5 +136,8 @@ namespace Relevantz.EEPZ.Common.Constants
             public const string REQUESTER = "requester";
             public const string APPROVER = "approver";
         }
+        
+      
+
     }
 }

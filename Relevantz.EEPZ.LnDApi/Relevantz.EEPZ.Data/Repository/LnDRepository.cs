@@ -381,6 +381,44 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
 
         #region Assignment Management
 
+        /// <summary>
+        /// Get all assignments that are overdue (past deadline and not completed)
+        /// </summary>
+        public async Task<List<Lndassignment>> GetOverdueAssignmentsAsync()
+        {
+            var today = DateTime.Now.Date;
+
+            return await _context
+                .Lndassignments
+                .Include(a => a.MenteeEmployee)
+                .Include(a => a.Sme)
+                .Include(a => a.Skill)
+                .Where(a =>
+                    a.Deadline.HasValue &&
+                    a.Deadline.Value.Date < today &&
+                    a.Status != LnDConstants.ASSIGNMENT_STATUS.COMPLETED &&
+                    a.Status != LnDConstants.ASSIGNMENT_STATUS.OVERDUE)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Mark assignments as overdue
+        /// </summary>
+        public async Task<int> MarkAssignmentsAsOverdueAsync()
+        {
+            var overdueAssignments = await GetOverdueAssignmentsAsync();
+
+            foreach (var assignment in overdueAssignments)
+            {
+                assignment.Status = LnDConstants.ASSIGNMENT_STATUS.OVERDUE;
+                assignment.UpdatedOn = DateOnly.FromDateTime(DateTime.Now);
+            }
+
+            _context.Lndassignments.UpdateRange(overdueAssignments);
+            return await _context.SaveChangesAsync();
+        }
+
+
         public async Task<Lndassignment?> GetAssignmentByIdAsync(int assignmentId)
         {
             return await _context
@@ -759,19 +797,18 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(a => a.Attachment)
                 .Where(a => a.ApproverEmployeeId == employeeId);
 
-            // Apply approval type filter
             if (!string.IsNullOrEmpty(approvalType))
             {
                 query = query.Where(a => a.ApprovalType == approvalType);
             }
 
-            // Apply status filter
+          
             if (!string.IsNullOrEmpty(status))
             {
                 query = query.Where(a => a.Status == status);
             }
 
-            // Apply sorting
+          
             if (!string.IsNullOrWhiteSpace(sortField))
             {
                 var isAscending = sortOrder?.ToLower() != LnDConstants.SORT_ORDER.DESC;
@@ -806,12 +843,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         ? query.OrderBy(a => a.Status)
                         : query.OrderByDescending(a => a.Status),
 
-                    _ => query.OrderByDescending(a => a.RequestedOn), // Default sort
+                    _ => query.OrderByDescending(a => a.RequestedOn), 
                 };
             }
             else
             {
-                // Default sorting when no sortField is specified
+                
                 query = query.OrderByDescending(a => a.RequestedOn);
             }
 
@@ -947,7 +984,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                     ? query
                         .OrderBy(a =>
                             a.ApproverEmployee != null
-                                ? a.ApproverEmployee.Userprofile.FirstName 
+                                ? a.ApproverEmployee.Userprofile.FirstName
                                 : ""
                         )
                         .ThenBy(a =>
@@ -1011,7 +1048,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 .Include(s => s.Skill)
                 .AsQueryable();
 
-            // Apply search filter if provided
+         
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var lowerSearchTerm = searchTerm.ToLower();
@@ -1026,7 +1063,7 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 );
             }
 
-            // Return all results without pagination
+            
             return await query
                 .OrderBy(s => s.Employee.Userprofile.FirstName)
                 .ThenBy(s => s.Employee.Userprofile.LastName)
@@ -1049,13 +1086,12 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                         .ThenInclude(e => e.Userprofile)
                 .AsQueryable();
 
-            // Apply status filter
+           
             if (!string.IsNullOrEmpty(statusFilter))
             {
                 query = query.Where(a => a.Status == statusFilter);
             }
 
-            // Apply search filter
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 var lowerSearchTerm = searchTerm.ToLower();
@@ -1070,10 +1106,10 @@ namespace Relevantz.EEPZ.Data.Repositories.Implementations
                 );
             }
 
-            // Apply sorting
+         
             query = ApplyAssignmentSorting(query, sortField, sortOrder);
 
-            // Return all results (no pagination for export)
+            
             return await query.ToListAsync();
         }
 
