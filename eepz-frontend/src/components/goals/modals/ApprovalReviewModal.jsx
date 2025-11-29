@@ -6,6 +6,7 @@ import goalService, {
 import LoadingSpinner from "../common/LoadingSpinner";
 import Alert from "../common/Alert";
 import { APPROVAL_TYPE_LABELS } from "../../../constants/goals/goalConstants";
+import GoalStatusBadge from "../badges/GoalStatusBadge";
 
 const ApprovalReviewModal = ({
   isOpen,
@@ -384,7 +385,7 @@ const ApprovalReviewModal = ({
                                 )} text-capitalize`}
                                 style={{ fontSize: "0.85rem" }}
                               >
-                                {goalDetails.status}
+                                <GoalStatusBadge status={goalDetails.status}/>
                               </span>
                             </p>
                           </div>
