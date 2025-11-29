@@ -13,7 +13,7 @@ public class DeptHeadPerformanceDTO
     public List<CompetencyRatingDTO> Competencies { get; set; }
 
 }
- 
+
 public class CompetencyRatingDTO
 
 {

@@ -9,7 +9,7 @@ using Relevantz.EEPZ.Core.Services.Interfaces;
 using System;
 using System.IO;
 using System.Threading.Tasks;
- 
+
 namespace eepzbackend.Controllers
 {
     [ApiController]
@@ -18,15 +18,13 @@ namespace eepzbackend.Controllers
     {
         private readonly IManagerReviewRepository _repo;
         private readonly EEPZDbContext _context;
-        
-        // ✅ FIXED: Must inject both dependencies
+
         public ApproverController(IManagerReviewRepository repo, EEPZDbContext context)
         {
             _repo = repo;
-            _context = context;  // ✅ THIS IS THE FIX!
+            _context = context;  
         }
- 
-        // GET /api/approver/7/submitted-forms?page=1&pageSize=25
+
         [HttpGet("submitted-forms")]
         public async Task<IActionResult> GetSubmittedForms(
             int approverUserId,
@@ -92,7 +90,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // POST /api/approver/7/reviews
         [HttpPost("reviews")]
         public async Task<IActionResult> PostApproverReviews(
             int approverUserId,
@@ -100,15 +97,14 @@ namespace eepzbackend.Controllers
         {
             if (body is null || body.Items is null || body.Items.Count == 0)
                 return BadRequest("No review items provided.");
- 
+
             var saved = await _repo.SaveApproverReviewAsync(approverUserId, body);
             if (saved <= 0)
                 return Forbid();
- 
+
             return Created(string.Empty, new { saved });
         }
- 
-        // GET /api/approver/7/rework-forms
+
         [HttpGet("rework-forms")]
         public async Task<IActionResult> GetReworkForms(
             int approverUserId,
@@ -118,8 +114,7 @@ namespace eepzbackend.Controllers
             var rows = await _repo.GetApproverReworkFormsAsync(approverUserId, page, pageSize);
             return Ok(rows);
         }
- 
-        // GET /api/approver/2/assessment/1
+
         [HttpGet("assessment/{assessmentId:int}")]
         public async Task<IActionResult> GetAssessmentForApprover(int approverUserId, int assessmentId)
         {
@@ -127,8 +122,7 @@ namespace eepzbackend.Controllers
             if (dto is null) return NotFound();
             return Ok(dto);
         }
- 
-        // GET /api/approver/2/assessments
+
         [HttpGet("assessments")]
         public async Task<IActionResult> GetApproverAssessmentsWithDetails(
             int approverUserId,
@@ -138,8 +132,7 @@ namespace eepzbackend.Controllers
             var list = await _repo.GetApproverAssessmentsWithDetailsAsync(approverUserId, page, pageSize);
             return Ok(list);
         }
- 
-        // GET /api/approver/2/assessment/3/decision
+
         [HttpGet("assessment/{assessmentId:int}/decision")]
         public async Task<IActionResult> GetL2DecisionForApprover(int approverUserId, int assessmentId)
         {

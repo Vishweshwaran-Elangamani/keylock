@@ -1,5 +1,4 @@
 
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -25,10 +24,6 @@ namespace PerformanceManagement.Controllers
             _context = context;
             _logger = logger;
         }
-
-        // ============================================================
-        // HELPER METHODS
-        // ============================================================
 
         private int GetUserIdFromToken()
         {
@@ -76,10 +71,6 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        // ============================================================
-        // FORM INITIATION & ASSIGNMENT
-        // ============================================================
-
         [HttpPost("initiate")]
         public async Task<IActionResult> InitiateAppraisal([FromBody] InitiateAppraisalRequestDto request)
         {
@@ -111,7 +102,6 @@ namespace PerformanceManagement.Controllers
                     return BadRequest("Only HR users can initiate appraisals.");
                 }
 
-                // ✅ Convert Employee.EmployeeId → Userauthentication.UserId
                 var employeeIdsReceived = request.UserIds.ToList();
                 _logger.LogInformation($"[INITIATE] Converting employee IDs: {string.Join(", ", employeeIdsReceived)}");
 
@@ -129,7 +119,6 @@ namespace PerformanceManagement.Controllers
                 var userIds = userIdMapping.Select(m => m.UserId).ToList();
                 _logger.LogInformation($"[INITIATE] Mapped to user IDs: {string.Join(", ", userIds)}");
 
-                // Calculate eligible users
                 HashSet<int> eligibleUserIds = new HashSet<int>();
 
                 if (form.Type == "Self")
@@ -300,10 +289,6 @@ namespace PerformanceManagement.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
-        // ============================================================
-        // EMPLOYEE & FORM QUERIES
-        // ============================================================
 
         [HttpGet("upcoming-eligible")]
         public async Task<IActionResult> GetUpcomingEligibleEmployees([FromQuery] int? formId = null)
@@ -772,43 +757,36 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        // ============================================================
-        // DEPARTMENT HEAD APPROVAL & RATINGS
-        // ============================================================
-
      [HttpPost("depthead/approve-employee")]
 public async Task<IActionResult> ApproveDeptHeadEmployee([FromBody] ApprovalRequestDto request)
 {
     try
     {
-        // Extract UserId from JWT
+
         var deptHeadUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(deptHeadUserIdClaim) || !int.TryParse(deptHeadUserIdClaim, out int deptHeadUserId))
         {
             return Unauthorized(new { success = false, message = "Invalid token" });
         }
- 
-        // Validate assessment exists
+
         var assessment = await _context.Selfassessments
             .FirstOrDefaultAsync(sa => sa.AssessmentId == request.AssessmentId);
- 
+
         if (assessment == null)
         {
             return NotFound(new { success = false, message = "Assessment not found" });
         }
- 
-        // Check if already approved
+
         var existingApproval = await _context.Departmentheadapprovals
             .AsNoTracking()
             .FirstOrDefaultAsync(a => a.AssessmentId == request.AssessmentId
                                    && a.EmployeeId == request.EmployeeId);
- 
+
         if (existingApproval != null)
         {
             return BadRequest(new { success = false, message = "Employee already approved" });
         }
- 
-        // Create approval record
+
         var approval = new Departmentheadapproval
         {
             EmployeeId = request.EmployeeId,
@@ -821,10 +799,10 @@ public async Task<IActionResult> ApproveDeptHeadEmployee([FromBody] ApprovalRequ
             AcknowledgedAt = null,
             EmployeeComments = null
         };
- 
+
         _context.Departmentheadapprovals.Add(approval);
         await _context.SaveChangesAsync();
- 
+
         return Ok(new
         {
             success = true,
@@ -839,17 +817,16 @@ public async Task<IActionResult> ApproveDeptHeadEmployee([FromBody] ApprovalRequ
         return StatusCode(500, new { success = false, message = ex.Message });
     }
 }
- 
+
 [HttpGet("depthead/submitted-ratings")]
 public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? departmentHeadId)
 {
     try
     {
         _logger.LogInformation($"GetDeptHeadSubmittedRatings called with departmentHeadId: {departmentHeadId}");
- 
-        // Get department head ID from either query parameter or JWT token
+
         int? deptHeadEmployeeId = departmentHeadId;
-       
+
         if (!deptHeadEmployeeId.HasValue)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -857,63 +834,60 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
             {
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(u => u.UserId == userId);
-               
+
                 if (userAuth != null)
                 {
                     deptHeadEmployeeId = userAuth.EmployeeId;
                 }
             }
         }
- 
+
         _logger.LogInformation($"Department Head Employee ID being used: {deptHeadEmployeeId}");
- 
-        // Fetch all required data
+
         var profiles = await _context.Userprofiles.AsNoTracking().ToListAsync();
         var userAuths = await _context.Userauthentications.AsNoTracking().ToListAsync();
         var projects = await _context.Projects.AsNoTracking().ToListAsync();
         var projectEmployees = await _context.Projectemployees.AsNoTracking().ToListAsync();
- 
-        // Filter by department if departmentHeadId is provided
+
         if (deptHeadEmployeeId.HasValue)
         {
             var deptHeadDeptId = await _context.Employeedetailsmasters
                 .Where(edm => edm.EmployeeId == deptHeadEmployeeId.Value)
                 .Select(edm => edm.DepartmentId)
                 .FirstOrDefaultAsync();
-           
+
             if (deptHeadDeptId > 0)
             {
                 _logger.LogInformation($"Filtering by Department ID: {deptHeadDeptId}");
-               
+
                 var departmentEmployeeIds = await _context.Employeedetailsmasters
                     .Where(edm => edm.DepartmentId == deptHeadDeptId)
                     .Select(edm => edm.EmployeeId)
                     .ToListAsync();
-               
+
                 projectEmployees = projectEmployees
                     .Where(pe => departmentEmployeeIds.Contains(pe.EmployeeId))
                     .ToList();
             }
         }
- 
+
         var selfAssessments = await _context.Selfassessments
             .Include(sa => sa.Assessmentdetails)
             .ThenInclude(ad => ad.Competency)
             .Where(sa => sa.Status == "Submitted")
             .AsNoTracking()
             .ToListAsync();
- 
+
         var reviews = await _context.Assessmentreviews.AsNoTracking().ToListAsync();
- 
-        // Fetch goals
+
         var allEmployeeIds = projectEmployees.Select(pe => pe.EmployeeId).Distinct().ToList();
-        
+
         var allGoalAssignments = await _context.GoalAssignments
             .Where(ga => ga.AssignedTo.HasValue && allEmployeeIds.Contains(ga.AssignedTo.Value))
             .ToListAsync();
- 
+
         var allGoalIds = allGoalAssignments.Select(ga => ga.GoalId).Distinct().ToList();
-        
+
         var allGoals = allGoalIds.Any() 
             ? await _context.Goals
                 .Where(g => allGoalIds.Contains(g.GoalId))
@@ -925,7 +899,7 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
                 .Include(g => g.GoalAttachments)
                 .ToListAsync()
             : new List<Goal>();
- 
+
         var results = new List<object>();
 
         foreach (var pe in projectEmployees)
@@ -941,7 +915,6 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
                 var project = projects.FirstOrDefault(p => p.ProjectId == pe.ProjectId);
                 if (project == null) continue;
 
-                // Get ALL submitted assessments for this employee
                 var employeeAssessments = selfAssessments
                     .Where(sa => sa.EmployeeId == userAuth.UserId && 
                                  sa.Assessmentdetails != null && 
@@ -951,10 +924,9 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
 
                 if (!employeeAssessments.Any()) continue;
 
-                // Process EACH assessment separately
                 foreach (var selfAssessment in employeeAssessments)
                 {
-                    // Check if already approved by department head
+
                     var approval = await _context.Departmentheadapprovals
                         .AsNoTracking()
                         .FirstOrDefaultAsync(a => 
@@ -969,11 +941,10 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
                         continue;
                     }
 
-                    // Get L1 and L2 approvers
                     var l1Auth = project.L1approverEmployeeId.HasValue 
                         ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L1approverEmployeeId) 
                         : null;
-                    
+
                     var l2Auth = project.L2approverEmployeeId.HasValue 
                         ? userAuths.FirstOrDefault(ua => ua.EmployeeId == project.L2approverEmployeeId) 
                         : null;
@@ -981,23 +952,20 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
                     bool hasL1 = l1Auth != null;
                     bool hasL2 = l2Auth != null;
 
-                    // ✅ FIXED LOGIC: Check if ALL detail reviews by L2 (Reviewer role) are "Approved"
                     bool allL2Approved = false;
-                    
+
                     if (hasL2)
                     {
-                        // Check if ALL assessment details have L2 reviews with "Approved" status
+
                         allL2Approved = selfAssessment.Assessmentdetails.All(detail =>
                             reviews.Any(r => 
                                 r.DetailId == detail.DetailId && 
                                 r.ReviewerId == l2Auth.UserId && 
-                                r.ReviewerRole == "Reviewer" &&  // ✅ Must be Reviewer role
-                                r.ReviewStatus == "Approved")     // ✅ Must be Approved status
+                                r.ReviewerRole == "Reviewer" &&  
+                                r.ReviewStatus == "Approved")     
                         );
                     }
 
-                    // ✅ CRITICAL: Show record ONLY if L2 (Reviewer) has approved ALL details
-                    // We don't care about L1 (Approver) status for Department Head view
                     if (!hasL2)
                     {
                         _logger.LogDebug($"Skipping AssessmentId {selfAssessment.AssessmentId}: No L2 reviewer configured");
@@ -1010,10 +978,8 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
                         continue;
                     }
 
-                    // ✅ At this point, L2 has approved - show it to department head
                     _logger.LogInformation($"✅ Including AssessmentId {selfAssessment.AssessmentId} - L2 approved");
 
-                    // Get reviewer names
                     string l1ReviewerName = "No L1";
                     if (hasL1 && project.L1approverEmployeeId.HasValue)
                     {
@@ -1042,7 +1008,6 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
                         }
                     }
 
-                    // Build competencies with L1 and L2 reviews
                     var competencies = selfAssessment.Assessmentdetails.Select(detail =>
                     {
                         var l1Review = hasL1 
@@ -1076,7 +1041,6 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
                         };
                     }).ToList();
 
-                    // Get goals for this employee
                     var employeeGoalIds = allGoalAssignments
                         .Where(ga => ga.AssignedTo.HasValue && ga.AssignedTo.Value == pe.EmployeeId)
                         .Select(ga => ga.GoalId)
@@ -1147,9 +1111,6 @@ public async Task<IActionResult> GetDeptHeadSubmittedRatings([FromQuery] int? de
     }
 }
 
- 
- 
- 
       [HttpGet("manager/approved-employees")]
 public async Task<IActionResult> GetManagerApprovedEmployees(
     [FromQuery] int page = 1,
@@ -1158,129 +1119,121 @@ public async Task<IActionResult> GetManagerApprovedEmployees(
 {
     try
     {
-        // ✅ NEW: Get department head ID from either query parameter or JWT token
+
         int? deptHeadEmployeeId = departmentHeadId;
-       
+
         if (!deptHeadEmployeeId.HasValue)
         {
-            // Fallback to JWT token if not provided
+
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
             {
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(u => u.UserId == userId);
-               
+
                 if (userAuth != null)
                 {
                     deptHeadEmployeeId = userAuth.EmployeeId;
                 }
             }
         }
- 
+
         _logger.LogInformation($"GetManagerApprovedEmployees - Department Head ID: {deptHeadEmployeeId}, Page: {page}");
- 
-        // ✅ NEW: Filter by department head and their department
+
         IQueryable<Departmentheadapproval> approvalQuery = _context.Departmentheadapprovals
             .Where(a => a.Status == "Approved" || a.Status == null);
- 
+
         if (deptHeadEmployeeId.HasValue)
         {
-            // ✅ NEW: Get department head's department via Employeedetailsmaster
+
             var deptHeadDeptId = await _context.Employeedetailsmasters
                 .Where(edm => edm.EmployeeId == deptHeadEmployeeId.Value)
                 .Select(edm => edm.DepartmentId)
                 .FirstOrDefaultAsync();
-           
+
             if (deptHeadDeptId > 0)
             {
                 _logger.LogInformation($"Filtering approved employees by Department ID: {deptHeadDeptId}");
-               
-                // Get all employee IDs in the department head's department
+
                 var departmentEmployeeIds = await _context.Employeedetailsmasters
                     .Where(edm => edm.DepartmentId == deptHeadDeptId)
                     .Select(edm => edm.EmployeeId)
                     .ToListAsync();
-               
-                // Filter approvals to only include employees from this department
+
                 approvalQuery = approvalQuery.Where(a => departmentEmployeeIds.Contains(a.EmployeeId));
             }
         }
- 
+
         var totalRecords = await approvalQuery.CountAsync();
- 
+
         var approvals = await approvalQuery
             .OrderByDescending(a => a.ApprovedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .AsNoTracking()
             .ToListAsync();
- 
+
         var results = new List<object>();
- 
+
         foreach (var approval in approvals)
         {
             try
             {
                 _logger.LogInformation($"Processing ApprovalId: {approval.ApprovalId}, EmployeeId: {approval.EmployeeId}");
- 
-                // Find employee in ProjectEmployees
+
                 var pe = await _context.Projectemployees
                     .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.EmployeeId == approval.EmployeeId);
- 
+
                 if (pe == null)
                 {
                     _logger.LogWarning($"ProjectEmployee not found for EmployeeId: {approval.EmployeeId}");
-                   
-                    // Try alternate approach
+
                     var empMaster = await _context.Employeedetailsmasters
                         .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.EmployeeMasterId == approval.EmployeeId);
-                   
+
                     if (empMaster == null)
                     {
                         _logger.LogWarning($"EmployeeDetailsMaster not found");
                         continue;
                     }
-                   
+
                     pe = await _context.Projectemployees
                         .AsNoTracking()
                         .FirstOrDefaultAsync(x => x.EmployeeId == empMaster.EmployeeId);
-                   
+
                     if (pe == null)
                     {
                         _logger.LogWarning($"Still no ProjectEmployee found");
                         continue;
                     }
                 }
- 
-                // Get profile
+
                 var profile = await _context.Userprofiles
                     .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.EmployeeId == pe.EmployeeId);
- 
+
                 if (profile == null)
                 {
                     _logger.LogWarning($"Profile not found for EmployeeId: {pe.EmployeeId}");
                     continue;
                 }
- 
-                // Get project
+
                 var project = await _context.Projects
                     .AsNoTracking()
                     .FirstOrDefaultAsync(x => x.ProjectId == approval.ProjectId);
- 
+
                 if (project == null)
                 {
                     _logger.LogWarning($"Project not found for ProjectId: {approval.ProjectId}");
                     continue;
                 }
- 
-                // Build employee name
+
                 string employeeName = $"{profile.FirstName ?? ""} {profile.LastName ?? ""}".Trim();
                 if (string.IsNullOrEmpty(employeeName))
                     employeeName = $"Employee {approval.EmployeeId}";
- 
+
                 results.Add(new
                 {
                     ApprovalId = approval.ApprovalId,
@@ -1289,7 +1242,7 @@ public async Task<IActionResult> GetManagerApprovedEmployees(
                     ProjectName = project.ProjectName ?? "Unknown",
                     ApprovedAt = approval.ApprovedAt
                 });
- 
+
                 _logger.LogInformation($"Successfully processed ApprovalId: {approval.ApprovalId}");
             }
             catch (Exception ex)
@@ -1298,9 +1251,9 @@ public async Task<IActionResult> GetManagerApprovedEmployees(
                 continue;
             }
         }
- 
+
         _logger.LogInformation($"Returning {results.Count} approved employees out of {totalRecords} total");
- 
+
         return Ok(new
         {
             success = true,
@@ -1317,21 +1270,16 @@ public async Task<IActionResult> GetManagerApprovedEmployees(
         return StatusCode(500, new { success = false, message = ex.Message });
     }
 }
- 
-        // ============================================================
-        // EMPLOYEE ACKNOWLEDGMENTS
-        // ============================================================
 
      [HttpGet("employee/pending-acknowledgments")]
 public async Task<IActionResult> GetPendingAcknowledgments()
 {
     try
     {
-        // DEBUG: Log all claims for troubleshooting
+
         var claimDump = string.Join(", ", User.Claims.Select(c => $"{c.Type}={c.Value}"));
         _logger.LogWarning($"EMPLOYEE PENDING ACK: Claims available: {claimDump}");
 
-        // Get possible EmployeeId and UserId from JWT
         var employeeIdClaim = User.FindFirst("empMasterId")?.Value
                            ?? User.FindFirst("EmployeeId")?.Value
                            ?? User.FindFirst("employeeId")?.Value;
@@ -1339,7 +1287,6 @@ public async Task<IActionResult> GetPendingAcknowledgments()
                        ?? User.FindFirst("userId")?.Value
                        ?? User.FindFirst("sub")?.Value;
 
-        // Parse both as int for compatibility (whichever matches your DB)
         int.TryParse(employeeIdClaim, out int employeeId);
         int.TryParse(userIdClaim, out int userId);
 
@@ -1348,7 +1295,6 @@ public async Task<IActionResult> GetPendingAcknowledgments()
 
         _logger.LogWarning($"EMPLOYEE PENDING ACK: Matching EmployeeId={employeeId} or UserId={userId}");
 
-        // Get all pending approvals matching either EmployeeId or UserId (handle both)
         var pendingApprovals = await _context.Departmentheadapprovals
             .Where(a =>
                 (a.EmployeeId == employeeId || a.EmployeeId == userId)
@@ -1365,11 +1311,10 @@ public async Task<IActionResult> GetPendingAcknowledgments()
         {
             try
             {
-                // Get project details
+
                 var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == approval.ProjectId);
                 if (project == null) continue;
 
-                // Get assessment details with competencies
                 var assessment = await _context.Selfassessments
                     .Include(sa => sa.Assessmentdetails)
                     .ThenInclude(ad => ad.Competency)
@@ -1377,12 +1322,10 @@ public async Task<IActionResult> GetPendingAcknowledgments()
 
                 if (assessment == null) continue;
 
-                // Get reviews for this assessment
                 var detailIds = assessment.Assessmentdetails.Select(d => d.DetailId).ToList();
                 var reviews = await _context.Assessmentreviews
                     .Where(r => detailIds.Contains(r.DetailId)).ToListAsync();
 
-                // Get L1/L2 names and user IDs
                 var l1Name = "No L1";
                 var l2Name = "No L2";
                 int? l1UserId = null, l2UserId = null;
@@ -1447,14 +1390,12 @@ public async Task<IActionResult> GetPendingAcknowledgments()
     }
 }
 
-
-
        [HttpPost("employee/acknowledge")]
 public async Task<IActionResult> AcknowledgeRating([FromBody] AcknowledgeRequestDto request)
 {
     try
     {
-        // Get both employeeId and userId from JWT token for maximum robustness
+
         var employeeIdClaim = User.FindFirst("empMasterId")?.Value
                            ?? User.FindFirst("EmployeeId")?.Value
                            ?? User.FindFirst("employeeId")?.Value;
@@ -1467,21 +1408,18 @@ public async Task<IActionResult> AcknowledgeRating([FromBody] AcknowledgeRequest
 
         _logger.LogInformation($"ACK (POST): ApprovalId={request.ApprovalId}, EmpId={employeeId}, UserId={userId}");
 
-        // Show ALL possible approval records visible to this identity, for debugging
         var myApprovals = await _context.Departmentheadapprovals
             .Where(a => (a.EmployeeId == employeeId || a.EmployeeId == userId))
             .Select(a => new { a.ApprovalId, a.EmployeeId })
             .ToListAsync();
         _logger.LogInformation($"ACK (POST) Approvals for this user: [{string.Join(", ", myApprovals.Select(a => $"id:{a.ApprovalId},emp:{a.EmployeeId}"))}]");
 
-        // Try to match both EmployeeId and UserId to ensure no mismatch
         var approval = await _context.Departmentheadapprovals
             .FirstOrDefaultAsync(a =>
                 a.ApprovalId == request.ApprovalId &&
                 (a.EmployeeId == employeeId || a.EmployeeId == userId)
             );
 
-        // If not found, return what was attempted for easy debugging
         if (approval == null)
         {
             _logger.LogWarning($"ACK (POST) NOT FOUND: approvalId={request.ApprovalId}, empId={employeeId}, userId={userId}");
@@ -1517,12 +1455,10 @@ public async Task<IActionResult> AcknowledgeRating([FromBody] AcknowledgeRequest
     }
 }
 
-        
-
 [HttpGet("manager/employee-acknowledged-comments")]
 public async Task<IActionResult> GetEmployeeAcknowledgedComments()
 {
-    // Get managerId from query param or JWT
+
     int managerId = 0;
     if (Request.Query.ContainsKey("managerId"))
     {
@@ -1535,14 +1471,13 @@ public async Task<IActionResult> GetEmployeeAcknowledgedComments()
                           ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         int.TryParse(managerIdClaim, out managerId);
     }
- 
-    // Find all employees who report to this manager as L1 only
+
     var employeeIds = await _context.Projects
         .Where(p => p.L1approverEmployeeId == managerId)
         .SelectMany(p => _context.Projectemployees.Where(pe => pe.ProjectId == p.ProjectId).Select(pe => pe.EmployeeId))
         .Distinct()
         .ToListAsync();
- 
+
     var acknowledgments = await _context.Departmentheadapprovals
         .Where(a => a.AcknowledgedByEmployee == true && employeeIds.Contains(a.EmployeeId))
         .Join(_context.Userprofiles,
@@ -1556,16 +1491,9 @@ public async Task<IActionResult> GetEmployeeAcknowledgedComments()
               })
         .OrderByDescending(x => x.AcknowledgedAt)
         .ToListAsync();
- 
+
     return Ok(new { success = true, data = acknowledgments });
 }
- 
- 
-
-
-        // ============================================================
-        // ALL DETAILS (L1/L2 REVIEWS)
-        // ============================================================
 
 [HttpGet("all-details")]
 public async Task<IActionResult> GetAllDetails()
@@ -1589,7 +1517,6 @@ public async Task<IActionResult> GetAllDetails()
             .AsNoTracking()
             .ToListAsync();
 
-        // ✅ FIXED: Include attachments
         var attachments = await _context.Selfassessmentattachments
             .AsNoTracking()
             .ToListAsync();
@@ -1604,7 +1531,6 @@ public async Task<IActionResult> GetAllDetails()
             var profile = profiles.FirstOrDefault(p => p.EmployeeId == userAuth.EmployeeId);
             if (profile == null) continue;
 
-            // Get the PRIMARY project mapping for this employee
             var pe = projectEmployees
                 .Where(x => x.EmployeeId == profile.EmployeeId && x.IsPrimary == true)
                 .FirstOrDefault();
@@ -1718,7 +1644,6 @@ public async Task<IActionResult> GetAllDetails()
                 }
             }
 
-            // ✅ FIXED: Get attachments for this assessment using correct property names
             var assessmentAttachments = new List<object>();
             if (selfAssessment != null)
             {
@@ -1748,7 +1673,7 @@ public async Task<IActionResult> GetAllDetails()
                 ProjectName = project?.ProjectName ?? string.Empty,
                 Competencies = competencies,
                 Goals = new List<object>(),
-                // ✅ FIXED: Include attachments
+
                 Attachments = assessmentAttachments
             });
         }
@@ -1761,14 +1686,13 @@ public async Task<IActionResult> GetAllDetails()
     }
 }
 
-// ✅ NEW: Download attachment for HR dashboard
 [HttpGet("hr/attachments/{attachmentId:int}/download")]
 public async Task<IActionResult> DownloadHrAttachment(int attachmentId)
 {
     try
     {
         Console.WriteLine($"DownloadHrAttachment - AttachmentId: {attachmentId}");
-        
+
         var attachment = await _context.Selfassessmentattachments
             .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
 
@@ -1798,30 +1722,26 @@ public async Task<IActionResult> DownloadHrAttachment(int attachmentId)
         }
 
         var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-        
-        // Determine actual extension from multiple sources
+
         string actualExtension = DetermineFileExtension(attachment.FilePath, attachment.FileName, attachment.FileType);
-        
-        // Ensure filename has extension
+
         string downloadFileName = EnsureFileExtension(attachment.FileName, actualExtension);
-        
-        // Get proper content type
+
         var contentType = GetContentType(actualExtension);
-        
+
         Console.WriteLine($"Original FileName: '{attachment.FileName}', FilePath: '{attachment.FilePath}', FileType: '{attachment.FileType}'");
         Console.WriteLine($"Determined Extension: '{actualExtension}', Final FileName: '{downloadFileName}', ContentType: '{contentType}'");
         Console.WriteLine($"File Size: {fileBytes.Length} bytes");
 
-        // ✅ CRITICAL: Set headers explicitly
         Response.Headers.Clear();
         Response.ContentType = contentType;
         Response.Headers["Content-Disposition"] = $"attachment; filename=\"{downloadFileName}\"";
         Response.Headers["X-Content-Type-Options"] = "nosniff";
         Response.Headers["Access-Control-Expose-Headers"] = "Content-Disposition, Content-Type";
-        
+
         Console.WriteLine($"Response Headers Set - ContentType: {Response.ContentType}");
         Console.WriteLine($"Response Headers Set - Content-Disposition: attachment; filename=\"{downloadFileName}\"");
-        
+
         return File(fileBytes, contentType, downloadFileName);
     }
     catch (Exception ex)
@@ -1832,7 +1752,6 @@ public async Task<IActionResult> DownloadHrAttachment(int attachmentId)
     }
 }
 
-// ✅ Helper method: Determine file extension
 private string DetermineFileExtension(string filePath, string fileName, string fileType)
 {
     var pathExtension = Path.GetExtension(filePath);
@@ -1841,55 +1760,53 @@ private string DetermineFileExtension(string filePath, string fileName, string f
         Console.WriteLine($"Extension from path: {pathExtension}");
         return pathExtension.ToLowerInvariant();
     }
-    
+
     var nameExtension = Path.GetExtension(fileName);
     if (!string.IsNullOrEmpty(nameExtension) && nameExtension != ".")
     {
         Console.WriteLine($"Extension from filename: {nameExtension}");
         return nameExtension.ToLowerInvariant();
     }
-    
+
     if (!string.IsNullOrEmpty(fileType))
     {
         var inferredExt = GetExtensionFromMimeType(fileType);
         Console.WriteLine($"Extension inferred from MIME type '{fileType}': {inferredExt}");
         return inferredExt;
     }
-    
+
     Console.WriteLine("Using default extension: .bin");
     return ".bin";
 }
 
-// ✅ Helper method: Ensure filename has extension
 private string EnsureFileExtension(string fileName, string extension)
 {
     if (string.IsNullOrEmpty(fileName))
     {
         return $"attachment{extension}";
     }
-    
+
     fileName = fileName.Trim();
-    
+
     if (fileName.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
     {
         return fileName;
     }
-    
+
     var currentExtension = Path.GetExtension(fileName);
     if (!string.IsNullOrEmpty(currentExtension))
     {
         fileName = Path.GetFileNameWithoutExtension(fileName);
     }
-    
+
     return $"{fileName}{extension}";
 }
 
-// ✅ Helper method: Get extension from MIME type
 private string GetExtensionFromMimeType(string mimeType)
 {
     if (string.IsNullOrEmpty(mimeType))
         return ".bin";
-    
+
     return mimeType.ToLowerInvariant() switch
     {
         "application/pdf" => ".pdf",
@@ -1911,7 +1828,6 @@ private string GetExtensionFromMimeType(string mimeType)
     };
 }
 
-// ✅ Helper method: Get content type
 private string GetContentType(string extension)
 {
     if (string.IsNullOrEmpty(extension))
@@ -1942,7 +1858,6 @@ private string GetContentType(string extension)
         _ => "application/octet-stream"
     };
 }
-
 
         [HttpGet("form/{formId}")]
         public async Task<IActionResult> GetAssignmentsByFormId(int formId)
@@ -2005,16 +1920,6 @@ private string GetContentType(string extension)
             }
         }
 
-
-
-        // ============================================================
-        // ✅ NEW: ATTACHMENT VIEWING FOR DEPARTMENT HEAD
-        // ============================================================
-
-        /// <summary>
-        /// Get attachments for a specific assessment (Department Head view)
-        /// GET: /api/AppraisalProcess/depthead/{deptHeadEmployeeId}/assessment/{assessmentId}/attachments
-        /// </summary>
         [HttpGet("depthead/{deptHeadEmployeeId}/assessment/{assessmentId}/attachments")]
         public async Task<IActionResult> GetDeptHeadAssessmentAttachments(int deptHeadEmployeeId, int assessmentId)
         {
@@ -2022,7 +1927,6 @@ private string GetContentType(string extension)
             {
                 _logger.LogInformation($"[DH_ATTACHMENTS] DeptHeadId: {deptHeadEmployeeId}, AssessmentId: {assessmentId}");
 
-                // Verify Department Head has access to this assessment
                 var deptHeadDetails = await _context.Employeedetailsmasters
                     .Where(edm => edm.EmployeeId == deptHeadEmployeeId)
                     .Include(edm => edm.Department)
@@ -2037,7 +1941,6 @@ private string GetContentType(string extension)
                     });
                 }
 
-                // Get the assessment and verify it belongs to the department
                 var assessment = await _context.Selfassessments
                     .Where(sa => sa.AssessmentId == assessmentId)
                     .FirstOrDefaultAsync();
@@ -2047,7 +1950,6 @@ private string GetContentType(string extension)
                     return NotFound(new { success = false, message = "Assessment not found" });
                 }
 
-                // Convert UserId to EmployeeId to check department
                 var employeeAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.UserId == assessment.EmployeeId);
 
@@ -2056,17 +1958,15 @@ private string GetContentType(string extension)
                     return NotFound(new { success = false, message = "Employee not found" });
                 }
 
-                // Check if the employee belongs to the Department Head's department
                 var employeeDept = await _context.Employeedetailsmasters
                     .Where(edm => edm.EmployeeId == employeeAuth.EmployeeId)
                     .FirstOrDefaultAsync();
 
                 if (employeeDept?.DepartmentId != deptHeadDetails.DepartmentId)
                 {
-                    return Forbid(); // Employee not in Department Head's department
+                    return Forbid(); 
                 }
 
-                // Get attachments
                 var attachments = await _context.Selfassessmentattachments
                     .Where(a => a.AssessmentId == assessmentId)
                     .OrderBy(a => a.DisplayOrder)
@@ -2100,10 +2000,6 @@ private string GetContentType(string extension)
             }
         }
 
-        /// <summary>
-        /// Download attachment file (Department Head)
-        /// GET: /api/AppraisalProcess/depthead/{deptHeadEmployeeId}/attachments/{attachmentId}/download
-        /// </summary>
         [HttpGet("depthead/{deptHeadEmployeeId}/attachments/{attachmentId}/download")]
         public async Task<IActionResult> DownloadDeptHeadAttachment(int deptHeadEmployeeId, int attachmentId)
         {
@@ -2111,7 +2007,6 @@ private string GetContentType(string extension)
             {
                 _logger.LogInformation($"[DH_DOWNLOAD] DeptHeadId: {deptHeadEmployeeId}, AttachmentId: {attachmentId}");
 
-                // Verify Department Head exists and has a department
                 var deptHeadDetails = await _context.Employeedetailsmasters
                     .Where(edm => edm.EmployeeId == deptHeadEmployeeId)
                     .Include(edm => edm.Department)
@@ -2126,7 +2021,6 @@ private string GetContentType(string extension)
                     });
                 }
 
-                // Get the attachment
                 var attachment = await _context.Selfassessmentattachments
                     .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
 
@@ -2135,7 +2029,6 @@ private string GetContentType(string extension)
                     return NotFound(new { success = false, message = "Attachment not found." });
                 }
 
-                // Verify the attachment's assessment belongs to someone in the Department Head's department
                 var assessment = await _context.Selfassessments
                     .Where(sa => sa.AssessmentId == attachment.AssessmentId)
                     .FirstOrDefaultAsync();
@@ -2145,7 +2038,6 @@ private string GetContentType(string extension)
                     return NotFound(new { success = false, message = "Assessment not found." });
                 }
 
-                // Convert UserId to EmployeeId
                 var employeeAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.UserId == assessment.EmployeeId);
 
@@ -2160,7 +2052,7 @@ private string GetContentType(string extension)
 
                 if (employeeDept?.DepartmentId != deptHeadDetails.DepartmentId)
                 {
-                    return Forbid(); // Not authorized to access this attachment
+                    return Forbid(); 
                 }
 
                 if (string.IsNullOrWhiteSpace(attachment.FilePath))
@@ -2195,7 +2087,6 @@ private string GetContentType(string extension)
                 });
             }
         }
-
 
     }
 }

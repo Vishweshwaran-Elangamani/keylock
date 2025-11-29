@@ -13,7 +13,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public T? Data { get; set; }
 
         public List<string> Errors { get; set; } = new List<string>();
- 
+
         public static ApiResponse<T> SuccessResponse(T data, string message = "Operation successful")
 
         {
@@ -31,7 +31,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
             };
 
         }
- 
+
         public static ApiResponse<T> ErrorResponse(string message, List<string>? errors = null)
 
         {

@@ -8,16 +8,16 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         public string Name { get; set; } = null!;
 
-        public string Type { get; set; } = null!; // "Self", "Manager", "HR Summary"
+        public string Type { get; set; } = null!;
 
-        public string DeliveryEnablement { get; set; } = null!; // "Delivery", "Enablement"
+        public string DeliveryEnablement { get; set; } = null!;
 
         public int CreatedBy { get; set; }
 
         public List<CompetencyDto> Competencies { get; set; } = new List<CompetencyDto>();
 
     }
- 
+
     public class CompetencyDto
 
     {
@@ -32,4 +32,3 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
 }
 
- 

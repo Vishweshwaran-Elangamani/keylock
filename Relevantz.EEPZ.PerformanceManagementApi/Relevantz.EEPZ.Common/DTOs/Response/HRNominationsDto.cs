@@ -1,11 +1,10 @@
 namespace Relevantz.EEPZ.Common.DTOs.Response;
 
- 
 public class CreateRewardTypeDto
 
 {
 
-    public string RewardCategory { get; set; }  // "Recognition" or "Promotion"
+    public string RewardCategory { get; set; }  
 
     public string RewardName { get; set; }
 
@@ -14,7 +13,7 @@ public class CreateRewardTypeDto
     public int? CreatedBy { get; set; }
 
 }
- 
+
 public class UpdateRewardTypeDto
 
 {
@@ -26,7 +25,7 @@ public class UpdateRewardTypeDto
     public bool IsActive { get; set; }
 
 }
- 
+
 public class CreateParameterDto
 
 {
@@ -35,7 +34,7 @@ public class CreateParameterDto
 
     public string ParameterName { get; set; }
 
-    public string ParameterType { get; set; }  // "Text", "Number", "Rating", "Date", "TextArea"
+    public string ParameterType { get; set; }  
 
     public bool IsRequired { get; set; }
 
@@ -48,7 +47,7 @@ public class CreateParameterDto
     public int SortOrder { get; set; }
 
 }
- 
+
 public class UpdateParameterDto
 
 {
@@ -69,4 +68,3 @@ public class UpdateParameterDto
 
 }
 
- 

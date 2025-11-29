@@ -24,8 +24,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
 
 }
 
- 
-
 }
 
  

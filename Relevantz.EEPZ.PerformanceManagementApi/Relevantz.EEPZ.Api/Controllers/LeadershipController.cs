@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.EntityFrameworkCore;
 
-
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
@@ -30,19 +29,17 @@ namespace eepzbackend.Controllers
             _context = context;
         }
 
-        // Example: GET /api/Leadership/performance-ratings?employeeId=3
         [HttpGet("performance-ratings")]
         public async Task<IActionResult> GetPerformanceRatings([FromQuery] int employeeId)
         {
             try
             {
-                // Look up "Leadership" RoleId
+
                 var leadershipRoleId = await _context.Roles
                     .Where(r => r.RoleCode == "LEAD")
                     .Select(r => r.RoleId)
                     .FirstOrDefaultAsync();
 
-                // Check if input employeeId is a Leadership member
                 var isLeadership = await _context.Employeedetailsmasters
                     .AnyAsync(edm => edm.EmployeeId == employeeId && edm.RoleId == leadershipRoleId);
 

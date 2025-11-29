@@ -15,7 +15,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public List<CompetencyRatingDto> Competencies { get; set; }
 
     }
- 
+
     public class CompetencyRatingDto
 
     {

@@ -15,15 +15,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
     public class SelfAssessmentService : ISelfAssessmentService
     {
         private readonly EEPZDbContext _context;
-        private readonly string _uploadBasePath; // Configure in appsettings.json
+        private readonly string _uploadBasePath; 
 
         public SelfAssessmentService(EEPZDbContext context)
         {
             _context = context;
-            // TODO: Get from configuration
+            
             _uploadBasePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "assessments");
             
-            // Ensure directory exists
+            
             if (!Directory.Exists(_uploadBasePath))
             {
                 Directory.CreateDirectory(_uploadBasePath);
@@ -57,7 +57,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     existingAssessment.SubmittedAt = request.Status == "Submitted" ? DateTime.Now : existingAssessment.SubmittedAt;
                     assessment = existingAssessment;
 
-                    // Remove existing details
+                    
                     var existingDetails = await _context.Assessmentdetails
                         .Where(ad => ad.AssessmentId == existingAssessment.AssessmentId)
                         .ToListAsync();
@@ -77,7 +77,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 await _context.SaveChangesAsync();
 
-                // ✅ Save assessment details
+                
                 var details = request.AssessmentDetails.Select(d => new Assessmentdetail
                 {
                     AssessmentId = assessment.AssessmentId,
@@ -89,13 +89,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 _context.Assessmentdetails.AddRange(details);
                 await _context.SaveChangesAsync();
 
-                // ✅ NEW: Handle attachments
+                
                 if (request.Attachments != null && request.Attachments.Any())
                 {
                     await ProcessAttachmentsAsync(assessment.AssessmentId, request.UserId, request.Attachments);
                 }
 
-                // ✅ Update progress tracker if submitted
+                
                 if (request.Status == "Submitted")
                 {
                     var assignment = await _context.Assignments
@@ -125,7 +125,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ✅ NEW: Process and save attachments
+        
         private async Task ProcessAttachmentsAsync(int assessmentId, int userId, List<AttachmentRequestDto> attachments)
         {
             var savedAttachments = new List<Selfassessmentattachment>();
@@ -134,7 +134,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             {
                 string filePath = attachment.FilePath ?? string.Empty;
 
-                // If Base64 content is provided, save the file
+                
                 if (!string.IsNullOrEmpty(attachment.Base64Content))
                 {
                     filePath = await SaveFileFromBase64Async(
@@ -168,12 +168,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ✅ NEW: Save Base64 file to disk
+        
         private async Task<string> SaveFileFromBase64Async(int assessmentId, string fileName, string base64Content)
         {
             try
             {
-                // Remove data URL prefix if present (e.g., "data:image/png;base64,")
+                
                 var base64Data = base64Content;
                 if (base64Content.Contains(","))
                 {
@@ -182,21 +182,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var bytes = Convert.FromBase64String(base64Data);
                 
-                // Create assessment-specific directory
+                
                 var assessmentDir = Path.Combine(_uploadBasePath, assessmentId.ToString());
                 if (!Directory.Exists(assessmentDir))
                 {
                     Directory.CreateDirectory(assessmentDir);
                 }
 
-                // Generate unique filename
+                
                 var fileExtension = Path.GetExtension(fileName);
                 var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
                 var fullPath = Path.Combine(assessmentDir, uniqueFileName);
 
                 await File.WriteAllBytesAsync(fullPath, bytes);
 
-                // Return relative path for storage
+                
                 return Path.Combine("uploads", "assessments", assessmentId.ToString(), uniqueFileName);
             }
             catch (Exception ex)
@@ -253,7 +253,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .Include(sa => sa.Employee)
                     .Include(sa => sa.Assessmentdetails)
                         .ThenInclude(ad => ad.Competency)
-                    .Include(sa => sa.Selfassessmentattachments) // ✅ Include attachments
+                    .Include(sa => sa.Selfassessmentattachments) 
                     .FirstOrDefaultAsync(sa => sa.AssessmentId == assessmentId);
 
                 if (assessment == null)
@@ -277,7 +277,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     .Include(sa => sa.Employee)
                     .Include(sa => sa.Assessmentdetails)
                         .ThenInclude(ad => ad.Competency)
-                    .Include(sa => sa.Selfassessmentattachments) // ✅ Include attachments
+                    .Include(sa => sa.Selfassessmentattachments) 
                     .FirstOrDefaultAsync(sa => sa.FormId == formId && sa.EmployeeId == userId);
 
                 if (assessment == null)
@@ -361,7 +361,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ✅ NEW: Get attachments for specific assessment
+        
         public async Task<ApiResponse<List<AttachmentResponseDto>>> GetAssessmentAttachmentsAsync(int assessmentId)
         {
             try
@@ -393,7 +393,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ✅ NEW: Delete attachment
+        
         public async Task<ApiResponse<bool>> DeleteAttachmentAsync(int attachmentId)
         {
             try
@@ -404,7 +404,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponse<bool>.ErrorResponse("Attachment not found");
                 }
 
-                // Delete physical file if exists
+                
                 if (!string.IsNullOrEmpty(attachment.FilePath))
                 {
                     var fullPath = Path.Combine(Directory.GetCurrentDirectory(), attachment.FilePath);
@@ -447,7 +447,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     EmployeeRating = ad.EmployeeRating,
                     EmployeeComments = ad.EmployeeComments
                 }).ToList(),
-                // ✅ NEW: Map attachments
+                
                 Attachments = assessment.Selfassessmentattachments?.Select(a => new AttachmentResponseDto
                 {
                     AttachmentId = a.AttachmentId,

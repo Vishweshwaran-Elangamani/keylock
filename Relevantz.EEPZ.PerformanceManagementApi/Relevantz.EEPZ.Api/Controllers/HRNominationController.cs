@@ -43,7 +43,7 @@ namespace PerformanceManagement.Controllers
 
                 foreach (var n in nominations)
                 {
-                    // Fetch the Recognitiondetails (Opportunity) separately with RewardType
+
                     var opportunity = await _context.Recognitiondetails
                         .Where(o => o.OpportunityId == n.OpportunityId)
                         .Include(o => o.RewardType)
@@ -54,7 +54,6 @@ namespace PerformanceManagement.Controllers
                         .Include(edm => edm.Department)
                         .FirstOrDefaultAsync();
 
-                    // Fetch parameter values for this nomination
                     var parameterValues = await _context.Nominationparametervalues
                         .Where(pv => pv.NominationId == n.NominationId)
                         .Include(pv => pv.Parameter)
@@ -202,7 +201,7 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             return BadRequest(new { success = false, message = "No nominations selected" });
 
         }
- 
+
         if (dto.SelectedNominationIds.Count > 3)
 
         {
@@ -210,15 +209,15 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             return BadRequest(new { success = false, message = "Maximum 3 nominees can be selected per opportunity" });
 
         }
- 
+
         var hrEmployeeId = dto.HrUserId;
- 
+
         var selectedNominations = await _context.Recognitionstatuses
 
             .Where(n => dto.SelectedNominationIds.Contains(n.NominationId))
 
             .ToListAsync();
- 
+
         if (selectedNominations.Count == 0)
 
         {
@@ -226,10 +225,8 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             return NotFound(new { success = false, message = "No nominations found" });
 
         }
- 
+
         var now = DateTime.UtcNow;
- 
-        // ✅ FIX: ONLY approve the selected nominations, DON'T touch others
 
         foreach (var nomination in selectedNominations)
 
@@ -242,7 +239,7 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             nomination.ReviewedAt = now;
 
             nomination.ReviewRemarks = dto.ApprovalRemarks ?? "Selected by HR";
- 
+
             var tracking = new Nominationvisibilitytracking
 
             {
@@ -260,13 +257,9 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             _context.Nominationvisibilitytrackings.Add(tracking);
 
         }
- 
-        // ✅ REMOVED THE CODE THAT AUTO-REJECTED OTHER NOMINATIONS
 
-        // Let HR explicitly reject nominations they don't want using the RejectNominations endpoint
- 
         await _context.SaveChangesAsync();
- 
+
         return Ok(new
 
         {
@@ -292,8 +285,6 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
     }
 
 }
-
- 
 
         [HttpGet("reward-types")]
         public async Task<IActionResult> GetAllRewardTypes([FromQuery] bool activeOnly = false)
@@ -626,7 +617,6 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
                     return NotFound(new { success = false, message = "Nomination not found" });
                 }
 
-                // Fetch opportunity separately with RewardType
                 var opportunity = await _context.Recognitiondetails
                     .Where(o => o.OpportunityId == nomination.OpportunityId)
                     .Include(o => o.RewardType)
@@ -851,19 +841,18 @@ public async Task<IActionResult> GetStatistics()
         var approvedNominations = await _context.Recognitionstatuses.CountAsync(n => n.Status == "Approved");
         var rejectedNominations = await _context.Recognitionstatuses.CountAsync(n => n.Status == "Rejected");
         var activeOpportunities = await _context.Recognitiondetails.CountAsync(o => o.Status == "Active");
- 
-        // Load Recognitionstatuses including Opportunities and RewardTypes eagerly
+
         var nominationsWithOpportunities = await _context.Recognitionstatuses
             .Include(n => n.Opportunity)
                 .ThenInclude(o => o.RewardType)
             .ToListAsync();
- 
+
         var recognitionCount = nominationsWithOpportunities
             .Count(x => x.Opportunity?.RewardType?.RewardCategory == "Recognition");
- 
+
         var promotionCount = nominationsWithOpportunities
             .Count(x => x.Opportunity?.RewardType?.RewardCategory == "Promotion");
- 
+
         return Ok(new
         {
             success = true,
@@ -885,9 +874,6 @@ public async Task<IActionResult> GetStatistics()
         return StatusCode(500, new { success = false, message = ex.Message });
     }
 }
-
- 
- 
 
     public class ReviewMetricsDto
     {

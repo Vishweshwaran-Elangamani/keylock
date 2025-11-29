@@ -20,16 +20,12 @@ namespace PerformanceManagement.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// ✅ Get all approved nominations for Department Head's department
-        /// GET: /api/DepartmentHeadNomination/depthead/3/approved-nominations
-        /// </summary>
         [HttpGet("depthead/{deptHeadEmployeeId}/approved-nominations")]
         public async Task<IActionResult> GetApprovedNominationsByDeptHead(int deptHeadEmployeeId)
         {
             try
             {
-                // ✅ STEP 1: Get Department Head's department details
+
                 var deptHeadDetails = await _context.Employeedetailsmasters
                     .Where(edm => edm.EmployeeId == deptHeadEmployeeId)
                     .Include(edm => edm.Department)
@@ -47,7 +43,6 @@ namespace PerformanceManagement.Controllers
                 var departmentId = deptHeadDetails.DepartmentId;
                 var departmentName = deptHeadDetails.Department.DepartmentName;
 
-                // ✅ STEP 2: Get all approved nominations (FIXED: Use Recognitionstatuses)
                 var nominations = await _context.Recognitionstatuses
                     .Where(n => n.NominationType == "ManagerNomination" && n.Status == "Approved")
                     .Include(n => n.NomineeEmployee)
@@ -59,11 +54,10 @@ namespace PerformanceManagement.Controllers
                     .ToListAsync();
 
                 var nominationDtos = new List<object>();
-                
-                // ✅ STEP 3: Filter nominations by department
+
                 foreach (var n in nominations)
                 {
-                    // ✅ Fetch opportunity separately with RewardType
+
                     var opportunity = await _context.Recognitiondetails
                         .Where(o => o.OpportunityId == n.OpportunityId)
                         .Include(o => o.RewardType)
@@ -74,13 +68,11 @@ namespace PerformanceManagement.Controllers
                         .Include(edm => edm.Department)
                         .FirstOrDefaultAsync();
 
-                    // Only include nominations from the same department
                     if (nomineeDept?.DepartmentId != departmentId)
                     {
                         continue;
                     }
 
-                    // ✅ STEP 4: Fetch parameter values
                     var parameterValues = await _context.Nominationparametervalues
                         .Where(pv => pv.NominationId == n.NominationId)
                         .Include(pv => pv.Parameter)
@@ -138,7 +130,6 @@ namespace PerformanceManagement.Controllers
                     });
                 }
 
-                // ✅ STEP 5: Group nominations by opportunity
                 var groupedNominations = nominationDtos
                     .GroupBy(n => new
                     {
@@ -177,16 +168,12 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// Get detailed view of a specific approved nomination
-        /// GET: /api/DepartmentHeadNomination/nomination-details/24
-        /// </summary>
         [HttpGet("nomination-details/{nominationId}")]
         public async Task<IActionResult> GetNominationDetails(int nominationId)
         {
             try
             {
-                // ✅ FIXED: Use Recognitionstatuses instead of Nominations
+
                 var nomination = await _context.Recognitionstatuses
                     .Where(n => n.NominationId == nominationId && n.Status == "Approved")
                     .Include(n => n.NomineeEmployee)
@@ -202,7 +189,6 @@ namespace PerformanceManagement.Controllers
                     return NotFound(new { success = false, message = "Approved nomination not found" });
                 }
 
-                // ✅ Fetch opportunity separately with RewardType
                 var opportunity = await _context.Recognitiondetails
                     .Where(o => o.OpportunityId == nomination.OpportunityId)
                     .Include(o => o.RewardType)
@@ -288,16 +274,12 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// Get statistics for Department Head's department
-        /// GET: /api/DepartmentHeadNomination/depthead/3/statistics
-        /// </summary>
         [HttpGet("depthead/{deptHeadEmployeeId}/statistics")]
         public async Task<IActionResult> GetDepartmentStatistics(int deptHeadEmployeeId)
         {
             try
             {
-                // Get Department Head's department
+
                 var deptHeadDetails = await _context.Employeedetailsmasters
                     .Where(edm => edm.EmployeeId == deptHeadEmployeeId)
                     .Include(edm => edm.Department)
@@ -311,13 +293,12 @@ namespace PerformanceManagement.Controllers
                 var departmentId = deptHeadDetails.DepartmentId;
                 var departmentName = deptHeadDetails.Department.DepartmentName;
 
-                // ✅ FIXED: Use Recognitionstatuses instead of Nominations
                 var allNominations = await _context.Recognitionstatuses
                     .Where(n => n.Status == "Approved")
                     .ToListAsync();
 
                 var departmentNominations = new List<Recognitionstatus>();
-                
+
                 foreach (var n in allNominations)
                 {
                     var dept = await _context.Employeedetailsmasters
@@ -330,16 +311,15 @@ namespace PerformanceManagement.Controllers
                     }
                 }
 
-                // ✅ Fetch opportunities with RewardType for statistics
                 var nominationsWithDetails = new List<(Recognitionstatus nomination, Recognitiondetail opportunity)>();
-                
+
                 foreach (var nom in departmentNominations)
                 {
                     var opp = await _context.Recognitiondetails
                         .Where(o => o.OpportunityId == nom.OpportunityId)
                         .Include(o => o.RewardType)
                         .FirstOrDefaultAsync();
-                    
+
                     if (opp != null)
                     {
                         nominationsWithDetails.Add((nom, opp));
@@ -384,16 +364,12 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// Get all employees in Department Head's department
-        /// GET: /api/DepartmentHeadNomination/depthead/3/employees
-        /// </summary>
         [HttpGet("depthead/{deptHeadEmployeeId}/employees")]
         public async Task<IActionResult> GetDepartmentEmployees(int deptHeadEmployeeId)
         {
             try
             {
-                // Get Department Head's department
+
                 var deptHeadDetails = await _context.Employeedetailsmasters
                     .Where(edm => edm.EmployeeId == deptHeadEmployeeId)
                     .Include(edm => edm.Department)

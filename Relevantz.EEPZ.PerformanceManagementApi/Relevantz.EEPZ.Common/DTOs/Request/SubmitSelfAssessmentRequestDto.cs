@@ -6,8 +6,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public int UserId { get; set; }
         public string Status { get; set; } = null!;
         public List<AssessmentDetailRequestDto> AssessmentDetails { get; set; } = new();
-        
-        // ✅ NEW: Support for multiple attachments
+
         public List<AttachmentRequestDto>? Attachments { get; set; }
     }
 
@@ -18,7 +17,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string? EmployeeComments { get; set; }
     }
 
-    // ✅ NEW: DTO for attachment data
     public class AttachmentRequestDto
     {
         public string FileName { get; set; } = null!;
@@ -27,6 +25,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public string? FileType { get; set; }
         public long? FileSize { get; set; }
         public int? DisplayOrder { get; set; }
-        public string? Base64Content { get; set; } // For file upload
+        public string? Base64Content { get; set; } 
     }
 }

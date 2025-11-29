@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.EntityFrameworkCore;
 
-
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
 
@@ -22,7 +21,6 @@ namespace eepzbackend.Controllers
             _logger = logger;
         }
 
-        // GET: api/opportunitynomination/opportunities
         [HttpGet("opportunities")]
         public async Task<IActionResult> GetAllOpportunities()
         {
@@ -54,7 +52,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // POST: api/opportunitynomination/nominate
         [HttpPost("nominate")]
         public async Task<IActionResult> NominateEmployee([FromBody] NominationRequest request)
         {
@@ -114,7 +111,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // GET: api/opportunitynomination/manager/{managerId}/project-team
         [HttpGet("manager/{managerId}/project-team")]
         public async Task<IActionResult> GetManagerProjectTeam(int managerId)
         {
@@ -133,7 +129,6 @@ namespace eepzbackend.Controllers
                 var userAuths = await _context.Userauthentications.Where(ua => employeeDetails.Select(e => e.EmployeeId).Contains(ua.EmployeeId)).ToListAsync();
                 var recognitionstatus = await _context.Recognitionstatuses.OrderByDescending(n => n.SubmittedAt).ToListAsync();
 
-                // load user profiles so we can show names
                 var employeeIds = employeeDetails.Select(e => e.EmployeeId).Distinct().ToList();
                 var userProfiles = await _context.Userprofiles.Where(up => employeeIds.Contains(up.EmployeeId)).ToListAsync();
 

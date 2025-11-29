@@ -10,8 +10,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string Status { get; set; } = null!;
         public DateTime? SubmittedAt { get; set; }
         public List<AssessmentDetailResponseDto> Details { get; set; } = new();
-        
-        // ✅ NEW: Include attachments in response
+
         public List<AttachmentResponseDto>? Attachments { get; set; }
     }
 
@@ -25,7 +24,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public string? EmployeeComments { get; set; }
     }
 
-    // ✅ NEW: DTO for attachment response
     public class AttachmentResponseDto
     {
         public int AttachmentId { get; set; }

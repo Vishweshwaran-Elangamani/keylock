@@ -23,9 +23,6 @@ namespace PerformanceManagement.Controllers
             _context = context;
         }
 
-        /// <summary>
-        /// Submit self-assessment with attachments (converts EmployeeId to UserId)
-        /// </summary>
         [HttpPost("submit")]
         public async Task<IActionResult> SubmitSelfAssessment([FromBody] SubmitSelfAssessmentRequestDto request)
         {
@@ -34,10 +31,9 @@ namespace PerformanceManagement.Controllers
 
             try
             {
-                // ✅ Frontend sends EmployeeId in the UserId field
+
                 var employeeId = request.UserId;
 
-                // Convert EmployeeId to actual UserId
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.EmployeeId == employeeId);
 
@@ -52,17 +48,15 @@ namespace PerformanceManagement.Controllers
 
                 var actualUserId = userAuth.UserId;
 
-                // ✅ Create new request with actual UserId for database
                 var convertedRequest = new SubmitSelfAssessmentRequestDto
                 {
                     FormId = request.FormId,
                     UserId = actualUserId,
                     Status = request.Status,
                     AssessmentDetails = request.AssessmentDetails,
-                    Attachments = request.Attachments // ✅ Pass through attachments
+                    Attachments = request.Attachments
                 };
 
-                // Call service with converted request
                 var result = await _assessmentService.SubmitSelfAssessmentAsync(convertedRequest);
 
                 if (result.Success)
@@ -91,15 +85,12 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// ✅ Get submitted assessment details with attachments (converts EmployeeId to UserId)
-        /// </summary>
         [HttpGet("view/{formId}/user/{employeeId}")]
         public async Task<IActionResult> GetSubmittedAssessment(int formId, int employeeId)
         {
             try
             {
-                // ✅ Convert EmployeeId to UserId
+
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.EmployeeId == employeeId);
 
@@ -114,12 +105,11 @@ namespace PerformanceManagement.Controllers
 
                 var userId = userAuth.UserId;
 
-                // ✅ Now query using UserId
                 var assessment = await _context.Selfassessments
                     .Include(sa => sa.Form)
                     .Include(sa => sa.Assessmentdetails)
                         .ThenInclude(ad => ad.Competency)
-                    .Include(sa => sa.Selfassessmentattachments) // ✅ Include attachments
+                    .Include(sa => sa.Selfassessmentattachments)
                     .FirstOrDefaultAsync(sa =>
                         sa.FormId == formId &&
                         sa.EmployeeId == userId &&
@@ -142,7 +132,7 @@ namespace PerformanceManagement.Controllers
                         rating = ad.EmployeeRating,
                         comments = ad.EmployeeComments
                     }).ToList(),
-                    // ✅ Include attachments in response
+
                     attachments = assessment.Selfassessmentattachments
                         .OrderBy(a => a.DisplayOrder)
                         .Select(a => new
@@ -169,9 +159,6 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// Get self-assessment by ID
-        /// </summary>
         [HttpGet("{assessmentId}")]
         public async Task<IActionResult> GetSelfAssessment(int assessmentId)
         {
@@ -183,15 +170,12 @@ namespace PerformanceManagement.Controllers
             return NotFound(new { success = false, message = string.Join(", ", result.Errors) });
         }
 
-        /// <summary>
-        /// ✅ Get self-assessment by form and user (converts EmployeeId to UserId)
-        /// </summary>
         [HttpGet("form/{formId}/user/{employeeId}")]
         public async Task<IActionResult> GetSelfAssessmentByFormAndUser(int formId, int employeeId)
         {
             try
             {
-                // ✅ Convert EmployeeId to UserId
+
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.EmployeeId == employeeId);
 
@@ -206,7 +190,6 @@ namespace PerformanceManagement.Controllers
 
                 var userId = userAuth.UserId;
 
-                // ✅ Call service with UserId
                 var result = await _assessmentService.GetSelfAssessmentByFormAndUserAsync(formId, userId);
 
                 if (result.Success)
@@ -224,9 +207,6 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// HR views forms submitted by employees
-        /// </summary>
         [HttpGet("submitted")]
         public async Task<IActionResult> GetAllSubmittedForms([FromQuery] string? status = null)
         {
@@ -238,15 +218,12 @@ namespace PerformanceManagement.Controllers
             return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
         }
 
-        /// <summary>
-        /// ✅ Get all assessments assigned to a specific user (converts EmployeeId to UserId)
-        /// </summary>
         [HttpGet("user/{employeeId}/assignments")]
         public async Task<IActionResult> GetAssessmentsByUser(int employeeId)
         {
             try
             {
-                // ✅ Convert EmployeeId to UserId
+
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.EmployeeId == employeeId);
 
@@ -261,7 +238,6 @@ namespace PerformanceManagement.Controllers
 
                 var userId = userAuth.UserId;
 
-                // ✅ Call service with UserId
                 var result = await _assessmentService.GetAssessmentsByUserAsync(userId);
 
                 if (result.Success)
@@ -279,9 +255,6 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        /// <summary>
-        /// Update assessment status
-        /// </summary>
         [HttpPatch("{assessmentId}/status")]
         public async Task<IActionResult> UpdateAssessmentStatus(int assessmentId, [FromBody] UpdateStatusDto statusDto)
         {
@@ -296,7 +269,6 @@ namespace PerformanceManagement.Controllers
             return BadRequest(new { success = false, message = string.Join(", ", result.Errors) });
         }
 
-        // ✅ NEW: Get attachments for an assessment
         [HttpGet("{assessmentId}/attachments")]
         public async Task<IActionResult> GetAssessmentAttachments(int assessmentId)
         {
@@ -319,7 +291,6 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        // ✅ NEW: Delete specific attachment
         [HttpDelete("attachments/{attachmentId}")]
         public async Task<IActionResult> DeleteAttachment(int attachmentId)
         {
@@ -342,7 +313,6 @@ namespace PerformanceManagement.Controllers
             }
         }
 
-        // ✅ NEW: Download attachment file
         [HttpGet("attachments/{attachmentId}/download")]
         public async Task<IActionResult> DownloadAttachment(int attachmentId)
         {
@@ -355,7 +325,7 @@ namespace PerformanceManagement.Controllers
                     return NotFound(new { success = false, message = "Attachment not found." });
 
                 var filePath = System.IO.Path.Combine(
-                    System.IO.Directory.GetCurrentDirectory(), 
+                    System.IO.Directory.GetCurrentDirectory(),
                     attachment.FilePath
                 );
 
@@ -378,9 +348,6 @@ namespace PerformanceManagement.Controllers
         }
     }
 
-    /// <summary>
-    /// Helper DTO for PATCH endpoint
-    /// </summary>
     public class UpdateStatusDto
     {
         public string Status { get; set; }

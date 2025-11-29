@@ -17,7 +17,7 @@ using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Data;
 
 using Relevantz.EEPZ.Data.DBContexts;
- 
+
 namespace Relevantz.EEPZ.API.Controllers
 
 {
@@ -33,7 +33,7 @@ namespace Relevantz.EEPZ.API.Controllers
         private readonly EEPZDbContext _context;
 
         private readonly ILogger<EmployeeNominationController> _logger;
- 
+
         public EmployeeNominationController(EEPZDbContext context, ILogger<EmployeeNominationController> logger)
 
         {
@@ -43,28 +43,6 @@ namespace Relevantz.EEPZ.API.Controllers
             _logger = logger;
 
         }
- 
-        /// <summary>
-
-        /// Get approved notifications for specific employee ID
-
-        /// NO authentication required (authentication is pending)
-
-        ///
-
-        /// Query Database:
-
-        /// - Check Nomination table
-
-        /// - Where NomineeEmployeeId = employeeId
-
-        /// - Where Status = "Approved"
-
-        ///
-
-        /// GET: api/EmployeeNomination/search?employeeId=1
-
-        /// </summary>
 
         [HttpGet("search")]
 
@@ -77,8 +55,6 @@ namespace Relevantz.EEPZ.API.Controllers
             {
 
                 _logger.LogInformation($"[SEARCH] Searching notifications for employee ID: {employeeId}");
- 
-                // Validation: Employee ID must be greater than 0
 
                 if (employeeId <= 0)
 
@@ -95,18 +71,14 @@ namespace Relevantz.EEPZ.API.Controllers
                     });
 
                 }
- 
-                // ✅ FIXED: Query Recognitionstatuses table for this employee
 
                 var approvedNominations = await _context.Recognitionstatuses
 
-                    .Where(n => n.NomineeEmployeeId == employeeId)  // Match employee ID
+                    .Where(n => n.NomineeEmployeeId == employeeId)  
 
-                    .Where(n => n.Status == "Approved")             // Only approved
+                    .Where(n => n.Status == "Approved")             
 
                     .ToListAsync();
- 
-                // If no approved nominations found
 
                 if (approvedNominations.Count == 0)
 
@@ -127,16 +99,12 @@ namespace Relevantz.EEPZ.API.Controllers
                     });
 
                 }
- 
-                // ✅ Transform data for display - fetch opportunity separately for each nomination
 
                 var result = new List<object>();
 
                 foreach (var nomination in approvedNominations)
 
                 {
-
-                    // ✅ Fetch opportunity with RewardType separately
 
                     var opportunity = await _context.Recognitiondetails
 
@@ -145,7 +113,7 @@ namespace Relevantz.EEPZ.API.Controllers
                         .Include(o => o.RewardType)
 
                         .FirstOrDefaultAsync();
- 
+
                     result.Add(new
 
                     {
@@ -157,9 +125,9 @@ namespace Relevantz.EEPZ.API.Controllers
                     });
 
                 }
- 
+
                 _logger.LogInformation($"[SEARCH] Found {result.Count} approved notifications for employee {employeeId}");
- 
+
                 return Ok(new
 
                 {

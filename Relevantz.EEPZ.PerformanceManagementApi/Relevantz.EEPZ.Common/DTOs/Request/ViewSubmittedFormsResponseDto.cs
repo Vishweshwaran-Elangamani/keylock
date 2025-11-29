@@ -15,7 +15,7 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         public List<SelfAssessmentSummaryDto> Assessments { get; set; } = new List<SelfAssessmentSummaryDto>();
 
     }
- 
+
     public class SelfAssessmentSummaryDto
 
     {

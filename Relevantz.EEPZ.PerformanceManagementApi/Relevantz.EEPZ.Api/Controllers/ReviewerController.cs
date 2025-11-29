@@ -19,12 +19,11 @@ namespace eepzbackend.Controllers
         private readonly IManagerReviewRepository _repo;
         private readonly EEPZDbContext _context;
 
-        // ✅ FIXED: Must inject BOTH dependencies
-       public ReviewerController(IManagerReviewRepository repo, EEPZDbContext context)
-{
-    _repo = repo;
-    _context = context;
-}
+        public ReviewerController(IManagerReviewRepository repo, EEPZDbContext context)
+        {
+            _repo = repo;
+            _context = context;
+        }
 
         [HttpGet("submitted-forms")]
         public async Task<IActionResult> GetSubmittedForms(
@@ -115,7 +114,6 @@ namespace eepzbackend.Controllers
             }
         }
 
-        // ✅ FIXED: Now _context is properly initialized
         [HttpGet("attachments/{attachmentId:int}/download")]
         public async Task<IActionResult> DownloadAttachment(int reviewerUserId, int attachmentId)
         {

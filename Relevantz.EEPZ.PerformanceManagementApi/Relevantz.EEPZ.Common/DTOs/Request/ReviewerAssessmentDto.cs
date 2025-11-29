@@ -11,7 +11,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         string? ReviewerComments
     );
 
-    // ✅ NEW: DTO for attachment info
     public record AttachmentInfoDto(
         int AttachmentId,
         string FileName,
@@ -30,6 +29,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
         DateTime SubmittedAt,
         string Project,
         List<CompetencyReviewRowDto> Items,
-        List<AttachmentInfoDto>? Attachments = null  // ✅ NEW: Add attachments
+        List<AttachmentInfoDto>? Attachments = null  
     );
 }

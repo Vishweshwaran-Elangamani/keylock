@@ -15,9 +15,6 @@ public partial class ManagerReviewRepository : IManagerReviewRepository
     private readonly EEPZDbContext _ctx;
     public ManagerReviewRepository(EEPZDbContext ctx) => _ctx = ctx;
 
-    // =========================================================
-    // L1 (Approver) — submitted forms list
-    // =========================================================
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverSubmittedFormsAsync(
         int approverUserId, int page, int pageSize)
     {
@@ -103,9 +100,6 @@ LIMIT @pageSize OFFSET @offset;";
         return await conn.QueryAsync<ApproverAssignmentRowDto>(sql, new { approverUserId, pageSize, offset });
     }
 
-    // =========================================================
-    // L2 (Reviewer) — submitted forms list with gating
-    // =========================================================
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedFormsAsync(
         int reviewerUserId, int page, int pageSize)
     {
@@ -197,9 +191,6 @@ LIMIT @pageSize OFFSET @offset;";
         return await conn.QueryAsync<ApproverAssignmentRowDto>(sql, new { reviewerUserId, pageSize, offset });
     }
 
-    // =========================================================
-    // L1 (Approver) — submit ratings & comments
-    // =========================================================
     public async Task<int> SaveApproverReviewAsync(int approverUserId, SubmitReviewDto dto)
     {
         if (dto is null || dto.Items is null || dto.Items.Count == 0)
@@ -299,10 +290,6 @@ WHERE ad.assessment_id = @assessmentId
         await tx.CommitAsync();
         return affected;
     }
-
-  // =========================================================
-  // L2 READ: full assessment view
-  // =========================================================
 
     public async Task<ReviewerAssessmentViewDto?> GetAssessmentForReviewerAsync(int reviewerUserId, int assessmentId)
     {
@@ -416,7 +403,6 @@ ORDER BY c.display_order IS NULL, c.display_order, c.name;";
             ReviewerComments: (string?)r.ReviewerComments
         )).ToList();
 
-        // ✅ NEW: Fetch attachments
         var attachments = await GetAssessmentAttachmentsAsync(assessmentId);
 
         return new ReviewerAssessmentViewDto(
@@ -426,11 +412,10 @@ ORDER BY c.display_order IS NULL, c.display_order, c.name;";
             SubmittedAt: (DateTime)head.SubmittedAt,
             Project: (string)head.Project,
             Items: items,
-            Attachments: attachments  // ✅ NEW: Include attachments
+            Attachments: attachments  
         );
     }
 
-    // ✅ UPDATED: GetAssessmentForApproverAsync - now includes attachments
     public async Task<ReviewerAssessmentViewDto?> GetAssessmentForApproverAsync(int approverUserId, int assessmentId)
     {
         const string sql = @"
@@ -531,7 +516,6 @@ ORDER BY c.display_order IS NULL, c.display_order, c.name;";
             ReviewerComments: (string?)r.ReviewerComments
         )).ToList();
 
-        // ✅ NEW: Fetch attachments
         var attachments = await GetAssessmentAttachmentsAsync(assessmentId);
 
         return new ReviewerAssessmentViewDto(
@@ -541,18 +525,10 @@ ORDER BY c.display_order IS NULL, c.display_order, c.name;";
             SubmittedAt: (DateTime)head.SubmittedAt,
             Project: (string)head.Project,
             Items: items,
-            Attachments: attachments  // ✅ NEW: Include attachments
+            Attachments: attachments  
         );
     }
 
-
-
-
-
-
-  // =========================================================
-  // L2 SAVE per-competency ratings/comments
-  // =========================================================
   public async Task<int> SaveReviewerReviewAsync(int reviewerUserId, SubmitReviewDto dto)
   {
     if (dto is null || dto.Items is null || dto.Items.Count == 0) return 0;
@@ -624,13 +600,6 @@ VALUES
     return saved;
   }
 
-  
-  // =========================================================
-
-// L1 (Approver) — SUBMIT REVIEW RATINGS
-
-// =========================================================
-
   public async Task SubmitApproverReviewsAsync(
         int approverId,
         int assessmentId,
@@ -646,24 +615,15 @@ VALUES
                 Rating = item.Rating,
                 Comments = item.Comments,
                 ReviewedAt = DateTime.Now,
-                ReviewStatus = "Pending"  // ✅ FIXED: Set to Pending for L1
+                ReviewStatus = "Pending"  
             };
 
             _ctx.Assessmentreviews.Add(entry);
         }
-    
+
         await _ctx.SaveChangesAsync();
     }
- 
-// =========================================================
 
-// L2 (Reviewer) — SUBMIT REVIEW RATINGS (WITHOUT AUTO-DECISION)
-
-// =========================================================
-
-// =========================================================
-// L2 (Reviewer) — SUBMIT REVIEW RATINGS (CLEAN APPROACH)
-// =========================================================
 public async Task SubmitReviewerReviewsAsync(
     int reviewerUserId,
     int assessmentId,
@@ -671,10 +631,9 @@ public async Task SubmitReviewerReviewsAsync(
 {
     var detailIds = items.Select(i => i.DetailId).ToList();
     var conn = _ctx.Database.GetDbConnection();
-    
+
     if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
-    // ✅ Strategy: Update existing L2 records, don't delete and recreate
     const string updateExistingSql = @"
 UPDATE AssessmentReview
 SET rating = @rating, 
@@ -684,9 +643,8 @@ SET rating = @rating,
 WHERE reviewer_role = 'Reviewer'
   AND reviewer_id = @reviewerUserId
   AND detail_id = @detailId
-  AND rating > 0;";  // Only update rating records
+  AND rating > 0;";  
 
-    // ✅ Insert only if no record exists for this detail
     const string insertNewSql = @"
 INSERT INTO AssessmentReview 
   (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
@@ -706,7 +664,7 @@ WHERE NOT EXISTS (
     {
         foreach (var item in items)
         {
-            // Try to update existing record
+
             var updateCount = await conn.ExecuteAsync(updateExistingSql,
                 new
                 {
@@ -716,7 +674,6 @@ WHERE NOT EXISTS (
                     detailId = item.DetailId
                 }, tx);
 
-            // If no existing record, insert new one
             if (updateCount == 0)
             {
                 await conn.ExecuteAsync(@"
@@ -743,18 +700,6 @@ VALUES
     }
 }
 
-
-
-
- 
-    
-    
-    // =========================================================
-
-  // L2 DECISION: approve / reject
-
-  // =========================================================
-
 public async Task<bool> SetReviewerDecisionAsync(
     int reviewerUserId,
     int assessmentId,
@@ -764,7 +709,7 @@ public async Task<bool> SetReviewerDecisionAsync(
     decision = (decision ?? "").Trim();
     var approved = string.Equals(decision, "Approved", StringComparison.OrdinalIgnoreCase);
     var rejected = string.Equals(decision, "Rejected", StringComparison.OrdinalIgnoreCase);
-    
+
     if (!approved && !rejected) return false;
 
     const string scopeSql = @"
@@ -797,7 +742,6 @@ WHERE sa.assessment_id = @assessmentId
 
     const string detailsSql = @"SELECT detail_id FROM AssessmentDetail WHERE assessment_id=@aid;";
 
-    // ✅ Update rating records with decision
     const string updateRatingsSql = @"
 UPDATE AssessmentReview
 SET review_status = @decision, reviewed_at = NOW()
@@ -806,7 +750,6 @@ WHERE reviewer_role = 'Reviewer'
   AND detail_id IN @detailIds
   AND rating > 0;";
 
-    // ✅ For REJECTION: Insert one decision note (rating = -1) OR UPDATE if exists
     const string updateOrInsertDecisionNoteSql = @"
 UPDATE AssessmentReview
 SET rating = -1, 
@@ -850,11 +793,9 @@ WHERE NOT EXISTS (
 
         var finalDecision = approved ? "Approved" : "Rejected";
 
-        // ✅ Update rating records
         await conn.ExecuteAsync(updateRatingsSql,
             new { decision = finalDecision, reviewerUserId, detailIds }, tx);
 
-        // ✅ For REJECTION: Update or insert decision note
         if (rejected)
         {
             var note = reviewerComment ?? "Reviewer Rejected";
@@ -867,7 +808,7 @@ WHERE NOT EXISTS (
                     decision = finalDecision
                 }, tx);
         }
-        // ✅ For APPROVAL: Delete any existing -1 decision records (cleanup)
+
         else
         {
             await conn.ExecuteAsync(@"
@@ -907,19 +848,12 @@ WHERE reviewer_role = 'Reviewer'
     }
     catch
     {
-        // Log if needed
+
     }
 
     return true;
 }
 
-
-
- 
-
-    // =========================================================
-  // L1 (Approver) — rework forms (rejected by L2)
-  // =========================================================
   public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverReworkFormsAsync(
       int approverUserId, int page, int pageSize)
   {
@@ -985,10 +919,6 @@ LIMIT @pageSize OFFSET @offset;";
         sql, new { approverUserId, pageSize, offset });
   }
 
-
-    // =========================================================
-    // L1 (Approver) — get assessments with details (FIXED)
-    // =========================================================
     public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetApproverAssessmentsWithDetailsAsync(
         int approverUserId, int page, int pageSize)
     {
@@ -1148,9 +1078,6 @@ ORDER BY h.SubmittedAt DESC, c.display_order IS NULL, c.display_order, c.name;";
         return result;
     }
 
-    // =========================================================
-    // L2 (Reviewer) — get assessments with details
-    // =========================================================
     public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessmentsWithDetailsAsync(
         int reviewerUserId, int page, int pageSize)
     {
@@ -1305,9 +1232,6 @@ ORDER BY h.SubmittedAt DESC, c.display_order IS NULL, c.display_order, c.name;";
         return list;
     }
 
-    // =========================================================
-    // Get latest L2 decision for an assessment
-    // =========================================================
     public async Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId)
     {
         const string sql = @"
@@ -1337,7 +1261,6 @@ LIMIT 1;";
         );
     }
 
-
     public async Task<List<AttachmentInfoDto>> GetAssessmentAttachmentsAsync(int assessmentId)
     {
         const string sql = @"
@@ -1358,7 +1281,7 @@ ORDER BY saa.display_order IS NULL, saa.display_order, saa.uploaded_at;";
         if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
         var rows = await conn.QueryAsync(sql, new { assessmentId });
-        
+
         return rows.Select(r => new AttachmentInfoDto(
             AttachmentId: (int)r.AttachmentId,
             FileName: (string)r.FileName,

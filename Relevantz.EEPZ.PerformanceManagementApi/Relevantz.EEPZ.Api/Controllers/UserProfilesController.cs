@@ -2,9 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.EntityFrameworkCore;
 
-
 using Relevantz.EEPZ.Data.DBContexts;
- 
+
 namespace eepzbackend.Controllers
 
 {
@@ -18,7 +17,7 @@ namespace eepzbackend.Controllers
     {
 
         private readonly EEPZDbContext _context;
- 
+
         public UserProfilesController(EEPZDbContext context)
 
         {
@@ -26,8 +25,6 @@ namespace eepzbackend.Controllers
             _context = context;
 
         }
- 
-        // GET: api/UserProfiles/all
 
         [HttpGet("all")]
 
@@ -58,7 +55,7 @@ namespace eepzbackend.Controllers
                 })
 
                 .ToListAsync();
- 
+
             return Ok(new { success = true, data = users });
 
         }
@@ -67,4 +64,3 @@ namespace eepzbackend.Controllers
 
 }
 
- 

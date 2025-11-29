@@ -13,8 +13,7 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<ApiResponse<ViewSubmittedFormsResponseDto>> GetAllSubmittedFormsAsync(string? status = null);
         Task<ApiResponse<bool>> UpdateAssessmentStatusAsync(int assessmentId, string status);
         Task<ApiResponse<List<SelfAssessmentResponseDto>>> GetAssessmentsByUserAsync(int userId);
-        
-   
+
         Task<ApiResponse<List<AttachmentResponseDto>>> GetAssessmentAttachmentsAsync(int assessmentId);
         Task<ApiResponse<bool>> DeleteAttachmentAsync(int attachmentId);
     }
