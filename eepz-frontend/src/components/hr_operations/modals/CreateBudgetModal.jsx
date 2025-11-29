@@ -493,22 +493,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
                   </div>
                 </div>
               )}
-
-              {/* Info Alert */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  background: "#eff6ff",
-                  border: "1px solid #bfdbfe",
-                  color: "#1e40af",
-                  borderRadius: 6,
-                  fontSize: 12,
-                  padding: "10px 12px",
-                  gap: 8,
-                  marginTop: 12,
-                }}
-              ></div>
             </div>
 
             {/* FOOTER */}

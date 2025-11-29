@@ -1,17 +1,3 @@
-/**
- * ResetPassword Component
- *
- * A form for requesting a password reset via email.
- * Features:
- * - Email validation with real-time feedback
- * - Success/error alerts with Sonner toasts
- * - Loading state during API call
- * - Auto-redirect to OTP verification on success
- * - Responsive design
- *
- * @component
- */
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../../services/auth/authService";
@@ -19,103 +5,40 @@ import { toast } from "sonner";
 import "../../../styles/auth/common/ResetPassword.css";
 
 const ResetPassword = () => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-
-  /**
-   * Email state - stores the email address input
-   */
   const [email, setEmail] = useState("");
-
-  /**
-   * Loading state - tracks form submission status
-   */
   const [loading, setLoading] = useState(false);
-
-  /**
-   * Message state - stores success messages
-   */
   const [message, setMessage] = useState("");
-
-  /**
-   * Error state - stores error messages
-   */
   const [error, setError] = useState("");
-
-  /**
-   * Email touched state - tracks if email field has been interacted with
-   */
   const [emailTouched, setEmailTouched] = useState(false);
 
-  // ========================
-  // HOOKS
-  // ========================
   const navigate = useNavigate();
 
-  // ========================
-  // EMAIL VALIDATION
-  // ========================
-
-  /**
-   * Validates email format using regex
-   *
-   * @param {string} email - Email address to validate
-   * @returns {boolean} True if email is valid format
-   */
   const validateEmail = (email) => {
-    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-    return emailRegex.test(email);
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    return gmailRegex.test(email);
   };
 
-  /**
-   * Check if email is valid
-   */
   const isEmailValid = validateEmail(email);
-
-  /**
-   * Show email error - true if email touched and invalid
-   */
   const showEmailError = emailTouched && email && !isEmailValid;
 
-  // ========================
-  // EVENT HANDLERS
-  // ========================
-
-  /**
-   * Handles email input change
-   * Clears previous errors and messages when user types
-   *
-   * @param {Event} e - Input change event
-   */
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
     setError("");
     setMessage("");
   };
 
-  /**
-   * Handles email input blur (when user leaves field)
-   * Marks email as touched for validation display
-   */
   const handleEmailBlur = () => {
     setEmailTouched(true);
   };
 
-  /**
-   * Handles form submission
-   * Validates email and makes API call to send reset code
-   * Shows Sonner toast notifications for user feedback
-   *
-   * @param {Event} e - Form submit event
-   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate email before submission
     if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
+      const errorMsg = "Only Gmail addresses (@gmail.com) are allowed for password reset";
+      setError(errorMsg);
       setEmailTouched(true);
+      toast.error(errorMsg);
       return;
     }
 
@@ -127,26 +50,21 @@ const ResetPassword = () => {
       console.log("Sending password reset request...");
       console.log("Email:", email);
 
-      // Show loading toast
       toast.loading("Sending reset code...");
 
-      // -------- API Call --------
       const response = await authService.forgotPassword(email);
 
       console.log("Reset Response:", response);
 
-      // -------- Handle Success Response --------
       if (response.success) {
         setMessage("OTP sent to your email successfully!");
         toast.dismiss();
         toast.success("OTP sent to your email successfully!");
 
-        // Navigate after 2 seconds
         setTimeout(() => {
           navigate("/verify-reset-otp", { state: { email } });
         }, 2000);
       } else {
-        // -------- Handle Failure Response --------
         toast.dismiss();
         const errorMsg =
           response.message || "Failed to send reset instructions";
@@ -154,7 +72,6 @@ const ResetPassword = () => {
         toast.error(errorMsg);
       }
     } catch (err) {
-      // -------- Handle Exception --------
       console.error("Reset password error:", err);
 
       let errorMessage = "Failed to send reset instructions";
@@ -183,9 +100,6 @@ const ResetPassword = () => {
     }
   };
 
-  // ========================
-  // RENDER LOGIC
-  // ========================
   return (
     <div className="reset-password-container">
       <div className="reset-password-card">
@@ -197,13 +111,12 @@ const ResetPassword = () => {
           </div>
           <h2 className="reset-title">Reset Password</h2>
           <p className="reset-subtitle">
-            Enter your email address and we'll send you a verification code to
+            Enter your Gmail address and we'll send you a verification code to
             reset your password
           </p>
         </div>
 
         <div className="reset-password-body">
-          {/* Success Message */}
           {message && (
             <div className="alert-success-reset">
               <i className="bi bi-check-circle-fill"></i>
@@ -215,7 +128,6 @@ const ResetPassword = () => {
             </div>
           )}
 
-          {/* Error Message */}
           {error && (
             <div className="alert-danger-reset">
               <i className="bi bi-exclamation-triangle-fill"></i>
@@ -227,11 +139,10 @@ const ResetPassword = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Email Input */}
             <div className="form-group-reset">
               <label htmlFor="email" className="form-label-reset">
                 <i className="bi bi-envelope"></i>
-                Email Address
+                Gmail Address
               </label>
               <div className="email-input-wrapper-reset">
                 <input
@@ -240,7 +151,7 @@ const ResetPassword = () => {
                     showEmailError ? "is-invalid" : ""
                   } ${emailTouched && isEmailValid ? "is-valid" : ""}`}
                   id="email"
-                  placeholder="your.email@eepz.com"
+                  placeholder="yourname@gmail.com"
                   value={email}
                   onChange={handleEmailChange}
                   onBlur={handleEmailBlur}
@@ -260,18 +171,17 @@ const ResetPassword = () => {
               {showEmailError && (
                 <small className="feedback-error-reset">
                   <i className="bi bi-info-circle"></i>
-                  Please enter a valid email address
+                  Only Gmail addresses (@gmail.com) are allowed
                 </small>
               )}
               {emailTouched && isEmailValid && (
                 <small className="feedback-success-reset">
                   <i className="bi bi-check-circle"></i>
-                  Email format is valid
+                  Valid Gmail address
                 </small>
               )}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               className="btn-submit-reset"
@@ -290,7 +200,6 @@ const ResetPassword = () => {
               )}
             </button>
 
-            {/* Back to Login */}
             <div className="back-to-login">
               <button
                 type="button"
@@ -304,12 +213,11 @@ const ResetPassword = () => {
             </div>
           </form>
 
-          {/* Security Note */}
           <div className="security-note">
             <small>
               <i className="bi bi-shield-check"></i>
-              This is a secure password reset process. Your account information
-              is protected.
+              Password reset is only available for Gmail accounts. Your account
+              information is protected.
             </small>
           </div>
         </div>

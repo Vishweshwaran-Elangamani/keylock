@@ -83,7 +83,7 @@ const EditOpportunityModal = ({
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error("Please fix the form errors");
+      toast.error("Please enter valid details");
       return;
     }
 

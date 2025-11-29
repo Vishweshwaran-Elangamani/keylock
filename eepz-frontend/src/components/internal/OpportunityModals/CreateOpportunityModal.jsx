@@ -85,7 +85,7 @@ const CreateOpportunityModal = ({
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error("Please fix the form errors");
+      toast.error("Please enter valid details");
       return;
     }
 
@@ -762,7 +762,7 @@ const CreateOpportunityModal = ({
                 ) : (
                   <>
                     <i className="bi bi-check-circle"></i>
-                    Create Opportunity
+                    Post Opportunity
                   </>
                 )}
               </button>

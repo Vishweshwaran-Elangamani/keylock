@@ -76,6 +76,11 @@ const ChangeRequestModal = ({
     }
   };
 
+  const validateGmailDomain = (email) => {
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    return gmailRegex.test(email);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -83,11 +88,12 @@ const ChangeRequestModal = ({
       toast.error("Please enter new email address");
       return;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.newEmail.trim())) {
-      toast.error("Please enter a valid email address");
+
+    if (!validateGmailDomain(formData.newEmail.trim())) {
+      toast.error("Only Gmail addresses (@gmail.com) are allowed");
       return;
     }
+
     if (
       currentEmail &&
       formData.newEmail.trim().toLowerCase() === currentEmail.toLowerCase()
@@ -149,11 +155,9 @@ const ChangeRequestModal = ({
 
   if (!show) return null;
 
-  // PENDING REQUEST VIEW
   if (hasPendingRequest) {
     return (
       <>
-        {/* Blurred Backdrop */}
         <div
           style={{
             position: "fixed",
@@ -169,7 +173,6 @@ const ChangeRequestModal = ({
           onClick={handleClose}
         />
 
-        {/* Modal Container with Scroll */}
         <div
           style={{
             position: "fixed",
@@ -195,7 +198,6 @@ const ChangeRequestModal = ({
               flexDirection: "column",
             }}
           >
-            {/* HEADER - Fixed */}
             <div
               style={{
                 background: "#27235C",
@@ -244,7 +246,6 @@ const ChangeRequestModal = ({
               </button>
             </div>
 
-            {/* BODY - Scrollable */}
             <div
               style={{
                 padding: "20px",
@@ -318,7 +319,6 @@ const ChangeRequestModal = ({
               </div>
             </div>
 
-            {/* FOOTER - Fixed */}
             <div
               style={{
                 padding: "10px 15px",
@@ -421,10 +421,8 @@ const ChangeRequestModal = ({
     );
   }
 
-  // MAIN FORM
   return (
     <>
-      {/* Blurred Backdrop */}
       <div
         style={{
           position: "fixed",
@@ -440,7 +438,6 @@ const ChangeRequestModal = ({
         onClick={handleClose}
       />
 
-      {/* Modal Container with Scroll */}
       <div
         style={{
           position: "fixed",
@@ -466,7 +463,6 @@ const ChangeRequestModal = ({
             flexDirection: "column",
           }}
         >
-          {/* HEADER - Fixed */}
           <div
             style={{
               background: "#27235C",
@@ -513,7 +509,6 @@ const ChangeRequestModal = ({
             </button>
           </div>
 
-          {/* BODY - Scrollable */}
           <form
             onSubmit={handleSubmit}
             style={{
@@ -546,14 +541,11 @@ const ChangeRequestModal = ({
                 }}
               >
                 <i
-                  className=""
+                  className="bi bi-info-circle-fill"
                   style={{ fontSize: 20, flexShrink: 0 }}
                 ></i>
                 <div>
-                  <strong>Note:</strong> You can request to change your Email
-                  address. Your current password is required for security
-                  verification. Your request will be sent to admin for approval.
-                  You can only have one pending request at a time.
+                  <strong>Note:</strong> You can only request to change your email to a <strong>Gmail address (@gmail.com)</strong>. Your current password is required for security verification. Your request will be sent to admin for approval. You can only have one pending request at a time.
                 </div>
               </div>
 
@@ -597,13 +589,13 @@ const ChangeRequestModal = ({
                     marginBottom: 6,
                   }}
                 >
-                  New Email Address{" "}
+                  New Gmail Address{" "}
                   <span style={{ color: "#ef4444", fontWeight: 700 }}>*</span>
                 </label>
                 <input
                   type="email"
                   required
-                  placeholder="Enter new email address (e.g., newemail@example.com)"
+                  placeholder="Enter new Gmail address (e.g., yourname@gmail.com)"
                   value={formData.newEmail}
                   onChange={(e) =>
                     setFormData({ ...formData, newEmail: e.target.value })
@@ -626,7 +618,8 @@ const ChangeRequestModal = ({
                     display: "block",
                   }}
                 >
-                  Enter a valid email address that you have access to
+                  <i className="bi bi-envelope" style={{ marginRight: 4 }}></i>
+                  Only Gmail addresses (@gmail.com) are allowed
                 </small>
               </div>
 
@@ -757,7 +750,6 @@ const ChangeRequestModal = ({
               </div>
             </div>
 
-            {/* FOOTER - Fixed */}
             <div
               style={{
                 padding: "10px 15px",

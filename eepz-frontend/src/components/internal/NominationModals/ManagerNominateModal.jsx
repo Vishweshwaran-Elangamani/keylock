@@ -318,7 +318,7 @@ const ManagerNominateModal = ({
                     }
                   }}
                 >
-                  <option value="">
+                  <option value="" disabled>
                     {loadingEmployees
                       ? "Loading team members..."
                       : "-- Choose a team member --"}

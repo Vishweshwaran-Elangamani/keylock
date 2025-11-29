@@ -1,18 +1,3 @@
-/**
- * ChangePassword Component
- *
- * A form for changing or setting a user's password.
- * Features:
- * - Password strength indicator and validation
- * - Real-time password requirement feedback
- * - Show/hide password toggle
- * - Error handling and user feedback
- * - Toast notifications using Sonner for success/error feedback
- * - Responsive layout for first-time login vs regular password change
- *
- * @component
- */
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
@@ -22,46 +7,24 @@ import "../../../styles/auth/common/ChangePassword.css";
 import logo from "../../../assets/logodarkbarred.png";
 
 const ChangePassword = () => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-
-  /**
-   * Form data state - stores password fields
-   */
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  /**
-   * Show/hide password state - controls password visibility
-   */
+  const [confirmationText, setConfirmationText] = useState("");
+  const CONFIRMATION_PHRASE = "CONFIRM PASSWORD CHANGE";
+
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
     confirm: false,
   });
 
-  /**
-   * Error state - stores form validation errors
-   */
   const [error, setError] = useState("");
-
-  /**
-   * Loading state - tracks form submission status
-   */
   const [loading, setLoading] = useState(false);
-
-  /**
-   * Password strength state - tracks password strength level
-   */
   const [passwordStrength, setPasswordStrength] = useState("");
-
-  /**
-   * Password validation state - tracks requirement fulfillment
-   */
   const [validations, setValidations] = useState({
     minLength: false,
     hasUppercase: false,
@@ -70,22 +33,13 @@ const ChangePassword = () => {
     hasSpecialChar: false,
   });
 
-  // ========================
-  // HOOKS & NAVIGATION
-  // ========================
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
 
-  // ========================
-  // ROUTE STATE
-  // ========================
   const isFirstLogin = location.state?.isFirstLogin || false;
   const fromSettings = location.state?.fromSettings || false;
 
-  // ========================
-  // PASSWORD REQUIREMENTS
-  // ========================
   const PASSWORD_REQUIREMENTS = {
     requireUppercase: true,
     requireLowercase: true,
@@ -94,14 +48,6 @@ const ChangePassword = () => {
     minLength: 8,
   };
 
-  // ========================
-  // EFFECTS
-  // ========================
-
-  /**
-   * Effect: Check authentication on component mount
-   * Logs authentication status for debugging
-   */
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("accessToken");
@@ -119,29 +65,13 @@ const ChangePassword = () => {
     checkAuth();
   }, [user]);
 
-  /**
-   * Effect: Redirect if not authenticated
-   * Shows error toast and redirects to login if needed
-   */
   useEffect(() => {
-    // If not first login and no user, redirect to login
     if (!isFirstLogin && !user) {
       toast.error("Please login first");
       navigate("/login");
     }
   }, [user, isFirstLogin, navigate]);
 
-  // ========================
-  // PASSWORD VALIDATION
-  // ========================
-
-  /**
-   * Evaluates password strength based on multiple criteria
-   * Returns: "weak", "medium", or "strong"
-   *
-   * @param {string} password - Password to evaluate
-   * @returns {string} Strength level
-   */
   const evaluatePasswordStrength = (password) => {
     let score = 0;
     if (!password) return "";
@@ -157,13 +87,6 @@ const ChangePassword = () => {
     return "strong";
   };
 
-  /**
-   * Validates password against requirements
-   * Updates validations state with requirement status
-   *
-   * @param {string} password - Password to validate
-   * @returns {Object} Validation results
-   */
   const validatePasswordRequirements = (password) => {
     const newValidations = {
       minLength: password.length >= PASSWORD_REQUIREMENTS.minLength,
@@ -176,13 +99,6 @@ const ChangePassword = () => {
     return newValidations;
   };
 
-  /**
-   * Validates password for form submission
-   * Returns error message if validation fails
-   *
-   * @param {string} password - Password to validate
-   * @returns {string} Error message or empty string
-   */
   const validatePassword = (password) => {
     if (password.length < PASSWORD_REQUIREMENTS.minLength) {
       return `Password must be at least ${PASSWORD_REQUIREMENTS.minLength} characters long`;
@@ -205,17 +121,6 @@ const ChangePassword = () => {
     return "";
   };
 
-  // ========================
-  // EVENT HANDLERS
-  // ========================
-
-  /**
-   * Handles input field changes
-   * Updates form data and password validation
-   * Clears errors when user starts typing
-   *
-   * @param {Event} e - Input change event
-   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -234,18 +139,17 @@ const ChangePassword = () => {
     }
   };
 
-  /**
-   * Handles form submission
-   * Validates all fields and makes API call
-   * Shows Sonner toast notifications for user feedback
-   *
-   * @param {Event} e - Form submit event
-   */
+  const handleConfirmationTextChange = (e) => {
+    setConfirmationText(e.target.value);
+    if (error) {
+      setError("");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Validate current password for non-first-login users
     if (!isFirstLogin && !formData.currentPassword) {
       setError("Current password is required");
       return;
@@ -267,6 +171,12 @@ const ChangePassword = () => {
       return;
     }
 
+    if (confirmationText.trim().toUpperCase() !== CONFIRMATION_PHRASE) {
+      setError(`Please type "${CONFIRMATION_PHRASE}" to confirm password change`);
+      toast.error(`Please type the confirmation phrase correctly`);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -274,7 +184,6 @@ const ChangePassword = () => {
       console.log("Is First Login:", isFirstLogin);
       console.log("From Settings:", fromSettings);
 
-      // Show loading toast
       toast.loading("Changing password...");
 
       const response = await api.post("/Authentication/change-password", {
@@ -293,7 +202,6 @@ const ChangePassword = () => {
         return;
       }
 
-      // Handle first-time user flow
       if (isFirstLogin) {
         console.log("First-time user password changed successfully");
 
@@ -311,7 +219,6 @@ const ChangePassword = () => {
         return;
       }
 
-      // Handle regular password change (from settings/dropdown)
       toast.dismiss();
       toast.success("Password changed successfully!");
 
@@ -349,11 +256,6 @@ const ChangePassword = () => {
     }
   };
 
-  /**
-   * Gets color for password strength indicator
-   *
-   * @returns {string} CSS color value
-   */
   const getStrengthColor = () => {
     switch (passwordStrength) {
       case "weak":
@@ -367,11 +269,6 @@ const ChangePassword = () => {
     }
   };
 
-  /**
-   * Gets width for password strength indicator
-   *
-   * @returns {string} CSS width value
-   */
   const getStrengthWidth = () => {
     switch (passwordStrength) {
       case "weak":
@@ -385,24 +282,13 @@ const ChangePassword = () => {
     }
   };
 
-  /**
-   * Checks if all password requirements are met
-   *
-   * @returns {boolean} True if all requirements passed
-   */
   const allValidationsPassed = Object.values(validations).every((v) => v);
+  const isConfirmationValid = confirmationText.trim().toUpperCase() === CONFIRMATION_PHRASE;
 
-  /**
-   * Handles cancel button click
-   * Navigates back to previous page
-   */
   const handleCancel = () => {
     navigate(-1);
   };
 
-  // ========================
-  // RENDER LOGIC
-  // ========================
   return (
     <div className="change-password-container">
       <div className="change-password-card">
@@ -446,10 +332,8 @@ const ChangePassword = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* 2-Column Grid Layout (only for non-first-login) */}
             {!isFirstLogin ? (
               <div className="form-grid-cp">
-                {/* LEFT COLUMN - Current Password */}
                 <div className="form-column-cp">
                   <div className="form-group-cp">
                     <label htmlFor="currentPassword" className="form-label-cp">
@@ -494,14 +378,11 @@ const ChangePassword = () => {
                   </div>
                 </div>
 
-                {/* RIGHT COLUMN - New Passwords */}
                 <div className="form-column-cp">
-                  {/* New Password */}
                   <div className="form-group-cp">
                     <label htmlFor="newPassword" className="form-label-cp">
                       <i className="bi bi-lock"></i>
                       New Password
-                      {/* Hover Tooltip */}
                       <div className="info-icon-wrapper-cp">
                         <div
                           className="info-icon-cp"
@@ -509,7 +390,6 @@ const ChangePassword = () => {
                         >
                           <i className="bi bi-info-circle"></i>
                         </div>
-                        {/* Tooltip content shown on hover */}
                         <div className="password-requirements-tooltip-cp">
                           <strong>Requirements:</strong>
                           <ul>
@@ -580,7 +460,6 @@ const ChangePassword = () => {
                     )}
                   </div>
 
-                  {/* Confirm Password */}
                   <div className="form-group-cp">
                     <label htmlFor="confirmPassword" className="form-label-cp">
                       <i className="bi bi-lock-fill"></i>
@@ -645,13 +524,11 @@ const ChangePassword = () => {
                 </div>
               </div>
             ) : (
-              // First Login: Vertical Layout (single column)
               <>
                 <div className="form-group-cp">
                   <label htmlFor="newPassword" className="form-label-cp">
                     <i className="bi bi-lock"></i>
                     New Password
-                    {/* Hover Tooltip */}
                     <div className="info-icon-wrapper-cp">
                       <div
                         className="info-icon-cp"
@@ -793,10 +670,50 @@ const ChangePassword = () => {
               </>
             )}
 
+            <div className="form-group-cp">
+              <label htmlFor="confirmationText" className="form-label-cp">
+                <i className="bi bi-shield-check"></i>
+                Confirmation Phrase
+                <span style={{ color: "#dc3545", marginLeft: "4px" }}>*</span>
+              </label>
+              <input
+                type="text"
+                className="form-input-cp"
+                id="confirmationText"
+                placeholder={`Type "${CONFIRMATION_PHRASE}" to confirm`}
+                value={confirmationText}
+                onChange={handleConfirmationTextChange}
+                required
+                style={{
+                  borderColor: confirmationText && !isConfirmationValid ? "#dc3545" : confirmationText && isConfirmationValid ? "#198754" : "#ced4da"
+                }}
+              />
+              {confirmationText && (
+                <small
+                  className={isConfirmationValid ? "match-success" : "match-error"}
+                >
+                  <i
+                    className={`bi ${
+                      isConfirmationValid
+                        ? "bi-check-circle-fill"
+                        : "bi-x-circle-fill"
+                    }`}
+                  ></i>
+                  {isConfirmationValid
+                    ? "Confirmation phrase correct"
+                    : `Please type "${CONFIRMATION_PHRASE}" exactly`}
+                </small>
+              )}
+              <small style={{ display: "block", marginTop: "6px", color: "#6c757d", fontSize: "12px" }}>
+                <i className="bi bi-info-circle" style={{ marginRight: "4px" }}></i>
+                This is a security measure to prevent accidental password changes
+              </small>
+            </div>
+
             <button
               type="submit"
               className="btn-submit-cp"
-              disabled={loading || !allValidationsPassed}
+              disabled={loading || !allValidationsPassed || !isConfirmationValid}
             >
               {loading ? (
                 <>

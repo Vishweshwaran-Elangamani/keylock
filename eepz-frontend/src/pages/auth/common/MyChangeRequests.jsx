@@ -1,83 +1,33 @@
-/**
- * MyChangeRequests Component
- *
- * Displays a list of the user's change requests with filtering and status tracking.
- * Features:
- * - Filter by status (All, Pending, Approved, Rejected)
- * - View request details including current and requested values
- * - Cancel pending requests
- * - Toast notifications using Sonner for user feedback
- * - Empty state handling
- * - Responsive design
- *
- * @component
- */
-
 import { useState, useEffect } from "react";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
 import { toast } from "sonner";
 import "../../../styles/auth/common/MyChangeRequests.css";
 
 const MyChangeRequests = () => {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
-
-  /**
-   * Requests state - stores array of change requests
-   */
   const [requests, setRequests] = useState([]);
-
-  /**
-   * Loading state - tracks initial data fetch status
-   */
   const [loading, setLoading] = useState(true);
-
-  /**
-   * Filter state - tracks selected status filter
-   * Options: "all", "pending", "approved", "rejected"
-   */
   const [filter, setFilter] = useState("all");
 
-  // ========================
-  // EFFECTS
-  // ========================
-
-  /**
-   * Effect: Fetch user's change requests on component mount
-   */
   useEffect(() => {
     fetchMyRequests();
   }, []);
 
-  // ========================
-  // API FUNCTIONS
-  // ========================
-
-  /**
-   * Fetches all change requests for the current user
-   * Shows Sonner toast notifications for user feedback
-   */
   const fetchMyRequests = async () => {
     try {
       setLoading(true);
       toast.loading("Loading change requests...");
 
-      // -------- API Call --------
       const response = await ChangeRequestService.getMyChangeRequests();
 
-      // -------- Handle Success Response --------
       if (response.success) {
         setRequests(response.data);
         toast.dismiss();
         toast.success(`Loaded ${response.data.length} change requests`);
       } else {
-        // -------- Handle Failure Response --------
         toast.dismiss();
         toast.error(response.message);
       }
     } catch (error) {
-      // -------- Handle Exception --------
       console.error("Error fetching requests:", error);
       toast.dismiss();
       toast.error("Failed to load change requests");
@@ -86,18 +36,7 @@ const MyChangeRequests = () => {
     }
   };
 
-  // ========================
-  // EVENT HANDLERS
-  // ========================
-
-  /**
-   * Handles cancellation of a pending change request
-   * Shows confirmation dialog and makes API call
-   *
-   * @param {string} requestId - ID of the request to cancel
-   */
   const handleCancel = async (requestId) => {
-    // Show confirmation dialog
     if (
       !window.confirm("Are you sure you want to cancel this change request?")
     ) {
@@ -107,41 +46,25 @@ const MyChangeRequests = () => {
     try {
       toast.loading("Cancelling request...");
 
-      // -------- API Call --------
       const response = await ChangeRequestService.cancelChangeRequest(
         requestId
       );
 
-      // -------- Handle Success Response --------
       if (response.success) {
         toast.dismiss();
         toast.success(response.message || "Request cancelled successfully");
-        // Refresh the requests list
         fetchMyRequests();
       } else {
-        // -------- Handle Failure Response --------
         toast.dismiss();
         toast.error(response.message || "Failed to cancel request");
       }
     } catch (error) {
-      // -------- Handle Exception --------
       console.error("Error cancelling request:", error);
       toast.dismiss();
       toast.error("Failed to cancel request");
     }
   };
 
-  // ========================
-  // HELPER FUNCTIONS
-  // ========================
-
-  /**
-   * Returns CSS class for status badge
-   * Different colors for different statuses
-   *
-   * @param {string} status - Request status
-   * @returns {string} CSS class name
-   */
   const getStatusBadge = (status) => {
     const badges = {
       Pending: "badge bg-warning text-dark",
@@ -151,12 +74,6 @@ const MyChangeRequests = () => {
     return badges[status] || "badge bg-secondary";
   };
 
-  /**
-   * Returns human-readable label for change type
-   *
-   * @param {string} changeType - Type of change
-   * @returns {string} Formatted label
-   */
   const getChangeTypeLabel = (changeType) => {
     const labels = {
       EmployeeCompanyId: "Employee Company ID",
@@ -165,12 +82,6 @@ const MyChangeRequests = () => {
     return labels[changeType] || changeType;
   };
 
-  /**
-   * Formats date string to readable format
-   *
-   * @param {string} dateString - ISO date string
-   * @returns {string} Formatted date
-   */
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-GB", {
@@ -182,23 +93,10 @@ const MyChangeRequests = () => {
     });
   };
 
-  // ========================
-  // FILTER LOGIC
-  // ========================
-
-  /**
-   * Filters requests based on selected filter
-   *
-   * @returns {Array} Filtered requests
-   */
   const filteredRequests = requests.filter((req) => {
     if (filter === "all") return true;
     return req.status.toLowerCase() === filter.toLowerCase();
   });
-
-  // ========================
-  // LOADING STATE
-  // ========================
 
   if (loading) {
     return (
@@ -213,9 +111,6 @@ const MyChangeRequests = () => {
     );
   }
 
-  // ========================
-  // RENDER LOGIC
-  // ========================
   return (
     <div className="change-request-container">
       <div className="change-request-header">
@@ -228,11 +123,7 @@ const MyChangeRequests = () => {
         </p>
       </div>
 
-      {/* ======================== */}
-      {/* FILTER TABS */}
-      {/* ======================== */}
       <div className="filter-tabs mb-4">
-        {/* All Tab */}
         <button
           className={`filter-tab ${filter === "all" ? "active" : ""}`}
           onClick={() => setFilter("all")}
@@ -240,7 +131,6 @@ const MyChangeRequests = () => {
           All ({requests.length})
         </button>
 
-        {/* Pending Tab */}
         <button
           className={`filter-tab ${filter === "pending" ? "active" : ""}`}
           onClick={() => setFilter("pending")}
@@ -248,7 +138,6 @@ const MyChangeRequests = () => {
           Pending ({requests.filter((r) => r.status === "Pending").length})
         </button>
 
-        {/* Approved Tab */}
         <button
           className={`filter-tab ${filter === "approved" ? "active" : ""}`}
           onClick={() => setFilter("approved")}
@@ -256,7 +145,6 @@ const MyChangeRequests = () => {
           Approved ({requests.filter((r) => r.status === "Approved").length})
         </button>
 
-        {/* Rejected Tab */}
         <button
           className={`filter-tab ${filter === "rejected" ? "active" : ""}`}
           onClick={() => setFilter("rejected")}
@@ -265,9 +153,6 @@ const MyChangeRequests = () => {
         </button>
       </div>
 
-      {/* ======================== */}
-      {/* REQUESTS LIST OR EMPTY STATE */}
-      {/* ======================== */}
       {filteredRequests.length === 0 ? (
         <div className="empty-state">
           <i className="bi bi-inbox"></i>
@@ -281,10 +166,8 @@ const MyChangeRequests = () => {
         <div className="requests-list">
           {filteredRequests.map((request) => (
             <div key={request.requestId} className="request-card">
-              {/* -------- Card Header -------- */}
               <div className="request-card-header">
                 <div className="d-flex align-items-center gap-3">
-                  {/* Change Type Label */}
                   <h5 className="request-field-name mb-0">
                     <i
                       className={`bi ${
@@ -295,12 +178,10 @@ const MyChangeRequests = () => {
                     ></i>
                     {getChangeTypeLabel(request.changeType)}
                   </h5>
-                  {/* Status Badge */}
                   <span className={getStatusBadge(request.status)}>
                     {request.status}
                   </span>
                 </div>
-                {/* Cancel Button - Only for Pending Requests */}
                 {request.status === "Pending" && (
                   <button
                     className="btn btn-sm btn-outline-danger"
@@ -312,9 +193,7 @@ const MyChangeRequests = () => {
                 )}
               </div>
 
-              {/* -------- Card Body -------- */}
               <div className="request-card-body">
-                {/* Current vs Requested Value */}
                 <div className="row align-items-center mb-3">
                   <div className="col-md-5">
                     <label className="request-label">Current Value</label>
@@ -333,7 +212,6 @@ const MyChangeRequests = () => {
                   </div>
                 </div>
 
-                {/* Reason Section */}
                 <div className="request-reason mb-3">
                   <label className="request-label">
                     <i className="bi bi-chat-left-quote me-1"></i>
@@ -342,7 +220,6 @@ const MyChangeRequests = () => {
                   <p className="mb-0">{request.reason}</p>
                 </div>
 
-                {/* Metadata - Dates */}
                 <div className="request-meta">
                   <span>
                     <i className="bi bi-calendar me-1"></i>
@@ -356,7 +233,6 @@ const MyChangeRequests = () => {
                   )}
                 </div>
 
-                {/* Admin Remarks - Only if exists */}
                 {request.adminRemarks && (
                   <div className="admin-remarks mt-3">
                     <label className="request-label">

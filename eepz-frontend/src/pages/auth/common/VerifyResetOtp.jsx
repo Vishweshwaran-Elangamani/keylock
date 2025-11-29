@@ -1,19 +1,3 @@
-/**
- * VerifyResetOtp Component
- *
- * Handles password reset verification and new password setting.
- * Features:
- * - OTP verification for password reset
- * - Password strength validation
- * - Show/hide password toggle
- * - Password match indicator
- * - Resend OTP functionality
- * - Toast notifications using Sonner
- * - Responsive two-column layout
- *
- * @component
- */
-
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../../../services/auth/authService";
@@ -31,44 +15,32 @@ const VerifyResetOtp = () => {
   // ========================
   // STATE MANAGEMENT
   // ========================
-
-  /**
-   * OTP code state - stores the 6-digit code
-   */
   const [otpCode, setOtpCode] = useState("");
-
-  /**
-   * New password state
-   */
   const [newPassword, setNewPassword] = useState("");
-
-  /**
-   * Confirm password state
-   */
   const [confirmPassword, setConfirmPassword] = useState("");
-
-  /**
-   * Loading state - tracks form submission
-   */
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // ========================
+  // EMAIL DOMAIN VALIDATION
+  // ========================
 
   /**
-   * Show password state - controls password visibility
+   * Validates that email belongs to Gmail domain
+   * Only accepts @gmail.com addresses
+   *
+   * @param {string} email - Email address to validate
+   * @returns {boolean} True if valid Gmail address
    */
-  const [showPassword, setShowPassword] = useState(false);
+  const isValidGmailDomain = (email) => {
+    if (!email) return false;
+    const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    return gmailPattern.test(email);
+  };
 
   // ========================
   // PASSWORD VALIDATION
   // ========================
-
-  /**
-   * Validates password strength
-   * Checks for length, uppercase, lowercase, numbers, and special characters
-   * Returns error message if validation fails
-   *
-   * @param {string} password - Password to validate
-   * @returns {string|null} Error message or null if valid
-   */
   const validatePassword = (password) => {
     const minLength = 8;
     const hasUpperCase = /[A-Z]/.test(password);
@@ -97,16 +69,22 @@ const VerifyResetOtp = () => {
   // ========================
   // FORM SUBMISSION
   // ========================
-
-  /**
-   * Handles password reset with OTP verification
-   * Validates all fields and makes API call
-   * Shows Sonner toast notifications
-   *
-   * @param {Event} e - Form submit event
-   */
   const handleResetPassword = async (e) => {
     e.preventDefault();
+
+    // -------- Validate Email Exists --------
+    if (!email) {
+      toast.error("Email address is missing. Please restart the process.");
+      navigate("/reset-password");
+      return;
+    }
+
+    // -------- Validate Gmail Domain --------
+    if (!isValidGmailDomain(email)) {
+      toast.error("Only Gmail addresses (@gmail.com) are allowed for password reset");
+      navigate("/reset-password");
+      return;
+    }
 
     // -------- Validate OTP --------
     if (!otpCode || otpCode.length !== 6) {
@@ -132,12 +110,9 @@ const VerifyResetOtp = () => {
       console.log("Resetting password...");
       console.log("Email:", email);
       console.log("OTP:", otpCode);
-      console.log("Password Length:", newPassword.length);
 
-      // Show loading toast
       toast.loading("Resetting password...");
 
-      // -------- API Call --------
       const response = await authService.resetPassword(
         email,
         otpCode,
@@ -147,7 +122,6 @@ const VerifyResetOtp = () => {
 
       console.log("Reset Response:", response);
 
-      // -------- Handle Success Response --------
       if (response.success) {
         toast.dismiss();
         toast.success(
@@ -155,13 +129,11 @@ const VerifyResetOtp = () => {
         );
         navigate("/login");
       } else {
-        // -------- Handle Failure Response --------
         toast.dismiss();
         const errorMsg = response.message || "Failed to reset password";
         toast.error(errorMsg);
       }
     } catch (error) {
-      // -------- Handle Exception --------
       console.error("Reset password error:", error);
       toast.dismiss();
       toast.error(
@@ -176,18 +148,17 @@ const VerifyResetOtp = () => {
   // ========================
   // RESEND OTP
   // ========================
-
-  /**
-   * Handles resend OTP request
-   * Makes API call to resend OTP to user's email
-   */
-  const handleResendOtp = () => {
-    authService.forgotPassword(email);
-    toast.info("New OTP sent to your email");
+  const handleResendOtp = async () => {
+    try {
+      await authService.forgotPassword(email);
+      toast.success("New OTP sent to your Gmail address");
+    } catch (error) {
+      toast.error("Failed to resend OTP. Please try again.");
+    }
   };
 
   // ========================
-  // GUARD CLAUSE
+  // GUARD CLAUSE - SILENT REDIRECT
   // ========================
   if (!email) {
     navigate("/reset-password");
@@ -200,9 +171,6 @@ const VerifyResetOtp = () => {
   return (
     <div className="verify-reset-otp-container">
       <div className="verify-reset-otp-card">
-        {/* ======================== */}
-        {/* HEADER */}
-        {/* ======================== */}
         <div className="verify-reset-header">
           <div className="shield-icon-reset">
             <i className="bi bi-shield-lock"></i>
@@ -213,12 +181,8 @@ const VerifyResetOtp = () => {
           </p>
         </div>
 
-        {/* ======================== */}
-        {/* BODY */}
-        {/* ======================== */}
         <div className="verify-reset-body">
           <form onSubmit={handleResetPassword}>
-            {/* -------- 2-Column Grid Layout -------- */}
             <div className="form-grid-reset">
               {/* -------- LEFT COLUMN - OTP -------- */}
               <div className="form-column-reset">
@@ -245,7 +209,6 @@ const VerifyResetOtp = () => {
                   </small>
                 </div>
 
-                {/* -------- Resend OTP Section -------- */}
                 <div className="resend-section-inline">
                   <small>
                     Didn't receive OTP?
@@ -263,12 +226,10 @@ const VerifyResetOtp = () => {
 
               {/* -------- RIGHT COLUMN - Passwords -------- */}
               <div className="form-column-reset">
-                {/* New Password */}
                 <div className="form-group-reset">
                   <label className="form-label-reset">
                     <i className="bi bi-lock-fill"></i>
                     New Password
-                    {/* Hover Tooltip */}
                     <div className="info-icon-wrapper-reset">
                       <div
                         className="info-icon-reset"
@@ -276,7 +237,6 @@ const VerifyResetOtp = () => {
                       >
                         <i className="bi bi-info-circle"></i>
                       </div>
-                      {/* Tooltip Content */}
                       <div className="password-requirements-tooltip-reset">
                         <strong>Password Requirements:</strong>
                         <ul>
@@ -310,7 +270,6 @@ const VerifyResetOtp = () => {
                   </div>
                 </div>
 
-                {/* Confirm Password */}
                 <div className="form-group-reset">
                   <label className="form-label-reset">
                     <i className="bi bi-lock-fill"></i>
@@ -327,7 +286,6 @@ const VerifyResetOtp = () => {
                     />
                   </div>
 
-                  {/* -------- Password Match Indicator -------- */}
                   {newPassword &&
                     confirmPassword &&
                     newPassword !== confirmPassword && (
@@ -348,7 +306,6 @@ const VerifyResetOtp = () => {
               </div>
             </div>
 
-            {/* -------- Submit Button (Full Width) -------- */}
             <button
               type="submit"
               className="btn-submit-reset"
@@ -368,9 +325,6 @@ const VerifyResetOtp = () => {
             </button>
           </form>
 
-          {/* ======================== */}
-          {/* FOOTER */}
-          {/* ======================== */}
           <div className="reset-footer">
             <button
               className="btn-back-reset"
