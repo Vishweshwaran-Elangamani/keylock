@@ -374,6 +374,14 @@ export default function HRFeedbackList() {
     return "#6c757d";
   };
 
+  const inputText = analysisData.input_text || "";
+// Regex to capture [Project] and the rest
+const match = inputText.match(/^\[(.*?)\]\s*(.*)$/);
+
+const projectTitle = match ? match[1] : "No project title";
+const comment = match ? match[2] : "No comment available";
+
+
   return (
     <div className="hrfeedback-list-container">
       <div className="hrfeedback-list-wrapper">
@@ -744,8 +752,9 @@ export default function HRFeedbackList() {
                     <label className="hrfeedback-analysis-label">
                       Original Feedback
                     </label>
-                    <div className="hrfeedback-analysis-feedback-box">
-                      {analysisData.input_text || "No feedback text available"}
+                    <div className="hrfeedback-analysis-feedback-box" style={{ textAlign: "left" }}>
+                      <div><strong>Project:</strong> {projectTitle}</div>
+                      <div><strong>Feedback:</strong> {comment}</div>
                     </div>
                   </div>
 
@@ -756,7 +765,7 @@ export default function HRFeedbackList() {
                         <Sparkles size={14} />
                         Summary
                       </label>
-                      <div className="hrfeedback-summary-box">
+                      <div className="hrfeedback-summary-box" style={{textAlign:"left"}}>
                         {analysisData.summary}
                       </div>
                     </div>
@@ -1057,7 +1066,7 @@ export default function HRFeedbackList() {
 
                         {/* VADER Scores */}
                         <div className="hrfeedback-vader-section">
-                          <div className="hrfeedback-vader-label">
+                          <div className="hrfeedback-vader-label" >
                             VADER Scores
                           </div>
                           <div className="hrfeedback-vader-bars">
@@ -1548,7 +1557,7 @@ export default function HRFeedbackList() {
                           <CheckCircle size={14} />
                           Key Insights
                         </label>
-                        <ul className="hrfeedback-insights-list">
+                        <ul className="hrfeedback-insights-list" style={{textAlign:"left"}}>
                           {analysisData.key_insights.map((insight, idx) => (
                             <li key={idx}>{insight}</li>
                           ))}
@@ -1566,10 +1575,10 @@ export default function HRFeedbackList() {
                         {analysisData.suggestions.suggestions &&
                           analysisData.suggestions.suggestions.length > 0 && (
                             <div>
-                              <div className="hrfeedback-suggestions-subtitle">
+                              <div className="hrfeedback-suggestions-subtitle" style={{textAlign:"left"}}>
                                 Actionable Recommendations:
                               </div>
-                              <ul className="hrfeedback-suggestions-list">
+                              <ul className="hrfeedback-suggestions-list" style={{textAlign:"left"}}>
                                 {analysisData.suggestions.suggestions.map(
                                   (suggestion, idx) => (
                                     <li key={idx}>{suggestion}</li>
@@ -1581,10 +1590,10 @@ export default function HRFeedbackList() {
 
                         {analysisData.suggestions.rewritten_example && (
                           <div className="hrfeedback-rewritten-example">
-                            <div className="hrfeedback-rewritten-label">
+                            <div className="hrfeedback-rewritten-label "style={{textAlign:"left"}}>
                               💡 Example Rewrite:
                             </div>
-                            <div className="hrfeedback-rewritten-content">
+                            <div className="hrfeedback-rewritten-content" style={{textAlign:"left"}}>
                               {analysisData.suggestions.rewritten_example}
                             </div>
                           </div>
@@ -1594,7 +1603,7 @@ export default function HRFeedbackList() {
                           analysisData.suggestions.improvement_areas.length >
                             0 && (
                             <div className="hrfeedback-improvement-areas">
-                              <div className="hrfeedback-improvement-label">
+                              <div className="hrfeedback-improvement-label" style={{textAlign:"left"}}>
                                 Focus Areas for Improvement:
                               </div>
                               <div className="hrfeedback-improvement-tags">
