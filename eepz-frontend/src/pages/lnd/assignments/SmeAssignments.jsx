@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Download, Search, ChevronUp, ChevronDown, Filter } from "lucide-react";
+import {
+  Download,
+  Search,
+  ChevronUp,
+  ChevronDown,
+  Filter,
+  AlertTriangle,
+} from "lucide-react";
 import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
@@ -71,7 +78,7 @@ const SmeAssignments = () => {
         searchTerm,
         sortField,
         sortOrderAsc ? "asc" : "desc",
-        itemsPerPage // Pass itemsPerPage to API
+        itemsPerPage
       );
 
       if (response.data.success) {
@@ -178,7 +185,6 @@ const SmeAssignments = () => {
     );
   };
 
-  // Show initial loading spinner only when no data
   if (loading && assignments.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
@@ -199,7 +205,6 @@ const SmeAssignments = () => {
         ]}
       />
 
-      {/* Filters and search */}
       <div
         style={{
           marginBottom: "1.5rem",
@@ -268,10 +273,10 @@ const SmeAssignments = () => {
           </option>
           <option value={ASSIGNMENT_STATUS.ACKNOWLEDGED}>Acknowledged</option>
           <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
+          <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>
         </select>
       </div>
 
-      {/* Assignments Table */}
       {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
@@ -299,12 +304,11 @@ const SmeAssignments = () => {
                 minWidth: 0,
               }}
             >
-              {/* Table Header */}
               <div
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr",
+                    "1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.8fr 0.7fr 0.8fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
@@ -330,6 +334,7 @@ const SmeAssignments = () => {
                     field: "completionRating",
                     align: "center",
                   },
+                  { label: "Overdue", field: null, align: "center" },
                   { label: "Proof", field: null, align: "center" },
                   { label: "Comments", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
@@ -361,14 +366,14 @@ const SmeAssignments = () => {
                   </div>
                 ))}
               </div>
-              {/* Table Rows */}
+
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
                   <div
                     style={{
                       display: "grid",
                       gridTemplateColumns:
-                        "1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.7fr 0.8fr",
+                        "1.5fr 1.3fr 1.2fr 1fr 1fr 0.7fr 0.8fr 0.7fr 0.8fr",
                       alignItems: "center",
                       fontSize: "0.875rem",
                       color: "#212529",
@@ -399,6 +404,7 @@ const SmeAssignments = () => {
                     >
                       {assignment.menteeName}
                     </div>
+
                     <div
                       style={{
                         fontWeight: 500,
@@ -411,9 +417,11 @@ const SmeAssignments = () => {
                     >
                       {assignment.skillName}
                     </div>
+
                     <div style={{ display: "flex", justifyContent: "center" }}>
                       <StatusBadge status={assignment.status} />
                     </div>
+
                     <div style={{ textAlign: "left", color: "#6b7280" }}>
                       {assignment.createdOn ? (
                         new Date(assignment.createdOn).toLocaleDateString()
@@ -423,15 +431,34 @@ const SmeAssignments = () => {
                         </span>
                       )}
                     </div>
-                    <div style={{ textAlign: "left", color: "#6b7280" }}>
+
+                    <div
+                      style={{
+                        textAlign: "left",
+                        color: assignment.isOverdue ? "#DC2626" : "#6b7280",
+                        fontWeight: assignment.isOverdue ? "600" : "normal",
+                      }}
+                    >
                       {assignment.deadline ? (
-                        new Date(assignment.deadline).toLocaleDateString()
+                        <>
+                          {assignment.isOverdue && (
+                            <AlertTriangle
+                              size={14}
+                              style={{
+                                marginRight: "0.25rem",
+                                color: "#DC2626",
+                              }}
+                            />
+                          )}
+                          {new Date(assignment.deadline).toLocaleDateString()}
+                        </>
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                           None
                         </span>
                       )}
                     </div>
+
                     <div
                       style={{
                         fontWeight: 600,
@@ -447,6 +474,50 @@ const SmeAssignments = () => {
                         </span>
                       )}
                     </div>
+
+                    <div style={{ textAlign: "center" }}>
+                      {assignment.isOverdue ? (
+                        <div
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.4rem",
+                            padding: "0.4rem 0.75rem",
+                            background: "#FEE2E2",
+                            border: "1px solid #DC2626",
+                            borderRadius: "8px",
+                            color: "#DC2626",
+                            fontWeight: "700",
+                            fontSize: "0.8rem",
+                            whiteSpace: "nowrap",
+                          }}
+                          title={`${assignment.daysOverdue} day(s) overdue`}
+                        >
+                          <AlertTriangle size={14} />
+                          {assignment.daysOverdue}{" "}
+                          {assignment.daysOverdue === 1 ? "day" : "days"}
+                        </div>
+                      ) : assignment.deadline &&
+                        assignment.status !== ASSIGNMENT_STATUS.COMPLETED ? (
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#10B981",
+                            fontWeight: "600",
+                          }}
+                        >
+                          On Track
+                        </span>
+                      ) : (
+                        <span
+                          style={{ fontSize: "0.75rem", color: "#9ca3af" }}
+                        >
+                          N/A
+                        </span>
+                      )}
+                    </div>
+
                     <div style={{ textAlign: "center" }}>
                       {assignment.proofFilePath ? (
                         <button
@@ -486,6 +557,7 @@ const SmeAssignments = () => {
                         </span>
                       )}
                     </div>
+
                     <div style={{ textAlign: "center" }}>
                       {assignment.completionNotes ? (
                         <button
@@ -527,7 +599,7 @@ const SmeAssignments = () => {
                       )}
                     </div>
                   </div>
-                  {/* Expanded notes */}
+
                   {expandedNotes?.[assignment.assignmentId] &&
                     assignment.completionNotes && (
                       <div
@@ -563,7 +635,6 @@ const SmeAssignments = () => {
             </div>
           </div>
 
-          {/* Updated Pagination with new props */}
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

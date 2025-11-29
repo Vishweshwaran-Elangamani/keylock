@@ -6,6 +6,7 @@ import {
   ChevronUp,
   ChevronDown,
   Filter,
+  AlertTriangle,
 } from "lucide-react";
 import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
@@ -15,7 +16,6 @@ import CompleteAssignmentModal from "../../../components/lnd/modals/CompleteAssi
 import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
-
 
 const TeamAssignments = () => {
   const [assignments, setAssignments] = useState([]);
@@ -27,20 +27,16 @@ const TeamAssignments = () => {
   const [expandedNotes, setExpandedNotes] = useState({});
   const [exporting, setExporting] = useState(false);
 
-
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
-
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
-
 
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
-
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,14 +44,12 @@ const TeamAssignments = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const roleName = user?.role || "";
     setUserRole(roleName);
     setRolePrefix(getRolePrefix(roleName));
   }, []);
-
 
   const getRolePrefix = (role) => {
     const prefixMap = {
@@ -69,7 +63,6 @@ const TeamAssignments = () => {
     return prefixMap[role] || "/employee";
   };
 
-
   useEffect(() => {
     fetchTeamAssignments();
   }, [
@@ -80,7 +73,6 @@ const TeamAssignments = () => {
     sortField,
     sortOrderAsc,
   ]);
-
 
   const fetchTeamAssignments = async () => {
     try {
@@ -93,7 +85,6 @@ const TeamAssignments = () => {
         sortOrderAsc ? "asc" : "desc",
         itemsPerPage
       );
-
 
       if (response.data.success) {
         setAssignments(response.data.data.items);
@@ -108,12 +99,11 @@ const TeamAssignments = () => {
     }
   };
 
-
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
       toast.loading("Preparing Excel export...");
-      
+
       const response = await lndService.exportTeamAssignments(
         statusFilter,
         searchTerm,
@@ -121,11 +111,14 @@ const TeamAssignments = () => {
         sortOrderAsc ? "asc" : "desc"
       );
 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+      const timestamp = new Date()
+        .toISOString()
+        .replace(/[:.]/g, "-")
+        .slice(0, -5);
       const filename = `TeamAssignments_${timestamp}.xlsx`;
-      
+
       downloadFile(response.data, filename);
-      
+
       toast.dismiss();
       toast.success("Excel file downloaded successfully!");
     } catch (error) {
@@ -137,11 +130,9 @@ const TeamAssignments = () => {
     }
   };
 
-
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -149,13 +140,11 @@ const TeamAssignments = () => {
     setCurrentPage(1);
   };
 
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -163,12 +152,10 @@ const TeamAssignments = () => {
     }
   };
 
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
 
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
@@ -176,19 +163,16 @@ const TeamAssignments = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-
   const handleCompleteAssignment = (assignment) => {
     setSelectedAssignment(assignment);
     setShowCompleteModal(true);
   };
-
 
   const handleCompleteSuccess = () => {
     setShowCompleteModal(false);
     toast.success("Assignment completed successfully!");
     fetchTeamAssignments();
   };
-
 
   const handleDownloadProof = async (assignment) => {
     try {
@@ -204,7 +188,6 @@ const TeamAssignments = () => {
     }
   };
 
-
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -214,7 +197,6 @@ const TeamAssignments = () => {
     }
     setCurrentPage(1);
   };
-
 
   const renderSortIcon = (field) => {
     if (sortField !== field) {
@@ -250,7 +232,6 @@ const TeamAssignments = () => {
     );
   };
 
-
   if (loading && assignments.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
@@ -261,7 +242,6 @@ const TeamAssignments = () => {
     );
   }
 
-
   return (
     <div>
       <Breadcrumb
@@ -271,7 +251,6 @@ const TeamAssignments = () => {
           { label: "Team Assignments" },
         ]}
       />
-
 
       <div
         style={{
@@ -353,6 +332,7 @@ const TeamAssignments = () => {
               Your Review
             </option>
             <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
+            <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>
           </select>
         </div>
 
@@ -388,7 +368,6 @@ const TeamAssignments = () => {
         </button>
       </div>
 
-
       {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
@@ -416,11 +395,12 @@ const TeamAssignments = () => {
                 minWidth: 0,
               }}
             >
+              {/*  UPDATED: Added 0.8fr for Overdue column */}
               <div
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "1.2fr 1.2fr 1fr 1.4fr 1fr 0.7fr 0.7fr 0.7fr 1fr",
+                    "1.2fr 1.2fr 1fr 1.4fr 1fr 0.7fr 0.7fr 0.8fr 0.7fr 1fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
@@ -451,6 +431,7 @@ const TeamAssignments = () => {
                     field: "completionRating",
                     align: "center",
                   },
+                  { label: "Overdue", field: null, align: "center" }, //  NEW
                   { label: "Proof", field: null, align: "center" },
                   { label: "Comments", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
@@ -483,13 +464,16 @@ const TeamAssignments = () => {
                   </div>
                 ))}
               </div>
+
+              {/* Assignment Rows */}
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
+                  {/* UPDATED: Added 0.8fr for Overdue column */}
                   <div
                     style={{
                       display: "grid",
                       gridTemplateColumns:
-                        "1.2fr 1.2fr 1fr 1.4fr 1fr 0.7fr 0.7fr 0.7fr 1fr",
+                        "1.2fr 1.2fr 1fr 1.4fr 1fr 0.7fr 0.7fr 0.8fr 0.7fr 1fr",
                       alignItems: "center",
                       fontSize: "0.875rem",
                       color: "#212529",
@@ -508,6 +492,7 @@ const TeamAssignments = () => {
                       e.currentTarget.style.background = "#fff";
                     }}
                   >
+                    {/* Employee Name */}
                     <div
                       style={{
                         fontWeight: 600,
@@ -520,6 +505,8 @@ const TeamAssignments = () => {
                     >
                       {assignment.menteeName}
                     </div>
+
+                    {/* Skill Name */}
                     <div
                       style={{
                         fontWeight: 500,
@@ -532,6 +519,8 @@ const TeamAssignments = () => {
                     >
                       {assignment.skillName}
                     </div>
+
+                    {/* SME Assigned */}
                     <div
                       style={{
                         fontWeight: 500,
@@ -545,9 +534,13 @@ const TeamAssignments = () => {
                     >
                       {assignment.smeName}
                     </div>
+
+                    {/* Status */}
                     <div style={{ display: "flex", justifyContent: "center" }}>
                       <StatusBadge status={assignment.status} />
                     </div>
+
+                    {/* Start Date */}
                     <div
                       style={{
                         display: "flex",
@@ -563,21 +556,34 @@ const TeamAssignments = () => {
                         </span>
                       )}
                     </div>
+
+                    {/* Due Date */}
                     <div
                       style={{
                         display: "flex",
                         justifyContent: "left",
-                        color: "#6b7280",
+                        color: assignment.isOverdue ? "#DC2626" : "#6b7280",
+                        fontWeight: assignment.isOverdue ? "600" : "normal",
                       }}
                     >
                       {assignment.deadline ? (
-                        new Date(assignment.deadline).toLocaleDateString()
+                        <>
+                          {assignment.isOverdue && (
+                            <AlertTriangle
+                              size={14}
+                              style={{ marginRight: "0.25rem", color: "#DC2626" }}
+                            />
+                          )}
+                          {new Date(assignment.deadline).toLocaleDateString()}
+                        </>
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                           None
                         </span>
                       )}
                     </div>
+
+                    {/* Score */}
                     <div
                       style={{
                         fontWeight: 600,
@@ -593,6 +599,50 @@ const TeamAssignments = () => {
                         </span>
                       )}
                     </div>
+
+                    {/*  NEW: Overdue Column */}
+                    <div style={{ textAlign: "center" }}>
+                      {assignment.isOverdue ? (
+                        <div
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.4rem",
+                            padding: "0.4rem 0.75rem",
+                            background: "#FEE2E2",
+                            border: "1px solid #DC2626",
+                            borderRadius: "8px",
+                            color: "#DC2626",
+                            fontWeight: "700",
+                            fontSize: "0.8rem",
+                            whiteSpace: "nowrap",
+                          }}
+                          title={`${assignment.daysOverdue} day(s) overdue`}
+                        >
+                          <AlertTriangle size={14} />
+                          {assignment.daysOverdue}{" "}
+                          {assignment.daysOverdue === 1 ? "day" : "days"}
+                        </div>
+                      ) : assignment.deadline &&
+                        assignment.status !== ASSIGNMENT_STATUS.COMPLETED ? (
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#10B981",
+                            fontWeight: "600",
+                          }}
+                        >
+                          On Track
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+                          None
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Proof */}
                     <div style={{ textAlign: "center" }}>
                       {assignment.proofFilePath ? (
                         <button
@@ -632,6 +682,8 @@ const TeamAssignments = () => {
                         </span>
                       )}
                     </div>
+
+                    {/* Comments */}
                     <div style={{ textAlign: "center" }}>
                       {assignment.status ===
                       ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT ? (
@@ -708,6 +760,8 @@ const TeamAssignments = () => {
                       )}
                     </div>
                   </div>
+
+                  {/* Expanded Notes */}
                   {expandedNotes?.[assignment.assignmentId] &&
                     assignment.completionNotes && (
                       <div
@@ -743,7 +797,6 @@ const TeamAssignments = () => {
             </div>
           </div>
 
-
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -757,7 +810,6 @@ const TeamAssignments = () => {
         </>
       )}
 
-
       {showCompleteModal && (
         <CompleteAssignmentModal
           assignment={selectedAssignment}
@@ -769,5 +821,4 @@ const TeamAssignments = () => {
   );
 };
 
-
-export default TeamAssignments;
+export default TeamAssignments; 

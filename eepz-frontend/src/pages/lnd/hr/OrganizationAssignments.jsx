@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Download, Search, ChevronUp, ChevronDown, Filter } from "lucide-react";
+import {
+  Download,
+  Search,
+  ChevronUp,
+  ChevronDown,
+  Filter,
+  AlertTriangle,
+} from "lucide-react";
 import Breadcrumb from "../../../components/lnd/common/Breadcrumb";
 import Pagination from "../../../components/lnd/common/Pagination";
 import StatusBadge from "../../../components/lnd/common/StatusBadge";
@@ -8,34 +15,28 @@ import { lndService, downloadFile } from "../../../services/lnd/lndService";
 import { ASSIGNMENT_STATUS } from "../../../constants/lnd/lndConstants";
 import { toast } from "sonner";
 
-
 const OrganizationAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedNotes, setExpandedNotes] = useState({});
   const [exporting, setExporting] = useState(false);
 
-
   // Search
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
 
-
   // Filter
   const [statusFilter, setStatusFilter] = useState("");
-
 
   // Sorting
   const [sortField, setSortField] = useState("");
   const [sortOrderAsc, setSortOrderAsc] = useState(true);
-
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-
 
   useEffect(() => {
     fetchAssignments();
@@ -48,7 +49,6 @@ const OrganizationAssignments = () => {
     sortOrderAsc,
   ]);
 
-
   const fetchAssignments = async () => {
     try {
       setLoading(true);
@@ -60,7 +60,6 @@ const OrganizationAssignments = () => {
         sortOrderAsc ? "asc" : "desc",
         itemsPerPage
       );
-
 
       if (response.data.success) {
         setAssignments(response.data.data.items);
@@ -75,12 +74,11 @@ const OrganizationAssignments = () => {
     }
   };
 
-
   const handleExportToExcel = async () => {
     try {
       setExporting(true);
       toast.loading("Preparing Excel export...");
-      
+
       const response = await lndService.exportOrganizationAssignments(
         statusFilter,
         searchTerm,
@@ -88,12 +86,14 @@ const OrganizationAssignments = () => {
         sortOrderAsc ? "asc" : "desc"
       );
 
-
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+      const timestamp = new Date()
+        .toISOString()
+        .replace(/[:.]/g, "-")
+        .slice(0, -5);
       const filename = `OrganizationalAssignments_${timestamp}.xlsx`;
-      
+
       downloadFile(response.data, filename);
-      
+
       toast.dismiss();
       toast.success("Excel file downloaded successfully!");
     } catch (error) {
@@ -105,11 +105,9 @@ const OrganizationAssignments = () => {
     }
   };
 
-
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -117,13 +115,11 @@ const OrganizationAssignments = () => {
     setCurrentPage(1);
   };
 
-
   const handleCancelSearch = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
   };
-
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -131,19 +127,16 @@ const OrganizationAssignments = () => {
     }
   };
 
-
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
 
   const handleItemsPerPageChange = (newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
 
   const handleDownloadProof = async (assignment) => {
     try {
@@ -159,7 +152,6 @@ const OrganizationAssignments = () => {
     }
   };
 
-
   const onSortClick = (field) => {
     if (sortField === field) {
       setSortOrderAsc(!sortOrderAsc);
@@ -169,7 +161,6 @@ const OrganizationAssignments = () => {
     }
     setCurrentPage(1);
   };
-
 
   const renderSortIcon = (field) => {
     if (sortField !== field) {
@@ -205,7 +196,6 @@ const OrganizationAssignments = () => {
     );
   };
 
-
   if (loading && assignments.length === 0) {
     return (
       <div style={{ textAlign: "center", padding: "3rem" }}>
@@ -216,7 +206,6 @@ const OrganizationAssignments = () => {
     );
   }
 
-
   return (
     <div>
       <Breadcrumb
@@ -226,7 +215,6 @@ const OrganizationAssignments = () => {
           { label: "Organizational Assignments" },
         ]}
       />
-
 
       <div
         style={{
@@ -308,9 +296,9 @@ const OrganizationAssignments = () => {
               Manager Review
             </option>
             <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
+            <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>
           </select>
         </div>
-
 
         <button
           onClick={handleExportToExcel}
@@ -344,7 +332,6 @@ const OrganizationAssignments = () => {
         </button>
       </div>
 
-
       {assignments.length === 0 && !loading ? (
         <EmptyState
           icon={Filter}
@@ -376,12 +363,12 @@ const OrganizationAssignments = () => {
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr",
+                    "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr 0.9fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
                   color: "white",
-                  fontSize: "14px",
+                  fontSize: "13px",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
@@ -408,6 +395,7 @@ const OrganizationAssignments = () => {
                     field: "completionRating",
                     align: "center",
                   },
+                  { label: "Overdue", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
                   <div
                     key={field || label}
@@ -439,14 +427,13 @@ const OrganizationAssignments = () => {
                 ))}
               </div>
 
-
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
                   <div
                     style={{
                       display: "grid",
                       gridTemplateColumns:
-                        "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr",
+                        "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr 0.9fr",
                       alignItems: "center",
                       fontSize: "0.875rem",
                       color: "#212529",
@@ -473,10 +460,11 @@ const OrganizationAssignments = () => {
                         whiteSpace: "nowrap",
                         textAlign: "left",
                       }}
-                      title={assignment.menteeName}
+                      title={assignment.menteeName} 
                     >
                       {assignment.menteeName}
                     </div>
+
                     <div
                       style={{
                         fontWeight: 500,
@@ -489,6 +477,7 @@ const OrganizationAssignments = () => {
                     >
                       {assignment.skillName}
                     </div>
+
                     <div
                       style={{
                         fontWeight: 500,
@@ -502,9 +491,11 @@ const OrganizationAssignments = () => {
                     >
                       {assignment.smeName}
                     </div>
+
                     <div style={{ display: "flex", justifyContent: "center" }}>
                       <StatusBadge status={assignment.status} />
                     </div>
+
                     <div style={{ textAlign: "left", color: "#6b7280" }}>
                       {assignment.createdOn ? (
                         new Date(assignment.createdOn).toLocaleDateString()
@@ -514,15 +505,34 @@ const OrganizationAssignments = () => {
                         </span>
                       )}
                     </div>
-                    <div style={{ textAlign: "left", color: "#6b7280" }}>
+
+                    <div
+                      style={{
+                        textAlign: "left",
+                        color: assignment.isOverdue ? "#DC2626" : "#6b7280",
+                        fontWeight: assignment.isOverdue ? "600" : "normal",
+                      }}
+                    >
                       {assignment.deadline ? (
-                        new Date(assignment.deadline).toLocaleDateString()
+                        <>
+                          {assignment.isOverdue && (
+                            <AlertTriangle
+                              size={14}
+                              style={{
+                                marginRight: "0.25rem",
+                                color: "#DC2626",
+                              }}
+                            />
+                          )}
+                          {new Date(assignment.deadline).toLocaleDateString()}
+                        </>
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                           None
                         </span>
                       )}
                     </div>
+
                     <div
                       style={{
                         fontWeight: 600,
@@ -538,12 +548,54 @@ const OrganizationAssignments = () => {
                         </span>
                       )}
                     </div>
+
+                    <div style={{ textAlign: "center" }}>
+                      {assignment.isOverdue ? (
+                        <div
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.4rem",
+                            padding: "0.4rem 0.75rem",
+                            background: "#FEE2E2",
+                            border: "1px solid #DC2626",
+                            borderRadius: "8px",
+                            color: "#DC2626",
+                            fontWeight: "700",
+                            fontSize: "0.8rem",
+                            whiteSpace: "nowrap",
+                          }}
+                          title={`${assignment.daysOverdue} day(s) overdue`}
+                        >
+                          <AlertTriangle size={14} />
+                          {assignment.daysOverdue}{" "}
+                          {assignment.daysOverdue === 1 ? "day" : "days"}
+                        </div>
+                      ) : assignment.deadline &&
+                        assignment.status !== ASSIGNMENT_STATUS.COMPLETED ? (
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#10B981",
+                            fontWeight: "600",
+                          }}
+                        >
+                          On Track
+                        </span>
+                      ) : (
+                        <span
+                          style={{ fontSize: "0.75rem", color: "#9ca3af" }}
+                        >
+                          N/A
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
 
           <Pagination
             currentPage={currentPage}
@@ -560,6 +612,5 @@ const OrganizationAssignments = () => {
     </div>
   );
 };
-
 
 export default OrganizationAssignments;
