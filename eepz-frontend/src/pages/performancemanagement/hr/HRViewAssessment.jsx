@@ -272,92 +272,121 @@ function HRViewAppraisals() {
           marginBottom: "2rem",
         }}
       >
-        <nav className="cg-breadcrumbs" aria-label="breadcrumb">
-          <ol className="cg-breadcrumb">
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard")}
-              style={{ cursor: "pointer" }}
-            >
-              <i className="bi bi-house-door"></i>
-            </li>
-            <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard/performance")}
-              style={{ cursor: "pointer" }}
-            >
-              Performance
-            </li>
-            <li className="cg-breadcrumb-item active" aria-current="page">
-              Initiate Form
-            </li>
-          </ol>
-        </nav>
+        <nav
+  className="cg-breadcrumbs"
+  aria-label="breadcrumb"
+  style={{ marginBottom: "16px", background: "transparent" }}
+>
+  <style>
+    {`
+      .cg-breadcrumb {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        align-items: center;
+      }
+      .cg-breadcrumb-item + .cg-breadcrumb-item::before {
+        content: "/";
+        margin: 0 0.25rem;   /* smaller spacing */
+        color: #888;         /* lighter gray separator */
+        font-weight: normal; /* prevents thick/bold look */
+        font-size: 0.9em;    /* slightly smaller than text */
+      }
+      .cg-breadcrumb-item {
+        cursor: pointer;
+      }
+      .cg-breadcrumb-item.active {
+        color: #97247E
+ ;      /* highlight active item (purple) */
+        cursor: default;
+      }
+    `}
+  </style>
+
+  <ol className="cg-breadcrumb">
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard")}
+    >
+      <i className="bi bi-house-door"></i>
+    </li>
+    <li
+      className="cg-breadcrumb-item"
+      onClick={() => navigate("/hr/dashboard/performance")}
+    >
+      Performance
+    </li>
+    <li className="cg-breadcrumb-item active" aria-current="page">
+      Form Progress
+    </li>
+  </ol>
+</nav>
+
       </div>
 
-
       <div className="hrvasspm-container">
-        <div className="hrvasspm-filters">
-          <div className="hrvasspm-filter-group">
-            <label>Search Employee Name</label>
-            <input
-              type="search"
-              placeholder="Type to search..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-            />
-          </div>
-          <div className="hrvasspm-filter-group">
-            <label>Filter by Status</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-          <div className="hrvasspm-filter-group">
-            <label>Filter by Project</label>
-            <select
-              value={filterProject}
-              onChange={(e) => {
-                setFilterProject(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              {uniqueProjects.map((p) => (
-                <option key={p} value={p}>
-                  {p === "all" ? "All Projects" : p}
-                </option>
-              ))}
-            </select>
-          </div>
+  <div
+    className="hrvasspm-filters"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",          // spacing between items
+      flexWrap: "wrap"      // optional: allows wrapping on smaller screens
+    }}
+  >
+    <div className="hrvasspm-filter-group">
+      <input
+        type="search"
+        placeholder="Type to search..."
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1);
+        }}
+      />
+    </div>
 
+    <div className="hrvasspm-filter-group">
+      <select
+        value={filterStatus}
+        onChange={(e) => {
+          setFilterStatus(e.target.value);
+          setCurrentPage(1);
+        }}
+      >
+        <option value="all">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
 
-          <div className="hrvasspm-filter-group">
-            <label style={{ visibility: "hidden" }}>Export</label>
-            
-            <button
-              className="hrvasspm-btn-export"
-              onClick={() => exportToCsv("appraisals.csv", csvData)}
-              style={{ padding: "8px 60px" }}
-            >
-              <i className="bi bi-download"></i> Export CSV
-            </button>
+    <div className="hrvasspm-filter-group">
+      <select
+        value={filterProject}
+        onChange={(e) => {
+          setFilterProject(e.target.value);
+          setCurrentPage(1);
+        }}
+      >
+        {uniqueProjects.map((p) => (
+          <option key={p} value={p}>
+            {p === "all" ? "All Projects" : p}
+          </option>
+        ))}
+      </select>
+    </div>
 
+    <div className="hrvasspm-filter-group" style={{ display: "flex", alignItems: "center" }}>
+  <button
+    className="hrvasspm-btn-export"
+    onClick={() => exportToCsv("appraisals.csv", csvData)}
+  >
+    <i className="bi bi-download"></i> Export CSV
+  </button>
+</div>
 
-          </div>
-        </div>
-
-
+  </div>
         <div className="hrvasspm-table-card">
           <div className="hrvasspm-table-wrapper">
             <table className="hrvasspm-table">

@@ -59,7 +59,7 @@ const ReviewModal = ({
       aria-modal="true"
       aria-label="Review modal"
     >
-      <style>{`
+     <style>{`
         .tl-modal-table th, .tl-modal-table td {
           text-align: left !important;
           vertical-align: middle !important;
@@ -83,7 +83,7 @@ const ReviewModal = ({
           font-weight: 600;
         }
         
-        /* ✅ NEW: Attachments section styles */
+        /* ✅ UPDATED: Attachments section styles */
         .tl-attachments-section {
           margin: 20px 0;
           padding: 16px;
@@ -160,6 +160,7 @@ const ReviewModal = ({
           margin-top: 2px;
         }
         
+        /* ✅ UPDATED: Purple download button */
         .tl-attachment-download {
           padding: 6px 12px;
           background: #26225A;
@@ -178,13 +179,50 @@ const ReviewModal = ({
           background: #1a1740;
         }
         
+        .tl-attachment-download:disabled {
+          background: #6c757d;
+          cursor: not-allowed;
+        }
+        
         .tl-no-attachments {
           text-align: center;
           padding: 20px;
           color: #6c757d;
           font-size: 14px;
         }
+
+        /* ✅ UPDATED: Purple header badge */
+        .tl-header-badge {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: #26225A;
+          padding: 6px 12px;
+          border-radius: 20px;
+          border: 1px solid #1a1740;
+          position: absolute;
+          right: 50px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        .tl-header-badge i {
+          color: white;
+          font-size: 14px;
+        }
+
+        .tl-header-badge span {
+          color: white;
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+        }
+
+        .tl-modal-header {
+          position: relative;
+        }
       `}</style>
+
       <div className="tl-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="tl-modal-header">
@@ -200,6 +238,16 @@ const ReviewModal = ({
               Self Assessment Form
             </div>
           </div>
+
+          {/* ✅ NEW: Attachment Count Badge in Header */}
+          {modalData?.attachments && modalData.attachments.length > 0 && (
+            <div className="tl-header-badge">
+              <i className="bi bi-paperclip"></i>
+              <span>
+                {modalData.attachments.length} {modalData.attachments.length === 1 ? "File" : "Files"}
+              </span>
+            </div>
+          )}
  
           <button
             className="tl-modal-close"
@@ -226,43 +274,6 @@ const ReviewModal = ({
             <span className="tl-value">{modalData?.formName || "-"}</span>
           </div>
         </div>
-
-        {/* ✅ NEW: Attachments Section */}
-        {modalData?.attachments && modalData.attachments.length > 0 && (
-          <div className="tl-attachments-section">
-            <div className="tl-attachments-header">
-              <i className="bi bi-paperclip"></i>
-              <span>Employee Attachments ({modalData.attachments.length})</span>
-            </div>
-            <div className="tl-attachments-list">
-              {modalData.attachments.map((attachment) => (
-                <div key={attachment.attachmentId} className="tl-attachment-item">
-                  <div className="tl-attachment-info">
-                    <i className={`bi ${getFileIcon(attachment.fileType)} tl-attachment-icon`}></i>
-                    <div className="tl-attachment-details">
-                      <div className="tl-attachment-name">{attachment.fileName}</div>
-                      <div className="tl-attachment-meta">
-                        {formatFileSize(attachment.fileSize)}
-                        {attachment.uploadedAt && ` • ${new Date(attachment.uploadedAt).toLocaleDateString()}`}
-                      </div>
-                      {attachment.attachmentNote && (
-                        <div className="tl-attachment-note">Note: {attachment.attachmentNote}</div>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    className="tl-attachment-download"
-                    onClick={() => handleDownloadAttachment(attachment.attachmentId)}
-                    aria-label={`Download ${attachment.fileName}`}
-                  >
-                    <i className="bi bi-download"></i>
-                    Download
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
  
         {/* L2 rejection note shown to L1 when present */}
         {active === "l1" && modalData?.l2Decision === "Rejected" && (
@@ -342,6 +353,43 @@ const ReviewModal = ({
               )}
             </tbody>
           </table>
+
+          {/* ✅ MOVED: Attachments Section - Now below the table */}
+          {modalData?.attachments && modalData.attachments.length > 0 && (
+            <div className="tl-attachments-section">
+              <div className="tl-attachments-header">
+                <i className="bi bi-paperclip"></i>
+                <span>Employee Attachments</span>
+              </div>
+              <div className="tl-attachments-list">
+                {modalData.attachments.map((attachment) => (
+                  <div key={attachment.attachmentId} className="tl-attachment-item">
+                    <div className="tl-attachment-info">
+                      <i className={`bi ${getFileIcon(attachment.fileType)} tl-attachment-icon`}></i>
+                      <div className="tl-attachment-details">
+                        <div className="tl-attachment-name">{attachment.fileName}</div>
+                        <div className="tl-attachment-meta">
+                          {formatFileSize(attachment.fileSize)}
+                          {attachment.uploadedAt && ` • ${new Date(attachment.uploadedAt).toLocaleDateString()}`}
+                        </div>
+                        {attachment.attachmentNote && (
+                          <div className="tl-attachment-note">Note: {attachment.attachmentNote}</div>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      className="tl-attachment-download"
+                      onClick={() => handleDownloadAttachment(attachment.attachmentId)}
+                      aria-label={`Download ${attachment.fileName}`}
+                    >
+                      <i className="bi bi-download"></i>
+                      Download
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
  
         {/* Footer buttons */}

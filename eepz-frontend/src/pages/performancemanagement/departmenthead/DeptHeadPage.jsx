@@ -950,10 +950,7 @@ export default function DeptHeadPage() {
                         background: '#f8f7fc'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                          <i className={`bi ${getFileIcon(attachment.fileType)}`} style={{
-                            fontSize: '1.5rem',
-                            color: '#97247e'
-                          }}></i>
+                         
                           <div style={{ flex: 1 }}>
                             <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>
                               {attachment.fileName}
@@ -963,7 +960,7 @@ export default function DeptHeadPage() {
                             </div>
                             {attachment.attachmentNote && (
                               <div style={{ fontSize: '0.85rem', color: '#9c8dbb', marginTop: '4px' }}>
-                                <i className="bi bi-chat-left-text"></i> {attachment.attachmentNote}
+                                {attachment.attachmentNote}
                               </div>
                             )}
                           </div>
@@ -971,7 +968,7 @@ export default function DeptHeadPage() {
                         <button
                           onClick={() => handleDownloadAttachment(attachment.attachmentId)}
                           style={{
-                            background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+                            background: " #27235c",
                             color: '#fff',
                             border: 'none',
                             borderRadius: '6px',

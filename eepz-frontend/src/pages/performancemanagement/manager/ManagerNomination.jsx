@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import * as managerNominationApi from "../../../services/performancemanagement/manager/managernominationapi";
 import NominationModal from "../../../components/performance_management/modals/ManagerNomination/NominationModal";
 import "../../../styles/performancemanagement/manager/ManagerNomination.css";
- 
-/* Uploaded fallback path (your environment will map this to a URL) */
-const FALLBACK_HOME_ICON = "/mnt/data/72db97da-9426-4032-9c37-de8aaa35465e.png";
- 
+
 /* Helper: safe text fallback for fields returned differently by APIs */
 const safeText = (...vals) => {
   for (const v of vals) {
@@ -17,7 +15,7 @@ const safeText = (...vals) => {
   }
   return "-";
 };
- 
+
 /* Pagination hook */
 const usePagination = (items = [], pageSize = 5) => {
   const [page, setPage] = useState(1);
@@ -31,78 +29,108 @@ const usePagination = (items = [], pageSize = 5) => {
   }, [items, page, pageSize]);
   return { page, setPage, totalPages, paged, pageSize };
 };
- 
-/* Breadcrumbs component using inline SVGs (no external images required) */
+
+/* Breadcrumbs component */
 const Breadcrumbs = ({ items = [] }) => {
   const HomeSvg = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M3 10.5L12 4l9 6.5" stroke="#8f2b6b" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M5 12.5v6a1 1 0 0 0 1 1h3v-5h6v5h3a1 1 0 0 0 1-1v-6" stroke="#8f2b6b" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 10.5L12 4l9 6.5" stroke="#26225A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M5 12.5v6a1 1 0 0 0 1 1h3v-5h6v5h3a1 1 0 0 0 1-1v-6" stroke="#26225A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
- 
-  const Chevron = () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M9 18l6-6-6-6" stroke="#bdb2c8" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
- 
+
   return (
     <nav className="managernomination-breadcrumbs" aria-label="Breadcrumb">
-      <ol className="managernomination-breadcrumb-list">
-        <li className="managernomination-crumb" aria-hidden>
-          {/* inline svg home icon */}
-          <span className="managernomination-home-icon">
+      <ol 
+        className="managernomination-breadcrumb-list" 
+        style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: "4px", 
+          padding: 0, 
+          margin: 0, 
+          listStyle: "none" 
+        }}
+      >
+        {/* Home Icon */}
+        <li className="managernomination-crumb">
+          <Link 
+            to="/manager/dashboard" 
+            style={{ 
+              display: "flex", 
+              alignItems: "center",
+              color: " #97247E",
+              textDecoration: "none"
+            }}
+          >
             <HomeSvg />
-          </span>
-          {/* Fallback: reference to uploaded file (hidden). Keep for build mapping if needed */}
-          <img src={FALLBACK_HOME_ICON} alt="" style={{ display: "none" }} />
+          </Link>
         </li>
- 
+
         {items.map((it, idx) => {
           const isLast = idx === items.length - 1;
           return (
-            <li
-              key={idx}
-              className={`managernomination-crumb ${isLast ? "managernomination-crumb-active" : ""}`}
-            >
-              <span className="managernomination-crumb-sep" aria-hidden>
-                <Chevron />
-              </span>
- 
-              {isLast ? (
-                <span className="managernomination-crumb-text" aria-current="page">
-                  {it.label}
-                </span>
-              ) : (
-                <a className="managernomination-crumb-link" href={it.to || "#"}>
-                  {it.label}
-                </a>
-              )}
-            </li>
+            <React.Fragment key={idx}>
+              {/* Separator - Forward Slash */}
+              <li style={{ 
+                color: "#97247E", 
+                fontSize: "10px",
+                fontWeight: 400,
+                margin: "0 4px"
+              }}>
+                /
+              </li>
+
+              <li className={`managernomination-crumb ${isLast ? "managernomination-crumb-active" : ""}`}>
+                {isLast ? (
+                  <span 
+                    style={{ 
+                      color: "#97247E",
+                      fontWeight: 600,
+                      fontSize: "10px"
+                    }}
+                  >
+                    {it.label}
+                  </span>
+                ) : (
+                  <Link 
+                    to={it.to || "#"} 
+                    style={{ 
+                      color: "#97247E",
+                      textDecoration: "none",
+                      fontSize: "10px",
+                      fontWeight: 500
+                    }}
+                  >
+                    {it.label}
+                  </Link>
+                )}
+              </li>
+            </React.Fragment>
           );
         })}
       </ol>
     </nav>
   );
 };
- 
+
 export default function ManagerNomination() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const empId = user?.empId ?? null;
   const [managerId] = useState(() => empId);
- 
+
   const [rewardTypes, setRewardTypes] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
   const [myNominations, setMyNominations] = useState([]);
   const [showNominationModal, setShowNominationModal] = useState(false);
+  const [showNominationsView, setShowNominationsView] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [activeTab, setActiveTab] = useState("pending"); // pending | approved | rejected
+  const [activeTab, setActiveTab] = useState("pending");
   const [loading, setLoading] = useState(false);
- 
+
   useEffect(() => { fetchRewardTypes(); }, []);
   useEffect(() => { if (managerId) { fetchTeamMembers(); fetchMyNominations(); } }, [managerId]);
- 
+
   const fetchRewardTypes = async () => {
     try {
       const { data } = await managerNominationApi.getRewardTypes();
@@ -112,7 +140,7 @@ export default function ManagerNomination() {
       toast.error("Failed to load reward types");
     }
   };
- 
+
   const fetchTeamMembers = async () => {
     try {
       setLoading(true);
@@ -126,7 +154,7 @@ export default function ManagerNomination() {
       setLoading(false);
     }
   };
- 
+
   const fetchMyNominations = async () => {
     try {
       const { data } = await managerNominationApi.getMyNominations(managerId);
@@ -136,34 +164,31 @@ export default function ManagerNomination() {
       toast.error("Failed to load nominations");
     }
   };
- 
+
   /* Strict partitions by status */
   const pendingNominations = myNominations.filter((n) => n?.status === "Pending");
   const approvedNominations = myNominations.filter((n) => n?.status === "Approved");
   const rejectedNominations = myNominations.filter((n) => n?.status === "Rejected");
- 
+
   /* Pagination hooks */
   const pendingPager = usePagination(pendingNominations, 5);
   const approvedPager = usePagination(approvedNominations, 5);
   const rejectedPager = usePagination(rejectedNominations, 5);
   const availableMembers = teamMembers.filter((m) => !myNominations.some((nom) => nom?.nominee?.employeeId === m?.employeeId));
   const availablePager = usePagination(availableMembers, 5);
- 
-  /* Only show "Nominate" buttons when Pending tab is active */
-  const canNominate = activeTab === "pending";
- 
+
   const handleOpenNominate = (member) => {
     setSelectedEmployee(member);
     setShowNominationModal(true);
   };
- 
+
   const handleNominationSuccess = () => {
     fetchMyNominations();
     fetchTeamMembers();
     setShowNominationModal(false);
     toast.success("Nomination submitted");
   };
- 
+
   /* Simple Pagination UI */
   const Pagination = ({ pager }) => {
     const { page, setPage, totalPages } = pager;
@@ -179,7 +204,7 @@ export default function ManagerNomination() {
         >
           Prev
         </button>
- 
+
         {pages.map((p) => (
           <button
             key={p}
@@ -190,7 +215,7 @@ export default function ManagerNomination() {
             {p}
           </button>
         ))}
- 
+
         <button
           className="managernomination-pg-btn"
           onClick={() => setPage(Math.min(totalPages, page + 1))}
@@ -201,193 +226,340 @@ export default function ManagerNomination() {
       </div>
     );
   };
- 
+
   return (
     <div className="managernomination-container">
       <Toaster position="top-right" richColors />
- 
-      <Breadcrumbs items={[{ label: "Performance", to: "/performance" }, { label: "Performance Review", to: "/performance/review" }]} />
- 
-      <h1 className="managernomination-page-title">My Team Nominations</h1>
- 
-      {/* My Team Nominations Card */}
-      <div className="managernomination-card">
-        <div className="managernomination-tab-container" role="tablist" aria-label="Nomination tabs">
+
+      <Breadcrumbs items={[{ label: "Performance", to: "/manager/dashboard/performance" }, { label: "Nominations" }]} />
+
+      {/* Team Members Card - Now at Top */}
+      <div 
+        className="managernomination-card managernomination-available-section"
+        style={{
+          border: "1px solid #26225A",
+          borderTop: "none",
+          borderRadius: "0 0 8px 8px",
+          boxShadow: "0 8px 24px rgba(38, 34, 90, 0.15)"
+        }}
+      >
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+          background: "linear-gradient(135deg, #26225A 0%, #1a1740 100%)",
+          padding: "16px 20px",
+          margin: "-20px -20px 12px -20px",
+          borderRadius: "8px 8px 0 0"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{
+              background: "rgba(255, 255, 255, 0.15)",
+              borderRadius: "50%",
+              width: "40px",
+              height: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              <i className="bi bi-people-fill" style={{ fontSize: "20px", color: "#fff" }}></i>
+            </div>
+            <h3 style={{ 
+              margin: 0, 
+              color: "#fff", 
+              fontSize: 18, 
+              fontWeight: 700 
+            }}>
+              Team Members
+            </h3>
+          </div>
           <button
-            className={`managernomination-tab ${activeTab === "pending" ? "managernomination-tab-active" : ""}`}
-            onClick={() => setActiveTab("pending")}
-            role="tab"
-            aria-selected={activeTab === "pending"}
+            onClick={() => {
+              setShowNominationsView(!showNominationsView);
+              if (!showNominationsView) {
+                setTimeout(() => {
+                  document.getElementById('nominations-section')?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                  });
+                }, 100);
+              }
+            }}
+            style={{
+              background: "linear-gradient(90deg, #97247e 0%, #e01950 100%)",
+              boxShadow: "0 10px 28px rgba(224, 25, 80, 0.18)",
+              color: "#fff",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: 8,
+              fontWeight: 700,
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = "0 12px 32px rgba(224, 25, 80, 0.28)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = "0 10px 28px rgba(224, 25, 80, 0.18)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
           >
-            Pending ({pendingNominations.length})
-          </button>
- 
-          <button
-            className={`managernomination-tab ${activeTab === "approved" ? "managernomination-tab-active" : ""}`}
-            onClick={() => setActiveTab("approved")}
-            role="tab"
-            aria-selected={activeTab === "approved"}
-          >
-            Approved ({approvedNominations.length})
-          </button>
- 
-          <button
-            className={`managernomination-tab ${activeTab === "rejected" ? "managernomination-tab-active" : ""}`}
-            onClick={() => setActiveTab("rejected")}
-            role="tab"
-            aria-selected={activeTab === "rejected"}
-          >
-            Rejected ({rejectedNominations.length})
+            {showNominationsView ? "Hide Nominations" : "View Nominations"}
           </button>
         </div>
- 
-        {/* Nominations table for selected tab */}
+        
         <div className="managernomination-table-wrapper">
-          <table className="managernomination-table" role="table" aria-label="Nominations table">
+          <table 
+            className="managernomination-table" 
+            role="table" 
+            aria-label="Team members"
+            style={{
+              border: "2px solid #26225A",
+              borderRadius: "8px",
+              overflow: "hidden"
+            }}
+          >
             <thead>
               <tr>
                 <th className="col-index">SNO</th>
                 <th className="col-name">Name</th>
                 <th className="col-dept">Department</th>
-                <th className="col-reward">Reward Type</th>
-                  {/* Status column removed */}
+                <th className="col-action">Action</th>
               </tr>
             </thead>
- 
             <tbody>
-              {activeTab === "pending" &&
-                pendingPager.paged.map((nom, i) => {
-                  const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
-                  const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
-                  let reward = "-";
-                  if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
-                    const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
-                    if (foundType && foundType.rewardName) reward = foundType.rewardName;
-                  }
-                  return (
-                    <tr key={nom?.nominationId || i}>
-                      <td className="col-index">{(pendingPager.page - 1) * pendingPager.pageSize + i + 1}</td>
-                      <td className="col-name">{name}</td>
-                      <td className="col-dept">{dept}</td>
-                      <td className="col-reward">{reward}</td>
-                      {/* Status cell removed */}
-                    </tr>
-                  );
-                })}
- 
-              {activeTab === "approved" &&
-                approvedPager.paged.map((nom, i) => {
-                  const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
-                  const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
-                  let reward = "-";
-                  if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
-                    const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
-                    if (foundType && foundType.rewardName) reward = foundType.rewardName;
-                  }
-                  return (
-                    <tr key={nom?.nominationId || i}>
-                      <td className="col-index">{(approvedPager.page - 1) * approvedPager.pageSize + i + 1}</td>
-                      <td className="col-name">{name}</td>
-                      <td className="col-dept">{dept}</td>
-                      <td className="col-reward">{reward}</td>
-                      {/* Status cell removed */}
-                    </tr>
-                  );
-                })}
- 
-              {activeTab === "rejected" &&
-                rejectedPager.paged.map((nom, i) => {
-                  const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
-                  const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
-                  let reward = "-";
-                  if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
-                    const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
-                    if (foundType && foundType.rewardName) reward = foundType.rewardName;
-                  }
-                  return (
-                    <tr key={nom?.nominationId || i}>
-                      <td className="col-index">{(rejectedPager.page - 1) * rejectedPager.pageSize + i + 1}</td>
-                      <td className="col-name">{name}</td>
-                      <td className="col-dept">{dept}</td>
-                      <td className="col-reward">{reward}</td>
-                      {/* Status cell removed */}
-                    </tr>
-                  );
-                })}
- 
-              {/* Empty fallback */}
-              {((activeTab === "pending" && pendingNominations.length === 0) ||
-                (activeTab === "approved" && approvedNominations.length === 0) ||
-                (activeTab === "rejected" && rejectedNominations.length === 0)) && (
+              {availablePager.paged.map((member, i) => {
+                const name = safeText(`${member?.firstName || ""} ${member?.lastName || ""}`, member?.name);
+                const dept = safeText(member?.department?.departmentName, member?.departmentName, "-");
+                return (
+                  <tr key={member?.employeeId || i}>
+                    <td className="col-index">{(availablePager.page - 1) * availablePager.pageSize + i + 1}</td>
+                    <td className="col-name">{name}</td>
+                    <td className="col-dept">{dept}</td>
+                    <td className="col-action">
+                      <button
+                        className="managernomination-nominate-button"
+                        onClick={() => handleOpenNominate(member)}
+                        title="Nominate this employee"
+                      >
+                        <i className="bi bi-award"></i> Nominate
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {availableMembers.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="managernomination-empty-row">
-                    No {activeTab} nominations found
-                  </td>
+                  <td colSpan={4} className="managernomination-empty-row">No available team members</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
- 
-        {/* Pagination area */}
         <div style={{ marginTop: 12 }}>
-          {activeTab === "pending" && <Pagination pager={pendingPager} />}
-          {activeTab === "approved" && <Pagination pager={approvedPager} />}
-          {activeTab === "rejected" && <Pagination pager={rejectedPager} />}
+          <Pagination pager={availablePager} />
         </div>
       </div>
- 
-      {/* Available for Nomination Card */}
-      {activeTab === "pending" && (
-        <div className="managernomination-card managernomination-available-section">
-          <h3 className="managernomination-subsection-title">Available for Nomination</h3>
-          <div className="managernomination-table-wrapper">
-            <table className="managernomination-table" role="table" aria-label="Available for nomination">
+
+      {/* My Nominations Card - Shows when View Nominations is clicked */}
+      {showNominationsView && (
+        <div 
+          id="nominations-section"
+          className="managernomination-card" 
+          style={{ 
+            marginTop: 20,
+            animation: "slideDown 0.3s ease-out",
+            border: "1px solid #26225A",
+            boxShadow: "0 8px 24px rgba(38, 34, 90, 0.15)"
+          }}
+        >
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16,
+            background: "linear-gradient(135deg, #26225A 0%, #1a1740 100%)",
+            padding: "16px 20px",
+            margin: "-20px -20px 12px -20px",
+            borderRadius: "8px 8px 0 0"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div style={{
+                background: "rgba(255, 255, 255, 0.15)",
+                borderRadius: "50%",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                <i className="bi bi-list-check" style={{ fontSize: "20px", color: "#fff" }}></i>
+              </div>
+              <h3 style={{ 
+                margin: 0, 
+                color: "#fff", 
+                fontSize: 18, 
+                fontWeight: 700 
+              }}>
+                My Nominations
+              </h3>
+            </div>
+            <button
+              onClick={() => setShowNominationsView(false)}
+              style={{
+                background: "rgba(255, 255, 255, 0.2)",
+                color: "#fff",
+                border: "none",
+                padding: "8px 16px",
+                borderRadius: 6,
+                fontWeight: 600,
+                cursor: "pointer",
+                fontSize: 13,
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                transition: "background 0.2s"
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)"}
+            >
+              <i className="bi bi-x-lg"></i> Close
+            </button>
+          </div>
+
+          <div className="managernomination-tab-container" role="tablist" aria-label="Nomination tabs">
+            <button
+              className={`managernomination-tab ${activeTab === "pending" ? "managernomination-tab-active" : ""}`}
+              onClick={() => setActiveTab("pending")}
+              role="tab"
+              aria-selected={activeTab === "pending"}
+            >
+              Pending ({pendingNominations.length})
+            </button>
+
+            <button
+              className={`managernomination-tab ${activeTab === "approved" ? "managernomination-tab-active" : ""}`}
+              onClick={() => setActiveTab("approved")}
+              role="tab"
+              aria-selected={activeTab === "approved"}
+            >
+              Approved ({approvedNominations.length})
+            </button>
+
+            <button
+              className={`managernomination-tab ${activeTab === "rejected" ? "managernomination-tab-active" : ""}`}
+              onClick={() => setActiveTab("rejected")}
+              role="tab"
+              aria-selected={activeTab === "rejected"}
+            >
+              Rejected ({rejectedNominations.length})
+            </button>
+          </div>
+
+          {/* Nominations table for selected tab */}
+          <div className="managernomination-table-wrapper" style={{ marginTop: 12 }}>
+            <table 
+              className="managernomination-table" 
+              role="table" 
+              aria-label="Nominations table"
+              style={{
+                border: "2px solid #26225A",
+                borderRadius: "8px",
+                overflow: "hidden"
+              }}
+            >
               <thead>
                 <tr>
                   <th className="col-index">SNO</th>
                   <th className="col-name">Name</th>
                   <th className="col-dept">Department</th>
-                  <th className="col-action">Action</th>
+                  <th className="col-reward">Reward Type</th>
                 </tr>
               </thead>
+
               <tbody>
-                {availablePager.paged.map((member, i) => {
-                  const name = safeText(`${member?.firstName || ""} ${member?.lastName || ""}`, member?.name);
-                  const dept = safeText(member?.department?.departmentName, member?.departmentName, "-");
-                  return (
-                    <tr key={member?.employeeId || i}>
-                      <td className="col-index">{(availablePager.page - 1) * availablePager.pageSize + i + 1}</td>
-                      <td className="col-name">{name}</td>
-                      <td className="col-dept">{dept}</td>
-                      <td className="col-action">
-                        <button
-                          className="managernomination-nominate-button"
-                          onClick={() => handleOpenNominate(member)}
-                          disabled={!canNominate}
-                          title={canNominate ? "Nominate this employee" : "Switch to Pending tab to nominate"}
-                          aria-disabled={!canNominate}
-                        >
-                          Nominate
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {availableMembers.length === 0 && (
+                {activeTab === "pending" &&
+                  pendingPager.paged.map((nom, i) => {
+                    const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
+                    const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
+                    let reward = "-";
+                    if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
+                      const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
+                      if (foundType && foundType.rewardName) reward = foundType.rewardName;
+                    }
+                    return (
+                      <tr key={nom?.nominationId || i}>
+                        <td className="col-index">{(pendingPager.page - 1) * pendingPager.pageSize + i + 1}</td>
+                        <td className="col-name">{name}</td>
+                        <td className="col-dept">{dept}</td>
+                        <td className="col-reward">{reward}</td>
+                      </tr>
+                    );
+                  })}
+
+                {activeTab === "approved" &&
+                  approvedPager.paged.map((nom, i) => {
+                    const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
+                    const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
+                    let reward = "-";
+                    if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
+                      const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
+                      if (foundType && foundType.rewardName) reward = foundType.rewardName;
+                    }
+                    return (
+                      <tr key={nom?.nominationId || i}>
+                        <td className="col-index">{(approvedPager.page - 1) * approvedPager.pageSize + i + 1}</td>
+                        <td className="col-name">{name}</td>
+                        <td className="col-dept">{dept}</td>
+                        <td className="col-reward">{reward}</td>
+                      </tr>
+                    );
+                  })}
+
+                {activeTab === "rejected" &&
+                  rejectedPager.paged.map((nom, i) => {
+                    const name = safeText(`${nom?.nominee?.firstName || ""} ${nom?.nominee?.lastName || ""}`, nom?.nominee?.name);
+                    const dept = safeText(nom?.nominee?.department?.departmentName, nom?.nominee?.departmentName, "-");
+                    let reward = "-";
+                    if (nom?.rewardTypeId && Array.isArray(rewardTypes)) {
+                      const foundType = rewardTypes.find(rt => rt.rewardTypeId === nom.rewardTypeId);
+                      if (foundType && foundType.rewardName) reward = foundType.rewardName;
+                    }
+                    return (
+                      <tr key={nom?.nominationId || i}>
+                        <td className="col-index">{(rejectedPager.page - 1) * rejectedPager.pageSize + i + 1}</td>
+                        <td className="col-name">{name}</td>
+                        <td className="col-dept">{dept}</td>
+                        <td className="col-reward">{reward}</td>
+                      </tr>
+                    );
+                  })}
+
+                {/* Empty fallback */}
+                {((activeTab === "pending" && pendingNominations.length === 0) ||
+                  (activeTab === "approved" && approvedNominations.length === 0) ||
+                  (activeTab === "rejected" && rejectedNominations.length === 0)) && (
                   <tr>
-                    <td colSpan={4} className="managernomination-empty-row">No available team members</td>
+                    <td colSpan={4} className="managernomination-empty-row">
+                      No {activeTab} nominations found
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          {/* Pagination area */}
           <div style={{ marginTop: 12 }}>
-            <Pagination pager={availablePager} />
+            {activeTab === "pending" && <Pagination pager={pendingPager} />}
+            {activeTab === "approved" && <Pagination pager={approvedPager} />}
+            {activeTab === "rejected" && <Pagination pager={rejectedPager} />}
           </div>
         </div>
       )}
- 
+
       {/* Nomination modal */}
       <NominationModal
         show={showNominationModal}
@@ -397,9 +569,28 @@ export default function ManagerNomination() {
         rewardTypes={rewardTypes}
         managerId={managerId}
       />
+
+      <style jsx>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .managernomination-table {
+          border-collapse: collapse;
+        }
+        
+        .managernomination-table thead th {
+          background: #26225A;
+          color: white;
+        }
+      `}</style>
     </div>
   );
 }
- 
- 
- 
