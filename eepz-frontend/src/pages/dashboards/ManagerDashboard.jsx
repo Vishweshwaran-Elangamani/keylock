@@ -28,7 +28,7 @@ import nominationService from "../../services/internal/nominationService";
 import lndService from "../../services/lnd/lndService";
 import {
   getTeamMembers,
-} from "../../services/performancemanagement/manager/managerNominationApi";
+} from "../../services/performancemanagement/manager/managernominationapi";
 import meetingService from "../../services/meeting/meetingService";
 import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/common/Breadcrumb";

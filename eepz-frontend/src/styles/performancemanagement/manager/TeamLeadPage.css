@@ -35,28 +35,6 @@ body { font-family: 'Segoe UI', 'Roboto', sans-serif; color: var(--text); backgr
 }
 .hrfcper-top-bar.compact { margin-bottom: 10px; }
  
-.hrfcper-breadcrumb-nav { flex: 1; }
-.hrfcper-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  list-style: none;
-  font-size: 13px;
-  color: var(--secondary);
-  margin: 0;
-  padding: 0;
-}
-.hrfcper-breadcrumb.compact li { display: inline-flex; align-items: center; gap: 8px; }
-.hrfcper-breadcrumb-item a, .hrfcper-breadcrumb-item { color: #97247e; text-decoration: none; font-weight: 600; }
-.hrfcper-breadcrumb-item:not(:last-child)::after {
-  content: '>';
-  color: #9b7aa1;
-  margin-left: 4px;
-  margin-right: 4px;
-  font-weight: 700;
-}
-.hrfcper-breadcrumb-item.active { font-weight: 700; color: #97247e; }
- 
 
 .tl-toggle {
   display: inline-flex;

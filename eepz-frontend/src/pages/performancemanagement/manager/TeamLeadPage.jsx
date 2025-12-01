@@ -618,19 +618,58 @@ function TeamLeadPage() {
       <Toaster position="top-right" richColors />
 
       <div className="hrfcper-top-bar compact">
-        <nav className="hrfcper-breadcrumb-nav">
-          <ul className="hrfcper-breadcrumb compact">
-            <li className="hrfcper-breadcrumb-item">
-              <Link to="/employee/dashboard" aria-label="Home">
-                <i className="bi bi-house-fill" />{" "}
-              </Link>
-            </li>
-            <li className="hrfcper-breadcrumb-item">
-              <Link to="/employee/dashboard/performance">Performance</Link>
-            </li>
-            <li className="hrfcper-breadcrumb-item active">Performance Review</li>
-          </ul>
-        </nav>
+
+
+<nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
+  <ol
+    className="hrfcper-breadcrumb compact"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "4px",
+      listStyle: "none",
+      padding: 0,
+      margin: 0,
+      fontSize: "13px",
+      color: "#9B287B",
+    }}
+  >
+    <li
+      className="hrfcper-breadcrumb-item"
+      style={{ display: "flex", alignItems: "center", gap: "4px" }}
+    >
+      <Link
+        to="/employee/dashboard"
+        aria-label="Home"
+        style={{ color: "#9B287B", textDecoration: "none", display: "flex", alignItems: "center" }}
+      >
+        {/* unified home icon */}
+        <i className="bi bi-house-door" />
+      </Link>
+    </li>
+
+    <span style={{ color: "#9B287B" }}>/</span>
+
+    <li className="hrfcper-breadcrumb-item">
+      <Link
+        to="/employee/dashboard/performance"
+        style={{ color: "#9B287B", textDecoration: "none" }}
+      >
+        Performance
+      </Link>
+    </li>
+
+    <span style={{ color: "#9B287B" }}>/</span>
+
+    <li
+      className="hrfcper-breadcrumb-item active"
+      style={{ fontWeight: 600, color: "#9B287B" }}
+    >
+      Performance Review
+    </li>
+  </ol>
+</nav>
+
 
         <div className="tl-toggle compact">
           <button

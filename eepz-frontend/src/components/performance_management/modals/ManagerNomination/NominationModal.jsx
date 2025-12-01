@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import * as managerNominationApi from "../../../../services/performancemanagement/manager/managernominationapi";
-
+import * as managerNominationApi from "../../../../services/performancemanagement/manager/managernominationapi"
 const NominationModal = ({
   show,
   onHide,

@@ -28,15 +28,13 @@ const ReviewModal = ({
     }));
   };
 
-
   const formatFileSize = (bytes) => {
     if (!bytes) return "0 Bytes";
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
-
 
   const getFileIcon = (fileType) => {
     if (!fileType) return "bi-file-earmark";
@@ -81,85 +79,139 @@ const ReviewModal = ({
         .tl-comp {
           font-weight: 600;
         }
-        
-        /*  UPDATED: Attachments section styles */
+
+        /* Header – aligned with page style */
+        .tl-modal {
+          max-width: 960px;
+        }
+      .tl-modal-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px 14px 32px;
+  background: #ffffff;
+  border-bottom: 2px solid  #27235c;
+}
+
+.tl-modal-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0; /* was: margin: 0 24px 10px 24px; */
+}
+
+        .tl-modal-header-left {
+          position: absolute;
+          left: 32px;
+          display: flex;
+          align-items: center;
+        }
+        .tl-modal-logo {
+          height: 34px;
+          width: auto;
+        }
+        .tl-modal-header-center {
+          text-align: center;
+        }
+        .tl-modal-title {
+          font-size: 18px;
+          font-weight: 700;
+          color: #26225A;
+          line-height: 1.2;
+        }
+        .tl-modal-subtitle {
+          font-size: 12px;
+          font-weight: 500;
+          color: #6c757d;
+          margin-top: 2px;
+        }
+        .tl-modal-close {
+          position: absolute;
+          right: 24px;
+          top: 50%;
+          transform: translateY(-50%);
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          color: #6c757d;
+          font-size: 14px;
+          padding: 4px;
+        }
+        .tl-modal-close:hover {
+          color: #26225A;
+        }
+        .tl-modal-divider {
+          height: 1px;
+          background: #e5e7eb;
+          margin: 0 24px 10px 24px;
+        }
+
+        /* Attachments section */
         .tl-attachments-section {
-          margin: 20px 0;
-          padding: 16px;
+          margin: 20px 0 10px 0;
+          padding: 14px 16px;
           background: #f8f9fa;
           border-radius: 8px;
           border: 1px solid #dee2e6;
         }
-        
         .tl-attachments-header {
           display: flex;
           align-items: center;
           gap: 8px;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
           font-weight: 600;
-          font-size: 14px;
+          font-size: 13px;
           color: #26225A;
         }
-        
         .tl-attachments-list {
           display: flex;
           flex-direction: column;
           gap: 8px;
         }
-        
         .tl-attachment-item {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 10px 12px;
+          padding: 8px 10px;
           background: white;
           border: 1px solid #dee2e6;
           border-radius: 6px;
           transition: all 0.2s;
         }
-        
         .tl-attachment-item:hover {
           border-color: #26225A;
           box-shadow: 0 2px 4px rgba(38, 34, 90, 0.1);
         }
-        
         .tl-attachment-info {
           display: flex;
           align-items: center;
           gap: 10px;
           flex: 1;
         }
-        
         .tl-attachment-icon {
-          font-size: 24px;
+          font-size: 20px;
           color: #26225A;
         }
-        
         .tl-attachment-details {
           display: flex;
           flex-direction: column;
           gap: 2px;
         }
-        
         .tl-attachment-name {
           font-weight: 500;
-          font-size: 14px;
+          font-size: 13px;
           color: #212529;
         }
-        
         .tl-attachment-meta {
-          font-size: 12px;
+          font-size: 11px;
           color: #6c757d;
         }
-        
         .tl-attachment-note {
-          font-size: 12px;
+          font-size: 11px;
           color: #495057;
           font-style: italic;
           margin-top: 2px;
         }
-        
-        /*  UPDATED: Purple download button */
         .tl-attachment-download {
           padding: 6px 12px;
           background: #26225A;
@@ -167,85 +219,58 @@ const ReviewModal = ({
           border: none;
           border-radius: 4px;
           cursor: pointer;
-          font-size: 13px;
+          font-size: 12px;
           display: flex;
           align-items: center;
           gap: 6px;
           transition: background 0.2s;
         }
-        
         .tl-attachment-download:hover {
           background: #1a1740;
         }
-        
-        .tl-attachment-download:disabled {
-          background: #6c757d;
-          cursor: not-allowed;
-        }
-        
+
         .tl-no-attachments {
           text-align: center;
-          padding: 20px;
+          padding: 18px;
           color: #6c757d;
-          font-size: 14px;
-        }
-
-        /*  UPDATED: Purple header badge */
-        .tl-header-badge {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: #26225A;
-          padding: 6px 12px;
-          border-radius: 20px;
-          border: 1px solid #1a1740;
-          position: absolute;
-          right: 50px;
-          top: 50%;
-          transform: translateY(-50%);
-        }
-
-        .tl-header-badge i {
-          color: white;
-          font-size: 14px;
-        }
-
-        .tl-header-badge span {
-          color: white;
           font-size: 13px;
-          font-weight: 700;
-          letter-spacing: 0.02em;
         }
+          .tl-rating-select {
+  width: 120px;
+  padding: 6px 32px 6px 10px;
+  border-radius: 6px;
+  border: 1.8px solid #26225A;
+  font-size: 14px;
+  color: #111827;
+  background-color: #ffffff;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2326225A' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 14px 14px;
+}
 
-        .tl-modal-header {
-          position: relative;
-        }
+.tl-rating-select:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 2px rgba(38, 34, 90, 0.18);
+}
+
       `}</style>
 
       <div className="tl-modal" onClick={(e) => e.stopPropagation()}>
-
+        {/* HEADER */}
         <div className="tl-modal-header">
           <div className="tl-modal-header-left">
             <img src={logoImage} alt="EEPZ Logo" className="tl-modal-logo" />
           </div>
 
           <div className="tl-modal-header-center" aria-hidden>
-            <div className="tl-modal-title" style={{ fontWeight: "bold" }}>
-              {modalData?.formName || "Assessment Form"}
+            <div className="tl-modal-title">
+              {modalData?.formName || "Appraisal Form For Employee"}
             </div>
-            <div className="tl-modal-subtitle" style={{ fontWeight: "bold" }}>
-              Self Assessment Form
-            </div>
+            <div className="tl-modal-subtitle">Self Assessment Form</div>
           </div>
-
-          {modalData?.attachments && modalData.attachments.length > 0 && (
-            <div className="tl-header-badge">
-              <i className="bi bi-paperclip"></i>
-              <span>
-                {modalData.attachments.length} {modalData.attachments.length === 1 ? "File" : "Files"}
-              </span>
-            </div>
-          )}
 
           <button
             className="tl-modal-close"
@@ -260,6 +285,7 @@ const ReviewModal = ({
 
         <div className="tl-modal-divider" />
 
+        {/* INFO STRIP */}
         <div className="tl-modal-info">
           <div className="tl-info-item">
             <span className="tl-label">Employee</span>
@@ -282,10 +308,10 @@ const ReviewModal = ({
           </div>
         )}
 
-
+        {/* BODY */}
         <div className="tl-modal-body">
           <table className="tl-modal-table" role="table" aria-label="Competencies table">
-            <thead style={{ backgroundColor: "#26225A", color: "white" }}>
+            <thead>
               <tr>
                 <th>COMPETENCY NAME</th>
                 {active === "l2" && <th>EMP RATING</th>}
@@ -315,17 +341,21 @@ const ReviewModal = ({
                   {active === "l1" && <td>{item.employeeComments || "-"}</td>}
 
                   <td className="tl-center">
-                    <input
-                      type="number"
-                      min="1"
-                      max="5"
-                      value={modalRatings[item.detailId]?.rating ?? ""}
-                      onChange={(e) => handleInputChange(item.detailId, "rating", e.target.value)}
-                      className="tl-input-num"
-                      placeholder="-"
-                      aria-label={`Rating for ${item.competencyName}`}
-                    />
-                  </td>
+  <select
+    className="tl-rating-select"
+    value={modalRatings[item.detailId]?.rating ?? ""}
+    onChange={(e) => handleInputChange(item.detailId, "rating", e.target.value)}
+    aria-label={`Rating for ${item.competencyName}`}
+  >
+    <option value="">-</option>
+    <option value="1">1 - Poor</option>
+    <option value="2">2 - Fair</option>
+    <option value="3">3 - Good</option>
+    <option value="4">4 - Very Good</option>
+    <option value="5">5 - Excellent</option>
+  </select>
+</td>
+
 
                   <td>
                     <textarea
@@ -354,7 +384,7 @@ const ReviewModal = ({
             <div className="tl-attachments-section">
               <div className="tl-attachments-header">
                 <i className="bi bi-paperclip"></i>
-                <span>Employee Attachments</span>
+                <span>Attachments</span>
               </div>
               <div className="tl-attachments-list">
                 {modalData.attachments.map((attachment) => (
@@ -365,7 +395,8 @@ const ReviewModal = ({
                         <div className="tl-attachment-name">{attachment.fileName}</div>
                         <div className="tl-attachment-meta">
                           {formatFileSize(attachment.fileSize)}
-                          {attachment.uploadedAt && ` • ${new Date(attachment.uploadedAt).toLocaleDateString()}`}
+                          {attachment.uploadedAt &&
+                            ` • ${new Date(attachment.uploadedAt).toLocaleDateString()}`}
                         </div>
                         {attachment.attachmentNote && (
                           <div className="tl-attachment-note">Note: {attachment.attachmentNote}</div>
@@ -387,6 +418,7 @@ const ReviewModal = ({
           )}
         </div>
 
+        {/* FOOTER */}
         <div className="tl-modal-footer">
           {active === "l1" && (
             <>
@@ -407,7 +439,8 @@ const ReviewModal = ({
                 disabled={submitting}
                 aria-label="Submit review"
               >
-                <i className="bi bi-check-circle" /> {submitting ? "Submitting..." : "Submit Assessment"}
+                <i className="bi bi-check-circle" />{" "}
+                {submitting ? "Submitting..." : "Submit Assessment"}
               </button>
             </>
           )}
@@ -420,7 +453,8 @@ const ReviewModal = ({
                 disabled={l2ActionLoading}
                 aria-label="Submit and approve"
               >
-                <i className="bi bi-check-lg" /> {l2ActionLoading ? "Processing..." : "Submit & Approve"}
+                <i className="bi bi-check-lg" />{" "}
+                {l2ActionLoading ? "Processing..." : "Submit & Approve"}
               </button>
 
               <button

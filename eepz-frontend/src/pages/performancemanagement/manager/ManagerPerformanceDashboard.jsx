@@ -265,7 +265,7 @@ export default function ManagerDashboard() {
                       e.currentTarget.style.transform = "translateY(0)";
                     }}
                   >
-                    <i className="bi bi-send-fill"></i>
+                    
                     Submit
                   </button>
                 ) : (
