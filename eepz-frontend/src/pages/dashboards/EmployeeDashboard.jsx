@@ -54,7 +54,6 @@ const EmployeeDashboard = () => {
 
   useEffect(() => {
     fetchAllData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getUserData = () => {
@@ -151,13 +150,34 @@ const EmployeeDashboard = () => {
       ];
 
       const allApprovedProfiles = extractData(approvedProfilesRes);
+      console.log("Approved profiles:", allApprovedProfiles);
+      console.log("Current empId:", empId);
+
       const myRecognitions = allApprovedProfiles.filter((p) => {
         const nomineeId =
-          p.employeeId || p.employeeMasterId || p.nomineeEmployeeId;
+          p.nominee?.employeeId ||
+          p.employeeId ||
+          p.employeeMasterId ||
+          p.nomineeEmployeeId;
+
+        console.log(
+          "Checking profile:",
+          p,
+          "nomineeId:",
+          nomineeId,
+          "empId:",
+          empId,
+          "match:",
+          nomineeId === empId
+        );
         return nomineeId === empId;
       });
 
+      console.log("My recognitions after filter:", myRecognitions);
+
+      console.log("Statistics response:", statsRes);
       const stats = statsRes?.data || statsRes?.data?.data || null;
+      console.log("Parsed stats:", stats);
 
       setDashboardData({
         goals: allGoals,
@@ -219,21 +239,39 @@ const EmployeeDashboard = () => {
     const byRewardType = {};
     myRecognitions.forEach((r) => {
       const type =
+        r.opportunity?.rewardType ||
         r.rewardTypeName ||
         r.rewardType ||
         (r.rewardTypeId ? `Type ${r.rewardTypeId}` : "Other");
       byRewardType[type] = (byRewardType[type] || 0) + 1;
     });
 
+    const REWARD_COLORS = [
+      "#2c2c54",
+      "#0F62FE",
+      "#10b981",
+      "#f59e0b",
+      "#E01950",
+      "#8b5cf6",
+    ];
+
     const chartData = Object.entries(byRewardType).map(
-      ([name, value]) => ({
+      ([name, value], index) => ({
         name,
         value,
+        fill: REWARD_COLORS[index % REWARD_COLORS.length],
       })
     );
 
     const orgTotalNoms =
-      stats?.totalNominations || stats?.total || stats?.count || 0;
+      stats?.data?.totalNominations ||
+      stats?.data?.total ||
+      stats?.data?.count ||
+      stats?.data?.approvedNominations ||
+      stats?.totalNominations ||
+      stats?.total ||
+      stats?.count ||
+      0;
 
     return {
       totalRecognitions,
@@ -304,7 +342,6 @@ const EmployeeDashboard = () => {
     };
   };
 
-  // L&D overview based on skills (lndSkills)
   const getLndOverview = () => {
     const skills = dashboardData.lndSkills || [];
 
@@ -337,9 +374,12 @@ const EmployeeDashboard = () => {
     });
 
     const chartData = [];
-    if (low > 0) chartData.push({ name: "Level 1–4", value: low, fill: "#f97316" });
-    if (medium > 0) chartData.push({ name: "Level 5–7", value: medium, fill: "#0F62FE" });
-    if (high > 0) chartData.push({ name: "Level 8–10", value: high, fill: "#10b981" });
+    if (low > 0)
+      chartData.push({ name: "Level 1-4", value: low, fill: "#f97316" });
+    if (medium > 0)
+      chartData.push({ name: "Level 5-7", value: medium, fill: "#0F62FE" });
+    if (high > 0)
+      chartData.push({ name: "Level 8-10", value: high, fill: "#10b981" });
 
     return {
       total: skills.length,
@@ -365,9 +405,7 @@ const EmployeeDashboard = () => {
 
     const monthlyData = {};
     meetings.forEach((m) => {
-      const date = new Date(
-        m.meetingDate || m.date || m.createdDate
-      );
+      const date = new Date(m.meetingDate || m.date || m.createdDate);
       if (isNaN(date.getTime())) return;
       const key = `${date.getFullYear()}-${String(
         date.getMonth() + 1
@@ -478,7 +516,7 @@ const EmployeeDashboard = () => {
       <div className="admin-kpi-grid">
         <div
           className="admin-kpi-card"
-          onClick={() => navigate("")}
+          onClick={() => navigate("/employee/dashboard/performance")}
         >
           <div className="admin-kpi-icon admin-purple">
             <i className="bi bi-trophy"></i>
@@ -496,7 +534,7 @@ const EmployeeDashboard = () => {
 
         <div
           className="admin-kpi-card"
-          onClick={() => navigate("")}
+          onClick={() => navigate("/employee/dashboard/goals")}
         >
           <div className="admin-kpi-icon admin-blue">
             <Target size={28} />
@@ -514,7 +552,7 @@ const EmployeeDashboard = () => {
 
         <div
           className="admin-kpi-card"
-          onClick={() => navigate("")}
+          onClick={() => navigate("/employee/lnd/dashboard")}
         >
           <div className="admin-kpi-icon admin-pink">
             <BookOpen size={28} />
@@ -524,15 +562,13 @@ const EmployeeDashboard = () => {
               <CountUp end={dashboardData.lndSkills.length} duration={2} />
             </h2>
             <p>My Skills</p>
-            <span className="admin-kpi-subtitle">
-              From L&D module
-            </span>
+            <span className="admin-kpi-subtitle">From L&D module</span>
           </div>
         </div>
 
         <div
           className="admin-kpi-card"
-          onClick={() => navigate("")}
+          onClick={() => navigate("/employee/dashboard/meetmom")}
         >
           <div className="admin-kpi-icon admin-green">
             <Calendar size={28} />
@@ -550,7 +586,7 @@ const EmployeeDashboard = () => {
 
         <div
           className="admin-kpi-card"
-          onClick={() => navigate("")}
+          onClick={() => navigate("/employee/dashboard/sla")}
         >
           <div className="admin-kpi-icon admin-cyan">
             <AlertTriangle size={28} />
@@ -663,7 +699,7 @@ const EmployeeDashboard = () => {
                           {perfOverview.chartData.map((entry, index) => (
                             <Cell
                               key={`cell-${index}`}
-                              fill={CHART_COLORS[index % CHART_COLORS.length]}
+                              fill={entry.fill}
                             />
                           ))}
                         </Pie>
@@ -1038,7 +1074,7 @@ const EmployeeDashboard = () => {
                             color: "#c2410c",
                           }}
                         >
-                          Level 1–4
+                          Level 1-4
                         </div>
                       </div>
                       <div
@@ -1065,7 +1101,7 @@ const EmployeeDashboard = () => {
                             color: "#1d4ed8",
                           }}
                         >
-                          Level 5–7
+                          Level 5-7
                         </div>
                       </div>
                       <div
@@ -1092,7 +1128,7 @@ const EmployeeDashboard = () => {
                             color: "#047857",
                           }}
                         >
-                          Level 8–10
+                          Level 8-10
                         </div>
                       </div>
                     </div>
@@ -1247,7 +1283,7 @@ const EmployeeDashboard = () => {
                         {slaData.chartData.map((entry, index) => (
                           <Cell
                             key={`cell-${index}`}
-                            fill={CHART_COLORS[index % CHART_COLORS.length]}
+                            fill={entry.fill}
                           />
                         ))}
                       </Pie>

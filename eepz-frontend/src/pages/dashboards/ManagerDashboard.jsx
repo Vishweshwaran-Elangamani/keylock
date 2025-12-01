@@ -37,7 +37,6 @@ import "../../styles/auth/AdminDashboard.css";
 
 const formatStatusLabel = (raw) => {
   if (!raw) return "";
-  // Normalize string like "IN_PROGRESS" or "in_progress"
   const lower = String(raw).toLowerCase().replace(/_/g, " ");
   return lower.replace(/\b\w/g, (c) => c.toUpperCase());
 };
@@ -357,19 +356,21 @@ const ManagerDashboard = () => {
 
   const getTeamAssignmentStatus = () => {
     const CHART_COLORS_LOCAL = [
-      "#2c2c54",
-      "#0F62FE",
       "#10b981",
       "#f59e0b",
-      "#E01950",
+      "#0F62FE",
+      "#ef4444",
       "#8b5cf6",
+      "#2c2c54",
     ];
+    
     const statusCount = {};
     dashboardData.teamAssignments.forEach((assignment) => {
       const rawStatus = assignment.assignmentStatus || assignment.status || "Unknown";
       const key = formatStatusLabel(rawStatus);
       statusCount[key] = (statusCount[key] || 0) + 1;
     });
+    
     return Object.entries(statusCount)
       .map(([name, value], index) => ({
         name,
@@ -381,6 +382,13 @@ const ManagerDashboard = () => {
 
   const getEscalationHistory = () => {
     const escalations = dashboardData.managerEscalations;
+    
+    const ESCALATION_COLORS = {
+      "Pending": "#f59e0b",
+      "Resolved": "#10b981",
+      "Rejected": "#ef4444",
+      "In Progress": "#0F62FE",
+    };
 
     const statusCount = {};
     escalations.forEach((esc) => {
@@ -392,6 +400,7 @@ const ManagerDashboard = () => {
     const chartData = Object.entries(statusCount).map(([name, value]) => ({
       name,
       value,
+      fill: ESCALATION_COLORS[name] || "#6b7280",
     }));
 
     return {
@@ -1183,7 +1192,7 @@ const ManagerDashboard = () => {
                       {escalationHistory.chartData.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
-                          fill={CHART_COLORS[index % CHART_COLORS.length]}
+                          fill={entry.fill}
                         />
                       ))}
                     </Pie>
