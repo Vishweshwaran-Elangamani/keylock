@@ -22,11 +22,11 @@ import HRDashboard from "./pages/dashboards/HRDashboard";
 import HROperations from "./pages/hr_operations/hr/HROperations";
 import HRHome from "./pages/performancemanagement/hr/HRHome";
 import FormCreate from "./pages/performancemanagement/hr/FormCreate";
-import FormProgressTrackerPage from "./pages/performancemanagement/hr/Formprogresstracker";
+import FormProgressTrackerPage from "./pages/performancemanagement/hr/FormProgressTracker";
 import FormsList from "./pages/performancemanagement/hr/FormsList";
 import HRNominations from "./pages/performancemanagement/hr/HRNomination";
-import HRAssessmentView from "./pages/performancemanagement/hr/HRViewAssessment";
-import RewardConfiguration from "./pages/performancemanagement/hr/Rewardconfiguration";
+import HRViewAppraisals from "./pages/performancemanagement/hr/HRViewAssessment";
+import RewardConfiguration from "./pages/performancemanagement/hr/RewardConfiguration";
 import ProjectManagementDashboard from "./pages/project_management/ProjectManagementDashboard";
 import CreateProject from "./pages/project_management/CreateProject";
 import ProjectDetails from "./pages/project_management/ProjectDetails";
@@ -49,7 +49,7 @@ import DeptHeadPage from "./pages/performancemanagement/departmenthead/DeptHeadP
 import DeptHeadSLADashboard from "./pages/sla/DeptHeadSLADashboard";
 import SLACompliance from "./pages/sla/SLACompliance";
 import DepartmentHeadBudgetView from "./pages/hr_operations/hr/compliance/DepartmentHeadBudgetView";
-import TopPerformers from "./pages/performancemanagement/departmenthead/deptheadtopperformer";
+import TopPerformers from "./pages/performancemanagement/departmenthead/DeptHeadTopPerformer";
 import ManagerDashboard from "./pages/dashboards/ManagerDashboard";
 import PerformanceManagerHome from "./pages/performancemanagement/manager/PerformanceManagerHome";
 import Nominations from "./pages/performancemanagement/employee/Nominations";
@@ -59,7 +59,7 @@ import ManagerPerformanceDashboard from "./pages/performancemanagement/manager/M
 import ManagerSLADashboard from "./pages/sla/ManagerSLADashboard";
 import EmployeeDashboard from "./pages/dashboards/EmployeeDashboard";
 import EmployeeSLADashboard from "./pages/sla/EmployeeSLADashboard";
-import UserAssignments from "./pages/performancemanagement/employee/MyAssessments";
+import MyAssessments from "./pages/performancemanagement/employee/MyAssessments";
 import EmployeePolicyView from "./pages/hr_operations/employee/EmployeePolicyView";
 import SubmitMentorFeedback from "./pages/feedback_management/feedback/SubmitMentorFeedback";
 //LnD
@@ -93,7 +93,7 @@ import ManagerReviewsList from "./pages/feedback_management/manager/ManagerRevie
 import ManagerEmployeeList from "./pages/feedback_management/manager/ManagerEmployeeList";
 import ManagerTeamSubmissions from "./pages/feedback_management/manager/ManagerTeamSubmissions";
 import AllManagerReviews from "./pages/feedback_management/head/AllManagerReviews";
-import EmployeeHome from "./pages/performancemanagement/employee/employeehome";
+import EmployeeHome from "./pages/performancemanagement/employee/EmployeeHome";
 import EmployeeAcknowledgment from "./pages/performancemanagement/employee/EmployeeAcknowledge";
 import ManagerAcknowledgment from "./pages/performancemanagement/manager/ManagerAcknowledgment";
 import MentorFeedbackDashboard from "./pages/feedback_management/feedback/MentorFeedbackDashboard";
@@ -290,7 +290,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["HR"]}>
             <DashboardLayout role="HR">
-              <HRAssessmentView />
+              <HRViewAppraisals />
             </DashboardLayout>
           </ProtectedRoute>
         }
@@ -704,7 +704,7 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute allowedRoles={["Employee"]}>
             <DashboardLayout role="Employee">
-              <UserAssignments />
+              <MyAssessments />
             </DashboardLayout>
           </ProtectedRoute>
         }
