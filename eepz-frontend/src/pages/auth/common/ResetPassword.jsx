@@ -151,7 +151,7 @@ const ResetPassword = () => {
                     showEmailError ? "is-invalid" : ""
                   } ${emailTouched && isEmailValid ? "is-valid" : ""}`}
                   id="email"
-                  placeholder="yourname@gmail.com"
+                  placeholder="youremail@gmail.com"
                   value={email}
                   onChange={handleEmailChange}
                   onBlur={handleEmailBlur}

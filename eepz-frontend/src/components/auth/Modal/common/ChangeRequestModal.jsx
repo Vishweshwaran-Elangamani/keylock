@@ -595,7 +595,7 @@ const ChangeRequestModal = ({
                 <input
                   type="email"
                   required
-                  placeholder="Enter new Gmail address (e.g., yourname@gmail.com)"
+                  placeholder="Enter new Gmail address (e.g., youremail@gmail.com)"
                   value={formData.newEmail}
                   onChange={(e) =>
                     setFormData({ ...formData, newEmail: e.target.value })

@@ -219,7 +219,7 @@ const UserList = () => {
             <i className="bi bi-people-fill"></i>
           </div>
           <div className="stat-content">
-            <h3 className="stat-value">{getNonAdminUsers().length}</h3>
+            <h3 className="stat-value-ul">{getNonAdminUsers().length}</h3>
             <p className="stat-label">Total Users</p>
           </div>
         </div>
@@ -228,7 +228,7 @@ const UserList = () => {
             <i className="bi bi-person-check-fill"></i>
           </div>
           <div className="stat-content">
-            <h3 className="stat-value">
+            <h3 className="stat-value-ul">
               {getNonAdminUsers().filter((u) => u.isActive).length}
             </h3>
             <p className="stat-label">Active Users</p>
@@ -239,7 +239,7 @@ const UserList = () => {
             <i className="bi bi-person-x-fill"></i>
           </div>
           <div className="stat-content">
-            <h3 className="stat-value">
+            <h3 className="stat-value-ul id=one">
               {getNonAdminUsers().filter((u) => !u.isActive).length}
             </h3>
             <p className="stat-label">Inactive Users</p>
@@ -250,7 +250,7 @@ const UserList = () => {
             <i className="bi bi-person-plus-fill"></i>
           </div>
           <div className="stat-content">
-            <h3 className="stat-value">
+            <h3 className="stat-value-ul">
               {
                 getNonAdminUsers().filter((u) => {
                   const joinDate = new Date(u.joiningDate);

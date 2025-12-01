@@ -387,7 +387,7 @@ const Login = () => {
                       }`}
                       id="email"
                       name="email"
-                      placeholder="your.email@eepz.com"
+                      placeholder="youremail@gmail.com"
                       value={formData.email}
                       onChange={handleChange}
                       onBlur={handleBlur}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
 import departmentService from "../../services/auth/departmentService";
@@ -59,6 +59,7 @@ const InternalOpportunityManagement = () => {
     fetchData();
   }, []);
 
+  // Auto-filter only on department/status changes (NOT searchTerm)
   useEffect(() => {
     filterOpportunities();
   }, [opportunities, selectedDepartment, selectedStatus]);
@@ -94,7 +95,7 @@ const InternalOpportunityManagement = () => {
     }
   };
 
-  const filterOpportunities = () => {
+  const filterOpportunities = useCallback(() => {
     let filtered = Array.isArray(opportunities) ? [...opportunities] : [];
 
     if (searchTerm) {
@@ -119,12 +120,16 @@ const InternalOpportunityManagement = () => {
 
     setFilteredOpportunities(filtered);
     setCurrentPage(1);
-  };
+  }, [opportunities, searchTerm, selectedDepartment, selectedStatus]);
 
   const clearFilters = () => {
+    // Reset all filters first
     setSearchTerm("");
     setSelectedDepartment("");
     setSelectedStatus("");
+    // Force update filteredOpportunities to show ALL opportunities
+    setFilteredOpportunities(opportunities);
+    setCurrentPage(1);
   };
 
   const handleCreateOpportunity = () => {
@@ -509,6 +514,7 @@ const InternalOpportunityManagement = () => {
                   setCurrentPage(1);
                 }}
               >
+                <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>

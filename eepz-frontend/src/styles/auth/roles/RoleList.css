@@ -78,9 +78,9 @@
 }
 
 .stat-label-rl {
-  font-size: 9px;
+  font-size: 10px;
   color: #64748b;
-  font-weight: 600;
+  font-weight: 650;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0;
@@ -315,7 +315,7 @@
 }
 
 .rlm-card-title {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #27235c;
   line-height: 1.3;
@@ -334,7 +334,7 @@
 }
 
 .rlm-badge-system i {
-  font-size: 0.8125rem;
+  font-size: 1.5rem;
 }
 
 .rlm-card-code {
@@ -342,14 +342,15 @@
   padding: 0.25rem 0.5rem;
   background: #f8f9fa;
   border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 550;
   color: #27235c;
   margin-bottom: 0.625rem;
   font-family: "Courier New", monospace;
 }
 
 .rlm-card-desc {
+  font-weight: 600;
   font-size: 0.9rem;
   color: #6c757d;
   line-height: 1.4;
