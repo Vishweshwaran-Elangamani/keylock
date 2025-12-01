@@ -386,7 +386,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         ];
         const emp = availableEmployees.find((e) => e.empMasterId === empMasterId);
         if (emp) {
-          toast.success(`${emp.fullName} added to team`, {
+          toast.success(`${emp.fullName} added as an assignee.`, {
             duration: 2000,
           });
         }
@@ -394,7 +394,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         delete newChecklistByAssignee[empMasterId];
         const emp = availableEmployees.find((e) => e.empMasterId === empMasterId);
         if (emp) {
-          toast.info(`${emp.fullName} removed from team`, {
+          toast.info(`${emp.fullName} added from assignees.`, {
             duration: 2000,
           });
         }
@@ -420,7 +420,7 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
         ],
       },
     }));
-    toast.success("Checklist item added", { duration: 2000 });
+    toast.success("Checklist item added.", { duration: 2000 });
   };
 
   const removeChecklistItem = (assigneeId, index) => {
@@ -521,13 +521,11 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
       if (isEdit) {
         await goalService.updateGoal(goalData.goalId, payload);
         toast.success("Goal Updated Successfully!", {
-          description: "Your goal has been updated",
           duration: 3000,
         });
       } else {
         await goalService.createGoal(payload);
-        toast.success("Goal Created Successfully!", {
-          description: "Your new goal has been created",
+        toast.success("Goal Saved Successfully!", {
           duration: 3000,
         });
       }
@@ -894,16 +892,6 @@ const GoalFormModal = ({ isOpen, onClose, goalData = null, onSuccess }) => {
                               onFocus={() => setShowAssigneeDropdown(true)}
                               disabled={isEdit || loading || loadingEmployees}
                             />
-                            <button
-                              type="button"
-                              className="btn btn-outline-secondary"
-                              onClick={() =>
-                                setShowAssigneeDropdown(!showAssigneeDropdown)
-                              }
-                              disabled={isEdit || loading || loadingEmployees}
-                            >
-                              <i className="bi bi-chevron-down"></i>
-                            </button>
                           </div>
                           {errors.assignees && (
                             <div className="invalid-feedback d-block">

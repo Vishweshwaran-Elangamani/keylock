@@ -186,7 +186,7 @@ const RequestApprovalModal = ({
 
         if (uploadResponse.data?.attachmentId) {
           proofAttachmentId = uploadResponse.data.attachmentId;
-          toast.success("File uploaded successfully", { id: "upload" });
+          toast.success("File uploaded successfully.", { id: "upload" });
         }
       }
 
@@ -197,27 +197,23 @@ const RequestApprovalModal = ({
 
       if (isClosure) {
         toast.success("Goal Closed Successfully!", {
-          description: "The goal has been closed",
           duration: 3000,
         });
       } else if (isReactivation) {
         toast.success("Goal Reactivated Successfully!", {
-          description: "The goal is now active again",
           duration: 3000,
         });
       } else if (isReopening) {
         toast.success("Extension Request Submitted!", {
-          description: "Your deadline extension request has been submitted",
           duration: 3000,
         });
       } else if (isLeadershipOrgCompletion) {
         toast.success("Goal Completed Successfully!", {
-          description: "The organization goal has been marked as completed",
           duration: 3000,
         });
       } else {
         toast.success("Request Submitted Successfully!", {
-          description: `Your ${approvalLabel.toLowerCase()} request has been submitted`,
+          description: `Your ${approvalLabel.toLowerCase()} request has been submitted.`,
           duration: 3000,
         });
       }
