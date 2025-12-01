@@ -1,11 +1,6 @@
 import api from "./api";
 
-/**
- * Form Management API Service
- * Handles all form-related operations with proper error handling
- */
 
-//  Create a new form (HR only)
 export const createForm = async (payload) => {
   try {
     console.log(" Creating new form...", payload);
@@ -21,7 +16,6 @@ export const createForm = async (payload) => {
   }
 };
 
-// 🔍 Get a single form by ID
 export const getFormById = async (id) => {
   try {
     console.log(" Fetching form with ID:", id);
@@ -37,7 +31,6 @@ export const getFormById = async (id) => {
   }
 };
 
-// 📋 Get all forms
 export const getAllForms = async () => {
   try {
     console.log(" Fetching all forms...");
@@ -53,7 +46,6 @@ export const getAllForms = async () => {
   }
 };
 
-//  Update an existing form
 export const updateForm = async (id, payload) => {
   try {
     console.log(" Updating form with ID:", id, payload);
@@ -69,7 +61,6 @@ export const updateForm = async (id, payload) => {
   }
 };
 
-//  Delete form by ID
 export const deleteForm = async (id) => {
   try {
     console.log(" Deleting form with ID:", id);
@@ -85,7 +76,6 @@ export const deleteForm = async (id) => {
   }
 };
 
-//  Delete draft by assignment ID
 export const deleteDraft = async (assignmentId) => {
   try {
     console.log(" Deleting draft with Assignment ID:", assignmentId);

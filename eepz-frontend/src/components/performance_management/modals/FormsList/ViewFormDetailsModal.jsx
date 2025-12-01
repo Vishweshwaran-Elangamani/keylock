@@ -9,7 +9,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
 
   return (
     <>
-      {/* Custom Backdrop with Blur Effect - Matching AddPolicyModal */}
+
       <div
         style={{
           position: 'fixed',
@@ -97,7 +97,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
           </button>
         </div>
 
-        {/* BODY - Matching AddPolicyModal */}
+
         <div
           style={{
             padding: '20px',
@@ -346,156 +346,155 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
             </div>
           </div>
 
-          {/* Competencies Table Section */}
-         {/* Competencies Table Section */}
-{formDetails.competencies && formDetails.competencies.length > 0 && (
-  <div style={{ marginBottom: '20px' }}>
-    <h4
-      style={{
-        fontSize: '14px',
-        fontWeight: '600',
-        color: '#334155',
-        marginBottom: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        paddingBottom: '8px',
-        borderBottom: '1px solid #e5e7eb',
-        textAlign: 'left'
-      }}
-    >
-      <i className="bi bi-grid-3x3-gap-fill" style={{ fontSize: '14px' }}></i>
-      Competencies Breakdown
-    </h4>
-    <div
-      style={{
-        border: '1px solid #e5e7eb',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        background: '#ffffff'
-      }}
-    >
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ background: '#27235C' }}>
-            <th
-              style={{
-                padding: '12px 16px',
-                textAlign: 'center',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#ffffff',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                width: '80px'
-              }}
-            >
-              S.NO
-            </th>
-            <th
-              style={{
-                padding: '12px 16px',
-                textAlign: 'left',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#ffffff',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                width: '35%'
-              }}
-            >
-              Competency Name
-            </th>
-            <th
-              style={{
-                padding: '12px 16px',
-                textAlign: 'left',
-                fontSize: '12px',
-                fontWeight: '600',
-                color: '#ffffff',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}
-            >
-              Description
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {formDetails.competencies.map((comp, index) => (
-            <tr
-              key={index}
-              style={{
-                borderBottom: '1px solid #e5e7eb',
-                transition: 'background 0.2s',
-                textAlign: 'left'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-              onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
-            >
-              <td
+
+          {formDetails.competencies && formDetails.competencies.length > 0 && (
+            <div style={{ marginBottom: '20px' }}>
+              <h4
                 style={{
-                  padding: '14px 16px',
-                  textAlign: 'center',
-                  fontSize: '13px',
-                  color: '#334155'
-                }}
-              >
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
-                    background: '#27235C',
-                    color: '#ffffff',
-                    fontWeight: '600',
-                    fontSize: '13px'
-                  }}
-                >
-                  {comp.displayOrder || index + 1}
-                </span>
-              </td>
-              <td
-                style={{
-                  padding: '14px 16px',
-                  fontSize: '13px',
+                  fontSize: '14px',
+                  fontWeight: '600',
                   color: '#334155',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  paddingBottom: '8px',
+                  borderBottom: '1px solid #e5e7eb',
                   textAlign: 'left'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <i className="bi bi-award-fill" style={{ color: '#97247E', fontSize: '16px' }}></i>
-                  <strong style={{ fontWeight: '600', color: '#334155' }}>{comp.name}</strong>
-                </div>
-              </td>
-              <td
+                <i className="bi bi-grid-3x3-gap-fill" style={{ fontSize: '14px' }}></i>
+                Competencies Breakdown
+              </h4>
+              <div
                 style={{
-                  padding: '14px 16px',
-                  fontSize: '13px',
-                  color: '#64748b',
-                  textAlign: 'left'
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  background: '#ffffff'
                 }}
               >
-                {comp.description || (
-                  <span style={{ color: '#9ca3af', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <i className="bi bi-dash-circle"></i>
-                    No description provided
-                  </span>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)}
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#27235C' }}>
+                      <th
+                        style={{
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: '#ffffff',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          width: '80px'
+                        }}
+                      >
+                        S.NO
+                      </th>
+                      <th
+                        style={{
+                          padding: '12px 16px',
+                          textAlign: 'left',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: '#ffffff',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          width: '35%'
+                        }}
+                      >
+                        Competency Name
+                      </th>
+                      <th
+                        style={{
+                          padding: '12px 16px',
+                          textAlign: 'left',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: '#ffffff',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}
+                      >
+                        Description
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formDetails.competencies.map((comp, index) => (
+                      <tr
+                        key={index}
+                        style={{
+                          borderBottom: '1px solid #e5e7eb',
+                          transition: 'background 0.2s',
+                          textAlign: 'left'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = '#ffffff'}
+                      >
+                        <td
+                          style={{
+                            padding: '14px 16px',
+                            textAlign: 'center',
+                            fontSize: '13px',
+                            color: '#334155'
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              background: '#27235C',
+                              color: '#ffffff',
+                              fontWeight: '600',
+                              fontSize: '13px'
+                            }}
+                          >
+                            {comp.displayOrder || index + 1}
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            padding: '14px 16px',
+                            fontSize: '13px',
+                            color: '#334155',
+                            textAlign: 'left'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <i className="bi bi-award-fill" style={{ color: '#97247E', fontSize: '16px' }}></i>
+                            <strong style={{ fontWeight: '600', color: '#334155' }}>{comp.name}</strong>
+                          </div>
+                        </td>
+                        <td
+                          style={{
+                            padding: '14px 16px',
+                            fontSize: '13px',
+                            color: '#64748b',
+                            textAlign: 'left'
+                          }}
+                        >
+                          {comp.description || (
+                            <span style={{ color: '#9ca3af', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <i className="bi bi-dash-circle"></i>
+                              No description provided
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
 
-          {/* No Competencies Message */}
+
           {(!formDetails.competencies || formDetails.competencies.length === 0) && (
             <div
               style={{
@@ -518,7 +517,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
           )}
         </div>
 
-        {/* FOOTER - Matching AddPolicyModal */}
+
         <div
           style={{
             padding: '12px 20px',
@@ -532,7 +531,7 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
             borderBottomRightRadius: '12px'
           }}
         >
-          {/* CANCEL BUTTON */}
+
           <button
             onClick={onClose}
             style={{
@@ -553,11 +552,10 @@ function ViewFormDetailsModal({ formDetails, onClose }) {
             onMouseEnter={(e) => e.currentTarget.style.background = '#5a6268'}
             onMouseLeave={(e) => e.currentTarget.style.background = '#6c757d'}
           >
-            
+
             Close
           </button>
 
-          {/* CREATE/EDIT BUTTON */}
           <button
             onClick={() => {
               onClose();

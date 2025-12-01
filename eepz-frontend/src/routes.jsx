@@ -27,7 +27,6 @@ import FormsList from "./pages/performancemanagement/hr/FormsList";
 import HRNominations from "./pages/performancemanagement/hr/HRNomination";
 import HRAssessmentView from "./pages/performancemanagement/hr/HRViewAssessment";
 import RewardConfiguration from "./pages/performancemanagement/hr/Rewardconfiguration";
-import DraftsList from "./pages/performancemanagement/hr/DraftList";
 import ProjectManagementDashboard from "./pages/project_management/ProjectManagementDashboard";
 import CreateProject from "./pages/project_management/CreateProject";
 import ProjectDetails from "./pages/project_management/ProjectDetails";
@@ -285,16 +284,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/hr/dashboard/performance/draftlists"
-        element={
-          <ProtectedRoute allowedRoles={["HR"]}>
-            <DashboardLayout role="HR">
-              <DraftsList />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      />
+    
       <Route
         path="/hr/dashboard/performance/status"
         element={

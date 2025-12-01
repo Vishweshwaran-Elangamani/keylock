@@ -1,7 +1,6 @@
-// ReviewModal.jsx
 import React from "react";
 import logoImage from "../../../../assets/logodark.png";
- 
+
 const ReviewModal = ({
   showModal,
   closeModal,
@@ -18,10 +17,10 @@ const ReviewModal = ({
   submitting,
   l2ActionLoading,
   active,
-  handleDownloadAttachment, // ✅ NEW: Receive download handler
+  handleDownloadAttachment,
 }) => {
   if (!showModal) return null;
- 
+
   const handleInputChange = (detailId, key, value) => {
     setModalRatings((prev) => ({
       ...prev,
@@ -29,7 +28,7 @@ const ReviewModal = ({
     }));
   };
 
-  // ✅ NEW: Format file size
+
   const formatFileSize = (bytes) => {
     if (!bytes) return "0 Bytes";
     const k = 1024;
@@ -38,7 +37,7 @@ const ReviewModal = ({
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
   };
 
-  // ✅ NEW: Get file icon based on file type
+
   const getFileIcon = (fileType) => {
     if (!fileType) return "bi-file-earmark";
     if (fileType.includes("pdf")) return "bi-file-earmark-pdf";
@@ -48,7 +47,7 @@ const ReviewModal = ({
     if (fileType.includes("zip") || fileType.includes("compressed")) return "bi-file-earmark-zip";
     return "bi-file-earmark";
   };
- 
+
   return (
     <div
       className="tl-modal-overlay"
@@ -59,7 +58,7 @@ const ReviewModal = ({
       aria-modal="true"
       aria-label="Review modal"
     >
-     <style>{`
+      <style>{`
         .tl-modal-table th, .tl-modal-table td {
           text-align: left !important;
           vertical-align: middle !important;
@@ -83,7 +82,7 @@ const ReviewModal = ({
           font-weight: 600;
         }
         
-        /* ✅ UPDATED: Attachments section styles */
+        /*  UPDATED: Attachments section styles */
         .tl-attachments-section {
           margin: 20px 0;
           padding: 16px;
@@ -160,7 +159,7 @@ const ReviewModal = ({
           margin-top: 2px;
         }
         
-        /* ✅ UPDATED: Purple download button */
+        /*  UPDATED: Purple download button */
         .tl-attachment-download {
           padding: 6px 12px;
           background: #26225A;
@@ -191,7 +190,7 @@ const ReviewModal = ({
           font-size: 14px;
         }
 
-        /* ✅ UPDATED: Purple header badge */
+        /*  UPDATED: Purple header badge */
         .tl-header-badge {
           display: flex;
           align-items: center;
@@ -224,12 +223,12 @@ const ReviewModal = ({
       `}</style>
 
       <div className="tl-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
+
         <div className="tl-modal-header">
           <div className="tl-modal-header-left">
             <img src={logoImage} alt="EEPZ Logo" className="tl-modal-logo" />
           </div>
- 
+
           <div className="tl-modal-header-center" aria-hidden>
             <div className="tl-modal-title" style={{ fontWeight: "bold" }}>
               {modalData?.formName || "Assessment Form"}
@@ -239,7 +238,6 @@ const ReviewModal = ({
             </div>
           </div>
 
-          {/* ✅ NEW: Attachment Count Badge in Header */}
           {modalData?.attachments && modalData.attachments.length > 0 && (
             <div className="tl-header-badge">
               <i className="bi bi-paperclip"></i>
@@ -248,7 +246,7 @@ const ReviewModal = ({
               </span>
             </div>
           )}
- 
+
           <button
             className="tl-modal-close"
             onClick={() => {
@@ -259,23 +257,21 @@ const ReviewModal = ({
             <i className="bi bi-x-lg" />
           </button>
         </div>
- 
+
         <div className="tl-modal-divider" />
- 
-        {/* Info row */}
+
         <div className="tl-modal-info">
           <div className="tl-info-item">
             <span className="tl-label">Employee</span>
             <span className="tl-value">{modalData?.employeeName || "-"}</span>
           </div>
- 
+
           <div className="tl-info-item">
             <span className="tl-label">Form</span>
             <span className="tl-value">{modalData?.formName || "-"}</span>
           </div>
         </div>
- 
-        {/* L2 rejection note shown to L1 when present */}
+
         {active === "l1" && modalData?.l2Decision === "Rejected" && (
           <div className="tl-rejection">
             <div className="tl-rejection-header">
@@ -285,8 +281,8 @@ const ReviewModal = ({
             <p className="tl-rejection-note">{modalData?.l2DecisionNote || "No reason provided"}</p>
           </div>
         )}
- 
-        {/* Modal body - table */}
+
+
         <div className="tl-modal-body">
           <table className="tl-modal-table" role="table" aria-label="Competencies table">
             <thead style={{ backgroundColor: "#26225A", color: "white" }}>
@@ -302,22 +298,22 @@ const ReviewModal = ({
                 <th>COMMENTS</th>
               </tr>
             </thead>
- 
+
             <tbody>
               {(modalData?.items || []).map((item) => (
                 <tr key={item.detailId}>
                   <td className="tl-comp">
                     <strong>{item.competencyName}</strong>
                   </td>
- 
+
                   {active === "l2" && <td className="tl-center">{item.employeeRating ?? "-"}</td>}
                   {active === "l2" && <td>{item.employeeComments || "-"}</td>}
                   {active === "l2" && <td className="tl-center">{item.approverRating ?? "-"}</td>}
                   {active === "l2" && <td>{item.approverComments || "-"}</td>}
- 
+
                   {active === "l1" && <td className="tl-center">{item.employeeRating ?? "-"}</td>}
                   {active === "l1" && <td>{item.employeeComments || "-"}</td>}
- 
+
                   <td className="tl-center">
                     <input
                       type="number"
@@ -330,7 +326,7 @@ const ReviewModal = ({
                       aria-label={`Rating for ${item.competencyName}`}
                     />
                   </td>
- 
+
                   <td>
                     <textarea
                       value={modalRatings[item.detailId]?.comment ?? ""}
@@ -343,7 +339,7 @@ const ReviewModal = ({
                   </td>
                 </tr>
               ))}
- 
+
               {(!modalData?.items || modalData.items.length === 0) && (
                 <tr>
                   <td colSpan={active === "l2" ? 9 : 6} style={{ textAlign: "center", padding: "18px" }}>
@@ -354,7 +350,6 @@ const ReviewModal = ({
             </tbody>
           </table>
 
-          {/* ✅ MOVED: Attachments Section - Now below the table */}
           {modalData?.attachments && modalData.attachments.length > 0 && (
             <div className="tl-attachments-section">
               <div className="tl-attachments-header">
@@ -391,8 +386,7 @@ const ReviewModal = ({
             </div>
           )}
         </div>
- 
-        {/* Footer buttons */}
+
         <div className="tl-modal-footer">
           {active === "l1" && (
             <>
@@ -406,7 +400,7 @@ const ReviewModal = ({
               >
                 <i className="bi bi-x-circle" /> Cancel
               </button>
- 
+
               <button
                 className="tl-btn tl-btn-primary"
                 onClick={handleL1Submit}
@@ -417,7 +411,7 @@ const ReviewModal = ({
               </button>
             </>
           )}
- 
+
           {active === "l2" && (
             <>
               <button
@@ -428,7 +422,7 @@ const ReviewModal = ({
               >
                 <i className="bi bi-check-lg" /> {l2ActionLoading ? "Processing..." : "Submit & Approve"}
               </button>
- 
+
               <button
                 className="tl-btn tl-btn-cancel"
                 onClick={() => setShowRejectReason(!showRejectReason)}
@@ -440,14 +434,13 @@ const ReviewModal = ({
             </>
           )}
         </div>
- 
-        {/* L2 rejection box */}
+
         {active === "l2" && showRejectReason && (
           <div className="tl-reject-box" role="region" aria-label="Rejection reason">
             <label className="tl-reject-label" htmlFor="tl-reason-textarea">
               <i className="bi bi-exclamation-triangle" /> Rejection Reason
             </label>
- 
+
             <textarea
               id="tl-reason-textarea"
               value={rejectionReason}
@@ -457,7 +450,7 @@ const ReviewModal = ({
               rows="4"
               aria-label="Rejection reason"
             />
- 
+
             <div className="tl-reject-actions">
               <button
                 className="tl-btn tl-btn-primary"
@@ -467,7 +460,7 @@ const ReviewModal = ({
               >
                 <i className="bi bi-check" /> Confirm Rejection
               </button>
- 
+
               <button
                 className="tl-btn tl-btn-cancel"
                 onClick={() => setShowRejectReason(false)}
@@ -483,5 +476,5 @@ const ReviewModal = ({
     </div>
   );
 };
- 
+
 export default ReviewModal;

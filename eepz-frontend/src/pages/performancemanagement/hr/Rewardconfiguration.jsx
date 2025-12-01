@@ -289,42 +289,42 @@ function RewardConfiguration() {
           </button>
         </div>
         <div
-  style={{
-    fontSize: "13px",
-    color: "#8886b3",
-    marginTop: 6,
-    maxWidth: "100%",
-    textAlign: "justify",
-    lineHeight: 1.6,
-    wordBreak: "break-word",
-    whiteSpace: "pre-wrap",
-    minHeight: needsCollapse ? 75 : "auto",
-  }}
->
-  <span>
-    {visibleDesc}
-    {showReadMore && !descExpanded && <span style={{ color: RL_PURPLE }}>...</span>}
-    {showReadMore && (
-      <button
-        onClick={() => setDescExpanded((e) => !e)}
-        style={{
-          background: "transparent",
-          border: "none",
-          color: RL_PURPLE,
-          fontWeight: 600,
-          fontSize: 12,
-          cursor: "pointer",
-          outline: "none",
-          padding: 0,
-          whiteSpace: "nowrap",
-          marginLeft: 2,   // small spacing after the dots
-        }}
-      >
-        {descExpanded ? "Read Less" : "Read More"}
-      </button>
-    )}
-  </span>
-</div>
+          style={{
+            fontSize: "13px",
+            color: "#8886b3",
+            marginTop: 6,
+            maxWidth: "100%",
+            textAlign: "justify",
+            lineHeight: 1.6,
+            wordBreak: "break-word",
+            whiteSpace: "pre-wrap",
+            minHeight: needsCollapse ? 75 : "auto",
+          }}
+        >
+          <span>
+            {visibleDesc}
+            {showReadMore && !descExpanded && <span style={{ color: RL_PURPLE }}>...</span>}
+            {showReadMore && (
+              <button
+                onClick={() => setDescExpanded((e) => !e)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: RL_PURPLE,
+                  fontWeight: 600,
+                  fontSize: 12,
+                  cursor: "pointer",
+                  outline: "none",
+                  padding: 0,
+                  whiteSpace: "nowrap",
+                  marginLeft: 2,
+                }}
+              >
+                {descExpanded ? "Read Less" : "Read More"}
+              </button>
+            )}
+          </span>
+        </div>
 
       </>
     );
@@ -360,7 +360,6 @@ function RewardConfiguration() {
 
   return (
     <div style={{ background: RL_BG, minHeight: "100vh", minWidth: 0 }}>
-      {/* Top Bar: Breadcrumbs + Create Button */}
       <div
         style={{
           padding: "16px 28px 0 28px",
@@ -372,16 +371,16 @@ function RewardConfiguration() {
           marginBottom: "1.2rem",
         }}
       >
-     <nav
-  className="cg-breadcrumbs"
-  aria-label="breadcrumb"
-  style={{
-    marginBottom: 0,
-    background: "transparent"
-  }}
->
-  <style>
-    {`
+        <nav
+          className="cg-breadcrumbs"
+          aria-label="breadcrumb"
+          style={{
+            marginBottom: 0,
+            background: "transparent"
+          }}
+        >
+          <style>
+            {`
       .cg-breadcrumb-item + .cg-breadcrumb-item::before {
         content: "/";
         margin: 0 0.25rem;   /* smaller spacing */
@@ -389,30 +388,30 @@ function RewardConfiguration() {
         font-weight: normal; /* prevents bold/thick look */
       }
     `}
-  </style>
-  <ol
-    className="cg-breadcrumb"
-    style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}
-  >
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard")}
-      style={{ cursor: "pointer" }}
-    >
-      <i className="bi bi-house-door"></i>
-    </li>
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard/performance")}
-      style={{ cursor: "pointer" }}
-    >
-      Performance
-    </li>
-    <li className="cg-breadcrumb-item active" aria-current="page">
-      Rewards
-    </li>
-  </ol>
-</nav>
+          </style>
+          <ol
+            className="cg-breadcrumb"
+            style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}
+          >
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard")}
+              style={{ cursor: "pointer" }}
+            >
+              <i className="bi bi-house-door"></i>
+            </li>
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard/performance")}
+              style={{ cursor: "pointer" }}
+            >
+              Performance
+            </li>
+            <li className="cg-breadcrumb-item active" aria-current="page">
+              Rewards
+            </li>
+          </ol>
+        </nav>
 
 
         <button
@@ -439,7 +438,6 @@ function RewardConfiguration() {
         </button>
       </div>
 
-      {/* Two-Column Layout */}
       <div
         style={{
           margin: "0 auto",
@@ -452,7 +450,6 @@ function RewardConfiguration() {
           alignItems: "flex-start",
         }}
       >
-        {/* LEFT COLUMN (Recognition Cards) */}
         <div
           style={{
             flex: 1.3,
@@ -467,7 +464,6 @@ function RewardConfiguration() {
             maxHeight: "75vh",
           }}
         >
-          {/* Tabs: Active/Inactive */}
           <div
             style={{
               background: "#fff",
@@ -666,7 +662,6 @@ function RewardConfiguration() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN (Parameter Details) */}
         <div
           style={{
             flex: 2,
@@ -724,150 +719,150 @@ function RewardConfiguration() {
                   </div>
                 ) : (
                   <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    fontSize: "13px",
-                    border: "2px solid #27235C",   // outer border
-                  }}
-                >
-                  <thead>
-                    <tr
-                      style={{
-                        background: "#27235C",     // header background
-                        borderBottom: "1.5px solid #27235C",
-                      }}
-                    >
-                      <th
-                        style={{
-                          textAlign: "left",
-                          padding: "11px",
-                          fontWeight: 800,
-                          color: "white",           // header text color
-                        }}
-                      >
-                        Parameter Name
-                      </th>
-                      <th
-                        style={{
-                          textAlign: "left",
-                          padding: "11px",
-                          fontWeight: 700,
-                          color: "white",           // header text color
-                        }}
-                      >
-                        Type
-                      </th>
-                      <th
-                        style={{
-                          textAlign: "left",        // left aligned
-                          padding: "11px",
-                          fontWeight: 700,
-                          color: "white",
-                        }}
-                      >
-                        Required
-                      </th>
-                      <th
-                        style={{
-                          textAlign: "left",        // left aligned
-                          padding: "11px",
-                          fontWeight: 700,
-                          color: "white",
-                        }}
-                      >
-                        Order
-                      </th>
-                      <th
-                        style={{
-                          textAlign: "left",        // left aligned
-                          padding: "11px",
-                          fontWeight: 800,
-                          color: "white",
-                        }}
-                      >
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {parameters.map((param) => (
+                    style={{
+                      width: "100%",
+                      borderCollapse: "collapse",
+                      fontSize: "13px",
+                      border: "2px solid #27235C",
+                    }}
+                  >
+                    <thead>
                       <tr
-                        key={param.parameterId}
                         style={{
-                          borderBottom: "1px solid darkblue",
+                          background: "#27235C",
+                          borderBottom: "1.5px solid #27235C",
                         }}
                       >
-                        <td
+                        <th
                           style={{
-                            padding: "13px 11px",
-                            fontWeight: "600",
-                            color: "#000",
-                            textAlign: "left",      // left aligned
+                            textAlign: "left",
+                            padding: "11px",
+                            fontWeight: 800,
+                            color: "white",
                           }}
                         >
-                          {param.parameterName}
-                        </td>
-                        <td
+                          Parameter Name
+                        </th>
+                        <th
                           style={{
-                            padding: "13px 11px",
-                            color: "#000",
-                            fontWeight: 500,
-                            textAlign: "left",      // left aligned
+                            textAlign: "left",
+                            padding: "11px",
+                            fontWeight: 700,
+                            color: "white",
                           }}
                         >
-                          {param.parameterType}
-                        </td>
-                        <td
+                          Type
+                        </th>
+                        <th
                           style={{
-                            padding: "13px 11px",
-                            textAlign: "left",      // left aligned
-                            fontWeight: "700",
+                            textAlign: "left",
+                            padding: "11px",
+                            fontWeight: 700,
+                            color: "white",
                           }}
                         >
-                          {param.isRequired ? (
-                            <span style={{ color: "green" }}>Yes</span>
-                          ) : (
-                            <span style={{ color: "red" }}>No</span>
-                          )}
-                        </td>
-                        <td
+                          Required
+                        </th>
+                        <th
                           style={{
-                            padding: "13px 11px",
-                            textAlign: "left",      // left aligned
-                            color: "#000",
+                            textAlign: "left",
+                            padding: "11px",
+                            fontWeight: 700,
+                            color: "white",
                           }}
                         >
-                          {param.sortOrder}
-                        </td>
-                        <td
+                          Order
+                        </th>
+                        <th
                           style={{
-                            padding: "13px 11px",
-                            textAlign: "left",      // left aligned
+                            textAlign: "left",
+                            padding: "11px",
+                            fontWeight: 800,
+                            color: "white",
                           }}
                         >
-                          <button
-                            onClick={() => confirmDelete(param.parameterId, "parameter")}
-                            style={{
-                              padding: "6px 18px",
-                              background: "#eee",
-                              color: "#27235C",
-                              borderRadius: 5,
-                              fontWeight: "700",
-                              border: "1px solid #27235C",
-                              cursor: "pointer",
-                              fontSize: 13,
-                            }}
-                            title="Delete Parameter"
-                          >
-                            <i className="bi bi-trash" />
-                          </button>
-                        </td>
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-                
+                    </thead>
+                    <tbody>
+                      {parameters.map((param) => (
+                        <tr
+                          key={param.parameterId}
+                          style={{
+                            borderBottom: "1px solid darkblue",
+                          }}
+                        >
+                          <td
+                            style={{
+                              padding: "13px 11px",
+                              fontWeight: "600",
+                              color: "#000",
+                              textAlign: "left",
+                            }}
+                          >
+                            {param.parameterName}
+                          </td>
+                          <td
+                            style={{
+                              padding: "13px 11px",
+                              color: "#000",
+                              fontWeight: 500,
+                              textAlign: "left",
+                            }}
+                          >
+                            {param.parameterType}
+                          </td>
+                          <td
+                            style={{
+                              padding: "13px 11px",
+                              textAlign: "left",
+                              fontWeight: "700",
+                            }}
+                          >
+                            {param.isRequired ? (
+                              <span style={{ color: "green" }}>Yes</span>
+                            ) : (
+                              <span style={{ color: "red" }}>No</span>
+                            )}
+                          </td>
+                          <td
+                            style={{
+                              padding: "13px 11px",
+                              textAlign: "left",
+                              color: "#000",
+                            }}
+                          >
+                            {param.sortOrder}
+                          </td>
+                          <td
+                            style={{
+                              padding: "13px 11px",
+                              textAlign: "left",
+                            }}
+                          >
+                            <button
+                              onClick={() => confirmDelete(param.parameterId, "parameter")}
+                              style={{
+                                padding: "6px 18px",
+                                background: "#eee",
+                                color: "#27235C",
+                                borderRadius: 5,
+                                fontWeight: "700",
+                                border: "1px solid #27235C",
+                                cursor: "pointer",
+                                fontSize: 13,
+                              }}
+                              title="Delete Parameter"
+                            >
+                              <i className="bi bi-trash" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
                 )}
               </>
             ) : (
@@ -888,7 +883,6 @@ function RewardConfiguration() {
         </div>
       </div>
 
-      {/* MODALS */}
       {showRewardTypeModal && (
         <RewardTypeModal
           show={showRewardTypeModal}

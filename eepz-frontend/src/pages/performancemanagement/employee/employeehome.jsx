@@ -8,7 +8,7 @@ export default function EmployeeHome() {
   const [hasNominations, setHasNominations] = useState(false);
   const [awardName, setAwardName] = useState("");
 
-  // Retrieve the employeeId from localStorage
+
   const user = JSON.parse(localStorage.getItem("user"));
   const employeeId = user ? user.empId : null;
 
@@ -17,7 +17,7 @@ export default function EmployeeHome() {
     return null;
   }
 
-  // Function to fetch employee nominations and award details
+
   const fetchNominations = async () => {
     try {
       const response = await getEmployeeNominations(employeeId);
@@ -47,12 +47,12 @@ export default function EmployeeHome() {
   };
 
   return (
-    <div className="ehp-page" style={{ position: "relative", minHeight: "80vh"}}>
+    <div className="ehp-page" style={{ position: "relative", minHeight: "80vh" }}>
       <div
         className="ehp-container"
         style={{ padding: 24, paddingTop: 110, position: "relative" }}
       >
-        {/* Notification Card - Top Right with Medal on Left */}
+
         {hasNominations && (
           <div
             onClick={handleNavigateToNominations}
@@ -76,9 +76,9 @@ export default function EmployeeHome() {
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
               display: "flex",
               alignItems: "center",
-              // backgroundColor: "#d9f2d9",
+
               gap: "16px",
-              
+
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-4px)";
@@ -89,7 +89,7 @@ export default function EmployeeHome() {
               e.currentTarget.style.boxShadow = "0 12px 32px rgba(0, 0, 0, 0.15)";
             }}
           >
-            {/* Medal/Star Icon - Left Side */}
+
             <div
               style={{
                 position: "relative",
@@ -101,7 +101,7 @@ export default function EmployeeHome() {
                 justifyContent: "center",
               }}
             >
-              {/* Decorative stars around the medal */}
+
               <div
                 style={{
                   position: "absolute",
@@ -169,7 +169,7 @@ export default function EmployeeHome() {
                 ✦
               </div>
 
-              {/* Medal Circle */}
+
               <div
                 style={{
                   width: 75,
@@ -185,7 +185,7 @@ export default function EmployeeHome() {
                   position: "relative",
                 }}
               >
-                {/* Inner lighter circle */}
+
                 <div
                   style={{
                     width: 62,
@@ -198,7 +198,6 @@ export default function EmployeeHome() {
                     boxShadow: "inset 0 2px 4px rgba(255, 255, 255, 0.4)",
                   }}
                 >
-                  {/* Star Icon */}
                   <div
                     style={{
                       fontSize: 34,
@@ -211,7 +210,6 @@ export default function EmployeeHome() {
                 </div>
               </div>
 
-              {/* Ribbon */}
               <div
                 style={{
                   position: "absolute",
@@ -243,7 +241,7 @@ export default function EmployeeHome() {
               </div>
             </div>
 
-            {/* Text Content - Right Side */}
+
             <div style={{ flex: 1, textAlign: "left" }}>
               <h2
                 style={{
@@ -257,25 +255,25 @@ export default function EmployeeHome() {
                 Congratulations!
               </h2>
               <p
-              style={{
-                fontSize: "14px",  // Increased font size for better readability
-                color: "#4a5568",  // Slightly darker color for better contrast
-                margin: "0 0 12px",  // Reduced bottom margin for better spacing
-                fontWeight: 600,  // Bold text for emphasis
-                lineHeight: 1.6,  // Increased line height for better text spacing
-                textAlign: "center",  // Center aligned text for symmetry
-                whiteSpace: "nowrap",  // Prevents text overflow in a single line
-                overflow: "hidden",  // Hides overflow text
-                textOverflow: "ellipsis",  // Adds ellipsis if the text is too long
-                padding: "4px 0",
-                paddingRight: "130px"  // Padding for better spacing within the paragraph
-              }}
-            >
-              {awardName ? `${awardName}` : "You earned points"}
-            </p>
+                style={{
+                  fontSize: "14px",
+                  color: "#4a5568",
+                  margin: "0 0 12px",
+                  fontWeight: 600,
+                  lineHeight: 1.6,
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  padding: "4px 0",
+                  paddingRight: "130px"
+                }}
+              >
+                {awardName ? `${awardName}` : "You earned points"}
+              </p>
 
 
-              {/* Action Button */}
+
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -308,7 +306,7 @@ export default function EmployeeHome() {
           </div>
         )}
 
-        {/* Center area that holds the My Assessments card */}
+
         <div
           style={{
             minHeight: "60vh",
@@ -316,7 +314,7 @@ export default function EmployeeHome() {
             alignItems: "center",
             justifyContent: "center",
             paddingBottom: 500,
-            marginTop: "20px", // moved card further down
+            marginTop: "20px",
           }}
         >
           <div
@@ -330,13 +328,13 @@ export default function EmployeeHome() {
             aria-label="Go to My Assessments"
             style={{
               cursor: "pointer",
-              width: "min(500px, 75%)", // reduced width
-              borderRadius: 12,         // slightly smaller radius
-              padding: 24,              // reduced padding
+              width: "min(500px, 75%)",
+              borderRadius: 12,
+              padding: 24,
               boxShadow: "0 14px 32px rgba(20,30,60,0.06)",
               display: "flex",
               alignItems: "center",
-              gap: 20,                  // reduced gap
+              gap: 20,
               background: "#fff",
               border: "1px solid darkblue"
             }}
@@ -344,7 +342,7 @@ export default function EmployeeHome() {
             <div
               className="ehp-assessment-icon"
               style={{
-                width: 80,               // smaller icon box
+                width: 80,
                 height: 80,
                 borderRadius: 16,
                 display: "flex",
@@ -356,14 +354,14 @@ export default function EmployeeHome() {
             >
               <i
                 className="bi bi-clipboard-check"
-                style={{ color: "#fff", fontSize: 24 }} // smaller icon
+                style={{ color: "#fff", fontSize: 24 }}
               />
             </div>
 
             <div className="ehp-assessment-content" style={{ flex: 1 }}>
               <h3
                 className="ehp-assessment-title"
-                style={{ fontSize: 24, margin: 0, color: "#0f172a" }} // reduced font size
+                style={{ fontSize: 24, margin: 0, color: "#0f172a" }}
               >
                 My Assessments
                 <br />
@@ -371,7 +369,7 @@ export default function EmployeeHome() {
               </h3>
               <p
                 className="ehp-assessment-description"
-                style={{ marginTop: "0px", color: "#6b7280", fontSize: 13 }} // smaller text
+                style={{ marginTop: "0px", color: "#6b7280", fontSize: 13 }}
               >
                 Complete your performance assessments and track your progress across
                 all assigned evaluations.
@@ -387,11 +385,11 @@ export default function EmployeeHome() {
                   style={{
                     background: "#eef2ff",
                     color: "#3740d6",
-                    padding: "8px 14px",   // smaller button
+                    padding: "8px 14px",
                     borderRadius: 8,
                     border: "none",
                     fontWeight: 600,
-                    fontSize: 13,          // reduced font size
+                    fontSize: 13,
                     cursor: "pointer",
                   }}
                 >

@@ -229,7 +229,6 @@ function HRViewAppraisals() {
   }, [summaryRows]);
 
 
-  // Handle modal opening with attachments
   const handleViewDetails = (row) => {
     setModalRow(row);
     setModalAttachments(row.attachments || []);
@@ -273,12 +272,12 @@ function HRViewAppraisals() {
         }}
       >
         <nav
-  className="cg-breadcrumbs"
-  aria-label="breadcrumb"
-  style={{ marginBottom: "16px", background: "transparent" }}
->
-  <style>
-    {`
+          className="cg-breadcrumbs"
+          aria-label="breadcrumb"
+          style={{ marginBottom: "16px", background: "transparent" }}
+        >
+          <style>
+            {`
       .cg-breadcrumb {
         margin: 0;
         padding: 0;
@@ -302,91 +301,91 @@ function HRViewAppraisals() {
         cursor: default;
       }
     `}
-  </style>
+          </style>
 
-  <ol className="cg-breadcrumb">
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard")}
-    >
-      <i className="bi bi-house-door"></i>
-    </li>
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard/performance")}
-    >
-      Performance
-    </li>
-    <li className="cg-breadcrumb-item active" aria-current="page">
-      Form Progress
-    </li>
-  </ol>
-</nav>
+          <ol className="cg-breadcrumb">
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard")}
+            >
+              <i className="bi bi-house-door"></i>
+            </li>
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard/performance")}
+            >
+              Performance
+            </li>
+            <li className="cg-breadcrumb-item active" aria-current="page">
+              Form Progress
+            </li>
+          </ol>
+        </nav>
 
       </div>
 
       <div className="hrvasspm-container">
-  <div
-    className="hrvasspm-filters"
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",          // spacing between items
-      flexWrap: "wrap"      // optional: allows wrapping on smaller screens
-    }}
-  >
-    <div className="hrvasspm-filter-group">
-      <input
-        type="search"
-        placeholder="Type to search..."
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value);
-          setCurrentPage(1);
-        }}
-      />
-    </div>
+        <div
+          className="hrvasspm-filters"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap"
+          }}
+        >
+          <div className="hrvasspm-filter-group">
+            <input
+              type="search"
+              placeholder="Type to search..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
 
-    <div className="hrvasspm-filter-group">
-      <select
-        value={filterStatus}
-        onChange={(e) => {
-          setFilterStatus(e.target.value);
-          setCurrentPage(1);
-        }}
-      >
-        <option value="all">All Statuses</option>
-        <option value="pending">Pending</option>
-        <option value="completed">Completed</option>
-      </select>
-    </div>
+          <div className="hrvasspm-filter-group">
+            <select
+              value={filterStatus}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
 
-    <div className="hrvasspm-filter-group">
-      <select
-        value={filterProject}
-        onChange={(e) => {
-          setFilterProject(e.target.value);
-          setCurrentPage(1);
-        }}
-      >
-        {uniqueProjects.map((p) => (
-          <option key={p} value={p}>
-            {p === "all" ? "All Projects" : p}
-          </option>
-        ))}
-      </select>
-    </div>
+          <div className="hrvasspm-filter-group">
+            <select
+              value={filterProject}
+              onChange={(e) => {
+                setFilterProject(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              {uniqueProjects.map((p) => (
+                <option key={p} value={p}>
+                  {p === "all" ? "All Projects" : p}
+                </option>
+              ))}
+            </select>
+          </div>
 
-    <div className="hrvasspm-filter-group" style={{ display: "flex", alignItems: "center" }}>
-  <button
-    className="hrvasspm-btn-export"
-    onClick={() => exportToCsv("appraisals.csv", csvData)}
-  >
-    <i className="bi bi-download"></i> Export CSV
-  </button>
-</div>
+          <div className="hrvasspm-filter-group" style={{ display: "flex", alignItems: "center" }}>
+            <button
+              className="hrvasspm-btn-export"
+              onClick={() => exportToCsv("appraisals.csv", csvData)}
+            >
+              <i className="bi bi-download"></i> Export CSV
+            </button>
+          </div>
 
-  </div>
+        </div>
         <div className="hrvasspm-table-card">
           <div className="hrvasspm-table-wrapper">
             <table className="hrvasspm-table">
@@ -424,9 +423,9 @@ function HRViewAppraisals() {
                       <td>{statusBadge(row.status)}</td>
                       <td>
                         <div className="hrvasspm-action-buttons">
-                          <button 
-                            className="hrvasspm-action-btn hrvasspm-btn-view" 
-                            title="View Details" 
+                          <button
+                            className="hrvasspm-action-btn hrvasspm-btn-view"
+                            title="View Details"
                             onClick={() => handleViewDetails(row)}
                           >
                             <i className="bi bi-eye"></i>
@@ -441,7 +440,6 @@ function HRViewAppraisals() {
           </div>
 
 
-          {/* PAGINATION - SINGLE ROW */}
           <div className="hrvasspm-pagination-container">
             <div className="hrvasspm-pagination-info">
               <span className="hrvasspm-pagination-label">Show</span>
@@ -473,9 +471,8 @@ function HRViewAppraisals() {
                 {getPageNumbers().map((page, idx) => (
                   <li
                     key={idx}
-                    className={`hrvasspm-page-item${page === currentPage ? " hrvasspm-active" : ""} ${
-                      typeof page !== "number" ? " hrvasspm-disabled" : ""
-                    }`}
+                    className={`hrvasspm-page-item${page === currentPage ? " hrvasspm-active" : ""} ${typeof page !== "number" ? " hrvasspm-disabled" : ""
+                      }`}
                   >
                     <button className="hrvasspm-page-link" onClick={() => typeof page === "number" && setCurrentPage(page)} disabled={typeof page !== "number"}>
                       {page}

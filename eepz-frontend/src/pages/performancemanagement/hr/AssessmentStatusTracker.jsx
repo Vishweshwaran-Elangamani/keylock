@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import api from "../../../services/performancemanagement/hr/api"; // Assuming your API service is correctly configured
+import api from "../../../services/performancemanagement/hr/api";
 import toast, { Toaster } from 'react-hot-toast';
 
-// --- Styles for a clean dashboard look ---
+
 const styles = {
     container: {
         padding: "30px",
@@ -100,29 +100,29 @@ const styles = {
     }
 };
 
-// --- Custom Status Badges based on your request ---
+
 const Badge = ({ status }) => {
     let color, text;
 
     switch (status) {
         case "Completed":
-            color = "#24A148"; // Green
+            color = "#24A148";
             text = "Completed";
             break;
         case "Pending":
-            color = "#ffc107"; // Yellow/Orange
+            color = "#ffc107";
             text = "Pending";
             break;
         case "Not Started":
-            color = "#6c757d"; // Gray/Muted
+            color = "#6c757d";
             text = "Not Started";
             break;
         case "N/A":
-            color = "#e9ecef"; // Light Gray
+            color = "#e9ecef";
             text = "N/A";
             break;
         default:
-            color = "#97247E"; // Default Purple
+            color = "#97247E";
             text = status;
     }
 
@@ -130,58 +130,51 @@ const Badge = ({ status }) => {
 };
 
 
-// --- Core Logic: Pre-processing the API Data ---
 const processAppraisalData = (data) => {
     return data.map(appraisal => {
-        // Assume 'selfAssessmentSubmittedAt' determines if the Employee phase is done.
         const employeeSubmitted = !!appraisal.selfAssessmentSubmittedAt;
 
-        // Use the 'competencies' array to determine L1 and L2 status.
-        // We only need to check one competency, as the status in your API is identical across all competencies.
         const firstCompetency = appraisal.competencies[0];
 
         let l1Status = "N/A";
         let l2Status = "N/A";
         let employeeStatus = "Not Started";
 
-        // 1. Employee Status
         if (employeeSubmitted) {
             employeeStatus = "Completed";
         } else {
-            employeeStatus = "Pending"; // Or 'Not Started' if 'assignedAt' field exists and is used
+            employeeStatus = "Pending";
         }
 
-        // 2. L1 Status (Reviewer/Manager)
-        // L1 is considered 'Completed' if l1Rating is NOT null and l1Comments is NOT null/empty
-        const l1Completed = firstCompetency && 
-                            firstCompetency.l1Rating !== null && 
-                            firstCompetency.l1Comments?.trim();
+
+        const l1Completed = firstCompetency &&
+            firstCompetency.l1Rating !== null &&
+            firstCompetency.l1Comments?.trim();
 
         if (employeeSubmitted && l1Completed) {
             l1Status = "Completed";
         } else if (employeeSubmitted && !l1Completed) {
-            l1Status = "Pending"; // Employee submitted, but L1 has not finished
+            l1Status = "Pending";
         } else {
-            l1Status = "Not Started"; // Employee hasn't submitted yet
+            l1Status = "Not Started";
         }
 
-        // 3. L2 Status (Leader)
-        // L2 is considered 'Completed' if l2Rating is NOT null and l2Comments is NOT null/empty
-        const l2Completed = firstCompetency && 
-                            firstCompetency.l2Rating !== null && 
-                            firstCompetency.l2Comments?.trim();
-        
+
+        const l2Completed = firstCompetency &&
+            firstCompetency.l2Rating !== null &&
+            firstCompetency.l2Comments?.trim();
+
         if (l1Completed && l2Completed) {
             l2Status = "Completed";
         } else if (l1Completed && !l2Completed) {
-            l2Status = "Pending"; // L1 finished, but L2 has not finished
+            l2Status = "Pending";
         } else {
-            l2Status = "Not Started"; // L1 hasn't finished yet
+            l2Status = "Not Started";
         }
 
         return {
             ...appraisal,
-            // Assign a single, overall status for the dashboard view
+
             employeeStatus,
             l1Status,
             l2Status,
@@ -189,8 +182,8 @@ const processAppraisalData = (data) => {
     });
 };
 
-// --- AssessmentStatusTracker Component ---
- function AssessmentStatusTracker() {
+
+function AssessmentStatusTracker() {
     const [appraisalData, setAppraisalData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -198,11 +191,11 @@ const processAppraisalData = (data) => {
         const fetchAppraisalDetails = async () => {
             setLoading(true);
             try {
-                // Using your provided endpoint
+
                 const { data } = await api.get("/AppraisalProcess/all-details");
 
                 if (data.success && Array.isArray(data.data)) {
-                    // Pre-process the raw data to extract the L1, L2, and Employee statuses
+
                     const processedData = processAppraisalData(data.data);
                     setAppraisalData(processedData);
                     toast.success("Appraisal statuses loaded successfully!");
@@ -252,7 +245,7 @@ const processAppraisalData = (data) => {
                                     <th style={{ ...styles.th, width: "10%" }}>Employee ID</th>
                                     <th style={{ ...styles.th, width: "15%" }}>Employee Name</th>
                                     <th style={{ ...styles.th, width: "15%" }}>Project</th>
-                                    {/* --- SEGREGATED STATUS COLUMNS --- */}
+
                                     <th style={{ ...styles.th, width: "15%" }}>Employee Status</th>
                                     <th style={{ ...styles.th, width: "15%" }}>L1 Status (Manager)</th>
                                     <th style={{ ...styles.th, width: "15%" }}>L2 Status (Leader)</th>
@@ -267,8 +260,8 @@ const processAppraisalData = (data) => {
                                             <strong>{appraisal.employeeName}</strong>
                                         </td>
                                         <td style={styles.td}>{appraisal.projectName}</td>
-                                        
-                                        {/* --- Status Display --- */}
+
+
                                         <td style={styles.td}>
                                             <Badge status={appraisal.employeeStatus} />
                                         </td>
@@ -278,7 +271,7 @@ const processAppraisalData = (data) => {
                                         <td style={styles.td}>
                                             <Badge status={appraisal.l2Status} />
                                         </td>
-                                        {/* --- Overall Action/Status (Derived from L2) --- */}
+
                                         <td style={styles.td}>
                                             <Badge status={appraisal.l2Status === "Completed" ? "Completed" : "Pending"} />
                                         </td>

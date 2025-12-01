@@ -49,7 +49,7 @@ export default function ManagerDashboard() {
     }, duration + 200);
   };
 
-  // Filter states
+
   const [pendingFormNameInput, setPendingFormNameInput] = useState("");
   const [pendingFormNameFilter, setPendingFormNameFilter] = useState("");
   const [pendingTypeFilter, setPendingTypeFilter] = useState("");
@@ -461,10 +461,8 @@ export default function ManagerDashboard() {
         </button>
       </div>
 
-      {/* Pending Tab */}
       {activeTab === "pending" && (
         <div className="manevap-card">
-          {/* Filters */}
           <div className="manevap-filter-section">
             <div className="manevap-filter-group" style={{ display: 'flex', flexDirection: 'column' }}>
               <div className="unified-search-wrapper">
@@ -532,7 +530,7 @@ export default function ManagerDashboard() {
         </div>
       )}
 
-      {/* Completed Tab */}
+
       {activeTab === "completed" && (
         <div className="manevap-card">
           <div className="manevap-filter-section">
@@ -602,14 +600,13 @@ export default function ManagerDashboard() {
         </div>
       )}
 
-      {/* UPDATED MODAL */}
+
       {showModal && currentAssignment && (
         <div className="manevap-modal-overlay" onClick={() => setShowModal(false)}>
           <div className="manevap-modal-content" onClick={(e) => e.stopPropagation()}>
-            {/* Compact Header with Close Button */}
-            <div 
-              className="manevap-form-header-strict" 
-              style={{ 
+            <div
+              className="manevap-form-header-strict"
+              style={{
                 padding: "12px 20px",
                 minHeight: "auto"
               }}
@@ -617,15 +614,15 @@ export default function ManagerDashboard() {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1 }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                    <img 
-                      src={logoImage} 
-                      alt="EEPZ Logo" 
-                      className="manevap-modal-logo" 
-                      style={{ height: "40px", width: "auto" }} 
+                    <img
+                      src={logoImage}
+                      alt="EEPZ Logo"
+                      className="manevap-modal-logo"
+                      style={{ height: "40px", width: "auto" }}
                     />
-                    <div style={{ 
-                      fontSize: "9px", 
-                      marginTop: "2px", 
+                    <div style={{
+                      fontSize: "9px",
+                      marginTop: "2px",
                       fontWeight: 600,
                       color: "#26225A"
                     }}>
@@ -633,11 +630,11 @@ export default function ManagerDashboard() {
                     </div>
                   </div>
                   <div style={{ textAlign: "left" }}>
-                    <div style={{ 
-                      fontSize: "16px", 
-                      fontWeight: 700, 
-                      marginBottom: "2px", 
-                      color: "#26225A" 
+                    <div style={{
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      marginBottom: "2px",
+                      color: "#26225A"
                     }}>
                       Appraisal Form
                     </div>
@@ -646,8 +643,7 @@ export default function ManagerDashboard() {
                     </div>
                   </div>
                 </div>
-                
-                {/* Close Button */}
+
                 <button
                   onClick={() => setShowModal(false)}
                   style={{
@@ -738,20 +734,19 @@ export default function ManagerDashboard() {
                     </tbody>
                   </table>
                 </div>
-                
-                {/* Compact Footer */}
-                <div 
-                  className="manevap-modal-actions" 
-                  style={{ 
-                    padding: "10px 20px", 
-                    display: "flex", 
-                    gap: "10px", 
+
+                <div
+                  className="manevap-modal-actions"
+                  style={{
+                    padding: "10px 20px",
+                    display: "flex",
+                    gap: "10px",
                     justifyContent: "flex-end",
                     borderTop: "1px solid #e5e7eb"
                   }}
                 >
-                  <button 
-                    onClick={() => setShowModal(false)} 
+                  <button
+                    onClick={() => setShowModal(false)}
                     className="manevap-btn-close"
                     style={{
                       background: "#6b7280",
@@ -775,8 +770,8 @@ export default function ManagerDashboard() {
                       disabled={submitting}
                       className="manevap-btn-submit-form"
                       style={{
-                        background: submitting 
-                          ? "#9ca3af" 
+                        background: submitting
+                          ? "#9ca3af"
                           : "linear-gradient(135deg, #97247E 0%, #E01950 100%)",
                         color: "white",
                         border: "none",

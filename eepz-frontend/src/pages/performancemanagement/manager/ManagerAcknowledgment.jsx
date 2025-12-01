@@ -4,16 +4,16 @@ import { getUserIdFromToken } from "../../../utils/PerformanceManagement/jwtDeco
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ManagerAcknowledgmentModal from "../../../components/performance_management/modals/ManagerAcknowledgment/ManagerAcknowledgmentModal";
- 
+
 export default function ManagerAcknowledgment() {
   const [ackList, setAckList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
- 
+
   useEffect(() => {
     fetchAckList();
   }, []);
- 
+
   const fetchAckList = async () => {
     setLoading(true);
     setError(null);
@@ -37,7 +37,7 @@ export default function ManagerAcknowledgment() {
       setLoading(false);
     }
   };
- 
+
   return (
     <div className="manageracknowledgment-page">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -49,7 +49,6 @@ export default function ManagerAcknowledgment() {
     </div>
   );
 }
- 
- 
- 
- 
+
+
+

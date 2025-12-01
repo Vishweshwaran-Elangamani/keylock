@@ -1,4 +1,3 @@
-// TeamLeadPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../../../services/performancemanagement/hr/api";
@@ -6,7 +5,7 @@ import { Toaster, toast } from "sonner";
 import "../../../styles/performancemanagement/manager/TeamLeadPage.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ReviewModal from "../../../components/performance_management/modals/TeamLeadPage/ReviewModal";
- 
+
 const calculateAverageRating = (items) => {
   if (!items || items.length === 0) return 0;
   const validRatings = items
@@ -16,10 +15,9 @@ const calculateAverageRating = (items) => {
   return (validRatings.reduce((a, b) => a + b, 0) / validRatings.length).toFixed(2);
 };
 
-// ✅ Helper function to get extension from content-type (MOVED TO TOP LEVEL)
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
-  
+
   const mimeToExt = {
     'application/pdf': '.pdf',
     'application/msword': '.doc',
@@ -36,10 +34,10 @@ const getExtensionFromContentType = (contentType) => {
     'application/zip': '.zip',
     'application/x-zip-compressed': '.zip',
   };
-  
+
   return mimeToExt[contentType.toLowerCase()] || null;
 };
- 
+
 const isL1Complete = (assess) => {
   return (assess.items || []).every(
     (item) =>
@@ -49,7 +47,7 @@ const isL1Complete = (assess) => {
       item.approverRating <= 5
   );
 };
- 
+
 const getL1Categories = (allSubs) => {
   if (!Array.isArray(allSubs)) return { pending: [], submitted: [], rejected: [] };
   const rejected = [];
@@ -68,7 +66,7 @@ const getL1Categories = (allSubs) => {
   });
   return { pending, submitted, rejected };
 };
- 
+
 function TeamLeadPage() {
   const user = JSON.parse(localStorage.getItem("user"));
   const empId = user ? user.empId : null;
@@ -85,14 +83,13 @@ function TeamLeadPage() {
   const [showRejectReason, setShowRejectReason] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [l2ActionLoading, setL2ActionLoading] = useState(false);
- 
+
   useEffect(() => {
     if (userId) {
       fetchData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, active]);
- 
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -103,27 +100,27 @@ function TeamLeadPage() {
             .get(`/approver/${userId}/rework-forms`, { params: { page: 1, pageSize: 25 } })
             .catch(() => ({ data: [] })),
         ]);
- 
+
         const extractAssessments = (resp) => {
           const respData = resp?.data;
           return Array.isArray(respData)
             ? respData
             : Array.isArray(respData?.data)
-            ? respData.data
-            : Array.isArray(respData?.data?.assessments)
-            ? respData.data.assessments
-            : Array.isArray(respData?.assessments)
-            ? respData.assessments
-            : [];
+              ? respData.data
+              : Array.isArray(respData?.data?.assessments)
+                ? respData.data.assessments
+                : Array.isArray(respData?.assessments)
+                  ? respData.assessments
+                  : [];
         };
- 
+
         const pendingAssessments = extractAssessments(pendingResp);
         const reworkAssessmentsList = extractAssessments(reworkResp);
         const allAssessmentIds = [
           ...pendingAssessments.map((a) => a.assessmentId),
           ...reworkAssessmentsList.map((a) => a.assessmentId),
         ];
- 
+
         const allWithDetails = await Promise.all(
           allAssessmentIds.map(async (assessmentId) => {
             try {
@@ -137,7 +134,7 @@ function TeamLeadPage() {
             }
           })
         );
- 
+
         const withNotes = await Promise.all(
           allWithDetails.map(async (a) => {
             try {
@@ -154,10 +151,9 @@ function TeamLeadPage() {
             }
           })
         );
- 
+
         setAllL1(withNotes);
       } else {
-        // L2 data must call the reviewer endpoints (backend exposes reviewer routes)
         const resp = await api.get(`/reviewer/${userId}/assessments/full`, {
           params: { page: 1, pageSize: 25 },
         });
@@ -165,23 +161,21 @@ function TeamLeadPage() {
         const assessments = Array.isArray(respData)
           ? respData
           : Array.isArray(respData?.data)
-          ? respData.data
-          : Array.isArray(respData?.data?.assessments)
-          ? respData.data.assessments
-          : Array.isArray(respData?.assessments)
-          ? respData.assessments
-          : [];
+            ? respData.data
+            : Array.isArray(respData?.data?.assessments)
+              ? respData.data.assessments
+              : Array.isArray(respData?.assessments)
+                ? respData.assessments
+                : [];
         setL2Subs(assessments);
       }
     } catch (error) {
-      // be explicit so the UI can show a friendly message
       toast.error("No submissions found.");
     } finally {
       setLoading(false);
     }
   };
- 
-  // ✅ UPDATED: Fetch attachments when opening modal
+
   const openModal = async (assess) => {
     setModalData(assess);
     const ratings = {};
@@ -192,7 +186,6 @@ function TeamLeadPage() {
           comment: item.approverComments ?? "",
         };
       } else {
-        // reviewer fields for L2
         ratings[item.detailId] = {
           rating: item.reviewerRating ?? "",
           comment: item.reviewerComments ?? "",
@@ -202,16 +195,15 @@ function TeamLeadPage() {
     setModalRatings(ratings);
     setShowRejectReason(false);
     setRejectionReason("");
-    
-    // ✅ NEW: Fetch attachments for this assessment
+
     try {
-      const endpoint = active === "l1" 
+      const endpoint = active === "l1"
         ? `/approver/${userId}/assessment/${assess.assessmentId}/attachments`
         : `/reviewer/${userId}/assessment/${assess.assessmentId}/attachments`;
-      
+
       const attachmentsResp = await api.get(endpoint);
       const attachments = attachmentsResp.data?.data || attachmentsResp.data || [];
-      
+
       setModalData(prev => ({
         ...assess,
         attachments: attachments
@@ -223,10 +215,10 @@ function TeamLeadPage() {
         attachments: []
       }));
     }
-    
+
     setShowModal(true);
   };
- 
+
   const closeModal = () => {
     setShowModal(false);
     setModalData(null);
@@ -234,7 +226,7 @@ function TeamLeadPage() {
     setShowRejectReason(false);
     setRejectionReason("");
   };
- 
+
   const handleL1Submit = async () => {
     setSubmitting(true);
     try {
@@ -243,7 +235,7 @@ function TeamLeadPage() {
         rating: Number(modalRatings[item.detailId]?.rating),
         comments: modalRatings[item.detailId]?.comment,
       }));
- 
+
       if (
         !items.every(
           (it) =>
@@ -259,7 +251,7 @@ function TeamLeadPage() {
         setSubmitting(false);
         return;
       }
- 
+
       await api.post(`/approver/${userId}/reviews`, {
         assessmentId: modalData.assessmentId,
         items,
@@ -273,7 +265,7 @@ function TeamLeadPage() {
       setSubmitting(false);
     }
   };
- 
+
   const handleL2Approve = async () => {
     setL2ActionLoading(true);
     try {
@@ -297,14 +289,13 @@ function TeamLeadPage() {
           return null;
         })
         .filter((item) => item !== null);
- 
+
       if (items.length !== (modalData.items || []).length) {
         toast.error("Please complete all items.");
         setL2ActionLoading(false);
         return;
       }
- 
-      // Use reviewer endpoints for L2 approve (backend expects reviewer routes)
+
       await api.post(`/reviewer/${userId}/reviews`, {
         assessmentId: modalData.assessmentId,
         items,
@@ -323,7 +314,7 @@ function TeamLeadPage() {
       setL2ActionLoading(false);
     }
   };
- 
+
   const handleL2Reject = async () => {
     if (!rejectionReason.trim()) {
       toast.error("Please provide a rejection reason.");
@@ -331,7 +322,6 @@ function TeamLeadPage() {
     }
     setL2ActionLoading(true);
     try {
-      // Use reviewer endpoint for rejection as backend exposes reviewer routes for L2 actions
       await api.post(
         `/reviewer/${userId}/decision?assessmentId=${modalData.assessmentId}&decision=rejected`,
         rejectionReason,
@@ -347,35 +337,30 @@ function TeamLeadPage() {
     }
   };
 
-  // ✅ COMPLETE FIX: Handle attachment download with proper header extraction
   const handleDownloadAttachment = async (attachmentId) => {
     try {
       console.log(`Downloading attachment ${attachmentId} for ${active} role`);
-      
-      const endpoint = active === "l1" 
+
+      const endpoint = active === "l1"
         ? `/approver/${userId}/attachments/${attachmentId}/download`
         : `/reviewer/${userId}/attachments/${attachmentId}/download`;
-      
+
       console.log(`Download endpoint: ${endpoint}`);
-      
+
       const response = await api.get(endpoint, {
         responseType: 'blob'
       });
-      
+
       console.log('Full Response:', response);
       console.log('Response headers object:', response.headers);
-      
-      // ✅ CRITICAL FIX: Extract filename from content-disposition header properly
+
       let filename = 'attachment';
-      
-      // Try to get from response headers (Axios exposes this)
+
       const contentDisposition = response.headers['content-disposition'];
       console.log('Content-Disposition header:', contentDisposition);
-      
+
       if (contentDisposition) {
-        // Match patterns: 
-        // attachment; filename="SAMPLE PDF.pdf"
-        // attachment; filename=SAMPLE PDF.pdf
+
         const matches = contentDisposition.match(/filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/);
         if (matches && (matches[1] || matches[2])) {
           filename = matches[1] || matches[2];
@@ -383,11 +368,10 @@ function TeamLeadPage() {
           console.log('✅ Extracted filename from header:', filename);
         }
       }
-      
-      // If still no filename, try content-type to infer extension
+
       const contentType = response.headers['content-type'];
       console.log('Content-Type:', contentType);
-      
+
       if (!filename.includes('.') && contentType) {
         const extension = getExtensionFromContentType(contentType);
         if (extension) {
@@ -395,25 +379,23 @@ function TeamLeadPage() {
           console.log('Added extension based on content-type:', filename);
         }
       }
-      
+
       console.log('Final filename for download:', filename);
-      
-      // ✅ Create blob and download
+
       const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename);
-      
+
       document.body.appendChild(link);
       link.click();
-      
-      // Cleanup after a brief delay
+
       setTimeout(() => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
       }, 100);
-      
+
       toast.success(`Downloaded: ${filename}`);
     } catch (error) {
       console.error("Error downloading attachment:", error);
@@ -421,16 +403,15 @@ function TeamLeadPage() {
       toast.error("Failed to download attachment.");
     }
   };
- 
+
   function renderL1Table() {
     const categories = getL1Categories(allL1);
-    // Only Pending & Rejected tabs (Awaiting removed)
     const tabs = [
       { key: "Pending", label: "Pending L1 Review", subs: categories.pending },
       { key: "Rejected", label: "Rejected (Rework)", subs: categories.rejected },
     ];
     const currentSubs = tabs.find((t) => t.key === activeL1Tab)?.subs || [];
- 
+
     return (
       <>
         <div className="tl-tabs-bar">
@@ -477,19 +458,18 @@ function TeamLeadPage() {
                       </td>
                       <td>
                         <span
-                          className={`cg-days-badge ${
-                            assess.l2Decision === "Rejected"
+                          className={`cg-days-badge ${assess.l2Decision === "Rejected"
                               ? "badge-danger"
                               : l1Complete
-                              ? "badge-warning"
-                              : "badge-info"
-                          }`}
+                                ? "badge-warning"
+                                : "badge-info"
+                            }`}
                         >
                           {assess.l2Decision === "Rejected"
                             ? "Rejected"
                             : l1Complete
-                            ? "Submitted"
-                            : "Pending"}
+                              ? "Submitted"
+                              : "Pending"}
                         </span>
                       </td>
                       <td>{new Date(assess.submittedAt).toLocaleDateString()}</td>
@@ -541,7 +521,7 @@ function TeamLeadPage() {
       </>
     );
   }
- 
+
   function renderL2Table() {
     return l2Subs.length === 0 ? (
       <div className="tl-empty">
@@ -571,8 +551,8 @@ function TeamLeadPage() {
               const l1Avg =
                 assess.items && assess.items.length > 0
                   ? (l1AvgRating /
-                      (assess.items || []).filter((i) => i.approverRating && i.approverRating > 0).length
-                    ).toFixed(2)
+                    (assess.items || []).filter((i) => i.approverRating && i.approverRating > 0).length
+                  ).toFixed(2)
                   : 0;
               return (
                 <tr key={assess.assessmentId}>
@@ -632,12 +612,11 @@ function TeamLeadPage() {
       </>
     );
   }
- 
+
   return (
     <div className="tl-page">
       <Toaster position="top-right" richColors />
- 
-      {/* compact breadcrumb + toggle row */}
+
       <div className="hrfcper-top-bar compact">
         <nav className="hrfcper-breadcrumb-nav">
           <ul className="hrfcper-breadcrumb compact">
@@ -652,7 +631,7 @@ function TeamLeadPage() {
             <li className="hrfcper-breadcrumb-item active">Performance Review</li>
           </ul>
         </nav>
- 
+
         <div className="tl-toggle compact">
           <button
             className={`tl-toggle-btn ${active === "l1" ? "active" : ""}`}
@@ -675,8 +654,7 @@ function TeamLeadPage() {
           </button>
         </div>
       </div>
- 
-      {/* main content (filters removed as requested) */}
+
       <div className="tl-content">
         {loading ? (
           <div className="tl-loading">
@@ -690,7 +668,7 @@ function TeamLeadPage() {
           </>
         )}
       </div>
- 
+
       {showModal && modalData && (
         <ReviewModal
           showModal={showModal}
@@ -708,11 +686,11 @@ function TeamLeadPage() {
           submitting={submitting}
           l2ActionLoading={l2ActionLoading}
           active={active}
-          handleDownloadAttachment={handleDownloadAttachment} // ✅ Pass download handler
+          handleDownloadAttachment={handleDownloadAttachment}
         />
       )}
     </div>
   );
 }
- 
+
 export default TeamLeadPage;

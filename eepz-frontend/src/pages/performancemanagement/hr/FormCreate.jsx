@@ -6,17 +6,12 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 import "../../../styles/performancemanagement/hr/FormCreate.css";
 
 function FormCreate() {
-  // ========================
-  // HOOKS & CONTEXT
-  // ========================
+
   const { user, loading } = useAuth();
   const { formId } = useParams();
   const navigate = useNavigate();
   const isEditMode = !!formId;
 
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
 
   const [model, setModel] = useState({
     name: "",
@@ -29,9 +24,6 @@ function FormCreate() {
   const [busy, setBusy] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
 
-  // ========================
-  // EFFECTS
-  // ========================
 
   useEffect(() => {
     if (user?.userId) {
@@ -66,9 +58,7 @@ function FormCreate() {
     loadFormData();
   }, [formId, isEditMode]);
 
-  // ========================
-  // COMPETENCY HANDLERS
-  // ========================
+
 
   const addCompetency = () => {
     setModel((m) => ({
@@ -129,9 +119,6 @@ function FormCreate() {
     });
   };
 
-  // ========================
-  // VALIDATION
-  // ========================
 
   const validateForm = () => {
     const errors = {};
@@ -155,19 +142,19 @@ function FormCreate() {
     });
     const newValidationErrors = {};
 
-model.competencies.forEach((comp, index) => {
-  if (!comp.name || comp.name.trim() === "") {
-    newValidationErrors[`comp_${index}_name`] = "Competency name is required";
-  }
-  if (!comp.description || comp.description.trim() === "") {
-    newValidationErrors[`comp_${index}_description`] = "Description is required";
-  }
-});
+    model.competencies.forEach((comp, index) => {
+      if (!comp.name || comp.name.trim() === "") {
+        newValidationErrors[`comp_${index}_name`] = "Competency name is required";
+      }
+      if (!comp.description || comp.description.trim() === "") {
+        newValidationErrors[`comp_${index}_description`] = "Description is required";
+      }
+    });
 
-if (Object.keys(newValidationErrors).length > 0) {
-  setValidationErrors(newValidationErrors);
-  return; // stop submission
-}
+    if (Object.keys(newValidationErrors).length > 0) {
+      setValidationErrors(newValidationErrors);
+      return;
+    }
 
 
     setValidationErrors(errors);
@@ -179,9 +166,6 @@ if (Object.keys(newValidationErrors).length > 0) {
     return true;
   };
 
-  // ========================
-  // SUBMIT HANDLER
-  // ========================
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -232,7 +216,7 @@ if (Object.keys(newValidationErrors).length > 0) {
       toast.dismiss();
       toast.error(
         error.response?.data?.message ||
-          (isEditMode ? "Failed to update form." : "Failed to create form.")
+        (isEditMode ? "Failed to update form." : "Failed to create form.")
       );
       console.error(error);
     } finally {
@@ -240,9 +224,6 @@ if (Object.keys(newValidationErrors).length > 0) {
     }
   };
 
-  // ========================
-  // RENDER - LOADING STATE
-  // ========================
 
   if (loading) {
     return (
@@ -266,66 +247,60 @@ if (Object.keys(newValidationErrors).length > 0) {
     );
   }
 
-  // ========================
-  // MAIN RENDER
-  // ========================
 
   return (
     <div className="hrfcper-page">
-      {/* Top Bar */}
+
       <div className="hrfcper-top-bar">
-  <ol
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "4px",          // tighter spacing
-      listStyle: "none",
-      padding: 0,
-      margin: 0
-    }}
-  >
-    <li
-      style={{ cursor: "pointer", display: "flex", alignItems: "center", color: "#97247E" }}
-      onClick={() => navigate("/dashboard")}
-    >
-      <i className="bi bi-house-door"></i>
-    </li>
+        <ol
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            listStyle: "none",
+            padding: 0,
+            margin: 0
+          }}
+        >
+          <li
+            style={{ cursor: "pointer", display: "flex", alignItems: "center", color: "#97247E" }}
+            onClick={() => navigate("/dashboard")}
+          >
+            <i className="bi bi-house-door"></i>
+          </li>
 
-    <span style={{ color: "#97247E" }}>/</span>
+          <span style={{ color: "#97247E" }}>/</span>
 
-    <li
-      style={{ cursor: "pointer", display: "flex", alignItems: "center", color: "#97247E" }}
-      onClick={() => navigate("/hr/dashboard/performance")}
-    >
-      Performance
-    </li>
+          <li
+            style={{ cursor: "pointer", display: "flex", alignItems: "center", color: "#97247E" }}
+            onClick={() => navigate("/hr/dashboard/performance")}
+          >
+            Performance
+          </li>
 
-    <span style={{ color: "#97247E" }}>/</span>
+          <span style={{ color: "#97247E" }}>/</span>
 
-    <li
-      style={{ fontWeight: "600", display: "flex", alignItems: "center", color: "#97247E" }}
-      aria-current="page"
-    >
-      {isEditMode ? "Edit Form" : "Create Form"}
-    </li>
-  </ol>
-</div>
+          <li
+            style={{ fontWeight: "600", display: "flex", alignItems: "center", color: "#97247E" }}
+            aria-current="page"
+          >
+            {isEditMode ? "Edit Form" : "Create Form"}
+          </li>
+        </ol>
+      </div>
 
 
-    
 
-      {/* FORM CONTAINER */}
+
+
       <form onSubmit={onSubmit} className="hrfcper-form-container">
-        {/* LEFT COLUMN - details and actions */}
         <div className="hrfcper-left-column">
-          {/* General Details */}
           <div className="hrfcper-section hrfcper-general-details">
             <div className="hrfcper-section-header">
               <i className="bi bi-info-circle"></i>
               <h3 className="hrfcper-section-title">General Details</h3>
             </div>
             <div className="hrfcper-section-body">
-              {/* Form Name */}
               <div className="hrfcper-form-group hrfcper-full-width">
                 <label className="hrfcper-label">
                   Form Name <span className="hrfcper-required">*</span>
@@ -350,7 +325,6 @@ if (Object.keys(newValidationErrors).length > 0) {
                   )}
                 </div>
               </div>
-              {/* Form Type & Category */}
               <div className="hrfcper-form-row-two">
                 <div className="hrfcper-form-group">
                   <label className="hrfcper-label">
@@ -369,7 +343,7 @@ if (Object.keys(newValidationErrors).length > 0) {
                       <option value="">Select form type</option>
                       <option value="Self">Self</option>
                       <option value="Manager">Manager</option>
-                      
+
                     </select>
                     {validationErrors.type && (
                       <span className="hrfcper-error-text">
@@ -385,9 +359,8 @@ if (Object.keys(newValidationErrors).length > 0) {
                   </label>
                   <div className="hrfcper-error-wrapper">
                     <select
-                      className={`hrfcper-select ${
-                        validationErrors.deliveryEnablement ? "hrfcper-input-error" : ""
-                      }`}
+                      className={`hrfcper-select ${validationErrors.deliveryEnablement ? "hrfcper-input-error" : ""
+                        }`}
                       value={model.deliveryEnablement}
                       onChange={(e) => {
                         setModel({ ...model, deliveryEnablement: e.target.value });
@@ -410,7 +383,6 @@ if (Object.keys(newValidationErrors).length > 0) {
               </div>
             </div>
           </div>
-          {/* Action Buttons */}
           <div className="hrfcper-form-actions">
             <button
               type="button"
@@ -434,7 +406,6 @@ if (Object.keys(newValidationErrors).length > 0) {
             </button>
           </div>
         </div>
-        {/* RIGHT COLUMN - Competencies with fixed header and scrollable cards */}
         <div className="hrfcper-section hrfcper-competencies-section">
           <div className="hrfcper-section-header">
             <div className="hrfcper-section-header-left">
@@ -448,7 +419,7 @@ if (Object.keys(newValidationErrors).length > 0) {
               onClick={addCompetency}
               disabled={busy}
             >
-             
+
               Add Competency
             </button>
           </div>
@@ -504,9 +475,8 @@ if (Object.keys(newValidationErrors).length > 0) {
                     <div className="hrfcper-error-wrapper">
                       <input
                         type="text"
-                        className={`hrfcper-input ${
-                          validationErrors[`comp_${index}_name`] ? "hrfcper-input-error" : ""
-                        }`}
+                        className={`hrfcper-input ${validationErrors[`comp_${index}_name`] ? "hrfcper-input-error" : ""
+                          }`}
                         placeholder="e.g., Communication Skills, Technical Expertise"
                         value={comp.name}
                         onChange={(e) => {
@@ -527,39 +497,38 @@ if (Object.keys(newValidationErrors).length > 0) {
                     </div>
                   </div>
                   <div className="hrfcper-form-group hrfcper-full-width">
-  <label className="hrfcper-label">
-    Description <span className="hrfcper-required">*</span>
-  </label>
-  <div className="hrfcper-error-wrapper">
-    <textarea
-      className={`hrfcper-textarea ${
-        validationErrors[`comp_${index}_description`] ? "hrfcper-input-error" : ""
-      }`}
-      placeholder="Enter competency description..."
-      rows="2"
-      value={comp.description || ""}
-      onChange={(e) => {
-        updateComp(index, "description", e.target.value);
-        setValidationErrors({
-          ...validationErrors,
-          [`comp_${index}_description`]: null, // clear error on change
-        });
-      }}
-      disabled={busy}
-    ></textarea>
+                    <label className="hrfcper-label">
+                      Description <span className="hrfcper-required">*</span>
+                    </label>
+                    <div className="hrfcper-error-wrapper">
+                      <textarea
+                        className={`hrfcper-textarea ${validationErrors[`comp_${index}_description`] ? "hrfcper-input-error" : ""
+                          }`}
+                        placeholder="Enter competency description..."
+                        rows="2"
+                        value={comp.description || ""}
+                        onChange={(e) => {
+                          updateComp(index, "description", e.target.value);
+                          setValidationErrors({
+                            ...validationErrors,
+                            [`comp_${index}_description`]: null,
+                          });
+                        }}
+                        disabled={busy}
+                      ></textarea>
 
-    {validationErrors[`comp_${index}_description`] && (
-      <span className="hrfcper-error-text">
-        <i className="bi bi-exclamation-circle"></i>
-        {validationErrors[`comp_${index}_description`]}
-      </span>
-    )}
-  </div>
-</div>
-
+                      {validationErrors[`comp_${index}_description`] && (
+                        <span className="hrfcper-error-text">
+                          <i className="bi bi-exclamation-circle"></i>
+                          {validationErrors[`comp_${index}_description`]}
+                        </span>
+                      )}
+                    </div>
                   </div>
+
                 </div>
-              
+              </div>
+
             ))}
           </div>
         </div>

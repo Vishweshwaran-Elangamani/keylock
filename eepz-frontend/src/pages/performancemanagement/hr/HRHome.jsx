@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
- 
+
 export default function HRHome() {
   const navigate = useNavigate();
   const [hoveredCard, setHoveredCard] = useState(null);
- 
+
   const cards = [
     {
       title: "Initiate Form",
@@ -23,7 +23,7 @@ export default function HRHome() {
       bg: "#EBFAF4",
       path: "/hr/dashboard/performance/create"
     },
-   
+
     {
       title: "Form Details",
       description: "Check review form submissions and status.",
@@ -57,25 +57,25 @@ export default function HRHome() {
       path: "/hr/dashboard/performance/nominations"
     }
   ];
- 
+
   return (
     <div className="eepz-hrhome-bg">
       <div className="eepz-hrhome-container">
 
         <h1 >
-  Performance & Nomination Management
-</h1>
-<p style={{ color : "gray",  paddingBottom: "10px" }}>Initiate , Review , Track the form and nominations </p>
- 
-       
+          Performance & Nomination Management
+        </h1>
+        <p style={{ color: "gray", paddingBottom: "10px" }}>Initiate , Review , Track the form and nominations </p>
+
+
         <div className="eepz-hrhome-card-grid">
           {cards.map((card, idx) => (
             <div
               key={card.title}
               className={`eepz-hrhome-card${hoveredCard === idx ? " hovered" : ""}`}
               style={{
-                  transition: "border-color 0.2s, box-shadow 0.18s, transform 0.18s"
-                }}
+                transition: "border-color 0.2s, box-shadow 0.18s, transform 0.18s"
+              }}
               onMouseEnter={() => setHoveredCard(idx)}
               onMouseLeave={() => setHoveredCard(null)}
               onClick={() => navigate(card.path)}
@@ -102,7 +102,6 @@ export default function HRHome() {
           ))}
         </div>
       </div>
-      {/* Inline style for self-containment, you can move to a CSS file. */}
       <style>{`
 .eepz-hrhome-bg {
   min-height: 100vh;
@@ -220,5 +219,4 @@ export default function HRHome() {
     </div>
   );
 }
- 
- 
+

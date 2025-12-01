@@ -1,4 +1,4 @@
-/* Ensure the nominations table appears inside the card visually */
+
 .managernomination-table-wrapper {
   background: #fff;
   border-radius: 12px;
@@ -6,7 +6,6 @@
   padding: 24px;
   margin-bottom: 16px;
 }
-/* Curved header for Available for Nomination table */
 .managernomination-available-section .managernomination-table thead tr {
   border-radius: 16px 16px 0 0;
   overflow: hidden;
@@ -17,10 +16,7 @@
   border-radius: 16px 16px 0 0;
   overflow: hidden;
 }
-/* ===================================================================
-   MANAGER NOMINATION PAGE - PREFIX: managernomination-
-   =================================================================== */
- 
+
 :root {
   --mn-primary: #27235C;
   --mn-accent: #3B4B8C;
@@ -36,7 +32,6 @@
   --mn-gap: 16px;
 }
  
-/* Container */
 .managernomination-container {
   padding: 24px;
   max-width: 1200px;
@@ -47,7 +42,7 @@
   box-sizing: border-box;
 }
  
-/* Breadcrumbs */
+
 .managernomination-breadcrumbs {
   margin-bottom: 12px;
 }
@@ -80,7 +75,6 @@
   color: var(--mn-primary); font-weight:800;
 }
  
-/* Page title */
 .managernomination-page-title {
   text-align:left;
   font-size:22px;
@@ -89,7 +83,6 @@
   font-weight:700;
 }
  
-/* Card & Tabs */
 .managernomination-card {
   background: var(--mn-card);
   padding: 20px;
@@ -107,12 +100,9 @@
 .managernomination-tab:hover { color:var(--mn-primary); }
 .managernomination-tab-active { color:var(--mn-primary); border-bottom-color:var(--mn-primary); box-shadow: 0 6px 12px rgba(39,35,92,0.04); }
  
-/* Table wrapper */
 .managernomination-table-wrapper { margin-top:8px; overflow:hidden; border-radius:16px 16px 0 0; }
  
-/* Table */
 .managernomination-table { width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed; font-size:14px; background:transparent; }
-/* Curved header for Available for Nomination table */
 .managernomination-available-section .managernomination-table thead {
   background: #2E2B5F;
   color: #fff;
@@ -131,7 +121,7 @@
 .managernomination-table thead { background-color:#26225A; color:#fff; }
 .managernomination-table th { padding:12px; text-align:left; font-weight:700; font-size:12px; color:#fff; border-bottom:2px solid rgba(255,255,255,0.05); text-transform:uppercase; letter-spacing:0.5px; }
  
-/* Column widths */
+
 .managernomination-table th.col-index, .managernomination-table td.col-index { width:6%; min-width:40px; }
 .managernomination-table th.col-name, .managernomination-table td.col-name { width:42%; min-width:220px; }
 .managernomination-table th.col-dept, .managernomination-table td.col-dept { width:30%; min-width:160px; }
@@ -139,21 +129,17 @@
 .managernomination-table th.col-status, .managernomination-table td.col-status { width:12%; min-width:100px; text-align:center; }
 .managernomination-table th.col-action, .managernomination-table td.col-action { width:14%; min-width:120px; text-align:center; }
  
-/* Body rows */
 .managernomination-table tbody tr { border-bottom: 1px solid var(--mn-border); background:#fff; }
 .managernomination-table td { padding:14px; font-size:14px; color:var(--mn-text); text-align:left; vertical-align:middle; word-wrap:break-word; }
 .managernomination-table tbody tr:last-child td { border-bottom:none; }
  
-/* Empty row */
 .managernomination-empty-row { padding:32px; text-align:center; color:var(--mn-muted); font-size:14px; }
  
-/* Badges */
 .managernomination-badge { padding:6px 10px; border-radius:8px; font-size:13px; font-weight:700; display:inline-block; }
 .managernomination-badge-pending { background:rgba(245,158,11,0.12); color:var(--mn-warning); border:1px solid rgba(245,158,11,0.14); }
 .managernomination-badge-approved { background:rgba(16,185,129,0.10); color:var(--mn-success); border:1px solid rgba(16,185,129,0.12); }
 .managernomination-badge-rejected { background:rgba(239,68,68,0.08); color:var(--mn-danger); border:1px solid rgba(239,68,68,0.1); }
  
-/* Buttons */
 .managernomination-nominate-button {
   padding:8px 18px; border-radius:8px; font-weight:700; color:#fff; border:none;
   background:linear-gradient(90deg,#97247e 0%,#e01950 100%); box-shadow:0 10px 28px rgba(224,25,80,0.18);
@@ -162,7 +148,6 @@
 .managernomination-nominate-button:hover { transform:translateY(-2px); box-shadow:0 14px 36px rgba(224,25,80,0.24); }
 .managernomination-nominate-button[disabled] { opacity:0.55; cursor:not-allowed; transform:none; box-shadow:none; }
  
-/* Pagination */
 .managernomination-pagination { display:flex; gap:8px; align-items:center; margin-top:12px; flex-wrap:wrap; }
 .managernomination-pg-btn {
   padding:6px 10px; border-radius:6px; border:1px solid #e6e6e6; background:#fff; cursor:pointer; font-weight:600;
@@ -170,7 +155,6 @@
 .managernomination-pg-btn.active { background:var(--mn-primary); color:#fff; border-color:var(--mn-primary); }
 .managernomination-pg-btn:disabled { opacity:0.5; cursor:not-allowed; }
  
-/* Available section */
 .managernomination-available-section {
   margin-top:32px;
   background: var(--mn-card);
@@ -188,24 +172,19 @@
   padding-bottom:8px;
   border-bottom:2px solid var(--mn-border);
 }
- 
-/* Modal and inputs (namespaced) */
 .managernomination-modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(39,35,92,0.5); display:flex; align-items:center; justify-content:center; z-index:9999; backdrop-filter: blur(3px); }
 .managernomination-modal-content { background:var(--mn-card); border-radius:12px; max-width:900px; width:98%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.18); }
 .managernomination-modal-header { padding:20px; border-bottom:1px solid #e6e9ee; background:#fff; position:sticky; top:0; z-index:10; }
 .managernomination-modal-title { font-size:20px; font-weight:700; color:var(--mn-text); margin:0 0 6px 0; }
  
-/* Inputs */
 .managernomination-input, .managernomination-textarea { width:100%; padding:10px 12px; font-size:14px; border:1px solid var(--mn-border); border-radius:8px; outline:none; box-sizing:border-box; background:#fff; color:var(--mn-text); }
 .managernomination-input:focus, .managernomination-textarea:focus { border-color:var(--mn-primary); box-shadow:0 0 0 6px rgba(39,35,92,0.06); }
  
-/* Modal actions */
 .managernomination-modal-actions { display:flex; gap:12px; justify-content:flex-end; margin-top:18px; padding-top:18px; border-top:1px solid #eef1f4; }
 .managernomination-cancel-button { padding:10px 20px; font-weight:600; color:var(--mn-text); background:#fff; border:1px solid #e0e6ef; border-radius:8px; }
 .managernomination-submit-button { padding:10px 22px; font-weight:700; color:#fff; background:linear-gradient(135deg,var(--mn-primary),var(--mn-accent)); border:none; border-radius:8px; box-shadow:0 6px 18px rgba(39,35,92,0.14); }
 .managernomination-submit-button:disabled { background:#d1d5db; cursor:not-allowed; box-shadow:none; }
  
-/* Responsive */
 @media (max-width: 1024px) {
   .managernomination-table th.col-name, .managernomination-table td.col-name { width: 42%; }
   .managernomination-table th.col-dept, .managernomination-table td.col-dept { width: 30%; }
@@ -220,7 +199,6 @@
   .managernomination-nominate-button { padding:6px 10px; font-size:13px; }
 }
  
-/* Accessibility focus */
 .managernomination-tab:focus, .managernomination-nominate-button:focus, .managernomination-submit-button:focus, .managernomination-cancel-button:focus {
   outline: 3px solid rgba(39,35,92,0.08);
   outline-offset: 2px;

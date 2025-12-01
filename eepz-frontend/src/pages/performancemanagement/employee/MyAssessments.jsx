@@ -1,6 +1,3 @@
-// MyAssessments_updated.jsx
-// Updated: Added attachment name field with improved design
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
@@ -8,7 +5,6 @@ import api from "../../../services/performancemanagement/hr/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
 
-// Utility function to get days and hours left
 function getTimeLeft(deadline) {
   const now = new Date();
   const dl = new Date(deadline);
@@ -19,10 +15,7 @@ function getTimeLeft(deadline) {
   return { days, hours, expired: ms === 0 };
 }
 
-/**
- * Breadcrumbs component
- * items: [{ label: string, to: string }]
- */
+
 function Breadcrumbs({ items = [] }) {
   return (
     <nav aria-label="breadcrumb" className="empassper-breadcrumbs">
@@ -69,16 +62,12 @@ function MyAssessments() {
   const [downloadingAttachmentId, setDownloadingAttachmentId] = useState(null);
 
 
-  // ✅ Attachment states
   const [attachments, setAttachments] = useState([]);
   const [viewAttachments, setViewAttachments] = useState([]);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
 
-  // ========================
-  // EFFECTS
-  // ========================
 
   useEffect(() => {
     if (!userId) {
@@ -88,7 +77,6 @@ function MyAssessments() {
     fetchAssignments();
   }, [userId, navigate]);
 
-  // TIMER EFFECT
   useEffect(() => {
     const interval = setInterval(() => {
       const pendingAssignments = assignments.filter((a) => !a.isCompleted);
@@ -120,171 +108,161 @@ function MyAssessments() {
     return () => clearInterval(interval);
   }, [assignments]);
 
-  // ========================
-  // API FUNCTIONS
-  // ========================
 
-  // Get file extension from MIME type
-function getExtensionFromMime(mimeType) {
-  if (!mimeType) return '';
-  const type = mimeType.toLowerCase().trim();
-  const mimeMap = {
-    'application/pdf': '.pdf',
-    'text/csv': '.csv',
-    'text/plain': '.txt',
-    'application/msword': '.doc',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
-    'application/vnd.ms-excel': '.xls',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
-    'image/jpeg': '.jpg',
-    'image/png': '.png',
-    'image/gif': '.gif',
-    'application/zip': '.zip',
-    'audio/mpeg': '.mp3',
-    'video/mp4': '.mp4',
-  };
-  return mimeMap[type] || '';
-}
+  function getExtensionFromMime(mimeType) {
+    if (!mimeType) return '';
+    const type = mimeType.toLowerCase().trim();
+    const mimeMap = {
+      'application/pdf': '.pdf',
+      'text/csv': '.csv',
+      'text/plain': '.txt',
+      'application/msword': '.doc',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+      'application/vnd.ms-excel': '.xls',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+      'image/jpeg': '.jpg',
+      'image/png': '.png',
+      'image/gif': '.gif',
+      'application/zip': '.zip',
+      'audio/mpeg': '.mp3',
+      'video/mp4': '.mp4',
+    };
+    return mimeMap[type] || '';
+  }
 
-function hasExtension(filename) {
-  return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
-}
+  function hasExtension(filename) {
+    return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
+  }
 
-function extractFilenameFromHeader(contentDisposition) {
-  if (!contentDisposition) return null;
-  const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
-  if (matchUtf8 && matchUtf8) {
+  function extractFilenameFromHeader(contentDisposition) {
+    if (!contentDisposition) return null;
+    const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
+    if (matchUtf8 && matchUtf8) {
+      try {
+        return decodeURIComponent(matchUtf8.replace(/"/g, '').trim());
+      } catch (e) {
+        return matchUtf8.replace(/"/g, '').trim();
+      }
+    }
+    const matchNormal = contentDisposition.match(/filename=([^;]+)(?:;|$)/i);
+    if (matchNormal && matchNormal) {
+      return matchNormal.replace(/"/g, '').trim();
+    }
+    return null;
+  }
+
+
+  function hasExtension(filename) {
+    return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
+  }
+
+
+
+  const handleDownloadAttachment = async (attachment) => {
     try {
-      return decodeURIComponent(matchUtf8.replace(/"/g, '').trim());
-    } catch (e) {
-      return matchUtf8.replace(/"/g, '').trim();
-    }
-  }
-  const matchNormal = contentDisposition.match(/filename=([^;]+)(?:;|$)/i);
-  if (matchNormal && matchNormal) {
-    return matchNormal.replace(/"/g, '').trim();
-  }
-  return null;
-}
+      setDownloadingId(attachment.attachmentId);
+      setError(null);
 
+      const downloadUrl = `/api/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
+      const response = await fetch(downloadUrl);
 
-// Checks if filename string contains a file extension (dot + at least 2 chars)
-function hasExtension(filename) {
-  return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
-}
-
-
-
-// ---- The corrected download handler ----
-const handleDownloadAttachment = async (attachment) => {
-  try {
-    setDownloadingId(attachment.attachmentId);
-    setError(null);
-
-    const downloadUrl = `/api/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
-    const response = await fetch(downloadUrl);
-
-    if (!response.ok) {
-      throw new Error(`Download failed with status ${response.status}`);
-    }
-
-    const blob = await response.blob();
-
-    let filename = attachment.fileName || "attachment";
-    const contentDisposition = response.headers.get("content-disposition");
-    if (contentDisposition) {
-      const parsedName = extractFilenameFromHeader(contentDisposition);
-      if (parsedName) {
-        filename = parsedName;
+      if (!response.ok) {
+        throw new Error(`Download failed with status ${response.status}`);
       }
-    }
 
-    // If the filename does not have an extension, try to infer from Content-Type header
-    if (!hasExtension(filename)) {
-      // Try Content-Type header from response
-      let extension = '';
-      const mimeType = response.headers.get("content-type") || attachment.fileType || '';
-      extension = getExtensionFromMime(mimeType);
-      if (!extension && blob.type) {
-        extension = getExtensionFromMime(blob.type);
-      }
-      // Fallback to .bin if no match at all
-      if (!extension) extension = '.bin';
+      const blob = await response.blob();
 
-      filename += extension;
-    }
+      let filename = attachment.fileName || "attachment";
+      const contentDisposition = response.headers.get("content-disposition");
+      if (contentDisposition) {
+        const parsedName = extractFilenameFromHeader(contentDisposition);
+        if (parsedName) {
+          filename = parsedName;
+        }
+      }
 
-    // Download with final filename
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(link);
+      if (!hasExtension(filename)) {
+        let extension = '';
+        const mimeType = response.headers.get("content-type") || attachment.fileType || '';
+        extension = getExtensionFromMime(mimeType);
+        if (!extension && blob.type) {
+          extension = getExtensionFromMime(blob.type);
+        }
+        if (!extension) extension = '.bin';
 
-    console.log(`✅ Downloaded: ${filename}`);
-  } catch (err) {
-    console.error("Download error:", err);
-    setError(`Failed to download ${attachment.fileName}: ${err.message}`);
-  } finally {
-    setDownloadingId(null);
-  }
-};
-const handleDownloadViewAttachment = async (attachment) => {
-  try {
-    setDownloadingAttachmentId(attachment.attachmentId);
-    const downloadUrl = `/api/SelfAssessment/attachments/${attachment.attachmentId}/download`;
-    const response = await fetch(downloadUrl);
-    
-    if (!response.ok) {
-      throw new Error(`Download failed with status ${response.status}`);
-    }
+        filename += extension;
+      }
 
-    const blob = await response.blob();
-    let filename = attachment.fileName || "attachment";
-    const contentDisposition = response.headers.get('content-disposition');
-    
-    if (contentDisposition) {
-      const headerFilename = extractFilenameFromHeader(contentDisposition);
-      if (headerFilename) {
-        filename = headerFilename;
-      }
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+
+      console.log(` Downloaded: ${filename}`);
+    } catch (err) {
+      console.error("Download error:", err);
+      setError(`Failed to download ${attachment.fileName}: ${err.message}`);
+    } finally {
+      setDownloadingId(null);
     }
-    
-    if (!hasExtension(filename)) {
-      let extension = '';
-      const contentType = response.headers.get('content-type');
-      if (contentType) {
-        extension = getExtensionFromMime(contentType);
+  };
+  const handleDownloadViewAttachment = async (attachment) => {
+    try {
+      setDownloadingAttachmentId(attachment.attachmentId);
+      const downloadUrl = `/api/SelfAssessment/attachments/${attachment.attachmentId}/download`;
+      const response = await fetch(downloadUrl);
+
+      if (!response.ok) {
+        throw new Error(`Download failed with status ${response.status}`);
       }
-      if (!extension && attachment.fileType) {
-        extension = getExtensionFromMime(attachment.fileType);
+
+      const blob = await response.blob();
+      let filename = attachment.fileName || "attachment";
+      const contentDisposition = response.headers.get('content-disposition');
+
+      if (contentDisposition) {
+        const headerFilename = extractFilenameFromHeader(contentDisposition);
+        if (headerFilename) {
+          filename = headerFilename;
+        }
       }
-      if (!extension) {
-        extension = '.bin';
+
+      if (!hasExtension(filename)) {
+        let extension = '';
+        const contentType = response.headers.get('content-type');
+        if (contentType) {
+          extension = getExtensionFromMime(contentType);
+        }
+        if (!extension && attachment.fileType) {
+          extension = getExtensionFromMime(attachment.fileType);
+        }
+        if (!extension) {
+          extension = '.bin';
+        }
+        filename += extension;
       }
-      filename += extension;
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+
+      console.log(` Downloaded: ${filename}`);
+    } catch (err) {
+      console.error("Download error:", err);
+      toast.error(`Failed to download attachment: ${err.message}`);
+    } finally {
+      setDownloadingAttachmentId(null);
     }
-    
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(link);
-    
-    console.log(`✅ Downloaded: ${filename}`);
-  } catch (err) {
-    console.error("Download error:", err);
-    toast.error(`Failed to download attachment: ${err.message}`);
-  } finally {
-    setDownloadingAttachmentId(null);
-  }
-};
+  };
 
 
 
@@ -355,20 +333,19 @@ const handleDownloadViewAttachment = async (attachment) => {
     );
   };
 
-  // ✅ Handle file selection
   const handleFileSelect = (event) => {
     const files = Array.from(event.target.files);
-    
+
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result;
-        
+
         setAttachments((prev) => [
           ...prev,
           {
             fileName: file.name,
-            customName: file.name, // ✅ NEW: Allow custom name editing
+            customName: file.name,
             fileType: file.type,
             fileSize: file.size,
             attachmentNote: "",
@@ -379,38 +356,33 @@ const handleDownloadViewAttachment = async (attachment) => {
       };
       reader.readAsDataURL(file);
     });
-    
+
     event.target.value = null;
   };
 
-  // ✅ NEW: Update attachment custom name
   const updateAttachmentName = (index, name) => {
     setAttachments((prev) =>
       prev.map((att, i) => (i === index ? { ...att, customName: name } : att))
     );
   };
 
-  // ✅ Update attachment note
   const updateAttachmentNote = (index, note) => {
     setAttachments((prev) =>
       prev.map((att, i) => (i === index ? { ...att, attachmentNote: note } : att))
     );
   };
 
-  // ✅ Remove attachment
   const removeAttachment = (index) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmitAssessment = async () => {
-    // Validate ratings
     const incompleteRatings = assessmentData.filter((item) => !item.rating);
     if (incompleteRatings.length > 0) {
       toast.error("Please provide ratings for all competencies.");
       return;
     }
 
-    // Validate comments
     const incompleteComments = assessmentData.filter((item) => !item.comments || item.comments.trim() === "");
     if (incompleteComments.length > 0) {
       toast.error("Please provide comments for all competencies.");
@@ -427,9 +399,8 @@ const handleDownloadViewAttachment = async (attachment) => {
         employeeRating: parseInt(item.rating),
         employeeComments: item.comments.trim(),
       })),
-      // ✅ Include attachments with custom name
       attachments: attachments.map((att) => ({
-        fileName: att.customName || att.fileName, // Use custom name if provided
+        fileName: att.customName || att.fileName,
         fileType: att.fileType,
         fileSize: att.fileSize,
         attachmentNote: att.attachmentNote,
@@ -465,9 +436,6 @@ const handleDownloadViewAttachment = async (attachment) => {
     }
   };
 
-  // ========================
-  // FILTER & DATA PROCESSING
-  // ========================
 
   const pendingAssignments = assignments.filter((a) => !a.isCompleted);
   const completedAssignments = assignments.filter((a) => a.isCompleted);
@@ -497,20 +465,17 @@ const handleDownloadViewAttachment = async (attachment) => {
     setSearchQuery(searchInput.trim());
   };
 
-  // ========================
-  // RENDER FUNCTIONS
-  // ========================
 
   const renderTable = (data) => (
     <div className="empassper-table-container">
-      <table className="empassper-table" style={{ borderCollapse: "separate", borderSpacing: 0, width: "100%", border:"1px solid black", borderRadius:"12px"}}>
+      <table className="empassper-table" style={{ borderCollapse: "separate", borderSpacing: 0, width: "100%", border: "1px solid black", borderRadius: "12px" }}>
         <thead>
           <tr>
-            <th style={{ borderTopLeftRadius: "8px"}}>FORM NAME</th>
+            <th style={{ borderTopLeftRadius: "8px" }}>FORM NAME</th>
             <th>TYPE</th>
             <th>DEADLINE</th>
             <th>STATUS</th>
-            <th style={{ borderTopRightRadius: "8px"}}>SUBMISSION</th>
+            <th style={{ borderTopRightRadius: "8px" }}>SUBMISSION</th>
           </tr>
         </thead>
         <tbody>
@@ -577,13 +542,12 @@ const handleDownloadViewAttachment = async (attachment) => {
     <div className="empassper-container">
       <Toaster position="top-right" />
 
-      {/* Header Section */}
       <div className="empassper-header-section">
         <div className="empassper-header-content">
           <div className="empassper-header-text" style={{ flex: 1 }}>
             <Breadcrumbs
               items={[
-                { label:  <i className="bi bi-house-door"></i>, to: "/employee/dashboard", isIcon: true },
+                { label: <i className="bi bi-house-door"></i>, to: "/employee/dashboard", isIcon: true },
                 { label: "Performance Management", to: "/employee/dashboard/performance" },
                 { label: <strong>My Performance Assessments</strong>, to: "/employee/dashboard/performance/my-assessments" }
               ]}
@@ -606,7 +570,6 @@ const handleDownloadViewAttachment = async (attachment) => {
         )}
       </div>
 
-      {/* TIMER BARS */}
       {visibleTimers.length > 0 && (
         <div className="empassper-timer-bars-container">
           {visibleTimers.map((timer) => (
@@ -625,7 +588,6 @@ const handleDownloadViewAttachment = async (attachment) => {
         </div>
       )}
 
-      {/* Search & Filter */}
       <div className="empassper-search-filter-container">
         <div className="empassper-search-box">
           <input
@@ -659,7 +621,6 @@ const handleDownloadViewAttachment = async (attachment) => {
         />
       </div>
 
-      {/* Tab Navigation */}
       <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
         <div className="empassper-pill-tabs">
           <button
@@ -684,7 +645,6 @@ const handleDownloadViewAttachment = async (attachment) => {
         </div>
       </div>
 
-      {/* Content */}
       {activeTab === "pending" && (
         <>
           {filteredPending.length > 0 ? (
@@ -723,140 +683,131 @@ const handleDownloadViewAttachment = async (attachment) => {
         </>
       )}
 
-      {/*-------------------------------------------------------MODAL---------------------------------- */}
       {showModal && currentAssignment && (
-  <div
-    className="empassper-modal-overlay"
-    onClick={() => !submitting && setShowModal(false)}
-  >
-    <div
-      className="empassper-modal-content"
-      onClick={(e) => e.stopPropagation()}
-      style={{ paddingTop: "0px", marginTop: "0px" }}
-    >
-     {/* Form Header */}
-<div className="empass-form-header" style={{ marginBottom: "0px", paddingBottom: "0px", position: "relative" }}>
-  <div className="empass-logo-section">
-    <img src={logoImage} alt="Logo" className="empass-logo-small" />
-    <div className="empass-appraisal-label" style={{paddingBottom:"10px"}}>Appraisal Form</div>
-  </div>
-  <div className="empass-form-title-container" style={{marginRight:"100px"}}>
-    <h2 className="empass-form-title">{currentAssignment?.formName}</h2>
-    <p className="empass-form-subtitle">
-      {currentAssignment?.formType} Assessment Form
-    </p>
-  </div>
-  
-  {/* ✅ Attachment Count Badge in Header */}
-  {((modalMode === "submit" && attachments.length > 0) || 
-    (modalMode === "view" && viewAttachments && viewAttachments.length > 0)) && (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        background: "#97247E",
-        padding: "6px 12px",
-        borderRadius: "8px",
-        position: "absolute",
-        right: "24px",
-        top: "50%",
-        transform: "translateY(-50%)"
-      }}
-    >
-      {/* <i
-        className="bi bi-paperclip"
-        style={{
-          color: "white",
-          fontSize: "14px",
-        }}
-      ></i> */}
-      <span
-        style={{
-          color: "white",
-          fontSize: "13px",
-          fontWeight: 700,
-          letterSpacing: "0.02em",
-        }}
-      >
-        {modalMode === "submit" 
-          ? `${attachments.length} ${attachments.length === 1 ? "File" : "Files"}`
-          : `${viewAttachments.length} ${viewAttachments.length === 1 ? "File" : "Files"}`
-        }
-      </span>
-    </div>
-  )}
-</div>
-
-
-      <div
-        className="empass-form-divider"
-        style={{
-          marginTop: "0px",
-          marginBottom: "0px",
-          padding: "0",
-          height: "0px",
-          lineHeight: "0",
-        }}
-      ></div>
-
-      {submitting && modalMode === "view" ? (
         <div
-          className="empass-form-body"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            paddingTop: "0px",
-            marginTop: "0px",
-            padding:"0px"
-          }}
+          className="empassper-modal-overlay"
+          onClick={() => !submitting && setShowModal(false)}
         >
-          <div>
-            <div className="spinner-border"></div>
-            <p
-              style={{
-                marginTop: "16px",
-                color: "var(--text-light)",
-                textAlign: "center",
-              }}
-            >
-              Loading assessment...
-            </p>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Form Body */}
           <div
-            className="empass-form-body"
-            style={{
-              paddingTop: "24px", // ✅ Added gap here
-              marginTop: "0px",
-            }}
+            className="empassper-modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{ paddingTop: "0px", marginTop: "0px" }}
           >
-            <table
-              className="empass-form-table"
+
+            <div className="empass-form-header" style={{ marginBottom: "0px", paddingBottom: "0px", position: "relative" }}>
+              <div className="empass-logo-section">
+                <img src={logoImage} alt="Logo" className="empass-logo-small" />
+                <div className="empass-appraisal-label" style={{ paddingBottom: "10px" }}>Appraisal Form</div>
+              </div>
+              <div className="empass-form-title-container" style={{ marginRight: "100px" }}>
+                <h2 className="empass-form-title">{currentAssignment?.formName}</h2>
+                <p className="empass-form-subtitle">
+                  {currentAssignment?.formType} Assessment Form
+                </p>
+              </div>
+
+              {((modalMode === "submit" && attachments.length > 0) ||
+                (modalMode === "view" && viewAttachments && viewAttachments.length > 0)) && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      background: "#97247E",
+                      padding: "6px 12px",
+                      borderRadius: "8px",
+                      position: "absolute",
+                      right: "24px",
+                      top: "50%",
+                      transform: "translateY(-50%)"
+                    }}
+                  >
+
+                    <span
+                      style={{
+                        color: "white",
+                        fontSize: "13px",
+                        fontWeight: 700,
+                        letterSpacing: "0.02em",
+                      }}
+                    >
+                      {modalMode === "submit"
+                        ? `${attachments.length} ${attachments.length === 1 ? "File" : "Files"}`
+                        : `${viewAttachments.length} ${viewAttachments.length === 1 ? "File" : "Files"}`
+                      }
+                    </span>
+                  </div>
+                )}
+            </div>
+
+
+            <div
+              className="empass-form-divider"
               style={{
-                width:"100%",
                 marginTop: "0px",
-                borderCollapse: "separate",
-                borderLeft: "none",
-                borderRadius: "12px",
-                borderRight: "none",
-                borderBottom: "none",
-                border: "1px solid black",
-                borderSpacing: 0,
+                marginBottom: "0px",
+                padding: "0",
+                height: "0px",
+                lineHeight: "0",
               }}
-            >
-              <thead>
-                <tr>
-                  <th style={{ padding: "10px 6px", height: "44px", borderTopLeftRadius: "8px" }}>Competency Name</th>
-                  <th style={{ padding: "10px 6px", height: "40px" }}>Description</th>
-                  <th style={{ padding: "10px 6px", height: "40px" }}>Rating</th>
-                  <th style={{ padding: "10px 6px", height: "40px", borderTopRightRadius: "8px" }}>Comments</th>
-                </tr>
-              </thead>
+            ></div>
+
+            {submitting && modalMode === "view" ? (
+              <div
+                className="empass-form-body"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  paddingTop: "0px",
+                  marginTop: "0px",
+                  padding: "0px"
+                }}
+              >
+                <div>
+                  <div className="spinner-border"></div>
+                  <p
+                    style={{
+                      marginTop: "16px",
+                      color: "var(--text-light)",
+                      textAlign: "center",
+                    }}
+                  >
+                    Loading assessment...
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div
+                  className="empass-form-body"
+                  style={{
+                    paddingTop: "24px",
+                    marginTop: "0px",
+                  }}
+                >
+                  <table
+                    className="empass-form-table"
+                    style={{
+                      width: "100%",
+                      marginTop: "0px",
+                      borderCollapse: "separate",
+                      borderLeft: "none",
+                      borderRadius: "12px",
+                      borderRight: "none",
+                      borderBottom: "none",
+                      border: "1px solid black",
+                      borderSpacing: 0,
+                    }}
+                  >
+                    <thead>
+                      <tr>
+                        <th style={{ padding: "10px 6px", height: "44px", borderTopLeftRadius: "8px" }}>Competency Name</th>
+                        <th style={{ padding: "10px 6px", height: "40px" }}>Description</th>
+                        <th style={{ padding: "10px 6px", height: "40px" }}>Rating</th>
+                        <th style={{ padding: "10px 6px", height: "40px", borderTopRightRadius: "8px" }}>Comments</th>
+                      </tr>
+                    </thead>
 
                     <tbody>
                       {assessmentData.map((item) => (
@@ -880,7 +831,7 @@ const handleDownloadViewAttachment = async (attachment) => {
                                     e.target.value
                                   )
                                 }
-                                className="ma-form-select"
+                                className="form-select"
                                 disabled={submitting}
                               >
                                 <option value="">-</option>
@@ -893,405 +844,396 @@ const handleDownloadViewAttachment = async (attachment) => {
                             )}
                           </td>
 
-                    <td>
-                      {modalMode === "view" ? (
-                        <span>{item.comments || "-"}</span>
-                      ) : (
-                        <textarea
-                          value={item.comments}
-                          onChange={(e) =>
-                            updateAssessmentData(
-                              item.competencyId,
-                              "comments",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Justify through comments"
-                          className="form-textarea"
-                          disabled={submitting}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <td>
+                            {modalMode === "view" ? (
+                              <span>{item.comments || "-"}</span>
+                            ) : (
+                              <textarea
+                                value={item.comments}
+                                onChange={(e) =>
+                                  updateAssessmentData(
+                                    item.competencyId,
+                                    "comments",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Justify through comments"
+                                className="form-textarea"
+                                disabled={submitting}
+                              />
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
-            {/* ✅ UPDATED: Attachments Section with Name Field */}
-            <div style={{ marginTop: "24px", padding: "0 16px" }}>
-              <h3 style={{ 
-                fontSize: "16px", 
-                fontWeight: "600", 
-                marginBottom: "12px",
-                color: "var(--text-primary)",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px"
-              }}>
-                <i className="bi bi-paperclip"></i>
-                Attachments
-              </h3>
-
-              {/* Submit Mode: Upload Interface */}
-              {modalMode === "submit" && (
-                <div>
-                  <div style={{ marginBottom: "16px" }}>
-                    <label
-                      htmlFor="file-upload"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        padding: "10px 20px",
-                        backgroundColor: "#007bff",
-                        color: "white",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                        transition: "background-color 0.2s",
-                      }}
-                      onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
-                      onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
-                    >
-                      <i className="bi bi-cloud-upload"></i> Add Attachment
-                    </label>
-                    <input
-                      id="file-upload"
-                      type="file"
-                      multiple
-                      onChange={handleFileSelect}
-                      style={{ display: "none" }}
-                      disabled={submitting}
-                    />
-                    <span style={{ 
-                      marginLeft: "12px", 
-                      fontSize: "13px", 
-                      color: "#666" 
+                  <div style={{ marginTop: "24px", padding: "0 16px" }}>
+                    <h3 style={{
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      marginBottom: "12px",
+                      color: "var(--text-primary)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px"
                     }}>
-                      {attachments.length > 0 && `${attachments.length} file(s) selected`}
-                    </span>
-                  </div>
+                      <i className="bi bi-paperclip"></i>
+                      Attachments
+                    </h3>
 
-                  {/* Display Selected Attachments */}
-                  {attachments.length > 0 && (
-                    <div style={{ marginTop: "16px" }}>
-                      {attachments.map((att, index) => (
-                        <div
-                          key={index}
-                          style={{
-                            padding: "16px",
-                            border: "1px solid #d1d5db",
-                            borderRadius: "8px",
-                            marginBottom: "16px",
-                            backgroundColor: "#f9fafb",
-                            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                          }}
-                        >
-                          {/* Header with file icon and remove button */}
-                          <div style={{ 
-                            display: "flex", 
-                            justifyContent: "space-between", 
-                            alignItems: "center",
-                            marginBottom: "12px"
-                          }}>
-                            <div style={{ 
-                              display: "flex", 
+                    {modalMode === "submit" && (
+                      <div>
+                        <div style={{ marginBottom: "16px" }}>
+                          <label
+                            htmlFor="file-upload"
+                            style={{
+                              display: "inline-flex",
                               alignItems: "center",
-                              gap: "8px"
-                            }}>
-                              <i 
-                                className="bi bi-file-earmark-text" 
-                                style={{ 
-                                  fontSize: "24px", 
-                                  color: "#3b82f6" 
-                                }}
-                              ></i>
-                              <div>
-                                <div style={{ 
-                                  fontSize: "12px", 
-                                  color: "#6b7280",
-                                  marginBottom: "2px"
-                                }}>
-                                  Original: {att.fileName}
-                                </div>
-                                <div style={{ 
-                                  fontSize: "12px", 
-                                  color: "#9ca3af" 
-                                }}>
-                                  {(att.fileSize / 1024).toFixed(2)} KB • {att.fileType || 'Unknown type'}
-                                </div>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => removeAttachment(index)}
-                              style={{
-                                padding: "6px 12px",
-                                backgroundColor: "#ef4444",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "6px",
-                                cursor: "pointer",
-                                fontSize: "13px",
-                                fontWeight: "500",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "4px",
-                                transition: "background-color 0.2s",
-                              }}
-                              onMouseOver={(e) => e.target.style.backgroundColor = "#dc2626"}
-                              onMouseOut={(e) => e.target.style.backgroundColor = "#ef4444"}
-                              disabled={submitting}
-                            >
-                              <i className="bi bi-trash"></i> Remove
-                            </button>
-                          </div>
-
-                          {/* ✅ NEW: Attachment Name Field */}
-                          <div style={{ marginBottom: "12px" }}>
-                            <label style={{ 
-                              display: "block",
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              color: "#374151",
-                              marginBottom: "6px"
-                            }}>
-                              <i className="bi bi-tag"></i> Attachment Name *
-                            </label>
-                            <input
-                              type="text"
-                              value={att.customName}
-                              onChange={(e) => updateAttachmentName(index, e.target.value)}
-                              placeholder="Enter a name for this attachment"
-                              style={{
-                                width: "100%",
-                                padding: "8px 12px",
-                                border: "1px solid #d1d5db",
-                                borderRadius: "6px",
-                                fontSize: "14px",
-                                backgroundColor: "white",
-                                outline: "none",
-                                transition: "border-color 0.2s",
-                              }}
-                              onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
-                              onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
-                              disabled={submitting}
-                            />
-                          </div>
-
-                          {/* Attachment Description Field */}
-                          <div>
-                            <label style={{ 
-                              display: "block",
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              color: "#374151",
-                              marginBottom: "6px"
-                            }}>
-                              <i className="bi bi-chat-left-text"></i> Description (Optional)
-                            </label>
-                            <textarea
-                              value={att.attachmentNote}
-                              onChange={(e) => updateAttachmentNote(index, e.target.value)}
-                              placeholder="Add a description or notes for this attachment..."
-                              style={{
-                                width: "100%",
-                                padding: "8px 12px",
-                                border: "1px solid #d1d5db",
-                                borderRadius: "6px",
-                                fontSize: "13px",
-                                minHeight: "70px",
-                                resize: "vertical",
-                                backgroundColor: "white",
-                                outline: "none",
-                                transition: "border-color 0.2s",
-                                fontFamily: "inherit"
-                              }}
-                              onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
-                              onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
-                              disabled={submitting}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {attachments.length === 0 && (
-                    <div style={{
-                      padding: "24px",
-                      textAlign: "center",
-                      color: "#9ca3af",
-                      fontSize: "14px",
-                      fontStyle: "italic",
-                      border: "2px dashed #e5e7eb",
-                      borderRadius: "8px",
-                      backgroundColor: "#f9fafb"
-                    }}>
-                      <i className="bi bi-inbox" style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}></i>
-                      No attachments added yet. Click "Add Attachment" to upload files.
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* View Mode: Display Attachments */}
-              {modalMode === "view" && (
-                <div>
-                  {viewAttachments && viewAttachments.length > 0 ? (
-                    <div style={{ marginTop: "12px" }}>
-                      {viewAttachments.map((att) => (
-                        <div
-                          key={att.attachmentId}
-                          style={{
-                            padding: "16px",
-                            border: "1px solid #e5e7eb",
-                            borderRadius: "8px",
-                            marginBottom: "12px",
-                            backgroundColor: "#f9fafb",
-                          }}
-                        >
-                          <div style={{ 
-                            display: "flex", 
-                            justifyContent: "space-between", 
-                            alignItems: "flex-start"
+                              gap: "6px",
+                              padding: "10px 20px",
+                              backgroundColor: "#007bff",
+                              color: "white",
+                              borderRadius: "6px",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              transition: "background-color 0.2s",
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
+                            onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
+                          >
+                            <i className="bi bi-cloud-upload"></i> Add Attachment
+                          </label>
+                          <input
+                            id="file-upload"
+                            type="file"
+                            multiple
+                            onChange={handleFileSelect}
+                            style={{ display: "none" }}
+                            disabled={submitting}
+                          />
+                          <span style={{
+                            marginLeft: "12px",
+                            fontSize: "13px",
+                            color: "#666"
                           }}>
-                            <div style={{ flex: 1 }}>
-                              <div style={{ 
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                marginBottom: "8px"
-                              }}>
-                               
-                                <div style={{ 
-                                  fontWeight: "600", 
-                                  fontSize: "14px",
-                                  color: "#1f2937"
-                                }}>
-                                  {att.fileName}
-                                </div>
-                              </div>
-                              
-                              {att.attachmentNote && (
-                                <div style={{ 
-                                  fontSize: "13px", 
-                                  color: "#4b5563",
-                                  marginTop: "8px",
-                                  padding: "8px 12px",
-                                  backgroundColor: "#ffffff",
-                                  borderRadius: "6px",
-                                  borderLeft: "3px solid #3b82f6"
-                                }}>
-                                  <strong>Description:</strong> {att.attachmentNote}
-                                </div>
-                              )}
-                              
-                              <div style={{ 
-                                fontSize: "12px", 
-                                color: "#9ca3af",
-                                marginTop: "8px",
-                                display: "flex",
-                                gap: "12px",
-                                flexWrap: "wrap"
-                              }}>
-                                {att.fileSize && (
-                                  <span>
-                                    <i className="bi bi-hdd"></i> {(att.fileSize / 1024).toFixed(2)} KB
-                                  </span>
-                                )}
-                                {att.uploadedAt && (
-                                  <span>
-                                    <i className="bi bi-calendar3"></i> {new Date(att.uploadedAt).toLocaleDateString('en-US', {
-                                      year: 'numeric',
-                                      month: 'short',
-                                      day: 'numeric'
-                                    })}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <button
-                              onClick={() => handleDownloadViewAttachment(att)}
-                              disabled={downloadingAttachmentId === att.attachmentId}
-                              style={{
-                                padding: "8px 16px",
-                                backgroundColor: "#97247E",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "6px",
-                                cursor: downloadingAttachmentId === att.attachmentId ? "not-allowed" : "pointer",
-                                fontSize: "13px",
-                                fontWeight: "600",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "6px",
-                              }}
-                            >
-                              {downloadingAttachmentId === att.attachmentId ? (
-                                <>
-                                  <i className="bi bi-hourglass-split"></i>
-                                  Downloading...
-                                </>
-                              ) : (
-                                <>
-                                  <i className="bi bi-download"></i>
-                                  Download
-                                </>
-                              )}
-                            </button>
-                          </div>
+                            {attachments.length > 0 && `${attachments.length} file(s) selected`}
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div style={{
-                      padding: "24px",
-                      textAlign: "center",
-                      color: "#9ca3af",
-                      fontSize: "14px",
-                      fontStyle: "italic",
-                      border: "2px dashed #e5e7eb",
-                      borderRadius: "8px",
-                      backgroundColor: "#f9fafb"
-                    }}>
-                      <i className="bi bi-inbox" style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}></i>
-                      No attachments submitted with this assessment
-                    </div>
+
+                        {attachments.length > 0 && (
+                          <div style={{ marginTop: "16px" }}>
+                            {attachments.map((att, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  padding: "16px",
+                                  border: "1px solid #d1d5db",
+                                  borderRadius: "8px",
+                                  marginBottom: "16px",
+                                  backgroundColor: "#f9fafb",
+                                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                                }}
+                              >
+                                <div style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  marginBottom: "12px"
+                                }}>
+                                  <div style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px"
+                                  }}>
+                                    <i
+                                      className="bi bi-file-earmark-text"
+                                      style={{
+                                        fontSize: "24px",
+                                        color: "#3b82f6"
+                                      }}
+                                    ></i>
+                                    <div>
+                                      <div style={{
+                                        fontSize: "12px",
+                                        color: "#6b7280",
+                                        marginBottom: "2px"
+                                      }}>
+                                        Original: {att.fileName}
+                                      </div>
+                                      <div style={{
+                                        fontSize: "12px",
+                                        color: "#9ca3af"
+                                      }}>
+                                        {(att.fileSize / 1024).toFixed(2)} KB • {att.fileType || 'Unknown type'}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => removeAttachment(index)}
+                                    style={{
+                                      padding: "6px 12px",
+                                      backgroundColor: "#ef4444",
+                                      color: "white",
+                                      border: "none",
+                                      borderRadius: "6px",
+                                      cursor: "pointer",
+                                      fontSize: "13px",
+                                      fontWeight: "500",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "4px",
+                                      transition: "background-color 0.2s",
+                                    }}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = "#dc2626"}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = "#ef4444"}
+                                    disabled={submitting}
+                                  >
+                                    <i className="bi bi-trash"></i> Remove
+                                  </button>
+                                </div>
+
+                                <div style={{ marginBottom: "12px" }}>
+                                  <label style={{
+                                    display: "block",
+                                    fontSize: "13px",
+                                    fontWeight: "600",
+                                    color: "#374151",
+                                    marginBottom: "6px"
+                                  }}>
+                                    <i className="bi bi-tag"></i> Attachment Name *
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={att.customName}
+                                    onChange={(e) => updateAttachmentName(index, e.target.value)}
+                                    placeholder="Enter a name for this attachment"
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px 12px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: "6px",
+                                      fontSize: "14px",
+                                      backgroundColor: "white",
+                                      outline: "none",
+                                      transition: "border-color 0.2s",
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
+                                    onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
+                                    disabled={submitting}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label style={{
+                                    display: "block",
+                                    fontSize: "13px",
+                                    fontWeight: "600",
+                                    color: "#374151",
+                                    marginBottom: "6px"
+                                  }}>
+                                    <i className="bi bi-chat-left-text"></i> Description (Optional)
+                                  </label>
+                                  <textarea
+                                    value={att.attachmentNote}
+                                    onChange={(e) => updateAttachmentNote(index, e.target.value)}
+                                    placeholder="Add a description or notes for this attachment..."
+                                    style={{
+                                      width: "100%",
+                                      padding: "8px 12px",
+                                      border: "1px solid #d1d5db",
+                                      borderRadius: "6px",
+                                      fontSize: "13px",
+                                      minHeight: "70px",
+                                      resize: "vertical",
+                                      backgroundColor: "white",
+                                      outline: "none",
+                                      transition: "border-color 0.2s",
+                                      fontFamily: "inherit"
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = "#3b82f6"}
+                                    onBlur={(e) => e.target.style.borderColor = "#d1d5db"}
+                                    disabled={submitting}
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {attachments.length === 0 && (
+                          <div style={{
+                            padding: "24px",
+                            textAlign: "center",
+                            color: "#9ca3af",
+                            fontSize: "14px",
+                            fontStyle: "italic",
+                            border: "2px dashed #e5e7eb",
+                            borderRadius: "8px",
+                            backgroundColor: "#f9fafb"
+                          }}>
+                            <i className="bi bi-inbox" style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}></i>
+                            No attachments added yet. Click "Add Attachment" to upload files.
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {modalMode === "view" && (
+                      <div>
+                        {viewAttachments && viewAttachments.length > 0 ? (
+                          <div style={{ marginTop: "12px" }}>
+                            {viewAttachments.map((att) => (
+                              <div
+                                key={att.attachmentId}
+                                style={{
+                                  padding: "16px",
+                                  border: "1px solid #e5e7eb",
+                                  borderRadius: "8px",
+                                  marginBottom: "12px",
+                                  backgroundColor: "#f9fafb",
+                                }}
+                              >
+                                <div style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "flex-start"
+                                }}>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "8px",
+                                      marginBottom: "8px"
+                                    }}>
+
+                                      <div style={{
+                                        fontWeight: "600",
+                                        fontSize: "14px",
+                                        color: "#1f2937"
+                                      }}>
+                                        {att.fileName}
+                                      </div>
+                                    </div>
+
+                                    {att.attachmentNote && (
+                                      <div style={{
+                                        fontSize: "13px",
+                                        color: "#4b5563",
+                                        marginTop: "8px",
+                                        padding: "8px 12px",
+                                        backgroundColor: "#ffffff",
+                                        borderRadius: "6px",
+                                        borderLeft: "3px solid #3b82f6"
+                                      }}>
+                                        <strong>Description:</strong> {att.attachmentNote}
+                                      </div>
+                                    )}
+
+                                    <div style={{
+                                      fontSize: "12px",
+                                      color: "#9ca3af",
+                                      marginTop: "8px",
+                                      display: "flex",
+                                      gap: "12px",
+                                      flexWrap: "wrap"
+                                    }}>
+                                      {att.fileSize && (
+                                        <span>
+                                          <i className="bi bi-hdd"></i> {(att.fileSize / 1024).toFixed(2)} KB
+                                        </span>
+                                      )}
+                                      {att.uploadedAt && (
+                                        <span>
+                                          <i className="bi bi-calendar3"></i> {new Date(att.uploadedAt).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric'
+                                          })}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    onClick={() => handleDownloadViewAttachment(att)}
+                                    disabled={downloadingAttachmentId === att.attachmentId}
+                                    style={{
+                                      padding: "8px 16px",
+                                      backgroundColor: "#97247E",
+                                      color: "white",
+                                      border: "none",
+                                      borderRadius: "6px",
+                                      cursor: downloadingAttachmentId === att.attachmentId ? "not-allowed" : "pointer",
+                                      fontSize: "13px",
+                                      fontWeight: "600",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "6px",
+                                    }}
+                                  >
+                                    {downloadingAttachmentId === att.attachmentId ? (
+                                      <>
+                                        <i className="bi bi-hourglass-split"></i>
+                                        Downloading...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <i className="bi bi-download"></i>
+                                        Download
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div style={{
+                            padding: "24px",
+                            textAlign: "center",
+                            color: "#9ca3af",
+                            fontSize: "14px",
+                            fontStyle: "italic",
+                            border: "2px dashed #e5e7eb",
+                            borderRadius: "8px",
+                            backgroundColor: "#f9fafb"
+                          }}>
+                            <i className="bi bi-inbox" style={{ fontSize: "32px", display: "block", marginBottom: "8px" }}></i>
+                            No attachments submitted with this assessment
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-footer">
+                  <button
+                    className="empass-btn-cancel"
+                    onClick={() => setShowModal(false)}
+                    disabled={submitting}
+                  >
+                    {modalMode === "view" ? "Close" : "Cancel"}
+                  </button>
+
+                  {modalMode === "submit" && (
+                    <button
+                      className="btn-submit-form"
+                      onClick={handleSubmitAssessment}
+                      disabled={submitting}
+                    >
+                      {submitting ? "Submitting..." : "Submit Assessment"}
+                    </button>
                   )}
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Form Footer */}
-          <div className="form-footer">
-            <button
-              className="empass-btn-cancel"
-              onClick={() => setShowModal(false)}
-              disabled={submitting}
-            >
-              {modalMode === "view" ? "Close" : "Cancel"}
-            </button>
-
-            {modalMode === "submit" && (
-              <button
-                className="btn-submit-form"
-                onClick={handleSubmitAssessment}
-                disabled={submitting}
-              >
-                {submitting ? "Submitting..." : "Submit Assessment"}
-              </button>
+              </>
             )}
           </div>
-        </>
+        </div>
       )}
-    </div>
-  </div>
-)}
 
-      {/*-------------------------------------------------------MODAL---------------------------------- */}
     </div>
   );
 }

@@ -1,174 +1,173 @@
-/* src/styles/self-assessment.css */
-
 .sa-container {
-    max-width: 1200px;
-    margin: 48px auto;
-    padding: 32px 32px 48px 32px;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 6px 32px rgba(39, 35, 92, 0.07);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-  
-  .sa-title {
-    font-size: 2rem;
-    color: #27235c;
-    font-weight: 700;
-    margin-bottom: 2px;
-  }
-  
-  .sa-subtitle {
-    font-size: 1.06rem;
-    color: #687088;
-    margin-bottom: 26px;
-  }
-  
-  .sa-section-label {
-    font-size: 1.25rem;
-    color: #27235c;
-    font-weight: 700;
-    margin-bottom: 18px;
-    letter-spacing: -1px;
-  }
-  
-  .sa-table-container {
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 30px;
-  }
-  
-  .sa-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .sa-table th, .sa-table td {
-    font-size: 1rem;
-    text-align: left;
-    padding: 16px 10px;
-  }
-  
-  .sa-table th {
-    color: #fff;
-    background: #97247e;
-    font-weight: 600;
-    font-size: 1.09rem;
-    border-right: 2px solid #fff9;
-    vertical-align: middle;
-  }
-  
-  .sa-table th:last-child, .sa-table td:last-child {
-    text-align: center;
-  }
-  
-  .sa-table td {
-    color: #26205a;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .sa-table tr:last-child td {
-    border-bottom: none;
-  }
-  
-  .sa-table td select {
-    font-size: 1.1rem;
-    border-radius: 7px;
-    border: 1px solid #c8c8d1;
-    background: #f8f6f9;
-    color: #97247e;
-    padding: 8px 20px;
-    font-weight: 700;
-    outline: none;
-    min-width: 68px;
-    margin-left: 8px;
-    margin-right: 8px;
-  }
-  
-  .sa-table td .sa-rating-label {
-    font-weight: 600;
-  }
-  
-  .sa-table .sa-rating-cell {
-    min-width: 120px;
-  }
-  
-  .sa-table th, .sa-table td {
-    /* No vertical divider for last column */
-    border-right: none;
-  }
-  
-  .sa-drafts-btn {
-    float: right;
-    margin-bottom: 10px;
-    background: #27235c;
-    color: #fff;
-    font-weight: 600;
-    border: none;
-    border-radius: 7px;
-    font-size: 1rem;
-    padding: 9px 22px;
-    cursor: pointer;
-    transition: background 0.18s;
-    letter-spacing: 0.1px;
-  }
-  
-  .sa-drafts-btn:hover {
-    background: #3c3379;
-  }
-  
-  .sa-policy-box {
-    background: #edeef7;
-    border: 1px solid #dbdef4;
-    font-size: 1.0rem;
-    color: #23235c;
-    padding: 18px 16px;
-    border-radius: 11px;
-    margin-top: 38px;
-    margin-bottom: 34px;
-    display: flex;
-    align-items: flex-start;
-  }
-  
-  .sa-policy-box .fa-info-circle {
-    color: #8882b0;
-    margin-right: 13px;
-    font-size: 1.3rem;
-    margin-top: 3px;
-  }
-  
-  .sa-policy-text {
-    color: #606184;
-    font-size: 1.02rem;
-    letter-spacing: 0.04px;
-  }
-  
-  .sa-action-buttons {
-    display: flex;
-    gap: 17px;
-    margin-top: 10px;
-  }
-  
-  .sa-action-btn {
-    background: #27235c;
-    color: #fff;
-    border: none;
-    padding: 11px 34px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1.09rem;
-    cursor: pointer;
-    transition: background 0.18s;
-    letter-spacing: 0.3px;
-  }
-  
-  .sa-action-btn.sa-save {
-    background: #97247e;
-  }
-  
-  .sa-action-btn:disabled {
-    background: #d6d8e6;
-    color: #a1a3bb;
-    cursor: not-allowed;
-  }
-  
+  max-width: 1200px;
+  margin: 48px auto;
+  padding: 32px 32px 48px 32px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 32px rgba(39, 35, 92, 0.07);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.sa-title {
+  font-size: 2rem;
+  color: #27235c;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.sa-subtitle {
+  font-size: 1.06rem;
+  color: #687088;
+  margin-bottom: 26px;
+}
+
+.sa-section-label {
+  font-size: 1.25rem;
+  color: #27235c;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: -1px;
+}
+
+.sa-table-container {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.sa-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sa-table th,
+.sa-table td {
+  font-size: 1rem;
+  text-align: left;
+  padding: 16px 10px;
+}
+
+.sa-table th {
+  color: #fff;
+  background: #97247e;
+  font-weight: 600;
+  font-size: 1.09rem;
+  border-right: 2px solid #fff9;
+  vertical-align: middle;
+}
+
+.sa-table th:last-child,
+.sa-table td:last-child {
+  text-align: center;
+}
+
+.sa-table td {
+  color: #26205a;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.sa-table tr:last-child td {
+  border-bottom: none;
+}
+
+.sa-table td select {
+  font-size: 1.1rem;
+  border-radius: 7px;
+  border: 1px solid #c8c8d1;
+  background: #f8f6f9;
+  color: #97247e;
+  padding: 8px 20px;
+  font-weight: 700;
+  outline: none;
+  min-width: 68px;
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.sa-table td .sa-rating-label {
+  font-weight: 600;
+}
+
+.sa-table .sa-rating-cell {
+  min-width: 120px;
+}
+
+.sa-table th,
+.sa-table td {
+  border-right: none;
+}
+
+.sa-drafts-btn {
+  float: right;
+  margin-bottom: 10px;
+  background: #27235c;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 7px;
+  font-size: 1rem;
+  padding: 9px 22px;
+  cursor: pointer;
+  transition: background 0.18s;
+  letter-spacing: 0.1px;
+}
+
+.sa-drafts-btn:hover {
+  background: #3c3379;
+}
+
+.sa-policy-box {
+  background: #edeef7;
+  border: 1px solid #dbdef4;
+  font-size: 1.0rem;
+  color: #23235c;
+  padding: 18px 16px;
+  border-radius: 11px;
+  margin-top: 38px;
+  margin-bottom: 34px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.sa-policy-box .fa-info-circle {
+  color: #8882b0;
+  margin-right: 13px;
+  font-size: 1.3rem;
+  margin-top: 3px;
+}
+
+.sa-policy-text {
+  color: #606184;
+  font-size: 1.02rem;
+  letter-spacing: 0.04px;
+}
+
+.sa-action-buttons {
+  display: flex;
+  gap: 17px;
+  margin-top: 10px;
+}
+
+.sa-action-btn {
+  background: #27235c;
+  color: #fff;
+  border: none;
+  padding: 11px 34px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.09rem;
+  cursor: pointer;
+  transition: background 0.18s;
+  letter-spacing: 0.3px;
+}
+
+.sa-action-btn.sa-save {
+  background: #97247e;
+}
+
+.sa-action-btn:disabled {
+  background: #d6d8e6;
+  color: #a1a3bb;
+  cursor: not-allowed;
+}

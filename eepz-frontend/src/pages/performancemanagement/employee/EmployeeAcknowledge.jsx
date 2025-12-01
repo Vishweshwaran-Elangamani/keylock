@@ -105,22 +105,21 @@ export default function EmployeeAcknowledgment() {
     return (total / vals.length).toFixed(2);
   };
 
-  // Breadcrumb component using react-router Link (clickable home)
   const Breadcrumbs = () => (
     <div style={breadcrumbStyles.wrapper}>
       <div style={breadcrumbStyles.inner}>
         <Link to="/employee/dashboard" style={breadcrumbStyles.link}>
           <li
-              className="cg-breadcrumb-item"
-              onClick={() => navigate("/hr/dashboard")}
-              style={{ cursor: "pointer" }}>
-              <i className="bi bi-house-door" style={{ fontSize: "12px" }}></i>
-            </li>
+            className="cg-breadcrumb-item"
+            onClick={() => navigate("/hr/dashboard")}
+            style={{ cursor: "pointer" }}>
+            <i className="bi bi-house-door" style={{ fontSize: "12px" }}></i>
+          </li>
         </Link>
 
         <span style={breadcrumbStyles.sep}>›</span>
 
-        <span style={{ ...breadcrumbStyles.current, fontSize: "11px", fontStyle:"bold", color: "purple" }}>Performance Rating Acknowledgment</span>
+        <span style={{ ...breadcrumbStyles.current, fontSize: "11px", fontStyle: "bold", color: "purple" }}>Performance Rating Acknowledgment</span>
       </div>
     </div>
   );
@@ -129,12 +128,10 @@ export default function EmployeeAcknowledgment() {
     <div style={{ ...styles.container, ...styles.pageWrapper }}>
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* Breadcrumbs (compact wrapper to remove top gap) */}
       <div style={styles.breadcrumbWrapper}>
         <Breadcrumbs />
       </div>
 
-      {/* retained loading / error / content flow */}
       {loading && (
         <div style={styles.loadingCard}>
           <div style={styles.spinner}></div>
@@ -160,14 +157,13 @@ export default function EmployeeAcknowledgment() {
             <div style={styles.ratingsContainer}>
               {pendingRatings.map((rating) => (
                 <div key={rating.approvalId} style={{ ...styles.ratingCard, ...styles.compactCard }}>
-                  {/* Card Header */}
                   <div style={styles.cardHeader}>
                     <div>
                       <h3
                         style={{
                           ...styles.projectName,
-                          textAlign: "left",     // ✅ force left alignment
-                          marginBottom: "8px"    // optional: spacing below title
+                          textAlign: "left",
+                          marginBottom: "8px"
                         }}
                       >
                         {rating.projectName}
@@ -175,8 +171,8 @@ export default function EmployeeAcknowledgment() {
                       <p
                         style={{
                           ...styles.approvedDate,
-                          textAlign: "left",     // ✅ aligns date text left as well
-                          marginTop: 0           // optional: remove extra gap
+                          textAlign: "left",
+                          marginTop: 0
                         }}
                       >
                         Approved on:{" "}
@@ -193,16 +189,15 @@ export default function EmployeeAcknowledgment() {
                     <span style={styles.statusBadge}>Pending Acknowledgment</span>
                   </div>
 
-                  {/* Summary Ratings */}
                   <div style={styles.summarySection}>
                     <div
                       style={{
                         ...styles.summaryItem,
-                        border: "1px solid black",   // ✅ light gray border
-                        borderRadius: "8px",           // ✅ rounded corners
-                        padding: "12px",               // ✅ spacing inside card
-                        margin: "8px",                 // ✅ spacing between cards
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)" // optional: subtle shadow
+                        border: "1px solid black",
+                        borderRadius: "8px",
+                        padding: "12px",
+                        margin: "8px",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
                       }}
                     >
                       <span style={styles.summaryLabel}>Your Average Rating</span>
@@ -244,7 +239,6 @@ export default function EmployeeAcknowledgment() {
                     </div>
                   </div>
 
-                  {/* View Details Button */}
                   <button
                     onClick={() => toggleDetails(rating.approvalId)}
                     style={styles.viewDetailsButton}
@@ -252,7 +246,6 @@ export default function EmployeeAcknowledgment() {
                     {expandedRatingId === rating.approvalId ? "Hide Details" : "View Details"}
                   </button>
 
-                  {/* Expanded Details */}
                   {expandedRatingId === rating.approvalId && (
                     <div style={styles.detailsSection}>
                       <h4 style={styles.detailsTitle}>Competency Details</h4>
@@ -303,7 +296,6 @@ export default function EmployeeAcknowledgment() {
                     </div>
                   )}
 
-                  {/* Acknowledgment Section */}
                   <div style={styles.acknowledgmentSection}>
                     <h4 style={{ ...styles.acknowledgmentTitle, color: "rgb(39, 35, 92)" }}>
                       Your Acknowledgment
@@ -344,7 +336,6 @@ export default function EmployeeAcknowledgment() {
   );
 }
 
-/* Breadcrumb inline styles */
 const breadcrumbStyles = {
   wrapper: {
     marginBottom: "8px",
@@ -378,7 +369,6 @@ const breadcrumbStyles = {
   }
 };
 
-/* Styles object (includes compact adjustments) */
 const styles = {
   container: {
     padding: "0px 32px",
@@ -389,20 +379,18 @@ const styles = {
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
   },
 
-  /* --- NEW: page wrapper to remove top gap and push content up --- */
   pageWrapper: {
-    paddingTop: "8px",   // bring content up (was 32px)
+    paddingTop: "8px",
     marginTop: "0px"
   },
 
-  /* --- NEW: breadcrumb wrapper to ensure reduced spacing --- */
+
   breadcrumbWrapper: {
     marginTop: "0px",
     paddingTop: "0px",
     marginBottom: "12px"
   },
 
-  /* --- NEW: compact card adjustments to reduce vertical density --- */
   compactCard: {
     paddingTop: "12px",
     paddingBottom: "12px",
@@ -416,7 +404,6 @@ const styles = {
     textAlign: "center",
     boxShadow: "0 2px 8px rgba(0,0,0,0.08)"
   },
-  // spinner: { ... } // optional spinner styles
   errorCard: {
     backgroundColor: "#FEE2E2",
     color: THEME.danger,

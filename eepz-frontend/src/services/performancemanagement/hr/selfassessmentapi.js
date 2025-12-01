@@ -13,7 +13,6 @@ export const listSubmitted = (status) => {
   return api.get("/SelfAssessment/submitted", { params });
 };
 
-// Controller expects raw string body for status — send as text/plain or plain string
 export const updateAssessmentStatus = (assessmentId, status) =>
   api.patch(`/SelfAssessment/${assessmentId}/status`, status, {
     headers: { "Content-Type": "text/plain" },

@@ -234,30 +234,30 @@ function HRNominations() {
   };
 
   const statIcons = {
-  "Total Nominations": "bi-bar-chart-fill",
-  "Pending": "bi-hourglass-split",
-  "Approved": "bi-check2-circle",
-  "Rejected": "bi-x-circle",
-};
+    "Total Nominations": "bi-bar-chart-fill",
+    "Pending": "bi-hourglass-split",
+    "Approved": "bi-check2-circle",
+    "Rejected": "bi-x-circle",
+  };
 
-const statColors = {
-  "Total Nominations": "stat-icon-primary",
-  "Pending": "stat-icon-warning",
-  "Approved": "stat-icon-success",
-  "Rejected": "stat-icon-danger",
-};
+  const statColors = {
+    "Total Nominations": "stat-icon-primary",
+    "Pending": "stat-icon-warning",
+    "Approved": "stat-icon-success",
+    "Rejected": "stat-icon-danger",
+  };
 
-const StatCard = ({ title, value }) => (
-  <div className="ad-stat-card">
-    <div className={`stat-icon ${statColors[title]}`}>
-      <i className={`bi ${statIcons[title]}`}></i>
+  const StatCard = ({ title, value }) => (
+    <div className="ad-stat-card">
+      <div className={`stat-icon ${statColors[title]}`}>
+        <i className={`bi ${statIcons[title]}`}></i>
+      </div>
+      <div className="stat-content">
+        <h3 className="stat-value">{value}</h3>
+        <p className="stat-label">{title}</p>
+      </div>
     </div>
-    <div className="stat-content">
-      <h3 className="stat-value">{value}</h3>
-      <p className="stat-label">{title}</p>
-    </div>
-  </div>
-);
+  );
 
 
   if (loading) {
@@ -308,14 +308,13 @@ const StatCard = ({ title, value }) => (
       `}</style>
 
       <div className="container-fluid">
-        {/* BREADCRUMB */}
         <nav
-  className="cg-breadcrumbs"
-  aria-label="breadcrumb"
-  style={{ marginBottom: "16px", background: "transparent" }}
->
-  <style>
-    {`
+          className="cg-breadcrumbs"
+          aria-label="breadcrumb"
+          style={{ marginBottom: "16px", background: "transparent" }}
+        >
+          <style>
+            {`
       .cg-breadcrumb-item + .cg-breadcrumb-item::before {
         content: "/";
         margin: 0 0.25rem;   /* smaller spacing */
@@ -324,58 +323,56 @@ const StatCard = ({ title, value }) => (
         font-size: 0.9em;    /* slightly smaller than text */
       }
     `}
-  </style>
-  <ol
-    className="cg-breadcrumb"
-    style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}
-  >
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard")}
-      style={{ cursor: "pointer" }}
-    >
-      <i className="bi bi-house-door"></i>
-    </li>
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard/performance")}
-      style={{ cursor: "pointer" }}
-    >
-      Performance
-    </li>
-    <li className="cg-breadcrumb-item active" aria-current="page">
-      Nominations
-    </li>
-  </ol>
-</nav>
+          </style>
+          <ol
+            className="cg-breadcrumb"
+            style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}
+          >
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard")}
+              style={{ cursor: "pointer" }}
+            >
+              <i className="bi bi-house-door"></i>
+            </li>
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard/performance")}
+              style={{ cursor: "pointer" }}
+            >
+              Performance
+            </li>
+            <li className="cg-breadcrumb-item active" aria-current="page">
+              Nominations
+            </li>
+          </ol>
+        </nav>
 
 
-        {/* STAT CARDS */}
         {statsLoading ? (
           <div className="text-center mb-3">
             <div className="spinner-border spinner-border-sm" role="status"></div>
           </div>
         ) : (
-         <div className="row row-cols-2 row-cols-md-4 g-4 mb-3">
-  <div className="col">
-    <StatCard title="Total Nominations" value={statistics.totalNominations} />
-  </div>
-  <div className="col">
-    <StatCard title="Pending" value={statistics.pendingNominations} />
-  </div>
-  <div className="col">
-    <StatCard title="Approved" value={statistics.approvedNominations} />
-  </div>
-  <div className="col">
-    <StatCard title="Rejected" value={statistics.rejectedNominations} />
-  </div>
-</div>
+          <div className="row row-cols-2 row-cols-md-4 g-4 mb-3">
+            <div className="col">
+              <StatCard title="Total Nominations" value={statistics.totalNominations} />
+            </div>
+            <div className="col">
+              <StatCard title="Pending" value={statistics.pendingNominations} />
+            </div>
+            <div className="col">
+              <StatCard title="Approved" value={statistics.approvedNominations} />
+            </div>
+            <div className="col">
+              <StatCard title="Rejected" value={statistics.rejectedNominations} />
+            </div>
+          </div>
 
 
 
         )}
 
-        {/* TABS + VIEW TOGGLE */}
         <div
           style={{
             display: "flex",
@@ -417,52 +414,52 @@ const StatCard = ({ title, value }) => (
               height: "36px",
             }}
           >
-            
-<button
-  onClick={() => setViewMode("grid")}
-  title="Grid View"
-  aria-label="Grid View"
-  style={{
-    background: viewMode === "grid" ? "#27235c" : "#fff",
-    color: viewMode === "grid" ? "#fff" : "#27235c",
-    border: "none",
-    fontWeight: 700,
-    fontSize: "13px",
-    padding: "6px 20px",
-    minWidth: 80,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all 0.12s",
-    outline: "none",
-    cursor: "pointer",
-  }}
->
-  <i className="bi bi-grid-3x3-gap-fill" style={{ fontSize: 18 }} />
-</button>
 
-<button
-  onClick={() => setViewMode("table")}
-  title="Table View"
-  aria-label="Table View"
-  style={{
-    background: viewMode === "table" ? "#27235c" : "#fff",
-    color: viewMode === "table" ? "#fff" : "#27235c",
-    border: "none",
-    fontWeight: 700,
-    fontSize: "13px",
-    padding: "6px 20px",
-    minWidth: 80,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all 0.12s",
-    outline: "none",
-    cursor: "pointer",
-  }}
->
-  <i className="bi bi-table" style={{ fontSize: 18 }} />
-</button>
+            <button
+              onClick={() => setViewMode("grid")}
+              title="Grid View"
+              aria-label="Grid View"
+              style={{
+                background: viewMode === "grid" ? "#27235c" : "#fff",
+                color: viewMode === "grid" ? "#fff" : "#27235c",
+                border: "none",
+                fontWeight: 700,
+                fontSize: "13px",
+                padding: "6px 20px",
+                minWidth: 80,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.12s",
+                outline: "none",
+                cursor: "pointer",
+              }}
+            >
+              <i className="bi bi-grid-3x3-gap-fill" style={{ fontSize: 18 }} />
+            </button>
+
+            <button
+              onClick={() => setViewMode("table")}
+              title="Table View"
+              aria-label="Table View"
+              style={{
+                background: viewMode === "table" ? "#27235c" : "#fff",
+                color: viewMode === "table" ? "#fff" : "#27235c",
+                border: "none",
+                fontWeight: 700,
+                fontSize: "13px",
+                padding: "6px 20px",
+                minWidth: 80,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.12s",
+                outline: "none",
+                cursor: "pointer",
+              }}
+            >
+              <i className="bi bi-table" style={{ fontSize: 18 }} />
+            </button>
 
           </div>
         </div>

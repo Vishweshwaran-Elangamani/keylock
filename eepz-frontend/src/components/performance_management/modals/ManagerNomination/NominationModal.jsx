@@ -25,13 +25,13 @@ const NominationModal = ({
     }
   }, [show, rewardTypes]);
 
-  // fetch dynamic parameters when selecting a reward type
+
   const handleRewardTypeSelect = async (rewardTypeId) => {
     const rewardType = rewardTypes.find((rt) => rt?.rewardTypeId === rewardTypeId);
     setSelectedRewardType(rewardType || null);
     setParameters([]);
     setParameterValues({});
-    // only fetch parameters if rewardTypeId exists
+
     if (rewardTypeId) {
       try {
         const { data } = await managerNominationApi.getNominationParameters(rewardTypeId);
@@ -151,25 +151,23 @@ const NominationModal = ({
     }
   };
 
-  // not shown if modal is hidden
   if (!show) return null;
 
-  // Dynamic layout decisions for reward card grid
   const rewardCount = categoryRewards.length;
   let rewardGridStyle = {};
-  
+
   if (rewardCount === 0) {
     rewardGridStyle = { display: "block" };
   } else if (rewardCount === 1) {
-    rewardGridStyle = { 
-      display: "flex", 
+    rewardGridStyle = {
+      display: "flex",
       justifyContent: "flex-start",
-      width: "100%" 
+      width: "100%"
     };
   } else if (rewardCount === 2) {
-    rewardGridStyle = { 
-      display: "grid", 
-      gridTemplateColumns: "repeat(2, 1fr)", 
+    rewardGridStyle = {
+      display: "grid",
+      gridTemplateColumns: "repeat(2, 1fr)",
       gap: 18,
       width: "100%"
     };
@@ -182,7 +180,6 @@ const NominationModal = ({
     };
   }
 
-  // Inline styles
   const modalOverlayStyle = {
     position: "fixed",
     top: 0,
@@ -220,27 +217,27 @@ const NominationModal = ({
     flexShrink: 0,
   };
 
-  const headerLeftStyle = { 
-    display: "flex", 
-    flexDirection: "column", 
-    gap: 6, 
-    minWidth: 0, 
+  const headerLeftStyle = {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+    minWidth: 0,
     flex: 1,
     textAlign: "left"
   };
-  
-  const titleStyle = { 
-    margin: 0, 
-    fontSize: 20, 
-    fontWeight: 800, 
+
+  const titleStyle = {
+    margin: 0,
+    fontSize: 20,
+    fontWeight: 800,
     lineHeight: 1.3,
     textAlign: "left"
   };
-  
-  const subtitleStyle = { 
-    margin: 0, 
-    fontSize: 14, 
-    color: "rgba(255,255,255,0.9)", 
+
+  const subtitleStyle = {
+    margin: 0,
+    fontSize: 14,
+    color: "rgba(255,255,255,0.9)",
     fontWeight: 500,
     textAlign: "left"
   };
@@ -354,15 +351,13 @@ const NominationModal = ({
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
-          {/* Body - Scrollable */}
           <div style={bodyWrapperStyle}>
-            {/* Reward selection */}
             {!selectedRewardType && (
               <div style={{ width: "100%" }}>
-                <label style={{ 
-                  fontWeight: 700, 
-                  marginBottom: 12, 
-                  display: "block", 
+                <label style={{
+                  fontWeight: 700,
+                  marginBottom: 12,
+                  display: "block",
                   color: "#374151",
                   fontSize: 15,
                   textAlign: "left"
@@ -394,19 +389,19 @@ const NominationModal = ({
                       }}
                       aria-pressed={selectedRewardType?.rewardTypeId === reward.rewardTypeId}
                     >
-                      <div style={{ 
-                        fontWeight: 700, 
-                        color: "#26225A", 
-                        fontSize: 15, 
+                      <div style={{
+                        fontWeight: 700,
+                        color: "#26225A",
+                        fontSize: 15,
                         marginBottom: 6,
                         textAlign: "left"
                       }}>
                         {reward?.rewardName || "Unnamed reward"}
                       </div>
                       {reward?.description && (
-                        <div style={{ 
-                          color: "#6b7280", 
-                          fontSize: 13, 
+                        <div style={{
+                          color: "#6b7280",
+                          fontSize: 13,
                           lineHeight: 1.4,
                           textAlign: "left"
                         }}>
@@ -419,174 +414,170 @@ const NominationModal = ({
               </div>
             )}
 
-         {/* Selected reward + justification + parameters */}
-{selectedRewardType && (
-  <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
-    {/* Selected Reward Display - Compact & Attractive - CENTERED */}
-    <div style={{ 
-      display: "flex", 
-      justifyContent: "center", 
-      width: "100%" 
-    }}>
-      <div style={{ 
-        background: "#97247E", 
-        padding: "12px 16px", 
-        borderRadius: 8,
-        border: "1px solid #26225A",
-        textAlign: "left",
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "12px",
-        boxShadow: "0 4px 12px rgba(38, 34, 90, 0.15)"
-      }}>
-        <div style={{
-          background: "rgba(255, 255, 255, 0.15)",
-          borderRadius: "50%",
-          width: "36px",
-          height: "36px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0
-        }}>
-          <i className="bi bi-award-fill" style={{ 
-            fontSize: "18px", 
-            color: "#fff"
-          }}></i>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <div style={{ 
-            fontSize: 11, 
-            color: "rgba(255, 255, 255, 0.8)", 
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-            fontWeight: 600,
-            textAlign: "left"
-          }}>
-            Selected Reward
-          </div>
-          <div style={{ 
-            fontWeight: 700, 
-            color: "#fff", 
-            fontSize: 15,
-            textAlign: "left"
-          }}>
-            {selectedRewardType.rewardName || "N/A"}
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            setSelectedRewardType(null);
-            setParameters([]);
-            setParameterValues({});
-            setJustification("");
-          }}
-          style={{
-            background: "rgba(255, 255, 255, 0.2)",
-            border: "none",
-            borderRadius: "50%",
-            width: "28px",
-            height: "28px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            marginLeft: "8px",
-            color: "#fff",
-            fontSize: "16px",
-            flexShrink: 0,
-            transition: "background 0.2s"
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)"}
-          onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)"}
-          aria-label="Change reward selection"
-        >
-          <i className="bi bi-x-lg"></i>
-        </button>
-      </div>
-    </div>
+            {selectedRewardType && (
+              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
+                <div style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%"
+                }}>
+                  <div style={{
+                    background: "#97247E",
+                    padding: "12px 16px",
+                    borderRadius: 8,
+                    border: "1px solid #26225A",
+                    textAlign: "left",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    boxShadow: "0 4px 12px rgba(38, 34, 90, 0.15)"
+                  }}>
+                    <div style={{
+                      background: "rgba(255, 255, 255, 0.15)",
+                      borderRadius: "50%",
+                      width: "36px",
+                      height: "36px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0
+                    }}>
+                      <i className="bi bi-award-fill" style={{
+                        fontSize: "18px",
+                        color: "#fff"
+                      }}></i>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      <div style={{
+                        fontSize: 11,
+                        color: "rgba(255, 255, 255, 0.8)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                        fontWeight: 600,
+                        textAlign: "left"
+                      }}>
+                        Selected Reward
+                      </div>
+                      <div style={{
+                        fontWeight: 700,
+                        color: "#fff",
+                        fontSize: 15,
+                        textAlign: "left"
+                      }}>
+                        {selectedRewardType.rewardName || "N/A"}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedRewardType(null);
+                        setParameters([]);
+                        setParameterValues({});
+                        setJustification("");
+                      }}
+                      style={{
+                        background: "rgba(255, 255, 255, 0.2)",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "28px",
+                        height: "28px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        marginLeft: "8px",
+                        color: "#fff",
+                        fontSize: "16px",
+                        flexShrink: 0,
+                        transition: "background 0.2s"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)"}
+                      aria-label="Change reward selection"
+                    >
+                      <i className="bi bi-x-lg"></i>
+                    </button>
+                  </div>
+                </div>
 
-    {/* Justification */}
-    <div style={{ width: "100%" }}>
-      <label style={{ 
-        display: "block", 
-        fontWeight: 700, 
-        color: "#334155", 
-        marginBottom: 8,
-        fontSize: 14,
-        textAlign: "left"
-      }}>
-        Justification <span style={{ color: "#ef4444" }}>*</span>
-      </label>
-      <textarea
-        value={justification}
-        onChange={(e) => setJustification(e.target.value)}
-        placeholder="Explain why this employee deserves this nomination..."
-        required
-        style={textareaStyle}
-      />
-    </div>
+                <div style={{ width: "100%" }}>
+                  <label style={{
+                    display: "block",
+                    fontWeight: 700,
+                    color: "#334155",
+                    marginBottom: 8,
+                    fontSize: 14,
+                    textAlign: "left"
+                  }}>
+                    Justification <span style={{ color: "#ef4444" }}>*</span>
+                  </label>
+                  <textarea
+                    value={justification}
+                    onChange={(e) => setJustification(e.target.value)}
+                    placeholder="Explain why this employee deserves this nomination..."
+                    required
+                    style={textareaStyle}
+                  />
+                </div>
 
-    {/* Parameters in Two Columns */}
-    {parameters.length > 0 && (
-      <div style={{ width: "100%" }}>
-        <div style={{ 
-          fontWeight: 700, 
-          color: "#26225A", 
-          marginBottom: 12,
-          fontSize: 15,
-          textAlign: "left"
-        }}>
-          Additional Information
-        </div>
-        <div style={{ 
-          display: "grid", 
-          gridTemplateColumns: parameters.length === 1 ? "1fr" : "repeat(2, 1fr)", 
-          gap: 16
-        }}>
-          {parameters.map((param, idx) => (
-            <div 
-              key={param.parameterId ?? idx} 
-              style={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                gap: 6
-              }}
-            >
-              <label style={{ 
-                fontWeight: 600, 
-                color: "#334155",
-                fontSize: 13,
-                textAlign: "left"
-              }}>
-                {param.parameterName} {param.isRequired ? <span style={{ color: "#ef4444" }}>*</span> : null}
-              </label>
-              {renderParameterField(param)}
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-  </div>
-)}
+                {parameters.length > 0 && (
+                  <div style={{ width: "100%" }}>
+                    <div style={{
+                      fontWeight: 700,
+                      color: "#26225A",
+                      marginBottom: 12,
+                      fontSize: 15,
+                      textAlign: "left"
+                    }}>
+                      Additional Information
+                    </div>
+                    <div style={{
+                      display: "grid",
+                      gridTemplateColumns: parameters.length === 1 ? "1fr" : "repeat(2, 1fr)",
+                      gap: 16
+                    }}>
+                      {parameters.map((param, idx) => (
+                        <div
+                          key={param.parameterId ?? idx}
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 6
+                          }}
+                        >
+                          <label style={{
+                            fontWeight: 600,
+                            color: "#334155",
+                            fontSize: 13,
+                            textAlign: "left"
+                          }}>
+                            {param.parameterName} {param.isRequired ? <span style={{ color: "#ef4444" }}>*</span> : null}
+                          </label>
+                          {renderParameterField(param)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
           </div>
 
-          {/* Actions - Fixed at Bottom */}
+
           <div style={actionsAreaStyle}>
-            <button 
-              type="button" 
-              onClick={handleClose} 
+            <button
+              type="button"
+              onClick={handleClose}
               style={cancelBtnStyle}
               onMouseEnter={(e) => e.currentTarget.style.background = "#4b5563"}
               onMouseLeave={(e) => e.currentTarget.style.background = "#6b7280"}
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
-              style={{...submitBtnStyle, opacity: !selectedRewardType ? 0.6 : 1}} 
+            <button
+              type="submit"
+              style={{ ...submitBtnStyle, opacity: !selectedRewardType ? 0.6 : 1 }}
               disabled={!selectedRewardType}
               onMouseEnter={(e) => {
                 if (selectedRewardType) e.currentTarget.style.background = "#1a1740";

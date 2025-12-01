@@ -44,52 +44,52 @@ function FormsList() {
   ], [rows]);
   const formDeliveryOptions = ["All", "Delivery", "Enablement"];
 
- const analyticsIcons = {
-  "Total Forms": "bi-journal-text",
-  "Manager Forms": "bi-person-badge",
-  "Delivery Forms": "bi-folder",
-  "Enablement Forms": "bi-lightbulb",          
-  "Assigned Users": "bi-people",              
-};
+  const analyticsIcons = {
+    "Total Forms": "bi-journal-text",
+    "Manager Forms": "bi-person-badge",
+    "Delivery Forms": "bi-folder",
+    "Enablement Forms": "bi-lightbulb",
+    "Assigned Users": "bi-people",
+  };
 
-const analyticsIconBg = {
-  "Total Forms": "#e2ebfd",    // blue
-  "Manager Forms": "#d2fbe7",  // green
-  "Delivery Forms": "#fbe7d2", // orange
-  "Enablement Forms": "#f9eaff", // violet or light purple
-  "Assigned Users": "#e2e7fa", // light gray-blue
-};
+  const analyticsIconBg = {
+    "Total Forms": "#e2ebfd",
+    "Manager Forms": "#d2fbe7",
+    "Delivery Forms": "#fbe7d2",
+    "Enablement Forms": "#f9eaff",
+    "Assigned Users": "#e2e7fa",
+  };
 
-// Usage:
-function AnalyticsStatCard({ title, value }) {
-  return (
-    <div className="ad-stat-card">
-      <div
-        className="stat-icon"
-        style={{
-          background: analyticsIconBg[title] || "#f0f0f0",
-          width: 50,
-          height: 50,
-          borderRadius: 16,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "8px"
-          
-        }}
-      >
-        <i
-          className={`bi ${analyticsIcons[title]}`}
-          style={{ fontSize: "26px", color: "#27235C" }}
-        />
+
+  function AnalyticsStatCard({ title, value }) {
+    return (
+      <div className="ad-stat-card">
+        <div
+          className="stat-icon"
+          style={{
+            background: analyticsIconBg[title] || "#f0f0f0",
+            width: 50,
+            height: 50,
+            borderRadius: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "8px"
+
+          }}
+        >
+          <i
+            className={`bi ${analyticsIcons[title]}`}
+            style={{ fontSize: "26px", color: "#27235C" }}
+          />
+        </div>
+        <div className="stat-content">
+          <h3 className="stat-value">{value}</h3>
+          <p className="stat-label">{title}</p>
+        </div>
       </div>
-      <div className="stat-content">
-        <h3 className="stat-value">{value}</h3>
-        <p className="stat-label">{title}</p>
-      </div>
-    </div>
-  );
-}
+    );
+  }
 
 
   useEffect(() => {
@@ -363,9 +363,9 @@ function AnalyticsStatCard({ title, value }) {
 
         const alreadyAssignedIds = Array.isArray(skipped)
           ? skipped
-              .filter((s) => s.Reason === "Already Assigned")
-              .map((s) => s.UserId || s.userId || s.EmployeeId || s.employeeId)
-              .filter(Boolean)
+            .filter((s) => s.Reason === "Already Assigned")
+            .map((s) => s.UserId || s.userId || s.EmployeeId || s.employeeId)
+            .filter(Boolean)
           : [];
 
         const allProcessedUserIds = [...successfulUserIds, ...alreadyAssignedIds];
@@ -411,7 +411,7 @@ function AnalyticsStatCard({ title, value }) {
         e?.response?.data?.title ||
         (actionType === "Send" ? "Failed to share form." : "Failed to save draft.");
       toast.error(errorMsg, { id: loadingToast });
-      console.error("❌ Error details:", e.response?.data);
+      console.error(" Error details:", e.response?.data);
     } finally {
       setSharing(false);
     }
@@ -443,47 +443,47 @@ function AnalyticsStatCard({ title, value }) {
   return (
     <div className="formlistperf">
       <div className="flp-root">
-      <nav className="cg-breadcrumbs" aria-label="breadcrumb">
-  <ol
-    className="cg-breadcrumb"
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "4px",          // small spacing between items
-      listStyle: "none",   // remove default list styling
-      padding: 0,
-      margin: 0
-    }}
-  >
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard")}
-      style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-    >
-      <i className="bi bi-house-door"></i>
-    </li>
+        <nav className="cg-breadcrumbs" aria-label="breadcrumb">
+          <ol
+            className="cg-breadcrumb"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              listStyle: "none",
+              padding: 0,
+              margin: 0
+            }}
+          >
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard")}
+              style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
+            >
+              <i className="bi bi-house-door"></i>
+            </li>
 
-    <span style={{ color: "#6c757d" }}>/</span>
+            <span style={{ color: "#6c757d" }}>/</span>
 
-    <li
-      className="cg-breadcrumb-item"
-      onClick={() => navigate("/hr/dashboard/performance")}
-      style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
-    >
-      Performance
-    </li>
+            <li
+              className="cg-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard/performance")}
+              style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}
+            >
+              Performance
+            </li>
 
-    <span style={{ color: "#6c757d" }}>/</span>
+            <span style={{ color: "#6c757d" }}>/</span>
 
-    <li
-      className="cg-breadcrumb-item active"
-      aria-current="page"
-      style={{ display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
-    >
-      Initiate Form
-    </li>
-  </ol>
-</nav>
+            <li
+              className="cg-breadcrumb-item active"
+              aria-current="page"
+              style={{ display: "flex", alignItems: "center", gap: "4px", fontWeight: "600" }}
+            >
+              Initiate Form
+            </li>
+          </ol>
+        </nav>
 
 
         <div className="row row-cols-2 row-cols-lg-3 row-cols-xl-5 g-4 mb-3">
@@ -531,535 +531,524 @@ function AnalyticsStatCard({ title, value }) {
         />
 
         <div className="flp-main-area">
-        <div
-  className="flp-forms-section"
-  style={{
-    border: "1px solid #27235C",
-    borderRadius: "8px",
-    overflow: "hidden",
-  }}
->
-  <div className="flp-section-header">
-    <div className="flp-header-left">
-      <h3>
-        Available Forms
-      </h3>
-      <span className="flp-count-badge">{filteredForms.length}</span>
-    </div>
-    <div className="flp-header-right" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-    <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    border: "1px solid #ccc",
-    borderRadius: "6px",
-    overflow: "hidden",
-    
-    
-  }}
->
-  <input
-    type="text"
-    placeholder="Search forms..."
-    value={formSearchInput}
-    onChange={(e) => setFormSearchInput(e.target.value)}
-    style={{
-      border: "none",
-      padding: "8px 12px",
-      outline: "none",
-      flex: 1,
-    
-    }}
-  />
-
-  {formSearchQuery ? (
-    // 🔹 Clear button when search is active
-    <button
-      onClick={() => {
-        setFormSearchQuery("");   // reset search
-        setFormSearchInput("");   // clear input field
-        setFormsPage(1);          // reset pagination
-      }}
-      style={{
-        backgroundColor: "#27235c",
-        color: "#fff",
-        border: "none",
-        padding: "8px 12px",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      Clear
-    </button>
-  ) : (
-    // 🔹 Search button when no search is active
-    <button
-      onClick={() => {
-        setFormSearchQuery(formSearchInput); // apply search
-        setFormsPage(1);
-      }}
-      style={{
-        backgroundColor: "#27235c",
-        color: "#fff",
-        border: "none",
-        padding: "8px 12px",
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      Search
-    </button>
-  )}
-</div>
-
-
-
-  <select
-    className="flp-filter-select"
-    value={formTypeFilter}
-    onChange={(e) => {
-      setFormTypeFilter(e.target.value);
-      setFormsPage(1);
-    }}
-    style={{ padding: "6px", borderRadius: "6px" }}
-  >
-    {formTypes.map((type) => (
-      <option key={type} value={type}>
-        {type}
-      </option>
-    ))}
-  </select>
-
-  <select
-    className="flp-filter-select"
-    value={formDeliveryFilter}
-    onChange={(e) => {
-      setFormDeliveryFilter(e.target.value);
-      setFormsPage(1);
-    }}
-    style={{ padding: "6px", borderRadius: "6px" }}
-  >
-    {formDeliveryOptions.map((option) => (
-      <option key={option} value={option}>
-        {option}
-      </option>
-    ))}
-  </select>
-</div>
-
-  </div>
-
-  <div className="flp-table-card">
-    <div className="flp-table-wrapper">
-      <table className="flp-table">
-        <thead>
-          <tr>
-            <th>NAME</th>
-            <th>TYPE</th>
-            <th>DELIVERY/ENABLEMENT</th>
-            <th className="text-center">ACTIONS</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan={4} className="flp-empty-state">
-                <i className="bi bi-hourglass-split"></i>
-                <p>Loading forms...</p>
-              </td>
-            </tr>
-          ) : pagedForms.length === 0 ? (
-            <tr>
-              <td colSpan={4} className="flp-empty-state">
-                <i className="bi bi-inbox"></i>
-                <p>No forms found matching the criteria!</p>
-              </td>
-            </tr>
-          ) : (
-            pagedForms.map((f) => (
-              <tr
-                key={f.formId}
-                className={
-                  selectedFormId === f.formId ? "flp-selected-row" : ""
-                }
-              >
-                <td>
-                  <strong>{f.name}</strong>
-                </td>
-                <td>
-                  <span className="flp-type-badge">{f.type}</span>
-                </td>
-                <td>
-                  {f.deliveryEnablement === "Delivery"
-                    ? "Delivery"
-                    : f.deliveryEnablement === "Enablement"
-                    ? "Enablement"
-                    : "Delivery and Enablement"}
-                </td>
-                <td>
-                  <div className="flp-action-buttons">
-                    <button
-                      className="themed-action-btn btn-view"
-                      onClick={() => handleView(f)}
-                      title="View Form"
-                    >
-                      <i className="bi bi-eye" />
-                    </button>
-                    <button
-                      className="themed-action-btn btn-edit"
-                      onClick={() =>
-                        navigate(
-                          `/hr/dashboard/performance/create/${f.formId}`
-                        )
-                      }
-                      title="Edit Form"
-                    >
-                      <i className="bi bi-pencil" />
-                    </button>
-                    <button
-                      className={`themed-action-btn btn-choose${
-                        selectedFormId === f.formId ? " btn-active" : ""
-                      }`}
-                      onClick={() => handleFormSelect(f.formId)}
-                      title="Choose Form"
-                    >
-                      <i className="bi bi-hand-index" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-
-    <div className="flp-pagination-container">
-      <div className="flp-pagination-info">
-        <span className="flp-pagination-label">Rows per page:</span>
-        <select
-          className="flp-pagination-select"
-          value={formsPerPage}
-          onChange={(e) => {
-            setFormsPerPage(Number(e.target.value));
-            setFormsPage(1);
-          }}
-        >
-          <option value={5}>5</option>
-          <option value={8}>8</option>
-          <option value={10}>10</option>
-          <option value={15}>15</option>
-          <option value={20}>20</option>
-        </select>
-      </div>
-
-      <nav className="flp-pagination-nav">
-        <ul className="flp-pagination">
-          <li
-            className={`flp-page-item ${
-              formsPage === 1 ? "flp-disabled" : ""
-            }`}
+          <div
+            className="flp-forms-section"
+            style={{
+              border: "1px solid #27235C",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
           >
-            <button
-              className="flp-page-link"
-              onClick={() => onFormsPageChange(formsPage - 1)}
-            >
-              &laquo;
-            </button>
-          </li>
-          {Array.from({ length: formsTotalPages }, (_, i) => (
-            <li
-              key={i + 1}
-              className={`flp-page-item ${
-                formsPage === i + 1 ? "flp-active" : ""
-              }`}
-            >
-              <button
-                className="flp-page-link"
-                onClick={() => onFormsPageChange(i + 1)}
-              >
-                {i + 1}
-              </button>
-            </li>
-          ))}
-          <li
-            className={`flp-page-item ${
-              formsPage === formsTotalPages ? "flp-disabled" : ""
-            }`}
-          >
-            <button
-              className="flp-page-link"
-              onClick={() => onFormsPageChange(formsPage + 1)}
-            >
-              &raquo;
-            </button>
-          </li>
-        </ul>
-      </nav>
+            <div className="flp-section-header">
+              <div className="flp-header-left">
+                <h3>
+                  Available Forms
+                </h3>
+                <span className="flp-count-badge">{filteredForms.length}</span>
+              </div>
+              <div className="flp-header-right" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    border: "1px solid #ccc",
+                    borderRadius: "6px",
+                    overflow: "hidden",
 
-      <div className="flp-pagination-status">
-        {formsCount === 0
-          ? "No forms to display"
-          : `Showing ${Math.min(
-              (formsPage - 1) * formsPerPage + 1,
-              formsCount
-            )}-${Math.min(formsPage * formsPerPage, formsCount)} of ${
-              formsCount
-            } forms`}
-      </div>
-    </div>
-  </div>
+
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Search forms..."
+                    value={formSearchInput}
+                    onChange={(e) => setFormSearchInput(e.target.value)}
+                    style={{
+                      border: "none",
+                      padding: "8px 12px",
+                      outline: "none",
+                      flex: 1,
+
+                    }}
+                  />
+
+                  {formSearchQuery ? (
+
+                    <button
+                      onClick={() => {
+                        setFormSearchQuery("");
+                        setFormSearchInput("");
+                        setFormsPage(1);
+                      }}
+                      style={{
+                        backgroundColor: "#27235c",
+                        color: "#fff",
+                        border: "none",
+                        padding: "8px 12px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}
+                    >
+                      Clear
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setFormSearchQuery(formSearchInput);
+                        setFormsPage(1);
+                      }}
+                      style={{
+                        backgroundColor: "#27235c",
+                        color: "#fff",
+                        border: "none",
+                        padding: "8px 12px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}
+                    >
+                      Search
+                    </button>
+                  )}
+                </div>
+
+
+
+                <select
+                  className="flp-filter-select"
+                  value={formTypeFilter}
+                  onChange={(e) => {
+                    setFormTypeFilter(e.target.value);
+                    setFormsPage(1);
+                  }}
+                  style={{ padding: "6px", borderRadius: "6px" }}
+                >
+                  {formTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="flp-filter-select"
+                  value={formDeliveryFilter}
+                  onChange={(e) => {
+                    setFormDeliveryFilter(e.target.value);
+                    setFormsPage(1);
+                  }}
+                  style={{ padding: "6px", borderRadius: "6px" }}
+                >
+                  {formDeliveryOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+            </div>
+
+            <div className="flp-table-card">
+              <div className="flp-table-wrapper">
+                <table className="flp-table">
+                  <thead>
+                    <tr>
+                      <th>NAME</th>
+                      <th>TYPE</th>
+                      <th>DELIVERY/ENABLEMENT</th>
+                      <th className="text-center">ACTIONS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={4} className="flp-empty-state">
+                          <i className="bi bi-hourglass-split"></i>
+                          <p>Loading forms...</p>
+                        </td>
+                      </tr>
+                    ) : pagedForms.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="flp-empty-state">
+                          <i className="bi bi-inbox"></i>
+                          <p>No forms found matching the criteria!</p>
+                        </td>
+                      </tr>
+                    ) : (
+                      pagedForms.map((f) => (
+                        <tr
+                          key={f.formId}
+                          className={
+                            selectedFormId === f.formId ? "flp-selected-row" : ""
+                          }
+                        >
+                          <td>
+                            <strong>{f.name}</strong>
+                          </td>
+                          <td>
+                            <span className="flp-type-badge">{f.type}</span>
+                          </td>
+                          <td>
+                            {f.deliveryEnablement === "Delivery"
+                              ? "Delivery"
+                              : f.deliveryEnablement === "Enablement"
+                                ? "Enablement"
+                                : "Delivery and Enablement"}
+                          </td>
+                          <td>
+                            <div className="flp-action-buttons">
+                              <button
+                                className="themed-action-btn btn-view"
+                                onClick={() => handleView(f)}
+                                title="View Form"
+                              >
+                                <i className="bi bi-eye" />
+                              </button>
+                              <button
+                                className="themed-action-btn btn-edit"
+                                onClick={() =>
+                                  navigate(
+                                    `/hr/dashboard/performance/create/${f.formId}`
+                                  )
+                                }
+                                title="Edit Form"
+                              >
+                                <i className="bi bi-pencil" />
+                              </button>
+                              <button
+                                className={`themed-action-btn btn-choose${selectedFormId === f.formId ? " btn-active" : ""
+                                  }`}
+                                onClick={() => handleFormSelect(f.formId)}
+                                title="Choose Form"
+                              >
+                                <i className="bi bi-hand-index" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flp-pagination-container">
+                <div className="flp-pagination-info">
+                  <span className="flp-pagination-label">Rows per page:</span>
+                  <select
+                    className="flp-pagination-select"
+                    value={formsPerPage}
+                    onChange={(e) => {
+                      setFormsPerPage(Number(e.target.value));
+                      setFormsPage(1);
+                    }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={8}>8</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                    <option value={20}>20</option>
+                  </select>
+                </div>
+
+                <nav className="flp-pagination-nav">
+                  <ul className="flp-pagination">
+                    <li
+                      className={`flp-page-item ${formsPage === 1 ? "flp-disabled" : ""
+                        }`}
+                    >
+                      <button
+                        className="flp-page-link"
+                        onClick={() => onFormsPageChange(formsPage - 1)}
+                      >
+                        &laquo;
+                      </button>
+                    </li>
+                    {Array.from({ length: formsTotalPages }, (_, i) => (
+                      <li
+                        key={i + 1}
+                        className={`flp-page-item ${formsPage === i + 1 ? "flp-active" : ""
+                          }`}
+                      >
+                        <button
+                          className="flp-page-link"
+                          onClick={() => onFormsPageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
+                      </li>
+                    ))}
+                    <li
+                      className={`flp-page-item ${formsPage === formsTotalPages ? "flp-disabled" : ""
+                        }`}
+                    >
+                      <button
+                        className="flp-page-link"
+                        onClick={() => onFormsPageChange(formsPage + 1)}
+                      >
+                        &raquo;
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+
+                <div className="flp-pagination-status">
+                  {formsCount === 0
+                    ? "No forms to display"
+                    : `Showing ${Math.min(
+                      (formsPage - 1) * formsPerPage + 1,
+                      formsCount
+                    )}-${Math.min(formsPage * formsPerPage, formsCount)} of ${formsCount
+                    } forms`}
+                </div>
+              </div>
+            </div>
 
 
           </div>
 
           <div
-  className="flp-users-panel"
-  style={{
-    border: "1px solid #27235C",
-    borderRadius: "8px",
-    overflow: "hidden",
-  }}
->
-  <div className="flp-panel-header">
-    <h3>
-      <i className="bi bi-people-fill"></i> Select Users
-    </h3>
-{selectedFormId && (
-  <div className="flp-users-filters" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        border: "1px solid #27235c",
-        borderRadius: "6px",
-        overflow: "hidden",
-        flex: 1
-      }}
-    >
-      <input
-        type="text"
-        placeholder="Search users..."
-        value={userSearchInput}   // temporary input state
-        onChange={(e) => setUserSearchInput(e.target.value)}
-        style={{
-          border: "none",
-          padding: "8px 12px",
-          outline: "none",
-          flex: 1
-        }}
-      />
+            className="flp-users-panel"
+            style={{
+              border: "1px solid #27235C",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <div className="flp-panel-header">
+              <h3>
+                <i className="bi bi-people-fill"></i> Select Users
+              </h3>
+              {selectedFormId && (
+                <div className="flp-users-filters" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      border: "1px solid #27235c",
+                      borderRadius: "6px",
+                      overflow: "hidden",
+                      flex: 1
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Search users..."
+                      value={userSearchInput}
+                      onChange={(e) => setUserSearchInput(e.target.value)}
+                      style={{
+                        border: "none",
+                        padding: "8px 12px",
+                        outline: "none",
+                        flex: 1
+                      }}
+                    />
 
-      {userSearchQuery ? (
-        // 🔹 Clear button when search is active
-        <button
-          onClick={() => {
-            setUserSearchQuery("");   // reset search
-            setUserSearchInput("");   // clear input field
-            setUsersPage(1);          // reset pagination
-          }}
-          style={{
-            backgroundColor: "#27235c",
-            color: "#fff",
-            border: "none",
-            padding: "8px 12px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          Clear
-        </button>
-      ) : (
-        // 🔹 Search button when no search is active
-        <button
-          onClick={() => {
-            setUserSearchQuery(userSearchInput); // apply search only on click
-            setUsersPage(1);
-          }}
-          style={{
-            backgroundColor: "#27235c",
-            color: "#fff",
-            border: "none",
-            padding: "8px 12px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          Search
-        </button>
-      )}
-    </div>
+                    {userSearchQuery ? (
 
-    <button
-      onClick={handleSelectAll}
-      className="flp-btn-select-all"
-      style={{
-        background: allEligibleSelected ? "#AC5098" : "#27235C",
-        color: "#fff",
-        border: "none",
-        padding: "8px 12px",
-        borderRadius: "6px",
-        cursor: "pointer"
-      }}
-      title={allEligibleSelected ? "Deselect All" : "Select All"}
-    >
-      <i
-        className={
-          allEligibleSelected ? "bi bi-x-circle" : "bi bi-check2-all"
-        }
-      ></i>
-      {allEligibleSelected ? "Deselect All" : "Select All"}
-    </button>
-  </div>
-)}
-  </div>
+                      <button
+                        onClick={() => {
+                          setUserSearchQuery("");
+                          setUserSearchInput("");
+                          setUsersPage(1);
+                        }}
+                        style={{
+                          backgroundColor: "#27235c",
+                          color: "#fff",
+                          border: "none",
+                          padding: "8px 12px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center"
+                        }}
+                      >
+                        Clear
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setUserSearchQuery(userSearchInput);
+                          setUsersPage(1);
+                        }}
+                        style={{
+                          backgroundColor: "#27235c",
+                          color: "#fff",
+                          border: "none",
+                          padding: "8px 12px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center"
+                        }}
+                      >
+                        Search
+                      </button>
+                    )}
+                  </div>
 
-  <div
-    className="flp-panel-body"
-    style={{
-      overflowY: "auto",
-      maxHeight: "580px",
-      minHeight: "350px",
-    }}
-  >
-    {!selectedFormId ? (
-      <div className="flp-empty-box">
-        <i className="bi bi-hand-index"></i>
-        <p>Please choose a form to select users</p>
-      </div>
-    ) : pagedUsers.length === 0 ? (
-      <div className="flp-empty-box">
-        <i className="bi bi-inbox"></i>
-        <p>No users available</p>
-      </div>
-    ) : (
-      <>
-        <div className="flp-selected-count">
-          <i className="bi bi-check-circle-fill"></i>
-          <strong>{selectedUserIds.length}</strong> user(s) selected
-        </div>
-        {pagedUsers.map((user) => {
-          const isAssigned = assignedUserIds
-            .map(String)
-            .includes(String(user.userId));
-          const isSelected = selectedUserIds.includes(user.userId);
-          return (
-            <div
-              key={user.userId}
-              className={`flp-user-card ${
-                isSelected ? "flp-selected" : ""
-              } ${isAssigned ? "flp-disabled" : ""}`}
-              onClick={() => !isAssigned && toggleUser(user.userId)}
-            >
-              <input
-                type="checkbox"
-                checked={isSelected}
-                readOnly
-                disabled={isAssigned}
-              />
-              <div className="flp-user-info">
-                <strong>
-                  {user.firstName} {user.lastName}
-                </strong>
-                {isAssigned && (
-                  <span className="flp-assigned-tag">
-                    <i className="bi bi-lock-fill"></i> Assigned
-                  </span>
-                )}
-              </div>
+                  <button
+                    onClick={handleSelectAll}
+                    className="flp-btn-select-all"
+                    style={{
+                      background: allEligibleSelected ? "#AC5098" : "#27235C",
+                      color: "#fff",
+                      border: "none",
+                      padding: "8px 12px",
+                      borderRadius: "6px",
+                      cursor: "pointer"
+                    }}
+                    title={allEligibleSelected ? "Deselect All" : "Select All"}
+                  >
+                    <i
+                      className={
+                        allEligibleSelected ? "bi bi-x-circle" : "bi bi-check2-all"
+                      }
+                    ></i>
+                    {allEligibleSelected ? "Deselect All" : "Select All"}
+                  </button>
+                </div>
+              )}
             </div>
-          );
-        })}
-      </>
-    )}
-  </div>
 
-  {usersTotalPages > 0 && (
-    <div className="flp-pagination-container">
-      <div className="flp-pagination-info">
-        <span className="flp-pagination-label">Rows per page:</span>
-        <select
-          className="flp-pagination-select"
-          value={usersPerPage}
-          onChange={(e) => {
-            setUsersPerPage(Number(e.target.value));
-            setUsersPage(1);
-          }}
-        >
-          <option value={5}>5</option>
-          <option value={9}>9</option>
-          <option value={10}>10</option>
-          <option value={15}>15</option>
-          <option value={20}>20</option>
-        </select>
-      </div>
+            <div
+              className="flp-panel-body"
+              style={{
+                overflowY: "auto",
+                maxHeight: "580px",
+                minHeight: "350px",
+              }}
+            >
+              {!selectedFormId ? (
+                <div className="flp-empty-box">
+                  <i className="bi bi-hand-index"></i>
+                  <p>Please choose a form to select users</p>
+                </div>
+              ) : pagedUsers.length === 0 ? (
+                <div className="flp-empty-box">
+                  <i className="bi bi-inbox"></i>
+                  <p>No users available</p>
+                </div>
+              ) : (
+                <>
+                  <div className="flp-selected-count">
+                    <i className="bi bi-check-circle-fill"></i>
+                    <strong>{selectedUserIds.length}</strong> user(s) selected
+                  </div>
+                  {pagedUsers.map((user) => {
+                    const isAssigned = assignedUserIds
+                      .map(String)
+                      .includes(String(user.userId));
+                    const isSelected = selectedUserIds.includes(user.userId);
+                    return (
+                      <div
+                        key={user.userId}
+                        className={`flp-user-card ${isSelected ? "flp-selected" : ""
+                          } ${isAssigned ? "flp-disabled" : ""}`}
+                        onClick={() => !isAssigned && toggleUser(user.userId)}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          readOnly
+                          disabled={isAssigned}
+                        />
+                        <div className="flp-user-info">
+                          <strong>
+                            {user.firstName} {user.lastName}
+                          </strong>
+                          {isAssigned && (
+                            <span className="flp-assigned-tag">
+                              <i className="bi bi-lock-fill"></i> Assigned
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
+              )}
+            </div>
 
-      <nav className="flp-pagination-nav">
-        <ul className="flp-pagination">
-          <li
-            className={`flp-page-item ${
-              usersPage === 1 ? "flp-disabled" : ""
-            }`}
-          >
-            <button
-              className="flp-page-link"
-              onClick={() => onUsersPageChange(usersPage - 1)}
-            >
-              &laquo;
-            </button>
-          </li>
-          {Array.from({ length: usersTotalPages }, (_, i) => (
-            <li
-              key={i + 1}
-              className={`flp-page-item ${
-                usersPage === i + 1 ? "flp-active" : ""
-              }`}
-            >
+            {usersTotalPages > 0 && (
+              <div className="flp-pagination-container">
+                <div className="flp-pagination-info">
+                  <span className="flp-pagination-label">Rows per page:</span>
+                  <select
+                    className="flp-pagination-select"
+                    value={usersPerPage}
+                    onChange={(e) => {
+                      setUsersPerPage(Number(e.target.value));
+                      setUsersPage(1);
+                    }}
+                  >
+                    <option value={5}>5</option>
+                    <option value={9}>9</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                    <option value={20}>20</option>
+                  </select>
+                </div>
+
+                <nav className="flp-pagination-nav">
+                  <ul className="flp-pagination">
+                    <li
+                      className={`flp-page-item ${usersPage === 1 ? "flp-disabled" : ""
+                        }`}
+                    >
+                      <button
+                        className="flp-page-link"
+                        onClick={() => onUsersPageChange(usersPage - 1)}
+                      >
+                        &laquo;
+                      </button>
+                    </li>
+                    {Array.from({ length: usersTotalPages }, (_, i) => (
+                      <li
+                        key={i + 1}
+                        className={`flp-page-item ${usersPage === i + 1 ? "flp-active" : ""
+                          }`}
+                      >
+                        <button
+                          className="flp-page-link"
+                          onClick={() => onUsersPageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
+                      </li>
+                    ))}
+                    <li
+                      className={`flp-page-item ${usersPage === usersTotalPages ? "flp-disabled" : ""
+                        }`}
+                    >
+                      <button
+                        className="flp-page-link"
+                        onClick={() => onUsersPageChange(usersPage + 1)}
+                      >
+                        &raquo;
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
+
+            <div className="flp-panel-footer">
               <button
-                className="flp-page-link"
-                onClick={() => onUsersPageChange(i + 1)}
+                className="flp-btn-share"
+                onClick={() => openDeadlineModal("Send")}
+                disabled={
+                  !selectedFormId || selectedUserIds.length === 0 || !currentUserId
+                }
               >
-                {i + 1}
+                <i className="bi bi-send-fill"></i> Share
               </button>
-            </li>
-          ))}
-          <li
-            className={`flp-page-item ${
-              usersPage === usersTotalPages ? "flp-disabled" : ""
-            }`}
-          >
-            <button
-              className="flp-page-link"
-              onClick={() => onUsersPageChange(usersPage + 1)}
-            >
-              &raquo;
-            </button>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  )}
-
-  <div className="flp-panel-footer">
-    <button
-      className="flp-btn-share"
-      onClick={() => openDeadlineModal("Send")}
-      disabled={
-        !selectedFormId || selectedUserIds.length === 0 || !currentUserId
-      }
-    >
-      <i className="bi bi-send-fill"></i> Share
-    </button>
-  </div>
-</div>
+            </div>
+          </div>
 
         </div>
       </div>

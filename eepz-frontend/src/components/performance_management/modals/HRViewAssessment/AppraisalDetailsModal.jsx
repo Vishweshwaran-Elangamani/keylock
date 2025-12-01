@@ -1,5 +1,5 @@
 import React from "react";
-import api from "../../../../services/performancemanagement/hr/api"; // ✅ CORRECTED IMPORT PATH
+import api from "../../../../services/performancemanagement/hr/api";
 
 
 function statusRender(status) {
@@ -38,7 +38,7 @@ const fieldOrder = [
 ];
 
 
-// Format file size to readable format
+
 function formatFileSize(bytes) {
   if (!bytes || bytes === 0) return "0 B";
   const k = 1024;
@@ -48,7 +48,7 @@ function formatFileSize(bytes) {
 }
 
 
-// Format date to readable format
+
 function formatDate(dateString) {
   if (!dateString) return "-";
   try {
@@ -66,13 +66,12 @@ function formatDate(dateString) {
 }
 
 
-// Get file icon based on file type
 function getFileIcon(fileType, fileName) {
   if (!fileType && !fileName) return "bi-file";
-  
+
   const name = (fileName || "").toLowerCase();
   const type = (fileType || "").toLowerCase();
-  
+
   if (type.includes("pdf") || name.endsWith(".pdf")) return "bi-file-pdf";
   if (type.includes("word") || name.endsWith(".doc") || name.endsWith(".docx")) return "bi-file-word";
   if (type.includes("excel") || type.includes("spreadsheet") || name.endsWith(".xls") || name.endsWith(".xlsx")) return "bi-file-earmark-spreadsheet";
@@ -82,17 +81,17 @@ function getFileIcon(fileType, fileName) {
   if (type === "text/csv" || name.endsWith(".csv")) return "bi-file-earmark-text";
   if (type.includes("text") || name.endsWith(".txt")) return "bi-file-text";
   if (type.includes("zip") || type.includes("compressed") || name.match(/\.(zip|rar|7z)$/i)) return "bi-file-zip";
-  
+
   return "bi-file";
 }
 
 
-// Get file extension from MIME type
+
 function getExtensionFromMime(mimeType) {
   if (!mimeType) return '';
-  
+
   const type = mimeType.toLowerCase().trim();
-  
+
   const mimeMap = {
     'application/pdf': '.pdf',
     'text/csv': '.csv',
@@ -121,12 +120,12 @@ function getExtensionFromMime(mimeType) {
     'text/xml': '.xml',
     'text/html': '.html',
   };
-  
+
   return mimeMap[type] || '';
 }
 
 
-// Check if filename already has an extension
+
 function hasExtension(filename) {
   return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
 }
@@ -145,7 +144,7 @@ const AppraisalDetailsModal = ({
   const [error, setError] = React.useState(null);
 
 
-  // ✅ FIXED: Using correct API import with proper baseURL
+
   const handleDownloadAttachment = async (attachment) => {
     try {
       console.log('=== DOWNLOAD START ===');
@@ -153,20 +152,20 @@ const AppraisalDetailsModal = ({
       setError(null);
 
 
-      // ✅ USE CORRECT API BASE URL
+
       const downloadUrl = `${api.defaults.baseURL}/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
       console.log(`[DOWNLOAD] URL: ${downloadUrl}`);
-      
+
       const response = await fetch(downloadUrl);
-      
+
       console.log(`[RESPONSE] Status: ${response.status}`);
       console.log(`[RESPONSE] OK: ${response.ok}`);
-      
-      // ✅ CRITICAL: Check response status and headers BEFORE processing
+
+
       const contentType = response.headers.get('content-type');
       console.log(`[HEADER] Content-Type: ${contentType}`);
-      
-      // ✅ If response not OK, show error
+
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`[ERROR] HTTP ${response.status}:`, errorText);
@@ -174,7 +173,7 @@ const AppraisalDetailsModal = ({
       }
 
 
-      // ✅ If content-type is HTML, backend returned an error page
+
       if (contentType && contentType.includes('text/html')) {
         const errorText = await response.text();
         console.error('[ERROR] Backend returned HTML error page:', errorText);
@@ -184,47 +183,42 @@ const AppraisalDetailsModal = ({
 
       const blob = await response.blob();
       console.log(`[BLOB] Type: ${blob.type}, Size: ${blob.size}`);
-      
-      // STEP 1: Get base filename
+
       let filename = attachment.fileName || "attachment";
       console.log(`[FILENAME] Original: "${filename}"`);
-      
-      // STEP 2: Add extension if missing
+
+
       if (!hasExtension(filename)) {
         console.log(`[EXTENSION] Missing - detecting...`);
         let extension = '';
-        
-        // Try Content-Type header first (MOST RELIABLE)
+
+
         if (contentType) {
           extension = getExtensionFromMime(contentType);
           console.log(`[EXTENSION] From Header: "${extension}"`);
         }
-        
-        // Fallback: use fileType from attachment
+
         if (!extension && attachment.fileType) {
           extension = getExtensionFromMime(attachment.fileType);
           console.log(`[EXTENSION] From Attachment: "${extension}"`);
         }
-        
-        // Fallback: use blob.type
+
         if (!extension && blob.type) {
           extension = getExtensionFromMime(blob.type);
           console.log(`[EXTENSION] From Blob: "${extension}"`);
         }
-        
-        // Last resort
+
         if (!extension) {
           extension = '.bin';
           console.log(`[EXTENSION] Default: ".bin"`);
         }
-        
+
         filename += extension;
         console.log(`[FILENAME] Final: "${filename}"`);
       } else {
         console.log(`[EXTENSION] Already has extension`);
       }
-      
-      // STEP 3: Download
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -233,11 +227,11 @@ const AppraisalDetailsModal = ({
       link.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
-      
-      console.log(`✅ Downloaded: ${filename}`);
+
+      console.log(` Downloaded: ${filename}`);
       console.log('=== DOWNLOAD END ===');
     } catch (err) {
-      console.error("❌ Download error:", err);
+      console.error(" Download error:", err);
       console.error("Error stack:", err.stack);
       setError(`Failed to download ${attachment.fileName}: ${err.message}`);
     } finally {
@@ -251,7 +245,7 @@ const AppraisalDetailsModal = ({
 
   return (
     <>
-      {/* Backdrop */}
+
       <div
         style={{
           position: "fixed",
@@ -266,7 +260,7 @@ const AppraisalDetailsModal = ({
         }}
         onClick={onClose}
       />
-      {/* Modal container */}
+
       <div
         style={{
           position: "fixed",
@@ -287,7 +281,7 @@ const AppraisalDetailsModal = ({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+
         <div
           style={{
             background: "#27235C",
@@ -333,7 +327,7 @@ const AppraisalDetailsModal = ({
             </div>
           </div>
 
-          {/* Attachment Badge in Header */}
+
           {attachments && attachments.length > 0 && (
             <div
               style={{
@@ -369,7 +363,7 @@ const AppraisalDetailsModal = ({
         </div>
 
 
-        {/* Cards Section */}
+
         <div
           style={{
             flex: 1,
@@ -380,7 +374,7 @@ const AppraisalDetailsModal = ({
             msOverflowStyle: "none",
           }}
         >
-          {/* Error Message */}
+
           {error && (
             <div
               style={{
@@ -401,7 +395,6 @@ const AppraisalDetailsModal = ({
             </div>
           )}
 
-          {/* Competencies Section */}
           <div style={{ marginBottom: "32px" }}>
             <div
               style={{
@@ -444,7 +437,7 @@ const AppraisalDetailsModal = ({
                     textAlign: "left",
                   }}
                 >
-                  {/* Title */}
+
                   <div
                     style={{
                       fontWeight: 700,
@@ -460,7 +453,7 @@ const AppraisalDetailsModal = ({
                   >
                     #{idx + 1} &nbsp; {c.competencyName}
                   </div>
-                  {/* Details Grid */}
+
                   <div style={{ width: "100%", maxWidth: 820 }}>
                     {fieldOrder.map(([label, key]) =>
                       key === "competencyName" ? null : (
@@ -493,8 +486,8 @@ const AppraisalDetailsModal = ({
                               fontWeight: key === "status" ? 700 : 500,
                               whiteSpace:
                                 key === "employeeComments" ||
-                                key === "l1Comments" ||
-                                key === "l2Comments"
+                                  key === "l1Comments" ||
+                                  key === "l2Comments"
                                   ? "pre-wrap"
                                   : "inherit",
                               wordBreak: "break-word",
@@ -509,8 +502,8 @@ const AppraisalDetailsModal = ({
                               : c[key] !== undefined &&
                                 c[key] !== null &&
                                 c[key] !== ""
-                              ? c[key]
-                              : "-"}
+                                ? c[key]
+                                : "-"}
                           </span>
                         </div>
                       )
@@ -521,144 +514,138 @@ const AppraisalDetailsModal = ({
             )}
           </div>
 
-          {/* Attachments Detail Section - Now below competencies */}
+
           {attachments && attachments.length > 0 && (
-  <div style={{ 
-    margin: "20px 0",
-    padding: "16px",
-    background: "#f8f9fa",
-    borderRadius: "8px",
-    border: "1px solid #dee2e6"
-  }}>
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      marginBottom: "12px",
-      fontWeight: 600,
-      fontSize: "14px",
-      color: "#26225A"
-    }}>
-      <i className="bi bi-paperclip"></i>
-      <span>Employee Attachments</span>
-    </div>
-    
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      gap: "8px"
-    }}>
-      {attachments.map((att, idx) => (
-        <div
-          key={idx}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "10px 12px",
-            background: "white",
-            border: "1px solid #dee2e6",
-            borderRadius: "6px",
-            transition: "all 0.2s"
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#26225A";
-            e.currentTarget.style.boxShadow = "0 2px 4px rgba(38, 34, 90, 0.1)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#dee2e6";
-            e.currentTarget.style.boxShadow = "none";
-          }}
-        >
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            flex: 1
-          }}>
-            {/* <i
-              className={`bi ${getFileIcon(att.fileType, att.fileName)}`}
-              style={{
-                fontSize: "24px",
-                color: "#26225A"
-              }}
-            ></i> */}
             <div style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "2px"
+              margin: "20px 0",
+              padding: "16px",
+              background: "#f8f9fa",
+              borderRadius: "8px",
+              border: "1px solid #dee2e6"
             }}>
               <div style={{
-                fontWeight: 500,
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "12px",
+                fontWeight: 600,
                 fontSize: "14px",
-                color: "#212529"
+                color: "#26225A"
               }}>
-                {att.fileName}
+                <i className="bi bi-paperclip"></i>
+                <span>Employee Attachments</span>
               </div>
+
               <div style={{
-                fontSize: "12px",
-                color: "#6c757d"
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px"
               }}>
-                {formatFileSize(att.fileSize)}
-                {att.uploadedAt && ` • ${formatDate(att.uploadedAt)}`}
+                {attachments.map((att, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "10px 12px",
+                      background: "white",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "6px",
+                      transition: "all 0.2s"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "#26225A";
+                      e.currentTarget.style.boxShadow = "0 2px 4px rgba(38, 34, 90, 0.1)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "#dee2e6";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      flex: 1
+                    }}>
+
+                      <div style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "2px"
+                      }}>
+                        <div style={{
+                          fontWeight: 500,
+                          fontSize: "14px",
+                          color: "#212529"
+                        }}>
+                          {att.fileName}
+                        </div>
+                        <div style={{
+                          fontSize: "12px",
+                          color: "#6c757d"
+                        }}>
+                          {formatFileSize(att.fileSize)}
+                          {att.uploadedAt && ` • ${formatDate(att.uploadedAt)}`}
+                        </div>
+                        {att.note && (
+                          <div style={{
+                            fontSize: "12px",
+                            color: "#495057",
+                            fontStyle: "italic",
+                            marginTop: "2px"
+                          }}>
+                            Note: {att.note}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDownloadAttachment(att)}
+                      disabled={downloadingId === att.attachmentId}
+                      style={{
+                        padding: "6px 12px",
+                        background: downloadingId === att.attachmentId ? "#6c757d" : "#26225A",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: downloadingId === att.attachmentId ? "not-allowed" : "pointer",
+                        fontSize: "13px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        transition: "background 0.2s"
+                      }}
+                      onMouseEnter={(e) => {
+                        if (downloadingId !== att.attachmentId) {
+                          e.currentTarget.style.background = "#1a1740";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (downloadingId !== att.attachmentId) {
+                          e.currentTarget.style.background = "#26225A";
+                        }
+                      }}
+                      aria-label={`Download ${att.fileName}`}
+                    >
+                      {downloadingId === att.attachmentId ? (
+                        <>
+                          <i className="bi bi-hourglass-split"></i>
+                          Downloading...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-download"></i>
+                          Download
+                        </>
+                      )}
+                    </button>
+                  </div>
+                ))}
               </div>
-              {att.note && (
-                <div style={{
-                  fontSize: "12px",
-                  color: "#495057",
-                  fontStyle: "italic",
-                  marginTop: "2px"
-                }}>
-                  Note: {att.note}
-                </div>
-              )}
             </div>
-          </div>
-          <button
-            onClick={() => handleDownloadAttachment(att)}
-            disabled={downloadingId === att.attachmentId}
-            style={{
-              padding: "6px 12px",
-              background: downloadingId === att.attachmentId ? "#6c757d" : "#26225A",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: downloadingId === att.attachmentId ? "not-allowed" : "pointer",
-              fontSize: "13px",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              transition: "background 0.2s"
-            }}
-            onMouseEnter={(e) => {
-              if (downloadingId !== att.attachmentId) {
-                e.currentTarget.style.background = "#1a1740";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (downloadingId !== att.attachmentId) {
-                e.currentTarget.style.background = "#26225A";
-              }
-            }}
-            aria-label={`Download ${att.fileName}`}
-          >
-            {downloadingId === att.attachmentId ? (
-              <>
-                <i className="bi bi-hourglass-split"></i>
-                Downloading...
-              </>
-            ) : (
-              <>
-                <i className="bi bi-download"></i>
-                Download
-              </>
-            )}
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+          )}
 
           <style>{`
             div[style*="overflow-y: auto"]::-webkit-scrollbar {display:none;}
@@ -670,7 +657,7 @@ const AppraisalDetailsModal = ({
         </div>
 
 
-        {/* Footer */}
+
         <div
           style={{
             background: "#F5F5F7",

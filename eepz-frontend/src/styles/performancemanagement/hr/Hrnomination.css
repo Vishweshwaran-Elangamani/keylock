@@ -1,7 +1,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,7 +15,7 @@
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
 }
@@ -189,10 +189,10 @@
   background: #b91c1c;
 }
 
-/* Scrollbar for modal content */
 .modal-content::-webkit-scrollbar {
   width: 8px;
 }
+
 .modal-content::-webkit-scrollbar-thumb {
   background-color: rgba(39, 35, 92, 0.3);
   border-radius: 4px;
@@ -219,26 +219,26 @@
   transition: color 0.18s;
 }
 
-/* View Button - Blue */
 .custom-action-btn.action-view {
   border-color: #aec2f3;
 }
+
 .custom-action-btn.action-view i {
   color: #457cea;
 }
 
-/* Approve Button - Green */
 .custom-action-btn.action-approve {
   border-color: #90dbbf;
 }
+
 .custom-action-btn.action-approve i {
   color: #23b781;
 }
 
-/* Reject Button - Red */
 .custom-action-btn.action-reject {
   border-color: #e6a3a0;
 }
+
 .custom-action-btn.action-reject i {
   color: #f16355;
 }
@@ -249,7 +249,6 @@
   border-width: 2.5px;
 }
 
-/* Optional: active touch state */
 .custom-action-btn:active {
   box-shadow: none;
   opacity: 0.88;
@@ -265,10 +264,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
 }
+
 .ad-stat-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
+
 .stat-icon {
   width: 52px;
   height: 52px;
@@ -279,24 +280,30 @@
   font-size: 2rem;
   color: white;
 }
+
 .stat-icon-primary {
   background: linear-gradient(135deg, #0d6efd 60%, #4582ec 100%);
 }
+
 .stat-icon-warning {
   background: linear-gradient(135deg, #ffc107 60%, #ffe082 100%);
 }
+
 .stat-icon-success {
   background: linear-gradient(135deg, #28a745 60%, #81c784 100%);
 }
+
 .stat-icon-danger {
   background: linear-gradient(135deg, #dc3545 60%, #ef5350 100%);
 }
+
 .stat-content h3 {
   margin: 0;
   font-size: 2rem;
   font-weight: 700;
   color: #212529;
 }
+
 .stat-content p {
   margin: 0;
   color: #6c757d;

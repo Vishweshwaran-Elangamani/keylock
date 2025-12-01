@@ -1,13 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../../styles/performancemanagement/manager/ManagerAcknowledgement.css";
- 
+
 const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
   const navigate = useNavigate();
- 
+
   return (
     <div className="manageracknowledgment-fullpage">
-      {/* Breadcrumb */}
+
       <nav className="cg-breadcrumbs" aria-label="breadcrumb">
         <ol className="cg-breadcrumb">
           <li
@@ -27,9 +27,9 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
           </li>
         </ol>
       </nav>
- 
+
       <h2 className="manageracknowledgment-title">Employee Acknowledgments</h2>
- 
+
       {loading ? (
         <div className="manageracknowledgment-loading">Loading...</div>
       ) : error ? (
@@ -54,18 +54,18 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
                   <td>
                     {row.acknowledgedAt
                       ? new Date(row.acknowledgedAt).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric"
-                        })
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric"
+                      })
                       : "-"}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
- 
-          {/* Pagination */}
+
+
           <div className="manageracknowledgment-pagination-container">
             <div className="manageracknowledgment-pagination-info">
               <span className="manageracknowledgment-pagination-label">Show</span>
@@ -102,7 +102,6 @@ const ManagerAcknowledgmentModal = ({ ackList, error, loading }) => {
     </div>
   );
 };
- 
+
 export default ManagerAcknowledgmentModal;
- 
- 
+

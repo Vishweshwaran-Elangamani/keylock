@@ -11,7 +11,6 @@ import "../../../styles/performancemanagement/hr/DeptHeadPage.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import api from "../../../services/performancemanagement/hr/api";
 
-// ✅ Helper function to get extension from content-type
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
 
@@ -36,9 +35,6 @@ const getExtensionFromContentType = (contentType) => {
 };
 
 export default function DeptHeadPage() {
-  // ========================
-  // STATE MANAGEMENT
-  // ========================
 
   const [pendingRequests, setPendingRequests] = useState([]);
   const [approvedRequests, setApprovedRequests] = useState([]);
@@ -47,8 +43,8 @@ export default function DeptHeadPage() {
 
   const [activeTab, setActiveTab] = useState("pending");
 
-  const [searchTerm, setSearchTerm] = useState("");       // what user types
-  const [appliedSearch, setAppliedSearch] = useState(""); // what is actually applied
+  const [searchTerm, setSearchTerm] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
 
   const [filterProject, setFilterProject] = useState("");
   const [filteredData, setFilteredData] = useState([]);
@@ -62,19 +58,16 @@ export default function DeptHeadPage() {
   const [expandedEmployeeIds, setExpandedEmployeeIds] = useState(new Set());
   const [approvingEmployeeId, setApprovingEmployeeId] = useState(null);
 
-  // ✅ NEW: State for attachments
+
   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
 
-  // ========================
-  // EFFECTS
-  // ========================
 
   useEffect(() => {
-    fetchData();  // Initial load
+    fetchData();  // 
 
     const refreshInterval = setInterval(() => {
-      fetchData(true);  // Silent background refresh
+      fetchData(true);
     }, 30000);
 
     return () => clearInterval(refreshInterval);
@@ -84,9 +77,6 @@ export default function DeptHeadPage() {
     applyFilters();
   }, [pendingRequests, approvedRequests, activeTab, searchTerm, filterProject]);
 
-  // ========================
-  // API FUNCTIONS
-  // ========================
 
   const fetchData = async (silent = false) => {
     try {
@@ -125,13 +115,12 @@ export default function DeptHeadPage() {
     }
   };
 
-  // ✅ NEW: Fetch attachments for an assessment
   const fetchAttachments = async (assessmentId) => {
     setLoadingAttachments(true);
     try {
       const departmentHeadId = getEmployeeIdForFilter();
       const response = await api.get(`/AppraisalProcess/depthead/${departmentHeadId}/assessment/${assessmentId}/attachments`);
-      
+
       if (response.data.success) {
         setAttachments(response.data.data || []);
       } else {
@@ -145,11 +134,10 @@ export default function DeptHeadPage() {
     }
   };
 
-  // ✅ COMPLETE FIX: Updated handleDownloadAttachment with proper header extraction
   const handleDownloadAttachment = async (attachmentId) => {
     try {
       console.log(`Downloading attachment ${attachmentId}`);
-      
+
       const departmentHeadId = getEmployeeIdForFilter();
       const response = await api.get(
         `/AppraisalProcess/depthead/${departmentHeadId}/attachments/${attachmentId}/download`,
@@ -159,24 +147,17 @@ export default function DeptHeadPage() {
       console.log('Full Response:', response);
       console.log('Response headers object:', response.headers);
 
-      // ✅ CRITICAL FIX: Extract filename from content-disposition header properly
       let filename = 'attachment';
-      
-      // Try to get from response headers (Axios exposes this)
+
       const contentDisposition = response.headers['content-disposition'];
       console.log('Content-Disposition header:', contentDisposition);
-      
+
       if (contentDisposition) {
-        // Match patterns: 
-        // attachment; filename="SAMPLE PDF.pdf"
-        // attachment; filename=SAMPLE PDF.pdf
-        // attachment; filename="SAMPLE PDF.pdf"; filename*=UTF-8''SAMPLE%20PDF.pdf
         const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
         if (matches && matches[1]) {
           filename = matches[1].trim();
           console.log('✅ Extracted filename from header:', filename);
         } else {
-          // Try without quotes
           const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
           if (matches2 && matches2[1]) {
             filename = matches2[1].trim();
@@ -184,11 +165,10 @@ export default function DeptHeadPage() {
           }
         }
       }
-      
-      // If still no filename, try content-type to infer extension
+
       const contentType = response.headers['content-type'];
       console.log('Content-Type:', contentType);
-      
+
       if (!filename.includes('.') && contentType) {
         const extension = getExtensionFromContentType(contentType);
         if (extension) {
@@ -196,20 +176,18 @@ export default function DeptHeadPage() {
           console.log('Added extension based on content-type:', filename);
         }
       }
-      
+
       console.log('Final filename for download:', filename);
-      
-      // ✅ Create blob and download
+
       const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename);
-      
+
       document.body.appendChild(link);
       link.click();
-      
-      // Cleanup after a brief delay
+
       setTimeout(() => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
@@ -222,9 +200,7 @@ export default function DeptHeadPage() {
     }
   };
 
-  // ========================
-  // FILTER FUNCTIONS
-  // ========================
+
 
   const applyFilters = () => {
     let filtered = activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
@@ -247,15 +223,11 @@ export default function DeptHeadPage() {
     setCurrentPage(1);
   };
 
-  // ========================
-  // APPROVE HANDLERS
-  // ========================
 
   const handleViewDetails = async (employee) => {
     setSelectedEmployee(employee);
     setShowDetailsModal(true);
-    
-    // ✅ NEW: Fetch attachments when opening details modal
+
     if (employee.assessmentId) {
       await fetchAttachments(employee.assessmentId);
     }
@@ -302,12 +274,9 @@ export default function DeptHeadPage() {
     setShowApproveModal(false);
     setShowDetailsModal(false);
     setSelectedEmployee(null);
-    setAttachments([]); // ✅ NEW: Clear attachments when closing modal
+    setAttachments([]);
   };
 
-  // ========================
-  // TABLE EXPAND/COLLAPSE
-  // ========================
 
   const toggleDetails = (employeeId) => {
     setExpandedEmployeeIds((prev) => {
@@ -321,9 +290,6 @@ export default function DeptHeadPage() {
     });
   };
 
-  // ========================
-  // UI HELPERS
-  // ========================
 
   const getAvgRating = (competencies, key) => {
     if (!competencies || competencies.length === 0) return "-";
@@ -386,7 +352,7 @@ export default function DeptHeadPage() {
     return [...new Set(projects)].filter(Boolean);
   };
 
-  // ✅ NEW: Format file size
+
   const formatFileSize = (bytes) => {
     if (!bytes) return "0 Bytes";
     const k = 1024;
@@ -395,7 +361,7 @@ export default function DeptHeadPage() {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
   };
 
-  // ✅ NEW: Get file icon
+
   const getFileIcon = (fileType) => {
     if (!fileType) return "bi-file-earmark";
     if (fileType.includes("pdf")) return "bi-file-earmark-pdf";
@@ -406,31 +372,27 @@ export default function DeptHeadPage() {
     return "bi-file-earmark";
   };
 
-  // ========================
-  // PAGINATION FUNCTIONS
-  // ========================
 
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   const getPaginatedData = (tab) => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-  
-    // pick dataset based on tab
+
+
     const data = tab === "pending" ? pendingRequests : approvedRequests;
-  
-    // if you have filtering logic, apply it here
+
     const filtered = filteredData
       ? filteredData.filter(item =>
-          tab === "pending"
-            ? pendingRequests.includes(item)
-            : approvedRequests.includes(item)
-        )
+        tab === "pending"
+          ? pendingRequests.includes(item)
+          : approvedRequests.includes(item)
+      )
       : data;
-  
+
     return filtered.slice(startIndex, endIndex);
   };
-  
+
 
   const getPageNumbers = () => {
     const pages = [];
@@ -453,13 +415,11 @@ export default function DeptHeadPage() {
     return pages;
   };
 
-  // ========================
-  // RENDER MODALS
-  // ========================
+
 
   const renderApproveModal = () => {
     if (!showApproveModal || !selectedEmployee) return null;
-  
+
     return (
       <>
         <div className="dp-modal-backdrop"></div>
@@ -469,7 +429,6 @@ export default function DeptHeadPage() {
             borderRadius: "12px",
             overflow: "hidden"
           }}>
-            {/* Modal Header */}
             <div style={{
               background: '#27235C',
               color: '#fff',
@@ -514,8 +473,7 @@ export default function DeptHeadPage() {
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
-  
-            {/* Modal Body */}
+
             <div style={{
               background: '#fff',
               padding: '24px 28px',
@@ -523,7 +481,6 @@ export default function DeptHeadPage() {
               borderBottomRightRadius: '12px',
               textAlign: "left",
             }}>
-              {/* Employee Details Box */}
               <div className="dp-details-box">
                 <h6 className="dp-details-title">
                   <i className="bi bi-person-badge me-2"></i>
@@ -575,7 +532,6 @@ export default function DeptHeadPage() {
                   </div>
                 </div>
               </div>
-              {/* Info Alert */}
               <div className="dp-info-alert">
                 <i className="bi bi-info-circle"></i>
                 <div>
@@ -583,7 +539,6 @@ export default function DeptHeadPage() {
                   The employee will be notified via system notification.
                 </div>
               </div>
-              {/* Modal Footer */}
               <div style={{
                 display: 'flex',
                 justifyContent: 'flex-end',
@@ -652,7 +607,6 @@ export default function DeptHeadPage() {
 
     return (
       <>
-        {/* Blurred, semi-dark backdrop */}
         <div
           className="dp-modal-backdrop"
           style={{
@@ -689,7 +643,6 @@ export default function DeptHeadPage() {
               border: "2px solid #27235c"
             }}
           >
-            {/* Modal Header */}
             <div style={{
               background: '#27235C',
               color: '#fff',
@@ -727,7 +680,6 @@ export default function DeptHeadPage() {
               </button>
             </div>
 
-            {/* Modal Body */}
             <div style={{
               background: '#f7f8fc',
               padding: '0 0 0 0',
@@ -745,7 +697,6 @@ export default function DeptHeadPage() {
                 alignItems: 'flex-start',
                 flexWrap: 'wrap',
               }}>
-                {/* Employee Card */}
                 <div style={{
                   flex: '1 1 240px',
                   background: '#fff',
@@ -783,7 +734,6 @@ export default function DeptHeadPage() {
                   </div>
                 </div>
 
-                {/* Ratings Card */}
                 <div style={{
                   flex: '1 1 240px',
                   background: '#fff',
@@ -842,7 +792,6 @@ export default function DeptHeadPage() {
                 </div>
               </div>
 
-              {/* Competencies Section */}
               <div style={{
                 background: "#fff",
                 margin: "0 32px 22px 32px",
@@ -907,7 +856,6 @@ export default function DeptHeadPage() {
                 </div>
               </div>
 
-              {/* ✅ NEW: Attachments Section */}
               <div style={{
                 background: "#fff",
                 margin: "0 32px 22px 32px",
@@ -950,7 +898,7 @@ export default function DeptHeadPage() {
                         background: '#f8f7fc'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-                         
+
                           <div style={{ flex: 1 }}>
                             <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>
                               {attachment.fileName}
@@ -989,7 +937,7 @@ export default function DeptHeadPage() {
                 )}
               </div>
 
-              {/* Goals Section */}
+
               <div style={{
                 background: "#fff",
                 margin: "0 32px 28px 32px",
@@ -1069,7 +1017,7 @@ export default function DeptHeadPage() {
                 )}
               </div>
             </div>
-            {/* Modal Footer */}
+
             <div style={{
               display: 'flex',
               justifyContent: 'flex-end',
@@ -1102,9 +1050,6 @@ export default function DeptHeadPage() {
     );
   };
 
-  // ========================
-  // MAIN RENDER - LOADING STATE
-  // ========================
 
   if (loading) {
     return (
@@ -1116,13 +1061,9 @@ export default function DeptHeadPage() {
     );
   }
 
-  // ========================
-  // MAIN RENDER - PAGE CONTENT
-  // ========================
 
   return (
     <div className="dp-page">
-      {/* Top bar with Breadcrumbs */}
       <div className="hrfcper-top-bar">
         <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
           <Breadcrumb
@@ -1132,14 +1073,13 @@ export default function DeptHeadPage() {
         <div />
       </div>
 
-      {/* Page Header */}
       <div className="dp-page-header">
         <div className="dp-header-content">
           <div className="dp-header-text"></div>
         </div>
       </div>
 
-      {/* Stats Cards */}
+
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
@@ -1147,7 +1087,7 @@ export default function DeptHeadPage() {
         marginBottom: "1.5rem"
       }}>
 
-        {/* Active Tabs with Counts */}
+
         <div
           style={{
             display: "flex",
@@ -1220,7 +1160,7 @@ export default function DeptHeadPage() {
         </div>
       </div>
 
-      {/* Filters */}
+
       <div className="dp-filters-card">
         <div className="dp-filters-content">
           <div className="dp-filters-left">
@@ -1269,9 +1209,9 @@ export default function DeptHeadPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div 
-        className="dp-table-card" 
+
+      <div
+        className="dp-table-card"
         style={{ border: "2px solid #27235C", borderRadius: "8px", overflow: "hidden" }}
       >
         <div className="dp-table-wrapper">
@@ -1291,8 +1231,8 @@ export default function DeptHeadPage() {
               <tbody>
                 {getPaginatedData("pending").length === 0 ? (
                   <tr>
-                    <td 
-                      colSpan={7} 
+                    <td
+                      colSpan={7}
                       className="dp-empty-state"
                       style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}
                     >
@@ -1406,10 +1346,10 @@ export default function DeptHeadPage() {
           )}
         </div>
 
-        {/* Pagination */}
+
         {filteredData.length > 0 && (
-          <div 
-            className="dp-pagination-container" 
+          <div
+            className="dp-pagination-container"
             style={{ borderTop: "2px solid #27235C", paddingTop: "10px", marginTop: "10px" }}
           >
             <div className="dp-pagination-info">
@@ -1447,9 +1387,8 @@ export default function DeptHeadPage() {
                 {getPageNumbers().map((page, index) => (
                   <li
                     key={index}
-                    className={`dp-page-item ${page === currentPage ? "active" : ""} ${
-                      typeof page !== "number" ? "disabled" : ""
-                    }`}
+                    className={`dp-page-item ${page === currentPage ? "active" : ""} ${typeof page !== "number" ? "disabled" : ""
+                      }`}
                   >
                     <button
                       className="dp-page-link"
@@ -1475,7 +1414,7 @@ export default function DeptHeadPage() {
         )}
       </div>
 
-      {/* Modals */}
+
       {renderApproveModal()}
       {renderDetailsModal()}
     </div>

@@ -1,12 +1,3 @@
-/* ===================================================================
-   DEPARTMENT HEAD TOP PERFORMERS - PROFESSIONAL STYLES
-   All classes use 'dtp-' prefix to prevent CSS conflicts
-   DTP = DepartHead Top Performers
-   =================================================================== */
-
-/* ========================
-   PAGE & CONTAINER
-   ======================== */
 .dtp-page {
   min-height: 100vh;
   background: #f8f9fa;
@@ -18,9 +9,7 @@
   margin: 0 auto;
 }
 
-/* ========================
-   HEADER SECTION
-   ======================== */
+
 .dtp-header {
   background: linear-gradient(135deg, #27235C 0%, #AC5098 100%);
   border-radius: 16px;
@@ -64,9 +53,7 @@
   color: #fff;
 }
 
-/* ========================
-   LOADING STATE
-   ======================== */
+
 .dtp-loading-container {
   min-height: 100vh;
   display: flex;
@@ -102,9 +89,7 @@
   font-size: 16px;
 }
 
-/* ========================
-   EMPTY STATE
-   ======================== */
+
 .dtp-empty-state {
   background: #fff;
   border-radius: 12px;
@@ -131,9 +116,7 @@
   margin: 0;
 }
 
-/* ========================
-   NOMINATIONS GRID
-   ======================== */
+
 .dtp-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -155,9 +138,7 @@
   border-color: #AC5098;
 }
 
-/* ========================
-   EMPLOYEE SECTION
-   ======================== */
+
 .dtp-employee-section {
   margin-bottom: 16px;
 }
@@ -190,9 +171,7 @@
   margin: 0;
 }
 
-/* ========================
-   OPPORTUNITY BOX
-   ======================== */
+
 .dtp-opportunity-box {
   background: rgba(172, 80, 152, 0.1);
   padding: 12px;
@@ -213,9 +192,7 @@
   margin: 0;
 }
 
-/* ========================
-   JUSTIFICATION PREVIEW
-   ======================== */
+
 .dtp-justification-preview {
   font-size: 14px;
   color: #2c3e50;
@@ -228,9 +205,7 @@
   text-overflow: ellipsis;
 }
 
-/* ========================
-   VIEW BUTTON
-   ======================== */
+
 .dtp-btn-view {
   width: 100%;
   padding: 12px;
@@ -250,9 +225,7 @@
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.4);
 }
 
-/* ========================
-   MODAL
-   ======================== */
+
 .dtp-modal-backdrop {
   position: fixed;
   top: 0;
@@ -272,6 +245,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -293,13 +267,13 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Modal Header */
 .dtp-modal-header {
   background: linear-gradient(135deg, #27235C 0%, #AC5098 100%);
   padding: 24px;
@@ -314,7 +288,7 @@
   color: #fff;
 }
 
-/* Modal Body */
+
 .dtp-modal-body {
   padding: 32px;
 }
@@ -356,7 +330,6 @@
   margin-bottom: 0;
 }
 
-/* Justification Box */
 .dtp-justification-box {
   background: #f8f9fa;
   padding: 16px;
@@ -367,7 +340,6 @@
   margin-top: 8px;
 }
 
-/* Parameter Cards */
 .dtp-parameter-card {
   display: flex;
   justify-content: space-between;
@@ -407,7 +379,6 @@
   white-space: nowrap;
 }
 
-/* Modal Footer */
 .dtp-modal-footer {
   padding: 20px 32px;
   border-top: 1px solid #e0e0e0;
@@ -432,9 +403,7 @@
   box-shadow: 0 4px 12px rgba(39, 35, 92, 0.4);
 }
 
-/* ========================
-   RESPONSIVE DESIGN
-   ======================== */
+
 @media (max-width: 768px) {
   .dtp-page {
     padding: 20px 16px;
@@ -502,9 +471,7 @@
   }
 }
 
-/* ========================
-   ACCESSIBILITY
-   ======================== */
+
 .dtp-btn-back:focus-visible,
 .dtp-btn-view:focus-visible,
 .dtp-btn-close:focus-visible {

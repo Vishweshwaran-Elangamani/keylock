@@ -1,9 +1,3 @@
-/* ============================================
-   DEADLINE MODAL STYLES
-   HR Form List - Deadline Setting Modal
-   ============================================ */
-
-/* Modal Overlay */
 .hrformlist-modal-overlay {
   position: fixed;
   top: 0;
@@ -29,7 +23,7 @@
   }
 }
 
-/* Deadline Modal Container */
+
 .hrformlist-deadline-modal {
   background: #ffffff;
   border-radius: 16px;
@@ -56,7 +50,7 @@
   }
 }
 
-/* Calendar Icon Styling */
+
 .hrformlist-deadline-modal .bi-calendar-check {
   display: block;
   color: #27235C;
@@ -79,7 +73,7 @@
   }
 }
 
-/* Modal Title */
+
 .hrformlist-deadline-modal h3 {
   font-size: 26px;
   font-weight: 700;
@@ -88,7 +82,7 @@
   line-height: 1.3;
 }
 
-/* Modal Description */
+
 .hrformlist-deadline-modal p {
   font-size: 15px;
   color: #6b7280;
@@ -97,13 +91,11 @@
   max-width: 90%;
 }
 
-/* Input Group Container */
 .hrformlist-input-group {
   width: 100%;
   margin-bottom: 32px;
 }
 
-/* Input Label */
 .hrformlist-input-group label {
   display: flex;
   align-items: center;
@@ -120,7 +112,6 @@
   font-size: 18px;
 }
 
-/* Number Input */
 .hrformlist-input-group input[type="number"] {
   width: 100%;
   max-width: 280px;
@@ -148,14 +139,12 @@
   box-shadow: 0 0 0 4px rgba(39, 35, 92, 0.1);
 }
 
-/* Remove spinner arrows (optional - for cleaner look) */
 .hrformlist-input-group input[type="number"]::-webkit-inner-spin-button,
 .hrformlist-input-group input[type="number"]::-webkit-outer-spin-button {
   opacity: 1;
   height: 40px;
 }
 
-/* Modal Buttons Container */
 .hrformlist-modal-buttons {
   display: flex;
   gap: 12px;
@@ -163,7 +152,6 @@
   justify-content: center;
 }
 
-/* Cancel Button */
 .hrformlist-btn-cancel-modal {
   flex: 1;
   max-width: 180px;
@@ -197,7 +185,6 @@
   font-size: 16px;
 }
 
-/* Confirm Button */
 .hrformlist-btn-confirm-modal {
   flex: 1;
   max-width: 200px;
@@ -231,7 +218,6 @@
   font-size: 16px;
 }
 
-/* Disabled State */
 .hrformlist-btn-confirm-modal:disabled {
   background: #d1d5db;
   cursor: not-allowed;
@@ -244,7 +230,6 @@
   transform: none;
 }
 
-/* Responsive Design */
 @media (max-width: 576px) {
   .hrformlist-deadline-modal {
     padding: 32px 24px;
@@ -281,7 +266,6 @@
   }
 }
 
-/* Tablet View */
 @media (max-width: 768px) {
   .hrformlist-deadline-modal {
     padding: 36px 28px;
@@ -292,7 +276,6 @@
   }
 }
 
-/* Focus visible for accessibility */
 .hrformlist-btn-cancel-modal:focus-visible,
 .hrformlist-btn-confirm-modal:focus-visible {
   outline: 3px solid rgba(39, 35, 92, 0.4);
@@ -304,7 +287,6 @@
   outline-offset: 2px;
 }
 
-/* Loading State (Optional - if you want to add loading spinner) */
 .hrformlist-btn-confirm-modal.loading {
   position: relative;
   color: transparent;
@@ -328,7 +310,6 @@
   }
 }
 
-/* Success Animation (Optional) */
 @keyframes hrformlist-success {
   0% {
     transform: scale(1);

@@ -1,12 +1,4 @@
-/* ===================================================================
-   MANAGER EVALUATION PAGE - SIMPLE PROFESSIONAL STYLES
-   Both main page and form page table headers fixed
-   =================================================================== */
- 
-/* ========================
-   THEME COLORS
-   ======================== */
-   :root {
+ :root {
     --manevap-primary: #2E2B5F;
     --manevap-secondary: #E91E63;
     --manevap-accent: #5E5BA7;
@@ -23,9 +15,7 @@
     --manevap-info: #3B82F6;
   }
    
-  /* ========================
-     CONTAINER & LAYOUT
-     ======================== */
+ 
   .manevap-container {
     padding: 32px;
     max-width: 1400px;
@@ -35,9 +25,7 @@
     min-height: 100vh;
   }
    
-  /* ========================
-     LOADING STATE
-     ======================== */
+  
   .manevap-loading-state {
     display: flex;
     flex-direction: column;
@@ -58,12 +46,7 @@
     border-style: solid;
   }
    
-  /* @keyframes spinner-border {
-    to {
-      transform: rotate(360deg);
-    }
-  } */
-   
+  
   .manevap-loading-state p {
     margin-top: 16px;
     color: var(--manevap-text-light);
@@ -71,9 +54,7 @@
     font-weight: 500;
   }
    
-  /* ========================
-     HEADER SECTION - LEFT ALIGNED
-     ======================== */
+
   .manevap-header-section {
     display: flex;
     align-items: center;
@@ -129,9 +110,7 @@
     text-align: left;
   }
    
-  /* ========================
-     TAB NAVIGATION
-     ======================== */
+
   .manevap-tab-container {
     display: flex;
     gap: 0;
@@ -159,10 +138,7 @@
     border-bottom: 3px solid transparent;
   }
    
-  /* .manevap-tab:hover {
-    background: rgba(46, 43, 95, 0.05);
-  }
-    */
+ 
   .manevap-tab.active {
     background: var(--manevap-primary);
     color: #FFFFFF;
@@ -182,9 +158,7 @@
     background: rgba(233, 30, 99, 0.3);
   }
    
-  /* ========================
-     CARD
-     ======================== */
+ 
   .manevap-card {
     background-color: var(--manevap-card);
     border-radius: 0 0 12px 12px;
@@ -195,9 +169,7 @@
     min-height: 300px;
   }
    
-  /* ========================
-     FILTER SECTION
-     ======================== */
+
   .manevap-filter-section {
     display: flex;
     gap: 16px;
@@ -264,15 +236,7 @@
     white-space: nowrap;
   }
    
-  /* .manevap-clear-btn:hover {
-    background: #C2185B;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
-  } */
-   
-  /* ========================
-     EMPTY STATE
-     ======================== */
+ 
   .manevap-empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -297,10 +261,7 @@
     color: var(--manevap-text-light);
     margin: 0;
   }
-   
-  /* ========================
-     MAIN PAGE TABLE - FIXED VISIBLE HEADER
-     ======================== */
+
   .manevap-table-container {
     overflow-x: auto;
   }
@@ -350,9 +311,7 @@
     text-align: left;
   }
    
-  /* ========================
-     BADGES
-     ======================== */
+ 
   .manevap-badge {
     display: inline-flex;
     align-items: center;
@@ -383,9 +342,7 @@
     font-size: 10px;
   }
    
-  /* ========================
-     BUTTONS
-     ======================== */
+ 
   .manevap-btn {
     display: inline-flex;
     align-items: center;
@@ -406,37 +363,19 @@
     box-shadow: 0 2px 6px rgba(46, 43, 95, 0.3);
   }
    
-  /* .manevap-btn-submit:hover {
-    background: linear-gradient(135deg, var(--manevap-primary), var(--manevap-secondary));
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(46, 43, 95, 0.4);
-  } */
-   
+
   .manevap-btn-view {
     background:  #C2185B;;
     color: #fff;
   }
    
-  /* .manevap-btn-view:hover {
-    background: #4E4B8F;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(94, 91, 167, 0.4);
-  } */
- 
-  /* -------------------------------
-     Button styling (namespaced)
-     - .manevap-btn-primary: used by Search buttons (solid primary)
-     - .manevap-btn-submit-form: used by modal Submit (nomination gradient)
-     No hover transform or shadow changes to avoid unexpected animation.
-     ------------------------------- */
- 
+
   .manevap-btn-primary {
     padding: 10px 18px;
     border-radius: 8px;
     font-weight: 700;
     color: #fff;
     border: none;
-    /* search buttons should use the solid primary */
     background: var(--manevap-primary);
     box-shadow: none;
     display: inline-flex;
@@ -455,7 +394,6 @@
     font-weight: 700;
     color: #fff;
     border: none;
-    /* submit buttons should use the nomination gradient */
     background: #C2185B;;
     box-shadow: none;
     display: inline-flex;
@@ -468,9 +406,7 @@
     outline-offset: 2px;
   }
    
-  /* ========================
-     MODAL
-     ======================== */
+
   .manevap-modal-overlay {
     position: fixed;
     top: 0;
@@ -511,9 +447,7 @@
     }
   }
    
-  /* ========================
-     COMPACT HEADER
-     ======================== */
+
   .manevap-compact-header {
     display: flex;
     justify-content: space-between;
@@ -572,9 +506,7 @@
     color: var(--manevap-text-light);
   }
    
-  /* ========================
-     MODAL LOADING
-     ======================== */
+
   .manevap-modal-loading {
     display: flex;
     flex-direction: column;
@@ -601,9 +533,7 @@
     font-size: 16px;
   }
    
-  /* ========================
-     MODAL BODY
-     ======================== */
+
   .manevap-modal-body {
     flex: 1;
     overflow-x: auto;
@@ -611,9 +541,7 @@
     padding: 0;
   }
    
-  /* ========================
-     FORM PAGE TABLE - FIXED BLUE HEADER
-     ======================== */
+ 
   .manevap-simple-table {
     width: 100%;
     border-collapse: collapse;
@@ -662,9 +590,7 @@
     border-right: none;
   }
    
-  /* ========================
-     FORM INPUTS
-     ======================== */
+
   .manevap-select {
     width: 100%;
     padding: 10px 14px;
@@ -718,9 +644,7 @@
     line-height: 1.5;
   }
    
-  /* ========================
-     MODAL ACTIONS
-     ======================== */
+ 
   .manevap-modal-actions {
     display: flex;
     gap: 12px;
@@ -745,12 +669,7 @@
     font-size: 15px;
     transition: all 0.3s ease;
   }
-   
-  /* .manevap-btn-close:hover {
-    background: #4B5563;
-    transform: translateY(-2px);
-  } */
-   
+
   .manevap-btn-submit-form {
     display: flex;
     align-items: center;
@@ -766,11 +685,7 @@
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(46, 43, 95, 0.3);
   }
-   
-  /* No hover effects for submit button to keep static appearance */
-  /* .manevap-btn-submit-form:hover:not(:disabled) {
-    background: linear-gradient(90deg,#97247e 0%,#e01950 100%);
-  } */
+ 
    
   .manevap-btn-submit-form:disabled {
     opacity: 0.6;
@@ -778,9 +693,7 @@
     transform: none;
   }
    
-  /* ========================
-     RESPONSIVE DESIGN
-     ======================== */
+ 
   @media (max-width: 768px) {
     .manevap-container {
       padding: 16px;
@@ -824,9 +737,7 @@
     }
   }
    
-  /* ========================
-     ACCESSIBILITY
-     ======================== */
+ 
   .manevap-tab:focus-visible,
   .manevap-btn:focus-visible,
   .manevap-filter-input:focus-visible,
@@ -858,7 +769,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center; /* center the title and description horizontally */
+    align-items: center; 
     text-align: center;
   }
   .manevap-modal-logo {
@@ -885,7 +796,6 @@
     font-weight: 400;
   }
  
-  /* Responsive: stack logo above titles on narrow screens */
   @media (max-width: 640px) {
     .manevap-form-header-inner {
       flex-direction: column;
@@ -914,7 +824,7 @@
     font-size: 1rem;
     vertical-align: middle;
     background: #fff;
-    text-align: left; /* ensure left alignment */
+    text-align: left; 
   }
   .manevap-strict-table th {
     background: #2E2B5F !important;

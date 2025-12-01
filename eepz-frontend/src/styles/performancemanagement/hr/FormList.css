@@ -1,5 +1,3 @@
-/* FormsList.css - All classes scoped under .formlistperf */
-
 :root {
   --primary: #27235C;
   --secondary: #AC5098;
@@ -21,7 +19,6 @@
   box-sizing: border-box;
 }
 
-/* Base Root */
 .formlistperf .flp-root {
   padding: 20px 24px 64px 24px;
   max-width: 1600px;
@@ -30,7 +27,6 @@
   min-height: 100vh;
 }
 
-/* Breadcrumbs */
 .formlistperf .cg-breadcrumbs {
   margin-bottom: 2.5rem;
 }
@@ -66,7 +62,7 @@
   opacity: 1;
 }
 
-.formlistperf .cg-breadcrumb-item + .cg-breadcrumb-item:before {
+.formlistperf .cg-breadcrumb-item+.cg-breadcrumb-item:before {
   content: ">";
   margin: 0 0.7em;
   color: #b687b6;
@@ -82,7 +78,6 @@
   cursor: default;
 }
 
-/* Analytics Cards */
 .formlistperf .ad-stat-card {
   min-height: 100px;
   display: flex;
@@ -92,7 +87,6 @@
   padding: 1.5rem;
 }
 
-/* Main Area Grid */
 .formlistperf .flp-main-area {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -100,7 +94,6 @@
   align-items: start;
 }
 
-/* Forms Section */
 .formlistperf .flp-forms-section {
   background: #ffffff;
   border-radius: 12px;
@@ -109,7 +102,6 @@
   overflow: hidden;
 }
 
-/* Section Header */
 .formlistperf .flp-section-header {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e5e7eb;
@@ -158,7 +150,6 @@
   flex-wrap: wrap;
 }
 
-/* Search Box */
 .formlistperf .flp-search-box {
   position: relative;
   min-width: 180px;
@@ -195,7 +186,6 @@
   color: #9ca3af;
 }
 
-/* Filter Select */
 .formlistperf .flp-filter-select {
   min-width: 140px;
   padding: 0.55rem 0.75rem;
@@ -214,7 +204,6 @@
   box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
 }
 
-/* Table Card */
 .formlistperf .flp-table-card {
   background: #ffffff;
 }
@@ -275,7 +264,6 @@
   font-size: 1.1rem;
 }
 
-/* Type Badge */
 .formlistperf .flp-type-badge {
   display: inline-flex;
   align-items: center;
@@ -288,7 +276,6 @@
   border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
-/* Action Buttons */
 .formlistperf .flp-action-buttons {
   display: flex;
   justify-content: center;
@@ -358,7 +345,6 @@
   box-shadow: none;
 }
 
-/* Empty State */
 .formlistperf .flp-empty-state {
   text-align: center;
   padding: 3rem 1rem !important;
@@ -378,7 +364,6 @@
   font-size: 1rem;
 }
 
-/* Users Panel */
 .formlistperf .flp-users-panel {
   background: #ffffff;
   border-radius: 12px;
@@ -393,7 +378,6 @@
   overflow: hidden;
 }
 
-/* Panel Header */
 .formlistperf .flp-panel-header {
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e5e7eb;
@@ -420,7 +404,6 @@
   color: #27235c;
 }
 
-/* Users Filters & Controls */
 .formlistperf .flp-users-filters {
   display: flex;
   gap: 0.5rem;
@@ -472,7 +455,6 @@
   font-size: 1.05rem;
 }
 
-/* Panel Body */
 .formlistperf .flp-panel-body {
   flex: 1 1 auto;
   min-height: 0;
@@ -481,7 +463,6 @@
   background: #fff;
 }
 
-/* Empty Box */
 .formlistperf .flp-empty-box {
   display: flex;
   flex-direction: column;
@@ -504,7 +485,6 @@
   font-size: 1rem;
 }
 
-/* Selected Count */
 .formlistperf .flp-selected-count {
   display: flex;
   align-items: center;
@@ -527,7 +507,6 @@
   font-weight: 700;
 }
 
-/* User Card */
 .formlistperf .flp-user-card {
   padding: 0.875rem 1rem;
   display: flex;
@@ -598,7 +577,6 @@
   font-size: 0.8rem;
 }
 
-/* Panel Footer */
 .formlistperf .flp-panel-footer {
   padding: 1.25rem 1.5rem;
   border-top: 1px solid #e5e7eb;
@@ -653,7 +631,6 @@
   transform: none;
 }
 
-/* Pagination Container */
 .formlistperf .flp-pagination-container {
   padding: 1.25rem;
   display: flex;
@@ -745,7 +722,6 @@
   pointer-events: none;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .formlistperf .flp-main-area {
     grid-template-columns: 1fr;

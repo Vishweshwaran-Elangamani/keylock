@@ -13,7 +13,7 @@ const ActionModal = ({
 
   return (
     <>
-      {/* Overlay */}
+
       <div
         style={{
           position: "fixed",
@@ -26,7 +26,7 @@ const ActionModal = ({
         onClick={onClose}
       ></div>
 
-      {/* Modal Container */}
+
       <div
         style={{
           position: "fixed",
@@ -43,10 +43,10 @@ const ActionModal = ({
             background: THEME.card,
             borderRadius: 18,
             boxShadow: "0 8px 24px rgba(32, 30, 60, 0.13)",
-            overflow: "hidden", // Ensures no white border on header
+            overflow: "hidden",
           }}
         >
-          {/* Full-width Header */}
+
           <div
             style={{
               background: THEME.primary,
@@ -71,7 +71,7 @@ const ActionModal = ({
             >
               {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
             </h6>
-            
+
           </div>
 
           <div

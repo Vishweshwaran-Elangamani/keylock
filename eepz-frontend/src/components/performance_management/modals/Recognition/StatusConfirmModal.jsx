@@ -19,26 +19,26 @@ const StatusConfirmModal = ({
           </p>
         </div>
         <div style={styles.footer}>
-    
-<button
-  style={styles.btnCancel}
-  onClick={onClose}
-  onMouseEnter={e => (e.currentTarget.style.background = '#5a6268')}
-  onMouseLeave={e => (e.currentTarget.style.background = '#6c757d')}
->
-  Cancel
-</button>
-<button
-  style={{
-    ...styles.btnConfirm,
-    background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
-  }}
-  onClick={onConfirm}
-  onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.11)')}
-  onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
->
-  {isActivating ? "Activate" : "Deactivate"}
-</button>
+
+          <button
+            style={styles.btnCancel}
+            onClick={onClose}
+            onMouseEnter={e => (e.currentTarget.style.background = '#5a6268')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#6c757d')}
+          >
+            Cancel
+          </button>
+          <button
+            style={{
+              ...styles.btnConfirm,
+              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)"
+            }}
+            onClick={onConfirm}
+            onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.11)')}
+            onMouseLeave={e => (e.currentTarget.style.filter = 'none')}
+          >
+            {isActivating ? "Activate" : "Deactivate"}
+          </button>
 
         </div>
         <style>{`

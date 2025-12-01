@@ -5,7 +5,6 @@ import * as managerNominationApi from "../../../services/performancemanagement/m
 import NominationModal from "../../../components/performance_management/modals/ManagerNomination/NominationModal";
 import "../../../styles/performancemanagement/manager/ManagerNomination.css";
 
-/* Helper: safe text fallback for fields returned differently by APIs */
 const safeText = (...vals) => {
   for (const v of vals) {
     if (v !== undefined && v !== null) {
@@ -16,7 +15,6 @@ const safeText = (...vals) => {
   return "-";
 };
 
-/* Pagination hook */
 const usePagination = (items = [], pageSize = 5) => {
   const [page, setPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil((items?.length || 0) / pageSize));
@@ -30,34 +28,32 @@ const usePagination = (items = [], pageSize = 5) => {
   return { page, setPage, totalPages, paged, pageSize };
 };
 
-/* Breadcrumbs component */
 const Breadcrumbs = ({ items = [] }) => {
   const HomeSvg = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M3 10.5L12 4l9 6.5" stroke="#26225A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M5 12.5v6a1 1 0 0 0 1 1h3v-5h6v5h3a1 1 0 0 0 1-1v-6" stroke="#26225A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 10.5L12 4l9 6.5" stroke="#26225A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 12.5v6a1 1 0 0 0 1 1h3v-5h6v5h3a1 1 0 0 0 1-1v-6" stroke="#26225A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 
   return (
     <nav className="managernomination-breadcrumbs" aria-label="Breadcrumb">
-      <ol 
-        className="managernomination-breadcrumb-list" 
-        style={{ 
-          display: "flex", 
-          alignItems: "center", 
-          gap: "4px", 
-          padding: 0, 
-          margin: 0, 
-          listStyle: "none" 
+      <ol
+        className="managernomination-breadcrumb-list"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+          padding: 0,
+          margin: 0,
+          listStyle: "none"
         }}
       >
-        {/* Home Icon */}
         <li className="managernomination-crumb">
-          <Link 
-            to="/manager/dashboard" 
-            style={{ 
-              display: "flex", 
+          <Link
+            to="/manager/dashboard"
+            style={{
+              display: "flex",
               alignItems: "center",
               color: " #97247E",
               textDecoration: "none"
@@ -71,9 +67,8 @@ const Breadcrumbs = ({ items = [] }) => {
           const isLast = idx === items.length - 1;
           return (
             <React.Fragment key={idx}>
-              {/* Separator - Forward Slash */}
-              <li style={{ 
-                color: "#97247E", 
+              <li style={{
+                color: "#97247E",
                 fontSize: "10px",
                 fontWeight: 400,
                 margin: "0 4px"
@@ -83,8 +78,8 @@ const Breadcrumbs = ({ items = [] }) => {
 
               <li className={`managernomination-crumb ${isLast ? "managernomination-crumb-active" : ""}`}>
                 {isLast ? (
-                  <span 
-                    style={{ 
+                  <span
+                    style={{
                       color: "#97247E",
                       fontWeight: 600,
                       fontSize: "10px"
@@ -93,9 +88,9 @@ const Breadcrumbs = ({ items = [] }) => {
                     {it.label}
                   </span>
                 ) : (
-                  <Link 
-                    to={it.to || "#"} 
-                    style={{ 
+                  <Link
+                    to={it.to || "#"}
+                    style={{
                       color: "#97247E",
                       textDecoration: "none",
                       fontSize: "10px",
@@ -165,12 +160,10 @@ export default function ManagerNomination() {
     }
   };
 
-  /* Strict partitions by status */
   const pendingNominations = myNominations.filter((n) => n?.status === "Pending");
   const approvedNominations = myNominations.filter((n) => n?.status === "Approved");
   const rejectedNominations = myNominations.filter((n) => n?.status === "Rejected");
 
-  /* Pagination hooks */
   const pendingPager = usePagination(pendingNominations, 5);
   const approvedPager = usePagination(approvedNominations, 5);
   const rejectedPager = usePagination(rejectedNominations, 5);
@@ -189,7 +182,6 @@ export default function ManagerNomination() {
     toast.success("Nomination submitted");
   };
 
-  /* Simple Pagination UI */
   const Pagination = ({ pager }) => {
     const { page, setPage, totalPages } = pager;
     if (totalPages <= 1) return null;
@@ -233,8 +225,7 @@ export default function ManagerNomination() {
 
       <Breadcrumbs items={[{ label: "Performance", to: "/manager/dashboard/performance" }, { label: "Nominations" }]} />
 
-      {/* Team Members Card - Now at Top */}
-      <div 
+      <div
         className="managernomination-card managernomination-available-section"
         style={{
           border: "1px solid #26225A",
@@ -265,11 +256,11 @@ export default function ManagerNomination() {
             }}>
               <i className="bi bi-people-fill" style={{ fontSize: "20px", color: "#fff" }}></i>
             </div>
-            <h3 style={{ 
-              margin: 0, 
-              color: "#fff", 
-              fontSize: 18, 
-              fontWeight: 700 
+            <h3 style={{
+              margin: 0,
+              color: "#fff",
+              fontSize: 18,
+              fontWeight: 700
             }}>
               Team Members
             </h3>
@@ -279,9 +270,9 @@ export default function ManagerNomination() {
               setShowNominationsView(!showNominationsView);
               if (!showNominationsView) {
                 setTimeout(() => {
-                  document.getElementById('nominations-section')?.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
+                  document.getElementById('nominations-section')?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
                   });
                 }, 100);
               }
@@ -309,11 +300,11 @@ export default function ManagerNomination() {
             {showNominationsView ? "Hide Nominations" : "View Nominations"}
           </button>
         </div>
-        
+
         <div className="managernomination-table-wrapper">
-          <table 
-            className="managernomination-table" 
-            role="table" 
+          <table
+            className="managernomination-table"
+            role="table"
             aria-label="Team members"
             style={{
               border: "2px solid #26225A",
@@ -363,12 +354,11 @@ export default function ManagerNomination() {
         </div>
       </div>
 
-      {/* My Nominations Card - Shows when View Nominations is clicked */}
       {showNominationsView && (
-        <div 
+        <div
           id="nominations-section"
-          className="managernomination-card" 
-          style={{ 
+          className="managernomination-card"
+          style={{
             marginTop: 20,
             animation: "slideDown 0.3s ease-out",
             border: "1px solid #26225A",
@@ -397,11 +387,11 @@ export default function ManagerNomination() {
               }}>
                 <i className="bi bi-list-check" style={{ fontSize: "20px", color: "#fff" }}></i>
               </div>
-              <h3 style={{ 
-                margin: 0, 
-                color: "#fff", 
-                fontSize: 18, 
-                fontWeight: 700 
+              <h3 style={{
+                margin: 0,
+                color: "#fff",
+                fontSize: 18,
+                fontWeight: 700
               }}>
                 My Nominations
               </h3>
@@ -458,11 +448,10 @@ export default function ManagerNomination() {
             </button>
           </div>
 
-          {/* Nominations table for selected tab */}
           <div className="managernomination-table-wrapper" style={{ marginTop: 12 }}>
-            <table 
-              className="managernomination-table" 
-              role="table" 
+            <table
+              className="managernomination-table"
+              role="table"
               aria-label="Nominations table"
               style={{
                 border: "2px solid #26225A",
@@ -537,21 +526,19 @@ export default function ManagerNomination() {
                     );
                   })}
 
-                {/* Empty fallback */}
                 {((activeTab === "pending" && pendingNominations.length === 0) ||
                   (activeTab === "approved" && approvedNominations.length === 0) ||
                   (activeTab === "rejected" && rejectedNominations.length === 0)) && (
-                  <tr>
-                    <td colSpan={4} className="managernomination-empty-row">
-                      No {activeTab} nominations found
-                    </td>
-                  </tr>
-                )}
+                    <tr>
+                      <td colSpan={4} className="managernomination-empty-row">
+                        No {activeTab} nominations found
+                      </td>
+                    </tr>
+                  )}
               </tbody>
             </table>
           </div>
 
-          {/* Pagination area */}
           <div style={{ marginTop: 12 }}>
             {activeTab === "pending" && <Pagination pager={pendingPager} />}
             {activeTab === "approved" && <Pagination pager={approvedPager} />}
@@ -560,7 +547,6 @@ export default function ManagerNomination() {
         </div>
       )}
 
-      {/* Nomination modal */}
       <NominationModal
         show={showNominationModal}
         onHide={() => setShowNominationModal(false)}

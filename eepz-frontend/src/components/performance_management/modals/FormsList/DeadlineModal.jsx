@@ -13,7 +13,7 @@ function DeadlineModal({
 
   return (
     <>
-      {/* Backdrop Overlay - with blur and dark color */}
+
       <div
         style={{
           position: 'fixed',
