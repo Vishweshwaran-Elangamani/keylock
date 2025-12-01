@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import careerProgressionService from "../../../services/hr_operations/hr/careerProgressionService";
 import { Spinner, Alert } from "react-bootstrap";
-import "../../../styles/hr_operations/hr/leadershipApproval.css";
+import "../../../styles/hr_operations/hr/LeadershipApproval.css";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 
 const LeadershipApproval = () => {

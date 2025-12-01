@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
-import "../../../styles/auth/auth.css";
+import "../../../styles/auth/Auth.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({

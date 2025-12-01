@@ -4,7 +4,7 @@ import { Spinner, Badge, Button } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
 import violationService from "../../../../services/hr_operations/hr/violationService";
 import EscalationDetailModal from "../../../../components/hr_operations/modals/EscalationDetailModal";
-import "../../../../styles/hr_operations/hr/complianceIssues.css";
+import "../../../../styles/hr_operations/hr/ComplianceIssues.css";
 
 const ComplianceIssues = () => {
   // ===== STATE MANAGEMENT =====

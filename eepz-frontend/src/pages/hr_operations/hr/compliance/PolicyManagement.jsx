@@ -8,7 +8,7 @@ import EditPolicyModal from "../../../../components/hr_operations/modals/EditPol
 import PublishPolicyModal from "../../../../components/hr_operations/modals/PublishPolicyModal";
 import UnpublishPolicyModal from "../../../../components/hr_operations/modals/UnpublishPolicyModal";
 import { Alert, Spinner } from "react-bootstrap";
-import "../../../../styles/hr_operations/hr/policyManagement.css";
+import "../../../../styles/hr_operations/hr/PolicyManagement.css";
  
 const PolicyManagement = () => {
   const [policies, setPolicies] = useState([]);

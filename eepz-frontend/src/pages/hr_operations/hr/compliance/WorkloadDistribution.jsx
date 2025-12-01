@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import workloadService from "../../../../services/hr_operations/hr/workloadService";
-import "../../../../styles/hr_operations/hr/workload.css";
+import "../../../../styles/hr_operations/hr/Workload.css";
 
 const WorkloadDistribution = () => {
   const [projects, setProjects] = useState([]);

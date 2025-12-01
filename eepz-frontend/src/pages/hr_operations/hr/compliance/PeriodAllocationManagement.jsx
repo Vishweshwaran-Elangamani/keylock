@@ -8,7 +8,7 @@ import AllocateFromPeriodModal from "../../../../components/hr_operations/modals
 import ViewPeriodDetailsModal from "../../../../components/hr_operations/modals/ViewPeriodDetailsModal";
 import DeleteConfirmationModal from "../../../../components/hr_operations/modals/DeleteConfirmationModal";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
-import "../../../../styles/hr_operations/hr/periodAllocation.css";
+import "../../../../styles/hr_operations/hr/PeriodAllocation.css";
 
 const PeriodAllocationManagement = () => {
   const [budgets, setBudgets] = useState([]);

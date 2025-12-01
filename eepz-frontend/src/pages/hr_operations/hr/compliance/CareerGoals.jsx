@@ -30,7 +30,7 @@ import GoalSuggestionsModal from "../../../../components/hr_operations/modals/Go
 import ReminderEmailModal from "../../../../components/hr_operations/modals/ReminderEmailModal";
 import BulkReminderModal from "../../../../components/hr_operations/modals/BulkReminderModal";
 import Breadcrumb from "../../../../components/common/Breadcrumb";
-import "../../../../styles/hr_operations/hr/careerGoals.css";
+import "../../../../styles/hr_operations/hr/CareerGoals.css";
 
 const ADMIN_EMPLOYEE_ID = "12560";
 const COLORS = [

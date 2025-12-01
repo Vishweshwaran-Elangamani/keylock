@@ -4,8 +4,8 @@ import budgetAllocationService from "../../../../services/hr_operations/hr/budge
 import AllocateByCategoryModal from "../../../../components/hr_operations/modals/AllocateByCategoryModal";
 import UpdateUtilizedAmountModal from "../../../../components/hr_operations/modals/UpdateUtilizedAmountModal";
 import AllocationsList from "../../../../components/hr_operations/modals/AllocationsList";
-import "../../../../styles/hr_operations/hr/budgetAllocation.css";
-import "../../../../styles/hr_operations/hr/allocationsList.css";
+import "../../../../styles/hr_operations/hr/BudgetAllocation.css";
+import "../../../../styles/hr_operations/hr/AllocationsList.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
 const BudgetAllocationBreakdown = () => {

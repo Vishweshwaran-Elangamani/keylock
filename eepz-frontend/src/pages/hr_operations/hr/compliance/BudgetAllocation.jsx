@@ -8,7 +8,7 @@ import DeleteBudgetModal from "../../../../components/hr_operations/modals/Delet
 import Breadcrumb from "../../../../components/common/Breadcrumb";
 import { FaSearch } from "react-icons/fa";
 import { Form } from "react-bootstrap";
-import "../../../../styles/hr_operations/hr/budgetAllocation.css";
+import "../../../../styles/hr_operations/hr/BudgetAllocation.css";
 import { formatCurrency } from "../../../../utils/auth/currencyFormatter";
 
 const BudgetAllocation = () => {

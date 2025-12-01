@@ -7,7 +7,7 @@ import ApproveRejectModal from "../../../../components/hr_operations/modals/Appr
 import PayrollUpdateModal from "../../../../components/hr_operations/modals/PayrollUpdateModal.jsx";
 import SubmitToLeadershipModal from "../../../../components/hr_operations/modals/SubmitToLeadershipModal.jsx";
 import PromotionDetailsModal from "../../../../components/hr_operations/modals/PromotionDetailsModal.jsx";
-import "../../../../styles/hr_operations/hr/promotionsManagement.css";
+import "../../../../styles/hr_operations/hr/PromotionsManagement.css";
 
 const PromotionsManagement = () => {
   const [promotions, setPromotions] = useState([]);

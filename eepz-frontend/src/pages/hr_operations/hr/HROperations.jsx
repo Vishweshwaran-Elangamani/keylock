@@ -8,7 +8,7 @@ import PeriodAllocationManagement from "./compliance/PeriodAllocationManagement"
 import WorkloadDistribution from "./compliance/WorkloadDistribution";
 import PromotionsManagement from "./compliance/PromotionsManagement";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import "../../../styles/hr_operations/hr/hrOperations.css";
+import "../../../styles/hr_operations/hr/HROperations.css";
 
 const HROperations = () => {
   const navigate = useNavigate();
