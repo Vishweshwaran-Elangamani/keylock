@@ -328,9 +328,7 @@ const HRMomDashboard = () => {
                         {/* Submitted By */}
                         <td>
                           <div className="d-flex align-items-center gap-2">
-                            <div className="mom-submitter-avatar">
-                              <User size={16} style={{ color: "#4f46e5" }} />
-                            </div>
+                           
                             <div>
                               <div className="mom-submitter-name">
                                 {mom.submittedByEmployeeName || "Unknown"}

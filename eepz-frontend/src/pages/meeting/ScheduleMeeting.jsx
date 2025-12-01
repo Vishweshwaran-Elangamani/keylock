@@ -554,11 +554,6 @@ const ScheduleMeeting = () => {
           display: none;
         }
 
-        .form-select{
-                    -webkit-appearance: auto !important;
-            -moz-appearance: auto !important;
-             appearance: auto !important;
-        }
       `}</style>
     </div>
   );

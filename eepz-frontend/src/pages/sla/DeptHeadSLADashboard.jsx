@@ -15,7 +15,7 @@ import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "../../styles/sla/DeptHeadSLADashboard.css";
 
-const DeptHeadDashboard = () => {
+const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
 
   const [allL2Escalations, setAllL2Escalations] = useState([]);
@@ -527,4 +527,4 @@ const DeptHeadDashboard = () => {
   );
 };
 
-export default DeptHeadDashboard;
+export default DeptHeadSLADashboard;

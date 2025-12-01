@@ -47,7 +47,7 @@ import BudgetAllocation from "./pages/hr_operations/hr/compliance/BudgetAllocati
 import LeadershipApproval from "./pages/hr_operations/hr/LeadershipApproval";
 import DepartmentHeadDashboard from "./pages/dashboards/DepartmentHeadDashboard";
 import DeptHeadPage from "./pages/performancemanagement/departmenthead/DeptHeadPage";
-import DeptHeadSLADashboard from "./pages/sla/DeptHeadDashboard";
+import DeptHeadSLADashboard from "./pages/sla/DeptHeadSLADashboard";
 import SLACompliance from "./pages/sla/SLACompliance";
 import DepartmentHeadBudgetView from "./pages/hr_operations/hr/compliance/DepartmentHeadBudgetView";
 import TopPerformers from "./pages/performancemanagement/departmenthead/deptheadtopperformer";
