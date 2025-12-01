@@ -1,7 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {

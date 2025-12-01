@@ -1,6 +1,4 @@
-// Repository/Interfaces/ISlaRepository.cs
 using Relevantz.EEPZ.Common.Entities;
-using System.Data;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {

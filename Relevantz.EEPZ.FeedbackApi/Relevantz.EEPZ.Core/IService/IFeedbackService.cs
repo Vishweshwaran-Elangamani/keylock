@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 
@@ -11,18 +8,11 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
     /// </summary>
     public interface IFeedbackService
     {
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
+        
         /// <summary>
         /// Submit feedback
         /// </summary>
         Task<FeedbackResponseDto> CreateFeedbackAsync(CreateFeedbackRequestDto dto);
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Get feedback by ID with all question responses
@@ -35,25 +25,19 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         Task<List<FeedbackResponseDto>> GetMyFeedbackAsync(int employeeId);
 
         /// <summary>
-        /// Get all feedback received BY current user (as recipient)
-        
+        /// Get all feedback received BY current user (as recipient)        
         /// </summary>
         Task<List<FeedbackResponseDto>> GetFeedbackAsRecipientAsync(int employeeId);
 
         /// <summary>
         /// Get team feedback (from team members)
-        
         /// </summary>
         Task<List<FeedbackResponseDto>> GetTeamFeedbackAsync(int managerId);
 
         /// <summary>
         /// Get feedback form structure for specific feedback type
-
         /// </summary>
         Task<FeedbackFormDto> GetFeedbackFormAsync(string feedbackType);
-
-        /// <summary>
-        /// </summary>
         Task<List<FeedbackResponseDto>> GetFlaggedFeedbackAsync(bool? isBias = null, bool? isFairness = null);
 
         /// <summary>
@@ -78,10 +62,6 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         /// </summary>
         Task<List<FeedbackResponseDto>> GetFeedbackByProjectAsync(int projectId);
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Update feedback (content, rating, comments)
         /// </summary>
@@ -102,18 +82,10 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
         /// </summary>
         Task<bool> SetHRReviewAsync(int feedbackId, string hrComments, int reviewedByHRId);
 
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Delete feedback (only if Draft status)
         /// </summary>
         Task<bool> DeleteFeedbackAsync(int feedbackId);
-
-        // ============================================================================
-        // VALIDATION OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Check if employee can edit feedback

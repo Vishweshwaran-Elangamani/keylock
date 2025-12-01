@@ -1,8 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
@@ -12,10 +8,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
     /// </summary>
     public interface IFeedbackRepository
     {
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Create new feedback record
         /// </summary>
@@ -26,10 +18,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         /// Stores individual question ratings/answers
         /// </summary>
         Task<int> CreateQuestionResponseAsync(Feedbackquestionresponse response);
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Get feedback by ID with all relationships
@@ -92,10 +80,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         /// </summary>
         Task<List<Feedback>> GetAllFeedbackAsync(int pageNumber = 1, int pageSize = 20);
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Update feedback record (content, rating, comments)
         /// </summary>
@@ -108,10 +92,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<bool> SetHRReviewAsync(int feedbackId, string hrComments, int reviewedByHRId);
         Task<bool> UpdateQuestionResponseAsync(Feedbackquestionresponse response);
 
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Delete feedback (only if Draft status)
         /// </summary>
@@ -121,10 +101,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         /// Delete question response
         /// </summary>
         Task<bool> DeleteQuestionResponseAsync(int responseId);
-
-        // ============================================================================
-        // EXISTENCE CHECKS
-        // ============================================================================
 
         /// <summary>
         /// Check if feedback exists

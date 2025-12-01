@@ -1,23 +1,15 @@
 using Relevantz.EEPZ.Common.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
     /// <summary>
     /// Repository interface for HrFeedbackForm and HrFeedbackFormResponse entities
-    /// Handles HR form creation, distribution, and response collection (US039)
+    /// Handles HR form creation, distribution, and response collection
     /// </summary>
     public interface IHrFeedbackFormRepository
     {
-        // ============================================================================
-        // HR FORM OPERATIONS (Template Management)
-        // ============================================================================
-
         /// <summary>
-        /// Create new HR feedback form template
-    
+        /// Create new HR feedback form template    
         /// </summary>
         Task<int> CreateFormAsync(Hrfeedbackform form);
 
@@ -62,10 +54,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         /// Check if form exists
         /// </summary>
         Task<bool> FormExistsAsync(int formId);
-
-        // ============================================================================
-        // FORM RESPONSE OPERATIONS (Employee Submissions)
-        // ============================================================================
 
         /// <summary>
         /// Create form response submission

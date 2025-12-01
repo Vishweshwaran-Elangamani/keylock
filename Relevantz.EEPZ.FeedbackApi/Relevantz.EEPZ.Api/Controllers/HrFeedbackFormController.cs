@@ -2,9 +2,6 @@ using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Relevantz.EEPZ.Common.Entities;
 
 namespace EepzBackend.Controllers
 {
@@ -18,10 +15,6 @@ namespace EepzBackend.Controllers
         {
             _service = service;
         }
-
-        // ============================================================================
-        // FORM ENDPOINTS
-        // ============================================================================
 
         [HttpPost("forms/create")]
         public async Task<ApiResponseDto<HrFeedbackFormResponseDto>> CreateForm(CreateHRFeedbackFormRequestDto dto)
@@ -106,10 +99,6 @@ namespace EepzBackend.Controllers
                 return ApiResponseDto<bool>.ErrorResponse($"Error: {ex.Message}", new List<string> { ex.Message });
             }
         }
-
-        // ============================================================================
-        // FORM RESPONSE ENDPOINTS
-        // ============================================================================
 
         [HttpPost("responses/create")]
         public async Task<ApiResponseDto<HrFeedbackFormResponseResponseDto>> CreateFormResponse(SubmitHRFormResponseRequestDto dto)
@@ -209,7 +198,6 @@ namespace EepzBackend.Controllers
             }
         }
 
-        /// </summary>
 [HttpGet("responses/by-employee/{employeeId}")]
 public async Task<ApiResponseDto<List<HrFeedbackFormResponseResponseDto>>> GetResponsesByEmployee(int employeeId)
 {

@@ -1,11 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Data.Repository.Implementations;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Common.Entities;
 
 namespace eepzbackend.Controllers
 {
@@ -49,7 +44,6 @@ namespace eepzbackend.Controllers
 
                 _logger.LogInformation("Queueing SLA creation process");
 
-                // Fire-and-forget background task
                 _ = Task.Run(async () =>
                 {
                     try
@@ -70,7 +64,6 @@ namespace eepzbackend.Controllers
                     }
                 });
 
-                // Respond immediately
                 return Accepted(new { success = true, message = "SLA creation started in background" });
             }
             catch (Exception ex)

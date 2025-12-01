@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs.Response
 {
-    // ============================================================================
-    // FEEDBACK RESPONSE DTOs
-    // ============================================================================
-
-    public class FeedbackResponseDto
+       public class FeedbackResponseDto
     {
         public int FeedbackId { get; set; }
         public string FeedbackType { get; set; }
@@ -74,10 +68,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public List<FeedbackQuestionDto> Questions { get; set; } = new();
     }
 
-    // ============================================================================
-    // MANAGER REVIEW DTOs
-    // ============================================================================
-
     public class ManagerReviewResponseDto
     {
         public int ReviewcommentId { get; set; }
@@ -95,12 +85,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime? SubmittedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
     }
-
-   
-
-    // ============================================================================
-    // MENTOR FEEDBACK DTOs
-    // ============================================================================
 
     public class MentorFeedbackResponseDto
     {
@@ -121,17 +105,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
         public DateTime? ReviewedAt { get; set; }
     }
 
-
-    // ============================================================================
-    // ORGANIZATION GOAL FEEDBACK DTOs
-    // ============================================================================
-
-
-
-// ============================================================================
-// ORGANIZATION GOAL FEEDBACK RESPONSE DTOs
-// ============================================================================
-
 /// <summary>
 /// Response DTO for organization goal feedback
 /// Maps from Feedback table where RelatedGoal.GoalType = "Organization"
@@ -146,7 +119,7 @@ public class OrgGoalFeedbackResponseDto
     
     public string GoalDescription { get; set; }
     
-    public string GoalType { get; set; }  // Should be "Organization"
+    public string GoalType { get; set; }  
     
     public int SubmittedByEmployeeId { get; set; }
     
@@ -171,11 +144,6 @@ public class OrgGoalFeedbackResponseDto
     public DateTime? SubmittedAt { get; set; }
 }
 
-
-    // ============================================================================
-    // PEER FEEDBACK QUEUE DTOs
-    // ============================================================================
-
     public class PeerFeedbackQueueResponseDto
     {
         public int QueueId { get; set; }
@@ -193,12 +161,6 @@ public class OrgGoalFeedbackResponseDto
         public DateTime CreatedAt { get; set; }
         public DateTime? ApprovedAt { get; set; }
     }
-
- 
-    // ============================================================================
-    // HR FEEDBACK FORM DTOs
-    // ============================================================================
-
     public class HrFeedbackFormResponseDto
     {
         public int FormId { get; set; }
@@ -255,11 +217,6 @@ public class DistributeFormResponse
     public int EmployeeCount { get; set; }
     public string Message { get; set; }
 }
-
-    // ============================================================================
-    // API RESPONSE WRAPPER
-    // ============================================================================
-
     public class ApiResponseDto<T>
     {
         public bool Success { get; set; }
@@ -286,11 +243,6 @@ public class DistributeFormResponse
                 Errors = errors ?? new List<string>()
             };
         }
-
-        
-      // ============================================================================
-    // DTOs - RESPONSE
-    // ============================================================================
 
     public class SubmitFeedbackResponse
     {
@@ -343,15 +295,11 @@ public class DistributeFormResponse
         }
     
 
-    // ============================================================================
-// HR FEEDBACK FORM DTOs
-// ============================================================================
 
 /// <summary>
 /// Response DTO for HR Feedback Form
-/// ✅ FIXED: Added DistributedToEmployeeIds
 /// </summary>
-// In your HrFeedbackFormResponseDto
+
 public class HrFeedbackFormResponseDto
 {
     public int FormId { get; set; }
@@ -364,7 +312,6 @@ public class HrFeedbackFormResponseDto
     public DateTime CreatedAt { get; set; }
     public DateTime? Deadline { get; set; }
     
-    // ✅ ADD THIS PROPERTY
     public List<int> DistributedToEmployeeIds { get; set; } = new List<int>();
     
     public int TotalResponsesCount { get; set; }

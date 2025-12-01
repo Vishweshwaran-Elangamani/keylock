@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
-using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
@@ -14,11 +13,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             _context = context;
         }
-
-        // ============================================================================
-        // CREATE - SUBMIT FEEDBACK
-        // ============================================================================
-
         public async Task<Projectgoalfeedback> SubmitFeedbackAsync(Projectgoalfeedback feedback)
         {
             try
@@ -37,10 +31,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error submitting feedback: {ex.Message}");
             }
         }
-
-        // ============================================================================
-        // READ - GET FEEDBACK BY PROJECT AND GOAL
-        // ============================================================================
 
         public async Task<List<Projectgoalfeedback>> GetFeedbackByProjectAndGoalAsync(int projectId, int goalId)
         {
@@ -61,11 +51,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by project and goal: {ex.Message}");
             }
         }
-
-        // ============================================================================
-        // READ - GET FEEDBACK BY PROJECT
-        // ============================================================================
-
         public async Task<List<Projectgoalfeedback>> GetFeedbackByProjectAsync(int projectId)
         {
             try
@@ -85,11 +70,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by project: {ex.Message}");
             }
         }
-
-        // ============================================================================
-        // READ - GET FEEDBACK BY EMPLOYEE
-        // ============================================================================
-
         public async Task<List<Projectgoalfeedback>> GetFeedbackByEmployeeAsync(int employeeId)
         {
             try
@@ -110,10 +90,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ============================================================================
-        // READ - GET FEEDBACK BY ID
-        // ============================================================================
-
         public async Task<Projectgoalfeedback> GetFeedbackByIdAsync(int feedbackId)
         {
             try
@@ -131,10 +107,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw new Exception($"Error retrieving feedback by ID: {ex.Message}");
             }
         }
-
-        // ============================================================================
-        // VALIDATIONS
-        // ============================================================================
 
         public async Task<bool> EmployeeExistsAsync(int employeeId)
         {

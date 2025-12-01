@@ -1,9 +1,5 @@
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Relevantz.EEPZ.Common.Entities;
 
 namespace  Relevantz.EEPZ.Core.Services.Interfaces
 {
@@ -12,19 +8,13 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
     /// </summary>
     public interface IPeerFeedbackQueueService
     {
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
+        
         /// <summary>
         /// Create peer feedback in queue (pending HR review)
         /// </summary>
         Task<PeerFeedbackQueueResponseDto> CreatePeerFeedbackAsync(CreatePeerFeedbackRequestDto dto);
 
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
-
+      
         /// <summary>
         /// Get peer feedback queue item by ID
         /// </summary>
@@ -75,10 +65,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
         /// </summary>
         Task<List<PeerFeedbackQueueResponseDto>> GetAnonymousPeerFeedbackAsync();
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Update peer feedback record
         /// </summary>
@@ -99,19 +85,11 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
         /// </summary>
         Task<bool> UpdateFeedbackStatusAsync(int queueId, string newStatus);
 
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Delete peer feedback from queue
         /// </summary>
         Task<bool> DeleteQueueItemAsync(int queueId);
-
-        // ============================================================================
-        // VALIDATION OPERATIONS
-        // ============================================================================
-
+        
         /// <summary>
         /// Check if queue item exists
         /// </summary>

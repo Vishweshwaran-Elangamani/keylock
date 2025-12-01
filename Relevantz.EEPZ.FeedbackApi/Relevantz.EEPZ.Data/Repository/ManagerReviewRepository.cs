@@ -1,13 +1,8 @@
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
@@ -25,17 +20,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _context = context;
             _logger = logger;
         }
-
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         public async Task<int> CreateReviewAsync(Managerreviewcomment review)
         {
             try
             {
                 review.CreatedAt = DateTime.UtcNow;
-                review.Status = "Draft"; // Default status
+                review.Status = "Draft";
                 
                 _context.Managerreviewcomments.Add(review);
                 await _context.SaveChangesAsync();
@@ -49,11 +39,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
-
         public async Task<Managerreviewcomment> GetReviewByIdAsync(int reviewId)
         {
             try
@@ -198,10 +183,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> UpdateReviewAsync(Managerreviewcomment review)
         {
             try
@@ -229,11 +210,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (review == null)
                     return false;
 
-                // Status transitions: Draft → Submitted → Modified → Finalized
                 review.Status = newStatus;
                 review.ModifiedAt = DateTime.UtcNow;
 
-                // Set SubmittedAt when status changes to Submitted
                 if (newStatus == "Submitted" && review.SubmittedAt == null)
                     review.SubmittedAt = DateTime.UtcNow;
 
@@ -250,10 +229,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteReviewAsync(int reviewId)
         {
             try
@@ -262,7 +237,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (review == null)
                     return false;
 
-                // Only allow deletion if Draft status
                 if (review.Status != "Draft")
                     throw new InvalidOperationException($"Cannot delete review in {review.Status} status. Only Draft reviews can be deleted.");
 
@@ -278,10 +252,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // EXISTENCE CHECKS
-        // ============================================================================
 
         public async Task<bool> ReviewExistsAsync(int reviewId)
         {

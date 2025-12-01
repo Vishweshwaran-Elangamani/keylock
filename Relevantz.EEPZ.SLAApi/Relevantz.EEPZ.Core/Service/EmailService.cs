@@ -1,8 +1,5 @@
-// Services/EmailService.cs
-using System;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -61,8 +58,6 @@ namespace Relevantz.EEPZ.Core.Services
             return message;
         }
 
-        // ===== SLA REMINDER EMAILS (Day -2, -1, SLA Day) =====
-
         public virtual async Task<bool> SendSlaReminderEmailAsync(
             string toEmail,
             string employeeName,
@@ -116,8 +111,6 @@ namespace Relevantz.EEPZ.Core.Services
             }
         }
 
-        // ===== SLA OVERDUE NOTIFICATION =====
-
         public virtual async Task<bool> SendSlaOverdueEmailAsync(
             string toEmail,
             string employeeName,
@@ -151,8 +144,6 @@ namespace Relevantz.EEPZ.Core.Services
                 return false;
             }
         }
-
-        // ===== EMPLOYEE ESCALATION ACKNOWLEDGMENT =====
 
         public virtual async Task<bool> SendEmployeeEscalationEmailAsync(
             string toEmail,
@@ -188,8 +179,6 @@ namespace Relevantz.EEPZ.Core.Services
                 return false;
             }
         }
-
-        // ===== MANAGER LEVEL ESCALATION =====
 
         public virtual async Task<bool> SendManagerEscalationEmailAsync(
             string toEmail,
@@ -230,8 +219,6 @@ namespace Relevantz.EEPZ.Core.Services
                 return false;
             }
         }
-
-        // ===== DEPARTMENT HEAD ESCALATION =====
 
         public virtual async Task<bool> SendDeptHeadEscalationEmailAsync(
             string toEmail,
@@ -274,9 +261,6 @@ namespace Relevantz.EEPZ.Core.Services
                 return false;
             }
         }
-
-        // ===== HR LEVEL ESCALATION =====
-
         public virtual async Task<bool> SendHrEscalationEmailAsync(
             string toEmail,
             string employeeName,
@@ -320,8 +304,6 @@ namespace Relevantz.EEPZ.Core.Services
             }
         }
 
-        // ===== SLA REOPEN NOTIFICATION =====
-
         public virtual async Task<bool> SendSlaReopenEmailAsync(
             string toEmail,
             string employeeName,
@@ -356,8 +338,6 @@ namespace Relevantz.EEPZ.Core.Services
             }
         }
 
-        // ===== SLA COMPLETION CONFIRMATION =====
-
         public virtual async Task<bool> SendSlaCompletionEmailAsync(
             string toEmail,
             string employeeName,
@@ -389,9 +369,6 @@ namespace Relevantz.EEPZ.Core.Services
                 return false;
             }
         }
-
-        // ===== SLA REJECTION/RESUBMISSION NOTIFICATION =====
-
         public virtual async Task<bool> SendSlaResubmissionEmailAsync(
             string toEmail,
             string employeeName,
@@ -427,9 +404,6 @@ namespace Relevantz.EEPZ.Core.Services
                 return false;
             }
         }
-
-        // ===== BULK SLA NOTIFICATION (For Department/Organization) =====
-
         public virtual async Task<bool> SendBulkSlaNotificationEmailAsync(
             string toEmail,
             string recipientName,

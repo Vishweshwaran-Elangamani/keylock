@@ -1,6 +1,3 @@
-// DTOs/MomDTOs.cs
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs
@@ -82,7 +79,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         [Required(ErrorMessage = "Due date is required")]
         public DateOnly DueDate { get; set; }
 
-        public string Status { get; set; } = "Pending"; // Pending, Completed
+        public string Status { get; set; } = "Pending"; 
     }
 
 
@@ -201,7 +198,6 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<MeetingParticipantDto> Participants { get; set; } = new();
     }
 
-    // Meeting Participant DTO
     public class MeetingParticipantDto
     {
         public int ParticipantId { get; set; }
@@ -212,25 +208,20 @@ namespace Relevantz.EEPZ.Common.DTOs
 
     public class OneOnOneReportDto
     {
-        // Meeting Statistics
         public int TotalMeetings { get; set; }
         public int CompletedMeetings { get; set; }
         public int ScheduledMeetings { get; set; }
         public int CancelledMeetings { get; set; }
         public double CompletionRate { get; set; }
-        
-        // Action Item Statistics
+
         public int TotalActionItems { get; set; }
         public int CompletedActionItems { get; set; }
         public int PendingActionItems { get; set; }
         public int OverdueActionItems { get; set; }
         public double ActionItemCompletionRate { get; set; }
-        
-        // Averages
+   
         public double AverageActionItemsPerMeeting { get; set; }
         public double AverageDiscussionPointsPerMeeting { get; set; }
-        
-        // Detailed Data
         public List<MeetingResponseDto> Meetings { get; set; } = new();
         public List<EmployeeOneOnOneStatsDto> EmployeeStats { get; set; } = new();
     }
@@ -254,27 +245,21 @@ namespace Relevantz.EEPZ.Common.DTOs
 
     public class OneOnOneSummaryDto
     {
-        // Team Overview
         public int TotalTeamMembers { get; set; }
         public int TotalOneOnOnes { get; set; }
-        
-        // Time-based Metrics
+     
         public int ThisMonthOneOnOnes { get; set; }
         public int ThisQuarterOneOnOnes { get; set; }
         public int LastMonthOneOnOnes { get; set; }
-        
-        // Averages
+   
         public double AverageMeetingsPerEmployee { get; set; }
         public double AverageDaysBetweenMeetings { get; set; }
-        
-        // Alerts
+
         public int EmployeesWithNoRecentMeeting { get; set; }
         public int OverdueActionItemsCount { get; set; }
-        
-        // Upcoming Schedule
+     
         public List<UpcomingMeetingDto> UpcomingMeetings { get; set; } = new();
-        
-        // Recently Completed
+ 
         public List<RecentMeetingDto> RecentlyCompleted { get; set; } = new();
     }
 
@@ -305,7 +290,7 @@ namespace Relevantz.EEPZ.Common.DTOs
  
     public class ActionItemFilterDto
     {
-        public string? Status { get; set; } // Pending, Completed
+        public string? Status { get; set; } 
         public bool? IsOverdue { get; set; }
         public int? AssignedToEmployeeId { get; set; }
         public DateTime? DueDateFrom { get; set; }
@@ -322,8 +307,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public string Status { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public bool IsOverdue { get; set; }
-        
-        // MOM Context
+   
         public int MomId { get; set; }
         public string MeetingTitle { get; set; } = null!;
         public DateTime MeetingDate { get; set; }

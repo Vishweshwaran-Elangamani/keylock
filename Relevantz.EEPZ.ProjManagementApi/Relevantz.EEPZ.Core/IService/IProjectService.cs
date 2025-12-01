@@ -18,7 +18,6 @@ namespace Relevantz.EEPZ.Core.Services.Interfaces
 
         Task<ApiResponse<List<EmployeeBasicInfo>>> GetAvailableEmployeesAsync();
 
-        // ✅ NEW: Get all employees with their primary project information
 Task<ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>> GetAllEmployeesWithPrimaryProjectAsync();
 
         

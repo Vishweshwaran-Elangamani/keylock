@@ -1,9 +1,5 @@
-    // Controllers/ProjectManagementController.cs
     using Relevantz.EEPZ.Common.DTOs.Request;
     using Relevantz.EEPZ.Core.Services.Interfaces;
-    using Relevantz.EEPZ.Data;
-    using Relevantz.EEPZ.Common.Entities;
-    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Relevantz.EEPZ.Data.DBContexts;
@@ -168,14 +164,7 @@
                 return StatusCode(500, result);
             }
 
-            /// <summary>
-/// ✅ UPDATED: Map employees to a project (US149)
-/// ✅ ENHANCED LOGIC:
-///   - Employee added to ANY PRIMARY PROJECT → Auto-unmap from Resource Pool
-///   - Employee added to RESOURCE POOL → Remove from ALL other projects
-/// ✅ SINGLE PROJECT RULE: Employee can only be in ONE project at a time
-/// ✅ FIXED: Consistent ID usage (EmployeeMasterId throughout)
-/// </summary>
+ 
 [HttpPost("{projectId}/employees/map")]
 [ProducesResponseType(StatusCodes.Status200OK)]
 [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -198,15 +187,11 @@ public async Task<IActionResult> MapEmployeesToProject(int projectId, [FromBody]
         if (request.Employees == null || !request.Employees.Any())
             return BadRequest(new { success = false, message = "No employees provided." });
 
-        // Get resource pool project
         var resourcePoolProject = await _context.Projects
             .FirstOrDefaultAsync(p => p.ProjectName.ToLower() == "org.rz.resourcepool");
 
-        // ✅ FIXED: Use EmployeeMasterId consistently
         var employeeMasterIds = request.Employees.Select(e => e.EmployeeId).ToList();
 
-        // ✅ LOGIC 1: Employee added to ANY NON-RESOURCE POOL PROJECT
-        // → Remove from resource pool ONLY
         if (resourcePoolProject != null && projectId != resourcePoolProject.ProjectId)
         {
             var resourcePoolMappings = await _context.Projectemployees
@@ -222,8 +207,6 @@ public async Task<IActionResult> MapEmployeesToProject(int projectId, [FromBody]
             }
         }
 
-        // ✅ LOGIC 2: Employee added to RESOURCE POOL
-        // → Remove from ALL other projects (single project rule)
         if (resourcePoolProject != null && projectId == resourcePoolProject.ProjectId)
         {
             var allOtherProjectMappings = await _context.Projectemployees
@@ -239,7 +222,6 @@ public async Task<IActionResult> MapEmployeesToProject(int projectId, [FromBody]
             }
         }
 
-        // Now call the service to add the new mappings with proper reporting manager updates
         var result = await _projectService.MapEmployeesToProjectAsync(request);
 
         if (result.Success)
@@ -272,9 +254,8 @@ public async Task<IActionResult> MapEmployeesToProject(int projectId, [FromBody]
 
 
             /// <summary>
-/// ✅ UPDATED: Unmap employees from a project (US149)
-/// Automatically moves employees to resource pool if they have no other project mappings
-/// </summary>
+            /// Automatically moves employees to resource pool if they have no other project mappings
+            /// </summary>
 [HttpPost("{projectId}/employees/unmap")]
 [ProducesResponseType(StatusCodes.Status200OK)]
 [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -321,7 +302,7 @@ public async Task<IActionResult> UnmapEmployeesFromProject(int projectId, [FromB
 
 
             /// <summary>
-/// ✅ NEW: Get all employees with their primary project information
+/// Get all employees with their primary project information
 /// Used by frontend to display primary project badges in the employee mapping modal
 /// </summary>
 [HttpGet("employees/primary-projects")]

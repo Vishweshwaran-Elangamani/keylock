@@ -1,14 +1,9 @@
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
@@ -448,12 +443,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (employeeIds == null || employeeIds.Count == 0)
                     throw new ArgumentException("At least one employee must be selected");
 
-                // Validate form exists
                 var form = await _formRepo.GetFormByIdAsync(formId);
                 if (form == null)
                     throw new KeyNotFoundException($"Form with ID {formId} not found");
 
-                // Distribute
                 var success = await _formRepo.DistributeFormAsync(formId, employeeIds);
 
                 if (!success)

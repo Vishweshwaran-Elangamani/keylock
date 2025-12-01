@@ -1,8 +1,5 @@
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace  Relevantz.EEPZ.Core.Services.Interfaces
 {
@@ -12,18 +9,11 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
     /// </summary>
     public interface IMentorFeedbackService
     {
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
+        
         /// <summary>
         /// Create mentor feedback
         /// </summary>
         Task<MentorFeedbackResponseDto> CreateMentorFeedbackAsync(CreateMentorFeedbackRequestDto dto);
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Get mentor feedback by ID
@@ -60,10 +50,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
         /// </summary>
         Task<List<MentorFeedbackResponseDto>> GetAnonymousMentorFeedbackAsync();
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Update mentor feedback record
         /// </summary>
@@ -77,22 +63,13 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
 
         /// <summary>
         /// Set HR review on mentor feedback
-
         /// </summary>
         Task<bool> SetHRReviewAsync(int trackingId, string hrComments, int reviewedByHRId);
-
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Delete mentor feedback (only if Submitted status)
         /// </summary>
         Task<bool> DeleteMentorFeedbackAsync(int trackingId);
-
-        // ============================================================================
-        // VALIDATION OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Check if mentor feedback exists

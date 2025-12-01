@@ -1,18 +1,9 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
-
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
-
-using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
-
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
@@ -30,10 +21,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _context = context;
             _logger = logger;
         }
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         public async Task<Feedbackquestion> GetQuestionByIdAsync(int questionId)
         {
@@ -122,7 +109,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (question == null || string.IsNullOrEmpty(question.RatingScaleLabels))
                     return new Dictionary<string, string>();
 
-                // Parse JSON labels stored in database
                 var labels = JsonSerializer.Deserialize<Dictionary<string, string>>(question.RatingScaleLabels);
                 return labels ?? new Dictionary<string, string>();
             }
@@ -143,7 +129,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (question == null || string.IsNullOrEmpty(question.ChoiceOptions))
                     return new List<Dictionary<string, object>>();
 
-                // Parse JSON choice options stored in database
                 var options = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(question.ChoiceOptions);
                 return options ?? new List<Dictionary<string, object>>();
             }
@@ -170,11 +155,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         public async Task<int> CreateQuestionAsync(Feedbackquestion question)
         {
             try
@@ -193,11 +173,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> UpdateQuestionAsync(Feedbackquestion question)
         {
             try
@@ -240,11 +215,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteQuestionAsync(int questionId)
         {
             try
@@ -253,7 +223,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (question == null)
                     return false;
 
-                // Check if any responses exist for this question
                 var responseCount = await _context.Feedbackquestionresponses
                     .CountAsync(r => r.QuestionId == questionId);
 
@@ -272,11 +241,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // EXISTENCE CHECKS
-        // ============================================================================
-
         public async Task<bool> QuestionExistsAsync(int questionId)
         {
             try

@@ -1,13 +1,8 @@
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
@@ -26,16 +21,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _logger = logger;
         }
 
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         public async Task<int> CreatePeerFeedbackAsync(Peerfeedbackqueue feedback)
         {
             try
             {
                 feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = "Pending"; // Default status - awaiting HR review
+                feedback.Status = "Pending"; 
                 
                 _context.Peerfeedbackqueues.Add(feedback);
                 await _context.SaveChangesAsync();
@@ -49,10 +40,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         public async Task<Peerfeedbackqueue> GetQueueItemByIdAsync(int queueId)
         {
@@ -232,10 +219,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> UpdatePeerFeedbackAsync(Peerfeedbackqueue feedback)
         {
             try
@@ -313,7 +296,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (feedback == null)
                     return false;
 
-                // Status transitions: Pending → UnderHRReview → Approved/Rejected
                 feedback.Status = newStatus;
 
                 _context.Peerfeedbackqueues.Update(feedback);
@@ -328,11 +310,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteQueueItemAsync(int queueId)
         {
             try
@@ -341,7 +318,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (feedback == null)
                     return false;
 
-                // Only allow deletion if Pending status
                 if (feedback.Status != "Pending")
                     throw new InvalidOperationException($"Cannot delete feedback in {feedback.Status} status. Only Pending feedback can be deleted.");
 
@@ -357,10 +333,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // EXISTENCE CHECKS
-        // ============================================================================
 
         public async Task<bool> QueueItemExistsAsync(int queueId)
         {

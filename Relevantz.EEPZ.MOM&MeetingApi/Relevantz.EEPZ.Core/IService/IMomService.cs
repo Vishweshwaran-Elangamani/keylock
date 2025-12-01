@@ -1,6 +1,3 @@
-// Services/Interface/IMomService.cs
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.DTOs;
 
 namespace Relevantz.EEPZ.Core.Services.Interfaces

@@ -26,7 +26,7 @@ namespace Relevantz.EEPZ.Api.Controllers
            
             if (!result.Success)
                 return BadRequest(result);
- 
+
             return Ok(result);
         }
  

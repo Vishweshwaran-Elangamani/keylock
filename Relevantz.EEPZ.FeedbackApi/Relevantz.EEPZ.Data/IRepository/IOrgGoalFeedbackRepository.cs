@@ -1,6 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
@@ -17,14 +15,11 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<List<Feedback>> GetFeedbackByStatusAsync(string status);
         Task<List<Feedback>> GetAnonymousOrgGoalFeedbackAsync();
 
-        // UPDATE
         Task<bool> UpdateOrgGoalFeedbackAsync(Feedback feedback);
         Task<bool> UpdateFeedbackStatusAsync(int feedbackId, string newStatus);
 
-        // DELETE
         Task<bool> DeleteOrgGoalFeedbackAsync(int feedbackId);
 
-        // VALIDATION
         Task<bool> OrgGoalFeedbackExistsAsync(int feedbackId);
     }
 }

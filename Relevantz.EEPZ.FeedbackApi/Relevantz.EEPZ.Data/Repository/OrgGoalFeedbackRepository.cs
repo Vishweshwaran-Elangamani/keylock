@@ -3,10 +3,6 @@ using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
@@ -26,15 +22,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _logger = logger;
         }
 
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         public async Task<int> CreateOrgGoalFeedbackAsync(Feedback feedback)
         {
             try
             {
-                // Validate that the goal is an organization-level goal
                 var goal = await _context.Goals
                     .Where(g => g.GoalId == feedback.RelatedGoalId && g.GoalType == ORG_GOAL_TYPE)
                     .FirstOrDefaultAsync();
@@ -44,7 +35,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 feedback.CreatedAt = DateTime.UtcNow;
                 feedback.Status = "Submitted";
-                feedback.FeedbackType = "Organization Goal"; // ✅ Set feedback type
+                feedback.FeedbackType = "Organization Goal";
                 
                 _context.Feedbacks.Add(feedback);
                 await _context.SaveChangesAsync();
@@ -58,11 +49,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
-
         public async Task<Feedback> GetOrgGoalFeedbackByIdAsync(int feedbackId)
         {
             try
@@ -187,10 +173,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> UpdateOrgGoalFeedbackAsync(Feedback feedback)
         {
             try
@@ -239,10 +221,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteOrgGoalFeedbackAsync(int feedbackId)
         {
             try
@@ -272,11 +250,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // VALIDATION
-        // ============================================================================
-
         public async Task<bool> OrgGoalFeedbackExistsAsync(int feedbackId)
         {
             try

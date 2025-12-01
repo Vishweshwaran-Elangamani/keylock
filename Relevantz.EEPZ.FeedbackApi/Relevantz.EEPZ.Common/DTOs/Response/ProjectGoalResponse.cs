@@ -1,11 +1,4 @@
 using System.Text.Json.Serialization;
-using Relevantz.EEPZ.Common.Entities;
-// using eepzbackend.Controllers;
-using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Common.DTOs.Response;
-
-
-
 
 namespace Relevantz.EEPZ.Common.DTOs.Response
 {
@@ -174,10 +167,10 @@ namespace Relevantz.EEPZ.Common.DTOs.Response
 
      public class GoalFeedbackResponseDto
     {
-        public int FeedbackId { get; set; }  // ✅ Changed from OrgGoalFeedbackId
-        public int GoalId { get; set; }  // ✅ Changed from OrganizationObjectiveId
-        public string GoalTitle { get; set; }  // ✅ Changed from OrganizationGoalName
-        public string GoalType { get; set; }  // ✅ Added to identify goal type
+        public int FeedbackId { get; set; }  
+        public int GoalId { get; set; } 
+        public string GoalTitle { get; set; }  
+        public string GoalType { get; set; } 
         public int SubmittedByEmployeeId { get; set; }
         public string SubmitterName { get; set; }
         public int? ManagerEmployeeId { get; set; }

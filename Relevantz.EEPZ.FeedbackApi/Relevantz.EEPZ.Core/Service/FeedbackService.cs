@@ -1,15 +1,9 @@
-
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
@@ -34,19 +28,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger = logger;
         }
 
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         public async Task<FeedbackResponseDto> CreateFeedbackAsync(CreateFeedbackRequestDto dto)
         {
             try
             {
-                // Validate question responses
                 if (dto.QuestionResponses == null || !dto.QuestionResponses.Any())
                     throw new ArgumentException("At least one question response is required");
 
-                // Create feedback entity
                 var feedback = new Feedback
                 {
                     FeedbackType = dto.FeedbackType,
@@ -64,7 +52,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var feedbackId = await _feedbackRepo.CreateFeedbackAsync(feedback);
 
-                // Create question responses
                 foreach (var responseDto in dto.QuestionResponses)
                 {
                     var questionResponse = new Feedbackquestionresponse
@@ -202,13 +189,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         RatingScaleMax = question.RatingScaleMax
                     };
 
-                    // Parse rating labels
                     if (!string.IsNullOrEmpty(question.RatingScaleLabels))
                     {
                         questionDto.RatingScaleLabels = JsonSerializer.Deserialize<Dictionary<string, string>>(question.RatingScaleLabels);
                     }
 
-                    // Parse choice options
                     if (!string.IsNullOrEmpty(question.ChoiceOptions))
                     {
                         var options = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(question.ChoiceOptions);
@@ -374,7 +359,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                // Check if can edit
                 var canEdit = await _feedbackRepo.CanEditFeedbackAsync(feedbackId);
                 if (!canEdit)
                     throw new InvalidOperationException("Cannot edit feedback in current status. Only Draft feedback can be edited.");
@@ -383,13 +367,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (feedback == null)
                     throw new KeyNotFoundException($"Feedback {feedbackId} not found");
 
-                // Update feedback
                 feedback.Rating = dto.Rating ?? feedback.Rating;
                 feedback.Comments = dto.Comments ?? feedback.Comments;
 
                 await _feedbackRepo.UpdateFeedbackAsync(feedback);
 
-                // Update question responses if provided
                 if (dto.QuestionResponses != null && dto.QuestionResponses.Any())
                 {
                     var existingResponses = await _feedbackRepo.GetFeedbackResponsesAsync(feedbackId);

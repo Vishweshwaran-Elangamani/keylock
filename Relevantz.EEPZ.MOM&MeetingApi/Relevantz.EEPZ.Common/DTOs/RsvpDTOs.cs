@@ -1,5 +1,3 @@
-// DTOs/RsvpDTOs.cs
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs
@@ -11,7 +9,7 @@ namespace Relevantz.EEPZ.Common.DTOs
         public int MeetingId { get; set; }
 
         [Required(ErrorMessage = "RSVP status is required")]
-        public string RsvpStatus { get; set; } = null!; // Pending, Accepted, Declined, Tentative
+        public string RsvpStatus { get; set; } = null!;
 
         [StringLength(500, ErrorMessage = "Comments cannot exceed 500 characters")]
         public string? RsvpComments { get; set; }

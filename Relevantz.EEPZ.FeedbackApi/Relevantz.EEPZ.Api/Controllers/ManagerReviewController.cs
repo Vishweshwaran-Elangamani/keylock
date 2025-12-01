@@ -1,12 +1,7 @@
-
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-
 
 namespace EepzBackend.Controllers
 {
@@ -68,7 +63,7 @@ namespace EepzBackend.Controllers
         {
             try
             {
-                var result = await _service.GetReviewsForMeAsync(targetEmployeeId);  // ← FIXED
+                var result = await _service.GetReviewsForMeAsync(targetEmployeeId); 
                 return ApiResponseDto<List<ManagerReviewResponseDto>>.SuccessResponse(result, "Reviews retrieved");
             }
             catch (Exception ex)

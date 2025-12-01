@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Relevantz.EEPZ.Common.DTOs.Request
@@ -224,7 +222,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [Required]
         public Dictionary<string, object> FormResponse { get; set; }
-        // Dynamic form response data
     }
 
     /// <summary>
@@ -296,7 +293,6 @@ namespace Relevantz.EEPZ.Common.DTOs.Request
 
         [Required]
         public string FeedbackFrom { get; set; }
-        // Values: Employee, Manager, DeptHead, HR
 
         public bool IsAnonymous { get; set; } = false;
     }

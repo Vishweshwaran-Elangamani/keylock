@@ -12,7 +12,7 @@ namespace eepzbackend.Controllers
     [Route("api/[controller]")]
     public class GoalsController : ControllerBase
     {
-        private readonly EEPZDbContext _context; // Correct DbContext
+        private readonly EEPZDbContext _context;
         private readonly ILogger<GoalsController> _logger;
 
         public GoalsController(EEPZDbContext context, ILogger<GoalsController> logger)
@@ -145,7 +145,7 @@ namespace eepzbackend.Controllers
                     .Include(g => g.CreatedByNavigation)
                         .ThenInclude(e => e.Department)
                     .Include(g => g.Project)
-                    .Where(g => g.Project != null) // Only goals linked to projects
+                    .Where(g => g.Project != null)
                     .ToListAsync();
 
                 var responses = teamGoals.Select(MapToProjectGoalResponse).ToList();
@@ -185,7 +185,7 @@ namespace eepzbackend.Controllers
                     .Include(g => g.CreatedByNavigation)
                         .ThenInclude(e => e.Department)
                     .Include(g => g.Project)
-                    .Where(g => g.Project == null) // Only goals not linked to projects
+                    .Where(g => g.Project == null) 
                     .ToListAsync();
 
                 var responses = orgGoals.Select(MapToProjectGoalResponse).ToList();
@@ -241,8 +241,6 @@ namespace eepzbackend.Controllers
                     $"An error occurred: {ex.Message}"));
             }
         }
-
-        // Helper mapping method
         private ProjectGoalResponse MapToProjectGoalResponse(Goal goal)
         {
             return new ProjectGoalResponse

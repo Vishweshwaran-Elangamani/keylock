@@ -1,4 +1,3 @@
-// Repository/Implementations/SlaRepository.cs
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -127,7 +126,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
         {
             try
             {
-                // Validate required fields before saving to DB 
                 if (string.IsNullOrWhiteSpace(sla.Slatype))
                     throw new ArgumentException("Slatype is required");
 
@@ -140,19 +138,15 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
                 if (sla.Deadline == default(DateTime))
                     throw new ArgumentException("Valid Deadline is required");
 
-                // Set timestamps
                 sla.CreatedAt = DateTime.Now;
                 sla.UpdatedAt = DateTime.Now;
 
-                // Set default statuses if not already set
                 sla.Status = sla.Status ?? "Open";
                 sla.ComplianceStatus = sla.ComplianceStatus ?? "OnTime";
 
-                // Clear navigation references to avoid EF Core tracking issues
                 sla.Employee = null;
                 sla.AssignedToEmployee = null;
 
-                // Sanitize optional related entity data
                 if (string.IsNullOrWhiteSpace(sla.RelatedEntityType))
                     sla.RelatedEntityType = null;
 
@@ -235,14 +229,12 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
                     return false;
                 }
 
-                // Update SLA
                 sla.Status = "Closed";
                 sla.ClosedAt = DateTime.Now;
                 sla.UpdatedAt = DateTime.Now;
 
                 _context.Slas.Update(sla);
 
-                // Add history entry
                 var history = new Slahistory
                 {
                     Slaid = slaid,
@@ -754,7 +746,7 @@ public async Task<int> BulkInsertSlasAsync(List<Sla> slas)
             try
             {
                 var sla = await _context.Slas.FindAsync(slaid);
-                return sla != null && sla.ReopenCount < 1; // Allow only 1 reopen
+                return sla != null && sla.ReopenCount < 1;
             }
             catch (Exception ex)
             {
@@ -811,9 +803,6 @@ public async Task<List<Slaescalation>> GetEscalationsByEscalatedToAsync(int empl
         throw;
     }
 }
-
-
-        // ===== NEW AUTOMATION METHODS - MOVED INSIDE CLASS =====
 
         /// <summary>
         /// Get SLAs due in specific number of days (for reminders)
@@ -915,6 +904,6 @@ public async Task<List<Slahistory>> GetAllSlaHistoryAsync()
      
         #endregion
 
-    } // CLASS CLOSING BRACE
+    } 
 
-} //NAMESPACE CLOSING BRACE
+} 

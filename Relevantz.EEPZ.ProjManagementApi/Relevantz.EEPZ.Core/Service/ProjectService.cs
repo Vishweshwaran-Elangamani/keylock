@@ -19,13 +19,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                // Validate project name uniqueness
                 if (await _projectRepository.ProjectNameExistsAsync(request.ProjectName))
                 {
                     return ApiResponse<ProjectResponse>.ErrorResponse("Project name already exists.");
                 }
 
-                // Validate reporting managers exist
                 var validationErrors = new List<string>();
                 
                 if (request.ResourceOwnerEmployeeId.HasValue)
@@ -72,8 +70,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
 
                 var createdProject = await _projectRepository.CreateProjectAsync(project);
-                
-                // Fetch full details
+
                 var fullProject = await _projectRepository.GetProjectByIdAsync(createdProject.ProjectId);
                 
                 var response = MapToProjectResponse(fullProject!);
@@ -97,7 +94,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponse<ProjectResponse>.ErrorResponse("Project not found.");
                 }
 
-                // Validate project name uniqueness (excluding current project)
                 if (await _projectRepository.ProjectNameExistsAsync(request.ProjectName, request.ProjectId))
                 {
                     return ApiResponse<ProjectResponse>.ErrorResponse("Project name already exists.");
@@ -129,13 +125,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     try
     {
-        // Check if project exists
         if (!await _projectRepository.ProjectExistsAsync(projectId))
         {
             return ApiResponse<bool>.ErrorResponse("Project not found.");
         }
 
-        // Repository now handles the manager vs employee separation logic
         var result = await _projectRepository.DeleteProjectAsync(projectId);
 
         if (result)
@@ -200,7 +194,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponse<bool>.ErrorResponse("Project not found.");
                 }
 
-                // Validate reporting managers exist
                 var validationErrors = new List<string>();
                 
                 if (request.ResourceOwnerEmployeeId.HasValue)
@@ -251,19 +244,14 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         {
             try
             {
-                // 1. Validate project exists
                 if (!await _projectRepository.ProjectExistsAsync(request.ProjectId))
                 {
                     return ApiResponse<bool>.ErrorResponse("Project not found.");
                 }
-
-                // 2. Validate employees provided
                 if (request.Employees == null || !request.Employees.Any())
                 {
                     return ApiResponse<bool>.ErrorResponse("No employees provided to map.");
                 }
-
-                // 3. Validate all employees exist
                 var validationErrors = new List<string>();
                 foreach (var emp in request.Employees)
                 {
@@ -278,14 +266,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     return ApiResponse<bool>.ErrorResponse("Validation failed.", validationErrors);
                 }
 
-                // 4. Get project details including L1/L2 approvers
                 var project = await _projectRepository.GetProjectByIdAsync(request.ProjectId);
                 if (project == null)
                 {
                     return ApiResponse<bool>.ErrorResponse("Project not found.");
                 }
-
-                // 5. Determine reporting manager from project (L1 > L2 priority)
                 int? reportingManagerMasterId = project.L1approverEmployeeId ?? project.L2approverEmployeeId;
                 int? reportingManagerEmployeeId = null;
 
@@ -299,26 +284,21 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }
                 }
 
-                // 6. Process primary employee mappings and update reporting managers
                 var employeesToUpdate = new List<Employee>();
                 var existingMappingsToUpdate = new List<Projectemployee>();
 
                 foreach (var emp in request.Employees.Where(e => e.IsPrimary))
                 {
-                    // Get all existing project mappings for this employee
                     var existingMappings = await _projectRepository.GetProjectEmployeesByEmployeeIdAsync(emp.EmployeeId);
-                    
-                    // Unset IsPrimary for all other project mappings
+
                     foreach (var mapping in existingMappings.Where(m => m.IsPrimary && m.ProjectId != request.ProjectId))
                     {
                         mapping.IsPrimary = false;
                         existingMappingsToUpdate.Add(mapping);
                     }
 
-                    // Update employee's reporting manager (only for primary mappings)
                     if (reportingManagerEmployeeId.HasValue)
                     {
-                        // Convert EmployeeMasterId to actual EmployeeId
                         var actualEmployeeId = await _projectRepository.GetEmployeeIdByMasterIdAsync(emp.EmployeeId);
                         
                         if (actualEmployeeId.HasValue)
@@ -334,7 +314,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }
                 }
 
-                // 7. Update existing primary flags in batch
                 if (existingMappingsToUpdate.Any())
                 {
                     var updateFlagsResult = await _projectRepository.UpdateProjectEmployeePrimaryFlagsAsync(existingMappingsToUpdate);
@@ -344,7 +323,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }
                 }
 
-                // 8. Update reporting managers for all primary employees
                 foreach (var employee in employeesToUpdate)
                 {
                     var updateEmployeeResult = await _projectRepository.UpdateEmployeeAsync(employee);
@@ -354,7 +332,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     }
                 }
 
-                // 9. Build new Projectemployee entities
                 var projectEmployees = request.Employees.Select(emp => new Projectemployee
                 {
                     ProjectId = request.ProjectId,
@@ -363,7 +340,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     IsPrimary = emp.IsPrimary
                 }).ToList();
 
-                // 10. Save new project-employee mappings
                 var result = await _projectRepository.MapEmployeesToProjectAsync(request.ProjectId, projectEmployees);
 
                 if (result)
@@ -398,7 +374,6 @@ public async Task<ApiResponse<bool>> UnmapEmployeesFromProjectAsync(UnmapEmploye
             return ApiResponse<bool>.ErrorResponse("No employees provided to unmap.");
         }
 
-        // Unmap employees from the project
         var result = await _projectRepository.UnmapEmployeesFromProjectAsync(request.ProjectId, request.EmployeeIds);
 
         if (!result)
@@ -406,7 +381,7 @@ public async Task<ApiResponse<bool>> UnmapEmployeesFromProjectAsync(UnmapEmploye
             return ApiResponse<bool>.ErrorResponse("Failed to unmap employees from project.");
         }
 
-        // NEW: Auto-move to resource pool logic
+
         var movedToResourcePool = await _projectRepository.MoveUnmappedEmployeesToResourcePoolAsync(request.EmployeeIds);
 
         var message = movedToResourcePool > 0
@@ -437,14 +412,12 @@ public async Task<ApiResponse<bool>> UnmapEmployeesFromProjectAsync(UnmapEmploye
             }
         }
 
-        // NEW: Get all employees with their primary project information
 public async Task<ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>> GetAllEmployeesWithPrimaryProjectAsync()
 {
     try
     {
         var primaryProjectsDict = await _projectRepository.GetAllEmployeesWithPrimaryProjectAsync();
-        
-        // Convert to DTO format
+
         var result = primaryProjectsDict.ToDictionary(
             kvp => kvp.Key,
             kvp => kvp.Value.HasValue
@@ -470,10 +443,6 @@ public async Task<ApiResponse<Dictionary<int, EmployeePrimaryProjectInfo?>>> Get
 }
 
 
-
-
-
-        // Helper mapping methods
         private ProjectResponse MapToProjectResponse(Project project)
         {
             return new ProjectResponse

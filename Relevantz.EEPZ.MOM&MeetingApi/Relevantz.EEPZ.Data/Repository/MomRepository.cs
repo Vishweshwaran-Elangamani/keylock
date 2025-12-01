@@ -1,8 +1,3 @@
-// Repository/MomRepository.cs
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Common.Entities;
@@ -18,10 +13,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             _context = context;
         }
-
-        // ============================================================================
-        // MOM OPERATIONS
-        // ============================================================================
 
         public async Task<Mom> CreateMomAsync(Mom mom)
         {
@@ -114,7 +105,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             var query = _context.Moms.AsQueryable();
 
-            // Apply filters
             query = ApplyMomFilters(query, searchTerm, meetingType, departmentId, startDate, endDate);
 
             return await query.CountAsync();
@@ -139,10 +129,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 .AsQueryable();
 
-            // Apply filters
             query = ApplyMomFilters(query, searchTerm, meetingType, departmentId, startDate, endDate);
 
-            // Apply pagination
             return await query
                 .OrderByDescending(m => m.MeetingDate)
                 .Skip((pageNumber - 1) * pageSize)
@@ -161,7 +149,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             DateTime? startDate,
             DateTime? endDate)
         {
-            // Search term filter (searches in meeting title and attendees)
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 query = query.Where(m =>
@@ -169,19 +156,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     m.Attendees.Contains(searchTerm));
             }
 
-            // Meeting type filter
             if (!string.IsNullOrWhiteSpace(meetingType))
             {
                 query = query.Where(m => m.MeetingType == meetingType);
             }
 
-            // // Department filter
-            // if (departmentId.HasValue)
-            // {
-            //     query = query.Where(m => m.SubmittedByEmployee.DepartmentId == departmentId.Value);
-            // }
-
-            // Date range filter
             if (startDate.HasValue)
             {
                 query = query.Where(m => m.MeetingDate >= startDate.Value);
@@ -373,14 +352,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .Where(m => m.ScheduledByEmployeeId == managerId && m.MeetingType == "One-on-One")
                 .AsQueryable();
 
-            // Filter by specific employee
             if (employeeId.HasValue)
             {
                 query = query.Where(m => m.Meetingparticipants
                     .Any(mp => mp.EmployeeId == employeeId.Value));
             }
 
-            // Filter by date range
             if (startDate.HasValue)
             {
                 query = query.Where(m => m.MeetingDate >= startDate.Value);
@@ -401,7 +378,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             return await _context.Employees
                 .Include(e => e.Userprofile)
-                // .Include(e => e.Department)
                 .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
         }
 
@@ -409,7 +385,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             return await _context.Employees
                 .Include(e => e.Userprofile)
-                // .Include(e => e.Department)
                 .Where(e => e.ReportingManagerEmployeeId == managerId)
                 .OrderBy(e => e.Userprofile.FirstName)
                 .ThenBy(e => e.Userprofile.LastName)

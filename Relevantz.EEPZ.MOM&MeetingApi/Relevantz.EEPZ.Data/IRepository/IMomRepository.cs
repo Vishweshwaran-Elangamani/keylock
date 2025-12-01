@@ -1,16 +1,9 @@
-// Repository/IMomRepository.cs
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
     public interface IMomRepository
     {
-        // ============================================================================
-        // MOM OPERATIONS
-        // ============================================================================
         Task<Mom> CreateMomAsync(Mom mom);
         Task<Mom?> GetMomByIdAsync(int momId);
         Task<List<Mom>> GetMomsByEmployeeIdAsync(int employeeId);
@@ -19,7 +12,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<Mom> UpdateMomAsync(Mom mom);
         Task<bool> DeleteMomAsync(int momId);
 
-        // HR Operations (US119)
         Task<int> GetAllMomsCountAsync(
             string? searchTerm = null,
             string? meetingType = null,
@@ -36,15 +28,9 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
             int pageNumber = 1,
             int pageSize = 20);
 
-        // ============================================================================
-        // DISCUSSION POINTS
-        // ============================================================================
         Task<List<Momdiscussionpoint>> AddDiscussionPointsAsync(List<Momdiscussionpoint> points);
         Task<bool> DeleteDiscussionPointsByMomIdAsync(int momId);
 
-        // ============================================================================
-        // ACTION ITEMS
-        // ============================================================================
         Task<List<Momactionitem>> AddActionItemsAsync(List<Momactionitem> actionItems);
         Task<bool> DeleteActionItemsByMomIdAsync(int momId);
         Task<Momactionitem?> GetActionItemByIdAsync(int actionItemId);
@@ -52,40 +38,23 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<List<Momactionitem>> GetActionItemsByEmployeeIdAsync(int employeeId);
         Task<List<Momactionitem>> GetActionItemsAssignedByEmployeeAsync(int employeeId);
 
-        // ============================================================================
-        // SHARING
-        // ============================================================================
         Task<List<Momsharing>> ShareMomAsync(List<Momsharing> sharings);
         Task<List<Momsharing>> GetMomSharingsByEmployeeIdAsync(int employeeId);
 
-        // ============================================================================
-        // MEETINGS
-        // ============================================================================
         Task<Meeting> CreateMeetingAsync(Meeting meeting);
         Task<List<Meetingparticipant>> AddMeetingParticipantsAsync(List<Meetingparticipant> participants);
         Task<List<Meeting>> GetMeetingsByManagerIdAsync(int managerId);
         Task<Meeting?> GetMeetingByIdAsync(int meetingId);
         Task<List<Meeting>> GetMeetingsByParticipantIdAsync(int participantId);
 
-        // One-on-One Reports (US060)
         Task<List<Meeting>> GetOneOnOneMeetingsByManagerAsync(
             int managerId,
             int? employeeId = null,
             DateTime? startDate = null,
             DateTime? endDate = null);
 
-        // ============================================================================
-        // EMPLOYEE OPERATIONS
-        // ============================================================================
         Task<Employee?> GetEmployeeByIdAsync(int employeeId);
         Task<List<Employee>> GetTeamMembersByManagerIdAsync(int managerId);
-        
-
-
-
-        // ============================================================================
-        // RSVP OPERATIONS (US061)
-        // ============================================================================
         
         /// <summary>
         /// Get meeting participant record for RSVP update

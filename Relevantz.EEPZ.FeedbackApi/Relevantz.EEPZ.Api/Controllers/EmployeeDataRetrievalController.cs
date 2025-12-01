@@ -1,5 +1,3 @@
-// Controllers/EmployeeManagementController.cs
-using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -75,7 +73,6 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                // Define manager/leadership roles
                 var managerRoles = new[]
                 {
                     "Project Manager",
@@ -215,7 +212,7 @@ namespace eepzbackend.Controllers
                                 e.Employee.EmployeeCompanyId.ToLower().Contains(searchTerm) ||
                                 e.Employee.Userauthentication.Email.ToLower().Contains(searchTerm)))
                     .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Take(50) // Limit results
+                    .Take(50) 
                     .Select(e => new
                     {
                         e.EmployeeMasterId,
@@ -378,7 +375,6 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                // Get distinct business units from existing projects
                 var businessUnits = await _context.Projects
                     .Where(p => !string.IsNullOrEmpty(p.BusinessUnit))
                     .Select(p => p.BusinessUnit!)
@@ -386,7 +382,6 @@ namespace eepzbackend.Controllers
                     .OrderBy(bu => bu)
                     .ToListAsync();
 
-                // If no business units exist in projects, return some default ones
                 if (!businessUnits.Any())
                 {
                     businessUnits = new List<string>

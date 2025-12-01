@@ -1,14 +1,10 @@
 using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;  // ✅ ADD THIS for EmailService
+using Relevantz.EEPZ.Core.Services.Interfaces; 
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -28,16 +24,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _mentorFeedbackRepo = mentorFeedbackRepo;
             _logger = logger;
         }
-
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         public async Task<MentorFeedbackResponseDto> CreateMentorFeedbackAsync(CreateMentorFeedbackRequestDto dto)
         {
             try
             {
-                // Validate inputs
                 if (dto.MentorEmployeeId <= 0)
                     throw new ArgumentException("MentorEmployeeId must be valid");
                 if (dto.MenteeEmployeeId <= 0)
@@ -70,10 +60,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         public async Task<MentorFeedbackResponseDto> GetMentorFeedbackByIdAsync(int trackingId)
         {
@@ -176,10 +162,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         public async Task<MentorFeedbackResponseDto> UpdateMentorFeedbackAsync(int trackingId, UpdateMentorFeedbackRequestDto dto)
         {
             try
@@ -188,7 +170,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (feedback == null)
                     throw new KeyNotFoundException($"Mentor feedback {trackingId} not found");
 
-                // Can only edit Submitted status
                 if (feedback.Status != "Submitted")
                     throw new InvalidOperationException($"Cannot edit feedback in {feedback.Status} status");
 
@@ -247,11 +228,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteMentorFeedbackAsync(int trackingId)
         {
             try
@@ -268,11 +244,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // VALIDATION OPERATIONS
-        // ============================================================================
-
         public async Task<bool> MentorFeedbackExistsAsync(int trackingId)
         {
             try
@@ -285,11 +256,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // PRIVATE HELPER METHODS
-        // ============================================================================
-
        private MentorFeedbackResponseDto MapToResponseDto(Mentorfeedbacktracking feedback)
 {
     return new MentorFeedbackResponseDto

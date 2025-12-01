@@ -12,19 +12,10 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
     /// </summary>
     public interface IManagerReviewService
     {
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         /// <summary>
-        /// Create manager review on team/org goal
-       
+        /// Create manager review on team/org goal       
         /// </summary>
         Task<ManagerReviewResponseDto> CreateReviewAsync(CreateManagerReviewRequestDto dto);
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Get review by ID
@@ -61,10 +52,6 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
         /// </summary>
         Task<List<ManagerReviewResponseDto>> GetReviewsByStatusAsync(string status);
 
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Update review (content and rating)
         /// </summary>
@@ -85,18 +72,10 @@ namespace  Relevantz.EEPZ.Core.Services.Interfaces
         /// </summary>
         Task<bool> FinalizeReviewAsync(int reviewId);
 
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Delete review (only if Draft status)
         /// </summary>
         Task<bool> DeleteReviewAsync(int reviewId);
-
-        // ============================================================================
-        // VALIDATION OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Check if manager can edit review

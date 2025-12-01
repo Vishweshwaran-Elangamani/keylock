@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 using Relevantz.EEPZ.Common.Entities;
-
 namespace Relevantz.EEPZ.Data.DBContexts;
-
 public partial class EEPZDbContext : DbContext
 {
     public EEPZDbContext()

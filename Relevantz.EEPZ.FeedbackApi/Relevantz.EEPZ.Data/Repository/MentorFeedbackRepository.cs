@@ -1,13 +1,8 @@
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
@@ -20,13 +15,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         private readonly EEPZDbContext _context;
         private readonly ILogger<MentorFeedbackRepository> _logger;
 
-        // Status constants
         private const string STATUS_SUBMITTED = "Submitted";
         private const string STATUS_ACKNOWLEDGED = "Acknowledged";
         private const string STATUS_REVIEWED = "Reviewed";
         private const string STATUS_ARCHIVED = "Archived";
 
-        // FeedbackFrom constants
         private const string FEEDBACK_FROM_MENTEE = "Mentee";
         private const string FEEDBACK_FROM_HR = "HR";
         private const string FEEDBACK_FROM_MANAGER = "Manager";
@@ -37,10 +30,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         public async Task<int> CreateMentorFeedbackAsync(Mentorfeedbacktracking feedback)
         {
             if (feedback == null)
@@ -49,7 +38,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Validate required fields
                 if (feedback.SmeId <= 0)
                     throw new ArgumentException("Invalid SmeId", nameof(feedback));
                 if (feedback.MentorEmployeeId <= 0)
@@ -60,7 +48,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     throw new ArgumentException("Invalid SkillIdReference", nameof(feedback));
 
                 feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = STATUS_SUBMITTED; // Default status
+                feedback.Status = STATUS_SUBMITTED;
                 
                 _context.Mentorfeedbacktrackings.Add(feedback);
                 await _context.SaveChangesAsync();
@@ -76,10 +64,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         public async Task<Mentorfeedbacktracking?> GetMentorFeedbackByIdAsync(int trackingId)
         {
@@ -219,7 +203,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (string.IsNullOrWhiteSpace(status))
                     throw new ArgumentException("Status cannot be null or empty", nameof(status));
 
-                // Validate status
                 var validStatuses = new[] { STATUS_SUBMITTED, STATUS_ACKNOWLEDGED, STATUS_REVIEWED, STATUS_ARCHIVED };
                 if (!validStatuses.Contains(status))
                     throw new ArgumentException($"Invalid status: {status}", nameof(status));
@@ -246,7 +229,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (string.IsNullOrWhiteSpace(feedbackFrom))
                     throw new ArgumentException("FeedbackFrom cannot be null or empty", nameof(feedbackFrom));
 
-                // Validate feedbackFrom
                 var validSources = new[] { FEEDBACK_FROM_MENTEE, FEEDBACK_FROM_HR, FEEDBACK_FROM_MANAGER };
                 if (!validSources.Contains(feedbackFrom))
                     throw new ArgumentException($"Invalid feedback source: {feedbackFrom}", nameof(feedbackFrom));
@@ -283,11 +265,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> UpdateMentorFeedbackAsync(Mentorfeedbacktracking feedback)
         {
             if (feedback == null)
@@ -325,7 +302,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             if (string.IsNullOrWhiteSpace(newStatus))
                 throw new ArgumentException("Status cannot be null or empty", nameof(newStatus));
 
-            // Validate status
             var validStatuses = new[] { STATUS_SUBMITTED, STATUS_ACKNOWLEDGED, STATUS_REVIEWED, STATUS_ARCHIVED };
             if (!validStatuses.Contains(newStatus))
                 throw new ArgumentException($"Invalid status: {newStatus}", nameof(newStatus));
@@ -340,7 +316,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     return false;
                 }
 
-                // Status transitions: Submitted → Acknowledged → Reviewed → Archived
                 feedback.Status = newStatus;
 
                 await _context.SaveChangesAsync();
@@ -394,11 +369,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteMentorFeedbackAsync(int trackingId)
         {
             if (trackingId <= 0)
@@ -414,7 +384,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     return false;
                 }
 
-                // Only allow deletion if Submitted status
                 if (feedback.Status != STATUS_SUBMITTED)
                 {
                     throw new InvalidOperationException(
@@ -435,11 +404,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // EXISTENCE CHECKS
-        // ============================================================================
-
         public async Task<bool> MentorFeedbackExistsAsync(int trackingId)
         {
             if (trackingId <= 0)

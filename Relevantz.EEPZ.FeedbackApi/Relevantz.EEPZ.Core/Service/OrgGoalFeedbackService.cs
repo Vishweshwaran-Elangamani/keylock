@@ -4,10 +4,6 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -28,10 +24,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger = logger;
         }
 
-        // ============================================================================
-        // CREATE
-        // ============================================================================
-
         public async Task<OrgGoalFeedbackResponseDto> CreateOrgGoalFeedbackAsync(CreateOrgGoalFeedbackRequestDto dto)
         {
             try
@@ -45,9 +37,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 var feedback = new Feedback
                 {
-                    RelatedGoalId = dto.GoalId, // ✅ Use RelatedGoalId
+                    RelatedGoalId = dto.GoalId, 
                     SubmittedByEmployeeId = dto.SubmittedByEmployeeId,
-                    RecipientEmployeeId = dto.RecipientEmployeeId, // Manager or assigned recipient
+                    RecipientEmployeeId = dto.RecipientEmployeeId, 
                     Rating = dto.Rating,
                     Comments = dto.FeedbackComments,
                     IsAnonymous = dto.IsAnonymous,
@@ -67,11 +59,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // READ
-        // ============================================================================
-
-        public async Task<OrgGoalFeedbackResponseDto> GetOrgGoalFeedbackByIdAsync(int feedbackId)
+     public async Task<OrgGoalFeedbackResponseDto> GetOrgGoalFeedbackByIdAsync(int feedbackId)
         {
             try
             {
@@ -157,11 +145,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // UPDATE
-        // ============================================================================
-
         public async Task<OrgGoalFeedbackResponseDto> UpdateOrgGoalFeedbackAsync(int feedbackId, UpdateOrgGoalFeedbackRequestDto dto)
         {
             try
@@ -212,10 +195,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // DELETE
-        // ============================================================================
-
         public async Task<bool> DeleteOrgGoalFeedbackAsync(int feedbackId)
         {
             try
@@ -232,11 +211,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // VALIDATION
-        // ============================================================================
-
         public async Task<bool> OrgGoalFeedbackExistsAsync(int feedbackId)
         {
             try
@@ -249,10 +223,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // MAPPING
-        // ============================================================================
 
         private OrgGoalFeedbackResponseDto MapToResponseDto(Feedback feedback)
         {

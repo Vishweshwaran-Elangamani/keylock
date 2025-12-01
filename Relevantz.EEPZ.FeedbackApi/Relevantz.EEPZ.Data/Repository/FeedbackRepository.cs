@@ -1,14 +1,8 @@
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
-
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
 {
@@ -26,17 +20,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _context = context;
             _logger = logger;
         }
-
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         public async Task<int> CreateFeedbackAsync(Feedback feedback)
         {
             try
             {
                 feedback.CreatedAt = DateTime.UtcNow;
-                feedback.Status = "Draft"; // Default status
+                feedback.Status = "Draft"; 
                 
                 _context.Feedbacks.Add(feedback);
                 await _context.SaveChangesAsync();
@@ -69,11 +58,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
-
         public async Task<Feedback> GetFeedbackByIdAsync(int feedbackId)
         {
             try
@@ -132,7 +116,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             try
             {
-                // Get all employees reporting to this manager
                 var teamMemberIds = await _context.Employees
                     .Where(e => e.ReportingManagerEmployeeId == managerId && e.IsActive == true)
                     .Select(e => e.EmployeeId)
@@ -141,7 +124,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (!teamMemberIds.Any())
                     return new List<Feedback>();
 
-                // Get feedback FROM team members OR ABOUT team members
                 return await _context.Feedbacks
                     .Where(f => (teamMemberIds.Contains(f.SubmittedByEmployeeId ?? 0) || 
                                  teamMemberIds.Contains(f.RecipientEmployeeId)) &&
@@ -304,11 +286,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> UpdateFeedbackAsync(Feedback feedback)
         {
             try
@@ -339,7 +316,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 feedback.Status = newStatus;
                 feedback.UpdatedAt = DateTime.UtcNow;
 
-                // Set SubmittedAt when status changes to Submitted
+               
                 if (newStatus == "Submitted" && feedback.SubmittedAt == null)
                     feedback.SubmittedAt = DateTime.UtcNow;
 
@@ -426,10 +403,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteFeedbackAsync(int feedbackId)
         {
             try
@@ -438,11 +411,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (feedback == null)
                     return false;
 
-                // Only allow deletion if Draft status
                 if (feedback.Status != "Draft")
                     throw new InvalidOperationException($"Cannot delete feedback in {feedback.Status} status. Only Draft feedback can be deleted.");
 
-                // Delete associated question responses first
                 var responses = await _context.Feedbackquestionresponses
                     .Where(r => r.FeedbackId == feedbackId)
                     .ToListAsync();
@@ -481,11 +452,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // EXISTENCE CHECKS
-        // ============================================================================
-
         public async Task<bool> FeedbackExistsAsync(int feedbackId)
         {
             try

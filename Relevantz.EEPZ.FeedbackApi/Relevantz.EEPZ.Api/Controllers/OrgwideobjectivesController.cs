@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Common.Entities;
 using System.Text.Json.Serialization;
-using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.DTOs.Request;
-using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Data.DBContexts;
 
 namespace eepzbackend.Controllers
@@ -35,10 +31,9 @@ namespace eepzbackend.Controllers
             {
                 _logger.LogInformation("Retrieving all organization-wide objectives from Goals table");
 
-                // ✅ Fetch from Goals table where GoalType = "Organization"
                 var objectives = await _context.Goals
                     .Where(g => g.GoalType == ORG_GOAL_TYPE && 
-                               (g.Goalstatus == "open" || g.Goalstatus == "inprogress")) // Only active goals
+                               (g.Goalstatus == "open" || g.Goalstatus == "inprogress"))
                     .OrderBy(g => g.GoalTitle)
                     .Select(g => new OrgObjectiveDto
                     {
@@ -75,7 +70,7 @@ namespace eepzbackend.Controllers
 
                 var objectives = await _context.Goals
                     .Where(g => g.GoalType == ORG_GOAL_TYPE)
-                    .OrderByDescending(g => g.Goalcreatedat) // Most recent first
+                    .OrderByDescending(g => g.Goalcreatedat) 
                     .Select(g => new OrgObjectiveDto
                     {
                         ObjectiveId = g.GoalId,
@@ -110,7 +105,6 @@ namespace eepzbackend.Controllers
             {
                 _logger.LogInformation("Retrieving organization objective with ID: {ObjectiveId}", objectiveId);
 
-                // ✅ Fetch from Goals table
                 var objective = await _context.Goals
                     .Where(g => g.GoalId == objectiveId && g.GoalType == ORG_GOAL_TYPE)
                     .FirstOrDefaultAsync();
@@ -188,7 +182,6 @@ namespace eepzbackend.Controllers
             {
                 _logger.LogInformation("Retrieving objectives with status: {Status}", status);
 
-                // Validate status
                 var validStatuses = new[] { "pending", "open", "inprogress", "completed", "closed", "expired", "reopened" };
                 if (!validStatuses.Contains(status.ToLower()))
                 {

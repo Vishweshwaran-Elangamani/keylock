@@ -1,13 +1,8 @@
-// Controllers/MomController.cs
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Common.Entities;
 
 namespace eepzbackend.Controllers
 {
@@ -304,25 +299,21 @@ namespace eepzbackend.Controllers
 
         private string GetRoleFromClaims()
 {
-    // Try standard Microsoft role claim
     var roleClaim = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
     
     if (roleClaim != null)
         return roleClaim.Value;
-    
-    // Try ClaimTypes.Role
+ 
     roleClaim = User.FindFirst(ClaimTypes.Role);
     
     if (roleClaim != null)
         return roleClaim.Value;
     
-    // Try simple "role" claim (for your JWT structure)
     roleClaim = User.FindFirst("role");
     
     if (roleClaim != null)
         return roleClaim.Value;
-    
-    // Default fallback
+   
     return "Employee";
 }
 

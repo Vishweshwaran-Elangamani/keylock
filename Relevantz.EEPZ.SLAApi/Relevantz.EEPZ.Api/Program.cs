@@ -12,18 +12,14 @@ using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services;
-using eepzbackend.Controllers;
 
-// CRITICAL: Clear JWT claim type mappings BEFORE building
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building........");
 
-// Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -31,14 +27,11 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Log application starting
 Log.Information("Starting EEPZ SLA Backend Application");
 
-// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger with JWT support
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -74,14 +67,12 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Configure MySQL Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 Log.Information("Database connection configured");
 
-// Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
@@ -101,7 +92,7 @@ builder.Services.AddAuthentication(options =>
     var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; // Set to true in production
+    options.RequireHttpsMetadata = false; 
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -120,7 +111,6 @@ builder.Services.AddAuthentication(options =>
         NameClaimType = "sub",
     };
 
-    // ADD: Event handlers for debugging
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -191,7 +181,6 @@ builder.Services.AddAuthorization();
 
 Log.Information("JWT Authentication configured");
 
-// ==================== Register Services - Dependency Injection ====================
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<ISlaService, SlaService>();
@@ -199,9 +188,6 @@ builder.Services.AddScoped<ISlaRepository, SlaRepository>();
 
 Log.Information("Dependency Injection configured - EmailService, ISlaService, ISlaRepository");
 
-// ===================================================================================
-
-// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -216,7 +202,6 @@ Log.Information("CORS configured");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -227,7 +212,6 @@ if (app.Environment.IsDevelopment())
     Log.Information("Swagger UI enabled");
 }
 
-// Enable Serilog request logging
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate =
@@ -245,8 +229,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 
-
-// Log configuration details
 Log.Information("Application Configuration:");
 Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
 Log.Information("   JWT Issuer: {Issuer}", jwtSettings["Issuer"]);

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Data;
 using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 
@@ -19,10 +18,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             return await _context
                 .Projects
-                // ✅ Load Projectemployees junction table (contains IsPrimary)
                 .Include(p => p.Projectemployees)
-                .ThenInclude(pe => pe.Employee) // Employeedetailsmaster
-                .ThenInclude(e => e!.Employee) // Employee entity
+                .ThenInclude(pe => pe.Employee) 
+                .ThenInclude(e => e!.Employee) 
                 .ThenInclude(e => e!.Userprofile)
                 .Include(p => p.Projectemployees)
                 .ThenInclude(pe => pe.Employee)
@@ -30,7 +28,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 .Include(p => p.Projectemployees)
                 .ThenInclude(pe => pe.Employee)
                 .ThenInclude(e => e!.Department)
-                // ... (manager includes remain the same)
                 .Include(p => p.ResourceOwnerEmployee)
                 .ThenInclude(e => e!.Employee)
                 .ThenInclude(e => e!.Userprofile)
@@ -83,13 +80,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             try
             {
-                // ✅ Step 1: Add the project
                 _context.Projects.Add(project);
                 await _context.SaveChangesAsync();
 
-                Console.WriteLine($"✅ Project created with ID: {project.ProjectId}");
+                Console.WriteLine($" Project created with ID: {project.ProjectId}");
 
-                // ✅ Step 2: Collect manager EmployeeMasterIds
                 var managerMasterIds = new List<int?>
                 {
                     project.ResourceOwnerEmployeeId,
@@ -102,12 +97,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .ToList();
 
                 Console.WriteLine(
-                    $"📋 Manager Master IDs to map: {string.Join(", ", managerMasterIds)}"
+                    $"Manager Master IDs to map: {string.Join(", ", managerMasterIds)}"
                 );
 
                 if (managerMasterIds.Any())
                 {
-                    // ✅ Step 3: Get FULL employee details (not just EmployeeId)
                     var managerDetails = await _context
                         .Employeedetailsmasters.Where(edm =>
                             managerMasterIds.Contains(edm.EmployeeMasterId)
@@ -125,24 +119,22 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         );
                     }
 
-                    // ✅ Step 4: Filter out invalid EmployeeIds (null or 0)
                     var validManagerEmployeeIds = managerDetails
-                        .Where(md => md.EmployeeId > 0) // ⚠️ CRITICAL: Filter null/0 values
+                        .Where(md => md.EmployeeId > 0) 
                         .Select(md => md.EmployeeId)
                         .ToList();
 
                     Console.WriteLine(
-                        $"✅ Valid EmployeeIds to map: {string.Join(", ", validManagerEmployeeIds)}"
+                        $" Valid EmployeeIds to map: {string.Join(", ", validManagerEmployeeIds)}"
                     );
 
-                    // ✅ Step 5: Warn about missing mappings
                     var missingMasterIds = managerMasterIds
                         .Except(managerDetails.Select(md => md.EmployeeMasterId))
                         .ToList();
                     if (missingMasterIds.Any())
                     {
                         Console.WriteLine(
-                            $"⚠️ WARNING: These EmployeeMasterIds were NOT found in Employeedetailsmaster: {string.Join(", ", missingMasterIds)}"
+                            $" WARNING: These EmployeeMasterIds were NOT found in Employeedetailsmaster: {string.Join(", ", missingMasterIds)}"
                         );
                     }
 
@@ -153,11 +145,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     if (invalidMasterIds.Any())
                     {
                         Console.WriteLine(
-                            $"⚠️ WARNING: These EmployeeMasterIds have invalid/null EmployeeId: {string.Join(", ", invalidMasterIds)}"
+                            $" WARNING: These EmployeeMasterIds have invalid/null EmployeeId: {string.Join(", ", invalidMasterIds)}"
                         );
                     }
 
-                    // ✅ Step 6: Check existing mappings
                     var existingMappings = await _context
                         .Projectemployees.Where(pe =>
                             pe.ProjectId == project.ProjectId
@@ -171,10 +162,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         .ToList();
 
                     Console.WriteLine(
-                        $"➕ New managers to add to Projectemployees: {newManagerEmployeeIds.Count}"
+                        $"New managers to add to Projectemployees: {newManagerEmployeeIds.Count}"
                     );
 
-                    // ✅ Step 7: Create Projectemployee records
                     if (newManagerEmployeeIds.Any())
                     {
                         var projectEmployees = newManagerEmployeeIds
@@ -190,16 +180,15 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         var savedCount = await _context.SaveChangesAsync();
 
                         Console.WriteLine(
-                            $"✅ Successfully saved {savedCount} Projectemployee records"
+                            $"Successfully saved {savedCount} Projectemployee records"
                         );
                     }
                 }
                 else
                 {
-                    Console.WriteLine("ℹ️ No managers assigned to this project");
+                    Console.WriteLine("No managers assigned to this project");
                 }
 
-                // ✅ NEW: Update manager reporting hierarchy
                 await UpdateManagerHierarchyAsync(
                     project.ResourceOwnerEmployeeId,
                     project.L1approverEmployeeId,
@@ -207,14 +196,14 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 );
 
                 await transaction.CommitAsync();
-                Console.WriteLine("✅ Transaction committed successfully");
+                Console.WriteLine(" Transaction committed successfully");
 
                 return project;
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                Console.WriteLine($"❌ Error in CreateProjectAsync: {ex.Message}");
+                Console.WriteLine($" Error in CreateProjectAsync: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 throw;
             }
@@ -236,20 +225,18 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 var project = await _context.Projects.FindAsync(projectId);
                 if (project == null)
                 {
-                    Console.WriteLine($"❌ Project {projectId} not found");
+                    Console.WriteLine($" Project {projectId} not found");
                     return false;
                 }
 
-                Console.WriteLine($"🗑️ Deleting Project {projectId}: {project.ProjectName}");
+                Console.WriteLine($" Deleting Project {projectId}: {project.ProjectName}");
 
-                // ✅ Step 1: Check for actual employee mappings (non-managers)
                 var allMappings = await _context
                     .Projectemployees.Where(pe => pe.ProjectId == projectId)
                     .ToListAsync();
 
-                Console.WriteLine($"📋 Found {allMappings.Count} total mappings for this project");
+                Console.WriteLine($" Found {allMappings.Count} total mappings for this project");
 
-                // ✅ Step 2: Identify manager EmployeeIds
                 var managerMasterIds = new List<int?>
                 {
                     project.ResourceOwnerEmployeeId,
@@ -273,11 +260,10 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         .ToListAsync();
 
                     Console.WriteLine(
-                        $"👔 Manager EmployeeIds: {string.Join(", ", managerEmployeeIds)}"
+                        $" Manager EmployeeIds: {string.Join(", ", managerEmployeeIds)}"
                     );
                 }
 
-                // ✅ Step 3: Separate actual employees from managers
                 var actualEmployeeMappings = allMappings
                     .Where(pe => !managerEmployeeIds.Contains(pe.EmployeeId))
                     .ToList();
@@ -287,38 +273,35 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     .ToList();
 
                 Console.WriteLine($"👥 Actual employee mappings: {actualEmployeeMappings.Count}");
-                Console.WriteLine($"👔 Manager-only mappings: {managerMappings.Count}");
+                Console.WriteLine($" Manager-only mappings: {managerMappings.Count}");
 
-                // ✅ Step 4: Block deletion if actual employees are mapped
                 if (actualEmployeeMappings.Any())
                 {
                     await transaction.RollbackAsync();
                     Console.WriteLine(
-                        $"❌ Cannot delete: {actualEmployeeMappings.Count} employees still mapped"
+                        $" Cannot delete: {actualEmployeeMappings.Count} employees still mapped"
                     );
                     return false;
                 }
 
-                // ✅ Step 5: Remove manager mappings automatically
                 if (managerMappings.Any())
                 {
                     _context.Projectemployees.RemoveRange(managerMappings);
-                    Console.WriteLine($"🧹 Removing {managerMappings.Count} manager mappings");
+                    Console.WriteLine($" Removing {managerMappings.Count} manager mappings");
                 }
 
-                // ✅ Step 6: Delete the project
                 _context.Projects.Remove(project);
                 await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
-                Console.WriteLine($"✅ Project {projectId} deleted successfully");
+                Console.WriteLine($" Project {projectId} deleted successfully");
 
                 return true;
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                Console.WriteLine($"❌ Error in DeleteProjectAsync: {ex.Message}");
+                Console.WriteLine($" Error in DeleteProjectAsync: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 throw;
             }
@@ -356,7 +339,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
     var project = await _context.Projects.FindAsync(projectId);
     if (project == null)
     {
-        Console.WriteLine($"❌ Project {projectId} not found");
+        Console.WriteLine($" Project {projectId} not found");
         return false;
     }
 
@@ -365,13 +348,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
     Console.WriteLine($"   - L1 Approver: {l1ApproverId}");
     Console.WriteLine($"   - L2 Approver: {l2ApproverId}");
 
-    // Update project's reporting manager fields
     project.ResourceOwnerEmployeeId = resourceOwnerId;
     project.L1approverEmployeeId = l1ApproverId;
     project.L2approverEmployeeId = l2ApproverId;
     project.UpdatedAt = DateTime.Now;
 
-    // Collect all manager EmployeeMasterIds
     var managerMasterIds = new List<int?> { resourceOwnerId, l1ApproverId, l2ApproverId }
         .Where(id => id.HasValue && id.Value > 0)
         .Select(id => id!.Value)
@@ -380,7 +361,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
     if (managerMasterIds.Any())
     {
-        // Get manager details with validation
         var managerDetails = await _context
             .Employeedetailsmasters.Where(edm =>
                 managerMasterIds.Contains(edm.EmployeeMasterId)
@@ -390,7 +370,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             .ToListAsync();
 
         Console.WriteLine(
-            $"👥 Found {managerDetails.Count}/{managerMasterIds.Count} managers:"
+            $" Found {managerDetails.Count}/{managerMasterIds.Count} managers:"
         );
         foreach (var detail in managerDetails)
         {
@@ -401,13 +381,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             );
         }
 
-        // Filter valid EmployeeIds
         var validManagerEmployeeIds = managerDetails
             .Where(md => md.EmployeeId > 0)
             .Select(md => md.EmployeeId)
             .ToList();
 
-        // Warn about problems
         var invalidManagers = managerDetails.Where(md => md.EmployeeId <= 0).ToList();
         if (invalidManagers.Any())
         {
@@ -424,8 +402,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // NEW: Update employee manager hierarchy correctly
-        // Get all employees currently assigned to this project (excluding managers themselves)
         var projectEmployeeIds = await _context
             .Projectemployees
             .Where(pe => pe.ProjectId == projectId)
@@ -439,32 +415,25 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
         foreach (var employee in employeesToUpdate)
         {
-            // Apply hierarchy logic based on employee's role
-            // Regular employees → L1 Approver
-            // L1 Approver → L2 Approver  
-            // L2 Approver → Resource Owner (or null if they're at the top)
+            
             
             if (employee.EmployeeId == l1ApproverId)
             {
-                // L1 Approver reports to L2 Approver
+             
                 employee.ReportingManagerEmployeeId = l2ApproverId;
                 Console.WriteLine($"L1 Approver (EmployeeId {employee.EmployeeId}) → Manager: {l2ApproverId}");
             }
             else if (employee.EmployeeId == l2ApproverId)
             {
-                // L2 Approver reports to Resource Owner
                 employee.ReportingManagerEmployeeId = resourceOwnerId;
                 Console.WriteLine($"L2 Approver (EmployeeId {employee.EmployeeId}) → Manager: {resourceOwnerId}");
             }
             else if (employee.EmployeeId == resourceOwnerId)
             {
-                // Resource Owner has no manager (or reports to someone outside project)
-                // employee.ReportingManagerId = null; // Or leave unchanged
                 Console.WriteLine($"Resource Owner (EmployeeId {employee.EmployeeId}) → No manager in project");
             }
             else
             {
-                // Regular employees report to L1 Approver
                 employee.ReportingManagerEmployeeId = l1ApproverId;
                 Console.WriteLine($"Regular Employee (EmployeeId {employee.EmployeeId}) → Manager: {l1ApproverId}");
             }
@@ -472,7 +441,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             employee.UpdatedAt = DateTime.Now;
         }
 
-        // ✅ Check existing project-employee mappings
         var existingMappings = await _context
             .Projectemployees.Where(pe =>
                 pe.ProjectId == projectId && validManagerEmployeeIds.Contains(pe.EmployeeId)
@@ -485,10 +453,9 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             .ToList();
 
         Console.WriteLine(
-            $"➕ Managers to add: {newManagerEmployeeIds.Count}, Already mapped: {existingMappings.Count}"
+            $" Managers to add: {newManagerEmployeeIds.Count}, Already mapped: {existingMappings.Count}"
         );
 
-        // ✅ Add new manager mappings to Projectemployee table
         if (newManagerEmployeeIds.Any())
         {
             var newProjectEmployees = newManagerEmployeeIds
@@ -502,12 +469,11 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
             await _context.Projectemployees.AddRangeAsync(newProjectEmployees);
             Console.WriteLine(
-                $"✅ Adding {newProjectEmployees.Count} new Projectemployee records"
+                $" Adding {newProjectEmployees.Count} new Projectemployee records"
             );
         }
     }
 
-    // ✅ Save all changes
     var changes = await _context.SaveChangesAsync();
     return changes > 0;
 }
@@ -639,8 +605,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 e.EmployeeMasterId == employeeMasterId
             );
         }
-
-        // ✅ NEW: Get EmployeeId from EmployeeMasterId
         public async Task<int?> GetEmployeeIdByMasterIdAsync(int employeeMasterId)
         {
             var employeeDetails = await _context
@@ -651,7 +615,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             return employeeDetails > 0 ? employeeDetails : null;
         }
 
-        // ✅ NEW: Update Employee entity
         public async Task<bool> UpdateEmployeeAsync(Employee employee)
         {
             try
@@ -666,8 +629,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 return false;
             }
         }
-
-        // ✅ NEW: Batch update primary flags for project employees
         public async Task<bool> UpdateProjectEmployeePrimaryFlagsAsync(
             List<Projectemployee> projectEmployees
         )
@@ -687,25 +648,16 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ==================== ✅ NEW: GET ALL EMPLOYEES WITH PRIMARY PROJECT ====================
 
-        /// <summary>
-        /// ✅ NEW: Get all active employees with their primary project information
-        /// </summary>
-        /// <returns>
-        /// Dictionary where:
-        /// - Key: EmployeeMasterId
-        /// - Value: Tuple containing (ProjectId, ProjectName) of their primary project, or null if none
-        /// </returns>
+  
         public async Task<
             Dictionary<int, (int ProjectId, string ProjectName)?>
         > GetAllEmployeesWithPrimaryProjectAsync()
         {
             try
             {
-                Console.WriteLine("🔍 Fetching all employees with primary project information...");
+                Console.WriteLine(" Fetching all employees with primary project information...");
 
-                // ✅ Query all active employees and their primary projects in one efficient query
                 var employeesWithPrimaryProjects = await _context
                     .Employeedetailsmasters.Where(edm =>
                         edm.Employee != null && edm.Employee.IsActive == true
@@ -715,7 +667,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                         EmployeeMasterId = edm.EmployeeMasterId,
                         FirstName = edm.Employee!.Userprofile!.FirstName,
                         LastName = edm.Employee.Userprofile.LastName,
-                        // ✅ FIXED: Navigate through Employeedetailsmaster's Projectemployees collection
                         PrimaryProject = _context
                             .Projectemployees.Where(pe =>
                                 pe.EmployeeId == edm.EmployeeId && pe.IsPrimary
@@ -729,9 +680,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                     })
                     .ToListAsync();
 
-                Console.WriteLine($"✅ Found {employeesWithPrimaryProjects.Count} active employees");
+                Console.WriteLine($" Found {employeesWithPrimaryProjects.Count} active employees");
 
-                // ✅ Convert to dictionary for O(1) lookup performance
                 var result = employeesWithPrimaryProjects.ToDictionary(
                     emp => emp.EmployeeMasterId,
                     emp =>
@@ -753,7 +703,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             catch (Exception ex)
             {
                 Console.WriteLine(
-                    $"❌ Error in GetAllEmployeesWithPrimaryProjectAsync: {ex.Message}"
+                    $" Error in GetAllEmployeesWithPrimaryProjectAsync: {ex.Message}"
                 );
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 throw;
@@ -761,7 +711,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         }
 
         /// <summary>
-        /// ⚙️ Updates the reporting manager hierarchy for project managers
+        /// Updates the reporting manager hierarchy for project managers
         /// L1 Approver reports to L2 Approver, L2 Approver reports to Resource Owner
         /// </summary>
         private async Task UpdateManagerHierarchyAsync(
@@ -772,9 +722,8 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
         {
             try
             {
-                Console.WriteLine("🔄 Updating manager reporting hierarchy...");
+                Console.WriteLine(" Updating manager reporting hierarchy...");
 
-                // ✅ Step 1: Get the actual EmployeeIds from EmployeeMasterIds
                 var resourceOwnerEmployeeId = resourceOwnerId.HasValue
                     ? await GetEmployeeIdByMasterIdAsync(resourceOwnerId.Value)
                     : null;
@@ -789,7 +738,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 Console.WriteLine($"   - L1 Approver EmployeeId: {l1ApproverEmployeeId}");
                 Console.WriteLine($"   - L2 Approver EmployeeId: {l2ApproverEmployeeId}");
 
-                // ✅ Step 2: Update L1 Approver's reporting manager
                 if (l1ApproverEmployeeId.HasValue && l1ApproverEmployeeId.Value > 0)
                 {
                     var l1Employee = await _context.Employees.FirstOrDefaultAsync(e =>
@@ -805,19 +753,18 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                             l1Employee.ReportingManagerEmployeeId = newReportingManagerId;
                             l1Employee.UpdatedAt = DateTime.UtcNow;
                             Console.WriteLine(
-                                $"✅ Updated L1 Approver's ReportingManagerEmployeeId: {newReportingManagerId}"
+                                $" Updated L1 Approver's ReportingManagerEmployeeId: {newReportingManagerId}"
                             );
                         }
                     }
                     else
                     {
                         Console.WriteLine(
-                            $"⚠️ WARNING: L1 Approver Employee not found (EmployeeId: {l1ApproverEmployeeId})"
+                            $" WARNING: L1 Approver Employee not found (EmployeeId: {l1ApproverEmployeeId})"
                         );
                     }
                 }
 
-                // ✅ Step 3: Update L2 Approver's reporting manager
                 if (l2ApproverEmployeeId.HasValue && l2ApproverEmployeeId.Value > 0)
                 {
                     var l2Employee = await _context.Employees.FirstOrDefaultAsync(e =>
@@ -831,49 +778,47 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                             l2Employee.ReportingManagerEmployeeId = resourceOwnerEmployeeId;
                             l2Employee.UpdatedAt = DateTime.UtcNow;
                             Console.WriteLine(
-                                $"✅ Updated L2 Approver's ReportingManagerEmployeeId: {resourceOwnerEmployeeId}"
+                                $" Updated L2 Approver's ReportingManagerEmployeeId: {resourceOwnerEmployeeId}"
                             );
                         }
                     }
                     else
                     {
                         Console.WriteLine(
-                            $"⚠️ WARNING: L2 Approver Employee not found (EmployeeId: {l2ApproverEmployeeId})"
+                            $" WARNING: L2 Approver Employee not found (EmployeeId: {l2ApproverEmployeeId})"
                         );
                     }
                 }
 
                 await _context.SaveChangesAsync();
-                Console.WriteLine("✅ Manager hierarchy updated successfully");
+                Console.WriteLine(" Manager hierarchy updated successfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error updating manager hierarchy: {ex.Message}");
+                Console.WriteLine($" Error updating manager hierarchy: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 throw;
             }
         }
         /// <summary>
-/// ✅ NEW: Automatically move employees to resource pool if they have no project mappings
+///  NEW: Automatically move employees to resource pool if they have no project mappings
 /// Also updates L1/L2 reporting manager logic
 /// </summary>
 public async Task<int> MoveUnmappedEmployeesToResourcePoolAsync(List<int> employeeIds)
 {
     try
     {
-        Console.WriteLine($"🔄 Checking {employeeIds.Count} employees for resource pool auto-assignment...");
+        Console.WriteLine($" Checking {employeeIds.Count} employees for resource pool auto-assignment...");
 
-        // Get resource pool project
         var resourcePoolProject = await _context.Projects
             .FirstOrDefaultAsync(p => p.ProjectName.ToLower() == "org.rz.resourcepool");
 
         if (resourcePoolProject == null)
         {
-            Console.WriteLine("⚠️ Resource pool project not found");
+            Console.WriteLine(" Resource pool project not found");
             return 0;
         }
 
-        // Get L2 approver's EmployeeId for reporting manager
         int? l2ApproverEmployeeId = null;
         if (resourcePoolProject.L2approverEmployeeId.HasValue)
         {
@@ -884,35 +829,30 @@ public async Task<int> MoveUnmappedEmployeesToResourcePoolAsync(List<int> employ
 
         foreach (var empMasterId in employeeIds)
         {
-            // Check if employee has ANY other project mappings (primary or secondary)
             var otherProjectMappings = await _context.Projectemployees
                 .Where(pe => pe.EmployeeId == empMasterId)
                 .ToListAsync();
 
-            // If no other mappings exist, move to resource pool
             if (!otherProjectMappings.Any())
             {
-                Console.WriteLine($"✅ Employee {empMasterId} has no project mappings. Moving to resource pool...");
+                Console.WriteLine($" Employee {empMasterId} has no project mappings. Moving to resource pool...");
 
-                // Check if already in resource pool
                 var existingResourcePoolMapping = await _context.Projectemployees
                     .FirstOrDefaultAsync(pe => pe.ProjectId == resourcePoolProject.ProjectId && 
                                               pe.EmployeeId == empMasterId);
 
                 if (existingResourcePoolMapping == null)
                 {
-                    // Add to resource pool
                     var resourcePoolMapping = new Projectemployee
                     {
                         ProjectId = resourcePoolProject.ProjectId,
                         EmployeeId = empMasterId,
                         AssignedAt = DateTime.UtcNow,
-                        IsPrimary = true // Resource pool is primary when no other projects
+                        IsPrimary = true 
                     };
 
                     await _context.Projectemployees.AddAsync(resourcePoolMapping);
 
-                    // ✅ Update reporting manager to L2 approver of resource pool
                     if (l2ApproverEmployeeId.HasValue)
                     {
                         var actualEmployeeId = await GetEmployeeIdByMasterIdAsync(empMasterId);
@@ -947,14 +887,14 @@ public async Task<int> MoveUnmappedEmployeesToResourcePoolAsync(List<int> employ
         if (movedCount > 0)
         {
             await _context.SaveChangesAsync();
-            Console.WriteLine($"✅ Successfully moved {movedCount} employee(s) to resource pool");
+            Console.WriteLine($" Successfully moved {movedCount} employee(s) to resource pool");
         }
 
         return movedCount;
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"❌ Error in MoveUnmappedEmployeesToResourcePoolAsync: {ex.Message}");
+        Console.WriteLine($" Error in MoveUnmappedEmployeesToResourcePoolAsync: {ex.Message}");
         Console.WriteLine($"Stack trace: {ex.StackTrace}");
         throw;
     }

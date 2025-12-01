@@ -14,7 +14,6 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building........");
 
-// Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -22,14 +21,11 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Log application starting
 Log.Information("Starting EEPZ MoM Backend Application");
 
-// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger with JWT support
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -63,12 +59,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Configure MySQL Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Configure JWT Authentication with the correct section "Jwt"
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSection["SecretKey"];
 var issuer = jwtSection["Issuer"];
@@ -106,12 +100,9 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
-
-// Register application services
 builder.Services.AddScoped<IMomRepository, MomRepository>();
 builder.Services.AddScoped<IMomService, MomService>();
 
-// Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -124,7 +115,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -135,7 +125,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Enable Serilog request logging
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate =
@@ -150,7 +139,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Run database migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
@@ -166,7 +154,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Log configuration details
 Log.Information("Application Configuration:");
 Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
 Log.Information("   JWT Issuer: {Issuer}", issuer);

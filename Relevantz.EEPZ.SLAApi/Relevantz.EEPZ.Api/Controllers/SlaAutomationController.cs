@@ -1,13 +1,9 @@
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;  // ✅ ADD THIS
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services;
-using Microsoft.EntityFrameworkCore;
-using Relevantz.EEPZ.Data.DBContexts;
-
 
 namespace eepzbackend.Controllers
 {
@@ -31,9 +27,6 @@ namespace eepzbackend.Controllers
             _emailService = emailService;
             _logger = logger;
         }
-
-        // ===== SLA REMINDERS =====
-
         /// <summary>
         /// Send SLA reminders for Day -2 (2 days before deadline)
         /// </summary>
@@ -48,7 +41,6 @@ public async Task<IActionResult> SendRemindersDayMinus2()
     {
         _logger.LogInformation("🔔 Starting Day -2 SLA reminders...");
 
-        // ✅ FIXED: Added parentheses to call the method
         var slas = await _slaRepository.GetSlasDueInDaysAsync(2);
         int emailsSent = 0;
         int emailsFailed = 0;
@@ -67,13 +59,13 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                         employeeName,
                         sla.Slatype,
                         sla.Deadline,
-                        2  // Days remaining
+                        2  
                     );
 
                     if (result)
                     {
                         emailsSent++;
-                        _logger.LogInformation("✅ Day -2 reminder sent to {Email} for SLA {SlaId}", 
+                        _logger.LogInformation("Day -2 reminder sent to {Email} for SLA {SlaId}", 
                             employeeEmail, sla.Slaid);
                     }
                     else
@@ -85,11 +77,9 @@ public async Task<IActionResult> SendRemindersDayMinus2()
             catch (Exception ex)
             {
                 emailsFailed++;
-                _logger.LogError(ex, "❌ Failed to send Day -2 reminder for SLA {SlaId}", sla.Slaid);
+                _logger.LogError(ex, " Failed to send Day -2 reminder for SLA {SlaId}", sla.Slaid);
             }
         }
-
-        // ✅ FIXED: Ensured all are variables, not method groups
         return Ok(new ApiResponse<object>
         {
             Success = true,
@@ -142,13 +132,13 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                                 employeeName,
                                 sla.Slatype,
                                 sla.Deadline,
-                                1  // Days remaining
+                                1  
                             );
 
                             if (result)
                             {
                                 emailsSent++;
-                                _logger.LogInformation("✅ Day -1 reminder sent to {Email} for SLA {SlaId}",
+                                _logger.LogInformation("Day -1 reminder sent to {Email} for SLA {SlaId}",
                                     employeeEmail, sla.Slaid);
                             }
                             else
@@ -210,13 +200,13 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                                 employeeName,
                                 sla.Slatype,
                                 sla.Deadline,
-                                0  // Days remaining
+                                0 
                             );
 
                             if (result)
                             {
                                 emailsSent++;
-                                _logger.LogInformation("✅ Day 0 reminder sent to {Email} for SLA {SlaId}",
+                                _logger.LogInformation(" Day 0 reminder sent to {Email} for SLA {SlaId}",
                                     employeeEmail, sla.Slaid);
                             }
                             else
@@ -286,8 +276,6 @@ public async Task<IActionResult> SendRemindersDayMinus2()
             }
         }
 
-        // ===== OVERDUE NOTIFICATIONS & ESCALATIONS =====
-
         /// <summary>
         /// Send overdue notifications and escalate to Manager (Level 1)
         /// </summary>
@@ -307,7 +295,6 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                 {
                     try
                     {
-                        // Send overdue notification to employee
                         var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
                         var employeeName = GetEmployeeName(sla.Employee);
 
@@ -328,7 +315,6 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                             }
                         }
 
-                        // Escalate to Manager
                         var manager = sla.AssignedToEmployee;
                         var managerEmail = manager?.Userprofile?.PersonalEmail;
 
@@ -393,7 +379,6 @@ public async Task<IActionResult> SendRemindersDayMinus2()
             {
                 _logger.LogInformation("🔐 Starting auto-closure of completed SLAs...");
 
-                // Get SLAs marked as ready for closure (status = "Completed" or similar)
                 var completedSlas = await _slaRepository.GetCompletedSlasAsync();
                 int closedCount = 0;
                 int emailsSent = 0;
@@ -409,7 +394,6 @@ public async Task<IActionResult> SendRemindersDayMinus2()
                         {
                             closedCount++;
 
-                            // Send completion confirmation email
                             var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
                             var employeeName = GetEmployeeName(sla.Employee);
 
@@ -470,13 +454,10 @@ public async Task<IActionResult> SendRemindersDayMinus2()
             {
                 _logger.LogInformation("🔄 Starting full SLA automation cycle...");
 
-                // Step 1: Send all reminders
                 await SendAllReminders();
 
-                // Step 2: Escalate overdue SLAs
                 await EscalateToManager();
 
-                // Step 3: Auto-close completed SLAs
                 await AutoCloseSlas();
 
                 return Ok(new ApiResponse<object>
@@ -558,15 +539,12 @@ public async Task<IActionResult> GetAutomationLogs([FromQuery] int days = 7)
 
         var cutoffDate = DateTime.Now.AddDays(-days);
 
-        // Get all SLAs first
         var allSlas = await _slaRepository.GetAllSlasAsync();
         var recentHistory = new List<Slahistory>();
 
-        // Get history for each SLA
         foreach (var sla in allSlas)
         {
             var history = await _slaRepository.GetSlaHistoryAsync(sla.Slaid);
-            // ✅ FIXED: Removed HasValue and Value - CreatedAt is DateTime, not DateTime?
             var recentForSla = history
                 .Where(h => h.CreatedAt != null && h.CreatedAt > cutoffDate)
                 .ToList();
@@ -574,7 +552,6 @@ public async Task<IActionResult> GetAutomationLogs([FromQuery] int days = 7)
             recentHistory.AddRange(recentForSla);
         }
 
-        // Sort and take top 100
         recentHistory = recentHistory
             .OrderByDescending(h => h.CreatedAt)
             .Take(100)
@@ -632,16 +609,14 @@ public async Task<IActionResult> CreatePerformanceFormSlas()
         var createdSlasList = new List<object>();
         var skippedList = new List<object>();
 
-        // ✅ FIX: EmployeeId is int (not nullable), so no .HasValue
         var employeeIds = allSlas
-            .Where(s => s.EmployeeId > 0)  // Changed from .HasValue
+            .Where(s => s.EmployeeId > 0) 
             .Select(s => s.EmployeeId)
             .Distinct()
             .ToList();
 
         _logger.LogInformation("Processing {Count} employees from SLAs", employeeIds.Count);
 
-        // ✅ Get full employee objects
         var allEmployees = allSlas
             .Where(s => s.Employee != null && employeeIds.Contains(s.Employee.EmployeeId))
             .Select(s => s.Employee)
@@ -657,7 +632,6 @@ public async Task<IActionResult> CreatePerformanceFormSlas()
                 var employeeId = employee.EmployeeId;
                 var joiningDate = employee.JoiningDate;
 
-                // ✅ FIX: Correct logging syntax (no extra string parameter)
                 _logger.LogInformation("Processing Employee {EmployeeId}", employeeId);
 
                 if (joiningDate == null)
@@ -770,10 +744,6 @@ public async Task<IActionResult> CreatePerformanceFormSlas()
         });
     }
 }
-
-
-
-        // ===== HELPER METHODS =====
 
         private string GetEmployeeName(Employee emp)
         {

@@ -2,13 +2,8 @@ using Relevantz.EEPZ.Common.DTOs.Request;
 using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Relevantz.EEPZ.Core.Services.Implementations;  // ✅ ADD THIS for EmailService
 using Relevantz.EEPZ.Common.Entities;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
@@ -29,18 +24,10 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             _logger = logger;
         }
 
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
-
-        
-
         public async Task<ManagerReviewResponseDto> CreateReviewAsync(CreateManagerReviewRequestDto dto)
         {
             try
             {
-                // Validate inputs
                 if (dto.ManagerEmployeeId <= 0)
                     throw new ArgumentException("ManagerEmployeeId must be valid");
                 if (dto.TargetEmployeeId <= 0)
@@ -70,11 +57,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
-
         public async Task<ManagerReviewResponseDto> GetReviewByIdAsync(int reviewId)
         {
             try
@@ -175,11 +157,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
-
         public async Task<ManagerReviewResponseDto> UpdateReviewAsync(int reviewId, UpdateManagerReviewRequestDto dto)
         {
             try
@@ -188,7 +165,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 if (review == null)
                     throw new KeyNotFoundException($"Review {reviewId} not found");
 
-                // Can only edit Draft status
                 if (review.Status != "Draft")
                     throw new InvalidOperationException($"Cannot edit review in {review.Status} status");
 
@@ -295,11 +271,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // DELETE OPERATIONS
-        // ============================================================================
-
         public async Task<bool> DeleteReviewAsync(int reviewId)
         {
             try
@@ -317,10 +288,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             }
         }
 
-        // ============================================================================
-        // VALIDATION OPERATIONS
-        // ============================================================================
-
         public async Task<bool> CanEditReviewAsync(int reviewId)
         {
             try
@@ -333,11 +300,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 throw;
             }
         }
-
-        // ============================================================================
-        // PRIVATE HELPER METHODS
-        // ============================================================================
-
                 private ManagerReviewResponseDto MapToResponseDto(Managerreviewcomment review)
         {
             return new ManagerReviewResponseDto

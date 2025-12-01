@@ -1,11 +1,8 @@
-// Controllers/EmployeeManagementController.cs
-using Relevantz.EEPZ.Data;
 using Relevantz.EEPZ.Common.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Common.DTOs.Request;  // ✅ ADD THIS
+using Relevantz.EEPZ.Common.DTOs.Request; 
 
 namespace eepzbackend.Controllers
 {
@@ -78,7 +75,6 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                // Define manager/leadership roles
                 var managerRoles = new[]
                 {
                     "Project Manager",
@@ -218,7 +214,7 @@ namespace eepzbackend.Controllers
                                 e.Employee.EmployeeCompanyId.ToLower().Contains(searchTerm) ||
                                 e.Employee.Userauthentication.Email.ToLower().Contains(searchTerm)))
                     .OrderBy(e => e.Employee.Userprofile.FirstName)
-                    .Take(50) // Limit results
+                    .Take(50) 
                     .Select(e => new
                     {
                         e.EmployeeMasterId,
@@ -381,7 +377,6 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                // Get distinct business units from existing projects
                 var businessUnits = await _context.Projects
                     .Where(p => !string.IsNullOrEmpty(p.BusinessUnit))
                     .Select(p => p.BusinessUnit!)
@@ -389,7 +384,6 @@ namespace eepzbackend.Controllers
                     .OrderBy(bu => bu)
                     .ToListAsync();
 
-                // If no business units exist in projects, return some default ones
                 if (!businessUnits.Any())
                 {
                     businessUnits = new List<string>
@@ -428,24 +422,20 @@ namespace eepzbackend.Controllers
         {
             try
             {
-                // Get resource pool project ID
                 var resourcePoolProject = await _context.Projects
                     .FirstOrDefaultAsync(p => p.ProjectName.ToLower() == "org.rz.resourcepool");
 
                 var resourcePoolProjectId = resourcePoolProject?.ProjectId;
 
-                // Get already mapped employee IDs to resource pool (using EmployeeMasterId)
                 var mappedEmployeeMasterIds = new List<int>();
                 if (resourcePoolProjectId.HasValue)
                 {
                     mappedEmployeeMasterIds = await _context.Projectemployees
                         .Where(pe => pe.ProjectId == resourcePoolProjectId.Value)
-                        .Select(pe => pe.EmployeeId)  // Assuming pe.EmployeeId == EmployeeMasterId
+                        .Select(pe => pe.EmployeeId) 
                         .ToListAsync();
                 }
 
-                // Get employees with NULL reporting manager
-                // EXCLUDING those already mapped to resource pool (using EmployeeMasterId)
                 var employees = await _context.Employeedetailsmasters
                     .Include(e => e.Employee)
                         .ThenInclude(e => e.Userprofile)
@@ -454,8 +444,8 @@ namespace eepzbackend.Controllers
                     .Include(e => e.Role)
                     .Include(e => e.Department)
                     .Where(e => e.Employee.IsActive == true && 
-                               e.Employee.ReportingManagerEmployeeId == null &&  // ✅ NULL reporting manager
-                               !mappedEmployeeMasterIds.Contains(e.EmployeeMasterId))  // ✅ FIXED: Use EmployeeMasterId for exclusion
+                               e.Employee.ReportingManagerEmployeeId == null && 
+                               !mappedEmployeeMasterIds.Contains(e.EmployeeMasterId))
                     .OrderBy(e => e.Employee.Userprofile.FirstName)
                     .Select(e => new
                     {
@@ -504,7 +494,6 @@ namespace eepzbackend.Controllers
                     });
                 }
 
-                // Find the resource pool project
                 var resourcePoolProject = await _context.Projects
                     .Include(p => p.L2approverEmployee)
                         .ThenInclude(e => e.Employee)
@@ -519,7 +508,6 @@ namespace eepzbackend.Controllers
                     });
                 }
 
-                // Check if L2 approver is set
                 if (!resourcePoolProject.L2approverEmployeeId.HasValue)
                 {
                     return BadRequest(new
@@ -529,7 +517,6 @@ namespace eepzbackend.Controllers
                     });
                 }
 
-                // Get the L2 approver's actual EmployeeId
                 var l2ApproverEmployeeId = resourcePoolProject.L2approverEmployee?.EmployeeId;
                 if (!l2ApproverEmployeeId.HasValue)
                 {
@@ -545,7 +532,6 @@ namespace eepzbackend.Controllers
 
                 foreach (var empMasterId in request.EmployeeMasterIds)
                 {
-                    // Get employee details
                     var employeeDetails = await _context.Employeedetailsmasters
                         .Include(e => e.Employee)
                         .FirstOrDefaultAsync(e => e.EmployeeMasterId == empMasterId);
@@ -556,25 +542,22 @@ namespace eepzbackend.Controllers
                         continue;
                     }
 
-                    // Check if already mapped (using EmployeeMasterId)
                     var existingMapping = await _context.Projectemployees
                         .AnyAsync(pe => pe.ProjectId == resourcePoolProject.ProjectId && 
-                                      pe.EmployeeId == empMasterId);  // ✅ pe.EmployeeId == EmployeeMasterId
+                                      pe.EmployeeId == empMasterId); 
 
                     if (!existingMapping)
                     {
-                        // Create new project-employee mapping
                         var projectEmployee = new Projectemployee
                         {
                             ProjectId = resourcePoolProject.ProjectId,
-                            EmployeeId = empMasterId,  // ✅ EmployeeMasterId
+                            EmployeeId = empMasterId,  
                             AssignedAt = DateTime.UtcNow,
-                            IsPrimary = true // Mark as primary for resource pool
+                            IsPrimary = true 
                         };
 
                         _context.Projectemployees.Add(projectEmployee);
 
-                        // Update employee's reporting manager
                         var employee = employeeDetails.Employee;
                         if (employee != null)
                         {

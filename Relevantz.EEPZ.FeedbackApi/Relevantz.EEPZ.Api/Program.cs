@@ -7,21 +7,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
-using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.DTOs.Response;
-using Relevantz.EEPZ.Common.DTOs.Request;
 
-// CRITICAL: Clear JWT claim type mappings BEFORE building
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
-// Bootstrap logger - ensures early logs are captured
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
@@ -35,7 +29,6 @@ try
     var builder = WebApplication.CreateBuilder(args);
     Console.WriteLine("Building........");
 
-    // Configure Serilog - Full configuration from appsettings.json
     builder.Host.UseSerilog((context, services, configuration) => configuration
         .ReadFrom.Configuration(context.Configuration)
         .ReadFrom.Services(services)
@@ -44,11 +37,9 @@ try
 
     Log.Information("Serilog configured successfully");
 
-    // Add services to the container
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
 
-    // Configure Swagger with JWT support
     builder.Services.AddSwaggerGen(options =>
     {
         options.SwaggerDoc(
@@ -92,7 +83,6 @@ try
         );
     });
 
-    // Configure MySQL Database
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<EEPZDbContext>(options =>
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
@@ -100,7 +90,6 @@ try
 
     Log.Information("Database connection configured");
 
-    // UPDATED: Configure JWT Authentication with debugging
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");
     var secretKey = jwtSettings["SecretKey"];
 
@@ -121,7 +110,7 @@ try
             var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
             options.SaveToken = true;
-            options.RequireHttpsMetadata = false; // Set to true in production
+            options.RequireHttpsMetadata = false; 
 
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -140,7 +129,6 @@ try
                 NameClaimType = "sub",
             };
 
-            // Event handlers for debugging
             options.Events = new JwtBearerEvents
             {
                 OnAuthenticationFailed = context =>
@@ -220,19 +208,14 @@ try
 
     Log.Information("JWT Authentication configured");
 
-    // ==================================================================================
-    // FEEDBACK MODULE - DEPENDENCY INJECTION
-    // ==================================================================================
     builder.Services.AddHttpContextAccessor();
 
-    // Repositories
     builder.Services.AddScoped<IManagerReviewRepository, ManagerReviewRepository>();
     builder.Services.AddScoped<IMentorFeedbackRepository, MentorFeedbackRepository>();
     builder.Services.AddScoped<IOrgGoalFeedbackRepository, OrgGoalFeedbackRepository>();
     builder.Services.AddScoped<IPeerFeedbackQueueRepository, PeerFeedbackQueueRepository>();
     builder.Services.AddScoped<IHrFeedbackFormRepository, HrFeedbackFormRepository>();
 
-    // Services
     builder.Services.AddScoped<IManagerReviewService, ManagerReviewService>();
     builder.Services.AddScoped<IMentorFeedbackService, MentorFeedbackService>();
     builder.Services.AddScoped<IOrgGoalFeedbackService, OrgGoalFeedbackService>();
@@ -241,7 +224,6 @@ try
 
     Log.Information("Dependency Injection configured - 5 repositories, 5 services");
 
-    // Configure CORS
     builder.Services.AddCors(options =>
     {
         options.AddPolicy(
@@ -257,7 +239,6 @@ try
 
     var app = builder.Build();
 
-    // Swagger
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
@@ -268,7 +249,6 @@ try
         Log.Information("Swagger UI enabled");
     }
 
-    // Enable Serilog request logging
     app.UseSerilogRequestLogging(options =>
     {
         options.MessageTemplate =
@@ -279,15 +259,12 @@ try
     app.UseHttpsRedirection();
     app.UseStaticFiles();
 
-    // CRITICAL: Order matters!
     app.UseCors("AllowAll");
     app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
 
-    
-    // Log configuration details
     Log.Information("========================================");
     Log.Information("Feedback Application Configuration:");
     Log.Information("========================================");

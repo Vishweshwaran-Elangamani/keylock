@@ -1,16 +1,9 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using System.Text.Json;
 using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Common.Entities;
-
-using MySqlConnector;
 using Relevantz.EEPZ.Data.DBContexts;
 
 namespace Relevantz.EEPZ.Data.Repository.Implementations
@@ -29,17 +22,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             _context = context;
             _logger = logger;
         }
-
-        // ============================================================================
-        // HR FORM OPERATIONS
-        // ============================================================================
-
         public async Task<int> CreateFormAsync(Hrfeedbackform form)
         {
             try
             {
                 form.CreatedAt = DateTime.UtcNow;
-                form.Status = "Draft"; // Default status
+                form.Status = "Draft"; 
                 
                 _context.Hrfeedbackforms.Add(form);
                 await _context.SaveChangesAsync();
@@ -94,9 +82,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             .Include(f => f.CreatedByHr)
             .OrderByDescending(f => f.CreatedAt)
             .ToListAsync();
-
-        // ✅ No changes needed here - the data is already in the Hrfeedbackform model
-        // The DistributedToEmployeeIds field is already populated from the database
         
         return forms;
     }
@@ -189,7 +174,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (form == null)
                     return false;
 
-                // Only allow deletion if Draft status
                 if (form.Status != "Draft")
                     throw new InvalidOperationException($"Cannot delete form in {form.Status} status. Only Draft forms can be deleted.");
 
@@ -219,16 +203,12 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
             }
         }
 
-        // ============================================================================
-        // FORM RESPONSE OPERATIONS
-        // ============================================================================
-
         public async Task<int> CreateFormResponseAsync(Hrfeedbackformresponse response)
         {
             try
             {
                 response.CreatedAt = DateTime.UtcNow;
-                response.Status = "Draft"; // Default status
+                response.Status = "Draft"; 
                 
                 _context.Hrfeedbackformresponses.Add(response);
                 await _context.SaveChangesAsync();
@@ -376,7 +356,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 response.Status = newStatus;
 
-                // Set SubmittedAt when status changes to Submitted
                 if (newStatus == "Submitted" && response.SubmittedAt == null)
                     response.SubmittedAt = DateTime.UtcNow;
 
@@ -427,9 +406,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 if (response == null)
                     return false;
 
-                // Only allow deletion if Draft status
-               
-
                 _context.Hrfeedbackformresponses.Remove(response);
                 await _context.SaveChangesAsync();
                 
@@ -455,8 +431,6 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
                 throw;
             }
         }
-
-        // ✅ NEW METHOD
 public async Task<bool> DistributeFormAsync(int formId, List<int> employeeIds)
 {
     try
@@ -465,7 +439,6 @@ public async Task<bool> DistributeFormAsync(int formId, List<int> employeeIds)
         if (form == null)
             return false;
 
-        // Convert list to JSON
         form.DistributedToEmployeeIds = JsonSerializer.Serialize(employeeIds);
         form.Status = "Active";
 
@@ -481,8 +454,6 @@ public async Task<bool> DistributeFormAsync(int formId, List<int> employeeIds)
         return false;
     }
 }
-
-// ✅ NEW METHOD
 public async Task<List<int>> GetFormDistributionAsync(int formId)
 {
     try

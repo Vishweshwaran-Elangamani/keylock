@@ -1,7 +1,4 @@
 using Relevantz.EEPZ.Common.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Relevantz.EEPZ.Data.Repository.Interfaces
 {
@@ -10,18 +7,10 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
     /// </summary>
     public interface IManagerReviewRepository
     {
-        // ============================================================================
-        // CREATE OPERATIONS
-        // ============================================================================
-
         /// <summary>
         /// Create manager review on team goal
         /// </summary>
         Task<int> CreateReviewAsync(Managerreviewcomment review);
-
-        // ============================================================================
-        // READ OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Get review by ID
@@ -59,10 +48,6 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         /// Get all reviews pending submission
         /// </summary>
         Task<List<Managerreviewcomment>> GetPendingReviewsAsync(int managerId);
-
-        // ============================================================================
-        // UPDATE OPERATIONS
-        // ============================================================================
 
         /// <summary>
         /// Update review (content and rating)
