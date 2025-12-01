@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
 import UpdateUtilizationModal from "./UpdateUtilizationModal";
-import "../../../styles/hr_operations/hr/allocationsList.css";
+import "../../../styles/hr_operations/hr/AllocationsList.css";
 
 const AllocationsList = ({
   budget,

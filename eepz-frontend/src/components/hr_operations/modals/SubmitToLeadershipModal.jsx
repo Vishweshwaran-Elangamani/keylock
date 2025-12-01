@@ -3,7 +3,7 @@ import { Modal } from "react-bootstrap";
 import { toast } from "sonner";
 import careerProgressionService from "../../../services/hr_operations/hr/careerProgressionService";
 import { formatCurrency } from "../../../utils/auth/currencyFormatter";
-import "../../../styles/hr_operations/hr/submitToLeadershipModal.css";
+import "../../../styles/hr_operations/hr/SubmitToLeadershipModal.css";
 
 const SubmitToLeadershipModal = ({ show, nomination, onHide, onSubmitted }) => {
   const [submissionNotes, setSubmissionNotes] = useState("");

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import careerProgressionService from "../../../services/hr_operations/hr/careerProgressionService";
-import "../../../styles/hr_operations/hr/payrollUpdateModal.css";
+import "../../../styles/hr_operations/hr/PayrollUpdateModal.css";
 
 const PayrollUpdateModal = ({ show, promotion, onHide, onPayrollUpdated }) => {
   const [formData, setFormData] = useState({

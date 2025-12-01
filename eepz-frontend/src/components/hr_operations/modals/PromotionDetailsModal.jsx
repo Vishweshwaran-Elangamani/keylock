@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal } from "react-bootstrap";
-import "../../../styles/hr_operations/hr/promotionDetailsModal.css";
+import "../../../styles/hr_operations/hr/PromotionDetailsModal.css";
 
 const PromotionDetailsModal = ({ show, promotion, onHide }) => {
   const formatCurrency = (amount) => {

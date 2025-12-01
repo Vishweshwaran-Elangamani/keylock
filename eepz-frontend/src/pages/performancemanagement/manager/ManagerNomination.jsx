@@ -29,15 +29,8 @@ const usePagination = (items = [], pageSize = 5) => {
 };
 
 const Breadcrumbs = ({ items = [] }) => {
-  const HomeSvg = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M3 10.5L12 4l9 6.5" stroke="#26225A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M5 12.5v6a1 1 0 0 0 1 1h3v-5h6v5h3a1 1 0 0 0 1-1v-6" stroke="#26225A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-
   return (
-    <nav className="managernomination-breadcrumbs" aria-label="Breadcrumb">
+    <nav className="managernomination-breadcrumbs" aria-label="breadcrumb">
       <ol
         className="managernomination-breadcrumb-list"
         style={{
@@ -45,60 +38,65 @@ const Breadcrumbs = ({ items = [] }) => {
           alignItems: "center",
           gap: "4px",
           padding: 0,
-          margin: 0,
-          listStyle: "none"
+          margin: "0 0 12px 0",
+          listStyle: "none",
+          fontSize: "13px",
+          color: "#9B287B",
         }}
       >
-        <li className="managernomination-crumb">
-          <Link
-            to="/manager/dashboard"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: " #97247E",
-              textDecoration: "none"
-            }}
-          >
-            <HomeSvg />
-          </Link>
-        </li>
+        {/* Home */}
+        <li
+  className="managernomination-crumb"
+  style={{ display: "flex", alignItems: "center" }}
+>
+  <Link
+    to="/manager/dashboard"
+    aria-label="Home"
+    style={{
+      color: "#9B287B",
+      textDecoration: "none",
+      display: "flex",
+      alignItems: "center",
+    }}
+  >
+    <i className="bi bi-house" style={{ fontSize: "14px" }} />
+  </Link>
+</li>
 
+
+        {/* Dynamic items */}
         {items.map((it, idx) => {
           const isLast = idx === items.length - 1;
           return (
             <React.Fragment key={idx}>
-              <li style={{
-                color: "#97247E",
-                fontSize: "10px",
-                fontWeight: 400,
-                margin: "0 4px"
-              }}>
-                /
-              </li>
+              <span style={{ color: "#9B287B" }}>/</span>
 
-              <li className={`managernomination-crumb ${isLast ? "managernomination-crumb-active" : ""}`}>
-                {isLast ? (
-                  <span
-                    style={{
-                      color: "#97247E",
-                      fontWeight: 600,
-                      fontSize: "10px"
-                    }}
-                  >
-                    {it.label}
-                  </span>
-                ) : (
+              <li
+                className={`managernomination-crumb ${
+                  isLast ? "managernomination-crumb-active" : ""
+                }`}
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                {it.to && !isLast ? (
                   <Link
-                    to={it.to || "#"}
+                    to={it.to}
                     style={{
-                      color: "#97247E",
+                      color: "#9B287B",
                       textDecoration: "none",
-                      fontSize: "10px",
-                      fontWeight: 500
+                      fontWeight: 400,
                     }}
                   >
                     {it.label}
                   </Link>
+                ) : (
+                  <span
+                    style={{
+                      color: "#9B287B",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {it.label}
+                  </span>
                 )}
               </li>
             </React.Fragment>
@@ -108,6 +106,7 @@ const Breadcrumbs = ({ items = [] }) => {
     </nav>
   );
 };
+
 
 export default function ManagerNomination() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -221,7 +220,7 @@ export default function ManagerNomination() {
 
   return (
     <div className="managernomination-container">
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right"/>
 
       <Breadcrumbs items={[{ label: "Performance", to: "/manager/dashboard/performance" }, { label: "Nominations" }]} />
 

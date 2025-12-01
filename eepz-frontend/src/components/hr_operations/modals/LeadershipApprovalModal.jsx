@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import careerProgressionService from "../../services/hr_operations/hr/careerProgressionService";
 import { Spinner, Alert } from "react-bootstrap";
-import "../../../styles/hr_operations/hr/leadershipApproval.css";
+import "../../../styles/hr_operations/hr/LeadershipApproval.css";
 
 const LeadershipApproval = () => {
   const [promotions, setPromotions] = useState([]);

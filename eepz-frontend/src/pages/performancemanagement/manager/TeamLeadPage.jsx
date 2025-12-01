@@ -360,7 +360,6 @@ function TeamLeadPage() {
       console.log('Content-Disposition header:', contentDisposition);
 
       if (contentDisposition) {
-
         const matches = contentDisposition.match(/filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/);
         if (matches && (matches[1] || matches[2])) {
           filename = matches[1] || matches[2];
@@ -432,16 +431,92 @@ function TeamLeadPage() {
             <p>No submissions</p>
           </div>
         ) : (
-          <>
-            <table className="cg-employee-table">
-              <thead>
+          <div 
+            style={{
+              // backgroundColor: '#27235c',
+              border: '2px solid #27235c',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              marginTop: '16px'
+            }}
+          >
+            <table 
+              className="cg-employee-table"
+              style={{
+                // backgroundColor: '#27235c',
+                borderCollapse: 'separate',
+                borderSpacing: 0,
+                width: '100%'
+              }}
+            >
+              <thead style={{ backgroundColor: '#27235c' }}>
                 <tr>
-                  <th>Employee</th>
-                  <th>Form</th>
-                  <th>Emp Avg</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Action</th>
+                  <th style={{
+                    padding: '12px 12px',
+                    textAlign: 'left',
+                    fontWeight: '700',
+                    fontSize: '12px',
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    borderBottom: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    Employee
+                  </th>
+                  <th style={{
+                    padding: '12px 12px',
+                    textAlign: 'left',
+                    fontWeight: '700',
+                    fontSize: '12px',
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    borderBottom: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    Form
+                  </th>
+                  <th style={{
+                    padding: '12px 12px',
+                    textAlign: 'left',
+                    fontWeight: '700',
+                    fontSize: '12px',
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    borderBottom: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    Emp Avg
+                  </th>
+                  <th style={{
+                    padding: '12px 12px',
+                    textAlign: 'left',
+                    fontWeight: '700',
+                    fontSize: '12px',
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    borderBottom: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    Status
+                  </th>
+                  <th style={{
+                    padding: '12px 12px',
+                    textAlign: 'left',
+                    fontWeight: '700',
+                    fontSize: '12px',
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    borderBottom: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    Date
+                  </th>
+                  <th style={{
+                    padding: '12px 12px',
+                    textAlign: 'left',
+                    fontWeight: '700',
+                    fontSize: '12px',
+                    color: '#ffffff',
+                    textTransform: 'uppercase',
+                    borderBottom: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -450,13 +525,56 @@ function TeamLeadPage() {
                   const l1Complete = isL1Complete(assess);
                   const showReviewBtn = !l1Complete || assess.l2Decision === "Rejected";
                   return (
-                    <tr key={assess.assessmentId}>
-                      <td>{assess.employeeName}</td>
-                      <td>{assess.formName}</td>
-                      <td>
-                        <span className="cg-days-badge badge-info">{avgRating}/5</span>
+                    <tr 
+                      key={assess.assessmentId}
+                      style={{
+                        backgroundColor: '#27235c'
+                      }}
+                    >
+                      <td style={{
+                        padding: '12px 12px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        borderBottom: '1px solid rgba(255,255,255,0.08)'
+                      }}>
+                        {assess.employeeName}
                       </td>
-                      <td>
+                      <td style={{
+                        padding: '12px 12px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        borderBottom: '1px solid rgba(255,255,255,0.08)'
+                      }}>
+                        {assess.formName}
+                      </td>
+                      <td style={{
+                        padding: '12px 12px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        borderBottom: '1px solid rgba(255,255,255,0.08)'
+                      }}>
+                        <span 
+                          className="cg-days-badge badge-info"
+                          style={{
+                            background: 'rgba(59,130,246,0.15)',
+                            color: '#60a5fa',
+                            borderColor: 'rgba(59,130,246,0.3)',
+                            fontWeight: '700',
+                            padding: '6px 10px',
+                            borderRadius: '20px',
+                            border: '1px solid',
+                            fontSize: '13px'
+                          }}
+                        >
+                          {avgRating}/5
+                        </span>
+                      </td>
+                      <td style={{
+                        padding: '12px 12px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        borderBottom: '1px solid rgba(255,255,255,0.08)'
+                      }}>
                         <span
                           className={`cg-days-badge ${assess.l2Decision === "Rejected"
                               ? "badge-danger"
@@ -464,6 +582,28 @@ function TeamLeadPage() {
                                 ? "badge-warning"
                                 : "badge-info"
                             }`}
+                          style={{
+                            background: assess.l2Decision === "Rejected" 
+                              ? 'rgba(239,68,68,0.15)' 
+                              : l1Complete 
+                              ? 'rgba(245,158,11,0.15)' 
+                              : 'rgba(59,130,246,0.15)',
+                            color: assess.l2Decision === "Rejected" 
+                              ? '#f87171' 
+                              : l1Complete 
+                              ? '#f59e2d' 
+                              : '#60a5fa',
+                            borderColor: assess.l2Decision === "Rejected" 
+                              ? 'rgba(239,68,68,0.3)' 
+                              : l1Complete 
+                              ? 'rgba(245,158,11,0.3)' 
+                              : 'rgba(59,130,246,0.3)',
+                            fontWeight: '700',
+                            padding: '6px 10px',
+                            borderRadius: '20px',
+                            border: '1px solid',
+                            fontSize: '13px'
+                          }}
                         >
                           {assess.l2Decision === "Rejected"
                             ? "Rejected"
@@ -472,11 +612,41 @@ function TeamLeadPage() {
                               : "Pending"}
                         </span>
                       </td>
-                      <td>{new Date(assess.submittedAt).toLocaleDateString()}</td>
-                      <td>
+                      <td style={{
+                        padding: '12px 12px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        borderBottom: '1px solid rgba(255,255,255,0.08)'
+                      }}>
+                        {new Date(assess.submittedAt).toLocaleDateString()}
+                      </td>
+                      <td style={{
+                        padding: '12px 12px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        borderBottom: '1px solid rgba(255,255,255,0.08)'
+                      }}>
                         {showReviewBtn && (
-                          <button className="cg-bulk-btn" onClick={() => openModal(assess)}>
-                            <i className="bi bi-pencil-square"></i> Review & Submit
+                          <button 
+                            className="cg-bulk-btn"
+                            onClick={() => openModal(assess)}
+                            style={{
+                              background: 'linear-gradient(90deg, #97247e 0%, #e01950 100%)',
+                              color: '#fff',
+                              border: 'none',
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              fontWeight: '700',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              boxShadow: '0 4px 12px rgba(151,36,126,0.25)',
+                              cursor: 'pointer',
+                              fontSize: '13px'
+                            }}
+                          >
+                            <i className="bi bi-pencil-square" style={{ fontSize: '14px' }}></i>
+                            Review & Submit
                           </button>
                         )}
                       </td>
@@ -485,38 +655,105 @@ function TeamLeadPage() {
                 })}
               </tbody>
             </table>
-            <div className="pagination-container">
+            <div 
+              className="pagination-container"
+              style={{
+                padding: '12px 12px',
+                backgroundColor: '#27235c',
+                borderTop: '1px solid rgba(255,255,255,0.08)'
+              }}
+            >
               <div className="pagination-info">
-                <span className="pagination-label">Show</span>
-                <select className="pagination-select">
+                <span className="pagination-label" style={{ color: '#ffffff', fontSize: '13px' }}>
+                  Show
+                </span>
+                <select 
+                  className="pagination-select"
+                  style={{
+                    height: '32px',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '6px',
+                    border: '1px solid #e0e0e0',
+                    padding: '0 8px',
+                    color: '#2c3e50',
+                    fontSize: '13px'
+                  }}
+                >
+                  <option value="5">5</option>
                   <option value="10">10</option>
                   <option value="25">25</option>
                   <option value="50">50</option>
                 </select>
-                <span className="pagination-label">entries</span>
+                <span className="pagination-label" style={{ color: '#ffffff', fontSize: '13px' }}>
+                  entries
+                </span>
               </div>
-              <div className="pagination-status">
+              <div className="pagination-status" style={{ color: '#e2e8f0', fontSize: '13px' }}>
                 Showing 1 to {currentSubs.length} of {currentSubs.length} entries
               </div>
               <nav className="pagination-nav">
-                <ul className="pagination">
-                  <li className="page-item disabled">
-                    <button className="page-link">
-                      <i className="bi bi-chevron-left"></i>
+                <ul 
+                  className="pagination"
+                  style={{
+                    display: 'flex',
+                    gap: '4px',
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0
+                  }}
+                >
+                  <li className="page-item disabled" style={{ margin: 0 }}>
+                    <button 
+                      className="page-link"
+                      style={{
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        color: '#ffffff',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        cursor: 'not-allowed',
+                        fontSize: '13px'
+                      }}
+                    >
+                      <i className="bi bi-chevron-left" style={{ fontSize: '14px' }}></i>
                     </button>
                   </li>
                   <li className="page-item active">
-                    <button className="page-link">1</button>
+                    <button 
+                      className="page-link"
+                      style={{
+                        backgroundColor: '#ffffff',
+                        color: '#27235c',
+                        border: '1px solid #ffffff',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        fontWeight: '600',
+                        fontSize: '13px'
+                      }}
+                    >
+                      1
+                    </button>
                   </li>
                   <li className="page-item disabled">
-                    <button className="page-link">
-                      <i className="bi bi-chevron-right"></i>
+                    <button 
+                      className="page-link"
+                      style={{
+                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        color: '#ffffff',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        cursor: 'not-allowed',
+                        fontSize: '13px'
+                      }}
+                    >
+                      <i className="bi bi-chevron-right" style={{ fontSize: '14px' }}></i>
                     </button>
                   </li>
                 </ul>
               </nav>
             </div>
-          </>
+          </div>
         )}
       </>
     );
@@ -529,17 +766,103 @@ function TeamLeadPage() {
         <p>No submissions</p>
       </div>
     ) : (
-      <>
-        <table className="cg-employee-table">
-          <thead>
+      <div 
+        style={{
+          backgroundColor: '#27235c',
+          border: '2px solid #27235c',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          marginTop: '16px'
+        }}
+      >
+        <table 
+          className="cg-employee-table"
+          style={{
+            backgroundColor: '#27235c',
+            borderCollapse: 'separate',
+            borderSpacing: 0,
+            width: '100%'
+          }}
+        >
+          <thead style={{ backgroundColor: '#27235c' }}>
             <tr>
-              <th>Employee</th>
-              <th>Form</th>
-              <th>Emp Avg</th>
-              <th>L1 Avg</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Action</th>
+              <th style={{
+                padding: '12px 12px',
+                textAlign: 'left',
+                fontWeight: '700',
+                fontSize: '12px',
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                Employee
+              </th>
+              <th style={{
+                padding: '12px 12px',
+                textAlign: 'left',
+                fontWeight: '700',
+                fontSize: '12px',
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                Form
+              </th>
+              <th style={{
+                padding: '12px 12px',
+                textAlign: 'left',
+                fontWeight: '700',
+                fontSize: '12px',
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                Emp Avg
+              </th>
+              <th style={{
+                padding: '12px 12px',
+                textAlign: 'left',
+                fontWeight: '700',
+                fontSize: '12px',
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                L1 Avg
+              </th>
+              <th style={{
+                padding: '12px 12px',
+                textAlign: 'left',
+                fontWeight: '700',
+                fontSize: '12px',
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                Status
+              </th>
+              <th style={{
+                padding: '12px 12px',
+                textAlign: 'left',
+                fontWeight: '700',
+                fontSize: '12px',
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                Date
+              </th>
+              <th style={{
+                padding: '12px 12px',
+                textAlign: 'left',
+                fontWeight: '700',
+                fontSize: '12px',
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                Action
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -555,22 +878,128 @@ function TeamLeadPage() {
                   ).toFixed(2)
                   : 0;
               return (
-                <tr key={assess.assessmentId}>
-                  <td>{assess.employeeName}</td>
-                  <td>{assess.formName}</td>
-                  <td>
-                    <span className="cg-days-badge badge-info">{empAvg}/5</span>
+                <tr 
+                  key={assess.assessmentId}
+                  style={{
+                    backgroundColor: '#27235c'
+                  }}
+                >
+                  <td style={{
+                    padding: '12px 12px',
+                    fontSize: '13px',
+                    color: '#ffffff',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                  }}>
+                    {assess.employeeName}
                   </td>
-                  <td>
-                    <span className="cg-days-badge badge-warning">{l1Avg}/5</span>
+                  <td style={{
+                    padding: '12px 12px',
+                    fontSize: '13px',
+                    color: '#ffffff',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                  }}>
+                    {assess.formName}
                   </td>
-                  <td>
-                    <span className="cg-days-badge badge-info">Awaiting</span>
+                  <td style={{
+                    padding: '12px 12px',
+                    fontSize: '13px',
+                    color: '#ffffff',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                  }}>
+                    <span 
+                      className="cg-days-badge badge-info"
+                      style={{
+                        background: 'rgba(59,130,246,0.15)',
+                        color: '#60a5fa',
+                        borderColor: 'rgba(59,130,246,0.3)',
+                        fontWeight: '700',
+                        padding: '6px 10px',
+                        borderRadius: '20px',
+                        border: '1px solid',
+                        fontSize: '13px'
+                      }}
+                    >
+                      {empAvg}/5
+                    </span>
                   </td>
-                  <td>{new Date(assess.submittedAt).toLocaleDateString()}</td>
-                  <td>
-                    <button className="cg-bulk-btn" onClick={() => openModal(assess)}>
-                      <i className="bi bi-pencil-square"></i> Review
+                  <td style={{
+                    padding: '12px 12px',
+                    fontSize: '13px',
+                    color: '#ffffff',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                  }}>
+                    <span 
+                      className="cg-days-badge badge-warning"
+                      style={{
+                        background: 'rgba(245,158,11,0.15)',
+                        color: '#f59e2d',
+                        borderColor: 'rgba(245,158,11,0.3)',
+                        fontWeight: '700',
+                        padding: '6px 10px',
+                        borderRadius: '20px',
+                        border: '1px solid',
+                        fontSize: '13px'
+                      }}
+                    >
+                      {l1Avg}/5
+                    </span>
+                  </td>
+                  <td style={{
+                    padding: '12px 12px',
+                    fontSize: '13px',
+                    color: '#ffffff',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                  }}>
+                    <span 
+                      className="cg-days-badge badge-info"
+                      style={{
+                        background: 'rgba(59,130,246,0.15)',
+                        color: '#60a5fa',
+                        borderColor: 'rgba(59,130,246,0.3)',
+                        fontWeight: '700',
+                        padding: '6px 10px',
+                        borderRadius: '20px',
+                        border: '1px solid',
+                        fontSize: '13px'
+                      }}
+                    >
+                      Awaiting
+                    </span>
+                  </td>
+                  <td style={{
+                    padding: '12px 12px',
+                    fontSize: '13px',
+                    color: '#ffffff',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                  }}>
+                    {new Date(assess.submittedAt).toLocaleDateString()}
+                  </td>
+                  <td style={{
+                    padding: '12px 12px',
+                    fontSize: '13px',
+                    color: '#ffffff',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)'
+                  }}>
+                    <button 
+                      className="cg-bulk-btn"
+                      onClick={() => openModal(assess)}
+                      style={{
+                        background: 'linear-gradient(90deg, #97247e 0%, #e01950 100%)',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        fontWeight: '700',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        boxShadow: '0 4px 12px rgba(151,36,126,0.25)',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      <i className="bi bi-pencil-square" style={{ fontSize: '14px' }}></i>
+                      Review
                     </button>
                   </td>
                 </tr>
@@ -578,38 +1007,104 @@ function TeamLeadPage() {
             })}
           </tbody>
         </table>
-        <div className="pagination-container">
+        <div 
+          className="pagination-container"
+          style={{
+            padding: '12px 12px',
+            backgroundColor: '#27235c',
+            borderTop: '1px solid rgba(255,255,255,0.08)'
+          }}
+        >
           <div className="pagination-info">
-            <span className="pagination-label">Show</span>
-            <select className="pagination-select">
+            <span className="pagination-label" style={{ color: '#ffffff', fontSize: '13px' }}>
+              Show
+            </span>
+            <select 
+              className="pagination-select"
+              style={{
+                height: '32px',
+                backgroundColor: '#ffffff',
+                borderRadius: '6px',
+                border: '1px solid #e0e0e0',
+                padding: '0 8px',
+                color: '#2c3e50',
+                fontSize: '13px'
+              }}
+            >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
             </select>
-            <span className="pagination-label">entries</span>
+            <span className="pagination-label" style={{ color: '#ffffff', fontSize: '13px' }}>
+              entries
+            </span>
           </div>
-          <div className="pagination-status">
+          <div className="pagination-status" style={{ color: '#e2e8f0', fontSize: '13px' }}>
             Showing 1 to {l2Subs.length} of {l2Subs.length} entries
           </div>
           <nav className="pagination-nav">
-            <ul className="pagination">
+            <ul 
+              className="pagination"
+              style={{
+                display: 'flex',
+                gap: '4px',
+                listStyle: 'none',
+                padding: 0,
+                margin: 0
+              }}
+            >
               <li className="page-item disabled">
-                <button className="page-link">
-                  <i className="bi bi-chevron-left"></i>
+                <button 
+                  className="page-link"
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    cursor: 'not-allowed',
+                    fontSize: '13px'
+                  }}
+                >
+                  <i className="bi bi-chevron-left" style={{ fontSize: '14px' }}></i>
                 </button>
               </li>
               <li className="page-item active">
-                <button className="page-link">1</button>
+                <button 
+                  className="page-link"
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: '#27235c',
+                    border: '1px solid #ffffff',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    fontWeight: '600',
+                    fontSize: '13px'
+                  }}
+                >
+                  1
+                </button>
               </li>
               <li className="page-item disabled">
-                <button className="page-link">
-                  <i className="bi bi-chevron-right"></i>
+                <button 
+                  className="page-link"
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    cursor: 'not-allowed',
+                    fontSize: '13px'
+                  }}
+                >
+                  <i className="bi bi-chevron-right" style={{ fontSize: '14px' }}></i>
                 </button>
               </li>
             </ul>
           </nav>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -618,58 +1113,54 @@ function TeamLeadPage() {
       <Toaster position="top-right" richColors />
 
       <div className="hrfcper-top-bar compact">
+        <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
+          <ol
+            className="hrfcper-breadcrumb compact"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+              fontSize: "13px",
+              color: "#9B287B",
+            }}
+          >
+            <li
+              className="hrfcper-breadcrumb-item"
+              style={{ display: "flex", alignItems: "center", gap: "4px" }}
+            >
+              <Link
+                to="/employee/dashboard"
+                aria-label="Home"
+                style={{ color: "#9B287B", textDecoration: "none", display: "flex", alignItems: "center" }}
+              >
+                <i className="bi bi-house-door" />
+              </Link>
+            </li>
 
+            <span style={{ color: "#9B287B" }}>/</span>
 
-<nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
-  <ol
-    className="hrfcper-breadcrumb compact"
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "4px",
-      listStyle: "none",
-      padding: 0,
-      margin: 0,
-      fontSize: "13px",
-      color: "#9B287B",
-    }}
-  >
-    <li
-      className="hrfcper-breadcrumb-item"
-      style={{ display: "flex", alignItems: "center", gap: "4px" }}
-    >
-      <Link
-        to="/employee/dashboard"
-        aria-label="Home"
-        style={{ color: "#9B287B", textDecoration: "none", display: "flex", alignItems: "center" }}
-      >
-        {/* unified home icon */}
-        <i className="bi bi-house-door" />
-      </Link>
-    </li>
+            <li className="hrfcper-breadcrumb-item">
+              <Link
+                to="/employee/dashboard/performance"
+                style={{ color: "#9B287B", textDecoration: "none" }}
+              >
+                Performance
+              </Link>
+            </li>
 
-    <span style={{ color: "#9B287B" }}>/</span>
+            <span style={{ color: "#9B287B" }}>/</span>
 
-    <li className="hrfcper-breadcrumb-item">
-      <Link
-        to="/employee/dashboard/performance"
-        style={{ color: "#9B287B", textDecoration: "none" }}
-      >
-        Performance
-      </Link>
-    </li>
-
-    <span style={{ color: "#9B287B" }}>/</span>
-
-    <li
-      className="hrfcper-breadcrumb-item active"
-      style={{ fontWeight: 600, color: "#9B287B" }}
-    >
-      Performance Review
-    </li>
-  </ol>
-</nav>
-
+            <li
+              className="hrfcper-breadcrumb-item active"
+              style={{ fontWeight: 600, color: "#9B287B" }}
+            >
+              Performance Review
+            </li>
+          </ol>
+        </nav>
 
         <div className="tl-toggle compact">
           <button
@@ -680,7 +1171,6 @@ function TeamLeadPage() {
             }}
             aria-pressed={active === "l1"}
           >
-            <i className="bi bi-person-check"></i>
             L1 Approver
           </button>
           <button
@@ -688,7 +1178,6 @@ function TeamLeadPage() {
             onClick={() => setActive("l2")}
             aria-pressed={active === "l2"}
           >
-            <i className="bi bi-person-check-fill"></i>
             L2 Approver
           </button>
         </div>

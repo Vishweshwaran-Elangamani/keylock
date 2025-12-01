@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import budgetAllocationService from "../../../services/hr_operations/hr/budgetAllocationService";
-import "../../../styles/hr_operations/hr/deleteBudgetModal.css";
+import "../../../styles/hr_operations/hr/DeleteBudgetModal.css";
 
 const DeleteBudgetModal = ({ show, onHide, onBudgetDeleted, budget }) => {
   const [loading, setLoading] = useState(false);
