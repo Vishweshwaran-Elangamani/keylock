@@ -251,7 +251,8 @@ const LeadershipDashboard = () => {
       );
       const deptName = dept?.departmentName || dept?.name || "Unknown";
       return {
-        department: deptName.length > 12 ? deptName.substring(0, 12) + "..." : deptName,
+        department:
+          deptName.length > 12 ? deptName.substring(0, 12) + "..." : deptName,
         budget: parseFloat(budget.totalBudget) || 0,
         utilized: parseFloat(budget.utilizedAmount) || 0,
         allocated: parseFloat(budget.allocatedAmount) || 0,
@@ -289,7 +290,11 @@ const LeadershipDashboard = () => {
     return Object.entries(statusMap)
       .filter(([_, count]) => count > 0)
       .map(([status, count]) => {
-        const label = status.charAt(0).toUpperCase() + status.slice(1).replace("inprogress", "In Progress").replace("onhold", "On Hold");
+        const label = status
+          .charAt(0)
+          .toUpperCase() + status.slice(1)
+          .replace("inprogress", "In Progress")
+          .replace("onhold", "On Hold");
         return {
           name: label,
           value: count,
@@ -316,7 +321,9 @@ const LeadershipDashboard = () => {
         color: "#10b981",
       });
 
-    return data.length > 0 ? data : [{ name: "No Data", value: 1, color: "#e5e7eb" }];
+    return data.length > 0
+      ? data
+      : [{ name: "No Data", value: 1, color: "#e5e7eb" }];
   };
 
   const getLndPerformance = () => {
@@ -345,33 +352,32 @@ const LeadershipDashboard = () => {
   };
 
   const getTopPerformingDepartments = () => {
-  return dashboardData.budgets
-    .map((budget) => {
-      const dept = dashboardData.departments.find(
-        (d) => d.departmentId === budget.departmentId
-      );
-      const deptName = dept?.departmentName || dept?.name || "Unknown";
-      
-      // ✅ CALCULATE utilization percentage from actual data
-      const totalBudget = parseFloat(budget.totalBudget) || 0;
-      const utilizedAmount = parseFloat(budget.utilizedAmount) || 0;
-      const utilization = totalBudget > 0 
-        ? Math.round((utilizedAmount / totalBudget) * 100) 
-        : 0;
-      
-      return {
-        department: deptName,
-        utilization: utilization,
-        headcount: budget.headcount || 0,
-        totalBudget: totalBudget,
-        utilized: utilizedAmount,
-      };
-    })
-    .filter(dept => dept.totalBudget > 0) // ✅ Only show departments with actual budgets
-    .sort((a, b) => b.utilization - a.utilization)
-    .slice(0, 5);
-};
+    return dashboardData.budgets
+      .map((budget) => {
+        const dept = dashboardData.departments.find(
+          (d) => d.departmentId === budget.departmentId
+        );
+        const deptName = dept?.departmentName || dept?.name || "Unknown";
 
+        const totalBudget = parseFloat(budget.totalBudget) || 0;
+        const utilizedAmount = parseFloat(budget.utilizedAmount) || 0;
+        const utilization =
+          totalBudget > 0
+            ? Math.round((utilizedAmount / totalBudget) * 100)
+            : 0;
+
+        return {
+          department: deptName,
+          utilization: utilization,
+          headcount: budget.headcount || 0,
+          totalBudget: totalBudget,
+          utilized: utilizedAmount,
+        };
+      })
+      .filter((dept) => dept.totalBudget > 0)
+      .sort((a, b) => b.utilization - a.utilization)
+      .slice(0, 5);
+  };
 
   if (loading) {
     return (
@@ -534,19 +540,23 @@ const LeadershipDashboard = () => {
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-graph-up-arrow"></i>
-                <h3>Budget Utilization by Department</h3>
+                <h3>Budget Allocation</h3>
               </div>
             </div>
             <div className="card-body">
               {budgetTrend.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={budgetTrend}>
+                  <BarChart data={budgetTrend} maxBarSize={70}>
                     <CartesianGrid
                       strokeDasharray="3 3"
                       stroke="#f3f4f6"
                       vertical={false}
                     />
-                    <XAxis dataKey="department" stroke="#6b7280" fontSize={12} />
+                    <XAxis
+                      dataKey="department"
+                      stroke="#6b7280"
+                      fontSize={12}
+                    />
                     <YAxis stroke="#6b7280" fontSize={12} />
                     <Tooltip
                       contentStyle={{
@@ -559,14 +569,20 @@ const LeadershipDashboard = () => {
                     />
                     <Legend wrapperStyle={{ fontSize: "12px" }} />
                     <Bar
+                      dataKey="allocated"
+                      fill="#0F62FE"
+                      radius={[8, 8, 0, 0]}
+                      name="Allocated"
+                    />
+                    <Bar
                       dataKey="budget"
                       fill="#27235c"
                       radius={[8, 8, 0, 0]}
-                      name="Total Budget"
+                      name="Total"
                     />
                     <Bar
                       dataKey="utilized"
-                      fill="#0F62FE"
+                      fill="#10b981"
                       radius={[8, 8, 0, 0]}
                       name="Utilized"
                     />

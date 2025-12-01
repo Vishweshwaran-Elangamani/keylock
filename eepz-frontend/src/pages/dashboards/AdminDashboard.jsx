@@ -235,7 +235,11 @@ const AdminDashboard = () => {
     return topDepts.map((dept) => {
       const deptUsers = nonAdminUsers.filter((u) => {
         const deptName = u.departmentName || "Unassigned";
-        return deptName === dept.name || (dept.name.includes("...") && deptName.startsWith(dept.name.replace("...", "")));
+        return (
+          deptName === dept.name ||
+          (dept.name.includes("...") &&
+            deptName.startsWith(dept.name.replace("...", "")))
+        );
       });
       const active = deptUsers.filter((u) => u.isActive).length;
       const inactive = deptUsers.filter((u) => !u.isActive).length;
@@ -293,7 +297,14 @@ const AdminDashboard = () => {
   const radarData = getDepartmentActivityRadar();
   const requestTrendData = getRequestTrendData();
 
-  const COLORS = ["#97247E", "#E01950", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6"];
+  const COLORS = [
+    "#97247E",
+    "#E01950",
+    "#f59e0b",
+    "#10b981",
+    "#3b82f6",
+    "#8b5cf6",
+  ];
 
   return (
     <div className="ada-dashboard">
@@ -337,7 +348,9 @@ const AdminDashboard = () => {
             </h3>
             <p className="ada-stat-label">Active Users</p>
             <div className="ada-stat-trend">
-              <span className="ada-trend-neutral">{stats.activeRate}% active rate</span>
+              <span className="ada-trend-neutral">
+                {stats.activeRate}% active rate
+              </span>
             </div>
           </div>
         </div>
@@ -367,7 +380,9 @@ const AdminDashboard = () => {
             </h3>
             <p className="ada-stat-label">Departments</p>
             <div className="ada-stat-trend">
-              <span className="ada-trend-neutral">{stats.totalRoles} roles</span>
+              <span className="ada-trend-neutral">
+                {stats.totalRoles} roles
+              </span>
             </div>
           </div>
         </div>
@@ -382,7 +397,9 @@ const AdminDashboard = () => {
             </h3>
             <p className="ada-stat-label">System Roles</p>
             <div className="ada-stat-trend">
-              <span className="ada-trend-neutral">{stats.customRoles} custom</span>
+              <span className="ada-trend-neutral">
+                {stats.customRoles} custom
+              </span>
             </div>
           </div>
         </div>
@@ -437,18 +454,18 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* CHARTS GRID - REORGANIZED */}
+      {/* CHARTS GRID */}
       <div className="ada-charts-grid">
-        {/* USER GROWTH TREND - LEFT */}
-        <div className="ada-chart-card">
-          <div className="ada-card-header">
-            <h3 className="ada-card-title">
-              <i className="bi bi-graph-up-arrow"></i>
-              User Growth Trend
-            </h3>
-            <span className="ada-card-badge">Last 6 Months</span>
+        {/* USER GROWTH TREND */}
+        <div className="dashboard-card card-medium">
+          <div className="card-header-dark">
+            <div className="card-header-content">
+              <i className="bi bi-graph-up-arrow" />
+              <h3>User Growth Trend</h3>
+            </div>
+            <span className="card-filter-btn-dark">Last 6 Months</span>
           </div>
-          <div className="ada-card-body">
+          <div className="card-body">
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={monthlyTrend}>
                 <defs>
@@ -461,7 +478,11 @@ const AdminDashboard = () => {
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e5e7eb"
+                  vertical={false}
+                />
                 <XAxis dataKey="month" stroke="#6c757d" fontSize={13} />
                 <YAxis stroke="#6c757d" fontSize={13} />
                 <Tooltip
@@ -494,16 +515,16 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* DEPARTMENT ACTIVITY RADAR - RIGHT */}
-        <div className="ada-chart-card">
-          <div className="ada-card-header">
-            <h3 className="ada-card-title">
-              <i className="bi bi-radar"></i>
-              Department Activity Analysis
-            </h3>
-            <span className="ada-card-badge">Top 5 Departments</span>
+        {/* DEPARTMENT ACTIVITY RADAR */}
+        <div className="dashboard-card card-medium">
+          <div className="card-header-dark">
+            <div className="card-header-content">
+              <i className="bi bi-radar" />
+              <h3>Department Activity Analysis</h3>
+            </div>
+            <span className="card-filter-btn-dark">Top 5 Departments</span>
           </div>
-          <div className="ada-card-body">
+          <div className="card-body">
             <ResponsiveContainer width="100%" height={280}>
               <RadarChart data={radarData}>
                 <PolarGrid stroke="#e5e7eb" />
@@ -531,14 +552,14 @@ const AdminDashboard = () => {
         </div>
 
         {/* DEPARTMENT DISTRIBUTION */}
-        <div className="ada-chart-card">
-          <div className="ada-card-header">
-            <h3 className="ada-card-title">
-              <i className="bi bi-pie-chart-fill"></i>
-              Department Distribution
-            </h3>
+        <div className="dashboard-card card-medium">
+          <div className="card-header-dark">
+            <div className="card-header-content">
+              <i className="bi bi-pie-chart-fill" />
+              <h3>Department Distribution</h3>
+            </div>
           </div>
-          <div className="ada-card-body">
+          <div className="card-body">
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
@@ -554,7 +575,10 @@ const AdminDashboard = () => {
                   dataKey="value"
                 >
                   {departmentData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -564,14 +588,14 @@ const AdminDashboard = () => {
         </div>
 
         {/* ROLE DISTRIBUTION */}
-        <div className="ada-chart-card">
-          <div className="ada-card-header">
-            <h3 className="ada-card-title">
-              <i className="bi bi-shield-fill"></i>
-              Role Distribution
-            </h3>
+        <div className="dashboard-card card-medium">
+          <div className="card-header-dark">
+            <div className="card-header-content">
+              <i className="bi bi-shield-fill" />
+              <h3>Role Distribution</h3>
+            </div>
           </div>
-          <div className="ada-card-body">
+          <div className="card-body">
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
@@ -588,7 +612,10 @@ const AdminDashboard = () => {
                   }
                 >
                   {roleData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -598,14 +625,14 @@ const AdminDashboard = () => {
         </div>
 
         {/* REQUEST STATUS */}
-        <div className="ada-chart-card">
-          <div className="ada-card-header">
-            <h3 className="ada-card-title">
-              <i className="bi bi-clipboard-data"></i>
-              Request Status
-            </h3>
+        <div className="dashboard-card card-medium">
+          <div className="card-header-dark">
+            <div className="card-header-content">
+              <i className="bi bi-clipboard-data" />
+              <h3>Request Status</h3>
+            </div>
           </div>
-          <div className="ada-card-body">
+          <div className="card-body">
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
@@ -637,19 +664,23 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* REQUEST TREND - NEW CHART */}
-        <div className="ada-chart-card">
-          <div className="ada-card-header">
-            <h3 className="ada-card-title">
-              <i className="bi bi-bar-chart-line-fill"></i>
-              Request Trend
-            </h3>
-            <span className="ada-card-badge">Last 6 Months</span>
+        {/* REQUEST TREND */}
+        <div className="dashboard-card card-medium">
+          <div className="card-header-dark">
+            <div className="card-header-content">
+              <i className="bi bi-bar-chart-line-fill" />
+              <h3>Request Trend</h3>
+            </div>
+            <span className="card-filter-btn-dark">Last 6 Months</span>
           </div>
-          <div className="ada-card-body">
+          <div className="card-body">
             <ResponsiveContainer width="100%" height={280}>
               <ComposedChart data={requestTrendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e5e7eb"
+                  vertical={false}
+                />
                 <XAxis dataKey="month" stroke="#6c757d" fontSize={13} />
                 <YAxis stroke="#6c757d" fontSize={13} />
                 <Tooltip
