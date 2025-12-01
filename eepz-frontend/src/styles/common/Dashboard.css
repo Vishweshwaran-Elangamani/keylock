@@ -845,6 +845,7 @@
   }
 }
 
+
 @media (max-width: 480px) {
   .admin-kpi-grid {
     grid-template-columns: 1fr;

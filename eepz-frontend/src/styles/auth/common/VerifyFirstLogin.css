@@ -13,6 +13,7 @@
   overflow: hidden;
 }
 
+
 .verify-first-login-container::before {
   content: '';
   position: absolute;

@@ -113,6 +113,7 @@
   background: #fff; overflow: hidden;
   transition: all 0.2s ease; position: relative;
 }
+
 .policy-search-icon {
   display: flex; align-items: center; justify-content: center;
   padding-left: 0.75rem; padding-right: 0.5rem;

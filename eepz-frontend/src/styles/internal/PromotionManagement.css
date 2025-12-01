@@ -1,6 +1,7 @@
 /* Reuse all styles from InternalOpportunityManagement.css */
 @import "./InternalOpportunityManagement.css";
 
+
 /* Additional promotion-specific styles */
 .salary-cell {
   font-weight: 600;

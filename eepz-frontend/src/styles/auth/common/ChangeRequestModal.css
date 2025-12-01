@@ -1,12 +1,3 @@
-/* ===================================================================
-   CHANGE REQUEST MODAL STYLES
-   Uses standard modal class naming pattern (custom suffix)
-   Matches Add modal styling
-   =================================================================== */
-
-/* ========================
-   MODAL BACKDROP
-   ======================== */
 .modal-backdrop-custom {
   position: fixed;
   top: 0;

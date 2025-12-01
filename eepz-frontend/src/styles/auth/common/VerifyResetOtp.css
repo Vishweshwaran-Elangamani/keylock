@@ -13,6 +13,7 @@
   overflow: hidden;
 }
 
+
 .verify-reset-otp-container::before {
   content: '';
   position: absolute;

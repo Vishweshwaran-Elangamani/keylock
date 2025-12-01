@@ -16,6 +16,7 @@
   font-family: inherit;
 }
 
+
 .form-textarea-custom:focus {
   outline: none;
   border-color: #3b82f6;
