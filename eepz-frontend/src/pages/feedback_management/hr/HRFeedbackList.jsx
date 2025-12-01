@@ -74,12 +74,10 @@ export default function HRFeedbackList() {
   const [analysisError, setAnalysisError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
 
-
-
   // State declarations
-const [showDeleteModal, setShowDeleteModal] = useState(false);
-const [deleteFeedbackData, setDeleteFeedbackData] = useState(null);
-const [deleteFeedbackType, setDeleteFeedbackType] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteFeedbackData, setDeleteFeedbackData] = useState(null);
+  const [deleteFeedbackType, setDeleteFeedbackType] = useState("");
 
   // Fetch employee map using service
   const fetchEmployeeMap = async () => {
@@ -281,78 +279,78 @@ const [deleteFeedbackType, setDeleteFeedbackType] = useState("");
   };
 
   const handleDeleteSuccess = async () => {
-  // Force refresh by calling fetchData directly
-  setRefreshing(true);
-  setLoading(true);
-  
-  try {
-    await fetchData();
-  } finally {
-    setRefreshing(false);
-    setLoading(false);
-  }
-};
+    // Force refresh by calling fetchData directly
+    setRefreshing(true);
+    setLoading(true);
+
+    try {
+      await fetchData();
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
+  };
 
 
 
-// ✅ KEEP ONLY THESE THREE HANDLERS:
+  // ✅ KEEP ONLY THESE THREE HANDLERS:
 
-const handleDeleteClick = (item, type) => {
-  console.log("Delete clicked:", { type, item }); // Debug log
-  setDeleteFeedbackData(item);
-  setDeleteFeedbackType(type);
-  setShowDeleteModal(true);
-};
+  const handleDeleteClick = (item, type) => {
+    console.log("Delete clicked:", { type, item }); // Debug log
+    setDeleteFeedbackData(item);
+    setDeleteFeedbackType(type);
+    setShowDeleteModal(true);
+  };
 
-const handleCloseDeleteModal = () => {
-  setShowDeleteModal(false);
-  setDeleteFeedbackData(null);
-  setDeleteFeedbackType("");
-};
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteFeedbackData(null);
+    setDeleteFeedbackType("");
+  };
 
 
 
-const getDeleteItemName = () => {
-  if (!deleteFeedbackData) return "";
+  const getDeleteItemName = () => {
+    if (!deleteFeedbackData) return "";
 
-  if (deleteFeedbackType === "Mentor") {
-    return (
-      deleteFeedbackData.mentorNameFull ||
-      deleteFeedbackData.mentorName ||
-      `Employee ${deleteFeedbackData.mentorEmployeeId}`
-    );
-  } else if (deleteFeedbackType === "Peer") {
-    const submitter =
-      deleteFeedbackData.submitterNameFull ||
-      deleteFeedbackData.submitterName ||
-      `Employee ${deleteFeedbackData.submittedByEmployeeId}`;
-    const recipient =
-      deleteFeedbackData.recipientNameFull ||
-      deleteFeedbackData.recipientName ||
-      `Employee ${deleteFeedbackData.recipientEmployeeId}`;
-    return `From ${submitter} to ${recipient}`;
-  } else if (deleteFeedbackType === "HR") {
-    return deleteFeedbackData.formName || "HR Form";
-  }
-  return "";
-};
+    if (deleteFeedbackType === "Mentor") {
+      return (
+        deleteFeedbackData.mentorNameFull ||
+        deleteFeedbackData.mentorName ||
+        `Employee ${deleteFeedbackData.mentorEmployeeId}`
+      );
+    } else if (deleteFeedbackType === "Peer") {
+      const submitter =
+        deleteFeedbackData.submitterNameFull ||
+        deleteFeedbackData.submitterName ||
+        `Employee ${deleteFeedbackData.submittedByEmployeeId}`;
+      const recipient =
+        deleteFeedbackData.recipientNameFull ||
+        deleteFeedbackData.recipientName ||
+        `Employee ${deleteFeedbackData.recipientEmployeeId}`;
+      return `From ${submitter} to ${recipient}`;
+    } else if (deleteFeedbackType === "HR") {
+      return deleteFeedbackData.formName || "HR Form";
+    }
+    return "";
+  };
 
-const getDeleteTitle = () => {
-  if (deleteFeedbackType === "Mentor") return "Delete Mentor Feedback";
-  if (deleteFeedbackType === "Peer") return "Delete Peer Feedback";
-  if (deleteFeedbackType === "HR") return "Delete HR Form";
-  return "Delete Submission";
-};
+  const getDeleteTitle = () => {
+    if (deleteFeedbackType === "Mentor") return "Delete Mentor Feedback";
+    if (deleteFeedbackType === "Peer") return "Delete Peer Feedback";
+    if (deleteFeedbackType === "HR") return "Delete HR Form";
+    return "Delete Submission";
+  };
 
-const getDeleteMessage = () => {
-  if (deleteFeedbackType === "Mentor")
-    return "Are you sure you want to delete this mentor feedback submission?";
-  if (deleteFeedbackType === "Peer")
-    return "Are you sure you want to delete this peer feedback submission?";
-  if (deleteFeedbackType === "HR")
-    return "Are you sure you want to delete this HR form submission?";
-  return "Are you sure you want to delete this submission?";
-};
+  const getDeleteMessage = () => {
+    if (deleteFeedbackType === "Mentor")
+      return "Are you sure you want to delete this mentor feedback submission?";
+    if (deleteFeedbackType === "Peer")
+      return "Are you sure you want to delete this peer feedback submission?";
+    if (deleteFeedbackType === "HR")
+      return "Are you sure you want to delete this HR form submission?";
+    return "Are you sure you want to delete this submission?";
+  };
 
   // Helper functions
   const getMentorName = (m) => {
@@ -422,8 +420,8 @@ const getDeleteMessage = () => {
         comment: "No comment available",
       };
     }
-
-    const inputText = analysisData.input_text;
+    const inputText = analysisData?.input_text || "";
+    // Regex to capture [Project] and the rest
     const match = inputText.match(/^\[(.*?)\]\s*(.*)$/);
 
     return {
@@ -445,7 +443,7 @@ const getDeleteMessage = () => {
           ]}
         />
 
-        
+
 
         {/* Error Alert */}
         {error && (
@@ -471,9 +469,8 @@ const getDeleteMessage = () => {
             <button
               type="button"
               onClick={() => setTab("Mentor")}
-              className={`hrfeedback-toggle-btn ${
-                tab === "Mentor" ? "hrfeedback-toggle-btn-active" : ""
-              }`}
+              className={`hrfeedback-toggle-btn ${tab === "Mentor" ? "hrfeedback-toggle-btn-active" : ""
+                }`}
             >
               <Send size={15} />
               Mentor
@@ -487,9 +484,8 @@ const getDeleteMessage = () => {
             <button
               type="button"
               onClick={() => setTab("Peer")}
-              className={`hrfeedback-toggle-btn ${
-                tab === "Peer" ? "hrfeedback-toggle-btn-active" : ""
-              }`}
+              className={`hrfeedback-toggle-btn ${tab === "Peer" ? "hrfeedback-toggle-btn-active" : ""
+                }`}
             >
               <Users size={15} />
               Peer
@@ -571,7 +567,7 @@ const getDeleteMessage = () => {
                             <Eye size={16} />
                             View
                           </button>
-                          
+
                         </div>
 
                         {/* Analyze Feedback Button */}
@@ -603,7 +599,7 @@ const getDeleteMessage = () => {
               ) : (
                 <div className="row g-3">
                   {peer.map((p) => {
-                    
+
 
                     return (
                       <div
@@ -612,7 +608,7 @@ const getDeleteMessage = () => {
                       >
                         <div
                           className="hrfeedback-card"
-                          
+
                         >
                           <div className="hrfeedback-card-header">
                             <div style={{ flex: 1 }}>
@@ -634,7 +630,7 @@ const getDeleteMessage = () => {
                                 </h6>
                               </div>
                             </div>
-                            
+
                           </div>
 
                           <div className="hrfeedback-card-date">
@@ -669,7 +665,7 @@ const getDeleteMessage = () => {
                               <Eye size={16} />
                               View
                             </button>
-                           
+
                           </div>
 
                           {/* Analyze Feedback Button */}
@@ -699,16 +695,16 @@ const getDeleteMessage = () => {
       />
 
       {/* Delete Confirmation Modal */}
-<FeedbackDeleteConfirmModal
-  isOpen={showDeleteModal}
-  onClose={handleCloseDeleteModal}
-  onSuccess={handleDeleteSuccess}
-  feedbackType={deleteFeedbackType}
-  feedbackData={deleteFeedbackData}
-  title={getDeleteTitle()}           
-  message={getDeleteMessage()}       
-  itemName={getDeleteItemName()}     
-/>
+      <FeedbackDeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onSuccess={handleDeleteSuccess}
+        feedbackType={deleteFeedbackType}
+        feedbackData={deleteFeedbackData}
+        title={getDeleteTitle()}
+        message={getDeleteMessage()}
+        itemName={getDeleteItemName()}
+      />
 
 
       {/* ========== ANALYSIS MODAL (COMPLETE IMPLEMENTATION) ========== */}
@@ -850,8 +846,8 @@ const getDeleteMessage = () => {
                             analysisData.fairness_score >= 0.7
                               ? "#198754"
                               : analysisData.fairness_score >= 0.4
-                              ? "#ffc107"
-                              : "#dc3545",
+                                ? "#ffc107"
+                                : "#dc3545",
                         }}
                       >
                         <div className="hrfeedback-metric-icon">
@@ -862,8 +858,8 @@ const getDeleteMessage = () => {
                                 analysisData.fairness_score >= 0.7
                                   ? "#198754"
                                   : analysisData.fairness_score >= 0.4
-                                  ? "#ffc107"
-                                  : "#dc3545",
+                                    ? "#ffc107"
+                                    : "#dc3545",
                             }}
                           />
                         </div>
@@ -878,8 +874,8 @@ const getDeleteMessage = () => {
                                 analysisData.fairness_score >= 0.7
                                   ? "#198754"
                                   : analysisData.fairness_score >= 0.4
-                                  ? "#ffc107"
-                                  : "#dc3545",
+                                    ? "#ffc107"
+                                    : "#dc3545",
                             }}
                           >
                             {(analysisData.fairness_score * 100).toFixed(0)}%
@@ -891,118 +887,118 @@ const getDeleteMessage = () => {
                     {/* Professionalism Score */}
                     {analysisData.feedback_metrics?.professionalism_score !==
                       undefined && (
-                      <div
-                        className="hrfeedback-metric-card"
-                        style={{
-                          borderColor:
-                            analysisData.feedback_metrics
-                              .professionalism_score >= 0.7
-                              ? "#198754"
-                              : analysisData.feedback_metrics
-                                  .professionalism_score >= 0.4
-                              ? "#ffc107"
-                              : "#dc3545",
-                        }}
-                      >
-                        <div className="hrfeedback-metric-icon">
-                          <BarChart
-                            size={20}
-                            style={{
-                              color:
-                                analysisData.feedback_metrics
-                                  .professionalism_score >= 0.7
-                                  ? "#198754"
-                                  : analysisData.feedback_metrics
-                                      .professionalism_score >= 0.4
-                                  ? "#ffc107"
-                                  : "#dc3545",
-                            }}
-                          />
-                        </div>
-                        <div className="hrfeedback-metric-content">
-                          <div className="hrfeedback-metric-label">
-                            Professionalism
-                          </div>
-                          <div
-                            className="hrfeedback-metric-value"
-                            style={{
-                              color:
-                                analysisData.feedback_metrics
-                                  .professionalism_score >= 0.7
-                                  ? "#198754"
-                                  : analysisData.feedback_metrics
-                                      .professionalism_score >= 0.4
-                                  ? "#ffc107"
-                                  : "#dc3545",
-                            }}
-                          >
-                            {(
+                        <div
+                          className="hrfeedback-metric-card"
+                          style={{
+                            borderColor:
                               analysisData.feedback_metrics
-                                .professionalism_score * 100
-                            ).toFixed(0)}
-                            %
+                                .professionalism_score >= 0.7
+                                ? "#198754"
+                                : analysisData.feedback_metrics
+                                  .professionalism_score >= 0.4
+                                  ? "#ffc107"
+                                  : "#dc3545",
+                          }}
+                        >
+                          <div className="hrfeedback-metric-icon">
+                            <BarChart
+                              size={20}
+                              style={{
+                                color:
+                                  analysisData.feedback_metrics
+                                    .professionalism_score >= 0.7
+                                    ? "#198754"
+                                    : analysisData.feedback_metrics
+                                      .professionalism_score >= 0.4
+                                      ? "#ffc107"
+                                      : "#dc3545",
+                              }}
+                            />
+                          </div>
+                          <div className="hrfeedback-metric-content">
+                            <div className="hrfeedback-metric-label">
+                              Professionalism
+                            </div>
+                            <div
+                              className="hrfeedback-metric-value"
+                              style={{
+                                color:
+                                  analysisData.feedback_metrics
+                                    .professionalism_score >= 0.7
+                                    ? "#198754"
+                                    : analysisData.feedback_metrics
+                                      .professionalism_score >= 0.4
+                                      ? "#ffc107"
+                                      : "#dc3545",
+                              }}
+                            >
+                              {(
+                                analysisData.feedback_metrics
+                                  .professionalism_score * 100
+                              ).toFixed(0)}
+                              %
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {/* Constructiveness Score */}
                     {analysisData.constructiveness_analysis
                       ?.constructiveness_score !== undefined && (
-                      <div
-                        className="hrfeedback-metric-card"
-                        style={{
-                          borderColor:
-                            analysisData.constructiveness_analysis
-                              .constructiveness_score >= 0.7
-                              ? "#198754"
-                              : analysisData.constructiveness_analysis
-                                  .constructiveness_score >= 0.4
-                              ? "#ffc107"
-                              : "#dc3545",
-                        }}
-                      >
-                        <div className="hrfeedback-metric-icon">
-                          <Lightbulb
-                            size={20}
-                            style={{
-                              color:
-                                analysisData.constructiveness_analysis
-                                  .constructiveness_score >= 0.7
-                                  ? "#198754"
-                                  : analysisData.constructiveness_analysis
-                                      .constructiveness_score >= 0.4
-                                  ? "#ffc107"
-                                  : "#dc3545",
-                            }}
-                          />
-                        </div>
-                        <div className="hrfeedback-metric-content">
-                          <div className="hrfeedback-metric-label">
-                            Constructiveness
-                          </div>
-                          <div
-                            className="hrfeedback-metric-value"
-                            style={{
-                              color:
-                                analysisData.constructiveness_analysis
-                                  .constructiveness_score >= 0.7
-                                  ? "#198754"
-                                  : analysisData.constructiveness_analysis
-                                      .constructiveness_score >= 0.4
-                                  ? "#ffc107"
-                                  : "#dc3545",
-                            }}
-                          >
-                            {(
+                        <div
+                          className="hrfeedback-metric-card"
+                          style={{
+                            borderColor:
                               analysisData.constructiveness_analysis
-                                .constructiveness_score * 100
-                            ).toFixed(0)}
-                            %
+                                .constructiveness_score >= 0.7
+                                ? "#198754"
+                                : analysisData.constructiveness_analysis
+                                  .constructiveness_score >= 0.4
+                                  ? "#ffc107"
+                                  : "#dc3545",
+                          }}
+                        >
+                          <div className="hrfeedback-metric-icon">
+                            <Lightbulb
+                              size={20}
+                              style={{
+                                color:
+                                  analysisData.constructiveness_analysis
+                                    .constructiveness_score >= 0.7
+                                    ? "#198754"
+                                    : analysisData.constructiveness_analysis
+                                      .constructiveness_score >= 0.4
+                                      ? "#ffc107"
+                                      : "#dc3545",
+                              }}
+                            />
+                          </div>
+                          <div className="hrfeedback-metric-content">
+                            <div className="hrfeedback-metric-label">
+                              Constructiveness
+                            </div>
+                            <div
+                              className="hrfeedback-metric-value"
+                              style={{
+                                color:
+                                  analysisData.constructiveness_analysis
+                                    .constructiveness_score >= 0.7
+                                    ? "#198754"
+                                    : analysisData.constructiveness_analysis
+                                      .constructiveness_score >= 0.4
+                                      ? "#ffc107"
+                                      : "#dc3545",
+                              }}
+                            >
+                              {(
+                                analysisData.constructiveness_analysis
+                                  .constructiveness_score * 100
+                              ).toFixed(0)}
+                              %
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
 
                   {/* Sentiment Analysis */}
@@ -1038,26 +1034,26 @@ const getDeleteMessage = () => {
                           </span>
                           {analysisData.sentiment_analysis.confidence !==
                             undefined && (
-                            <span
-                              className="hrfeedback-sentiment-confidence"
-                              style={{
-                                backgroundColor: `${getSentimentColor(
-                                  analysisData.sentiment_analysis.sentiment
-                                )}15`,
-                                color: getSentimentColor(
-                                  analysisData.sentiment_analysis.sentiment
-                                ),
-                                border: `1px solid ${getSentimentColor(
-                                  analysisData.sentiment_analysis.sentiment
-                                )}40`,
-                              }}
-                            >
-                              {(
-                                analysisData.sentiment_analysis.confidence * 100
-                              ).toFixed(1)}
-                              % Confidence
-                            </span>
-                          )}
+                              <span
+                                className="hrfeedback-sentiment-confidence"
+                                style={{
+                                  backgroundColor: `${getSentimentColor(
+                                    analysisData.sentiment_analysis.sentiment
+                                  )}15`,
+                                  color: getSentimentColor(
+                                    analysisData.sentiment_analysis.sentiment
+                                  ),
+                                  border: `1px solid ${getSentimentColor(
+                                    analysisData.sentiment_analysis.sentiment
+                                  )}40`,
+                                }}
+                              >
+                                {(
+                                  analysisData.sentiment_analysis.confidence * 100
+                                ).toFixed(1)}
+                                % Confidence
+                              </span>
+                            )}
                         </div>
 
                         {/* Sentiment Scores Grid */}
@@ -1108,10 +1104,9 @@ const getDeleteMessage = () => {
                                 <div
                                   className="hrfeedback-vader-bar-fill"
                                   style={{
-                                    width: `${
-                                      (analysisData.sentiment_analysis
+                                    width: `${(analysisData.sentiment_analysis
                                         .vader_positive || 0) * 100
-                                    }%`,
+                                      }%`,
                                     background: "#198754",
                                   }}
                                 />
@@ -1133,10 +1128,9 @@ const getDeleteMessage = () => {
                                 <div
                                   className="hrfeedback-vader-bar-fill"
                                   style={{
-                                    width: `${
-                                      (analysisData.sentiment_analysis
+                                    width: `${(analysisData.sentiment_analysis
                                         .vader_neutral || 0) * 100
-                                    }%`,
+                                      }%`,
                                     background: "#6c757d",
                                   }}
                                 />
@@ -1158,10 +1152,9 @@ const getDeleteMessage = () => {
                                 <div
                                   className="hrfeedback-vader-bar-fill"
                                   style={{
-                                    width: `${
-                                      (analysisData.sentiment_analysis
+                                    width: `${(analysisData.sentiment_analysis
                                         .vader_negative || 0) * 100
-                                    }%`,
+                                      }%`,
                                     background: "#dc3545",
                                   }}
                                 />
@@ -1255,8 +1248,8 @@ const getDeleteMessage = () => {
                         style={{
                           borderColor: analysisData.bias_analysis.has_bias
                             ? getBiasLevelColor(
-                                analysisData.bias_analysis.bias_level
-                              )
+                              analysisData.bias_analysis.bias_level
+                            )
                             : "#198754",
                         }}
                       >
@@ -1282,32 +1275,32 @@ const getDeleteMessage = () => {
                           </div>
                           {analysisData.bias_analysis.bias_score !==
                             undefined && (
-                            <span
-                              className="hrfeedback-bias-score-badge"
-                              style={{
-                                backgroundColor: `${getBiasLevelColor(
-                                  analysisData.bias_analysis.bias_level
-                                )}15`,
-                                color: getBiasLevelColor(
-                                  analysisData.bias_analysis.bias_level
-                                ),
-                                border: `1px solid ${getBiasLevelColor(
-                                  analysisData.bias_analysis.bias_level
-                                )}40`,
-                              }}
-                            >
-                              Score:{" "}
-                              {(
-                                analysisData.bias_analysis.bias_score * 100
-                              ).toFixed(0)}
-                              %
-                            </span>
-                          )}
+                              <span
+                                className="hrfeedback-bias-score-badge"
+                                style={{
+                                  backgroundColor: `${getBiasLevelColor(
+                                    analysisData.bias_analysis.bias_level
+                                  )}15`,
+                                  color: getBiasLevelColor(
+                                    analysisData.bias_analysis.bias_level
+                                  ),
+                                  border: `1px solid ${getBiasLevelColor(
+                                    analysisData.bias_analysis.bias_level
+                                  )}40`,
+                                }}
+                              >
+                                Score:{" "}
+                                {(
+                                  analysisData.bias_analysis.bias_score * 100
+                                ).toFixed(0)}
+                                %
+                              </span>
+                            )}
                         </div>
 
                         {analysisData.bias_analysis.biased_words &&
                           analysisData.bias_analysis.biased_words.length >
-                            0 && (
+                          0 && (
                             <div className="hrfeedback-bias-words-section">
                               <div className="hrfeedback-bias-words-label">
                                 Biased Terms Detected:
@@ -1413,7 +1406,7 @@ const getDeleteMessage = () => {
 
                         {analysisData.toxicity_analysis.toxic_elements &&
                           analysisData.toxicity_analysis.toxic_elements.length >
-                            0 && (
+                          0 && (
                             <div className="hrfeedback-toxic-elements">
                               <strong>Toxic Elements:</strong>
                               <ul className="hrfeedback-toxic-list">
@@ -1500,14 +1493,14 @@ const getDeleteMessage = () => {
 
                         {analysisData.constructiveness_analysis
                           .action_items_count !== undefined && (
-                          <div className="hrfeedback-constructiveness-action-count">
-                            Action Items:{" "}
-                            {
-                              analysisData.constructiveness_analysis
-                                .action_items_count
-                            }
-                          </div>
-                        )}
+                            <div className="hrfeedback-constructiveness-action-count">
+                              Action Items:{" "}
+                              {
+                                analysisData.constructiveness_analysis
+                                  .action_items_count
+                              }
+                            </div>
+                          )}
 
                         {analysisData.constructiveness_analysis
                           .positive_elements &&
@@ -1651,7 +1644,7 @@ const getDeleteMessage = () => {
 
                         {analysisData.suggestions.improvement_areas &&
                           analysisData.suggestions.improvement_areas.length >
-                            0 && (
+                          0 && (
                             <div className="hrfeedback-improvement-areas">
                               <div
                                 className="hrfeedback-improvement-label"
