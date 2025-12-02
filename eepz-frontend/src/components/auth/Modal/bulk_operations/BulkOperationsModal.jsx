@@ -382,7 +382,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                 gap: '8px'
               }}
             >
-              <i className="bi bi-upload"></i>
+              <i className="bi bi-download"></i>
               Import Users
             </button>
             <button
@@ -404,7 +404,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                 gap: '8px'
               }}
             >
-              <i className="bi bi-download"></i>
+              <i className="bi bi-upload"></i>
               Export Data
             </button>
           </div>
