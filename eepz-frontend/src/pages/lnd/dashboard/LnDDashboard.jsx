@@ -91,7 +91,7 @@ const LnDDashboard = () => {
       title: "My Skills",
       count: stats.mySkills,
       icon: BookOpen,
-      color: "#97247E",
+      backgroundColor: "#97247E",
       path: `${rolePrefix}/lnd/my-skills`,
       description: "View and manage your skills",
       show: true,
@@ -99,7 +99,7 @@ const LnDDashboard = () => {
     {
       title: "My Assignments",
       icon: TrendingUp,
-      color: "#0d6efd",
+      backgroundColor: "#0d6efd",
       path: `${rolePrefix}/lnd/my-assignments`,
       description: "Track your learning assignments",
       show: true,
@@ -108,7 +108,7 @@ const LnDDashboard = () => {
       title: "Pending Approvals",
       count: stats.pendingApprovals,
       icon: Clock,
-      color: "#ffc107",
+      backgroundColor: "#ffc107",
       path: `${rolePrefix}/lnd/approvals/pending`,
       description: "Review pending requests",
       show: true,
@@ -116,7 +116,7 @@ const LnDDashboard = () => {
     {
       title: "SME Status",
       icon: Award,
-      color: stats.isSme ? "#198754" : "#6c757d",
+      backgroundColor: stats.isSme ? "#198754" : "#6c757d",
       path: stats.isSme
         ? `${rolePrefix}/lnd/sme/assignments`
         : `${rolePrefix}/lnd/my-skills`,
@@ -129,7 +129,7 @@ const LnDDashboard = () => {
     {
       title: "Approval History",
       icon: FileText,
-      color: "#6c757d",
+      backgroundColor: "#6c757d",
       path: `${rolePrefix}/lnd/approvals/history`,
       description: "View all past approvals",
       show: true,
@@ -137,7 +137,7 @@ const LnDDashboard = () => {
     {
       title: "Team Skills",
       icon: Users,
-      color: "#20c997",
+      backgroundColor: "#20c997",
       path: `${rolePrefix}/lnd/team/skills`,
       description: "Manage team member skills",
       show: isManager,
@@ -145,7 +145,7 @@ const LnDDashboard = () => {
     {
       title: "Team Assignments",
       icon: ClipboardList,
-      color: "#17a2b8",
+      backgroundColor: "#17a2b8",
       path: `${rolePrefix}/lnd/assignments/team`,
       description: "Monitor team learning progress",
       show: isManager,
@@ -153,7 +153,7 @@ const LnDDashboard = () => {
     {
       title: "Organization Skills",
       icon: Building2,
-      color: "#97247E",
+      backgroundColor: "#97247E",
       path: `${rolePrefix}/lnd/organization-skills`,
       description: "View skills across the organization",
       show: isHR,
@@ -161,7 +161,7 @@ const LnDDashboard = () => {
     {
       title: "Organization Assignments",
       icon: Briefcase,
-      color: "#0d6efd",
+      backgroundColor: "#0d6efd",
       path: `${rolePrefix}/lnd/organization-assignments`,
       description: "Monitor all learning assignments",
       show: isHR,
@@ -169,7 +169,7 @@ const LnDDashboard = () => {
     {
       title: "SME Directory",
       icon: Award,
-      color: "#198754",
+      backgroundColor: "#198754",
       path: `${rolePrefix}/lnd/sme-directory`,
       description: "View all Subject Matter Experts",
       show: isHR,
@@ -188,6 +188,7 @@ const LnDDashboard = () => {
 
   return (
     <div>
+      {/* Breadcrumb */}
       <Breadcrumb
         items={[
           { label: "", path: "/dashboard", icon: "house-door" },
@@ -195,6 +196,7 @@ const LnDDashboard = () => {
         ]}
       />
 
+      {/* Header Section */}
       <div style={{ marginBottom: "2rem" }}>
         <h2
           style={{
@@ -212,6 +214,7 @@ const LnDDashboard = () => {
         </p>
       </div>
 
+      {/* Navigation Cards */}
       <div
         style={{
           display: "grid",
@@ -242,7 +245,7 @@ const LnDDashboard = () => {
                   e.currentTarget.style.transform = "translateY(-4px)";
                   e.currentTarget.style.boxShadow =
                     "0 8px 16px rgba(0,0,0,0.12)";
-                  e.currentTarget.style.borderColor = card.color;
+                  e.currentTarget.style.borderColor = card.backgroundColor;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "translateY(0)";
@@ -250,91 +253,100 @@ const LnDDashboard = () => {
                   e.currentTarget.style.borderColor = "rgba(39, 35, 92, 0.56)";
                 }}
               >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    width: "100px",
-                    height: "100px",
-                    background: `radial-gradient(circle, ${card.color}15 0%, transparent 70%)`,
-                    pointerEvents: "none",
-                  }}
-                />
-
+                {/* Card Content */}
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    alignItems: "start",
-                    position: "relative",
+                    alignItems: "center",
+                    gap: "1rem",
                   }}
                 >
+                  {/* Left Section: Icon + Text */}
                   <div
                     style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "12px",
-                      background: `${card.color}15`,
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      border: `2px solid ${card.color}30`,
+                      gap: "1rem",
                     }}
                   >
-                    <Icon size={24} color={card.color} />
-                  </div>
-                  {card.count !== undefined ? (
-                    <span
+                    {/* Icon */}
+                    <div
                       style={{
-                        fontSize: "2rem",
-                        fontWeight: "700",
-                        color: card.color,
-                        lineHeight: 1,
-                      }}
-                    >
-                      {card.count}
-                    </span>
-                  ) : card.badge ? (
-                    <span
-                      style={{
-                        padding: "0.375rem 0.75rem",
+                        width: "48px",
+                        height: "48px",
                         borderRadius: "12px",
-                        fontSize: "0.75rem",
-                        fontWeight: "600",
-                        background: stats.isSme ? "#d1fae5" : "#f3f4f6",
-                        color: stats.isSme ? "#065f46" : "#6c757d",
-                        border: `1px solid ${
-                          stats.isSme ? "#065f46" : "#6c757d"
-                        }30`,
+                        background: `${card.backgroundColor}15`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: `2px solid ${card.backgroundColor}30`,
+                        flexShrink: 0,
                       }}
                     >
-                      {card.badge}
-                    </span>
-                  ) : null}
-                </div>
+                      <Icon size={24} color={card.color} />
+                    </div>
 
-                <h5
-                  style={{
-                    marginTop: "1rem",
-                    marginBottom: "0.5rem",
-                    fontWeight: "600",
-                    color: "#212529",
-                    fontSize: "1rem",
-                  }}
-                >
-                  {card.title}
-                </h5>
-                <p
-                  style={{
-                    fontSize: "0.875rem",
-                    color: "#6c757d",
-                    margin: 0,
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {card.description}
-                </p>
+                    {/* Title & Description */}
+                    <div
+                      style={{
+                        textAlign: "left",
+                      }}
+                    >
+                      <h5
+                        style={{
+                          margin: 0,
+                          fontWeight: "600",
+                          color: "#212529",
+                          fontSize: "1rem",
+                        }}
+                      >
+                        {card.title}
+                      </h5>
+                      <p
+                        style={{
+                          fontSize: "0.875rem",
+                          color: "#6c757d",
+                          margin: 0,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {card.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Right Section: Count or Badge */}
+                  <div style={{ textAlign: "right" }}>
+                    {card.count !== undefined ? (
+                      <span
+                        style={{
+                          fontSize: "2rem",
+                          fontWeight: "700",
+                          lineHeight: 1,
+                        }}
+                      >
+                        {card.count}
+                      </span>
+                    ) : card.badge ? (
+                      <span
+                        style={{
+                          padding: "0.375rem 0.75rem",
+                          borderRadius: "12px",
+                          fontSize: "0.75rem",
+                          fontWeight: "600",
+                          background: stats.isSme ? "#d1fae5" : "#f3f4f6",
+                          color: stats.isSme ? "#065f46" : "#6c757d",
+                          border: `1px solid ${
+                            stats.isSme ? "#065f46" : "#6c757d"
+                          }30`,
+                        }}
+                      >
+                        {card.badge}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             );
           })}

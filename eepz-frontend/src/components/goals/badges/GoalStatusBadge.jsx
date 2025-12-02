@@ -18,17 +18,17 @@ const ICON_MAP = {
 // Size configurations
 const SIZE_CONFIG = {
   sm: {
-    fontSize: "0.7rem",
+    fontSize: "10px",
     padding: "0.25rem 0.5rem",
     iconSize: "0.85em",
   },
   md: {
-    fontSize: "0.8rem",
+    fontSize: "11px",
     padding: "0.35rem 0.65rem",
     iconSize: "0.95em",
   },
   lg: {
-    fontSize: "0.9rem",
+    fontSize: "12px",
     padding: "0.4rem 0.75rem",
     iconSize: "1.1em",
   },
@@ -67,7 +67,6 @@ const FormatStatusKey = (status) => {
   if (!status) return "";
 
   const statusMap = {
-    // Backend values -> Frontend PascalCase keys
     pending: "Pending",
     open: "Open",
     inprogress: "In Progress",
