@@ -163,7 +163,6 @@ const nominationService = {
     }
   },
 
-  // Computes analytics locally, no backend change
   getMyNominationAnalytics: async () => {
     try {
       const response = await nominationService.getMyNominations();
@@ -198,6 +197,33 @@ const nominationService = {
       };
     } catch (error) {
       return { success: false, message: "Failed to calculate analytics" };
+    }
+  },
+
+  // FIXED: Get Nomination History (Self + Team Nominations)
+  getMyNominationHistory: async (status = null) => {
+    try {
+      let url = `/${API_BASE}/my-history`;
+      if (status) {
+        url += `?status=${encodeURIComponent(status)}`;
+      }
+
+      console.log("Fetching nomination history:", url);
+
+      const response = await internalApi.get(url);
+
+      console.log("Nomination History Response:", response.data);
+      
+      return {
+        success: true,
+        data: response.data,
+      };
+    } catch (error) {
+      console.error("Error fetching nomination history:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to fetch nomination history",
+      };
     }
   },
 };

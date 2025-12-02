@@ -970,15 +970,15 @@ const ChangeRequestManagement = () => {
         </div>
       </div>
 
-      {/* TAB NAVIGATION BAR - Like HROperations */}
-      <div className="tab-navigation-bar-hr">
+      {/* TAB NAVIGATION BAR - HR OPS PILL STYLE */}
+      <div className="crm-request-tabs">
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            className={`tab-button-hr ${activeTab === tab.key ? "active" : ""}`}
+            className={`crm-tab-btn ${activeTab === tab.key ? "active" : ""}`}
             onClick={() => handleTabChange(tab)}
           >
-            <i className={`bi ${tab.icon} me-2`}></i>
+            <i className={`bi ${tab.icon}`}></i>
             {tab.label}
             {tab.key === "pending" &&
               requests.filter((r) => r.status === "Pending").length > 0 && (

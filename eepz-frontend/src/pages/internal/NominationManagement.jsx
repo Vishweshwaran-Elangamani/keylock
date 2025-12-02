@@ -322,16 +322,26 @@ const NominationManagement = () => {
             </select>
           </div>
           <div className="filters-actions">
-            {!["HR", "Department Head"].includes(user?.role) && (
-              <button
-                className="btn-graph"
-                onClick={() => setShowGraphModal(true)}
-                title="View Analytics Graph"
-              >
-                <i className="bi bi-bar-chart-fill"></i> View Graph
-              </button>
-            )}
-          </div>
+  {!["HR", "Department Head"].includes(user?.role) && (
+    <button
+      className="btn-graph"
+      onClick={() => setShowGraphModal(true)}
+      title="View Analytics Graph"
+    >
+      <i className="bi bi-bar-chart-fill"></i> View Graph
+    </button>
+  )}
+  
+  {/* 🆕 ADD THIS HISTORY BUTTON */}
+  <button
+    className="btn-history"
+    onClick={() => window.location.href = `/internal/nomination-history`}
+    title="View Nomination History"
+  >
+    <i className="bi bi-clock-history"></i> History
+  </button>
+</div>
+
         </div>
       </div>
 

@@ -122,7 +122,6 @@
   text-align: center;
 }
 
-
 .crm-stat-label {
   font-size: 10px;
   color: #64748b;
@@ -134,44 +133,49 @@
   text-align: center;
 }
 
-
-/* REQUEST TABS */
+/* REQUEST TABS - HR OPS STYLE TOGGLE */
 .crm-request-tabs {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  background: #ffffff;
-  padding: 0.5rem;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  gap: 0;
+  margin-bottom: 1.5rem;
+  background: #2c2762;
+  padding: 0.6rem;
+  border-radius: 50px;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(44, 39, 98, 0.3);
 }
 
+/* NON-ACTIVE TAB BUTTON */
 .crm-tab-btn {
   flex: 1;
-  padding: 0.75rem 1.25rem;
-  background: transparent;
+  padding: 0.85rem 3rem;
   border: none;
-  border-radius: 8px;
-  color: #6c757d;
+  border-radius: 40px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+  min-width: 220px;
 }
 
-.crm-tab-btn:hover {
-  background: rgba(39, 35, 92, 0.05);
-  color: #27235c;
-}
-
+/* ACTIVE TAB BUTTON - WHITE PILL */
 .crm-tab-btn.active {
-  background: #27235c;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
+  background: #ffffff !important;
+  color: #2c2762 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  font-weight: 700 !important;
+}
+
+.crm-tab-btn .badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
 }
 
 /* FILTERS CARD */
@@ -527,12 +531,12 @@
 .crm-admin-remarks-tooltip:hover {
   color: #27235c;
 }
+
 /* EMPTY STATE */
 .crm-empty-state {
   text-align: center;
   padding: 3rem 1rem !important;
 }
-
 
 .crm-empty-state i {
   font-size: 3rem;
@@ -566,7 +570,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding-left:20px ;
+  padding-left: 20px;
 }
 
 .pagination-label {
@@ -652,59 +656,8 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  /* backdrop-filter: blur(4px); */
   z-index: 1040;
 }
-/* Tab content spacing */
-.tab-content-hr {
-  margin-top: 1.5rem;
-}
-
-/* TAB NAVIGATION BAR - COMPACT TOGGLE STYLE */
-.tab-navigation-bar-hr {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  background: #ffffff;
-  padding: 0.5rem;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  width: fit-content; /* Makes it only as wide as needed */
-}
-
-.tab-button-hr {
-  padding: 0.5rem 1rem; /* Reduced from larger padding */
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  color: #6c757d;
-  font-weight: 600;
-  font-size: 0.875rem; /* Smaller font size */
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-}
-
-.tab-button-hr:hover {
-  background: rgba(39, 35, 92, 0.05);
-  color: white;
-}
-
-.tab-button-hr.active {
-  background: #27235c;
-  color: #ffffff;
-  box-shadow: 0 2px 6px rgba(39, 35, 92, 0.3);
-}
-
-.tab-button-hr .badge {
-  font-size: 0.7rem; /* Smaller badge */
-  padding: 0.2rem 0.4rem;
-}
-
 
 .crm-modal-wrapper-process {
   position: fixed;
@@ -1010,6 +963,11 @@
   min-height: 400px;
 }
 
+/* Tab content spacing */
+.tab-content-hr {
+  margin-top: 1.5rem;
+}
+
 /* RESPONSIVE */
 @media (max-width: 1200px) {
   .crm-stats-grid {
@@ -1082,7 +1040,6 @@
     width: 100%;
     justify-content: center;
     text-align: center;
-    
   }
 
   .pagination-nav {
@@ -1092,6 +1049,18 @@
   .pagination-nav .pagination {
     justify-content: center;
     flex-wrap: wrap;
+  }
+
+  .crm-request-tabs {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .crm-tab-btn {
+    padding: 0.7rem 1.8rem;
+    font-size: 0.9rem;
+    min-width: 160px;
   }
 }
 
@@ -1108,5 +1077,17 @@
   .crm-request-table td {
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .crm-request-tabs {
+    border-radius: 8px;
+  }
+
+  .crm-tab-btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+    min-width: 130px;
   }
 }

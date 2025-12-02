@@ -1,6 +1,4 @@
-/* ===================================
-   ROOT & CSS VARIABLES
-   =================================== */
+
 :root {
   --gradient-primary: linear-gradient(135deg, #97247e 0%, #e01950 100%);
   --color-primary: #27235c;

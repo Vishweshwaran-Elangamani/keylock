@@ -62,6 +62,7 @@ import EmployeeSLADashboard from "./pages/sla/EmployeeSLADashboard";
 import MyAssessments from "./pages/performancemanagement/employee/MyAssessments";
 import EmployeePolicyView from "./pages/hr_operations/employee/EmployeePolicyView";
 import SubmitMentorFeedback from "./pages/feedback_management/feedback/SubmitMentorFeedback";
+import NominationHistory from "./pages/internal/NominationHistory";
 //LnD
 import LnDDashboard from "./pages/lnd/dashboard/LnDDashboard";
 import MySkills from "./pages/lnd/skills/MySkills";
@@ -1667,6 +1668,22 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      {/*  NOMINATION HISTORY - View finalized self & team nominations */}
+<Route
+  path="/internal/nomination-history"
+  element={
+    <ProtectedRoute
+      allowedRoles={["Employee", "Manager", "Department Head", "HR"]}
+    >
+      <DashboardLayout
+        role={["Employee", "Manager", "Department Head", "HR"]}
+      >
+        <NominationHistory />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/>
+
       {/* HR ROUTES */}
       <Route
         path="/hr/dasboard/meetmom"
