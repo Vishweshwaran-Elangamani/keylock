@@ -123,7 +123,7 @@ const LnDDashboard = () => {
       description: stats.isSme
         ? "Manage your SME assignments"
         : "Apply to become SME",
-      badge: stats.isSme ? "Active SME" : "Not Active",
+      badge: stats.isSme ? "Active" : "Inactive",
       show: true,
     },
     {
@@ -333,7 +333,7 @@ const LnDDashboard = () => {
                         style={{
                           padding: "0.375rem 0.75rem",
                           borderRadius: "12px",
-                          fontSize: "0.75rem",
+                          fontSize: "10px",
                           fontWeight: "600",
                           background: stats.isSme ? "#d1fae5" : "#f3f4f6",
                           color: stats.isSme ? "#065f46" : "#6c757d",
