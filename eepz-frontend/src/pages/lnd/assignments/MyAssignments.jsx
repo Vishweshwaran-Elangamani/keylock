@@ -319,7 +319,7 @@ const MyAssignments = () => {
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.8fr 0.7fr 1fr",
+                    "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.7fr 1fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
@@ -328,6 +328,7 @@ const MyAssignments = () => {
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
+                  alignItems: "center",
                 }}
               >
                 {[
@@ -345,7 +346,6 @@ const MyAssignments = () => {
                     field: "completionRating",
                     align: "center",
                   },
-                  { label: "Overdue", field: null, align: "center" },
                   { label: "Proof", field: null, align: "center" },
                   { label: "Request Ack", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
@@ -360,7 +360,6 @@ const MyAssignments = () => {
                       gap: 4,
                       userSelect: "none",
                       cursor: field ? "pointer" : "default",
-                      textAlign: align || "left",
                       transition: "color 0.2s",
                       color: "white",
                     }}
@@ -385,7 +384,7 @@ const MyAssignments = () => {
                   style={{
                     display: "grid",
                     gridTemplateColumns:
-                      "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.8fr 0.7fr 1fr",
+                      "1.5fr 1fr 1.3fr 1fr 1fr 0.7fr 0.7fr 1fr",
                     alignItems: "center",
                     fontSize: "0.875rem",
                     color: "#212529",
@@ -404,6 +403,7 @@ const MyAssignments = () => {
                     e.currentTarget.style.background = "#fff";
                   }}
                 >
+                  {/* Skill Name */}
                   <div
                     style={{
                       fontWeight: 600,
@@ -417,6 +417,7 @@ const MyAssignments = () => {
                     {assignment.skillName}
                   </div>
 
+                  {/* SME Assigned */}
                   <div
                     style={{
                       textOverflow: "ellipsis",
@@ -431,18 +432,23 @@ const MyAssignments = () => {
                     {assignment.smeName}
                   </div>
 
+                  {/* Assignment Status */}
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     <StatusBadge status={assignment.status} />
                   </div>
 
+                  {/* Start Date */}
                   <div style={{ textAlign: "left", color: "#6b7280" }}>
                     {assignment.createdOn ? (
                       new Date(assignment.createdOn).toLocaleDateString()
                     ) : (
-                      <span style={{ color: "#9ca3af" }}>None</span>
+                      <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+                        None
+                      </span>
                     )}
                   </div>
 
+                  {/* Due Date */}
                   <div
                     style={{
                       textAlign: "left",
@@ -455,71 +461,43 @@ const MyAssignments = () => {
                         {assignment.isOverdue && (
                           <AlertTriangle
                             size={14}
-                            style={{ marginRight: "0.25rem", color: "#DC2626" }}
+                            style={{
+                              marginRight: "0.25rem",
+                              color: "#DC2626",
+                              display: "inline-block",
+                              verticalAlign: "middle",
+                            }}
                           />
                         )}
                         {new Date(assignment.deadline).toLocaleDateString()}
                       </>
                     ) : (
-                      <span style={{ color: "#9ca3af" }}>None</span>
+                      <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
+                        None
+                      </span>
                     )}
                   </div>
 
+                  {/* Score - FIXED WITH CENTER ALIGNMENT */}
                   <div
                     style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
                       fontWeight: 600,
                       color: "#198754",
-                      textAlign: "center",
                     }}
                   >
                     {assignment.completionRating ? (
                       `${assignment.completionRating}/10`
                     ) : (
-                      <span style={{ color: "#9ca3af" }}>None</span>
-                    )}
-                  </div>
-
-                  <div style={{ textAlign: "center" }}>
-                    {assignment.isOverdue ? (
-                      <div
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "0.4rem",
-                          padding: "0.4rem 0.75rem",
-                          background: "#FEE2E2",
-                          border: "1px solid #DC2626",
-                          borderRadius: "8px",
-                          color: "#DC2626",
-                          fontWeight: "700",
-                          fontSize: "0.8rem",
-                          whiteSpace: "nowrap",
-                        }}
-                        title={`${assignment.daysOverdue} day(s) overdue`}
-                      >
-                        <AlertTriangle size={14} />
-                        {assignment.daysOverdue}{" "}
-                        {assignment.daysOverdue === 1 ? "day" : "days"}
-                      </div>
-                    ) : assignment.deadline &&
-                      assignment.status !== ASSIGNMENT_STATUS.COMPLETED ? (
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#10B981",
-                          fontWeight: "600",
-                        }}
-                      >
-                        On Track
-                      </span>
-                    ) : (
                       <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                        N/A
+                        None
                       </span>
                     )}
                   </div>
 
+                  {/* Proof */}
                   <div style={{ textAlign: "center" }}>
                     {assignment.proofFilePath ? (
                       <button
@@ -554,12 +532,13 @@ const MyAssignments = () => {
                         <Download size={14} />
                       </button>
                     ) : (
-                      <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>
+                      <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                         None
                       </span>
                     )}
                   </div>
 
+                  {/* Request Acknowledgement / Upload Proof */}
                   <div style={{ textAlign: "center" }}>
                     {assignment.status === ASSIGNMENT_STATUS.IN_PROGRESS ? (
                       <button
@@ -595,7 +574,7 @@ const MyAssignments = () => {
                         <Upload size={14} /> Upload
                       </button>
                     ) : (
-                      <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>
+                      <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                         None
                       </span>
                     )}

@@ -363,16 +363,16 @@ const OrganizationAssignments = () => {
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr 0.9fr",
+                    "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
                   color: "white",
-                  fontSize: "13px",
+                  fontSize: "14px",
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
-                  height: "50px",
+                  alignItems: "center",
                 }}
               >
                 {[
@@ -395,7 +395,6 @@ const OrganizationAssignments = () => {
                     field: "completionRating",
                     align: "center",
                   },
-                  { label: "Overdue", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
                   <div
                     key={field || label}
@@ -408,7 +407,6 @@ const OrganizationAssignments = () => {
                       gap: 4,
                       userSelect: "none",
                       cursor: field ? "pointer" : "default",
-                      textAlign: align || "left",
                       transition: "color 0.2s",
                       color: "white",
                     }}
@@ -433,7 +431,7 @@ const OrganizationAssignments = () => {
                     style={{
                       display: "grid",
                       gridTemplateColumns:
-                        "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr 0.9fr",
+                        "1.5fr 1.5fr 1fr 1.6fr 1.1fr 1.1fr 0.8fr",
                       alignItems: "center",
                       fontSize: "0.875rem",
                       color: "#212529",
@@ -452,6 +450,7 @@ const OrganizationAssignments = () => {
                       e.currentTarget.style.background = "#fff";
                     }}
                   >
+                    {/* Employee Name */}
                     <div
                       style={{
                         fontWeight: 600,
@@ -460,11 +459,12 @@ const OrganizationAssignments = () => {
                         whiteSpace: "nowrap",
                         textAlign: "left",
                       }}
-                      title={assignment.menteeName} 
+                      title={assignment.menteeName}
                     >
                       {assignment.menteeName}
                     </div>
 
+                    {/* Skill Name */}
                     <div
                       style={{
                         fontWeight: 500,
@@ -478,6 +478,7 @@ const OrganizationAssignments = () => {
                       {assignment.skillName}
                     </div>
 
+                    {/* SME Assigned */}
                     <div
                       style={{
                         fontWeight: 500,
@@ -492,10 +493,12 @@ const OrganizationAssignments = () => {
                       {assignment.smeName}
                     </div>
 
+                    {/* Assignment Status */}
                     <div style={{ display: "flex", justifyContent: "center" }}>
                       <StatusBadge status={assignment.status} />
                     </div>
 
+                    {/* Start Date */}
                     <div style={{ textAlign: "left", color: "#6b7280" }}>
                       {assignment.createdOn ? (
                         new Date(assignment.createdOn).toLocaleDateString()
@@ -506,6 +509,7 @@ const OrganizationAssignments = () => {
                       )}
                     </div>
 
+                    {/* Due Date */}
                     <div
                       style={{
                         textAlign: "left",
@@ -521,6 +525,8 @@ const OrganizationAssignments = () => {
                               style={{
                                 marginRight: "0.25rem",
                                 color: "#DC2626",
+                                display: "inline-block",
+                                verticalAlign: "middle",
                               }}
                             />
                           )}
@@ -533,11 +539,14 @@ const OrganizationAssignments = () => {
                       )}
                     </div>
 
+                  
                     <div
                       style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                         fontWeight: 600,
                         color: "#198754",
-                        textAlign: "center",
                       }}
                     >
                       {assignment.completionRating ? (
@@ -545,49 +554,6 @@ const OrganizationAssignments = () => {
                       ) : (
                         <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
                           None
-                        </span>
-                      )}
-                    </div>
-
-                    <div style={{ textAlign: "center" }}>
-                      {assignment.isOverdue ? (
-                        <div
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "0.4rem",
-                            padding: "0.4rem 0.75rem",
-                            background: "#FEE2E2",
-                            border: "1px solid #DC2626",
-                            borderRadius: "8px",
-                            color: "#DC2626",
-                            fontWeight: "700",
-                            fontSize: "0.8rem",
-                            whiteSpace: "nowrap",
-                          }}
-                          title={`${assignment.daysOverdue} day(s) overdue`}
-                        >
-                          <AlertTriangle size={14} />
-                          {assignment.daysOverdue}{" "}
-                          {assignment.daysOverdue === 1 ? "day" : "days"}
-                        </div>
-                      ) : assignment.deadline &&
-                        assignment.status !== ASSIGNMENT_STATUS.COMPLETED ? (
-                        <span
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "#10B981",
-                            fontWeight: "600",
-                          }}
-                        >
-                          On Track
-                        </span>
-                      ) : (
-                        <span
-                          style={{ fontSize: "0.75rem", color: "#9ca3af" }}
-                        >
-                          N/A
                         </span>
                       )}
                     </div>

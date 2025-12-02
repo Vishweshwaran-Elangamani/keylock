@@ -395,12 +395,11 @@ const TeamAssignments = () => {
                 minWidth: 0,
               }}
             >
-              {/*  UPDATED: Added 0.8fr for Overdue column */}
               <div
                 style={{
                   display: "grid",
                   gridTemplateColumns:
-                    "1.2fr 1.2fr 1fr 1.4fr 1fr 0.7fr 0.7fr 0.8fr 0.7fr 1fr",
+                    "1.5fr 1.3fr 1.2fr 1.5fr 1fr 1fr 0.7fr 0.7fr 1fr",
                   background: "rgb(39, 35, 92)",
                   borderBottom: "2px solid #abb4c5ff",
                   fontWeight: 600,
@@ -409,6 +408,7 @@ const TeamAssignments = () => {
                   padding: "1rem 1.5rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.025em",
+                  alignItems: "center",
                 }}
               >
                 {[
@@ -431,7 +431,6 @@ const TeamAssignments = () => {
                     field: "completionRating",
                     align: "center",
                   },
-                  { label: "Overdue", field: null, align: "center" }, //  NEW
                   { label: "Proof", field: null, align: "center" },
                   { label: "Comments", field: null, align: "center" },
                 ].map(({ label, field, align }) => (
@@ -446,7 +445,6 @@ const TeamAssignments = () => {
                       gap: 4,
                       userSelect: "none",
                       cursor: field ? "pointer" : "default",
-                      textAlign: align || "left",
                       transition: "color 0.2s",
                       color: "white",
                     }}
@@ -465,15 +463,13 @@ const TeamAssignments = () => {
                 ))}
               </div>
 
-              {/* Assignment Rows */}
               {assignments.map((assignment, idx) => (
                 <div key={assignment.assignmentId}>
-                  {/* UPDATED: Added 0.8fr for Overdue column */}
                   <div
                     style={{
                       display: "grid",
                       gridTemplateColumns:
-                        "1.2fr 1.2fr 1fr 1.4fr 1fr 0.7fr 0.7fr 0.8fr 0.7fr 1fr",
+                        "1.5fr 1.3fr 1.2fr 1.5fr 1fr 1fr 0.7fr 0.7fr 1fr",
                       alignItems: "center",
                       fontSize: "0.875rem",
                       color: "#212529",
@@ -492,7 +488,6 @@ const TeamAssignments = () => {
                       e.currentTarget.style.background = "#fff";
                     }}
                   >
-                    {/* Employee Name */}
                     <div
                       style={{
                         fontWeight: 600,
@@ -506,7 +501,6 @@ const TeamAssignments = () => {
                       {assignment.menteeName}
                     </div>
 
-                    {/* Skill Name */}
                     <div
                       style={{
                         fontWeight: 500,
@@ -520,7 +514,6 @@ const TeamAssignments = () => {
                       {assignment.skillName}
                     </div>
 
-                    {/* SME Assigned */}
                     <div
                       style={{
                         fontWeight: 500,
@@ -535,16 +528,13 @@ const TeamAssignments = () => {
                       {assignment.smeName}
                     </div>
 
-                    {/* Status */}
                     <div style={{ display: "flex", justifyContent: "center" }}>
                       <StatusBadge status={assignment.status} />
                     </div>
 
-                    {/* Start Date */}
                     <div
                       style={{
-                        display: "flex",
-                        justifyContent: "left",
+                        textAlign: "left",
                         color: "#6b7280",
                       }}
                     >
@@ -557,11 +547,9 @@ const TeamAssignments = () => {
                       )}
                     </div>
 
-                    {/* Due Date */}
                     <div
                       style={{
-                        display: "flex",
-                        justifyContent: "left",
+                        textAlign: "left",
                         color: assignment.isOverdue ? "#DC2626" : "#6b7280",
                         fontWeight: assignment.isOverdue ? "600" : "normal",
                       }}
@@ -571,7 +559,12 @@ const TeamAssignments = () => {
                           {assignment.isOverdue && (
                             <AlertTriangle
                               size={14}
-                              style={{ marginRight: "0.25rem", color: "#DC2626" }}
+                              style={{
+                                marginRight: "0.25rem",
+                                color: "#DC2626",
+                                display: "inline-block",
+                                verticalAlign: "middle",
+                              }}
                             />
                           )}
                           {new Date(assignment.deadline).toLocaleDateString()}
@@ -583,7 +576,6 @@ const TeamAssignments = () => {
                       )}
                     </div>
 
-                    {/* Score */}
                     <div
                       style={{
                         fontWeight: 600,
@@ -600,49 +592,6 @@ const TeamAssignments = () => {
                       )}
                     </div>
 
-                    {/*  NEW: Overdue Column */}
-                    <div style={{ textAlign: "center" }}>
-                      {assignment.isOverdue ? (
-                        <div
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "0.4rem",
-                            padding: "0.4rem 0.75rem",
-                            background: "#FEE2E2",
-                            border: "1px solid #DC2626",
-                            borderRadius: "8px",
-                            color: "#DC2626",
-                            fontWeight: "700",
-                            fontSize: "0.8rem",
-                            whiteSpace: "nowrap",
-                          }}
-                          title={`${assignment.daysOverdue} day(s) overdue`}
-                        >
-                          <AlertTriangle size={14} />
-                          {assignment.daysOverdue}{" "}
-                          {assignment.daysOverdue === 1 ? "day" : "days"}
-                        </div>
-                      ) : assignment.deadline &&
-                        assignment.status !== ASSIGNMENT_STATUS.COMPLETED ? (
-                        <span
-                          style={{
-                            fontSize: "0.75rem",
-                            color: "#10B981",
-                            fontWeight: "600",
-                          }}
-                        >
-                          On Track
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: "0.75rem", color: "#9ca3af" }}>
-                          None
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Proof */}
                     <div style={{ textAlign: "center" }}>
                       {assignment.proofFilePath ? (
                         <button
@@ -683,7 +632,6 @@ const TeamAssignments = () => {
                       )}
                     </div>
 
-                    {/* Comments */}
                     <div style={{ textAlign: "center" }}>
                       {assignment.status ===
                       ASSIGNMENT_STATUS.PENDING_MANAGER_ACKNOWLEDGEMENT ? (
@@ -761,7 +709,6 @@ const TeamAssignments = () => {
                     </div>
                   </div>
 
-                  {/* Expanded Notes */}
                   {expandedNotes?.[assignment.assignmentId] &&
                     assignment.completionNotes && (
                       <div
@@ -821,4 +768,4 @@ const TeamAssignments = () => {
   );
 };
 
-export default TeamAssignments; 
+export default TeamAssignments;
