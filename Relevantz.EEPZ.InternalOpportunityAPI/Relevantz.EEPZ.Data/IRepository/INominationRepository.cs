@@ -23,5 +23,6 @@ namespace Relevantz.EEPZ.Data.IRepository
         Task<int?> GetManagerFromProjectAsync(int employeeUserId);
         Task<int?> GetDeptHeadFromProjectAsync(int employeeUserId);
         Task<string?> GetUserRoleNameAsync(int userId);
+        Task<List<Nomination>> GetNominationHistoryByUserIdAsync(int userId, string? status = null);
     }
 }

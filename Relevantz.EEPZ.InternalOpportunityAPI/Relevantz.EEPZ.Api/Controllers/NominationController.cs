@@ -128,6 +128,32 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
             }
         }
+        
+        [HttpGet("my-history")]
+        [Authorize(Roles = "Employee,Manager")]
+        public async Task<IActionResult> GetMyNominationHistory([FromQuery] string? status = null)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier) ?? 
+                                 User.FindFirst("sub");
+
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId) || userId <= 0)
+                {
+                    return Unauthorized(new { message = "User ID not found in token" });
+                }
+
+                Console.WriteLine($"✓ GetMyNominationHistory - UserId: {userId}, Status Filter: {status ?? "All"}");
+
+                var result = await _nominationService.GetMyNominationHistoryAsync(userId, status);
+                
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.InnerException?.Message ?? ex.Message });
+            }
+        }
 
         [HttpGet("pending-manager-review")]
         [Authorize(Roles = "Manager")]

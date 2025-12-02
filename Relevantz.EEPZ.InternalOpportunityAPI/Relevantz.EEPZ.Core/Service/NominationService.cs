@@ -607,5 +607,148 @@ namespace Relevantz.EEPZ.Core.Service
                 throw;
             }
         }
+        public async Task<NominationHistoryResponseDto> GetMyNominationHistoryAsync(int userId, string? status = null)
+{
+    try
+    {
+        Console.WriteLine($"✓ GetMyNominationHistoryAsync - UserId: {userId}, Status: {status ?? "All"}");
+
+        // Get all historical nominations (self + team)
+        var allHistoryNominations = await _nominationRepository.GetNominationHistoryByUserIdAsync(userId, status);
+
+        if (allHistoryNominations == null || !allHistoryNominations.Any())
+        {
+            return new NominationHistoryResponseDto
+            {
+                SelfNominations = new List<HistoryNominationDto>(),
+                TeamNominations = new List<HistoryNominationDto>(),
+                TotalCount = 0,
+                Statistics = new HistoryStatistics()
+            };
+        }
+
+        // Separate self nominations from team nominations
+        var selfNominations = allHistoryNominations
+            .Where(n => n.NominationType == "employee_self")
+            .ToList();
+
+        var teamNominations = allHistoryNominations
+            .Where(n => n.NominationType == "manager_nomination")
+            .ToList();
+
+        // Map to DTOs
+        var selfNominationDtos = selfNominations.Select(n => MapToHistoryDto(n)).ToList();
+        var teamNominationDtos = teamNominations.Select(n => MapToHistoryDto(n)).ToList();
+
+        // Calculate statistics
+        var statistics = new HistoryStatistics
+        {
+            TotalSelfNominations = selfNominations.Count,
+            TotalTeamNominations = teamNominations.Count,
+            ApprovedCount = allHistoryNominations.Count(n => n.Status.Contains("Approved")),
+            RejectedCount = allHistoryNominations.Count(n => n.Status.Contains("Rejected")),
+            PendingCount = 0, // History only shows finalized
+            WithdrawnCount = allHistoryNominations.Count(n => n.Status == "Withdrawn")
+        };
+
+        var response = new NominationHistoryResponseDto
+        {
+            SelfNominations = selfNominationDtos,
+            TeamNominations = teamNominationDtos,
+            TotalCount = selfNominationDtos.Count + teamNominationDtos.Count,
+            Statistics = statistics
+        };
+
+        Console.WriteLine($"✓ Found {response.TotalCount} historical nominations (Self: {selfNominationDtos.Count}, Team: {teamNominationDtos.Count})");
+
+        return response;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"✗ Error in GetMyNominationHistoryAsync: {ex.Message}");
+        throw new Exception($"Failed to fetch nomination history: {ex.Message}", ex);
+    }
+}
+
+// 🆕 HELPER METHOD: Map Nomination to History DTO
+private HistoryNominationDto MapToHistoryDto(Nomination nomination)
+{
+    // Get nominee (employee) details
+    var nomineeProfile = nomination.NomineeUser?.Employee?.Userprofile;
+    var nomineeEmployee = nomination.NomineeUser?.Employee;
+    
+    // Get manager details (L2 is the main manager in your flow)
+    var l2ManagerProfile = nomination.L2ManagerUser?.Employee?.Userprofile;
+    
+    // Get dept head details
+    var deptHeadProfile = nomination.DeptHeadUser?.Employee?.Userprofile;
+
+    // Determine the final review date (last approval level)
+    DateTime? finalizedDate = nomination.DeptHeadReviewedAt 
+                              ?? nomination.L2ReviewedAt 
+                              ?? nomination.L1ReviewedAt;
+
+    // Determine workflow stage based on current approval level
+    string workflowStage = nomination.CurrentApprovalLevel switch
+    {
+        0 => "Submitted",
+        1 => "Manager Review",
+        2 => "Department Head Review",
+        3 => "Completed",
+        _ => "Unknown"
+    };
+
+    // Determine display status
+    string displayStatus = nomination.Status switch
+    {
+        "Approved_By_DeptHead" => "Approved",
+        "Rejected_By_Manager" => "Rejected",
+        "Rejected_By_DeptHead" => "Rejected",
+        "Withdrawn" => "Withdrawn",
+        _ => nomination.Status
+    };
+
+    return new HistoryNominationDto
+    {
+        NominationId = nomination.NominationId,
+        OpportunityId = nomination.OpportunityId,
+        OpportunityTitle = nomination.Opportunity?.OpportunityName ?? "N/A",
+        OpportunityType = "Internal Opportunity",
+        
+        EmployeeId = nomination.NomineeUserId,
+        EmployeeName = nomineeProfile != null 
+            ? $"{nomineeProfile.FirstName} {nomineeProfile.LastName}" 
+            : "Unknown",
+        EmployeeCompanyId = nomineeEmployee?.EmployeeCompanyId ?? "N/A",
+        EmployeeEmail = nomination.NomineeUser?.Email ?? "N/A",
+        
+        NominationType = nomination.NominationType == "employee_self" ? "Self" : "Manager",
+        CurrentStatus = displayStatus,
+        WorkflowStage = workflowStage,
+        
+        NominatedDate = nomination.SubmittedAt,
+        ManagerReviewedDate = nomination.L2ReviewedAt,
+        DeptHeadReviewedDate = nomination.DeptHeadReviewedAt,
+        FinalizedDate = finalizedDate,
+        
+        ManagerReviewAction = nomination.L2Status,
+        ManagerReviewComments = nomination.L2ReviewRemarks,
+        ManagerName = l2ManagerProfile != null 
+            ? $"{l2ManagerProfile.FirstName} {l2ManagerProfile.LastName}" 
+            : null,
+        
+        DeptHeadReviewAction = nomination.DeptHeadStatus,
+        DeptHeadReviewComments = nomination.DeptHeadReviewRemarks,
+        DeptHeadName = deptHeadProfile != null 
+            ? $"{deptHeadProfile.FirstName} {deptHeadProfile.LastName}" 
+            : null,
+        
+        Justification = nomination.Justification,
+        RelevantSkills = null, // Not in your schema
+        RelevantExperience = null // Not in your schema
+    };
+}
+
+        
     }
 }

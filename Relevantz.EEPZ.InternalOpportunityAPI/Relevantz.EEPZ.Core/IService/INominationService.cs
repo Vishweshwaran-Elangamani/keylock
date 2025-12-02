@@ -18,5 +18,6 @@ Task<NominationListResponseDto> GetAllNominationsAsync(string? status);
 Task<NominationResponseDto> ManagerReviewNominationAsync(int nominationId, int managerId, ManagerReviewRequestDto request);
 Task<NominationResponseDto> DepartmentHeadReviewAsync(int nominationId, int deptHeadId, DepartmentHeadReviewRequestDto request);
 Task<EligibilityCheckResponseDto> CheckEligibilityAsync(int employeeId, int opportunityId);
+Task<NominationHistoryResponseDto> GetMyNominationHistoryAsync(int userId, string? status = null);
 }
 }

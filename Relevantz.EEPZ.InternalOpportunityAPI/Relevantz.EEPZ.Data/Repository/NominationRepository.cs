@@ -458,5 +458,71 @@ namespace Relevantz.EEPZ.Data.Repository
                 return null;
             }
         }
+        /// <summary>
+/// Get nomination history for a user (Self nominations + Team nominations they created)
+/// Filters only finalized nominations (Approved/Rejected/Withdrawn)
+/// </summary>
+public async Task<List<Nomination>> GetNominationHistoryByUserIdAsync(int userId, string? status = null)
+{
+    try
+    {
+        Console.WriteLine($"[Repository] GetNominationHistoryByUserIdAsync - UserId: {userId}, Status: {status ?? "All"}");
+
+        var query = _context.Nominations
+            .Include(n => n.Opportunity)
+                .ThenInclude(o => o.Department)
+            .Include(n => n.NomineeUser)
+                .ThenInclude(u => u.Employee)
+                .ThenInclude(e => e.Userprofile)
+            .Include(n => n.NominatedByUser)
+                .ThenInclude(u => u.Employee)
+                .ThenInclude(e => e.Userprofile)
+            .Include(n => n.L1ManagerUser)
+                .ThenInclude(u => u.Employee)
+                .ThenInclude(e => e.Userprofile)
+            .Include(n => n.L2ManagerUser)
+                .ThenInclude(u => u.Employee)
+                .ThenInclude(e => e.Userprofile)
+            .Include(n => n.DeptHeadUser)
+                .ThenInclude(u => u.Employee)
+                .ThenInclude(e => e.Userprofile)
+            .Where(n => 
+                // Self nominations: where user is the nominee
+                (n.NomineeUserId == userId && n.NominationType == "employee_self") ||
+                // Team nominations: where user is the nominating manager
+                (n.NominatedByUserId == userId && n.NominationType == "manager_nomination")
+            );
+
+        // Filter only finalized nominations (exclude pending)
+        var finalizedStatuses = new[] 
+        { 
+            "Approved_By_DeptHead", 
+            "Rejected_By_Manager", 
+            "Rejected_By_DeptHead", 
+            "Withdrawn" 
+        };
+        query = query.Where(n => finalizedStatuses.Contains(n.Status));
+
+        // Apply optional status filter
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(n => n.Status.Contains(status));
+        }
+
+        var nominations = await query
+            .OrderByDescending(n => n.SubmittedAt)
+            .ToListAsync();
+
+        Console.WriteLine($"[Repository] Found {nominations.Count} historical nominations for user {userId}");
+
+        return nominations;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Repository] Error in GetNominationHistoryByUserIdAsync: {ex.Message}");
+        throw;
+    }
+}
+
     }
 }
