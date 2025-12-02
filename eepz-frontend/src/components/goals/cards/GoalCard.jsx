@@ -238,7 +238,7 @@ const GoalCard = ({ goal }) => {
               backgroundColor: daysUntil <= 7 ? "#fff3cd" : "#e7f3ff",
               border: `1px solid ${daysUntil <= 7 ? "#ffc107" : "#0dcaf0"}`,
               borderRadius: "6px",
-              fontSize: "0.8rem",
+              fontSize: "12px",
               fontWeight: 500,
               color: daysUntil <= 7 ? "#856404" : "#0c5460",
               marginBottom: "1rem",
