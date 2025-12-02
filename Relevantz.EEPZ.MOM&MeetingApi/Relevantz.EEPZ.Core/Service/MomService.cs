@@ -16,7 +16,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<MomResponseDto> CreateMomAsync(CreateMomDto createMomDto, int submittedByEmployeeId, string role)
         {
-            
             ValidateCreateMomDto(createMomDto);
 
             var mappedRole = MapRoleToEnum(role);
@@ -63,6 +62,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }).ToList();
 
                 await _momRepository.AddActionItemsAsync(actionItems);
+
+                var uniqueEmployeeIds = createMomDto.ActionItems
+                    .Select(ai => ai.AssignedToEmployeeId)
+                    .Distinct()
+                    .Where(id => id != submittedByEmployeeId)
+                    .ToList();
+
+                if (uniqueEmployeeIds.Any())
+                {
+                    var sharings = uniqueEmployeeIds.Select(empId => new Momsharing
+                    {
+                        Momid = createdMom.Momid,
+                        SharedByEmployeeId = submittedByEmployeeId,
+                        SharedWithEmployeeId = empId,
+                        SharedAt = DateTime.Now
+                    }).ToList();
+
+                    await _momRepository.ShareMomAsync(sharings);
+                    Console.WriteLine($"✅ Auto-shared MOM {createdMom.Momid} '{createdMom.MeetingTitle}' with {uniqueEmployeeIds.Count} employees");
+                }
             }
 
             return await GetMomByIdAsync(createdMom.Momid) ?? throw new Exception("Failed to retrieve created MOM");
@@ -150,6 +169,26 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 }).ToList();
 
                 await _momRepository.AddActionItemsAsync(actionItems);
+
+                var uniqueEmployeeIds = updateMomDto.ActionItems
+                    .Select(ai => ai.AssignedToEmployeeId)
+                    .Distinct()
+                    .Where(id => id != employeeId)
+                    .ToList();
+
+                if (uniqueEmployeeIds.Any())
+                {
+                    var sharings = uniqueEmployeeIds.Select(empId => new Momsharing
+                    {
+                        Momid = existingMom.Momid,
+                        SharedByEmployeeId = employeeId,
+                        SharedWithEmployeeId = empId,
+                        SharedAt = DateTime.Now
+                    }).ToList();
+
+                    await _momRepository.ShareMomAsync(sharings);
+                    Console.WriteLine($"✅ Auto-shared updated MOM {existingMom.Momid} with {uniqueEmployeeIds.Count} employees");
+                }
             }
 
             return await GetMomByIdAsync(existingMom.Momid) ?? throw new Exception("Failed to retrieve updated MOM");
@@ -177,7 +216,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int pageNumber = 1,
             int pageSize = 20)
         {
-            
             var mappedRole = MapRoleToEnum(role);
             if (mappedRole != "HR")
                 throw new UnauthorizedAccessException("Only HR can view all MOMs");
@@ -259,60 +297,59 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             return moms.Select(MapToMomResponseDto).ToList();
         }
 
-       public async Task<MeetingResponseDto> ScheduleMeetingAsync(
-    ScheduleMeetingDto scheduleMeetingDto,
-    int scheduledByEmployeeId,
-    string role)
-{
-    
-    var mappedRole = MapRoleToEnum(role);
-    if (mappedRole != "Manager")
-        throw new UnauthorizedAccessException("Only managers can schedule meetings");
-
-    var employeeExists = await _momRepository.GetEmployeeByIdAsync(scheduledByEmployeeId);
-    if (employeeExists == null)
-    {
-        throw new Exception($"Scheduling employee with ID {scheduledByEmployeeId} does not exist in the employee table.");
-    }
-
-    if (scheduleMeetingDto.ParticipantEmployeeIds == null || !scheduleMeetingDto.ParticipantEmployeeIds.Any())
-        throw new Exception("At least one participant is required.");
-
-    foreach (var empId in scheduleMeetingDto.ParticipantEmployeeIds)
-    {
-        var participantExists = await _momRepository.GetEmployeeByIdAsync(empId);
-        if (participantExists == null)
+        public async Task<MeetingResponseDto> ScheduleMeetingAsync(
+            ScheduleMeetingDto scheduleMeetingDto,
+            int scheduledByEmployeeId,
+            string role)
         {
-            throw new Exception($"Participant with employee ID {empId} does not exist.");
+            var mappedRole = MapRoleToEnum(role);
+            if (mappedRole != "Manager")
+                throw new UnauthorizedAccessException("Only managers can schedule meetings");
+
+            var employeeExists = await _momRepository.GetEmployeeByIdAsync(scheduledByEmployeeId);
+            if (employeeExists == null)
+            {
+                throw new Exception($"Scheduling employee with ID {scheduledByEmployeeId} does not exist in the employee table.");
+            }
+
+            if (scheduleMeetingDto.ParticipantEmployeeIds == null || !scheduleMeetingDto.ParticipantEmployeeIds.Any())
+                throw new Exception("At least one participant is required.");
+
+            foreach (var empId in scheduleMeetingDto.ParticipantEmployeeIds)
+            {
+                var participantExists = await _momRepository.GetEmployeeByIdAsync(empId);
+                if (participantExists == null)
+                {
+                    throw new Exception($"Participant with employee ID {empId} does not exist.");
+                }
+            }
+
+            var meeting = new Meeting
+            {
+                MeetingTitle = scheduleMeetingDto.MeetingTitle,
+                MeetingType = scheduleMeetingDto.MeetingType,
+                MeetingDate = scheduleMeetingDto.MeetingDate,
+                MeetingLink = scheduleMeetingDto.MeetingLink,
+                Agenda = scheduleMeetingDto.Agenda,
+                ScheduledByEmployeeId = scheduledByEmployeeId, 
+                Status = "Scheduled",
+                CreatedAt = DateTime.Now
+            };
+
+            var createdMeeting = await _momRepository.CreateMeetingAsync(meeting);
+
+            var participants = scheduleMeetingDto.ParticipantEmployeeIds.Select(empId => new Meetingparticipant
+            {
+                MeetingId = createdMeeting.MeetingId,
+                EmployeeId = empId,
+                CreatedAt = DateTime.Now
+            }).ToList();
+
+            await _momRepository.AddMeetingParticipantsAsync(participants);
+
+            return await GetMeetingByIdAsync(createdMeeting.MeetingId)
+                ?? throw new Exception("Failed to retrieve created meeting");
         }
-    }
-
-    var meeting = new Meeting
-    {
-        MeetingTitle = scheduleMeetingDto.MeetingTitle,
-        MeetingType = scheduleMeetingDto.MeetingType,
-        MeetingDate = scheduleMeetingDto.MeetingDate,
-        MeetingLink = scheduleMeetingDto.MeetingLink,
-        Agenda = scheduleMeetingDto.Agenda,
-        ScheduledByEmployeeId = scheduledByEmployeeId, 
-        Status = "Scheduled",
-        CreatedAt = DateTime.Now
-    };
-
-    var createdMeeting = await _momRepository.CreateMeetingAsync(meeting);
-
-    var participants = scheduleMeetingDto.ParticipantEmployeeIds.Select(empId => new Meetingparticipant
-    {
-        MeetingId = createdMeeting.MeetingId,
-        EmployeeId = empId,
-        CreatedAt = DateTime.Now
-    }).ToList();
-
-    await _momRepository.AddMeetingParticipantsAsync(participants);
-
-    return await GetMeetingByIdAsync(createdMeeting.MeetingId)
-        ?? throw new Exception("Failed to retrieve created meeting");
-}
 
         public async Task<List<MeetingResponseDto>> GetMeetingsByManagerIdAsync(int managerId)
         {
@@ -335,7 +372,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-            
             var mappedRole = MapRoleToEnum(role);
             if (mappedRole != "Manager")
                 throw new UnauthorizedAccessException("Only managers can view reports");
@@ -418,7 +454,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
         public async Task<OneOnOneSummaryDto> GetOneOnOneSummaryAsync(int managerId, string role)
         {
-            
             var mappedRole = MapRoleToEnum(role);
             if (mappedRole != "Manager")
                 throw new UnauthorizedAccessException("Only managers can view summaries");
@@ -522,16 +557,33 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         public async Task<List<ActionItemResponseDto>> GetMyActionItemsAsync(int employeeId)
         {
             var actionItems = await _momRepository.GetActionItemsByEmployeeIdAsync(employeeId);
-            return actionItems.Select(ai => new ActionItemResponseDto
-            {
-                ActionItemId = ai.ActionItemId,
-                TaskDescription = ai.TaskDescription,
-                AssignedToEmployeeId = ai.AssignedToEmployeeId,
-                AssignedToEmployeeName = GetEmployeeName(ai.AssignedToEmployee),
-                DueDate = ai.DueDate,
-                Status = ai.Status,
-                CreatedAt = ai.CreatedAt
+            
+            Console.WriteLine($"[SERVICE] Found {actionItems.Count} action items for employee {employeeId}");
+            
+            var result = actionItems.Select(ai => {
+                var meetingTitle = ai.Mom?.MeetingTitle ?? "N/A";
+                Console.WriteLine($"[SERVICE] Action Item {ai.ActionItemId}: Meeting Title = '{meetingTitle}', MomId = {ai.Momid}");
+                
+                return new ActionItemResponseDto
+                {
+                    ActionItemId = ai.ActionItemId,
+                    TaskDescription = ai.TaskDescription,
+                    AssignedToEmployeeId = ai.AssignedToEmployeeId,
+                    AssignedToEmployeeName = GetEmployeeName(ai.AssignedToEmployee),
+                    DueDate = ai.DueDate,
+                    Status = ai.Status,
+                    CreatedAt = ai.CreatedAt,
+                    MeetingTitle = meetingTitle,
+                    MomId = ai.Momid,
+                    AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
+                    AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
+                        ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
+                        : null
+                };
             }).ToList();
+            
+            Console.WriteLine($"[SERVICE] Returning {result.Count} action items");
+            return result;
         }
 
         public async Task<List<ActionItemResponseDto>> GetActionItemsAssignedByMeAsync(int employeeId)
@@ -545,7 +597,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 AssignedToEmployeeName = GetEmployeeName(ai.AssignedToEmployee),
                 DueDate = ai.DueDate,
                 Status = ai.Status,
-                CreatedAt = ai.CreatedAt
+                CreatedAt = ai.CreatedAt,
+                MeetingTitle = ai.Mom?.MeetingTitle ?? "N/A",
+                MomId = ai.Momid,
+                AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
+                AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
+                    ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
+                    : null
             }).ToList();
         }
 
@@ -564,7 +622,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     AssignedToEmployeeName = GetEmployeeName(ai.AssignedToEmployee),
                     DueDate = ai.DueDate,
                     Status = ai.Status,
-                    CreatedAt = ai.CreatedAt
+                    CreatedAt = ai.CreatedAt,
+                    MeetingTitle = ai.Mom?.MeetingTitle ?? "N/A",
+                    MomId = ai.Momid,
+                    AssignedByEmployeeId = ai.Mom?.SubmittedByEmployeeId,
+                    AssignedByEmployeeName = ai.Mom?.SubmittedByEmployee != null 
+                        ? GetEmployeeName(ai.Mom.SubmittedByEmployee) 
+                        : null
                 }).ToList();
 
             return overdueItems;
@@ -595,7 +659,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
             var roleMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                
                 { "User", "Employee" },
                 { "Employee", "Employee" },
                 { "Staff", "Employee" },
@@ -671,7 +734,11 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     AssignedToEmployeeName = GetEmployeeName(ai.AssignedToEmployee),
                     DueDate = ai.DueDate,
                     Status = ai.Status,
-                    CreatedAt = ai.CreatedAt
+                    CreatedAt = ai.CreatedAt,
+                    MeetingTitle = mom.MeetingTitle,
+                    MomId = mom.Momid,
+                    AssignedByEmployeeId = mom.SubmittedByEmployeeId,
+                    AssignedByEmployeeName = GetEmployeeName(mom.SubmittedByEmployee)
                 }).ToList() ?? new List<ActionItemResponseDto>()
             };
         }
@@ -748,7 +815,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     EmployeeId = employee.EmployeeId,
                     EmployeeName = GetEmployeeName(employee),
-                    
                     TotalMeetings = employeeMeetings.Count,
                     CompletedMeetings = completedMeetings,
                     LastMeetingDate = lastMeeting?.MeetingDate,
@@ -764,7 +830,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         
         public async Task<MeetingInvitationDto> SubmitRsvpAsync(RsvpResponseDto rsvpDto, int employeeId)
         {
-            
             var validStatuses = new[] { "Accepted", "Declined", "Tentative" };
             if (!validStatuses.Contains(rsvpDto.RsvpStatus))
                 throw new ArgumentException("Invalid RSVP status. Must be: Accepted, Declined, or Tentative");
@@ -801,7 +866,6 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
             int managerId, 
             string role)
         {
-            
             var mappedRole = MapRoleToEnum(role);
             if (mappedRole != "Manager")
                 throw new UnauthorizedAccessException("Only managers can view RSVP summaries");
@@ -865,8 +929,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 RsvpStatus = participant.Rsvpstatus,
                 RsvpResponseDate = participant.RsvpresponseDate,
                 RsvpComments = participant.Rsvpcomments,
-                InvitedAt = participant.InvitedAt,
-                DaysUntilMeeting = daysUntilMeeting
+                DaysUntilMeeting = daysUntilMeeting,
+               // IsUpcoming = participant.Meeting.MeetingDate > DateTime.Now
             };
         }
     }

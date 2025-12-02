@@ -170,7 +170,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "❌ MoM Application terminated unexpectedly");
+    Log.Fatal(ex, " MoM Application terminated unexpectedly");
 }
 finally
 {

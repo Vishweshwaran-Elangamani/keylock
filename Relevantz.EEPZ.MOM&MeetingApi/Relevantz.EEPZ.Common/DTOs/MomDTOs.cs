@@ -103,24 +103,32 @@ namespace Relevantz.EEPZ.Common.DTOs
         public List<ActionItemResponseDto> ActionItems { get; set; } = new();
     }
 
+   public class ActionItemResponseDto
+{
+    public int ActionItemId { get; set; }
+    public string TaskDescription { get; set; }
+    public int AssignedToEmployeeId { get; set; }
+    public string AssignedToEmployeeName { get; set; }
+    public DateOnly DueDate { get; set; }
+    public string Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    // ✅ THESE MUST BE HERE:
+    public string? MeetingTitle { get; set; }
+    public int? MomId { get; set; }
+    public int? AssignedByEmployeeId { get; set; }
+    public string? AssignedByEmployeeName { get; set; }
+    public bool IsOverdue { get; set; }
+}
+
+
+
 
     public class DiscussionPointResponseDto
     {
         public int PointId { get; set; }
         public string PointText { get; set; } = null!;
         public int PointOrder { get; set; }
-    }
-
-    public class ActionItemResponseDto
-    {
-        public int ActionItemId { get; set; }
-        public string TaskDescription { get; set; } = null!;
-        public int AssignedToEmployeeId { get; set; }
-        public string AssignedToEmployeeName { get; set; } = null!;
-        public DateOnly DueDate { get; set; }
-        public string Status { get; set; } = null!;
-        public DateTime CreatedAt { get; set; }
-        public bool IsOverdue => DueDate < DateOnly.FromDateTime(DateTime.Now) && Status != "Completed";
     }
 
 
