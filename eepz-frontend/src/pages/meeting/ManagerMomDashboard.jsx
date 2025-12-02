@@ -1,14 +1,15 @@
-// src/pages/Meeting/ManagerMomDashboard.jsx
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import momService from "../../services/meeting/momService";
 import meetingService from "../../services/meeting/meetingService";
-import momActionItemService from "../../services/meeting/momService";
 import rsvpService from "../../services/meeting/rsvpService";
+import employeeService from "../../services/meeting/employeeservice";
 import toastr from "toastr";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerMeetingDetailsModal";
+
 
 const ManagerMomDashboard = () => {
   const navigate = useNavigate();
@@ -20,35 +21,72 @@ const ManagerMomDashboard = () => {
   });
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [recentTeamMoms, setRecentTeamMoms] = useState([]);
+  const [actionItems, setActionItems] = useState([]);
+  const [employeeMap, setEmployeeMap] = useState({});
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [showTableView, setShowTableView] = useState(true);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
+  const [actionItemFilter, setActionItemFilter] = useState("all");
+
 
   useEffect(() => {
     loadDashboardData();
   }, []);
 
-  const loadDashboardData = async () => {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadDashboardData(true); 
+    }, 30000); 
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
+
+  const loadDashboardData = async (silentRefresh = false) => {
     try {
-      setLoading(true);
-      const [myMomsRes, meetingsRes, actionItemsRes] = await Promise.all([
+      if (!silentRefresh) {
+        setLoading(true);
+      } else {
+        setRefreshing(true);
+      }
+      
+    
+      const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] = await Promise.all([
         momService.getMyMoms(),
         meetingService.getMyMeetings(),
-        momActionItemService.getActionItemsAssignedByMe(),
+        employeeService.getAllEmployees(),
+        momService.getActionItemsAssignedByMe(), // This gets action items assigned BY manager
       ]);
+
+      if (employeesRes.success && employeesRes.data) {
+        const nameMap = {};
+        employeesRes.data.forEach((emp) => {
+          nameMap[emp.employeeMasterId] = `${emp.firstName} ${emp.lastName}`;
+        });
+        setEmployeeMap(nameMap);
+      }
+
+      const allActionItems = actionItemsAssignedByMeRes.data || [];
+      
+      console.log(" Action Items Assigned By Manager:", allActionItems);
+
+      const overdueCount = allActionItems.filter((ai) => {
+        const dueDate = new Date(ai.dueDate);
+        return ai.status === "Pending" && dueDate < new Date();
+      }).length;
 
       setStats({
         teamMomsCount: myMomsRes.data?.length || 0,
         oneOnOnesCount:
           meetingsRes.data?.filter((m) => m.meetingType === "One-on-One")
             .length || 0,
-        overdueActionsCount:
-          actionItemsRes.data?.filter((ai) => {
-            const dueDate = new Date(ai.dueDate);
-            return ai.status === "Pending" && dueDate < new Date();
-          }).length || 0,
+        overdueActionsCount: overdueCount,
         totalMeetingsCount: meetingsRes.data?.length || 0,
       });
+
+      // Set action items
+      setActionItems(allActionItems);
 
       const meetingsWithRsvp = await Promise.all(
         (meetingsRes.data || []).map(async (meeting) => {
@@ -85,16 +123,20 @@ const ManagerMomDashboard = () => {
       console.error(err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
 
   const openMeetingDetails = (meeting) => {
     setSelectedMeeting(meeting);
   };
 
+
   const closeMeetingDetails = () => {
     setSelectedMeeting(null);
   };
+
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "-";
@@ -106,6 +148,31 @@ const ManagerMomDashboard = () => {
     const min = String(date.getMinutes()).padStart(2, "0");
     return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
   };
+
+  const formatDate = (isoString) => {
+    if (!isoString) return "-";
+    const date = new Date(isoString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const isOverdue = (dueDate, status) => {
+    return status === "Pending" && new Date(dueDate) < new Date();
+  };
+
+  const getFilteredActionItems = () => {
+    return actionItems.filter((item) => {
+      if (actionItemFilter === "all") return true;
+      if (actionItemFilter === "pending") return item.status === "Pending";
+      if (actionItemFilter === "completed") return item.status === "Completed";
+      if (actionItemFilter === "overdue") return isOverdue(item.dueDate, item.status);
+      return true;
+    });
+  };
+
 
   if (loading) {
     return (
@@ -120,6 +187,7 @@ const ManagerMomDashboard = () => {
       </div>
     );
   }
+
 
   return (
     <div
@@ -162,9 +230,10 @@ const ManagerMomDashboard = () => {
         />
       </div>
 
-      {/* View Toggle and Schedule Meeting Button */}
+
+    
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
-        {/* Left: View Toggle */}
+       
         <div className="btn-group" role="group">
           <button
             type="button"
@@ -190,35 +259,41 @@ const ManagerMomDashboard = () => {
           </button>
         </div>
 
-        {/* Right: Schedule Meeting Button with Gradient */}
-        <button
-          className="btn d-flex align-items-center gap-2 px-3 py-2"
-          onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
-          style={{ 
-            background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-            color: '#fff',
-            border: 'none',
-            fontWeight: '500',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.opacity = '0.9';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.opacity = '1';
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
-        >
-          <i className="bi bi-calendar-plus"></i>
-          Schedule Meeting
-        </button>
+
+        {/* Right: Refresh and Schedule Meeting Buttons */}
+        <div className="d-flex gap-2">
+         
+          
+          <button
+            className="btn d-flex align-items-center gap-2 px-3 py-2"
+            onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
+            style={{ 
+              background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
+              color: '#fff',
+              border: 'none',
+              fontWeight: '500',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '0.9';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1';
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <i className="bi bi-calendar-plus"></i>
+            Schedule Meeting
+          </button>
+        </div>
       </div>
 
+
       {/* Upcoming Meetings */}
-      <div className="card border-0 shadow-sm mb-4">
+      <div className="card shadow-sm mb-4" style={{ border: '1px solid #27235c', borderRadius: '12px' }}>
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h5
@@ -232,28 +307,89 @@ const ManagerMomDashboard = () => {
             </span>
           </div>
 
+
           {showTableView ? (
-            <div className="table-responsive">
-              <table className="table table-hover align-middle">
-                <thead className="table-light">
-                  <tr>
-                    <th className="fw-semibold" style={{ color: "#64748b" }}>
-                      Meeting Title
+            <div className="table-responsive" style={{ borderRadius: '8px', overflow: 'hidden' }}>
+              <table className="table align-middle" style={{ marginBottom: 0 }}>
+                <thead>
+                  <tr style={{ backgroundColor: "#27235c" }}>
+                    <th
+                      className="fw-semibold text-uppercase"
+                      style={{
+                        color: "#ffffff",
+                        padding: "16px 12px",
+                        backgroundColor: "#27235c",
+                        borderBottom: "none",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.5px"
+                      }}
+                    >
+                      MEETING TITLE
                     </th>
-                    <th className="fw-semibold" style={{ color: "#64748b" }}>
-                      Date & Time
+                    <th
+                      className="fw-semibold text-uppercase"
+                      style={{
+                        color: "#ffffff",
+                        padding: "16px 12px",
+                        backgroundColor: "#27235c",
+                        borderBottom: "none",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.5px"
+                      }}
+                    >
+                      DATE & TIME
                     </th>
-                    <th className="fw-semibold" style={{ color: "#64748b" }}>
-                      Type
+                    <th
+                      className="fw-semibold text-uppercase"
+                      style={{
+                        color: "#ffffff",
+                        padding: "16px 12px",
+                        backgroundColor: "#27235c",
+                        borderBottom: "none",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.5px"
+                      }}
+                    >
+                      TYPE
                     </th>
-                    <th className="fw-semibold" style={{ color: "#64748b" }}>
-                      Attendance
+                    <th
+                      className="fw-semibold text-uppercase"
+                      style={{
+                        color: "#ffffff",
+                        padding: "16px 12px",
+                        backgroundColor: "#27235c",
+                        borderBottom: "none",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.5px"
+                      }}
+                    >
+                      ATTENDANCE
                     </th>
-                    <th className="fw-semibold" style={{ color: "#64748b" }}>
-                      Status
+                    <th
+                      className="fw-semibold text-uppercase"
+                      style={{
+                        color: "#ffffff",
+                        padding: "16px 12px",
+                        backgroundColor: "#27235c",
+                        borderBottom: "none",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.5px"
+                      }}
+                    >
+                      STATUS
                     </th>
-                    <th className="fw-semibold" style={{ color: "#64748b" }}>
-                      Actions
+                    <th
+                      className="fw-semibold text-uppercase"
+                      style={{
+                        color: "#ffffff",
+                        padding: "16px 12px",
+                        backgroundColor: "#27235c",
+                        borderBottom: "none",
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.5px"
+                      }}
+                    >
+                      ACTIONS
                     </th>
                   </tr>
                 </thead>
@@ -272,10 +408,19 @@ const ManagerMomDashboard = () => {
                     upcomingMeetings.map((meeting) => (
                       <tr
                         key={meeting.meetingId}
-                        style={{ cursor: "pointer" }}
+                        style={{
+                          cursor: "pointer",
+                          transition: "background-color 0.2s"
+                        }}
                         onClick={() => openMeetingDetails(meeting)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f8f9fa";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
                       >
-                        <td>
+                        <td style={{ padding: "12px" }}>
                           <div className="d-flex align-items-center gap-2">
                             <div
                               className="rounded-circle d-flex align-items-center justify-content-center"
@@ -295,18 +440,18 @@ const ManagerMomDashboard = () => {
                             </span>
                           </div>
                         </td>
-                        <td>
+                        <td style={{ padding: "12px" }}>
                           <span className="text-muted">
                             <i className="bi bi-clock me-1"></i>
                             {formatDateTime(meeting.meetingDate)}
                           </span>
                         </td>
-                        <td>
+                        <td style={{ padding: "12px" }}>
                           <span className="badge bg-light text-dark border">
                             {meeting.meetingType || "General"}
                           </span>
                         </td>
-                        <td>
+                        <td style={{ padding: "12px" }}>
                           <div className="d-flex align-items-center gap-2">
                             <div
                               className="progress"
@@ -332,7 +477,7 @@ const ManagerMomDashboard = () => {
                             </small>
                           </div>
                         </td>
-                        <td>
+                        <td style={{ padding: "12px" }}>
                           {meeting.rsvpAcceptedCount ===
                             meeting.rsvpTotalInvitations &&
                           meeting.rsvpTotalInvitations > 0 ? (
@@ -349,7 +494,7 @@ const ManagerMomDashboard = () => {
                             </span>
                           )}
                         </td>
-                        <td>
+                        <td style={{ padding: "12px" }}>
                           <button
                             className="btn btn-sm btn-outline-primary"
                             onClick={(e) => {
@@ -459,66 +604,7 @@ const ManagerMomDashboard = () => {
         </div>
       </div>
 
-      {/* Recent Team MOMs */}
-      <div className="card border-0 shadow-sm mb-4">
-        <div className="card-body">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h5
-              className="card-title fw-semibold mb-0"
-              style={{ color: "#1e293b" }}
-            >
-              Recent Team MOMs
-            </h5>
-          </div>
 
-          {recentTeamMoms.length === 0 ? (
-            <div className="text-center py-5 text-muted">
-              <i className="bi bi-file-text" style={{ fontSize: "2rem" }}></i>
-              <p className="mt-2 mb-0">No recent MOMs</p>
-            </div>
-          ) : (
-            <div className="list-group list-group-flush">
-              {recentTeamMoms.map((mom) => (
-                <div
-                  key={mom.momId}
-                  className="list-group-item list-group-item-action border-0 px-0 py-3"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/mom/view/${mom.momId}`)}
-                >
-                  <div className="d-flex align-items-start gap-3">
-                    <div
-                      className="rounded-circle d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        backgroundColor: "#e8f5e9",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <i
-                        className="bi bi-file-text"
-                        style={{ color: "#388e3c" }}
-                      ></i>
-                    </div>
-                    <div className="flex-grow-1">
-                      <h6 className="mb-1 fw-semibold">{mom.meetingTitle}</h6>
-                      <small className="text-muted">
-                        <i className="bi bi-calendar3 me-1"></i>
-                        {new Date(mom.meetingDate).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </small>
-                    </div>
-                    <i className="bi bi-chevron-right text-muted"></i>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
 
       {/*  Modal Component */}
       {selectedMeeting && (
@@ -530,6 +616,7 @@ const ManagerMomDashboard = () => {
     </div>
   );
 };
+
 const StatCard = ({ icon, bgColor, iconColor, count, label, sublabel }) => (
   <div className="col-lg-3 col-md-6">
     <div

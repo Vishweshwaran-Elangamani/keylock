@@ -7,10 +7,8 @@ import toastr from 'toastr';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import './../../styles/mom/EmployeeMomDashboard.css';
 
-
-
-// Import separated modal components
 import MeetingDetailsModal from '../../components/meeting/modals/MeetingDetailsModal';
 import SharedMomsModal from '../../components/meeting/modals/SharedMomsModal';
 
@@ -203,6 +201,45 @@ const EmployeeMomDashboard = () => {
               Dashboard
             </button>
           </li>
+           <li
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "#97247E",
+              margin: "0 8px",
+              fontSize: "1rem",
+            }}
+          >
+            /
+          </li>
+          
+          <li
+            className="breadcrumb-item"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <button
+              onClick={() => navigate("/employee/dashboard")}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#97247E",
+                cursor: "pointer",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                textDecoration: "none",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+             
+              Meetings and MoM
+            </button>
+          </li>
           <li
             style={{
               display: "flex",
@@ -236,42 +273,41 @@ const EmployeeMomDashboard = () => {
       </nav>
 
       {/* Quick Stats */}
-      <div className="row g-3 mb-4" >
+      <div className="row g-3 mb-4">
         <StatCard 
           icon="bi-file-text" 
-          bgColor="#e3f2fd" 
-          iconColor="#1976d2"
+          bgColor="#E3F2FD" 
+          iconColor="#3B82F6"
           count={stats.myMoms} 
           label="My MOMs"
           onClick={() => navigate('/employee/dashboard/meetmom/my-moms')}
         />
         <StatCard 
           icon="bi-clock-history" 
-          bgColor="#f3e5f5" 
-          iconColor="#7b1fa2"
+          bgColor="#E0E7FF" 
+          iconColor="#7C3AED"
           count={stats.pendingActionItems} 
           label="Pending Actions"
           onClick={() => navigate('/employee/dashboard/meetmom/action-items')}
         />
         <StatCard 
           icon="bi-envelope-open" 
-          bgColor="#e8f5e9" 
-          iconColor="#388e3c"
+          bgColor="#DCFCE7" 
+          iconColor="#16A34A"
           count={stats.meetingInvitations} 
           label="Invitations"
           onClick={() => navigate('/employee/dashboard/meetmom/invitations')}
         />
         <StatCard 
           icon="bi-share" 
-          bgColor="#fff3e0" 
-          iconColor="#f57c00"
+          bgColor="#FEF3C7" 
+          iconColor="#F59E0B"
           count={stats.sharedMoms} 
           label="Shared MOMs"
           onClick={openSharedModal}
         />
       </div>
 
-      {/* Search & Filter Bar */}
       <div className="card border-0 shadow-sm mb-4">
         <div className="card-body py-3">
           <div className="row g-3 align-items-center">
@@ -469,7 +505,7 @@ const EmployeeMomDashboard = () => {
         </div>
       </div>
 
-      {/* ✅ Modal Components */}
+      {/*  Modal Components */}
       {selectedMeeting && (
         <MeetingDetailsModal 
           meeting={selectedMeeting}
@@ -507,54 +543,64 @@ const EmployeeMomDashboard = () => {
   );
 };
 
-// Stat Card Component
+// Stat Card Component - Updated to match reference design
 const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
   <div className="col-lg-3 col-md-6">
     <div 
-      className="card shadow-sm h-100"
+      className="card shadow-sm h-100 mom-stat-card-custom"
       onClick={onClick}
       style={{ 
         transition: 'all 0.3s',
         cursor: 'pointer',
-        border: '1px solid #27235c', 
-        borderRadius: '8px'            
+        border: '2px solid #000000', 
+        borderRadius: '12px',
+        padding: '1.5rem',
+        textAlign: 'center',
+        minHeight: '180px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}
       onMouseOver={(e) => {
-        e.currentTarget.style.transform = 'translateY(-5px)';
-        e.currentTarget.style.boxShadow = '0 0.5rem 1rem rgba(0, 0, 0, 0.15)';
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.1)';
       }}
       onMouseOut={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)';
+        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
       }}
     >
-      <div className="card-body d-flex align-items-center p-4">
-        <div 
-          className="rounded-circle d-flex align-items-center justify-content-center me-3"
-          style={{ 
-            width: '60px', 
-            height: '60px', 
-            backgroundColor: bgColor,
-            flexShrink: 0
-          }}
-        >
-          <i className={`${icon} fs-3`} style={{ color: iconColor }}></i>
-        </div>
-        <div className="flex-grow-1">
-          <h3 className="fw-bold mb-0" style={{ fontSize: '2rem', color: '#1e293b' }}>
-            {count}
-          </h3>
-          <p className="text-muted mb-0 fw-medium" style={{ fontSize: '0.875rem' }}>
-            {label}
-          </p>
-        </div>
+      {/* Icon with rounded background */}
+      <div 
+        style={{ 
+          width: '64px', 
+          height: '64px', 
+          backgroundColor: bgColor,
+          borderRadius: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '1rem'
+        }}
+      >
+        <i className={`${icon} fs-2`} style={{ color: iconColor }}></i>
       </div>
+      
+    
+      <h3 className="fw-bold mb-2" style={{ fontSize: '2.5rem', color: '#000000', lineHeight: 1 }}>
+        {count}
+      </h3>
+      
+    
+      <p className="mb-0 fw-medium" style={{ fontSize: '0.9375rem', color: '#6B7280' }}>
+        {label}
+      </p>
     </div>
   </div>
 );
 
 
-// Action Button Component
 const ActionButton = ({ icon, label, color, count, onClick }) => (
   <div className="col-lg-3 col-md-6">
     <button 
@@ -584,7 +630,7 @@ const ActionButton = ({ icon, label, color, count, onClick }) => (
   </div>
 );
 
-// Activity Item Component
+
 const ActivityItem = ({ item, onClick }) => {
   const iconBgColor = {
     primary: '#e3f2fd',
@@ -602,7 +648,7 @@ const ActivityItem = ({ item, onClick }) => {
 
   return (
     <div 
-      className="d-flex align-items-center p-3 rounded-3"
+      className="d-flex align-items-start p-3 rounded-3"
       onClick={onClick}
       style={{ 
         cursor: 'pointer', 
@@ -635,7 +681,7 @@ const ActivityItem = ({ item, onClick }) => {
         <i className={`${item.icon} fs-5`} style={{ color: iconColor[item.color] }}></i>
       </div>
       <div className="flex-grow-1">
-        <h6 className="mb-1 fw-semibold" style={{ fontSize: '0.95rem' }}>{item.title}</h6>
+        <h6 className="mb-1 fw-semibold text-start" style={{ fontSize: '0.95rem' }}>{item.title}</h6>
         <div className="d-flex align-items-center gap-3">
           <small className="text-muted d-flex align-items-center gap-1">
             <i className="bi bi-calendar3"></i>

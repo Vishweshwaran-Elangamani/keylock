@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import momService from "../../services/meeting/momService";
 import meetingService from "../../services/meeting/meetingService";
+import employeeService from "../../services/meeting/employeeservice";
 import toastr from "toastr";
 import {
   FileText,
@@ -19,21 +21,28 @@ import {
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+
 const initialActionItem = {
-  task: "",
-  assignTo: "",
+  taskDescription: "",
+  assignedToEmployeeId: null,
+  assignedToEmployeeName: "",
   dueDate: "",
   status: "Pending",
 };
+
 
 const CreateOrEditMom = ({ isEdit = false }) => {
   const navigate = useNavigate();
   const { momId, meetingId } = useParams();
 
-  // State for meeting data (used in create mode)
-  const [meetingData, setMeetingData] = useState(null);
 
-  // MOM form state (user inputs)
+
+  const [meetingData, setMeetingData] = useState(null);
+  const [allEmployees, setAllEmployees] = useState([]);
+  const [employeeMap, setEmployeeMap] = useState({});
+
+
+
   const [formData, setFormData] = useState({
     discussionPoints: [],
     actionItems: [],
@@ -43,24 +52,58 @@ const CreateOrEditMom = ({ isEdit = false }) => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Load MOM data for edit, or meeting if creating
+
   useEffect(() => {
+    loadEmployees(); 
     if (isEdit && momId) {
       fetchMomData(momId);
     } else if (meetingId) {
-      fetchMeetingData(meetingId); // Preload meeting for CREATE
+      fetchMeetingData(meetingId);
     }
   }, [momId, meetingId, isEdit]);
 
-  // Fetch MOM (edit mode)
+
+ 
+  const loadEmployees = async () => {
+    try {
+      const response = await employeeService.getAllEmployees();
+      if (response.success && response.data) {
+        setAllEmployees(response.data);
+        
+        const nameToIdMap = {};
+        response.data.forEach((emp) => {
+          const fullName = `${emp.firstName} ${emp.lastName}`;
+          nameToIdMap[fullName] = emp.employeeMasterId;
+        });
+        setEmployeeMap(nameToIdMap);
+        
+        console.log("👥 Employee Map (Name -> ID):", nameToIdMap);
+      }
+    } catch (err) {
+      console.error("Failed to load employees:", err);
+    }
+  };
+
+
   const fetchMomData = async (id) => {
     setLoading(true);
     try {
       const response = await momService.getMomById(id);
       const mom = response.data || response;
+      
+    
+      const mappedActionItems = (mom.actionItems || []).map(item => ({
+        actionItemId: item.actionItemId,
+        taskDescription: item.taskDescription || item.task || "",
+        assignedToEmployeeId: item.assignedToEmployeeId,
+        assignedToEmployeeName: item.assignedToEmployeeName || item.assignTo || "",
+        dueDate: item.dueDate || "",
+        status: item.status || "Pending",
+      }));
+      
       setFormData({
         discussionPoints: mom.discussionPoints || [],
-        actionItems: mom.actionItems || [],
+        actionItems: mappedActionItems,
         commentsObservations: mom.commentsObservations || "",
       });
       setMeetingData({
@@ -77,6 +120,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       setLoading(false);
     }
   };
+
 
   // Fetch Meeting (create mode)
   const fetchMeetingData = async (id) => {
@@ -99,7 +143,8 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     }
   };
 
-  // Discussion Points Functions
+
+
   const handleAddDiscussionPoint = () => {
     setFormData((prev) => ({
       ...prev,
@@ -107,11 +152,13 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     }));
   };
 
+
   const handleChangeDiscussionPoint = (index, value) => {
     const newPoints = [...formData.discussionPoints];
     newPoints[index].point = value;
     setFormData((prev) => ({ ...prev, discussionPoints: newPoints }));
   };
+
 
   const handleRemoveDiscussionPoint = (index) => {
     const newPoints = [...formData.discussionPoints];
@@ -119,7 +166,8 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     setFormData((prev) => ({ ...prev, discussionPoints: newPoints }));
   };
 
-  // Action Items Functions
+
+
   const handleAddActionItem = () => {
     setFormData((prev) => ({
       ...prev,
@@ -127,11 +175,25 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     }));
   };
 
+
   const handleChangeActionItem = (index, field, value) => {
     const newItems = [...formData.actionItems];
-    newItems[index][field] = value;
+    
+    if (field === "assignedToEmployeeName") {
+      // When employee name changes, also set the ID
+      newItems[index].assignedToEmployeeName = value;
+      newItems[index].assignedToEmployeeId = employeeMap[value] || null;
+      
+      console.log(`Assigned: ${value} -> ID: ${employeeMap[value]}`);
+    } else if (field === "taskDescription") {
+      newItems[index].taskDescription = value;
+    } else {
+      newItems[index][field] = value;
+    }
+    
     setFormData((prev) => ({ ...prev, actionItems: newItems }));
   };
+
 
   const handleRemoveActionItem = (index) => {
     const newItems = [...formData.actionItems];
@@ -139,7 +201,8 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     setFormData((prev) => ({ ...prev, actionItems: newItems }));
   };
 
-  // Comment/Observation Change
+
+
   const handleCommentsChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -147,24 +210,34 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     }));
   };
 
+
   // Validation
   const validateForm = () => {
     const newErrors = {};
     if (!meetingData) newErrors.meeting = "Meeting details missing";
+    
+
+    formData.actionItems.forEach((item, index) => {
+      if (item.taskDescription && !item.assignedToEmployeeId) {
+        newErrors[`actionItem_${index}`] = "Please select an employee for this task";
+      }
+    });
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Save/Submit MOM
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
-      toastr.error("Please check the form");
+      toastr.error("Please check the form - make sure all action items have employees assigned");
       return;
     }
     setSubmitting(true);
     try {
-      // Prepare payload
+    
       const momPayload = {
         momId: isEdit ? parseInt(momId) : 0,
         meetingId: meetingId ? parseInt(meetingId) : undefined,
@@ -176,11 +249,19 @@ const CreateOrEditMom = ({ isEdit = false }) => {
         discussionPoints: formData.discussionPoints.filter(
           (dp) => dp.point && dp.point.trim()
         ),
-        actionItems: formData.actionItems.filter(
-          (ai) => ai.task && ai.task.trim()
-        ),
+        actionItems: formData.actionItems
+          .filter((ai) => ai.taskDescription && ai.taskDescription.trim())
+          .map((ai) => ({
+            actionItemId: ai.actionItemId || 0,
+            taskDescription: ai.taskDescription,
+            assignedToEmployeeId: ai.assignedToEmployeeId,
+            dueDate: ai.dueDate,
+            status: ai.status || "Pending",
+          })),
         commentsObservations: formData.commentsObservations,
       };
+
+      console.log("Submitting MOM Payload:", momPayload);
 
       if (isEdit) {
         await momService.updateMom(momPayload);
@@ -192,11 +273,12 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       navigate("/mom/my-moms");
     } catch (err) {
       toastr.error("Failed to submit MOM");
-      console.error(err);
+      console.error("MOM Submission Error:", err);
     } finally {
       setSubmitting(false);
     }
   };
+
 
   const formatDateTime = (dateString) => {
     if (!dateString) return "-";
@@ -214,6 +296,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     }
   };
 
+
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100">
@@ -228,6 +311,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     );
   }
 
+
   if (!meetingData) {
     return (
       <div className="container-fluid px-4 py-4">
@@ -235,6 +319,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
       </div>
     );
   }
+
 
   return (
     <div
@@ -267,8 +352,9 @@ const CreateOrEditMom = ({ isEdit = false }) => {
             </div>
           </div>
 
+
           <form onSubmit={handleSubmit}>
-            {/* Meeting Details Card (Read Only) */}
+
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body p-4">
                 <h5 className="card-title fw-semibold mb-4 d-flex align-items-center gap-2">
@@ -339,7 +425,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
               </div>
             </div>
 
-            {/* Discussion Points Card */}
+
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body p-4">
                 <div className="d-flex justify-content-between align-items-center mb-3">
@@ -405,7 +491,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
               </div>
             </div>
 
-            {/* Action Items Card */}
+
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body p-4">
                 <div className="d-flex justify-content-between align-items-center mb-3">
@@ -436,11 +522,11 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                               <input
                                 type="text"
                                 placeholder="Task description..."
-                                value={item.task || ""}
+                                value={item.taskDescription || ""}
                                 onChange={(e) =>
                                   handleChangeActionItem(
                                     index,
-                                    "task",
+                                    "taskDescription",
                                     e.target.value
                                   )
                                 }
@@ -449,23 +535,31 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                             </div>
                             <div className="col-md-4">
                               <select
-                                value={item.assignTo || ""}
+                                value={item.assignedToEmployeeName || ""}
                                 onChange={(e) =>
                                   handleChangeActionItem(
                                     index,
-                                    "assignTo",
+                                    "assignedToEmployeeName",
                                     e.target.value
                                   )
                                 }
-                                className="form-select"
+                                className={`form-select ${errors[`actionItem_${index}`] ? 'is-invalid' : ''}`}
                               >
                                 <option value="">Assign to...</option>
-                                {meetingData.attendees.map((att, idx) => (
-                                  <option key={idx} value={att}>
-                                    {att}
-                                  </option>
-                                ))}
+                                {allEmployees.map((emp) => {
+                                  const fullName = `${emp.firstName} ${emp.lastName}`;
+                                  return (
+                                    <option key={emp.employeeMasterId} value={fullName}>
+                                      {fullName}
+                                    </option>
+                                  );
+                                })}
                               </select>
+                              {errors[`actionItem_${index}`] && (
+                                <div className="invalid-feedback d-block">
+                                  {errors[`actionItem_${index}`]}
+                                </div>
+                              )}
                             </div>
                             <div className="col-md-3">
                               <input
@@ -507,6 +601,11 @@ const CreateOrEditMom = ({ isEdit = false }) => {
                               </button>
                             </div>
                           </div>
+                          {item.assignedToEmployeeId && (
+                            <small className="text-success">
+                              ✓ Assigned to Employee ID: {item.assignedToEmployeeId}
+                            </small>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -515,7 +614,7 @@ const CreateOrEditMom = ({ isEdit = false }) => {
               </div>
             </div>
 
-            {/* Comments Card */}
+
             <div className="card border-0 shadow-sm mb-4">
               <div className="card-body p-4">
                 <h5 className="card-title fw-semibold mb-3 d-flex align-items-center gap-2">
@@ -533,7 +632,8 @@ const CreateOrEditMom = ({ isEdit = false }) => {
               </div>
             </div>
 
-            {/* Form Actions */}
+
+         
             <div className="d-flex gap-3 justify-content-end mb-4">
               <button
                 type="button"
@@ -572,5 +672,6 @@ const CreateOrEditMom = ({ isEdit = false }) => {
     </div>
   );
 };
+
 
 export default CreateOrEditMom;

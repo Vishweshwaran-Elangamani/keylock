@@ -236,80 +236,113 @@ const MeetingInvitations = () => {
       <div className="row justify-content-center">
         <div className="col-lg-10 col-xl-9">
           {/* Breadcrumb Navigation */}
-          <nav aria-label="breadcrumb" className="mb-3">
-            <ol
-              className="breadcrumb mb-0 d-flex align-items-center"
+          {/* Breadcrumb Navigation */}
+      <nav aria-label="breadcrumb" className="mb-3">
+        <ol
+          className="breadcrumb mb-0 d-flex align-items-center"
+          style={{
+            backgroundColor: "transparent",
+            padding: 0,
+            margin: 0,
+          }}
+        >
+          <li
+            className="breadcrumb-item"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <button
+              onClick={() => navigate("/employee/dashboard")}
               style={{
-                backgroundColor: "transparent",
+                background: "none",
+                border: "none",
+                color: "#97247E",
+                cursor: "pointer",
                 padding: 0,
-                margin: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                textDecoration: "none",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+              <i className="bi bi-house-door" style={{ fontSize: '1rem' }}></i>
+              Dashboard
+            </button>
+          </li>
+           <li
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "#97247E",
+              margin: "0 8px",
+              fontSize: "1rem",
+            }}
+          >
+            /
+          </li>
+          
+          <li
+            className="breadcrumb-item"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <button
+              onClick={() => navigate("/employee/dashboard/meetmom")}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#97247E",
+                cursor: "pointer",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                textDecoration: "none",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+             
+              Meetings and MoM
+            </button>
+          </li>
+          <li
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "#97247E",
+              margin: "0 8px",
+              fontSize: "1rem",
+            }}
+          >
+            /
+          </li>
+          <li
+            className="breadcrumb-item active"
+            aria-current="page"
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                color: "#1e293b",
+                fontSize: "0.875rem",
+                fontWeight: 600,
               }}
             >
-              <li
-                className="breadcrumb-item"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <button
-                  onClick={() => navigate("/employee/dashboard/meetmom")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#97247E",
-                    cursor: "pointer",
-                    padding: 0,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    textDecoration: "none",
-                    transition: "color 0.2s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = "#7a1d65")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "#97247E")
-                  }
-                >
-                  <i
-                    className="bi bi-house-door"
-                    style={{ fontSize: "1rem" }}
-                  ></i>
-                  Dashboard
-                </button>
-              </li>
-              <li
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: "#97247E",
-                  margin: "0 8px",
-                  fontSize: "1rem",
-                }}
-              >
-                /
-              </li>
-              <li
-                className="breadcrumb-item active"
-                aria-current="page"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <span
-                  style={{
-                    color: "#1e293b",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                  }}
-                >
-                  Meeting Invitations
-                </span>
-              </li>
-            </ol>
-          </nav>
+              Meeting Invitations
+            </span>
+          </li>
+        </ol>
+      </nav>
 
           {/* Empty State */}
           {invitations.length === 0 ? (

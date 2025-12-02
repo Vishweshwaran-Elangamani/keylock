@@ -189,7 +189,6 @@ const MyMomsList = () => {
     });
   };
 
-  // Filter employees based on search
   const filteredEmployees = employees.filter((emp) =>
     `${emp.firstName} ${emp.lastName} ${emp.email} ${emp.departmentName}`
       .toLowerCase()
@@ -328,7 +327,7 @@ const MyMomsList = () => {
                                   className="text-primary mt-1"
                                   style={{ flexShrink: 0 }}
                                 />
-                                <div>
+                                <div style={{ textAlign: "left" }}>
                                   <div
                                     className="text-muted fw-medium"
                                     style={{ fontSize: "0.8rem" }}
@@ -355,7 +354,7 @@ const MyMomsList = () => {
                                   className="text-primary mt-1"
                                   style={{ flexShrink: 0 }}
                                 />
-                                <div>
+                                <div style={{ textAlign: "left" }}>
                                   <div
                                     className="text-muted fw-medium"
                                     style={{ fontSize: "0.8rem" }}
@@ -382,7 +381,7 @@ const MyMomsList = () => {
                                   className="text-primary mt-1"
                                   style={{ flexShrink: 0 }}
                                 />
-                                <div>
+                                <div style={{ textAlign: "left" }}>
                                   <div
                                     className="text-muted fw-medium"
                                     style={{ fontSize: "0.8rem" }}
@@ -450,7 +449,7 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* Share Modal */}
+          {/* Share Modal - UPDATED with left-aligned employee details */}
           {showShareModal && shareModalMom && (
             <div
               className="modal fade show d-block"
@@ -463,8 +462,8 @@ const MyMomsList = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="modal-content border-0 shadow">
-                  <div className="modal-header">
-                    <div>
+                  <div className="modal-header" style={{ textAlign: "left" }}>
+                    <div style={{ textAlign: "left" }}>
                       <h5 className="modal-title fw-bold mb-1">Share MOM</h5>
                       <p className="text-muted small mb-0">
                         {shareModalMom.meetingTitle}
@@ -477,7 +476,7 @@ const MyMomsList = () => {
                     ></button>
                   </div>
 
-                  <div className="modal-body">
+                  <div className="modal-body" style={{ textAlign: "left" }}>
                     {/* Search Bar */}
                     <div className="mb-3">
                       <div className="input-group">
@@ -513,7 +512,7 @@ const MyMomsList = () => {
                       </div>
                     )}
 
-                    {/* Employee List */}
+                    {/* Employee List - UPDATED: Left-aligned */}
                     <div style={{ maxHeight: "400px", overflowY: "auto" }}>
                       {filteredEmployees.length === 0 ? (
                         <div className="text-center py-4 text-muted">
@@ -524,12 +523,13 @@ const MyMomsList = () => {
                           {filteredEmployees.map((employee) => (
                             <label
                               key={employee.employeeId}
-                              className="list-group-item list-group-item-action d-flex align-items-center gap-3"
-                              style={{ cursor: "pointer" }}
+                              className="list-group-item list-group-item-action d-flex align-items-start gap-3 py-3"
+                              style={{ cursor: "pointer", textAlign: "left" }}
                             >
                               <input
                                 type="checkbox"
-                                className="form-check-input m-0"
+                                className="form-check-input mt-1"
+                                style={{ flexShrink: 0 }}
                                 checked={selectedEmployees.includes(
                                   employee.employeeId
                                 )}
@@ -537,11 +537,11 @@ const MyMomsList = () => {
                                   toggleEmployeeSelection(employee.employeeId)
                                 }
                               />
-                              <div className="flex-grow-1">
-                                <div className="fw-semibold">
+                              <div className="flex-grow-1" style={{ textAlign: "left" }}>
+                                <div className="fw-semibold" style={{ textAlign: "left" }}>
                                   {employee.firstName} {employee.lastName}
                                 </div>
-                                <div className="small text-muted">
+                                <div className="small text-muted" style={{ textAlign: "left" }}>
                                   {employee.email} • {employee.departmentName} •{" "}
                                   {employee.roleName}
                                 </div>
@@ -578,7 +578,6 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* MOM Details Modal */}
           {selectedMom && (
             <div
               className="modal fade show d-block"
@@ -672,7 +671,6 @@ const MyMomsList = () => {
                       </div>
                     </div>
 
-                    {/* Comments/Observations */}
                     {selectedMom.commentsObservations && (
                       <div className="mb-4">
                         <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
@@ -685,7 +683,6 @@ const MyMomsList = () => {
                       </div>
                     )}
 
-                    {/* Discussion Points */}
                     <div className="mb-4">
                       <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
                         <MessageSquare size={18} />
@@ -772,7 +769,6 @@ const MyMomsList = () => {
                       )}
                     </div>
 
-                    {/* Metadata */}
                     <div className="border-top pt-3">
                       <small className="text-muted">
                         <strong>Created:</strong>{" "}
