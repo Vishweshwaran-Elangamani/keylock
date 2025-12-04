@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API_BASE_URL =
-  import.meta.env.VITE_EMPLOYEE_API_URL || "http://localhost:5260/api/employee";
+  import.meta.env.VITE_HR_API_URL+"/api/employee";
 
 const employeeApi = axios.create({
   baseURL: API_BASE_URL,

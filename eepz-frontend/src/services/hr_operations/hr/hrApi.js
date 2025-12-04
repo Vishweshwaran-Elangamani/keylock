@@ -3,7 +3,7 @@ import axios from "axios";
 // Create separate Axios instance for HR Operations API
 const hrApi = axios.create({
   baseURL:
-    (import.meta.env.VITE_HR_API_URL || "http://localhost:5253") + "/api",
+    import.meta.env.VITE_HR_API_URL+"/api",
   headers: {
     "Content-Type": "application/json",
   },

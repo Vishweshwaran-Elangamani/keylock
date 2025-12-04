@@ -108,7 +108,7 @@ export const smeApi = {
 export const feedbackAnalysisApi = {
   analyze: async (sentence) => {
     try {
-      const response = await fetch("http://localhost:8000/analyze", {
+      const response = await fetch(import.meta.env.VITE_AI_API_URL+"/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,8 +1,8 @@
 import axios from "axios";
-import authService from "./auth/authService";
+import authService from "./authService";
 
 const api = axios.create({
-  baseURL: "http://localhost:5121/api",
+  baseURL: import.meta.env.VITE_AUTH_API_URL+"/api",
   headers: {
     "Content-Type": "application/json",
   },

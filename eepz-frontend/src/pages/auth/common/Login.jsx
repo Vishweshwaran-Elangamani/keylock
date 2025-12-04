@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import authService from "../../../services/auth/authService";
 import { toast } from "sonner";
+import logodarkfull from "../../../assets/logodarkfull.png"
 import "../../../styles/auth/Auth.css";
 
 const Login = () => {
@@ -341,7 +342,7 @@ const Login = () => {
             <div className="eepz-login-form-container">
               <div className="text-center mb-4">
                 <img
-                  src="/logodarkfull.png"
+                  src= {logodarkfull}
                   alt="EEPZ Logo"
                   className="eepz-logo-img"
                   style={{

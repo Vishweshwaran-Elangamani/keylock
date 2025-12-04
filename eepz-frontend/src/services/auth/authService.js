@@ -1,4 +1,4 @@
-import api from "../api";
+import api from "./api";
 
 // JWT HELPER FUNCTIONS
 const decodeJwt = (token) => {

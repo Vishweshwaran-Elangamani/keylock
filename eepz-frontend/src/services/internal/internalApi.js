@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const internalApi = axios.create({
-  baseURL: "http://localhost:5203/api",
+  baseURL: import.meta.VITE_INTERNAL_API_URL+"/api",
 
   headers: {
     "Content-Type": "application/json",
@@ -9,7 +9,6 @@ const internalApi = axios.create({
 });
 
 // Add request interceptor to include token
-
 internalApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");

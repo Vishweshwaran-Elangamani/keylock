@@ -1,8 +1,6 @@
-// src/services/slaService.js - MODIFIED & PRODUCTION-READY
- 
 import axios from 'axios';
  
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5259';
+const API_BASE_URL = import.meta.env.VITE_SLA_API_URL;
  
 const slaApi = axios.create({
   baseURL: `${API_BASE_URL}/api/Sla`,

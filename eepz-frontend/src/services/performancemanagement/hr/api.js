@@ -2,7 +2,7 @@ import axios from "axios";
 import authService from "../../auth/authService";
 
 const api = axios.create({
-  baseURL: "http://localhost:5253/api",
+  baseURL: import.meta.env.VITE_PERFORMANCE_API_URL+"/api",
   headers: { "Content-Type": "application/json" },
   timeout: 30000,
 });

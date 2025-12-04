@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apii = axios.create({
-  baseURL: "http://localhost:5444/api",
+  baseURL: import.meta.env.VITE_MEETING_API_URL+"/api",
 });
 
 // Add a request interceptor to include authorization header with token from localStorage

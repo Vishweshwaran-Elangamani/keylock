@@ -1,4 +1,4 @@
-import internalApi from "../internalApi";
+import internalApi from "./internalApi";
 
 const API_BASE = "Nomination";
 
