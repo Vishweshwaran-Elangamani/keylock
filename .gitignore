@@ -485,6 +485,8 @@ $RECYCLE.BIN/
 
 # Ignore Logs directories everywhere
 Logs/
+logs/
+mysql-init/
 
 # Ignore _EEPZ_BusinessLog directories everywhere
 _EEPZBusinessLog/

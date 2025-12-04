@@ -222,7 +222,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "https://yourdomain.com",
-                "https://www.yourdomain.com"
+                "https://www.yourdomain.com",
+                "http://localhost:3007"
             )
             .AllowAnyMethod()
             .AllowAnyHeader()
@@ -438,7 +439,6 @@ try
     Log.Information($"Environment: {app.Environment.EnvironmentName}");
     Log.Information($"Content Root: {app.Environment.ContentRootPath}");
     Log.Information($"Web Root: {app.Environment.WebRootPath}");
-    Log.Information($"Swagger UI: {(app.Environment.IsDevelopment() ? "https://localhost:5001/swagger" : "Available at /swagger")}");
     Log.Information("========================================");
 
     app.Run();

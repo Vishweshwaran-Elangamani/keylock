@@ -27,9 +27,9 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "EEPZ API", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "EEPZ API",
         Version = "v1",
         Description = "EEPZ Authentication & User Management API"
     });
@@ -62,7 +62,10 @@ builder.Services.AddSwaggerGen(c =>
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+   options.UseMySql(
+        connectionString,
+        new MySqlServerVersion(new Version(8, 0, 36))
+    ));
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not configured");
@@ -142,9 +145,11 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<EEPZDbContext>();
         var configuration = services.GetRequiredService<IConfiguration>();
-        
+
+        context.Database.Migrate();
+
         await DbInitializer.InitializeAsync(context, configuration);
-        
+
         Log.Information("Database initialized successfully");
     }
     catch (Exception ex)

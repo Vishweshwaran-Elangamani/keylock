@@ -1,0 +1,342 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: eepz-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: eepzdb
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d  
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping --silent --protocol=TCP -h mysql -uroot -p$root"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+    networks:
+      - eepz-network
+
+  auth-api:
+    build: ./Relevantz.EEPZ.AuthApi
+    container_name: eepz-auth-api
+    restart: always
+    ports:
+      - "5101:5101"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5101
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  feedback-api:
+    build: ./Relevantz.EEPZ.FeedbackApi
+    container_name: eepz-feedback-api
+    restart: always
+    ports:
+      - "5102:5102"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5102
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  goal-api:
+    build: ./Relevantz.EEPZ.GoalApi
+    container_name: eepz-goal-api
+    restart: always
+    ports:
+      - "5103:5103"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5103
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  hr-operations-api:
+    build: ./Relevantz.EEPZ.HrOperationsApi
+    container_name: eepz-hr-operations-api
+    restart: always
+    ports:
+      - "5104:5104"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5104
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  internal-opportunity-api:
+    build: ./Relevantz.EEPZ.InternalOpportunityAPI
+    container_name: eepz-internal-opportunity-api
+    restart: always
+    ports:
+      - "5105:5105"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5105
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  lnd-api:
+    build: ./Relevantz.EEPZ.LnDApi
+    container_name: eepz-lnd-api
+    restart: always
+    ports:
+      - "5106:5106"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5106
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  mom-meeting-api:
+    build: ./Relevantz.EEPZ.MOM&MeetingApi
+    container_name: eepz-mom-meeting-api
+    restart: always
+    ports:
+      - "5107:5107"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5107
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  performance-api:
+    build: ./Relevantz.EEPZ.PerformanceManagementApi
+    container_name: eepz-performance-api
+    restart: always
+    ports:
+      - "5108:5108"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5108
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  proj-management-api:
+    build: ./Relevantz.EEPZ.ProjManagementApi
+    container_name: eepz-proj-management-api
+    restart: always
+    ports:
+      - "5109:5109"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5109
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  sla-api:
+    build: ./Relevantz.EEPZ.SLAApi
+    container_name: eepz-sla-api
+    restart: always
+    ports:
+      - "5110:5110"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5110
+      - Jwt__Issuer=EEPZ
+      - Jwt__Audience=EEPZUsers
+      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
+      - Jwt__AccessTokenExpirationMinutes=60
+      - Jwt__RefreshTokenExpirationDays=7
+      - SmtpSettings__Host=smtp.gmail.com
+      - SmtpSettings__Port=587
+      - SmtpSettings__EnableSsl=true
+      - SmtpSettings__Username=emailserviceeepz@gmail.com
+      - SmtpSettings__Password=bvnw qmio msiq cgat
+      - SmtpSettings__FromEmail=noreply@eepz.com
+      - SmtpSettings__FromName=EEPZ System
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+  
+  analysis-api:
+    build: ./Relevantz.EEPZ.AnalysisApi
+    container_name: analysis-api
+    restart: always
+    ports:
+      - "5111:5111"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+volumes:
+  mysql_data:
+
+networks:
+  eepz-network:
+    driver: bridge

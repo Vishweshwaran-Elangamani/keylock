@@ -197,7 +197,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
             try
             {
                 // Check if admin already exists
-                var adminEmail = configuration["AdminSeedData:Email"] ?? "eepzmailservice@gmail.com";
+                var adminEmail = configuration["AdminSeedData:Email"] ?? "emailserviceeepz@gmail.com";
                 var existingAdmin = await context.Userauthentications
                     .FirstOrDefaultAsync(u => u.Email == adminEmail);
 
