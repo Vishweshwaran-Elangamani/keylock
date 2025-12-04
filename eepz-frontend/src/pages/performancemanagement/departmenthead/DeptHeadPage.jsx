@@ -962,56 +962,72 @@ export default function DeptHeadPage() {
                   <p className="dp-no-data">No goals assigned.</p>
                 ) : (
                   selectedEmployee.goals?.map((goal) => {
-                    const avgProgress = getAvgChecklistProgress(goal.goalChecklists);
+                    // Get latest progress from goalProgressLogs
+                    const latestProgressLog = goal.goalProgressLogs?.length
+                        ? goal.goalProgressLogs.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn))[0]
+                        : null;
+                 
+                    const latestProgress = latestProgressLog ? latestProgressLog.progressPercent : 0;
+                 
+                    // Fallback: if no logs, use checklist progress
+                    const checklistProgress = getAvgChecklistProgress(goal.goalChecklists);
+                 
+                    // Decide final progress (prefer latestProgress)
+                    const overallProgress = latestProgress || checklistProgress;
+                 
                     return (
-                      <div key={goal.goalId} className="dp-goal-card" style={{
-                        border: '1.2px solid #ece6fa',
-                        borderRadius: '9px',
-                        marginBottom: '13px',
-                        padding: '10px 13px'
-                      }}>
-                        <div className="dp-goal-header" style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center'
+                        <div key={goal.goalId} className="dp-goal-card" style={{
+                            border: '1.2px solid #ece6fa',
+                            borderRadius: '9px',
+                            marginBottom: '13px',
+                            padding: '10px 13px'
                         }}>
-                          <div>
-                            <h5 className="dp-goal-title" style={{ fontWeight: 600, fontSize: '1.01rem', margin: 0 }}>{goal.goalTitle}</h5>
-                            <p className="dp-goal-description" style={{
-                              fontSize: '0.96rem',
-                              margin: 0,
-                              opacity: 0.82
-                            }}>{goal.goalDescription}</p>
-                          </div>
-                          <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
-                            {goal.goalstatus}
-                          </span>
+                            <div className="dp-goal-header" style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <div>
+                                    <h5 className="dp-goal-title" style={{ fontWeight: 600, fontSize: '1.01rem', margin: 0 }}>
+                                        {goal.goalTitle}
+                                    </h5>
+                                    <p className="dp-goal-description" style={{
+                                        fontSize: '0.96rem',
+                                        margin: 0,
+                                        opacity: 0.82
+                                    }}>{goal.goalDescription}</p>
+                                </div>
+                                <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
+                                    {goal.goalstatus}
+                                </span>
+                            </div>
+                            <div className="dp-progress-container" style={{ marginTop: 8 }}>
+                                <div className="dp-progress-label" style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    fontSize: '0.97rem'
+                                }}>
+                                    <span>Progress</span>
+                                    <span className="dp-progress-value">{overallProgress}%</span>
+                                </div>
+                                <div className="dp-progress-bar-bg" style={{
+                                    background: '#efe2f1',
+                                    borderRadius: '5px',
+                                    height: 6,
+                                    width: '96%',
+                                    marginTop: 4
+                                }}>
+                                    <div className="dp-progress-bar-fill" style={{
+                                        background: 'linear-gradient(90deg, #af295c 0%, #d1297b 100%)',
+                                        height: 6,
+                                        borderRadius: '4px',
+                                        width: `${overallProgress}%`
+                                    }} />
+                                </div>
+                            </div>
                         </div>
-                        <div className="dp-progress-container" style={{ marginTop: 8 }}>
-                          <div className="dp-progress-label" style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            fontSize: '0.97rem'
-                          }}>
-                            <span>Progress</span>
-                            <span className="dp-progress-value">{avgProgress}%</span>
-                          </div>
-                          <div className="dp-progress-bar-bg" style={{
-                            background: '#efe2f1',
-                            borderRadius: '5px',
-                            height: 6,
-                            width: '96%',
-                            marginTop: 4
-                          }}>
-                            <div className="dp-progress-bar-fill" style={{
-                              background: 'linear-gradient(90deg, #af295c 0%, #d1297b 100%)',
-                              height: 6,
-                              borderRadius: '4px',
-                              width: `${avgProgress}%`
-                            }} />
-                          </div>
-                        </div>
-                      </div>
+                 
+                 
                     );
                   })
                 )}
