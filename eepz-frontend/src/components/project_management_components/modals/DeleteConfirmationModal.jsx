@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertCircle, Trash2 } from 'lucide-react';
-import './DeleteConfirmationModal.css';
+import '../../../styles/projectmanagement/DeleteConfirmationModal.css'
 
 const DeleteConfirmationModal = ({ 
   show, 

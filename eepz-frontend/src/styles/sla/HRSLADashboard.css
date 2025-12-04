@@ -349,7 +349,7 @@
 .hr-sla-table.table-hover > tbody > tr:hover > * {
   --bs-table-accent-bg: #F9FAFB !important;
   color: inherit !important;
-  background-color: #F9FAFB !important;
+  background-color: #d7dadf !important;
 }
 
 /* Employee Cell */

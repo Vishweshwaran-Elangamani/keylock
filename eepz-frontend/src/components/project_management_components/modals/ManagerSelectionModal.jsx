@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { X, Search, Filter, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, UserCog, Info } from 'lucide-react';
 
@@ -75,14 +74,16 @@ const ManagerSelectionModal = ({
           }
         }}
       >
-        <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div 
             className="modal-content" 
             style={{ 
               borderRadius: '12px',
               border: 'none',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              maxWidth: '1000px'
+              
             }}
           >
             {/* Header */}
@@ -91,15 +92,15 @@ const ManagerSelectionModal = ({
               style={{ 
                 backgroundColor: '#25235c',
                 borderBottom: 'none',
-                padding: '1.25rem 1.5rem',
+                padding: '1.5rem 2rem',
                 color: 'white'
               }}
             >
               <h5 className="modal-title d-flex align-items-center gap-2 mb-0 text-start">
-                <UserCog size={22} style={{ color: 'white' }} />
+                <UserCog size={24} style={{ color: 'white' }} />
                 <span 
                   style={{ 
-                    fontSize: '1.1rem', 
+                    fontSize: '1.25rem', 
                     fontWeight: 600,
                     color: 'white'
                   }}
@@ -120,7 +121,7 @@ const ManagerSelectionModal = ({
               />
             </div>
 
-            <div className="modal-body" style={{ padding: '1.75rem', backgroundColor: '#f8f9fa' }}>
+            <div className="modal-body" style={{ padding: '2rem', backgroundColor: '#f8f9fa' }}>
               {message && (
                 <div
                   className={`alert alert-${
@@ -129,7 +130,7 @@ const ManagerSelectionModal = ({
                   style={{
                     borderRadius: '8px',
                     border: 'none',
-                    padding: '1rem',
+                    padding: '1rem 1.25rem',
                     fontSize: '0.95rem',
                     backgroundColor: message.type === 'success' 
                       ? 'rgba(36, 161, 72, 0.1)' 
@@ -152,7 +153,7 @@ const ManagerSelectionModal = ({
                 className="nav nav-pills mb-4" 
                 style={{ 
                   borderBottom: 'none',
-                  gap: '0.5rem'
+                  gap: '0.75rem'
                 }}
               >
                 <li className="nav-item">
@@ -160,10 +161,10 @@ const ManagerSelectionModal = ({
                     className={`nav-link ${activeTab === "resource" ? "active" : ""}`}
                     onClick={() => setActiveTab("resource")}
                     style={{ 
-                      fontSize: '0.95rem', 
+                      fontSize: '0.975rem', 
                       fontWeight: 600,
                       borderRadius: '8px',
-                      padding: '0.6rem 1.2rem',
+                      padding: '0.7rem 1.5rem',
                       backgroundColor: activeTab === 'resource' ? 'var(--color-primary-1)' : 'white',
                       color: activeTab === 'resource' ? 'white' : '#6b7280',
                       border: activeTab === 'resource' ? 'none' : '1px solid #d1d5db',
@@ -193,10 +194,10 @@ const ManagerSelectionModal = ({
                     className={`nav-link ${activeTab === "l1" ? "active" : ""}`}
                     onClick={() => setActiveTab("l1")}
                     style={{ 
-                      fontSize: '0.95rem', 
+                      fontSize: '0.975rem', 
                       fontWeight: 600,
                       borderRadius: '8px',
-                      padding: '0.6rem 1.2rem',
+                      padding: '0.7rem 1.5rem',
                       backgroundColor: activeTab === 'l1' ? 'var(--color-primary-1)' : 'white',
                       color: activeTab === 'l1' ? 'white' : '#6b7280',
                       border: activeTab === 'l1' ? 'none' : '1px solid #d1d5db',
@@ -226,10 +227,10 @@ const ManagerSelectionModal = ({
                     className={`nav-link ${activeTab === "l2" ? "active" : ""}`}
                     onClick={() => setActiveTab("l2")}
                     style={{ 
-                      fontSize: '0.95rem', 
+                      fontSize: '0.975rem', 
                       fontWeight: 600,
                       borderRadius: '8px',
-                      padding: '0.6rem 1.2rem',
+                      padding: '0.7rem 1.5rem',
                       backgroundColor: activeTab === 'l2' ? 'var(--color-primary-1)' : 'white',
                       color: activeTab === 'l2' ? 'white' : '#6b7280',
                       border: activeTab === 'l2' ? 'none' : '1px solid #d1d5db',
@@ -262,22 +263,22 @@ const ManagerSelectionModal = ({
                 style={{
                   borderRadius: '8px',
                   border: 'none',
-                  padding: '1rem',
+                  padding: '1.25rem',
                   backgroundColor: 'rgba(13, 110, 253, 0.1)',
                   color: '#084298',
                   textAlign: 'left'
                 }}
               >
-                <Info size={20} className="flex-shrink-0 mt-1" />
+                <Info size={22} className="flex-shrink-0 mt-1" />
                 <div style={{ textAlign: 'left' }}>
-                  <strong style={{ fontSize: '0.95rem' }}>Current Selection:</strong>
+                  <strong style={{ fontSize: '0.975rem' }}>Current Selection:</strong>
                   <div className="mt-2">
                     {getSelectedManager() ? (
                       <span 
                         className="badge" 
                         style={{ 
-                          fontSize: '0.9rem', 
-                          padding: '0.5rem 0.75rem',
+                          fontSize: '0.925rem', 
+                          padding: '0.6rem 0.85rem',
                           backgroundColor: '#10b981',
                           color: 'white'
                         }}
@@ -287,7 +288,7 @@ const ManagerSelectionModal = ({
                         {getSelectedManager().roleName}
                       </span>
                     ) : (
-                      <span className="text-muted" style={{ fontSize: '0.9rem' }}>None selected</span>
+                      <span className="text-muted" style={{ fontSize: '0.925rem' }}>None selected</span>
                     )}
                   </div>
                 </div>
@@ -302,7 +303,8 @@ const ManagerSelectionModal = ({
                       style={{
                         backgroundColor: 'white',
                         border: '1px solid #d1d5db',
-                        borderRight: 'none'
+                        borderRight: 'none',
+                        borderRadius: '8px 0 0 8px'
                       }}
                     >
                       <Search size={20} style={{ color: '#6b7280' }} />
@@ -317,7 +319,8 @@ const ManagerSelectionModal = ({
                         fontSize: '0.95rem',
                         border: '1px solid #d1d5db',
                         borderLeft: 'none',
-                        padding: '0.65rem 0.75rem'
+                        padding: '0.7rem 0.85rem',
+                        borderRadius: '0 8px 8px 0'
                       }}
                     />
                   </div>
@@ -330,7 +333,7 @@ const ManagerSelectionModal = ({
                     style={{ 
                       fontSize: '0.95rem',
                       border: '1px solid #d1d5db',
-                      padding: '0.65rem 0.75rem',
+                      padding: '0.7rem 0.85rem',
                       borderRadius: '8px'
                     }}
                   >
@@ -350,7 +353,7 @@ const ManagerSelectionModal = ({
                     style={{ 
                       fontSize: '0.95rem',
                       border: '1px solid #d1d5db',
-                      padding: '0.65rem 0.75rem',
+                      padding: '0.7rem 0.85rem',
                       borderRadius: '8px'
                     }}
                   >
@@ -368,7 +371,7 @@ const ManagerSelectionModal = ({
               <div
                 className="table-responsive"
                 style={{ 
-                  minHeight: '350px', 
+                  minHeight: '400px', 
                   borderRadius: '8px', 
                   border: '1px solid #e5e7eb',
                   backgroundColor: 'white'
@@ -384,16 +387,16 @@ const ManagerSelectionModal = ({
                     }}
                   >
                     <tr style={{ textAlign: 'left' }}>
-                      <th style={{ width: '60px', fontSize: '0.9rem', padding: '1rem', fontWeight: 600, textAlign: 'left' }}>
+                      <th style={{ width: '70px', fontSize: '0.925rem', padding: '1.1rem', fontWeight: 600, textAlign: 'left' }}>
                         Select
                       </th>
-                      <th style={{ fontSize: '0.9rem', padding: '1rem', fontWeight: 600, textAlign: 'left' }}>
+                      <th style={{ fontSize: '0.925rem', padding: '1.1rem', fontWeight: 600, textAlign: 'left' }}>
                         Employee Name
                       </th>
-                      <th style={{ fontSize: '0.9rem', padding: '1rem', fontWeight: 600, textAlign: 'left' }}>
+                      <th style={{ fontSize: '0.925rem', padding: '1.1rem', fontWeight: 600, textAlign: 'left' }}>
                         Role
                       </th>
-                      <th style={{ fontSize: '0.9rem', padding: '1rem', fontWeight: 600, textAlign: 'left' }}>
+                      <th style={{ fontSize: '0.925rem', padding: '1.1rem', fontWeight: 600, textAlign: 'left' }}>
                         Department
                       </th>
                     </tr>
@@ -424,7 +427,7 @@ const ManagerSelectionModal = ({
                           >
                             <td 
                               onClick={(e) => e.stopPropagation()} 
-                              style={{ padding: '1rem', textAlign: 'left' }}
+                              style={{ padding: '1.1rem', textAlign: 'left' }}
                             >
                               <input
                                 type="radio"
@@ -439,15 +442,15 @@ const ManagerSelectionModal = ({
                                 }}
                               />
                             </td>
-                            <td style={{ fontSize: '0.9rem', padding: '1rem', textAlign: 'left' }}>
+                            <td style={{ fontSize: '0.925rem', padding: '1.1rem', textAlign: 'left' }}>
                               <span style={{ fontWeight: 500 }}>
                                 {emp.firstName} {emp.lastName}
                               </span>
                             </td>
-                            <td style={{ fontSize: '0.9rem', padding: '1rem', color: '#6b7280', textAlign: 'left' }}>
+                            <td style={{ fontSize: '0.925rem', padding: '1.1rem', color: '#6b7280', textAlign: 'left' }}>
                               {emp.roleName}
                             </td>
-                            <td style={{ fontSize: '0.9rem', padding: '1rem', color: '#6b7280', textAlign: 'left' }}>
+                            <td style={{ fontSize: '0.925rem', padding: '1.1rem', color: '#6b7280', textAlign: 'left' }}>
                               {emp.departmentName}
                             </td>
                           </tr>
@@ -461,7 +464,7 @@ const ManagerSelectionModal = ({
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                  <div className="text-muted" style={{ fontSize: '0.9rem' }}>
+                  <div className="text-muted" style={{ fontSize: '0.925rem' }}>
                     Page {currentPage} of {totalPages}
                   </div>
                   <nav>
@@ -528,7 +531,7 @@ const ManagerSelectionModal = ({
             <div 
               className="modal-footer" 
               style={{ 
-                padding: '1rem 1.5rem',
+                padding: '1.25rem 2rem',
                 borderTop: '1px solid #e5e7eb',
                 backgroundColor: 'white',
                 display: 'flex',
@@ -543,7 +546,7 @@ const ManagerSelectionModal = ({
                 style={{ 
                   fontSize: '0.95rem',
                   fontWeight: 600,
-                  padding: '0.6rem 1.25rem',
+                  padding: '0.65rem 1.5rem',
                   borderRadius: '8px',
                   backgroundColor: '#6b7280',
                   border: 'none',
@@ -567,7 +570,7 @@ const ManagerSelectionModal = ({
                 style={{ 
                   fontSize: '0.95rem',
                   fontWeight: 600,
-                  padding: '0.6rem 1.5rem',
+                  padding: '0.65rem 1.75rem',
                   borderRadius: '8px',
                   background: 'var(--gradient-primary)',
                   border: 'none',

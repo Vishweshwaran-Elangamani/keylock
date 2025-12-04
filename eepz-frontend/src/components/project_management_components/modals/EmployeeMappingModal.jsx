@@ -100,7 +100,8 @@ const EmployeeMappingModal = ({
               borderRadius: '12px',
               border: 'none',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              maxWidth: '1800px'
             }}
           >
             {/* Header */}

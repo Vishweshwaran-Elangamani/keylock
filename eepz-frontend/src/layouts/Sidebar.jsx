@@ -155,10 +155,10 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         path: "/department-head/dashboard/performance/top-performers",
       },
       {
-        icon: "bi-chat-left-text",
-        label: "Feedback Management",
-        path: "/department-head/dashboard/feedback",
-      },
+       // icon: "bi-chat-left-text",
+       // label: "Feedback Management",
+       //path: "/department-head/dashboard/feedback",
+      }
     ],
     Manager: [
       {
