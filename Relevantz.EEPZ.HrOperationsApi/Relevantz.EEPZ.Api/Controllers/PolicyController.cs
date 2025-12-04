@@ -8,19 +8,19 @@ using Relevantz.EEPZ.Core.IService;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
-   [ApiController]
+    [ApiController]
     [Route("api/[controller]")]
     public class PolicyController : ControllerBase
     {
         private readonly IPolicyService _policyService;
         private readonly ILogger<PolicyController> _logger;
- 
+
         public PolicyController(IPolicyService policyService, ILogger<PolicyController> logger)
         {
             _policyService = policyService;
             _logger = logger;
         }
- 
+
         /// <summary>
         /// Create new policy - HR ONLY
         /// </summary>
@@ -32,20 +32,20 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
- 
+
                 if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int createdByUserId))
                 {
                     _logger.LogWarning(" Unable to extract user ID from JWT token for policy creation");
                     return Unauthorized(new { success = false, message = "Invalid user authentication" });
                 }
- 
+
                 _logger.LogInformation($" User {createdByUserId} creating new policy");
- 
+
                 var result = await _policyService.CreatePolicyAsync(request, createdByUserId);
- 
+
                 if (!result.Success)
                     return BadRequest(result);
- 
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -54,7 +54,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while creating policy" });
             }
         }
- 
+
         /// <summary>
         /// Get all policies - All authenticated users
         /// </summary>
@@ -72,7 +72,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
- 
+
         /// <summary>
         /// Get published policies only - All authenticated users
         /// </summary>
@@ -90,7 +90,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
- 
+
         /// <summary>
         /// Get draft policies - HR ONLY
         /// </summary>
@@ -109,7 +109,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
- 
+
         /// <summary>
         /// Get active policies only
         /// </summary>
@@ -127,7 +127,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
- 
+
         /// <summary>
         /// Get inactive policies
         /// </summary>
@@ -145,7 +145,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
- 
+
         /// <summary>
         /// Get policy by ID
         /// </summary>
@@ -155,10 +155,10 @@ namespace Relevantz.EEPZ.Api.Controllers
             try
             {
                 var result = await _policyService.GetPolicyByIdAsync(id);
- 
+
                 if (!result.Success)
                     return NotFound(result);
- 
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -167,7 +167,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred" });
             }
         }
- 
+
         /// <summary>
         /// Update policy - HR ONLY
         /// </summary>
@@ -179,17 +179,17 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
- 
+
                 if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
                 {
                     _logger.LogInformation($" User {userId} updating policy {id}");
                 }
- 
+
                 var result = await _policyService.UpdatePolicyAsync(id, request);
- 
+
                 if (!result.Success)
                     return BadRequest(result);
- 
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -198,107 +198,104 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while updating policy" });
             }
         }
- 
-        /// <summary>
-        /// Upload policy document (file or link) - HR ONLY
-        /// </summary>
+
         [HttpPost("upload-document")]
-        [Authorize(Roles = "Admin,HR")]
-        public async Task<IActionResult> UploadDocument([FromForm] IFormFile? file, [FromForm] string? documentUrl, [FromForm] string? documentName, [FromForm] string? documentType)
+[Authorize(Roles = "Admin,HR")]
+public async Task<IActionResult> UploadDocument([FromForm] IFormFile? file, [FromForm] string? documentUrl, [FromForm] string? documentName, [FromForm] string? documentType)
+{
+    try
+    {
+        // Validate inputs
+        if (string.IsNullOrEmpty(documentType) || (documentType != "link" && documentType != "upload"))
+            return BadRequest(new { success = false, message = "Document type must be 'link' or 'upload'" });
+
+        // Handle File Upload
+        if (documentType == "upload")
         {
-            try
+            if (file == null || file.Length == 0)
+                return BadRequest(new { success = false, message = "No file uploaded" });
+
+            // Validate file type
+            var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
+            var extension = Path.GetExtension(file.FileName).ToLower();
+            if (!allowedExtensions.Contains(extension))
+                return BadRequest(new { success = false, message = "Only PDF, DOC, DOCX files allowed" });
+
+            // Validate file size (5MB max)
+            const long maxFileSize = 5 * 1024 * 1024;
+            if (file.Length > maxFileSize)
+                return BadRequest(new { success = false, message = "File size must be less than 5MB" });
+
+            // Create uploads directory
+            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "policies");
+            Directory.CreateDirectory(uploadsPath);
+
+            // Generate unique filename
+            var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(uploadsPath, uniqueFileName);
+            
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                // Validate inputs
-                if (string.IsNullOrEmpty(documentType) || (documentType != "link" && documentType != "upload"))
-                    return BadRequest(new { success = false, message = "Document type must be 'link' or 'upload'" });
- 
-                //  Handle File Upload
-                if (documentType == "upload")
-                {
-                    if (file == null || file.Length == 0)
-                        return BadRequest(new { success = false, message = "No file uploaded" });
- 
-                    // Validate file type
-                    var allowedExtensions = new[] { ".pdf", ".doc", ".docx" };
-                    var extension = Path.GetExtension(file.FileName).ToLower();
-                    if (!allowedExtensions.Contains(extension))
-                        return BadRequest(new { success = false, message = "Only PDF, DOC, DOCX files allowed" });
- 
-                    // Validate file size (5MB max)
-                    const long maxFileSize = 5 * 1024 * 1024;
-                    if (file.Length > maxFileSize)
-                        return BadRequest(new { success = false, message = "File size must be less than 5MB" });
- 
-                    // Create uploads directory
-                    var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "policies");
-                    Directory.CreateDirectory(uploadsPath);
- 
-                    // Generate unique filename
-                    var uniqueFileName = $"{Guid.NewGuid()}{extension}";
-                    var filePath = Path.Combine(uploadsPath, uniqueFileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-
-                    var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                    var fileUrl = $"{baseUrl}/uploads/policies/{uniqueFileName}";
-                    var fileName = file.FileName;
- 
-                    _logger.LogInformation($" Document uploaded: {fileUrl} (Size: {file.Length} bytes)");
- 
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "File uploaded successfully",
-                        data = new
-                        {
-                            documentUrl = fileUrl, 
-                            documentName = fileName,
-                            documentSize = file.Length,
-                            documentSizeFormatted = FormatFileSize(file.Length),
-                            documentType = "upload"
-                        }
-                    });
-                }
-
-                else if (documentType == "link")
-                {
-                    if (string.IsNullOrEmpty(documentUrl))
-                        return BadRequest(new { success = false, message = "Document URL is required for links" });
- 
-                    if (string.IsNullOrEmpty(documentName))
-                        return BadRequest(new { success = false, message = "Document name is required" });
-
-                    if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
-                        return BadRequest(new { success = false, message = "Invalid URL format" });
- 
-                    _logger.LogInformation($" Document link added: {documentUrl}");
- 
-                    return Ok(new
-                    {
-                        success = true,
-                        message = "Document link added successfully",
-                        data = new
-                        {
-                            documentUrl = documentUrl,
-                            documentName = documentName,
-                            documentSize = (long?)null,
-                            documentType = "link"
-                        }
-                    });
-                }
- 
-                return BadRequest(new { success = false, message = "Invalid request" });
+                await file.CopyToAsync(stream);
             }
-            catch (Exception ex)
+
+            // FIXED: Return relative path (frontend will convert to document endpoint)
+            var fileUrl = $"/uploads/policies/{uniqueFileName}";
+            var fileName = file.FileName;
+
+            _logger.LogInformation($"Document uploaded: {uniqueFileName} (Size: {file.Length} bytes)");
+
+            return Ok(new
             {
-                _logger.LogError($" Error uploading document: {ex.Message}");
-                return StatusCode(500, new { success = false, message = "Document upload failed" });
-            }
+                success = true,
+                message = "File uploaded successfully",
+                data = new
+                {
+                    documentUrl = fileUrl,  // Relative path
+                    documentName = fileName,
+                    documentSize = file.Length,
+                    documentSizeFormatted = FormatFileSize(file.Length),
+                    documentType = "upload"
+                }
+            });
         }
- 
- 
+        else if (documentType == "link")
+        {
+            if (string.IsNullOrEmpty(documentUrl))
+                return BadRequest(new { success = false, message = "Document URL is required for links" });
+
+            if (string.IsNullOrEmpty(documentName))
+                return BadRequest(new { success = false, message = "Document name is required" });
+
+            if (!Uri.TryCreate(documentUrl, UriKind.Absolute, out _))
+                return BadRequest(new { success = false, message = "Invalid URL format" });
+
+            _logger.LogInformation($"🔗 Document link added: {documentUrl}");
+
+            return Ok(new
+            {
+                success = true,
+                message = "Document link added successfully",
+                data = new
+                {
+                    documentUrl = documentUrl,
+                    documentName = documentName,
+                    documentSize = (long?)null,
+                    documentType = "link"
+                }
+            });
+        }
+
+        return BadRequest(new { success = false, message = "Invalid request" });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error uploading document: {ex.Message}");
+        return StatusCode(500, new { success = false, message = "Document upload failed" });
+    }
+}
+
+
         /// <summary>
         /// Publish policy (make visible to all employees) - HR ONLY
         /// </summary>
@@ -310,15 +307,15 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
- 
+
                 if (!int.TryParse(userIdClaim, out int publishedBy))
                     return Unauthorized(new { success = false, message = "Invalid user" });
- 
+
                 var result = await _policyService.PublishPolicyAsync(id, publishedBy);
- 
+
                 if (!result.Success)
                     return BadRequest(result);
- 
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -327,7 +324,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "Failed to publish policy" });
             }
         }
- 
+
         /// <summary>
         /// Soft delete policy (mark inactive) - HR ONLY
         /// </summary>
@@ -339,17 +336,17 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
- 
+
                 if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out int userId))
                 {
                     _logger.LogInformation($" User {userId} deleting policy {id}");
                 }
- 
+
                 var result = await _policyService.DeletePolicyAsync(id);
- 
+
                 if (!result.Success)
                     return NotFound(result);
- 
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -358,7 +355,7 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while deleting policy" });
             }
         }
-        
+
         private string FormatFileSize(long bytes)
         {
             string[] sizes = { "B", "KB", "MB", "GB" };
@@ -378,7 +375,7 @@ namespace Relevantz.EEPZ.Api.Controllers
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                 var response = await _policyService.UnpublishPolicyAsync(policyId, userId);
- 
+
                 _logger.LogInformation($" Policy {policyId} unpublished by user {userId}");
                 return Ok(response);
             }
@@ -388,10 +385,61 @@ namespace Relevantz.EEPZ.Api.Controllers
                 return BadRequest(new { message = "Failed to unpublish policy" });
             }
         }
- 
-       
- 
+        /// <summary>
+        /// Serve/Download uploaded policy document - All authenticated users
+        /// </summary>
+        [HttpGet("document/{fileName}")]
+        public IActionResult GetPolicyDocument(string fileName)
+        {
+            try
+            {
+                // Validate filename to prevent directory traversal attacks
+                if (string.IsNullOrEmpty(fileName) || fileName.Contains(".."))
+                {
+                    _logger.LogWarning($" Invalid filename attempt: {fileName}");
+                    return BadRequest(new { success = false, message = "Invalid filename" });
+                }
+
+                // Same path where files are uploaded
+                var filePath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "wwwroot",
+                    "uploads",
+                    "policies",
+                    fileName
+                );
+
+                if (!System.IO.File.Exists(filePath))
+                {
+                    _logger.LogWarning($" Document not found: {fileName}");
+                    return NotFound(new { success = false, message = "Document not found" });
+                }
+
+                // Read file
+                var fileBytes = System.IO.File.ReadAllBytes(filePath);
+
+                // Determine content type based on extension
+                var extension = Path.GetExtension(fileName).ToLower();
+                var contentType = extension switch
+                {
+                    ".pdf" => "application/pdf",
+                    ".doc" => "application/msword",
+                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    _ => "application/octet-stream"
+                };
+
+                _logger.LogInformation($"Serving document: {fileName} ({contentType})");
+
+                // Return file (enables both inline view and download)
+                return File(fileBytes, contentType, fileName, enableRangeProcessing: true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($" Error serving document {fileName}: {ex.Message}");
+                return StatusCode(500, new { success = false, message = "Error retrieving document" });
+            }
+        }
+
     }
- 
- 
+
 }
