@@ -921,7 +921,7 @@ const AddPolicyModal = ({ show, onClose, onSuccess, onToast }) => {
                 ) : (
                   <>
                     <i className="bi bi-check-circle"></i>
-                    Create Policy
+                    Add Policy
                   </>
                 )}
               </button>

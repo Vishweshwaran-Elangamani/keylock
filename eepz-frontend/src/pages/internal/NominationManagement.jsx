@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import nominationService from "../../services/internal/nominationService";
 import internalOpportunityService from "../../services/internal/internalOpportunityService";
@@ -13,6 +14,7 @@ import "../../styles/internal/NominationManagement.css";
 
 const NominationManagement = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [nominations, setNominations] = useState([]);
   const [filteredNominations, setFilteredNominations] = useState([]);
   const [opportunities, setOpportunities] = useState([]);
@@ -23,7 +25,8 @@ const NominationManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [showSelfNominateModal, setShowSelfNominateModal] = useState(false);
-  const [showManagerNominateModal, setShowManagerNominateModal] = useState(false);
+  const [showManagerNominateModal, setShowManagerNominateModal] =
+    useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showGraphModal, setShowGraphModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -86,7 +89,8 @@ const NominationManagement = () => {
       if (user?.role === "Manager") {
         nominationsResponse = await nominationService.getPendingManagerReview();
       } else if (user?.role === "Department Head") {
-        nominationsResponse = await nominationService.getPendingDeptHeadReview();
+        nominationsResponse =
+          await nominationService.getPendingDeptHeadReview();
       } else {
         nominationsResponse = await nominationService.getAllNominations();
       }
@@ -94,7 +98,9 @@ const NominationManagement = () => {
         await internalOpportunityService.getAllOpportunities();
       if (nominationsResponse.success) {
         setNominations(
-          Array.isArray(nominationsResponse.data) ? nominationsResponse.data : []
+          Array.isArray(nominationsResponse.data)
+            ? nominationsResponse.data
+            : []
         );
       }
       if (opportunitiesResponse.success) {
@@ -154,6 +160,10 @@ const NominationManagement = () => {
     fetchData();
   };
 
+  const handleViewHistory = () => {
+  navigate("/internal/nomination-history");
+};
+
   const getPaginatedNominations = () => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -207,7 +217,6 @@ const NominationManagement = () => {
       />
 
       <div className="nm-stats-grid">
-        {/* ... Stats cards code unchanged ... */}
         <div className="nm-stat-card">
           <div className="stat-icon stat-icon-primary">
             <i className="bi bi-hand-thumbs-up"></i>
@@ -267,7 +276,7 @@ const NominationManagement = () => {
       <div className="filters-card">
         <div className="filters-content">
           <div className="filters-left">
-            {/* --- Updated Search Bar --- */}
+            {/* Search Bar */}
             <div className="policy-search-revamp">
               <div className="policy-search-input">
                 <div className="policy-search-inner">
@@ -307,7 +316,8 @@ const NominationManagement = () => {
             <button
               className="pm-clear-btn"
               onClick={clearFilters}
-              style={{ marginLeft: "1rem" }}>
+              style={{ marginLeft: "1rem" }}
+            >
               Clear Filters
             </button>
             <select
@@ -321,27 +331,30 @@ const NominationManagement = () => {
               <option value="Rejected">Rejected</option>
             </select>
           </div>
-          <div className="filters-actions">
-  {!["HR", "Department Head"].includes(user?.role) && (
-    <button
-      className="btn-graph"
-      onClick={() => setShowGraphModal(true)}
-      title="View Analytics Graph"
-    >
-      <i className="bi bi-bar-chart-fill"></i> View Graph
-    </button>
-  )}
-  
-  {/* 🆕 ADD THIS HISTORY BUTTON */}
-  <button
-    className="btn-history"
-    onClick={() => window.location.href = `/internal/nomination-history`}
-    title="View Nomination History"
-  >
-    <i className="bi bi-clock-history"></i> History
-  </button>
-</div>
 
+          <div className="filters-actions">
+            {/* View Graph Button - Visible for Employee and Manager only */}
+            {!["HR", "Department Head"].includes(user?.role) && (
+              <button
+                className="btn-graph"
+                onClick={() => setShowGraphModal(true)}
+                title="View Analytics Graph"
+              >
+                <i className="bi bi-bar-chart-fill"></i> View Graph
+              </button>
+            )}
+
+            {/* ✅ HISTORY BUTTON - ONLY FOR MANAGER ROLE */}
+            {user?.role === "Manager" && (
+              <button
+                className="btn-history"
+                onClick={handleViewHistory}
+                title="View Nomination History"
+              >
+                <i className="bi bi-clock-history"></i> History
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -374,19 +387,26 @@ const NominationManagement = () => {
                     <td>{nomination.nominatedByName}</td>
                     <td>{nomination.nominationType}</td>
                     <td>
-                      <span className={`status-badge ${getStatusBadgeClass(nomination.status)}`}>
+                      <span
+                        className={`status-badge ${getStatusBadgeClass(
+                          nomination.status
+                        )}`}
+                      >
                         {nomination.status}
                       </span>
                     </td>
                     <td>
                       <div className="action-buttons">
-                        {(user?.role === "Manager" || user?.role === "Department Head") &&
+                        {(user?.role === "Manager" ||
+                          user?.role === "Department Head") &&
                           nomination.status
                             ?.toLowerCase()
                             .includes("pending") && (
                             <button
                               className="action-btn action-btn-edit"
-                              onClick={() => handleReviewNomination(nomination)}
+                              onClick={() =>
+                                handleReviewNomination(nomination)
+                              }
                               title="Review Nomination"
                             >
                               <i className="bi bi-pencil"></i>
@@ -473,4 +493,3 @@ const NominationManagement = () => {
 };
 
 export default NominationManagement;
-

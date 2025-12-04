@@ -8,7 +8,10 @@ const NominationHistory = () => {
   const [historyData, setHistoryData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("");
-  const [activeTab, setActiveTab] = useState("self"); // "self" or "team"
+  const [activeTab, setActiveTab] = useState("self");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchHistory();
@@ -23,7 +26,6 @@ const NominationHistory = () => {
 
       if (response.success) {
         setHistoryData(response.data);
-        toast.success("History loaded successfully");
       } else {
         toast.error(response.message || "Failed to load history");
       }
@@ -37,11 +39,13 @@ const NominationHistory = () => {
 
   const getStatusBadge = (status) => {
     const statusClasses = {
-      Approved: "status-badge status-approved",
-      Rejected: "status-badge status-rejected",
-      Withdrawn: "status-badge status-withdrawn",
+      Approved: "nha-status-approved",
+      Rejected: "nha-status-rejected",
+      Withdrawn: "nha-status-withdrawn",
     };
-    return statusClasses[status] || "status-badge status-pending";
+    return `nha-status-badge ${
+      statusClasses[status] || "nha-status-pending"
+    }`;
   };
 
   const formatDate = (dateString) => {
@@ -74,9 +78,74 @@ const NominationHistory = () => {
       .substring(0, 2);
   };
 
+  const clearFilters = () => {
+    setStatusFilter("");
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  // Filter nominations based on search and status
+  const getFilteredNominations = () => {
+    let nominations =
+      activeTab === "self"
+        ? historyData?.selfNominations || []
+        : historyData?.teamNominations || [];
+
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      nominations = nominations.filter(
+        (nom) =>
+          nom.opportunityTitle?.toLowerCase().includes(search) ||
+          nom.employeeName?.toLowerCase().includes(search) ||
+          nom.employeeCompanyId?.toLowerCase().includes(search) ||
+          nom.opportunityType?.toLowerCase().includes(search)
+      );
+    }
+
+    return nominations;
+  };
+
+  const filteredNominations = getFilteredNominations();
+  const totalPages = Math.ceil(filteredNominations.length / rowsPerPage);
+
+  const getPaginatedNominations = () => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    return filteredNominations.slice(startIndex, endIndex);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(
+          1,
+          "...",
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          "...",
+          totalPages
+        );
+      }
+    }
+
+    return pages;
+  };
+
   if (loading) {
     return (
-      <div className="history-loading-container">
+      <div className="nha-loading-container">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -85,13 +154,8 @@ const NominationHistory = () => {
     );
   }
 
-  const currentNominations =
-    activeTab === "self"
-      ? historyData?.selfNominations || []
-      : historyData?.teamNominations || [];
-
   return (
-    <div className="nomination-history-container">
+    <div className="nha-nomination-history-page">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
@@ -105,107 +169,106 @@ const NominationHistory = () => {
         ]}
       />
 
-      {/* Header */}
-      <div className="history-header">
-        <div>
-          <h2 className="history-title">
-            <i className="bi bi-clock-history me-2"></i>
-            Nomination History
-          </h2>
-          <p className="history-subtitle">
-            View your past self-nominations and team nominations
-          </p>
-        </div>
-        <button className="btn btn-outline-primary" onClick={fetchHistory}>
-          <i className="bi bi-arrow-clockwise me-2"></i>
-          Refresh
-        </button>
-      </div>
-
       {/* Statistics Cards */}
-      <div className="history-stats-grid">
-        <div className="history-stat-card stat-primary">
-          <div className="stat-icon">
+      <div className="nha-stats-grid">
+        <div className="nha-stat-card">
+          <div className="nha-stat-icon nha-stat-icon-primary">
             <i className="bi bi-person-check-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
+          <div className="nha-stat-content">
+            <h3 className="nha-stat-value">
               {historyData?.statistics?.totalSelfNominations || 0}
             </h3>
-            <p className="stat-label">Self Nominations</p>
+            <p className="nha-stat-label">Self Nominations</p>
           </div>
         </div>
 
-        <div className="history-stat-card stat-info">
-          <div className="stat-icon">
+        <div className="nha-stat-card">
+          <div className="nha-stat-icon nha-stat-icon-info">
             <i className="bi bi-people-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
+          <div className="nha-stat-content">
+            <h3 className="nha-stat-value">
               {historyData?.statistics?.totalTeamNominations || 0}
             </h3>
-            <p className="stat-label">Team Nominations</p>
+            <p className="nha-stat-label">Team Nominations</p>
           </div>
         </div>
 
-        <div className="history-stat-card stat-success">
-          <div className="stat-icon">
+        <div className="nha-stat-card">
+          <div className="nha-stat-icon nha-stat-icon-success">
             <i className="bi bi-check-circle-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
+          <div className="nha-stat-content">
+            <h3 className="nha-stat-value">
               {historyData?.statistics?.approvedCount || 0}
             </h3>
-            <p className="stat-label">Approved</p>
+            <p className="nha-stat-label">Approved</p>
           </div>
         </div>
 
-        <div className="history-stat-card stat-danger">
-          <div className="stat-icon">
+        <div className="nha-stat-card">
+          <div className="nha-stat-icon nha-stat-icon-danger">
             <i className="bi bi-x-circle-fill"></i>
           </div>
-          <div className="stat-content">
-            <h3 className="stat-value">
+          <div className="nha-stat-content">
+            <h3 className="nha-stat-value">
               {historyData?.statistics?.rejectedCount || 0}
             </h3>
-            <p className="stat-label">Rejected</p>
+            <p className="nha-stat-label">Rejected</p>
           </div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="history-tabs-container">
-        <div className="history-tabs">
-          <button
-            className={`history-tab ${activeTab === "self" ? "active" : ""}`}
-            onClick={() => setActiveTab("self")}
-          >
-            <i className="bi bi-person-badge me-2"></i>
-            My Self Nominations
-            <span className="tab-badge">
-              {historyData?.selfNominations?.length || 0}
-            </span>
-          </button>
-          <button
-            className={`history-tab ${activeTab === "team" ? "active" : ""}`}
-            onClick={() => setActiveTab("team")}
-          >
-            <i className="bi bi-people me-2"></i>
-            My Team Nominations
-            <span className="tab-badge">
-              {historyData?.teamNominations?.length || 0}
-            </span>
-          </button>
-        </div>
+      <div className="nha-nomination-tabs">
+        <button
+          className={`nha-tab-btn ${activeTab === "self" ? "active" : ""}`}
+          onClick={() => {
+            setActiveTab("self");
+            setCurrentPage(1);
+          }}
+        >
+          <i className="bi bi-person-badge"></i>
+          My Self Nominations
+          <span className="badge bg-primary ms-2">
+            {historyData?.selfNominations?.length || 0}
+          </span>
+        </button>
+        <button
+          className={`nha-tab-btn ${activeTab === "team" ? "active" : ""}`}
+          onClick={() => {
+            setActiveTab("team");
+            setCurrentPage(1);
+          }}
+        >
+          <i className="bi bi-people"></i>
+          My Team Nominations
+          <span className="badge bg-primary ms-2">
+            {historyData?.teamNominations?.length || 0}
+          </span>
+        </button>
+      </div>
 
-        {/* Status Filter */}
-        <div className="history-filter">
-          <label htmlFor="statusFilter" className="filter-label">
-            Filter by Status:
-          </label>
+      {/* Filters Card */}
+      <div className="nha-filters-card">
+        <div className="nha-filters-content">
+          <div className="nha-search-box">
+            <i className="bi bi-search nha-search-icon"></i>
+            <input
+              type="text"
+              className="nha-search-input"
+              placeholder="Search by opportunity, employee, or type..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+
           <select
-            id="statusFilter"
-            className="form-select filter-select"
+            className="nha-filter-select"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -214,99 +277,126 @@ const NominationHistory = () => {
             <option value="Rejected">Rejected</option>
             <option value="Withdrawn">Withdrawn</option>
           </select>
+
+          <button className="btn-clear-nha" onClick={clearFilters}>
+            Clear Filters
+          </button>
+
+          <button className="btn-refresh-nha" onClick={fetchHistory}>
+            <i className="bi bi-arrow-clockwise me-2"></i>
+            Refresh
+          </button>
+
+          <div className="results-count-inline-nha">
+            Showing {getPaginatedNominations().length} of{" "}
+            {filteredNominations.length} nominations
+          </div>
         </div>
       </div>
 
-      {/* Nominations Table */}
-      <div className="history-table-card">
-        {currentNominations.length === 0 ? (
-          <div className="history-empty-state">
-            <i className="bi bi-inbox empty-icon"></i>
-            <h4>
-              No {activeTab === "self" ? "Self" : "Team"} Nominations Found
-            </h4>
-            <p className="text-muted">
-              {activeTab === "self"
-                ? "You haven't completed any self-nominations yet."
-                : "You haven't nominated any team members yet."}
-            </p>
-          </div>
-        ) : (
-          <div className="table-responsive">
-            <table className="history-table">
-              <thead>
+      {/* Table Card */}
+      <div className="nha-table-card">
+        <div className="nha-table-wrapper">
+          <table className="nha-nomination-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Opportunity</th>
+                <th>Employee</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Final Action</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {getPaginatedNominations().length === 0 ? (
                 <tr>
-                  <th>ID</th>
-                  <th>Opportunity</th>
-                  <th>Employee</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>Submitted</th>
-                  <th>Final Action</th>
-                  <th>Actions</th>
+                  <td colSpan="8" className="nha-empty-state">
+                    <i className="bi bi-inbox"></i>
+                    <p>
+                      No {activeTab === "self" ? "self" : "team"} nominations
+                      found
+                    </p>
+                    {searchTerm && (
+                      <small className="text-muted">
+                        Try adjusting your search criteria
+                      </small>
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {currentNominations.map((nom) => (
+              ) : (
+                getPaginatedNominations().map((nom) => (
                   <tr key={nom.nominationId}>
                     <td>
-                      <span className="nomination-id">#{nom.nominationId}</span>
+                      <span className="nha-nomination-id">
+                        #{nom.nominationId}
+                      </span>
                     </td>
+
                     <td>
-                      <div className="opportunity-cell">
-                        <strong className="opportunity-title">
+                      <div className="nha-opportunity-cell">
+                        <strong className="nha-opportunity-title">
                           {nom.opportunityTitle}
                         </strong>
-                        <span className="opportunity-type">
+                        <span className="nha-opportunity-type">
                           {nom.opportunityType}
                         </span>
                       </div>
                     </td>
+
                     <td>
-                      <div className="employee-cell">
-                        <div className="employee-avatar">
+                      <div className="nha-employee-cell">
+                        <div className="nha-employee-avatar">
                           {getInitials(nom.employeeName)}
                         </div>
                         <div>
-                          <div className="employee-name">
+                          <div className="nha-employee-name">
                             {nom.employeeName}
                           </div>
-                          <div className="employee-id">
+                          <div className="nha-employee-id">
                             @{nom.employeeCompanyId}
                           </div>
                         </div>
                       </div>
                     </td>
+
                     <td>
-                      <span className="type-badge">{nom.nominationType}</span>
+                      <span className="nha-type-badge">
+                        {nom.nominationType}
+                      </span>
                     </td>
+
                     <td>
                       <span className={getStatusBadge(nom.currentStatus)}>
                         {nom.currentStatus}
                       </span>
                     </td>
+
                     <td className="text-muted">
                       {formatDate(nom.nominatedDate)}
                     </td>
+
                     <td>
                       {nom.currentStatus === "Approved" && (
-                        <div className="action-cell action-approved">
+                        <div className="nha-action-cell nha-action-approved">
                           <i className="bi bi-check-circle-fill me-1"></i>
                           Approved
                           {nom.finalizedDate && (
-                            <div className="action-date">
+                            <div className="nha-action-date">
                               {formatDate(nom.finalizedDate)}
                             </div>
                           )}
                         </div>
                       )}
                       {nom.currentStatus === "Rejected" && (
-                        <div className="action-cell action-rejected">
+                        <div className="nha-action-cell nha-action-rejected">
                           <i className="bi bi-x-circle-fill me-1"></i>
                           Rejected
                           {nom.managerReviewComments && (
                             <div
-                              className="action-reason"
+                              className="nha-action-reason"
                               title={nom.managerReviewComments}
                             >
                               {nom.managerReviewComments.length > 30
@@ -318,27 +408,112 @@ const NominationHistory = () => {
                         </div>
                       )}
                       {nom.currentStatus === "Withdrawn" && (
-                        <div className="action-cell action-withdrawn">
+                        <div className="nha-action-cell nha-action-withdrawn">
                           <i className="bi bi-dash-circle-fill me-1"></i>
                           Withdrawn
                         </div>
                       )}
                     </td>
+
                     <td>
-                      <button
-                        className="btn btn-sm btn-outline-primary action-btn-view"
-                        title="View Details"
-                        onClick={() =>
-                          toast.info("View details functionality coming soon")
-                        }
-                      >
-                        <i className="bi bi-eye"></i>
-                      </button>
+                      <div className="nha-action-buttons">
+                        <button
+                          className="action-btn action-btn-view"
+                          title="View Details"
+                          onClick={() =>
+                            toast.info("View details functionality coming soon")
+                          }
+                        >
+                          <i className="bi bi-eye"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {filteredNominations.length > 0 && (
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span className="pagination-label">Show</span>
+              <select
+                className="pagination-select"
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select>
+              <span className="pagination-label">entries</span>
+            </div>
+
+            <div className="pagination-status">
+              Showing {(currentPage - 1) * rowsPerPage + 1} to{" "}
+              {Math.min(currentPage * rowsPerPage, filteredNominations.length)}{" "}
+              of {filteredNominations.length} entries
+            </div>
+
+            <nav className="pagination-nav">
+              <ul className="pagination">
+                <li
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                    disabled={currentPage === 1}
+                  >
+                    <i className="bi bi-chevron-left"></i>
+                  </button>
+                </li>
+
+                {getPageNumbers().map((page, index) => (
+                  <li
+                    key={index}
+                    className={`page-item ${
+                      page === currentPage ? "active" : ""
+                    } ${typeof page !== "number" ? "disabled" : ""}`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() =>
+                        typeof page === "number" && setCurrentPage(page)
+                      }
+                      disabled={typeof page !== "number"}
+                    >
+                      {page}
+                    </button>
+                  </li>
                 ))}
-              </tbody>
-            </table>
+
+                <li
+                  className={`page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
           </div>
         )}
       </div>

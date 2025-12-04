@@ -19,9 +19,8 @@ const RoleList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
   
-  // ✅ UPDATED: Two-state search approach
-  const [searchTerm, setSearchTerm] = useState(""); // What user types
-  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   
   const [viewMode, setViewMode] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,7 +89,6 @@ const RoleList = () => {
     setShowEditModal(true);
   };
 
-  // ✅ UPDATED: Use activeSearchTerm for filtering
   const filteredRoles = roles.filter(
     (role) =>
       role.roleName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
@@ -98,18 +96,15 @@ const RoleList = () => {
       role.description?.toLowerCase().includes(activeSearchTerm.toLowerCase())
   );
 
-  // ✅ NEW: Handle search button click
   const handleSearch = () => {
     setActiveSearchTerm(searchTerm);
   };
 
-  // ✅ UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
     setActiveSearchTerm("");
   };
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredRoles.slice(indexOfFirstItem, indexOfLastItem);
@@ -217,9 +212,8 @@ const RoleList = () => {
         </div>
       </div>
 
-      {/* CONTROLS BAR - UPDATED */}
+      {/* CONTROLS BAR */}
       <div className="rlm-controls">
-        {/* ✅ NEW: Search with Button */}
         <div className="rlm-search-input">
           <div className="rlm-search-inner">
             <span className="rlm-search-icon">
@@ -247,7 +241,6 @@ const RoleList = () => {
           </div>
         </div>
 
-        {/* ✅ UPDATED: Clear Filters Button */}
         <button className="rlm-btn-clear" onClick={clearFilters}>
           Clear Filters
         </button>
@@ -303,48 +296,265 @@ const RoleList = () => {
             <>
               <div className="rlm-grid">
                 {currentItems.map((role) => (
-                  <div key={role.roleId} className="rlm-card">
-                    <div className="rlm-card-top">
-                      <div className="rlm-card-title">{role.roleName}</div>
-                      {role.isSystemRole && (
-                        <span className="rlm-badge-system">
-                          <i className="bi bi-shield-check"></i>
-                        </span>
-                      )}
-                    </div>
+                  <div
+                    key={role.roleId}
+                    className="rlm-card-modern"
+                    style={{
+                      cursor: "pointer",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      border: "1px solid rgba(39, 35, 92, 0.75)",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      position: "relative",
+                      background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.52)";
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.borderColor = "rgb(39, 35, 92)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.borderColor = "rgba(39, 35, 92, 0.4)";
+                    }}
+                  >
+                    {/* Card Header */}
+                    <div
+                      style={{
+                        backgroundColor: "rgba(248, 249, 250, 0.8)",
+                        backdropFilter: "blur(10px)",
+                        borderBottom: "1px solid #e9ecef",
+                        padding: "0.875rem 1.25rem",
+                      }}
+                    >
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div className="d-flex gap-2 flex-wrap align-items-center">
+                          {role.isSystemRole ? (
+                            <span
+                              className="badge"
+                              style={{
+                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                fontSize: "10px",
+                                fontWeight: 600,
+                                padding: "0.35rem 0.6rem",
+                                borderRadius: "6px",
+                                boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.25rem",
+                              }}
+                            >
+                              <i className="bi bi-shield-check"></i>
+                              System
+                            </span>
+                          ) : (
+                            <span
+                              className="badge"
+                              style={{
+                                background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+                                fontSize: "10px",
+                                fontWeight: 600,
+                                padding: "0.35rem 0.6rem",
+                                borderRadius: "6px",
+                                boxShadow: "0 2px 8px rgba(79, 172, 254, 0.3)",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.25rem",
+                              }}
+                            >
+                              <i className="bi bi-gear-fill"></i>
+                              Custom
+                            </span>
+                          )}
+                        </div>
 
-                    <div className="rlm-card-code">{role.roleCode}</div>
-
-                    <div className="rlm-card-desc">
-                      {role.description || "No description available"}
-                    </div>
-
-                    <div className="rlm-card-footer">
-                      <div className="rlm-card-date">
-                        <i className="bi bi-calendar3"></i>
-                        {formatDate(role.createdAt)}
-                      </div>
-                      <div className="rlm-card-actions">
-                        <button
-                          className="rlm-action-edit"
-                          onClick={() => handleEdit(role)}
-                          title="Edit"
+                        <code
+                          style={{
+                            fontSize: "10px",
+                            fontWeight: 600,
+                            padding: "0.35rem 0.6rem",
+                            borderRadius: "6px",
+                            backgroundColor: "rgba(39, 35, 92, 0.1)",
+                            color: "#27235c",
+                            border: "1px solid rgba(39, 35, 92, 0.2)",
+                          }}
                         >
-                          <i className="bi bi-pencil-square"></i>
-                        </button>
-                        <button
-                          className="rlm-action-delete"
-                          onClick={() => handleDelete(role)}
-                          disabled={role.isSystemRole}
-                          title={
-                            role.isSystemRole
-                              ? "Cannot delete system role"
-                              : "Delete"
+                          {role.roleCode}
+                        </code>
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div
+                      style={{
+                        padding: "1.25rem",
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      {/* Role Name */}
+                      <h6
+                        style={{
+                          fontWeight: 700,
+                          fontSize: "18px",
+                          color: "#212529",
+                          lineHeight: "1.4",
+                          marginBottom: "0.75rem",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          minHeight: "2.8rem",
+                          textAlign: "left",
+                        }}
+                      >
+                        {role.roleName}
+                      </h6>
+
+                      {/* Description */}
+                      <p
+                        style={{
+                          fontSize: "14px",
+                          color: "#6c757d",
+                          lineHeight: "1.5",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          minHeight: "4rem",
+                          textAlign: "left",
+                          marginBottom: "1rem",
+                          flex: 1,
+                        }}
+                      >
+                        {role.description || "No description available"}
+                      </p>
+
+                      {/* Meta Info */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          padding: "0.75rem",
+                          backgroundColor: "#f8f9fa",
+                          borderRadius: "8px",
+                          fontSize: "0.8rem",
+                          marginTop: "auto",
+                        }}
+                      >
+                        <i
+                          className="bi bi-calendar-check-fill"
+                          style={{ fontSize: "1.1rem", color: "#0d6efd" }}
+                        ></i>
+                        <div style={{ flex: 1 }}>
+                          <div
+                            style={{
+                              fontSize: "0.7rem",
+                              color: "#6c757d",
+                              marginBottom: "2px",
+                            }}
+                          >
+                            Created On
+                          </div>
+                          <div style={{ fontWeight: 600, color: "#212529" }}>
+                            {formatDate(role.createdAt)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Footer - Actions */}
+                    <div
+                      style={{
+                        borderTop: "1px solid #e9ecef",
+                        padding: "0.75rem 1.25rem",
+                        backgroundColor: "rgba(248, 249, 250, 0.5)",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: "0.5rem",
+                      }}
+                    >
+                      <button
+                        onClick={() => handleEdit(role)}
+                        title="Edit Role"
+                        style={{
+                          width: "36px",
+                          height: "36px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          border: "1px solid rgba(13, 110, 253, 0.3)",
+                          borderRadius: "8px",
+                          background: "transparent",
+                          color: "#0d6efd",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          fontSize: "0.95rem",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "rgba(13, 110, 253, 0.1)";
+                          e.currentTarget.style.borderColor = "#0d6efd";
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.borderColor = "rgba(13, 110, 253, 0.3)";
+                          e.currentTarget.style.transform = "translateY(0)";
+                        }}
+                      >
+                        <i className="bi bi-pencil-square"></i>
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(role)}
+                        disabled={role.isSystemRole}
+                        title={
+                          role.isSystemRole
+                            ? "Cannot delete system role"
+                            : "Delete Role"
+                        }
+                        style={{
+                          width: "36px",
+                          height: "36px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          border: role.isSystemRole
+                            ? "1px solid rgba(108, 117, 125, 0.3)"
+                            : "1px solid rgba(220, 53, 69, 0.3)",
+                          borderRadius: "8px",
+                          background: "transparent",
+                          color: role.isSystemRole ? "#6c757d" : "#dc3545",
+                          cursor: role.isSystemRole ? "not-allowed" : "pointer",
+                          transition: "all 0.2s ease",
+                          fontSize: "0.95rem",
+                          opacity: role.isSystemRole ? 0.5 : 1,
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!role.isSystemRole) {
+                            e.currentTarget.style.background = "rgba(220, 53, 69, 0.1)";
+                            e.currentTarget.style.borderColor = "#dc3545";
+                            e.currentTarget.style.transform = "translateY(-2px)";
                           }
-                        >
-                          <i className="bi bi-trash3"></i>
-                        </button>
-                      </div>
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!role.isSystemRole) {
+                            e.currentTarget.style.background = "transparent";
+                            e.currentTarget.style.borderColor = "rgba(220, 53, 69, 0.3)";
+                            e.currentTarget.style.transform = "translateY(0)";
+                          }
+                        }}
+                      >
+                        <i className="bi bi-trash3"></i>
+                      </button>
                     </div>
                   </div>
                 ))}

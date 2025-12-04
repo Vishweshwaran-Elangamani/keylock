@@ -90,7 +90,6 @@ const EmployeePolicyView = () => {
     }
   };
 
-  // Apply all active filters (search, category, date)
   const applyFilters = () => {
     let filtered = policies;
     if (searchTerm.trim()) {
@@ -109,27 +108,28 @@ const EmployeePolicyView = () => {
     setCurrentPage(1);
   };
 
-  // Only set searchTerm on each keystroke; filter fires on Search button or Enter
   const handleSearchInput = (e) => {
     setSearchTerm(e.target.value);
   };
+  
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       applyFilters();
       if (searchInputRef.current) searchInputRef.current.blur();
     }
   };
+  
   const handleSearchButton = () => {
     applyFilters();
     if (searchInputRef.current) searchInputRef.current.blur();
   };
+  
   const handleClearSearch = () => {
     setSearchTerm("");
     setTimeout(() => applyFilters(), 0);
     if (searchInputRef.current) searchInputRef.current.focus();
   };
 
-  // Clear All filters
   const clearFilters = () => {
     setSelectedCategory("All");
     setSelectedDateFilter("All");
@@ -185,7 +185,6 @@ const EmployeePolicyView = () => {
 
   const stats = getCategoryStats();
 
-  // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredPolicies.slice(indexOfFirstItem, indexOfLastItem);
@@ -235,7 +234,6 @@ const EmployeePolicyView = () => {
 
   return (
     <div className="employee-policy-page">
-      {/* BREADCRUMB */}
       <Breadcrumb
         items={[
           {
@@ -277,7 +275,6 @@ const EmployeePolicyView = () => {
 
       {/* CONTROLS BAR */}
       <div className="controls-bar-epd">
-        {/* SEARCH INPUT + BUTTON REVAMP */}
         <div className="search-section-epd policy-search-revamp">
           <div className="policy-search-input">
             <div className="policy-search-inner">
@@ -379,50 +376,224 @@ const EmployeePolicyView = () => {
         </div>
       ) : (
         <>
-          {/* GRID VIEW */}
+          {/* GRID VIEW - MODERN DESIGN */}
           {viewMode === "grid" && (
             <div className="policies-grid-epd">
               {filteredPolicies.map((policy) => (
-                <div key={policy.policyId} className="policy-card-item">
-                  <div className="card-header-epd">
-                    <div
-                      className="policy-icon-badge"
+                <div
+                  key={policy.policyId}
+                  className="policy-card-modern"
+                  style={{
+                    cursor: "pointer",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    border: "1px solid rgba(39, 35, 92, 0.75)",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    position: "relative",
+                    background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.52)";
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.borderColor = "rgb(39, 35, 92)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.08)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.borderColor = "rgba(39, 35, 92, 0.4)";
+                  }}
+                >
+                  {/* Card Header */}
+                  <div
+                    style={{
+                      backgroundColor: "rgba(248, 249, 250, 0.8)",
+                      backdropFilter: "blur(10px)",
+                      borderBottom: "1px solid #e9ecef",
+                      padding: "0.875rem 1.25rem",
+                    }}
+                  >
+                    <div className="d-flex justify-content-between align-items-start">
+                      <div className="d-flex gap-2 flex-wrap align-items-center">
+                        <div
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "8px",
+                            background: "linear-gradient(135deg, #27235c 0%, #1f1c4b 100%)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#ffffff",
+                            fontSize: "1rem",
+                            boxShadow: "0 2px 8px rgba(39, 35, 92, 0.3)",
+                          }}
+                        >
+                          <i className={`bi ${getCategoryIcon(policy.category)}`}></i>
+                        </div>
+                        <span
+                          className="badge"
+                          style={{
+                            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                            fontSize: "10px",
+                            fontWeight: 600,
+                            padding: "0.35rem 0.6rem",
+                            borderRadius: "6px",
+                            boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
+                          }}
+                        >
+                          {policy.category}
+                        </span>
+                      </div>
+
+                      {policy.documentUrl && (
+                        <span
+                          style={{
+                            fontSize: "10px",
+                            fontWeight: 600,
+                            padding: "0.35rem 0.6rem",
+                            borderRadius: "6px",
+                            background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+                            color: "#ffffff",
+                            boxShadow: "0 2px 8px rgba(79, 172, 254, 0.3)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.25rem",
+                          }}
+                        >
+                          <i className="bi bi-file-earmark-pdf"></i>
+                          PDF
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Card Body */}
+                  <div
+                    style={{
+                      padding: "1.25rem",
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    {/* Policy Name */}
+                    <h6
                       style={{
-                        background: "#27235c",
-                        boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
+                        fontWeight: 700,
+                        fontSize: "18px",
+                        color: "#212529",
+                        lineHeight: "1.4",
+                        marginBottom: "0.75rem",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        minHeight: "2.8rem",
+                        textAlign: "left",
                       }}
                     >
-                      <i className={`bi ${getCategoryIcon(policy.category)}`}></i>
-                    </div>
-                    <span className="category-badge-epd">{policy.category}</span>
-                  </div>
-                  <div className="card-body-epd">
-                    <h3 className="policy-name-text">{policy.policyName}</h3>
-                    <p className="policy-description-text">
-                      {policy.description?.substring(0, 120)}
-                      {policy.description?.length > 120 && "..."}
+                      {policy.policyName}
+                    </h6>
+
+                    {/* Description */}
+                    <p
+                      style={{
+                        fontSize: "14px",
+                        color: "#6c757d",
+                        lineHeight: "1.5",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: "vertical",
+                        minHeight: "4rem",
+                        textAlign: "left",
+                        marginBottom: "1rem",
+                        flex: 1,
+                      }}
+                    >
+                      {policy.description || "No description available"}
                     </p>
-                    {policy.documentUrl && (
-                      <div className="document-indicator-epd">
-                        <i className="bi bi-file-earmark-pdf"></i>
-                        <span>Document Available</span>
+
+                    {/* Meta Info */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        padding: "0.75rem",
+                        backgroundColor: "#f8f9fa",
+                        borderRadius: "8px",
+                        fontSize: "0.8rem",
+                        marginTop: "auto",
+                      }}
+                    >
+                      <i
+                        className="bi bi-calendar-check-fill"
+                        style={{ fontSize: "1.1rem", color: "#0d6efd" }}
+                      ></i>
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "#6c757d",
+                            marginBottom: "2px",
+                          }}
+                        >
+                          Published On
+                        </div>
+                        <div style={{ fontWeight: 600, color: "#212529" }}>
+                          {formatDate(policy.publishedAt)}
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                  <div className="card-footer-epd">
-                    <div className="policy-info-date">
-                      <i className="bi bi-calendar3"></i>
-                      <span>{formatDate(policy.publishedAt)}</span>
-                    </div>
-                    <div className="card-actions-epd">
-                      <button
-                        className="action-btn action-btn-view"
-                        onClick={() => handleViewDetails(policy)}
-                        title="View Details"
-                      >
-                        <i className="bi bi-eye"></i>
-                      </button>
-                    </div>
+
+                  {/* Card Footer - Actions */}
+                  <div
+                    style={{
+                      borderTop: "1px solid #e9ecef",
+                      padding: "0.75rem 1.25rem",
+                      backgroundColor: "rgba(248, 249, 250, 0.5)",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    <button
+                      onClick={() => handleViewDetails(policy)}
+                      title="View Policy Details"
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "1px solid rgba(13, 110, 253, 0.3)",
+                        borderRadius: "8px",
+                        background: "transparent",
+                        color: "#0d6efd",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        fontSize: "0.95rem",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "rgba(13, 110, 253, 0.1)";
+                        e.currentTarget.style.borderColor = "#0d6efd";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.borderColor = "rgba(13, 110, 253, 0.3)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      <i className="bi bi-eye"></i>
+                    </button>
                   </div>
                 </div>
               ))}

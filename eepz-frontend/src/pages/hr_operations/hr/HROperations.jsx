@@ -52,7 +52,7 @@ const HROperations = () => {
       label: "Budget Allocations",
       path: "/hr/operations/period-allocations",
     },
-    { key: "workload", label: "Workload", path: "/hr/operations/workload" },
+    // { key: "workload", label: "Workload", path: "/hr/operations/workload" },
     // {
     //   key: "promotions",
     //   label: "Promotions",
@@ -131,8 +131,6 @@ const HROperations = () => {
                 path="period-allocations"
                 element={<PeriodAllocationManagement />}
               />
-              <Route path="workload" element={<WorkloadDistribution />} />
-              {/* <Route path="promotions" element={<PromotionsManagement />} /> */}
               <Route path="*" element={<PolicyManagement />} />
             </Routes>
           </div>

@@ -43,11 +43,28 @@ const EditPolicyModal = ({
 
   const statuses = ["Active", "Inactive", "Draft"];
 
+  // ✅ FIXED: Correct document URL generation
   const getFullDocumentUrl = (url) => {
-    if (!url) return "";
-    if (url.startsWith("http")) return url;
-    const baseUrl = import.meta.env.VITE_HR_API_URL;
-    return `${baseUrl}${url}`;
+    if (!url) {
+      console.warn("⚠️ Empty document URL provided");
+      return "";
+    }
+    
+    // If already a full URL (starts with http/https), return as-is
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      console.log("✅ Full URL detected:", url);
+      return url;
+    }
+    
+    // Extract filename from paths like "/uploads/policies/abc.pdf"
+    const fileName = url.split('/').pop();
+    
+    // Build document endpoint URL
+    const hrBaseUrl = import.meta.env.VITE_HR_API_URL || "http://localhost:5260";
+    const fullUrl = `${hrBaseUrl}/api/policy/document/${fileName}`;
+    
+    console.log(`🔗 Document URL converted: ${url} → ${fullUrl}`);
+    return fullUrl;
   };
 
   useEffect(() => {
@@ -67,6 +84,7 @@ const EditPolicyModal = ({
           type: policy.documentType,
           size: policy.documentSizeFormatted,
         });
+        console.log("📄 Existing document loaded:", policy.documentUrl);
       } else {
         setExistingDocument(null);
       }
@@ -105,6 +123,7 @@ const EditPolicyModal = ({
       }
 
       setSelectedFile(file);
+      console.log("📎 File selected:", file.name);
     }
   };
 
@@ -137,6 +156,7 @@ const EditPolicyModal = ({
       let documentData = {};
 
       if (documentType === "upload" && selectedFile) {
+        console.log("📤 Uploading new document...");
         setUploadingDoc(true);
         const uploadResult = await policyService.uploadDocument(selectedFile);
         documentData = {
@@ -145,8 +165,10 @@ const EditPolicyModal = ({
           documentType: uploadResult.documentType,
           documentSize: uploadResult.documentSize,
         };
+        console.log("✅ Document uploaded:", uploadResult.documentUrl);
         setUploadingDoc(false);
       } else if (documentType === "link" && documentLink) {
+        console.log("🔗 Adding document link...");
         const linkResult = await policyService.addDocumentLink(
           documentLink,
           documentName
@@ -156,16 +178,18 @@ const EditPolicyModal = ({
           documentName: linkResult.documentName,
           documentType: linkResult.documentType,
         };
+        console.log("✅ Document link added:", linkResult.documentUrl);
       }
 
       const policyDataWithDoc = { ...formData, ...documentData };
       await policyService.updatePolicy(policy.policyId, policyDataWithDoc);
 
+      console.log("✅ Policy updated successfully");
       onSuccess();
       if (typeof onToast === "function")
         onToast("success", "Policy updated successfully!");
     } catch (error) {
-      console.error("Error updating policy:", error);
+      console.error("❌ Error updating policy:", error);
       setErrors({ submit: "Failed to update policy. Please try again." });
       if (typeof onToast === "function")
         onToast("danger", "Failed to update policy");
@@ -178,11 +202,17 @@ const EditPolicyModal = ({
   const handleUnpublish = async () => {
     try {
       setUnpublishing(true);
+      console.log("🔄 Unpublishing policy...");
       await policyService.unpublishPolicy(policy.policyId);
       if (typeof onToast === "function")
         onToast("warning", "Policy unpublished - Hidden from employees");
+      console.log("✅ Policy unpublished");
       onSuccess();
       onClose();
+    } catch (error) {
+      console.error("❌ Error unpublishing:", error);
+      if (typeof onToast === "function")
+        onToast("danger", "Failed to unpublish policy");
     } finally {
       setUnpublishing(false);
     }
@@ -235,6 +265,7 @@ const EditPolicyModal = ({
             flexDirection: "column",
           }}
         >
+          {/* Header */}
           <div
             style={{
               background: "#27235C",
@@ -323,6 +354,7 @@ const EditPolicyModal = ({
               overflow: "hidden",
             }}
           >
+            {/* Body */}
             <div
               style={{
                 padding: "20px",
@@ -363,9 +395,11 @@ const EditPolicyModal = ({
                   marginBottom: 0,
                 }}
               >
+                {/* Left Column */}
                 <div
                   style={{ display: "flex", flexDirection: "column", gap: 12 }}
                 >
+                  {/* Policy Name */}
                   <div>
                     <label
                       style={{
@@ -410,6 +444,7 @@ const EditPolicyModal = ({
                     )}
                   </div>
 
+                  {/* Category */}
                   <div>
                     <label
                       style={{
@@ -460,6 +495,7 @@ const EditPolicyModal = ({
                     )}
                   </div>
 
+                  {/* Status */}
                   <div>
                     <label
                       style={{
@@ -496,9 +532,11 @@ const EditPolicyModal = ({
                   </div>
                 </div>
 
+                {/* Right Column */}
                 <div
                   style={{ display: "flex", flexDirection: "column", gap: 12 }}
                 >
+                  {/* Description */}
                   <div>
                     <label
                       style={{
@@ -548,6 +586,7 @@ const EditPolicyModal = ({
                     )}
                   </div>
 
+                  {/* Compliance Guidance */}
                   <div>
                     <label
                       style={{
@@ -585,6 +624,7 @@ const EditPolicyModal = ({
                 </div>
               </div>
 
+              {/* Document Section */}
               <div
                 style={{
                   border: "1px solid #e5e7eb",
@@ -612,6 +652,7 @@ const EditPolicyModal = ({
                   Policy Document
                 </label>
 
+                {/* Existing Document Display */}
                 {existingDocument && (
                   <div
                     style={{
@@ -649,6 +690,10 @@ const EditPolicyModal = ({
                         href={getFullDocumentUrl(existingDocument.url)}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={(e) => {
+                          const fullUrl = getFullDocumentUrl(existingDocument.url);
+                          console.log("🔍 Opening document:", fullUrl);
+                        }}
                         style={{
                           padding: "4px 12px",
                           fontSize: 12,
@@ -668,6 +713,7 @@ const EditPolicyModal = ({
                   </div>
                 )}
 
+                {/* Document Type Selector */}
                 <div
                   style={{
                     display: "flex",
@@ -756,6 +802,7 @@ const EditPolicyModal = ({
                   </button>
                 </div>
 
+                {/* Upload File UI */}
                 {documentType === "upload" && (
                   <div style={{ marginTop: 12 }}>
                     <label
@@ -812,7 +859,7 @@ const EditPolicyModal = ({
                       Supported: PDF, DOC, DOCX (Max 5MB)
                     </small>
 
-                    {/* Selected File Display - Green */}
+                    {/* Selected File Display */}
                     {selectedFile && (
                       <div
                         style={{
@@ -885,6 +932,7 @@ const EditPolicyModal = ({
                   </div>
                 )}
 
+                {/* Link UI */}
                 {documentType === "link" && (
                   <div style={{ marginTop: 12 }}>
                     <div style={{ marginBottom: 12 }}>
@@ -984,6 +1032,7 @@ const EditPolicyModal = ({
               </div>
             </div>
 
+            {/* Footer */}
             <div
               style={{
                 padding: "10px 15px",
@@ -1109,48 +1158,34 @@ const EditPolicyModal = ({
                   transition: "all 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  if (!isAnyActionLoading) e.target.style.opacity = 0.93;
+                  if (!isAnyActionLoading)
+                    e.target.style.boxShadow =
+                      "0 4px 12px rgba(151,36,126,0.35)";
                 }}
                 onMouseLeave={(e) => {
-                  if (!isAnyActionLoading) e.target.style.opacity = 1;
+                  if (!isAnyActionLoading)
+                    e.target.style.boxShadow =
+                      "0 2px 8px rgba(151,36,126,0.25)";
                 }}
               >
-                {uploadingDoc ? (
+                {loading || uploadingDoc ? (
                   <>
                     <span
                       style={{
                         width: 14,
                         height: 14,
                         border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
+                        borderTop: "2px solid #97247E",
                         borderRadius: "50%",
                         animation: "spin 0.7s linear infinite",
                         display: "inline-block",
-                        marginRight: 6,
                       }}
                     />
-                    Uploading...
-                  </>
-                ) : loading ? (
-                  <>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        border: "2px solid #fff",
-                        borderTop: "2px solid #E01950",
-                        borderRadius: "50%",
-                        animation: "spin 0.7s linear infinite",
-                        display: "inline-block",
-                        marginRight: 6,
-                      }}
-                    />
-                    Updating...
+                    {uploadingDoc ? "Uploading..." : "Updating..."}
                   </>
                 ) : (
                   <>
-                    <i className="bi bi-check-circle"></i>
-                    Update Policy
+                    <i className="bi bi-check-circle"></i> Update Policy
                   </>
                 )}
               </button>
