@@ -30,18 +30,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5101
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -60,18 +49,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5102
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -90,18 +68,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5103
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -120,18 +87,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5104
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -150,18 +106,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5105
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -180,18 +125,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5106
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -210,18 +144,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5107
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -240,18 +163,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5108
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -270,18 +182,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5109
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -300,18 +201,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5110
-      - Jwt__Issuer=EEPZ
-      - Jwt__Audience=EEPZUsers
-      - Jwt__SecretKey=f05505b63f8d9e2e5535089d6b13193d
-      - Jwt__AccessTokenExpirationMinutes=60
-      - Jwt__RefreshTokenExpirationDays=7
-      - SmtpSettings__Host=smtp.gmail.com
-      - SmtpSettings__Port=587
-      - SmtpSettings__EnableSsl=true
-      - SmtpSettings__Username=emailserviceeepz@gmail.com
-      - SmtpSettings__Password=bvnw qmio msiq cgat
-      - SmtpSettings__FromEmail=noreply@eepz.com
-      - SmtpSettings__FromName=EEPZ System
+      
     depends_on:
       mysql:
         condition: service_healthy
