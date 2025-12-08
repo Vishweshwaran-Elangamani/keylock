@@ -6,12 +6,12 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 import "../../../styles/performancemanagement/hr/FormCreate.css";
 
 function FormCreate() {
-
   const { user, loading } = useAuth();
   const { formId } = useParams();
   const navigate = useNavigate();
   const isEditMode = !!formId;
 
+  const [currentStep, setCurrentStep] = useState(1); 
 
   const [model, setModel] = useState({
     name: "",
@@ -23,7 +23,6 @@ function FormCreate() {
 
   const [busy, setBusy] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-
 
   useEffect(() => {
     if (user?.userId) {
@@ -58,7 +57,17 @@ function FormCreate() {
     loadFormData();
   }, [formId, isEditMode]);
 
+  
+  const isStep1Complete = () => {
+    return model.name?.trim() && model.type && model.deliveryEnablement;
+  };
 
+  const isStep2Complete = () => {
+    if (model.competencies.length === 0) return false;
+    return model.competencies.every(
+      (comp) => comp.name?.trim() && comp.description?.trim()
+    );
+  };
 
   const addCompetency = () => {
     setModel((m) => ({
@@ -78,7 +87,8 @@ function FormCreate() {
   const updateComp = (index, key, value) => {
     setModel((m) => {
       const next = structuredClone(m);
-      next.competencies[index][key] = key === "displayOrder" ? Number(value) : value;
+      next.competencies[index][key] =
+        key === "displayOrder" ? Number(value) : value;
       return next;
     });
   };
@@ -119,8 +129,8 @@ function FormCreate() {
     });
   };
 
-
-  const validateForm = () => {
+ 
+  const validateStep1 = () => {
     const errors = {};
 
     if (!model.name?.trim()) {
@@ -132,30 +142,31 @@ function FormCreate() {
     if (!model.deliveryEnablement) {
       errors.deliveryEnablement = "Delivery/Enablement selection is required";
     }
+
+    setValidationErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      toast.error("Please fill all required fields");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = () => {
+    const errors = {};
+
     if (model.competencies.length === 0) {
       errors.competencies = "At least one competency is required";
     }
+
     model.competencies.forEach((comp, idx) => {
       if (!comp.name?.trim()) {
         errors[`comp_${idx}_name`] = `Competency name is required`;
       }
-    });
-    const newValidationErrors = {};
-
-    model.competencies.forEach((comp, index) => {
-      if (!comp.name || comp.name.trim() === "") {
-        newValidationErrors[`comp_${index}_name`] = "Competency name is required";
-      }
-      if (!comp.description || comp.description.trim() === "") {
-        newValidationErrors[`comp_${index}_description`] = "Description is required";
+      if (!comp.description?.trim()) {
+        errors[`comp_${idx}_description`] = "Description is required";
       }
     });
-
-    if (Object.keys(newValidationErrors).length > 0) {
-      setValidationErrors(newValidationErrors);
-      return;
-    }
-
 
     setValidationErrors(errors);
 
@@ -166,6 +177,31 @@ function FormCreate() {
     return true;
   };
 
+  const proceedToStep2 = (e) => {
+    e.preventDefault();
+    if (validateStep1()) {
+      setCurrentStep(2);
+      setValidationErrors({});
+    }
+  };
+
+  const goBackToStep1 = () => {
+    setCurrentStep(1);
+    setValidationErrors({});
+  };
+
+  const navigateToStep = (step) => {
+    if (step === 1) {
+      goBackToStep1();
+    } else if (step === 2 && isStep1Complete()) {
+      setCurrentStep(2);
+      setValidationErrors({});
+    }
+  };
+
+  const validateForm = () => {
+    return validateStep1() && validateStep2();
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -206,17 +242,17 @@ function FormCreate() {
 
       toast.dismiss();
       toast.success(
-        data.message || (isEditMode ? "Form updated successfully!" : "Form created successfully!")
+        data.message ||
+          (isEditMode ? "Form updated successfully!" : "Form created successfully!")
       );
       setTimeout(() => {
         navigate("/hr/dashboard/performance/formslist");
       }, 500);
-
     } catch (error) {
       toast.dismiss();
       toast.error(
         error.response?.data?.message ||
-        (isEditMode ? "Failed to update form." : "Failed to create form.")
+          (isEditMode ? "Failed to update form." : "Failed to create form.")
       );
       console.error(error);
     } finally {
@@ -224,10 +260,9 @@ function FormCreate() {
     }
   };
 
-
   if (loading) {
     return (
-      <div className="hrfcper-loading-container">
+      <div className="pmhr-fc-loading-container">
         <div className="spinner-border text-primary" role="status">
           <span className="visually-hidden">Loading...</span>
         </div>
@@ -237,8 +272,8 @@ function FormCreate() {
 
   if (!user || !user.userId) {
     return (
-      <div className="hrfcper-error-container">
-        <div className="hrfcper-error-icon">
+      <div className="pmhr-fc-error-container">
+        <div className="pmhr-fc-error-icon">
           <i className="bi bi-exclamation-triangle"></i>
         </div>
         <h4>Authentication Required</h4>
@@ -247,292 +282,402 @@ function FormCreate() {
     );
   }
 
-
   return (
-    <div className="hrfcper-page">
-
-      <div className="hrfcper-top-bar">
-        <ol
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-            listStyle: "none",
-            padding: 0,
-            margin: 0
-          }}
-        >
+    <div className="pmhr-fc-page">
+      <div className="pmhr-fc-top-bar">
+        <ol className="pmhr-fc-breadcrumb">
           <li
-            style={{ cursor: "pointer", display: "flex", alignItems: "center", color: "#97247E" }}
+            className="pmhr-fc-breadcrumb-item"
             onClick={() => navigate("/dashboard")}
           >
             <i className="bi bi-house-door"></i>
           </li>
-
-          <span style={{ color: "#97247E" }}>/</span>
-
+          <span className="pmhr-fc-breadcrumb-separator">/</span>
           <li
-            style={{ cursor: "pointer", display: "flex", alignItems: "center", color: "#97247E" }}
+            className="pmhr-fc-breadcrumb-item"
             onClick={() => navigate("/hr/dashboard/performance")}
           >
             Performance
           </li>
-
-          <span style={{ color: "#97247E" }}>/</span>
-
-          <li
-            style={{ fontWeight: "600", display: "flex", alignItems: "center", color: "#97247E" }}
-            aria-current="page"
-          >
+          <span className="pmhr-fc-breadcrumb-separator">/</span>
+          <li className="pmhr-fc-breadcrumb-item pmhr-fc-breadcrumb-active">
             {isEditMode ? "Edit Form" : "Create Form"}
           </li>
         </ol>
       </div>
 
-
-
-
-
-      <form onSubmit={onSubmit} className="hrfcper-form-container">
-        <div className="hrfcper-left-column">
-          <div className="hrfcper-section hrfcper-general-details">
-            <div className="hrfcper-section-header">
-              <i className="bi bi-info-circle"></i>
-              <h3 className="hrfcper-section-title">General Details</h3>
-            </div>
-            <div className="hrfcper-section-body">
-              <div className="hrfcper-form-group hrfcper-full-width">
-                <label className="hrfcper-label">
-                  Form Name <span className="hrfcper-required">*</span>
-                </label>
-                <div className="hrfcper-error-wrapper">
-                  <input
-                    type="text"
-                    className={`hrfcper-input ${validationErrors.name ? "hrfcper-input-error" : ""}`}
-                    placeholder="Enter form name (e.g., Annual Performance Review 2024)"
-                    value={model.name}
-                    onChange={(e) => {
-                      setModel({ ...model, name: e.target.value });
-                      setValidationErrors({ ...validationErrors, name: null });
-                    }}
-                    disabled={busy}
-                  />
-                  {validationErrors.name && (
-                    <span className="hrfcper-error-text">
-                      <i className="bi bi-exclamation-circle"></i>
-                      {validationErrors.name}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="hrfcper-form-row-two">
-                <div className="hrfcper-form-group">
-                  <label className="hrfcper-label">
-                    Form Type <span className="hrfcper-required">*</span>
-                  </label>
-                  <div className="hrfcper-error-wrapper">
-                    <select
-                      className={`hrfcper-select ${validationErrors.type ? "hrfcper-input-error" : ""}`}
-                      value={model.type}
-                      onChange={(e) => {
-                        setModel({ ...model, type: e.target.value });
-                        setValidationErrors({ ...validationErrors, type: null });
-                      }}
-                      disabled={busy}
-                    >
-                      <option value="">Select form type</option>
-                      <option value="Self">Self</option>
-                      <option value="Manager">Manager</option>
-
-                    </select>
-                    {validationErrors.type && (
-                      <span className="hrfcper-error-text">
-                        <i className="bi bi-exclamation-circle"></i>
-                        {validationErrors.type}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="hrfcper-form-group">
-                  <label className="hrfcper-label">
-                    Category <span className="hrfcper-required">*</span>
-                  </label>
-                  <div className="hrfcper-error-wrapper">
-                    <select
-                      className={`hrfcper-select ${validationErrors.deliveryEnablement ? "hrfcper-input-error" : ""
-                        }`}
-                      value={model.deliveryEnablement}
-                      onChange={(e) => {
-                        setModel({ ...model, deliveryEnablement: e.target.value });
-                        setValidationErrors({ ...validationErrors, deliveryEnablement: null });
-                      }}
-                      disabled={busy}
-                    >
-                      <option value="">Select category</option>
-                      <option value="Delivery">Delivery</option>
-                      <option value="Enablement">Enablement</option>
-                    </select>
-                    {validationErrors.deliveryEnablement && (
-                      <span className="hrfcper-error-text">
-                        <i className="bi bi-exclamation-circle"></i>
-                        {validationErrors.deliveryEnablement}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="hrfcper-form-actions">
+      <div className="pmhr-fc-step-indicator-wrapper">
+        <div className="pmhr-fc-step-indicator">
+          <div className="pmhr-fc-step-item">
             <button
               type="button"
-              className="hrfcper-btn-cancel"
-              onClick={() => navigate("/hr/dashboard/performance/formslist")}
-              disabled={busy}
+              className={`pmhr-fc-step-number ${
+                currentStep === 1 ? "pmhr-fc-step-active" : ""
+              } ${isStep1Complete() ? "pmhr-fc-step-complete" : ""}`}
+              onClick={() => navigateToStep(1)}
+              disabled={currentStep === 1}
+              title="Form Details"
             >
-              Cancel
-            </button>
-            <button type="submit" className="hrfcper-btn-submit" disabled={busy}>
-              {busy ? (
-                <>
-                  <span className="hrfcper-spinner"></span>
-                  {isEditMode ? "Updating..." : "Creating..."}
-                </>
+              {isStep1Complete() && currentStep !== 1 ? (
+                <i className="bi bi-check-lg"></i>
               ) : (
-                <>
-                  {isEditMode ? "Update Form" : "Create Form"}
-                </>
+                <span>1</span>
               )}
             </button>
-          </div>
-        </div>
-        <div className="hrfcper-section hrfcper-competencies-section">
-          <div className="hrfcper-section-header">
-            <div className="hrfcper-section-header-left">
-              <i className="bi bi-list-check"></i>
-              <h3 className="hrfcper-section-title">Competencies</h3>
-              <span className="hrfcper-count-badge">{model.competencies.length} Competencies</span>
+            <div className="pmhr-fc-step-label">
+              <p className="pmhr-fc-step-title">Form Details</p>
+              <p className="pmhr-fc-step-desc">Basic information</p>
             </div>
+          </div>
+
+          <div
+            className={`pmhr-fc-step-line ${
+              isStep1Complete() ? "pmhr-fc-step-line-complete" : ""
+            }`}
+          ></div>
+
+          <div className="pmhr-fc-step-item">
             <button
               type="button"
-              className="hrfcper-btn-add-comp"
-              onClick={addCompetency}
-              disabled={busy}
+              className={`pmhr-fc-step-number ${
+                currentStep === 2 ? "pmhr-fc-step-active" : ""
+              } ${isStep2Complete() ? "pmhr-fc-step-complete" : ""} ${
+                !isStep1Complete() ? "pmhr-fc-step-disabled" : ""
+              }`}
+              onClick={() => navigateToStep(2)}
+              disabled={!isStep1Complete() || currentStep === 2}
+              title={
+                isStep1Complete()
+                  ? "Add Competencies"
+                  : "Complete Step 1 first"
+              }
             >
-
-              Add Competency
+              {isStep2Complete() ? (
+                <i className="bi bi-check-lg"></i>
+              ) : (
+                <span>2</span>
+              )}
             </button>
+            <div className="pmhr-fc-step-label">
+              <p className="pmhr-fc-step-title">Add Competencies</p>
+              <p className="pmhr-fc-step-desc">Skills & abilities</p>
+            </div>
           </div>
-          <div className="hrfcper-section-body">
-            {validationErrors.competencies && (
-              <div className="hrfcper-alert-warning">
-                <i className="bi bi-exclamation-triangle"></i>
-                <span>At least one competency is required</span>
-              </div>
-            )}
-            {model.competencies.map((comp, index) => (
-              <div key={index} className="hrfcper-comp-card">
-                <div className="hrfcper-comp-header">
-                  <div className="hrfcper-comp-left">
-                    <span className="hrfcper-comp-number">{comp.displayOrder}</span>
-                    <span className="hrfcper-comp-label">{comp.name || "Untitled Competency"}</span>
-                  </div>
-                  <div className="hrfcper-comp-actions">
-                    <button
-                      type="button"
-                      className="hrfcper-btn-icon hrfcper-btn-up"
-                      onClick={() => moveCompUp(index)}
-                      disabled={index === 0 || busy}
-                      title="Move Up"
-                    >
-                      <i className="bi bi-arrow-up"></i>
-                    </button>
-                    <button
-                      type="button"
-                      className="hrfcper-btn-icon hrfcper-btn-down"
-                      onClick={() => moveCompDown(index)}
-                      disabled={index === model.competencies.length - 1 || busy}
-                      title="Move Down"
-                    >
-                      <i className="bi bi-arrow-down"></i>
-                    </button>
-                    <button
-                      type="button"
-                      className="hrfcper-btn-icon hrfcper-btn-delete"
-                      onClick={() => removeComp(index)}
-                      disabled={busy}
-                      title="Delete"
-                    >
-                      <i className="bi bi-trash"></i>
-                    </button>
-                  </div>
+        </div>
+      </div>
+
+      <div className="pmhr-fc-form-wrapper">
+        <form
+          onSubmit={currentStep === 2 ? onSubmit : proceedToStep2}
+          className="pmhr-fc-form-container"
+        >
+        
+          {currentStep === 1 && (
+            <div className="pmhr-fc-form-content">
+              <div className="pmhr-fc-section pmhr-fc-general-details">
+                <div className="pmhr-fc-section-header">
+                    <div className="pmhr-fc-section-header-left">
+
+                  <i className="bi bi-info-circle"></i>
+                  <h3 className="pmhr-fc-section-title">General Details</h3>
                 </div>
-                <div className="hrfcper-comp-body">
-                  <div className="hrfcper-form-group hrfcper-full-width">
-                    <label className="hrfcper-label">
-                      Competency Name <span className="hrfcper-required">*</span>
+                </div>
+                <div className="pmhr-fc-section-body">
+                  <div className="pmhr-fc-form-group pmhr-fc-full-width">
+                    <label className="pmhr-fc-label">
+                      Form Name <span className="pmhr-fc-required">*</span>
                     </label>
-                    <div className="hrfcper-error-wrapper">
+                    <div className="pmhr-fc-error-wrapper">
                       <input
                         type="text"
-                        className={`hrfcper-input ${validationErrors[`comp_${index}_name`] ? "hrfcper-input-error" : ""
-                          }`}
-                        placeholder="e.g., Communication Skills, Technical Expertise"
-                        value={comp.name}
+                        className={`pmhr-fc-input ${
+                          validationErrors.name ? "pmhr-fc-input-error" : ""
+                        }`}
+                        placeholder="Enter form name (e.g., Annual Performance Review 2024)"
+                        value={model.name}
                         onChange={(e) => {
-                          updateComp(index, "name", e.target.value);
+                          setModel({ ...model, name: e.target.value });
                           setValidationErrors({
                             ...validationErrors,
-                            [`comp_${index}_name`]: null,
+                            name: null,
                           });
                         }}
                         disabled={busy}
                       />
-                      {validationErrors[`comp_${index}_name`] && (
-                        <span className="hrfcper-error-text">
+                      {validationErrors.name && (
+                        <span className="pmhr-fc-error-text">
                           <i className="bi bi-exclamation-circle"></i>
-                          {validationErrors[`comp_${index}_name`]}
+                          {validationErrors.name}
                         </span>
                       )}
                     </div>
                   </div>
-                  <div className="hrfcper-form-group hrfcper-full-width">
-                    <label className="hrfcper-label">
-                      Description <span className="hrfcper-required">*</span>
-                    </label>
-                    <div className="hrfcper-error-wrapper">
-                      <textarea
-                        className={`hrfcper-textarea ${validationErrors[`comp_${index}_description`] ? "hrfcper-input-error" : ""
+                  <div className="pmhr-fc-form-row-two">
+                    <div className="pmhr-fc-form-group">
+                      <label className="pmhr-fc-label">
+                        Form Type <span className="pmhr-fc-required">*</span>
+                      </label>
+                      <div className="pmhr-fc-error-wrapper">
+                        <select
+                          className={`pmhr-fc-select ${
+                            validationErrors.type ? "pmhr-fc-input-error" : ""
                           }`}
-                        placeholder="Enter competency description..."
-                        rows="2"
-                        value={comp.description || ""}
-                        onChange={(e) => {
-                          updateComp(index, "description", e.target.value);
-                          setValidationErrors({
-                            ...validationErrors,
-                            [`comp_${index}_description`]: null,
-                          });
-                        }}
-                        disabled={busy}
-                      ></textarea>
-
-                      {validationErrors[`comp_${index}_description`] && (
-                        <span className="hrfcper-error-text">
-                          <i className="bi bi-exclamation-circle"></i>
-                          {validationErrors[`comp_${index}_description`]}
-                        </span>
-                      )}
+                          value={model.type}
+                          onChange={(e) => {
+                            setModel({ ...model, type: e.target.value });
+                            setValidationErrors({
+                              ...validationErrors,
+                              type: null,
+                            });
+                          }}
+                          disabled={busy}
+                        >
+                          <option value="">Select form type</option>
+                          <option value="Self">Self</option>
+                          <option value="Manager">Manager</option>
+                        </select>
+                        {validationErrors.type && (
+                          <span className="pmhr-fc-error-text">
+                            <i className="bi bi-exclamation-circle"></i>
+                            {validationErrors.type}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="pmhr-fc-form-group">
+                      <label className="pmhr-fc-label">
+                        Category <span className="pmhr-fc-required">*</span>
+                      </label>
+                      <div className="pmhr-fc-error-wrapper">
+                        <select
+                          className={`pmhr-fc-select ${
+                            validationErrors.deliveryEnablement
+                              ? "pmhr-fc-input-error"
+                              : ""
+                          }`}
+                          value={model.deliveryEnablement}
+                          onChange={(e) => {
+                            setModel({
+                              ...model,
+                              deliveryEnablement: e.target.value,
+                            });
+                            setValidationErrors({
+                              ...validationErrors,
+                              deliveryEnablement: null,
+                            });
+                          }}
+                          disabled={busy}
+                        >
+                          <option value="">Select category</option>
+                          <option value="Delivery">Delivery</option>
+                          <option value="Enablement">Enablement</option>
+                        </select>
+                        {validationErrors.deliveryEnablement && (
+                          <span className="pmhr-fc-error-text">
+                            <i className="bi bi-exclamation-circle"></i>
+                            {validationErrors.deliveryEnablement}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-
                 </div>
               </div>
+              <div className="pmhr-fc-form-actions">
+                <button
+                  type="button"
+                  className="pmhr-fc-btn-cancel"
+                  onClick={() => navigate("/hr/dashboard/performance/formslist")}
+                  disabled={busy}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="pmhr-fc-btn-submit"
+                  disabled={busy || !isStep1Complete()}
+                >
+                  {busy ? (
+                    <>
+                      <span className="pmhr-fc-spinner"></span>
+                      Next...
+                    </>
+                  ) : (
+                    <>Next: Add Competencies</>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
 
-            ))}
-          </div>
-        </div>
-      </form>
+          {currentStep === 2 && (
+            <div className="pmhr-fc-form-content">
+              <div className="pmhr-fc-section pmhr-fc-competencies-section">
+                <div className="pmhr-fc-section-header">
+                  <div className="pmhr-fc-section-header-left">
+                    <i className="bi bi-list-check"></i>
+                    <h3 className="pmhr-fc-section-title">Competencies</h3>
+                    <span className="pmhr-fc-count-badge">
+                      {model.competencies.length} Competencies
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="pmhr-fc-btn-add-comp"
+                    onClick={addCompetency}
+                    disabled={busy}
+                  >
+                    Add Competency
+                  </button>
+                </div>
+                <div className="pmhr-fc-section-body">
+                  {validationErrors.competencies && (
+                    <div className="pmhr-fc-alert-warning">
+                      <i className="bi bi-exclamation-triangle"></i>
+                      <span>At least one competency is required</span>
+                    </div>
+                  )}
+                  {model.competencies.map((comp, index) => (
+                    <div key={index} className="pmhr-fc-comp-card">
+                      <div className="pmhr-fc-comp-header">
+                        <div className="pmhr-fc-comp-left">
+                          <span className="pmhr-fc-comp-number">
+                            {comp.displayOrder}
+                          </span>
+                          <span className="pmhr-fc-comp-label">
+                            {comp.name || "Untitled Competency"}
+                          </span>
+                        </div>
+                        <div className="pmhr-fc-comp-actions">
+                          <button
+                            type="button"
+                            className="pmhr-fc-btn-icon pmhr-fc-btn-up"
+                            onClick={() => moveCompUp(index)}
+                            disabled={index === 0 || busy}
+                            title="Move Up"
+                          >
+                            <i className="bi bi-arrow-up"></i>
+                          </button>
+                          <button
+                            type="button"
+                            className="pmhr-fc-btn-icon pmhr-fc-btn-down"
+                            onClick={() => moveCompDown(index)}
+                            disabled={
+                              index === model.competencies.length - 1 || busy
+                            }
+                            title="Move Down"
+                          >
+                            <i className="bi bi-arrow-down"></i>
+                          </button>
+                          <button
+                            type="button"
+                            className="pmhr-fc-btn-icon pmhr-fc-btn-delete"
+                            onClick={() => removeComp(index)}
+                            disabled={busy}
+                            title="Delete"
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="pmhr-fc-comp-body">
+                        <div className="pmhr-fc-form-group pmhr-fc-full-width">
+                          <label className="pmhr-fc-label">
+                            Competency Name{" "}
+                            <span className="pmhr-fc-required">*</span>
+                          </label>
+                          <div className="pmhr-fc-error-wrapper">
+                            <input
+                              type="text"
+                              className={`pmhr-fc-input ${
+                                validationErrors[`comp_${index}_name`]
+                                  ? "pmhr-fc-input-error"
+                                  : ""
+                              }`}
+                              placeholder="e.g., Communication Skills, Technical Expertise"
+                              value={comp.name}
+                              onChange={(e) => {
+                                updateComp(index, "name", e.target.value);
+                                setValidationErrors({
+                                  ...validationErrors,
+                                  [`comp_${index}_name`]: null,
+                                });
+                              }}
+                              disabled={busy}
+                            />
+                            {validationErrors[`comp_${index}_name`] && (
+                              <span className="pmhr-fc-error-text">
+                                <i className="bi bi-exclamation-circle"></i>
+                                {validationErrors[`comp_${index}_name`]}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="pmhr-fc-form-group pmhr-fc-full-width">
+                          <label className="pmhr-fc-label">
+                            Description{" "}
+                            <span className="pmhr-fc-required">*</span>
+                          </label>
+                          <div className="pmhr-fc-error-wrapper">
+                            <textarea
+                              className={`pmhr-fc-textarea ${
+                                validationErrors[`comp_${index}_description`]
+                                  ? "pmhr-fc-input-error"
+                                  : ""
+                              }`}
+                              placeholder="Enter competency description..."
+                              rows="2"
+                              value={comp.description || ""}
+                              onChange={(e) => {
+                                updateComp(index, "description", e.target.value);
+                                setValidationErrors({
+                                  ...validationErrors,
+                                  [`comp_${index}_description`]: null,
+                                });
+                              }}
+                              disabled={busy}
+                            ></textarea>
+                            {validationErrors[`comp_${index}_description`] && (
+                              <span className="pmhr-fc-error-text">
+                                <i className="bi bi-exclamation-circle"></i>
+                                {validationErrors[`comp_${index}_description`]}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="pmhr-fc-form-actions">
+                <button
+                  type="button"
+                  className="pmhr-fc-btn-cancel"
+                  onClick={goBackToStep1}
+                  disabled={busy}
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  className="pmhr-fc-btn-submit"
+                  disabled={busy || !isStep2Complete()}
+                >
+                  {busy ? (
+                    <>
+                      <span className="pmhr-fc-spinner"></span>
+                      {isEditMode ? "Updating..." : "Creating..."}
+                    </>
+                  ) : (
+                    <>{isEditMode ? "Update Form" : "Create Form"}</>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 }
