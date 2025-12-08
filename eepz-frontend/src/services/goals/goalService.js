@@ -3,9 +3,6 @@ import axios from "axios";
 // ==================== GOAL MODULE BASE URL ====================
 const GOAL_API_BASE_URL = import.meta.env.VITE_GOAL_API_URL + "/api";
 
-// FUTURE: Use main API base URL from api.js
-// import api from '../api';
-
 // ==================== CREATE AXIOS INSTANCE ====================
 const goalApi = axios.create({
   baseURL: GOAL_API_BASE_URL,
@@ -50,9 +47,6 @@ goalApi.interceptors.response.use(
 
 // ==================== HELPER FUNCTIONS FOR FILE PREVIEW ====================
 
-/**
- * File extensions that support browser preview
- */
 const PREVIEWABLE_EXTENSIONS = [
   ".pdf",
   ".png",
@@ -63,9 +57,6 @@ const PREVIEWABLE_EXTENSIONS = [
   ".svg",
 ];
 
-/**
- * File extensions that DO NOT support browser preview
- */
 const NON_PREVIEWABLE_EXTENSIONS = [
   ".doc",
   ".docx",
@@ -78,28 +69,16 @@ const NON_PREVIEWABLE_EXTENSIONS = [
   ".7z",
 ];
 
-/**
- * Check if a file supports preview based on filename or extension
- */
 export const isFilePreviewable = (filename) => {
   if (!filename) return false;
-
-  const extension = filename
-    .toLowerCase()
-    .substring(filename.lastIndexOf("."));
-
+  const extension = filename.toLowerCase().substring(filename.lastIndexOf("."));
   return PREVIEWABLE_EXTENSIONS.includes(extension);
 };
 
-/**
- * Get file icon class based on extension
- */
 export const getFileIcon = (filename) => {
   if (!filename) return "bi-file-earmark";
 
-  const extension = filename
-    .toLowerCase()
-    .substring(filename.lastIndexOf("."));
+  const extension = filename.toLowerCase().substring(filename.lastIndexOf("."));
 
   const iconMap = {
     ".pdf": "bi-file-earmark-pdf-fill text-danger",
@@ -241,41 +220,22 @@ const goalService = {
     }
   },
 
-  // ==================== CHECKLIST ====================
+  // ==================== CHECKLIST (UPDATED) ====================
+  /**
+   *  FIXED: Changed to /goal-progress/{goalId}/checklist/toggle
+   */
   toggleChecklist: async (goalId, checklistId, isCompleted) => {
     try {
-      const response = await goalApi.put(`/goals/${goalId}/checklist/toggle`, {
-        checklistId,
-        isCompleted,
-      });
+      const response = await goalApi.put(
+        `/goal-progress/${goalId}/checklist/toggle`,
+        {
+          checklistId,
+          isCompleted,
+        }
+      );
       return response.data;
     } catch (error) {
       console.error(`Error toggling checklist ${checklistId}:`, error);
-      throw error;
-    }
-  },
-
-  addChecklistItem: async (goalId, itemData) => {
-    try {
-      const response = await goalApi.post(
-        `/goals/${goalId}/checklist`,
-        itemData
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error adding checklist item:", error);
-      throw error;
-    }
-  },
-
-  deleteChecklistItem: async (goalId, checklistId) => {
-    try {
-      const response = await goalApi.delete(
-        `/goals/${goalId}/checklist/${checklistId}`
-      );
-      return response.data;
-    } catch (error) {
-      console.error(`Error deleting checklist ${checklistId}:`, error);
       throw error;
     }
   },
@@ -294,31 +254,14 @@ const goalService = {
     }
   },
 
-  getMyAssignments: async () => {
-    try {
-      const response = await goalApi.get("/goals/assignments/me");
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching assignments:", error);
-      throw error;
-    }
-  },
-
-  // ==================== APPROVALS (CONSOLIDATED) ====================
+  // ==================== APPROVALS (UPDATED - ALL ROUTES CHANGED) ====================
   /**
-   * Request approval for any approval type
-   * Supports: completion, closure, reactivation, reopening, task_acknowledgment
-   *
-   * Usage examples:
-   * - Completion: requestApproval(goalId, { approvalType: "completion", proofAttachmentIds: [...] })
-   * - Closure: requestApproval(goalId, { approvalType: "closure" })
-   * - Reopening: requestApproval(goalId, { approvalType: "reopening" })
-   * - Reactivation: requestApproval(goalId, { approvalType: "reactivation" })
+   *  FIXED: Changed to /goal-approvals/{goalId}
    */
   requestApproval: async (goalId, approvalData) => {
     try {
       const response = await goalApi.post(
-        `/goals/${goalId}/approvals`,
+        `/goal-approvals/${goalId}`,
         approvalData
       );
       return response.data;
@@ -328,9 +271,12 @@ const goalService = {
     }
   },
 
+  /**
+   *  FIXED: Changed to /goal-approvals/my
+   */
   getMyApprovals: async (filters = {}) => {
     try {
-      const response = await goalApi.get("/goals/approvals/my", {
+      const response = await goalApi.get("/goal-approvals/my", {
         params: filters,
       });
       return response.data;
@@ -340,9 +286,12 @@ const goalService = {
     }
   },
 
+  /**
+   *  FIXED: Changed to /goal-approvals/pending
+   */
   getPendingApprovals: async () => {
     try {
-      const response = await goalApi.get("/goals/approvals/pending");
+      const response = await goalApi.get("/goal-approvals/pending");
       return response.data;
     } catch (error) {
       console.error("Error fetching pending approvals:", error);
@@ -351,18 +300,12 @@ const goalService = {
   },
 
   /**
-   * Decide on an approval request
-   *
-   * Payload format:
-   * {
-   *   decision: "approved" | "rejected",
-   *   newDeadline?: "2025-11-15T10:00:00" // Only for reopening approvals when approving
-   * }
+   *  FIXED: Changed to /goal-approvals/{approvalId}
    */
   decideApproval: async (approvalId, decision) => {
     try {
       const response = await goalApi.put(
-        `/goals/approvals/${approvalId}`,
+        `/goal-approvals/${approvalId}`,
         decision
       );
       return response.data;
@@ -408,7 +351,10 @@ const goalService = {
     }
   },
 
-  // ==================== ATTACHMENTS ====================
+  // ==================== ATTACHMENTS (UPDATED - ALL ROUTES CHANGED) ====================
+  /**
+   *  FIXED: Changed to /goal-attachments/{goalId}/upload
+   */
   uploadAttachment: async (goalId, file, title, isProof) => {
     try {
       const formData = new FormData();
@@ -416,7 +362,7 @@ const goalService = {
       formData.append("title", title || file.name);
 
       const response = await goalApi.post(
-        `/goals/${goalId}/attachments/upload`,
+        `/goal-attachments/${goalId}/upload`,
         formData,
         {
           headers: {
@@ -432,72 +378,59 @@ const goalService = {
   },
 
   /**
-   * Preview attachment in browser (opens in new tab)
-   * Only works for previewable file types (PDF, images, txt)
+   *  FIXED: Changed to /goal-attachments/{attachmentId}/preview
    */
-  /**
- * Preview attachment in browser (opens in new tab)
- * Only works for previewable file types (PDF, images, txt)
- */
-previewAttachment: async (attachmentId, filename) => {
-  try {
-    // Check if file is previewable
-    if (!isFilePreviewable(filename)) {
-      throw new Error(
-        "This file type does not support preview. Please download to view."
-      );
-    }
-
-    // Fetch the file as blob with proper authentication
-    const response = await goalApi.get(
-      `/goals/attachments/${attachmentId}/preview`,
-      {
-        responseType: "blob", // CRITICAL: Must be blob
+  previewAttachment: async (attachmentId, filename) => {
+    try {
+      if (!isFilePreviewable(filename)) {
+        throw new Error(
+          "This file type does not support preview. Please download to view."
+        );
       }
-    );
 
-    // Get the content type from response headers
-    const contentType = response.headers["content-type"] || "application/pdf";
+      const response = await goalApi.get(
+        `/goal-attachments/${attachmentId}/preview`,
+        {
+          responseType: "blob",
+        }
+      );
 
-    // Create a blob with the correct content type
-    const blob = new Blob([response.data], { type: contentType });
+      const contentType = response.headers["content-type"] || "application/pdf";
+      const blob = new Blob([response.data], { type: contentType });
+      const blobUrl = window.URL.createObjectURL(blob);
+      const newWindow = window.open(blobUrl, "_blank");
 
-    // Create object URL from blob
-    const blobUrl = window.URL.createObjectURL(blob);
+      if (!newWindow) {
+        window.URL.revokeObjectURL(blobUrl);
+        throw new Error("Popup blocked. Please allow popups to preview files.");
+      }
 
-    // Open in new window
-    const newWindow = window.open(blobUrl, "_blank");
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 1000);
 
-    if (!newWindow) {
-      // Cleanup if popup was blocked
-      window.URL.revokeObjectURL(blobUrl);
-      throw new Error("Popup blocked. Please allow popups to preview files.");
+      return { success: true };
+    } catch (error) {
+      console.error("Error previewing attachment:", error);
+      throw error;
     }
-
-    // Cleanup after a delay to allow browser to load the file
-    setTimeout(() => {
-      window.URL.revokeObjectURL(blobUrl);
-    }, 1000);
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error previewing attachment:", error);
-    throw error;
-  }
-},
+  },
 
   /**
-   * Get preview URL for attachment (for iframe embedding)
+   *  FIXED: Changed to /goal-attachments/{attachmentId}/preview
    */
   getPreviewUrl: (attachmentId) => {
     const token = localStorage.getItem("token");
-    return `${GOAL_API_BASE_URL}/goals/attachments/${attachmentId}/preview?token=${token}`;
+    return `${GOAL_API_BASE_URL}/goal-attachments/${attachmentId}/preview?token=${token}`;
   },
 
+  /**
+   *  FIXED: Changed to /goal-attachments/{attachmentId}/download
+   */
   downloadAttachment: async (attachmentId) => {
     try {
       const response = await goalApi.get(
-        `/goals/attachments/${attachmentId}/download`,
+        `/goal-attachments/${attachmentId}/download`,
         {
           responseType: "blob",
         }
@@ -533,10 +466,13 @@ previewAttachment: async (attachmentId, filename) => {
     }
   },
 
+  /**
+   *  FIXED: Changed to /goal-attachments/{attachmentId}
+   */
   deleteAttachment: async (attachmentId) => {
     try {
       const response = await goalApi.delete(
-        `/goals/attachments/${attachmentId}`
+        `/goal-attachments/${attachmentId}`
       );
       return response.data;
     } catch (error) {
@@ -545,43 +481,23 @@ previewAttachment: async (attachmentId, filename) => {
     }
   },
 
-  // ==================== PERMISSIONS ====================
+  // ==================== PERMISSIONS (FIXED) ====================
+  /**
+   *  FIXED: Changed to /goals/{goalId}/can-complete
+   */
   canMarkComplete: async (goalId) => {
     try {
-      const response = await goalApi.get(`/goals/${goalId}/can-mark-complete`);
+      const response = await goalApi.get(`/goals/${goalId}/can-complete`);
       return response.data;
     } catch (error) {
       console.error("Error checking completion permission:", error);
       return { canMarkComplete: false };
     }
   },
-
-  canEditGoal: async (goalId) => {
-    try {
-      const response = await goalApi.get(`/goals/${goalId}/can-edit`);
-      return response.data;
-    } catch (error) {
-      console.error("Error checking edit permission:", error);
-      return { canEdit: false };
-    }
-  },
-
-  canAssignGoal: async (goalId) => {
-    try {
-      const response = await goalApi.get(`/goals/${goalId}/can-assign`);
-      return response.data;
-    } catch (error) {
-      console.error("Error checking assign permission:", error);
-      return { canAssign: false };
-    }
-  },
 };
 
 // ==================== HELPER FUNCTIONS ====================
 
-/**
- * Check if user can comment on a goal
- */
 export const canUserComment = (goal, user) => {
   if (!goal || !user) return false;
 
@@ -597,21 +513,15 @@ export const canUserComment = (goal, user) => {
   switch (goal.goalType?.toLowerCase()) {
     case "self":
       return isCreator || isManager;
-
     case "team":
       return isCreator || isAssignee || isManager;
-
     case "org":
       return isCreator || isLeadership;
-
     default:
       return false;
   }
 };
 
-/**
- * Get goal status badge color
- */
 export const getStatusBadgeColor = (status) => {
   const statusMap = {
     pending: "warning",
@@ -625,9 +535,6 @@ export const getStatusBadgeColor = (status) => {
   return statusMap[status?.toLowerCase()] || "secondary";
 };
 
-/**
- * Get goal status display label
- */
 export const getStatusLabel = (status) => {
   const labelMap = {
     pending: "Pending",
