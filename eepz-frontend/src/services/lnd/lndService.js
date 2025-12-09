@@ -61,7 +61,7 @@ const handleError = (error) => {
  * L&D Service - All API calls for Learning & Development module
  */
 export const lndService = {
-  // ==================== SKILLS ====================
+  // ==================== SKILLS (LnDSkillsController) ====================
 
   /**
    * Get current user's skills
@@ -88,7 +88,7 @@ export const lndService = {
         pageSize,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/skills/my-skills${query}`,
+        `${API_BASE_URL}/lnd-skills/my-skills${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -119,7 +119,7 @@ export const lndService = {
         sortBy,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/skills/subordinates${query}`,
+        `${API_BASE_URL}/lnd-skills/subordinates${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -136,7 +136,7 @@ export const lndService = {
   recordSkill: async (data) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/LnD/skills/record`,
+        `${API_BASE_URL}/lnd-skills/record`,
         data,
         { headers: getHeaders() }
       );
@@ -154,7 +154,7 @@ export const lndService = {
   recordSkillsBulk: async (data) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/LnD/skills/record-bulk`,
+        `${API_BASE_URL}/lnd-skills/record-bulk`,
         data,
         { headers: getHeaders() }
       );
@@ -172,7 +172,7 @@ export const lndService = {
   updateSkillRating: async (data) => {
     try {
       const response = await axios.put(
-        `${API_BASE_URL}/LnD/skills/update-rating`,
+        `${API_BASE_URL}/lnd-skills/update-rating`,
         data,
         { headers: getHeaders() }
       );
@@ -190,7 +190,7 @@ export const lndService = {
   deleteSkill: async (mapperId) => {
     try {
       const response = await axios.delete(
-        `${API_BASE_URL}/LnD/skills/${mapperId}`,
+        `${API_BASE_URL}/lnd-skills/${mapperId}`,
         { headers: getHeaders() }
       );
       return response;
@@ -203,7 +203,7 @@ export const lndService = {
    * Get subordinate employees for manager with pagination and search
    * @param {number} pageNumber - Page number (default: 1)
    * @param {string} searchTerm - Search term (optional)
-   * @param {number} pageSize - Items per page (default: 9)
+   * @param {number} pageSize - Items per page (default: 12)
    * @returns {Promise} API response with paginated employees
    */
   getSubordinateEmployees: async (
@@ -214,7 +214,7 @@ export const lndService = {
     try {
       const query = buildQueryString({ pageNumber, searchTerm, pageSize });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/employees/subordinates${query}`,
+        `${API_BASE_URL}/lnd-skills/employees/subordinates${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -229,7 +229,7 @@ export const lndService = {
    */
   getAllSkills: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/LnD/skills/all`, {
+      const response = await axios.get(`${API_BASE_URL}/lnd-skills/all`, {
         headers: getHeaders(),
       });
       return response;
@@ -238,7 +238,7 @@ export const lndService = {
     }
   },
 
-  // ==================== SME ====================
+  // ==================== SME (LnDSmeController) ====================
 
   /**
    * Check if current user is an SME
@@ -246,7 +246,7 @@ export const lndService = {
    */
   checkIfSme: async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/LnD/sme/check`, {
+      const response = await axios.get(`${API_BASE_URL}/lnd-sme/check`, {
         headers: getHeaders(),
       });
       return response;
@@ -263,7 +263,7 @@ export const lndService = {
   applyToBecomeSme: async (formData) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/LnD/sme/apply`,
+        `${API_BASE_URL}/lnd-sme/apply`,
         formData,
         { headers: getMultipartHeaders() }
       );
@@ -284,7 +284,7 @@ export const lndService = {
     try {
       const query = buildQueryString({ skillId, pageNumber, searchTerm });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/sme/available${query}`,
+        `${API_BASE_URL}/lnd-sme/available${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -293,7 +293,7 @@ export const lndService = {
     }
   },
 
-  // ==================== ASSIGNMENTS ====================
+  // ==================== ASSIGNMENTS (LnDAssignmentsController) ====================
 
   /**
    * Get current user's assignments (as mentee)
@@ -323,7 +323,7 @@ export const lndService = {
         pageSize,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/assignments/my-assignments${query}`,
+        `${API_BASE_URL}/lnd-assignments/my-assignments${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -360,7 +360,7 @@ export const lndService = {
         pageSize,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/assignments/team${query}`,
+        `${API_BASE_URL}/lnd-assignments/team${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -391,7 +391,7 @@ export const lndService = {
         sortOrder,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/assignments/team/export${query}`,
+        `${API_BASE_URL}/lnd-assignments/team/export${query}`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -431,7 +431,7 @@ export const lndService = {
         pageSize,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/assignments/sme${query}`,
+        `${API_BASE_URL}/lnd-assignments/sme${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -448,7 +448,7 @@ export const lndService = {
   requestSmeAssignment: async (data) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/LnD/assignments/request-sme`,
+        `${API_BASE_URL}/lnd-assignments/request-sme`,
         data,
         { headers: getHeaders() }
       );
@@ -466,7 +466,7 @@ export const lndService = {
   uploadCompletionProof: async (formData) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/LnD/assignments/upload-proof`,
+        `${API_BASE_URL}/lnd-assignments/upload-proof`,
         formData,
         { headers: getMultipartHeaders() }
       );
@@ -484,7 +484,7 @@ export const lndService = {
   completeAssignment: async (data) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/LnD/assignments/complete`,
+        `${API_BASE_URL}/lnd-assignments/complete`,
         data,
         { headers: getHeaders() }
       );
@@ -494,47 +494,7 @@ export const lndService = {
     }
   },
 
-  /**
-   * Download assignment completion proof
-   * @param {number} assignmentId - Assignment ID
-   * @returns {Promise} Blob response
-   */
-  downloadAssignmentProof: async (assignmentId) => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/LnD/assignments/${assignmentId}/download-proof`,
-        {
-          headers: getHeaders(),
-          responseType: "blob",
-        }
-      );
-      return response;
-    } catch (error) {
-      return handleError(error);
-    }
-  },
-
-  /**
-   * Preview assignment completion proof in browser
-   * @param {number} assignmentId - Assignment ID
-   * @returns {Promise} Blob response for inline viewing
-   */
-  previewAssignmentProof: async (assignmentId) => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/LnD/assignments/${assignmentId}/proof/preview`,
-        {
-          headers: getHeaders(),
-          responseType: "blob",
-        }
-      );
-      return response;
-    } catch (error) {
-      return handleError(error);
-    }
-  },
-
-  // ==================== HR MANAGEMENT ====================
+  // ==================== HR MANAGEMENT (LnDHRController) ====================
 
   /**
    * Get all organization employees (HR only)
@@ -551,7 +511,7 @@ export const lndService = {
     try {
       const query = buildQueryString({ pageNumber, searchTerm, pageSize });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/hr/employees/organization${query}`,
+        `${API_BASE_URL}/lnd-hr/employees/organization${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -588,7 +548,7 @@ export const lndService = {
         pageSize,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/hr/assignments/organization${query}`,
+        `${API_BASE_URL}/lnd-hr/assignments/organization${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -619,7 +579,7 @@ export const lndService = {
         sortOrder,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/hr/assignments/organization/export${query}`,
+        `${API_BASE_URL}/lnd-hr/assignments/organization/export${query}`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -642,7 +602,7 @@ export const lndService = {
     try {
       const query = buildQueryString({ pageNumber, searchTerm, pageSize });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/hr/smes/all${query}`,
+        `${API_BASE_URL}/lnd-hr/smes/all${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -662,7 +622,7 @@ export const lndService = {
         searchTerm,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/hr/smes/export${query}`,
+        `${API_BASE_URL}/lnd-hr/smes/export${query}`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -691,7 +651,7 @@ export const lndService = {
     try {
       const query = buildQueryString({ pageNumber, searchTerm, sortBy });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/hr/skills/employee/${employeeId}${query}`,
+        `${API_BASE_URL}/lnd-hr/skills/employee/${employeeId}${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -700,7 +660,7 @@ export const lndService = {
     }
   },
 
-  // ==================== APPROVALS ====================
+  // ==================== APPROVALS (LnDApprovalsController) ====================
 
   /**
    * Get current user's pending approvals (as approver)
@@ -730,7 +690,7 @@ export const lndService = {
         pageSize,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/approvals/my-approvals${query}`,
+        `${API_BASE_URL}/lnd-approvals/my-approvals${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -747,7 +707,7 @@ export const lndService = {
   processApproval: async (data) => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/LnD/approvals/process`,
+        `${API_BASE_URL}/lnd-approvals/process`,
         data,
         { headers: getHeaders() }
       );
@@ -791,7 +751,7 @@ export const lndService = {
         pageSize,
       });
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/approvals/history${query}`,
+        `${API_BASE_URL}/lnd-approvals/history${query}`,
         { headers: getHeaders() }
       );
       return response;
@@ -808,7 +768,7 @@ export const lndService = {
   getApprovalDetails: async (approvalId) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/approvals/${approvalId}/details`,
+        `${API_BASE_URL}/lnd-approvals/${approvalId}/details`,
         { headers: getHeaders() }
       );
       return response;
@@ -825,7 +785,7 @@ export const lndService = {
   downloadApprovalAttachment: async (approvalId) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/approvals/${approvalId}/download`,
+        `${API_BASE_URL}/lnd-approvals/${approvalId}/download`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -845,7 +805,49 @@ export const lndService = {
   previewApprovalAttachment: async (approvalId) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/LnD/approvals/${approvalId}/attachment/preview`,
+        `${API_BASE_URL}/lnd-approvals/${approvalId}/attachment/preview`,
+        {
+          headers: getHeaders(),
+          responseType: "blob",
+        }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Download assignment completion proof
+   *  ROUTE CHANGED: Moved from /assignments to /approvals
+   * @param {number} assignmentId - Assignment ID
+   * @returns {Promise} Blob response
+   */
+  downloadAssignmentProof: async (assignmentId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/lnd-approvals/assignments/${assignmentId}/download-proof`,
+        {
+          headers: getHeaders(),
+          responseType: "blob",
+        }
+      );
+      return response;
+    } catch (error) {
+      return handleError(error);
+    }
+  },
+
+  /**
+   * Preview assignment completion proof in browser
+   * ROUTE CHANGED: Moved from /assignments to /approvals
+   * @param {number} assignmentId - Assignment ID
+   * @returns {Promise} Blob response for inline viewing
+   */
+  previewAssignmentProof: async (assignmentId) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/lnd-approvals/assignments/${assignmentId}/proof/preview`,
         {
           headers: getHeaders(),
           responseType: "blob",
@@ -900,4 +902,4 @@ export const previewFile = (blob, contentType = "application/pdf") => {
   }, 100);
 };
 
-export default lndService;
+export default lndService; 
