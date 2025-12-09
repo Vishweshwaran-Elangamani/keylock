@@ -10,7 +10,9 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Serilog;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // ===================================
 // Configure Serilog
@@ -21,17 +23,22 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithProperty("Service", "HR-Operations")
     .CreateLogger();
 
+
 builder.Host.UseSerilog();
 
+
 Log.Information("Starting EEPZ HR Operations Microservice...");
+
 
 // SERVICE CONFIGURATION
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+
 // ---------- JWT AUTHENTICATION ----------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not configured");
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -52,6 +59,7 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 
+
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -68,7 +76,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
 builder.Services.AddAuthorization();
+
 
 // ---------- SWAGGER ----------
 builder.Services.AddSwaggerGen(c =>
@@ -80,6 +90,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Sprint 2 (Policies & Goals) + Sprint 3 (Career Progression & Payroll) - Combined API"
     });
 
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -89,6 +100,7 @@ builder.Services.AddSwaggerGen(c =>
         In = ParameterLocation.Header,
         Description = "Enter 'Bearer' followed by your JWT token"
     });
+
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -106,10 +118,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
 // ---------- DATABASE ----------
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 // ---------- REPOSITORIES & SERVICES ----------
 // Sprint 2
@@ -119,6 +133,7 @@ builder.Services.AddScoped<IPolicyService, PolicyService>();
 builder.Services.AddScoped<IViolationService, ViolationService>();
 builder.Services.AddScoped<IComplianceService, ComplianceService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+
 
 // Sprint 3
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -141,21 +156,19 @@ builder.Services.AddScoped<ISlaEscalationRepository, SlaEscalationRepository>();
 // ---------- CORS ----------
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://localhost:4173",
-            "http://localhost:3007"
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+        policy.SetIsOriginAllowed(origin => true)  // Allow any origin dynamically
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();  // Support credentials
     });
 });
 
+
+
 var app = builder.Build();
+
 
 // DATABASE INITIALIZATION
 using (var scope = app.Services.CreateScope())
@@ -166,10 +179,13 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<EEPZDbContext>();
         await context.Database.MigrateAsync();
 
+
         Log.Information("HR API: Database migration completed successfully");
+
 
         var initializerType = typeof(Program).Assembly.GetType("eepzbackend.Data.DbInitializer");
         var method = initializerType?.GetMethod("InitializeAsync");
+
 
         if (method != null)
         {
@@ -183,6 +199,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+
 // HTTP REQUEST PIPELINE
 if (app.Environment.IsDevelopment())
 {
@@ -193,6 +210,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
+
 
 // Enable Serilog Request Logging
 app.UseSerilogRequestLogging(options =>
@@ -205,11 +223,13 @@ app.UseSerilogRequestLogging(options =>
     };
 });
 
+
 app.UseStaticFiles();
 app.UseHttpsRedirection();
-app.UseCors("AllowReactApp");
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new
@@ -220,6 +240,7 @@ app.MapGet("/health", () => Results.Ok(new
     endpoints = "16 Total Endpoints",
     timestamp = DateTime.UtcNow
 }));
+
 
 try
 {
