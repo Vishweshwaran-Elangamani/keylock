@@ -43,7 +43,7 @@ const EditPolicyModal = ({
 
   const statuses = ["Active", "Inactive", "Draft"];
 
-  // ✅ FIXED: Correct document URL generation
+  //  FIXED: Correct document URL generation
   const getFullDocumentUrl = (url) => {
     if (!url) {
       console.warn("⚠️ Empty document URL provided");
@@ -52,7 +52,7 @@ const EditPolicyModal = ({
     
     // If already a full URL (starts with http/https), return as-is
     if (url.startsWith("http://") || url.startsWith("https://")) {
-      console.log("✅ Full URL detected:", url);
+      console.log(" Full URL detected:", url);
       return url;
     }
     
@@ -60,10 +60,9 @@ const EditPolicyModal = ({
     const fileName = url.split('/').pop();
     
     // Build document endpoint URL
-    const hrBaseUrl = import.meta.env.VITE_HR_API_URL || "http://localhost:5104";
+    const hrBaseUrl = import.meta.env.VITE_HR_API_URL;
     const fullUrl = `${hrBaseUrl}/api/policy/document/${fileName}`;
     
-    console.log(`🔗 Document URL converted: ${url} → ${fullUrl}`);
     return fullUrl;
   };
 
@@ -84,7 +83,7 @@ const EditPolicyModal = ({
           type: policy.documentType,
           size: policy.documentSizeFormatted,
         });
-        console.log("📄 Existing document loaded:", policy.documentUrl);
+        console.log("Existing document loaded:", policy.documentUrl);
       } else {
         setExistingDocument(null);
       }
@@ -156,7 +155,7 @@ const EditPolicyModal = ({
       let documentData = {};
 
       if (documentType === "upload" && selectedFile) {
-        console.log("📤 Uploading new document...");
+        console.log(" Uploading new document...");
         setUploadingDoc(true);
         const uploadResult = await policyService.uploadDocument(selectedFile);
         documentData = {
@@ -165,7 +164,7 @@ const EditPolicyModal = ({
           documentType: uploadResult.documentType,
           documentSize: uploadResult.documentSize,
         };
-        console.log("✅ Document uploaded:", uploadResult.documentUrl);
+        console.log(" Document uploaded:", uploadResult.documentUrl);
         setUploadingDoc(false);
       } else if (documentType === "link" && documentLink) {
         console.log("🔗 Adding document link...");
@@ -178,18 +177,18 @@ const EditPolicyModal = ({
           documentName: linkResult.documentName,
           documentType: linkResult.documentType,
         };
-        console.log("✅ Document link added:", linkResult.documentUrl);
+        console.log(" Document link added:", linkResult.documentUrl);
       }
 
       const policyDataWithDoc = { ...formData, ...documentData };
       await policyService.updatePolicy(policy.policyId, policyDataWithDoc);
 
-      console.log("✅ Policy updated successfully");
+      console.log(" Policy updated successfully");
       onSuccess();
       if (typeof onToast === "function")
         onToast("success", "Policy updated successfully!");
     } catch (error) {
-      console.error("❌ Error updating policy:", error);
+      console.error(" Error updating policy:", error);
       setErrors({ submit: "Failed to update policy. Please try again." });
       if (typeof onToast === "function")
         onToast("danger", "Failed to update policy");
@@ -202,15 +201,15 @@ const EditPolicyModal = ({
   const handleUnpublish = async () => {
     try {
       setUnpublishing(true);
-      console.log("🔄 Unpublishing policy...");
+      console.log(" Unpublishing policy...");
       await policyService.unpublishPolicy(policy.policyId);
       if (typeof onToast === "function")
         onToast("warning", "Policy unpublished - Hidden from employees");
-      console.log("✅ Policy unpublished");
+      console.log(" Policy unpublished");
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("❌ Error unpublishing:", error);
+      console.error(" Error unpublishing:", error);
       if (typeof onToast === "function")
         onToast("danger", "Failed to unpublish policy");
     } finally {

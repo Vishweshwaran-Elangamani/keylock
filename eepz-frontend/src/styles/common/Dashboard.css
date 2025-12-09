@@ -1,13 +1,265 @@
-/* ADMIN DASHBOARD STYLES */
+/* ==================== ADMIN DASHBOARD - MONOCHROMATIC BLUE DESIGN ==================== */
 
 /* Container */
+.ada-dashboard {
+  padding: 1.5rem;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
 .dashboard-container {
   padding: 0;
   min-height: 60vh;
   background: #f8f9fa;
 }
 
-/* Management Cards */
+/* ==================== STATISTICS CARDS ==================== */
+.ada-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ada-stat-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.ada-stat-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ada-stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* MONOCHROMATIC BLUE STAT ICONS - CLEAR DIFFERENTIATION */
+.ada-stat-icon-primary {
+  background: #1E40AF;
+  color: #FFFFFF;
+}
+
+.ada-stat-icon-success {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+.ada-stat-icon-warning {
+  background: #3B82F6;
+  color: #FFFFFF;
+}
+
+.ada-stat-icon-info {
+  background: #60A5FA;
+  color: #FFFFFF;
+}
+
+.ada-stat-icon-purple {
+  background: #93C5FD;
+  color: #1E40AF;
+}
+
+.ada-stat-icon-cyan {
+  background: #BFDBFE;
+  color: #1E40AF;
+}
+
+.ada-stat-content {
+  flex: 1;
+  text-align: center;
+}
+
+.ada-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.ada-stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.ada-stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+}
+
+.ada-trend-icon-up {
+  color: #1E40AF;
+}
+
+.ada-trend-icon-down {
+  color: #93C5FD;
+}
+
+.ada-trend-neutral {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ==================== QUICK ACTIONS - COMPACT ==================== */
+.ada-actions-card {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+  box-shadow: none;
+}
+
+.ada-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.ada-action-btn {
+  padding: 0.625rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #374151;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.ada-action-btn i {
+  font-size: 1rem;
+  color: #97247E;
+}
+
+.ada-action-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.ada-action-btn:active {
+  transform: scale(0.98);
+}
+
+/* ==================== CHARTS GRID - 3 COLUMNS ==================== */
+.ada-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.dashboard-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-small {
+  min-height: 320px;
+}
+
+.card-medium {
+  min-height: 400px;
+}
+
+/* CARD HEADER - Keep Purple/Navy for Branding */
+.card-header-dark {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #27235C;
+  border-bottom: none;
+}
+
+.card-header-manager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #97247E;
+  border-bottom: none;
+}
+
+.card-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card-header-content i {
+  color: #ffffff;
+  font-size: 1.25rem;
+}
+
+.card-header-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.card-filter-btn-dark,
+.card-select-dark {
+  padding: 0.5rem 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #ffffff;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.card-filter-btn-dark:hover,
+.card-select-dark:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.card-select-dark option {
+  background: #27235C;
+  color: #ffffff;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* ==================== MANAGEMENT CARDS ==================== */
 .management-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -18,7 +270,7 @@
   background: #FFFFFF;
   border-radius: 12px;
   padding: 1.5rem;
-  border: 1px solid #97247E;
+  border: 1px solid #e5e7eb;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -138,7 +390,7 @@
   transform: translateX(0);
 }
 
-/* Quick Actions */
+/* ==================== QUICK ACTIONS ==================== */
 .quick-actions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -160,6 +412,7 @@
 .quick-action-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #1E40AF;
 }
 
 .action-icon {
@@ -191,7 +444,7 @@
   margin: 0;
 }
 
-/* Chart Card */
+/* ==================== CHART CARD ==================== */
 .chart-card {
   background: #FFFFFF;
   border-radius: 12px;
@@ -230,7 +483,7 @@
   font-weight: 500;
 }
 
-/* Bar Chart */
+/* ==================== BAR CHART ==================== */
 .bar-chart {
   display: flex;
   align-items: flex-end;
@@ -291,7 +544,7 @@
   font-weight: 600;
 }
 
-/* Progress Chart */
+/* ==================== PROGRESS CHART ==================== */
 .progress-chart {
   display: flex;
   flex-direction: column;
@@ -343,7 +596,7 @@
   }
 }
 
-/* Activity Card */
+/* ==================== ACTIVITY CARD ==================== */
 .activity-card {
   background: #FFFFFF;
   border-radius: 12px;
@@ -392,7 +645,6 @@
   border-color: #97247E;
 }
 
-/* Activity List */
 .activity-list {
   display: flex;
   flex-direction: column;
@@ -456,76 +708,13 @@
   color: #6c757d;
 }
 
-/* Responsive Design */
-@media (max-width: 1400px) {
-  .main-content-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .right-column {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
-
-  .activity-card {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 1024px) {
-  .management-cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-title {
-    font-size: 1.5rem;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .management-cards-grid,
-  .quick-actions-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .right-column {
-    grid-template-columns: 1fr;
-  }
-
-  .bar-chart {
-    height: 150px;
-  }
-
-  .time-widget {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-/* ==================== HR DASHBOARD - ADMIN STYLE ==================== */
-
+/* ==================== HR DASHBOARD ==================== */
 .hr-dashboard-container {
   padding: 1.5rem;
   background: #f5f7fa;
   min-height: 100vh;
 }
 
-/* KPI GRID */
 .admin-kpi-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -536,7 +725,7 @@
 .admin-kpi-card {
   background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #27235c;
+  border: 1px solid #e5e7eb;
   padding: 1.125rem;
   display: flex;
   align-items: center;
@@ -549,6 +738,7 @@
 .admin-kpi-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  border-color: #1E40AF;
 }
 
 .admin-kpi-icon {
@@ -561,12 +751,36 @@
   flex-shrink: 0;
 }
 
-.admin-pink { background: #fce7f3; color: #ec4899; }
-.admin-green { background: #d1fae5; color: #059669; }
-.admin-yellow { background: #fef3c7; color: #d97706; }
-.admin-blue { background: #dbeafe; color: #1e40af; }
-.admin-purple { background: #e9d5ff; color: #7c3aed; }
-.admin-cyan { background: #cffafe; color: #0891b2; }
+/* MONOCHROMATIC BLUE KPI ICONS - CLEAR GRADATION */
+.admin-pink {
+  background: #1E40AF;
+  color: #FFFFFF;
+}
+
+.admin-green {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+.admin-yellow {
+  background: #3B82F6;
+  color: #FFFFFF;
+}
+
+.admin-blue {
+  background: #60A5FA;
+  color: #FFFFFF;
+}
+
+.admin-purple {
+  background: #93C5FD;
+  color: #1E40AF;
+}
+
+.admin-cyan {
+  background: #BFDBFE;
+  color: #1E40AF;
+}
 
 .admin-kpi-content {
   flex: 1;
@@ -575,7 +789,7 @@
 
 .admin-kpi-content h2 {
   font-size: 2rem;
-  font-weight: 630;
+  font-weight: 700;
   margin: 0 0 0.25rem 0;
   color: #1f2937;
   line-height: 1;
@@ -590,13 +804,13 @@
 
 .admin-kpi-subtitle {
   font-size: 0.8125rem;
-  color: #10b981;
+  color: #1E40AF;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
 }
 
-/* DASHBOARD CARDS CONTAINER */
+/* ==================== DASHBOARD CARDS ==================== */
 .dashboard-cards-container {
   display: flex;
   flex-direction: column;
@@ -609,96 +823,7 @@
   gap: 1rem;
 }
 
-/* DASHBOARD CARDS */
-.dashboard-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-}
-
-.dashboard-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.card-small {
-  min-height: 320px;
-}
-
-.card-medium {
-  min-height: 400px;
-}
-
-/* CARD HEADER - HR (BLUE) */
-.card-header-dark {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  background: #2c2c54;
-  border-bottom: none;
-}
-
-/* CARD HEADER - MANAGER (PURPLE #97247E) */
-.card-header-manager {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  background: #97247E;
-  border-bottom: none;
-}
-
-.card-header-content {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.card-header-content i {
-  color: #ffffff;
-  font-size: 1.25rem;
-}
-
-.card-header-content h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0;
-}
-
-.card-filter-btn-dark, .card-select-dark {
-  padding: 0.5rem 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 0.8125rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: #ffffff;
-  transition: all 0.2s;
-  font-weight: 500;
-}
-
-.card-filter-btn-dark:hover, .card-select-dark:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.card-select-dark option {
-  background: #2c2c54;
-  color: #ffffff;
-}
-
-/* CARD BODY */
-.card-body {
-  padding: 1.25rem;
-}
-
-/* EMPLOYEE STATUS */
+/* ==================== EMPLOYEE STATUS ==================== */
 .employee-status-summary {
   margin-bottom: 1.5rem;
 }
@@ -775,7 +900,6 @@
   color: #1f2937;
 }
 
-/* CARD BUTTONS */
 .card-view-btn {
   width: 100%;
   padding: 0.75rem;
@@ -796,7 +920,6 @@
   color: #97247E;
 }
 
-/* NO DATA MESSAGE */
 .no-data-message {
   text-align: center;
   padding: 3rem 1rem;
@@ -805,7 +928,6 @@
   font-weight: 500;
 }
 
-/* LOADING CONTAINER */
 .ada-loading-container {
   display: flex;
   align-items: center;
@@ -814,40 +936,118 @@
   background: #f5f7fa;
 }
 
-/* RESPONSIVE BREAKPOINTS */
+/* ==================== RESPONSIVE ==================== */
 @media (max-width: 1600px) {
   .admin-kpi-grid {
     grid-template-columns: repeat(5, 1fr);
   }
+  /* Keep 3 columns for charts */
+  .ada-charts-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 1400px) {
+  .main-content-grid {
+    grid-template-columns: 1fr;
+  }
+  .right-column {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  .activity-card {
+    grid-column: 1 / -1;
+  }
   .admin-kpi-grid {
     grid-template-columns: repeat(4, 1fr);
   }
   .dashboard-row {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
+  /* Keep 3 columns for charts */
+  .ada-charts-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ada-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  /* 2 columns on medium screens */
+  .ada-charts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 1024px) {
+  .management-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
   .admin-kpi-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+  .ada-charts-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 768px) {
+  .ada-dashboard {
+    padding: 1rem;
+  }
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .management-cards-grid,
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
+  .right-column {
+    grid-template-columns: 1fr;
+  }
+  .bar-chart {
+    height: 150px;
+  }
+  .time-widget {
+    width: 100%;
+  }
   .admin-kpi-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .ada-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ada-actions-grid {
+    grid-template-columns: 1fr;
   }
   .dashboard-row {
     grid-template-columns: 1fr;
   }
+  .ada-charts-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-
 @media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
   .admin-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .ada-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .ada-charts-grid {
     grid-template-columns: 1fr;
   }
 }
