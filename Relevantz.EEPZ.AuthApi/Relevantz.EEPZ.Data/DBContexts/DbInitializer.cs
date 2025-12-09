@@ -539,7 +539,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 {
                     context.MasterSkills.Add(skill);
                     addedCount++;
-                    Console.WriteLine($"Added skill: {skill.SkillName} [{skill.Category}]");
                 }
                 else
                 {
@@ -550,7 +549,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
 
             await context.SaveChangesAsync();
 
-            Console.WriteLine($"\n🔧 Master skills seeding completed!");
+            Console.WriteLine($"Master skills seeding completed!");
             Console.WriteLine($"Added: {addedCount} | Skipped: {skippedCount} | Total: {skills.Count}");
             Console.WriteLine(new string('-', 50));
         }
