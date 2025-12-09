@@ -146,7 +146,7 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<EEPZDbContext>();
         var configuration = services.GetRequiredService<IConfiguration>();
 
-        context.Database.Migrate();
+        context.Database.EnsureCreated();
 
         await DbInitializer.InitializeAsync(context, configuration);
 
