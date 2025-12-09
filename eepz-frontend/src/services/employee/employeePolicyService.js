@@ -61,8 +61,8 @@ const employeePolicyService = {
       return url;
     }
     
-    //  FIXED: Use HR API base URL (port 5260)
-    const hrBaseUrl = import.meta.env.VITE_HR_API_URL || "http://localhost:5260";
+    //  FIXED: Use HR API base URL (port 5104)
+    const hrBaseUrl = import.meta.env.VITE_HR_API_URL || "http://localhost:5104";
     
     // Extract filename from paths like "/uploads/policies/abc.pdf"
     const fileName = url.split('/').pop();

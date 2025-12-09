@@ -60,7 +60,7 @@ const EditPolicyModal = ({
     const fileName = url.split('/').pop();
     
     // Build document endpoint URL
-    const hrBaseUrl = import.meta.env.VITE_HR_API_URL || "http://localhost:5260";
+    const hrBaseUrl = import.meta.env.VITE_HR_API_URL || "http://localhost:5104";
     const fullUrl = `${hrBaseUrl}/api/policy/document/${fileName}`;
     
     console.log(`🔗 Document URL converted: ${url} → ${fullUrl}`);
