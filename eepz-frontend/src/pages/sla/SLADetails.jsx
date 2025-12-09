@@ -190,32 +190,35 @@ const SLADetails = () => {
     setShowEscalationForm(true);
   }, [canEscalate, escalationBlockReason]);
 
-  const handleCloseSLA = useCallback(async () => {
-    try {
-      setRefreshing(true);
-      setShowCloseConfirmation(false);
-      console.log(`Closing SLA ${sla.slaid}`);
-      const res = await slaService.closeSLA({
-        slaid: sla.slaid,
-        closedByEmployeeId: user.empId,
-        closureComments: "Closed from details page",
-      });
+  const handleCloseSLA = useCallback(
+    async () => {
+      try {
+        setRefreshing(true);
+        setShowCloseConfirmation(false);
+        console.log(`Closing SLA ${sla.slaid}`);
+        const res = await slaService.closeSLA({
+          slaid: sla.slaid,
+          closedByEmployeeId: user.empId,
+          closureComments: "Closed from details page",
+        });
 
-      if (res?.success) {
-        console.log("SLA closed successfully");
-        toast.success("SLA closed successfully");
-        await fetchSLADetails();
-      } else {
-        console.error("Failed to close SLA:", res?.message);
-        toast.error("Failed to close SLA");
+        if (res?.success) {
+          console.log("SLA closed successfully");
+          toast.success("SLA closed successfully");
+          await fetchSLADetails();
+        } else {
+          console.error("Failed to close SLA:", res?.message);
+          toast.error("Failed to close SLA");
+        }
+      } catch (err) {
+        console.error("Error closing SLA:", err);
+        toast.error("Error closing SLA");
+      } finally {
+        setRefreshing(false);
       }
-    } catch (err) {
-      console.error("Error closing SLA:", err);
-      toast.error("Error closing SLA");
-    } finally {
-      setRefreshing(false);
-    }
-  }, [sla, user, fetchSLADetails]);
+    },
+    [sla, user, fetchSLADetails]
+  );
 
   const handleReopenSuccess = useCallback(() => {
     console.log("SLA reopened successfully");
@@ -256,71 +259,76 @@ const SLADetails = () => {
 
   const daysRemaining = dateHelpers.daysRemaining(sla.deadline);
   const hasEscalations = escalations.length > 0;
+  const pendingEscalations = escalations.filter(
+    (e) => e.escalationStatus === "Pending"
+  ).length;
   const slaDashboardPath = user
     ? getSLADashboardPath(user.roleName)
     : "/dashboard/sla";
 
   return (
     <div className="sla-details-container">
-      <Breadcrumb
-        items={[
-          {
-            label: "SLA Compliance",
-            path: slaDashboardPath,
-          },
-          {
-            label: `${sla.slatype} - ${sla.employeeName}`,
-          },
-        ]}
-      />
+      <div className="sla-details-header">
+        <Breadcrumb
+          items={[
+            {
+              label: "SLA Compliance",
+              path: slaDashboardPath,
+            },
+            {
+              label: `${sla.slatype} - ${sla.employeeName}`,
+            },
+          ]}
+        />
 
-      <div className="sla-details-actions-wrapper">
-        {sla.status !== "Closed" &&
-          (user?.roleName === "Employee" || user?.roleName === "Manager") &&
-          (canEscalate ? (
+        <div className="sla-details-actions-wrapper">
+          {sla.status !== "Closed" &&
+            (user?.roleName === "Employee" || user?.roleName === "Manager") &&
+            (canEscalate ? (
+              <button
+                onClick={handleEscalateClick}
+                className="sla-details-btn sla-details-btn-warning"
+              >
+                <AlertTriangle size={16} />
+                Escalate
+              </button>
+            ) : (
+              <button
+                disabled
+                className="sla-details-btn sla-details-btn-disabled"
+                title={escalationBlockReason || "Cannot escalate"}
+              >
+                <AlertTriangle size={16} />
+                Escalated
+              </button>
+            ))}
+
+          {canReopen && sla.status === "Closed" && (
             <button
-              onClick={handleEscalateClick}
-              className="sla-details-btn sla-details-btn-warning"
+              onClick={() => setShowReopenForm(true)}
+              className="sla-details-btn sla-details-btn-reopen"
             >
-              <AlertTriangle size={16} />
-              Escalate
+              <RotateCcw size={16} />
+              Reopen
             </button>
-          ) : (
+          )}
+
+          {sla.status !== "Closed" && user?.roleName === "Manager" && (
             <button
-              disabled
-              className="sla-details-btn sla-details-btn-disabled"
-              title={escalationBlockReason || "Cannot escalate"}
+              onClick={() => setShowCloseConfirmation(true)}
+              disabled={refreshing}
+              className="sla-details-btn sla-details-btn-primary"
             >
-              <AlertTriangle size={16} />
-              Escalated
+              Close SLA
             </button>
-          ))}
-
-        {canReopen && sla.status === "Closed" && (
-          <button
-            onClick={() => setShowReopenForm(true)}
-            className="sla-details-btn sla-details-btn-reopen"
-          >
-            <RotateCcw size={16} />
-            Reopen
-          </button>
-        )}
-
-        {sla.status !== "Closed" && user?.roleName === "Manager" && (
-          <button
-            onClick={() => setShowCloseConfirmation(true)}
-            disabled={refreshing}
-            className="sla-details-btn sla-details-btn-primary"
-          >
-            {/* <CheckCircle size={16} /> */}
-            Close SLA
-          </button>
-        )}
+          )}
+        </div>
       </div>
 
-      <div className="row g-4">
-        <div className="col-lg-8">
-          <div className="sla-details-card mb-4">
+      <div className="sla-details-layout">
+        {/* LEFT SIDE - Main SLA Card with Status Summary */}
+        <div className="sla-details-left">
+          <div className="sla-details-card">
             <div className="sla-details-card-body">
               <div className="sla-details-status-header">
                 <div className="sla-details-icon-wrapper">
@@ -350,36 +358,79 @@ const SLADetails = () => {
                 </div>
               </div>
 
-              <div className="row g-4">
-                <div className="col-md-6">
-                  <small className="sla-details-label">Employee</small>
-                  <strong className="sla-details-value">
-                    {sla.employeeName || "—"}
-                  </strong>
-                </div>
-                <div className="col-md-6">
-                  <small className="sla-details-label">Department</small>
-                  <strong className="sla-details-value">
-                    {sla.departmentName || "—"}
-                  </strong>
-                </div>
-                <div className="col-md-6">
-                  <small className="sla-details-label">Deadline</small>
-                  <strong className="sla-details-value">
-                    {dateHelpers.formatDeadline(sla.deadline)}
-                  </strong>
-                </div>
-                <div className="col-md-6">
-                  <small className="sla-details-label">Compliance Status</small>
-                  <strong
-                    className={`sla-details-value ${
-                      sla.complianceStatus === "OnTime"
-                        ? "text-success"
-                        : "text-danger"
-                    }`}
-                  >
-                    {sla.complianceStatus || "—"}
-                  </strong>
+              {/* Integrated Status Summary */}
+              <div className="sla-details-summary-section">
+                <h5 className="sla-details-summary-title">Status Summary</h5>
+                <div className="sla-details-summary-grid">
+                  <div className="sla-details-summary-item">
+                    <small className="sla-details-label">Employee</small>
+                    <strong className="sla-details-value">
+                      {sla.employeeName || "—"}
+                    </strong>
+                  </div>
+                  <div className="sla-details-summary-item">
+                    <small className="sla-details-label">Department</small>
+                    <strong className="sla-details-value">
+                      {sla.departmentName || "—"}
+                    </strong>
+                  </div>
+                  <div className="sla-details-summary-item">
+                    <small className="sla-details-label">Deadline</small>
+                    <strong className="sla-details-value">
+                      {dateHelpers.formatDeadline(sla.deadline)}
+                    </strong>
+                  </div>
+                  <div className="sla-details-summary-item">
+                    <small className="sla-details-label">Compliance Status</small>
+                    <strong
+                      className={`sla-details-value ${
+                        sla.complianceStatus === "OnTime"
+                          ? "text-success"
+                          : "text-danger"
+                      }`}
+                    >
+                      {sla.complianceStatus || "—"}
+                    </strong>
+                  </div>
+                  <div className="sla-details-summary-item">
+                    <small className="sla-details-label">Days Until Deadline</small>
+                    <div
+                      className={`sla-details-value ${
+                        daysRemaining < 0 ? "text-danger" : "text-success"
+                      }`}
+                    >
+                      {Math.abs(daysRemaining)} days
+                      <small className="d-block text-muted sla-details-subtitle">
+                        {daysRemaining < 0 ? "OVERDUE" : "remaining"}
+                      </small>
+                    </div>
+                  </div>
+                  <div className="sla-details-summary-item">
+                    <small className="sla-details-label">Total Escalations</small>
+                    <div className="sla-details-value text-primary">
+                      {escalations.length}
+                    </div>
+                  </div>
+                  <div className="sla-details-summary-item">
+                    <small className="sla-details-label">Pending Escalations</small>
+                    <div className="sla-details-value text-warning">
+                      {pendingEscalations}
+                    </div>
+                  </div>
+                  <div className="sla-details-summary-item">
+                    <small className="sla-details-label">Current Status</small>
+                    <span
+                      className={`sla-details-badge ${
+                        sla.status === "Closed"
+                          ? "sla-details-badge-closed"
+                          : sla.status === "Escalated"
+                          ? "sla-details-badge-escalated"
+                          : "sla-details-badge-open"
+                      }`}
+                    >
+                      {sla.status}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -406,8 +457,9 @@ const SLADetails = () => {
             </div>
           </div>
 
+          {/* Escalations */}
           {hasEscalations && (
-            <div className="sla-details-card mb-4">
+            <div className="sla-details-card">
               <div className="sla-details-card-body">
                 <h5 className="sla-details-section-title">
                   <AlertTriangle size={20} className="text-danger" />
@@ -495,128 +547,29 @@ const SLADetails = () => {
               </div>
             </div>
           )}
-
-          <div className="sla-details-tabs-wrapper">
-            <div className="sla-details-tabs-container">
-              <button
-                className={`sla-details-tab-pill ${
-                  activeTab === "details" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("details")}
-              >
-                <FileText size={16} />
-                Details
-              </button>
-              <button
-                className={`sla-details-tab-pill ${
-                  activeTab === "history" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("history")}
-              >
-                <History size={16} />
-                History ({history.length})
-              </button>
-            </div>
-          </div>
-
-          <div className="sla-details-card">
-            <div className="sla-details-card-body">
-              {activeTab === "details" && (
-                <div className="row g-4">
-                  {sla.createdAt && (
-                    <div className="col-md-6">
-                      <small className="sla-details-label">Created At</small>
-                      <strong className="sla-details-value">
-                        {new Date(sla.createdAt).toLocaleString()}
-                      </strong>
-                    </div>
-                  )}
-                  {sla.updatedAt && (
-                    <div className="col-md-6">
-                      <small className="sla-details-label">Last Updated</small>
-                      <strong className="sla-details-value">
-                        {new Date(sla.updatedAt).toLocaleString()}
-                      </strong>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === "history" && (
-                <div>
-                  {history.length === 0 ? (
-                    <div className="sla-details-empty">
-                      <History size={48} className="sla-details-empty-icon" />
-                      <p className="sla-details-empty-text">
-                        No history available
-                      </p>
-                    </div>
-                  ) : (
-                    <SLAHistoryTimeline history={history} />
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
-        <div className="col-lg-4">
-          <div className="sla-details-sidebar">
-            <div className="sla-details-card-body">
-              <h5 className="sla-details-sidebar-title">Status Summary</h5>
-
-              <div className="sla-details-sidebar-item">
-                <small className="sla-details-label">Total Escalations</small>
-                <div className="sla-details-sidebar-value text-primary">
-                  {escalations.length}
-                </div>
-              </div>
-
-              <div className="sla-details-sidebar-item">
-                <small className="sla-details-label">Status</small>
-                <span
-                  className={`sla-details-badge ${
-                    sla.status === "Closed"
-                      ? "sla-details-badge-closed"
-                      : sla.status === "Escalated"
-                      ? "sla-details-badge-escalated"
-                      : "sla-details-badge-open"
-                  }`}
-                >
-                  {sla.status}
-                </span>
-              </div>
-
-              <div className="sla-details-sidebar-item">
-                <small className="sla-details-label">Days Until Deadline</small>
-                <div
-                  className={`sla-details-sidebar-value ${
-                    daysRemaining < 0 ? "text-danger" : "text-success"
-                  }`}
-                >
-                  {Math.abs(daysRemaining)} days
-                  <small className="d-block text-muted sla-details-sidebar-subtitle">
-                    {daysRemaining < 0 ? "OVERDUE" : "remaining"}
-                  </small>
-                </div>
-              </div>
-
-              <div className="sla-details-sidebar-highlight">
-                <small className="sla-details-sidebar-highlight-label">
-                  Pending Escalations
-                </small>
-                <div className="sla-details-sidebar-highlight-value">
-                  {
-                    escalations.filter((e) => e.escalationStatus === "Pending")
-                      .length
-                  }
-                </div>
-              </div>
-            </div>
+        {/* RIGHT SIDE - Tabs with Details/History */}
+        {/* RIGHT SIDE - Card always visible */}
+<div className="sla-details-right">
+  <div className="sla-details-card">
+    <div className="sla-details-card-body">
+      <div className="sla-details-tab-history">
+        {history.length === 0 ? (
+          <div className="sla-details-empty">
+            <History size={48} className="sla-details-empty-icon" />
+            <p className="sla-details-empty-text">No history available</p>
           </div>
-        </div>
+        ) : (
+          <SLAHistoryTimeline history={history} />
+        )}
+      </div>
+    </div>
+  </div>
+</div>
       </div>
 
+      {/* Modals */}
       {showReopenForm && (
         <ReopenSLAForm
           sla={sla}
@@ -742,3 +695,4 @@ const SLADetails = () => {
 };
 
 export default SLADetails;
+

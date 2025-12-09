@@ -1,12 +1,32 @@
 /* ========================================
-   SLA DETAILS PAGE
-   All classes prefixed with sla-details-
+   SLA DETAILS PAGE - ADAPTIVE HEIGHT LAYOUT
+   Left: Main Card + Status Summary + Escalations
+   Right: Tabs (Details/History) - Content Adaptive
    ======================================== */
 
 .sla-details-container {
   padding: 1.5rem 1.75rem;
   background-color: #F9FAFB;
   min-height: 100vh;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+
+.sla-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.sla-details-actions-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 /* ========================================
@@ -67,16 +87,43 @@
   box-shadow: 0 4px 12px rgba(151, 36, 126, 0.3);
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ========================================
-   ACTION BUTTONS
+   LAYOUT - TWO COLUMNS (ADAPTIVE)
    ======================================== */
 
-.sla-details-actions-wrapper {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+.sla-details-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 1.5rem;
+  align-items: start;
 }
+
+.sla-details-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sla-details-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
 
 .sla-details-btn {
   display: inline-flex;
@@ -133,7 +180,7 @@
 }
 
 /* ========================================
-   CARD STYLES
+   CARDS
    ======================================== */
 
 .sla-details-card {
@@ -153,6 +200,8 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #E5E7EB;
   align-items: start;
 }
 
@@ -192,11 +241,18 @@
   display: block;
 }
 
+.sla-details-subtitle {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-weight: 400;
+}
+
 .sla-details-badges {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
+
 
 .sla-details-badge {
   display: inline-flex;
@@ -206,7 +262,10 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
+  width: auto;       /* Ensures badge fits text */
+  max-width: fit-content; /* Modern browsers */
 }
+
 
 .sla-details-badge-open {
   background: #DBEAFE;
@@ -243,6 +302,50 @@
   color: #92400E;
 }
 
+.text-success {
+  color: #15803D;
+}
+
+.text-danger {
+  color: #B91C1C;
+}
+
+.text-warning {
+  color: #92400E;
+}
+
+.text-primary {
+  color: #3B82F6;
+}
+
+/* ========================================
+   INTEGRATED STATUS SUMMARY
+   ======================================== */
+
+.sla-details-summary-section {
+  margin-top: 1rem;
+}
+
+.sla-details-summary-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #E5E7EB;
+}
+
+.sla-details-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.sla-details-summary-item {
+  display: flex;
+  flex-direction: column;
+}
+
 .sla-details-alert {
   background: #FEF3C7;
   border: 1px solid #FCD34D;
@@ -253,6 +356,10 @@
   align-items: start;
   margin-top: 1.5rem;
 }
+
+/* ========================================
+   ESCALATIONS
+   ======================================== */
 
 .sla-details-section-title {
   font-size: 1.125rem;
@@ -278,17 +385,15 @@
 }
 
 /* ========================================
-   PILL-SHAPED TABS (UPDATED)
+   TABS (RIGHT SIDE) - CONTENT ADAPTIVE
    ======================================== */
 
 .sla-details-tabs-wrapper {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 1.25rem;
+  flex-shrink: 0;
 }
 
 .sla-details-tabs-container {
-  display: inline-flex;
+  display: flex;
   background: #27235C;
   padding: 0.5rem;
   border-radius: 100px;
@@ -297,7 +402,8 @@
 }
 
 .sla-details-tab-pill {
-  padding: 0.625rem 2rem;
+  flex: 1;
+  padding: 0.625rem 1.5rem;
   border-radius: 100px;
   border: none;
   background: transparent;
@@ -309,6 +415,7 @@
   white-space: nowrap;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
 }
 
@@ -316,11 +423,15 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.sla-details-tab-pill.active {
-  background: #FFFFFF;
-  color: #27235C;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border-radius: 100px;
+
+/* Tab Content - Adapts to Content Height */
+.sla-details-tab-details {
+  min-height: 150px;
+}
+
+.sla-details-tab-history {
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .sla-details-empty {
@@ -342,74 +453,7 @@
 }
 
 /* ========================================
-   SIDEBAR
-   ======================================== */
-
-.sla-details-sidebar {
-  background: #FFFFFF;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 2px solid #27235C;
-  position: sticky;
-  top: 20px;
-}
-
-.sla-details-sidebar-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #111827;
-  margin: 0 0 1.5rem;
-}
-
-.sla-details-sidebar-item {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #E5E7EB;
-}
-
-.sla-details-sidebar-item:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.sla-details-sidebar-value {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.sla-details-sidebar-subtitle {
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  font-weight: 500;
-}
-
-.sla-details-sidebar-highlight {
-  background: #EFF6FF;
-  border: 1px solid #BFDBFE;
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.sla-details-sidebar-highlight-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #1E40AF;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-}
-
-.sla-details-sidebar-highlight-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1E40AF;
-  line-height: 1;
-}
-
-/* ========================================
-   CLOSE MODAL STYLES
+   CLOSE MODAL
    ======================================== */
 
 .sla-close-modal-backdrop {
@@ -691,46 +735,42 @@
   }
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* ========================================
    RESPONSIVE
    ======================================== */
+
+@media (max-width: 1200px) {
+  .sla-details-layout {
+    grid-template-columns: 1fr 380px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .sla-details-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sla-details-right {
+    position: static;
+  }
+}
 
 @media (max-width: 768px) {
   .sla-details-container {
     padding: 1.25rem;
   }
 
+  .sla-details-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
   .sla-details-actions-wrapper {
-    flex-direction: column;
+    width: 100%;
   }
 
   .sla-details-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .sla-details-tabs-container {
-    width: 100%;
-  }
-
-  .sla-details-tab-pill {
     flex: 1;
     justify-content: center;
-    padding: 0.625rem 1rem;
-  }
-
-  .sla-details-sidebar {
-    position: relative;
-    top: 0;
   }
 
   .sla-close-modal-container {

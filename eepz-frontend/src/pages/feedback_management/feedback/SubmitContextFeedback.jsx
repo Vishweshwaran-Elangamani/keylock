@@ -138,13 +138,14 @@ export default function SubmitContextFeedback() {
     setLoading(true);
     try {
       const payload = {
-        organizationObjectiveId: Number(goalForm.organizationObjectiveId),
-        submittedByEmployeeId: Number(user?.empId),
-        managerEmployeeId: null,
-        rating: Number(goalForm.rating || 0),
-        feedbackComments: goalForm.feedbackComments,
-        feedbackFrom: "Employee",
-        isAnonymous: !!goalForm.isAnonymous,
+         organizationObjectiveId: Number(goalForm.organizationObjectiveId),
+  submittedByEmployeeId: Number(user?.empId),
+  managerEmployeeId: null,
+  rating: Number(goalForm.rating || 0),
+  feedbackComments: goalForm.feedbackComments,
+  feedbackFrom: "Employee",
+  isAnonymous: !!goalForm.isAnonymous,
+  feedbackType: "OrganizationalGoal" // or whatever valid value your DB expects
       };
 
       await orgGoalFeedbackApi.create(payload);

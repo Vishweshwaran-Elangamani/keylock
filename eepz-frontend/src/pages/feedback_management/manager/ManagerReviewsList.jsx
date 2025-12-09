@@ -403,13 +403,6 @@ export default function ManagerReviewsList() {
               <div className="fm-mgrrev-empty">
                 <User size={48} className="fm-mgrrev-empty__icon" />
                 <p className="fm-mgrrev-empty__text">No reviews created yet</p>
-                <Link
-                  to="/manager/create-review"
-                  className="fm-mgrrev-btn fm-mgrrev-btn--create"
-                >
-                  <Star size={16} />
-                  <span>Create Your First Review</span>
-                </Link>
               </div>
             ) : (
               <div className="fm-mgrrev-table-scroll">

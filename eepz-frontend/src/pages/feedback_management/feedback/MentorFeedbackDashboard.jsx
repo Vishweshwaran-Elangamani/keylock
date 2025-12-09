@@ -11,13 +11,13 @@ import {
   CheckCircle,
   Award,
   RefreshCw,
-  ArrowLeft,
+  Home,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { mentorFeedbackApi } from "../../../services/feedbackmanagement/feedbackApi";
+import { employeeApi, mentorFeedbackApi } from "../../../services/feedbackmanagement/feedbackApi";
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+import "../../../styles/feedback/SMEDashboard.css";
 
 const formatDate = (dateInput) => {
   if (!dateInput) return "—";
@@ -79,7 +79,24 @@ export default function MentorFeedbackDashboard() {
     skill: "all",
   });
 
-  // Fetch all data with employee name mapping
+  // Function to fetch employee name by ID
+  const fetchEmployeeName = async (employeeId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5333/api/EmployeeManagement/${employeeId}`
+      );
+      
+      if (response.data?.success && response.data.data) {
+        const { firstName, lastName } = response.data.data;
+        return `${firstName} ${lastName}`;
+      }
+      return `Employee ${employeeId}`;
+    } catch (err) {
+      console.error(`Failed to fetch employee ${employeeId}:`, err);
+      return `Employee ${employeeId}`;
+    }
+  };
+
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -87,45 +104,53 @@ export default function MentorFeedbackDashboard() {
     try {
       const empId = user?.empId || user?.employeeId || 1;
 
-      // FIRST: Fetch employee map
-      console.log(" Fetching employee map...");
-      const empResponse = await axios.get(`${API_BASE}/EmployeeManagement/all`);
-
-      let employeeMap = {};
-      if (empResponse.data?.success && Array.isArray(empResponse.data.data)) {
-        empResponse.data.data.forEach((emp) => {
-          employeeMap[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
-        });
-        console.log(" Employee map loaded:", Object.keys(employeeMap).length);
-      }
-
-      // THEN: Fetch mentor feedback
-      console.log(" Fetching mentor feedback...");
+      console.log("📋 Fetching mentor feedback...");
       const response = await mentorFeedbackApi.aboutMe(empId);
 
       if (response.data?.success && Array.isArray(response.data.data)) {
-        // Enrich with employee names
-        const enriched = response.data.data.map((feedback) => {
-          // Use menteeEmployeeId from the API response
-          const menteeId = feedback.menteeEmployeeId;
-          const menteeName = employeeMap[menteeId] || `Employee ${menteeId}`;
+        // Process each feedback to fetch mentee name
+        const enrichedPromises = response.data.data.map(async (feedback) => {
+          let menteeName = "Unknown";
+
+          // Extract menteeEmployeeId from the MenteeName field (which contains the ID as string)
+          if (feedback.menteeName) {
+            // Convert string ID to number
+            const menteeId = parseInt(feedback.menteeName, 10);
+            
+            if (!isNaN(menteeId)) {
+              // Fetch the actual employee name
+              menteeName = await fetchEmployeeName(menteeId);
+              console.log(`✓ Fetched name for ID ${menteeId}: ${menteeName}`);
+            }
+          } else if (feedback.menteeEmployeeId) {
+            // Fallback to menteeEmployeeId if menteeName is not available
+            const menteeId = parseInt(feedback.menteeEmployeeId, 10);
+            
+            if (!isNaN(menteeId)) {
+              menteeName = await fetchEmployeeName(menteeId);
+              console.log(`✓ Fetched name for ID ${menteeId}: ${menteeName}`);
+            }
+          }
 
           return {
             ...feedback,
+            menteeEmployeeId: feedback.menteeEmployeeId || parseInt(feedback.menteeName, 10),
             menteeName: menteeName,
             createdAtFormatted: formatDate(feedback.createdAt),
           };
         });
 
+        const enriched = await Promise.all(enrichedPromises);
+
         setFeedbacks(enriched);
         setFilteredFeedbacks(enriched);
-        console.log(" Feedback loaded:", enriched.length);
+        console.log("✓ Feedback loaded:", enriched.length);
       } else {
         setFeedbacks([]);
         setFilteredFeedbacks([]);
       }
     } catch (err) {
-      console.error(" Error fetching feedbacks:", err);
+      console.error("❌ Error fetching feedbacks:", err);
       setError("Failed to load feedback. Please try again.");
       setFeedbacks([]);
       setFilteredFeedbacks([]);
@@ -144,7 +169,6 @@ export default function MentorFeedbackDashboard() {
     setRefreshing(false);
   };
 
-  // Filter logic
   useEffect(() => {
     let filtered = [...feedbacks];
 
@@ -163,7 +187,6 @@ export default function MentorFeedbackDashboard() {
     setFilteredFeedbacks(filtered);
   }, [filters, feedbacks]);
 
-  // Acknowledge feedback
   const handleAcknowledge = async (trackingId) => {
     try {
       const response = await mentorFeedbackApi.acknowledge(trackingId);
@@ -182,7 +205,6 @@ export default function MentorFeedbackDashboard() {
     }
   };
 
-  // Stats
   const stats = useMemo(() => {
     const total = feedbacks.length;
     const avgRating =
@@ -219,440 +241,233 @@ export default function MentorFeedbackDashboard() {
 
   if (loading) {
     return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "60vh" }}
-      >
-        <div
-          className="spinner-border text-primary"
-          style={{ width: "3rem", height: "3rem" }}
-        >
-          <span className="visually-hidden">Loading...</span>
+      <div className="sme-sla-wrapper h-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <div
+            className="spinner-border text-primary"
+            style={{ width: "3rem", height: "3rem" }}
+          >
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="text-muted mt-3">Loading feedback data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        padding: "1.25rem 1.75rem",
-        maxWidth: "100%",
-        minHeight: "100vh",
-        backgroundColor: "#f8f9fa",
-      }}
-    >
-      {/* BACK BUTTON & HEADER */}
-      <div className="d-flex align-items-center gap-3 mb-3">
-        <button
-          className="btn d-flex align-items-center justify-content-center"
-          onClick={() => navigate(-1)}
+    <div className="sme-sla-wrapper">
+      {/* Breadcrumb Navigation */}
+      <nav aria-label="breadcrumb" className="mb-3">
+        <ol
+          className="breadcrumb mb-0 d-flex align-items-center"
           style={{
-            width: "40px",
-            height: "40px",
+            backgroundColor: "transparent",
             padding: 0,
-            backgroundColor: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: "8px",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#f8fafc";
-            e.currentTarget.style.borderColor = "#cbd5e1";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#fff";
-            e.currentTarget.style.borderColor = "#e2e8f0";
+            margin: 0,
           }}
         >
-          <ArrowLeft size={18} style={{ color: "#64748b" }} />
-        </button>
-        <div className="flex-grow-1">
-          <div className="d-flex align-items-center gap-2 mb-1">
-            <h2
-              className="fw-bold mb-0"
+          <li
+            className="breadcrumb-item"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <button
+              onClick={() => navigate("/employee/dashboard")}
               style={{
-                color: "#27235c",
-                fontSize: "1.5rem",
-                letterSpacing: "-0.025em",
+                background: "none",
+                border: "none",
+                color: "#97247E",
+                cursor: "pointer",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                textDecoration: "none",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+              <i className="bi bi-house-door" style={{ fontSize: '1rem' }}></i>
+              Dashboard
+            </button>
+          </li>
+          <li
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "#97247E",
+              margin: "0 8px",
+              fontSize: "1rem",
+            }}
+          >
+            /
+          </li>
+          
+          <li
+            className="breadcrumb-item"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <button
+              onClick={() => navigate("/employee/dashboard/feedback")}
+              style={{
+                background: "none",
+                border: "none",
+                color: "#97247E",
+                cursor: "pointer",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                textDecoration: "none",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+            >
+              Feedbacks
+            </button>
+          </li>
+          <li
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "#97247E",
+              margin: "0 8px",
+              fontSize: "1rem",
+            }}
+          >
+            /
+          </li>
+          <li
+            className="breadcrumb-item active"
+            aria-current="page"
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <span
+              style={{
+                color: "#1e293b",
+                fontSize: "0.875rem",
+                fontWeight: 600,
               }}
             >
               SME Dashboard
-            </h2>
-            <span
-              className="badge d-flex align-items-center gap-1"
-              style={{
-                backgroundColor: "#fef3c7",
-                color: "#d97706",
-                fontSize: "0.75rem",
-                padding: "4px 8px",
-                borderRadius: "6px",
-              }}
-            >
-              <Award size={14} />
-              SME
             </span>
-          </div>
-          <p
-            className="mb-0"
-            style={{ color: "#64748b", fontSize: "0.875rem" }}
-          >
-            Feedback from your mentees • {user.firstName} {user.lastName}
-          </p>
-        </div>
-        <button
-          className="btn d-flex align-items-center gap-2"
-          onClick={handleRefresh}
-          disabled={refreshing}
-          style={{
-            backgroundColor: "transparent",
-            border: "1.5px solid #0F62FE",
-            color: "#0F62FE",
-            borderRadius: "8px",
-            padding: "8px 16px",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-          }}
-        >
-          <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
-          Refresh
-        </button>
-      </div>
+          </li>
+        </ol>
+      </nav>
 
-      {/* ERROR ALERT */}
+      {/* Header with Refresh */}
+     
+
+      {/* Error Alert */}
       {error && (
-        <div
-          className="alert alert-danger mb-3"
-          style={{
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#fee2e2",
-            padding: "0.75rem 1rem",
-          }}
-        >
-          <p
-            className="mb-0"
-            style={{ fontSize: "0.875rem", color: "#991b1b" }}
-          >
-            {error}
-          </p>
+        <div className="alert alert-danger sme-sla-alert-error mb-3" role="alert">
+          <p className="mb-0">{error}</p>
         </div>
       )}
 
-      {/* STATS CARDS */}
+      {/* Stats Cards */}
       <div className="row g-3 mb-3">
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card border-0 h-100"
-            style={{
-              borderRadius: "10px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-            }}
-          >
-            <div
-              className="card-body text-center"
-              style={{ padding: "1.25rem 1rem" }}
-            >
-              <div
-                style={{
-                  width: "56px",
-                  height: "56px",
-                  backgroundColor: "#dbeafe",
-                  borderRadius: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 0.875rem",
-                }}
-              >
-                <MessageSquare size={28} color="#0F62FE" strokeWidth={2.5} />
+        {[
+          {
+            label: "Total Feedback",
+            value: stats.total,
+            icon: MessageSquare,
+            bgColor: "#EEF2FF",
+            iconColor: "#3B82F6",
+          },
+          {
+            label: "Average Rating",
+            value: stats.avgRating,
+            icon: Star,
+            bgColor: "#FEF3C7",
+            iconColor: "#E2B93B",
+          },
+        
+        ].map(({ label, value, icon: Icon, bgColor, iconColor }) => (
+          <div key={label} className="col-lg-3 col-md-6 col-sm-6">
+            <div className="sme-sla-stat-card">
+              <div className="sme-sla-stat-icon" style={{ backgroundColor: bgColor }}>
+                <Icon size={28} color={iconColor} strokeWidth={2.5} />
               </div>
-              <h2
-                className="fw-bold mb-2"
-                style={{ fontSize: "2rem", color: "#0f172a", lineHeight: 1 }}
-              >
-                {stats.total}
-              </h2>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.875rem",
-                  color: "#64748b",
-                  fontWeight: 600,
-                }}
-              >
-                Total Feedback
-              </p>
+              <div>
+                <h3 className="sme-sla-stat-value">{value}</h3>
+                <p className="sme-sla-stat-label">{label}</p>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
+      </div>
 
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card border-0 h-100"
-            style={{
-              borderRadius: "10px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-            }}
-          >
-            <div
-              className="card-body text-center"
-              style={{ padding: "1.25rem 1rem" }}
+      {/* Filters Card */}
+      <div className="sme-sla-filters-card">
+        <div className="row g-3">
+          <div className="col-md-4">
+            <select
+              className="form-select sme-sla-select"
+              value={filters.status}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, status: e.target.value }))
+              }
             >
-              <div
-                style={{
-                  width: "56px",
-                  height: "56px",
-                  backgroundColor: "#fef3c7",
-                  borderRadius: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 0.875rem",
-                }}
-              >
-                <Star size={28} color="#E2B93B" strokeWidth={2.5} />
-              </div>
-              <h2
-                className="fw-bold mb-2"
-                style={{ fontSize: "2rem", color: "#0f172a", lineHeight: 1 }}
-              >
-                {stats.avgRating}
-              </h2>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.875rem",
-                  color: "#64748b",
-                  fontWeight: 600,
-                }}
-              >
-                Average Rating
-              </p>
-            </div>
+              <option value="all">All Status</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Acknowledged">Acknowledged</option>
+              <option value="Reviewed">Reviewed</option>
+            </select>
           </div>
-        </div>
 
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card border-0 h-100"
-            style={{
-              borderRadius: "10px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-            }}
-          >
-            <div
-              className="card-body text-center"
-              style={{ padding: "1.25rem 1rem" }}
+          <div className="col-md-4">
+            <select
+              className="form-select sme-sla-select"
+              value={filters.rating}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, rating: e.target.value }))
+              }
             >
-              <div
-                style={{
-                  width: "56px",
-                  height: "56px",
-                  backgroundColor: "#fee2e2",
-                  borderRadius: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 0.875rem",
-                }}
-              >
-                <Clock size={28} color="#E01950" strokeWidth={2.5} />
-              </div>
-              <h2
-                className="fw-bold mb-2"
-                style={{ fontSize: "2rem", color: "#0f172a", lineHeight: 1 }}
-              >
-                {stats.pending}
-              </h2>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.875rem",
-                  color: "#64748b",
-                  fontWeight: 600,
-                }}
-              >
-                Pending
-              </p>
-            </div>
+              <option value="all">All Ratings</option>
+              <option value="5">5 Stars</option>
+              <option value="4">4 Stars</option>
+              <option value="3">3 Stars</option>
+              <option value="2">2 Stars</option>
+              <option value="1">1 Star</option>
+            </select>
           </div>
-        </div>
 
-        <div className="col-lg-3 col-md-6">
-          <div
-            className="card border-0 h-100"
-            style={{
-              borderRadius: "10px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-            }}
-          >
-            <div
-              className="card-body text-center"
-              style={{ padding: "1.25rem 1rem" }}
+          <div className="col-md-4">
+            <select
+              className="form-select sme-sla-select"
+              value={filters.skill}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, skill: e.target.value }))
+              }
             >
-              <div
-                style={{
-                  width: "56px",
-                  height: "56px",
-                  backgroundColor: "#dcfce7",
-                  borderRadius: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 0.875rem",
-                }}
-              >
-                <CheckCircle size={28} color="#24A148" strokeWidth={2.5} />
-              </div>
-              <h2
-                className="fw-bold mb-2"
-                style={{ fontSize: "2rem", color: "#0f172a", lineHeight: 1 }}
-              >
-                {stats.acknowledged}
-              </h2>
-              <p
-                className="mb-0"
-                style={{
-                  fontSize: "0.875rem",
-                  color: "#64748b",
-                  fontWeight: 600,
-                }}
-              >
-                Acknowledged
-              </p>
-            </div>
+              <option value="all">All Skills</option>
+              {uniqueSkills.map((skill) => (
+                <option key={skill} value={skill}>
+                  {skill}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
 
-      {/* FILTERS */}
-      <div
-        className="card border-0 mb-3"
-        style={{
-          borderRadius: "10px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-        }}
-      >
-        <div className="card-body" style={{ padding: "1.25rem" }}>
-          <div className="d-flex align-items-center gap-2 mb-3">
-            <Filter size={18} style={{ color: "#0f172a" }} />
-            <h6
-              className="mb-0 fw-bold"
-              style={{ color: "#0f172a", fontSize: "0.875rem" }}
-            >
-              Filter Feedback
-            </h6>
-          </div>
-
-          <div className="row g-3">
-            <div className="col-md-4">
-              <label
-                className="form-label"
-                style={{
-                  fontSize: "0.813rem",
-                  fontWeight: 600,
-                  color: "#64748b",
-                }}
-              >
-                Status
-              </label>
-              <select
-                className="form-select"
-                value={filters.status}
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, status: e.target.value }))
-                }
-                style={{ fontSize: "0.875rem", borderRadius: "6px" }}
-              >
-                <option value="all">All Status</option>
-                <option value="Submitted">Submitted</option>
-                <option value="Acknowledged">Acknowledged</option>
-                <option value="Reviewed">Reviewed</option>
-              </select>
-            </div>
-
-            <div className="col-md-4">
-              <label
-                className="form-label"
-                style={{
-                  fontSize: "0.813rem",
-                  fontWeight: 600,
-                  color: "#64748b",
-                }}
-              >
-                Rating
-              </label>
-              <select
-                className="form-select"
-                value={filters.rating}
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, rating: e.target.value }))
-                }
-                style={{ fontSize: "0.875rem", borderRadius: "6px" }}
-              >
-                <option value="all">All Ratings</option>
-                <option value="5">5 Stars</option>
-                <option value="4">4 Stars</option>
-                <option value="3">3 Stars</option>
-                <option value="2">2 Stars</option>
-                <option value="1">1 Star</option>
-              </select>
-            </div>
-
-            <div className="col-md-4">
-              <label
-                className="form-label"
-                style={{
-                  fontSize: "0.813rem",
-                  fontWeight: 600,
-                  color: "#64748b",
-                }}
-              >
-                Skill
-              </label>
-              <select
-                className="form-select"
-                value={filters.skill}
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, skill: e.target.value }))
-                }
-                style={{ fontSize: "0.875rem", borderRadius: "6px" }}
-              >
-                <option value="all">All Skills</option>
-                {uniqueSkills.map((skill) => (
-                  <option key={skill} value={skill}>
-                    {skill}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* FEEDBACK LIST */}
+      {/* Feedback Table */}
       {filteredFeedbacks.length === 0 ? (
-        <div
-          className="card border-0"
-          style={{
-            borderRadius: "10px",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-          }}
-        >
-          <div className="card-body text-center py-5">
-            <MessageSquare
-              size={56}
-              style={{ color: "#cbd5e1", opacity: 0.5 }}
-              className="mb-3"
-            />
-            <h6
-              className="fw-bold mb-2"
-              style={{ color: "#64748b", fontSize: "1.125rem" }}
-            >
-              No feedback found
-            </h6>
-            <p className="text-muted mb-0" style={{ fontSize: "0.875rem" }}>
+        <div className="sme-sla-empty-state-wrapper">
+          <div className="sme-sla-empty-state">
+            <MessageSquare size={64} className="sme-sla-empty-icon" />
+            <h6 className="sme-sla-empty-title">No feedback found</h6>
+            <p className="sme-sla-empty-text">
               {feedbacks.length === 0
                 ? "You haven't received any feedback from mentees yet"
                 : "No feedback matches your current filters"}
@@ -660,328 +475,196 @@ export default function MentorFeedbackDashboard() {
           </div>
         </div>
       ) : (
-        <div className="row g-3">
-          {filteredFeedbacks.map((feedback) => (
-            <div key={feedback.trackingId} className="col-md-6 col-lg-4">
-              <div
-                className="card border-0 h-100"
-                style={{
-                  border: "1px solid #e2e8f0",
-                  borderLeft: `4px solid ${getRatingColor(feedback.rating)}`,
-                  borderRadius: "8px",
-                  transition: "all 0.2s",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(0,0,0,0.12)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                <div className="card-body" style={{ padding: "1rem" }}>
-                  <div className="d-flex justify-content-between align-items-start mb-3">
-                    <span
-                      className="badge"
-                      style={{
-                        backgroundColor:
-                          feedback.status === "Acknowledged"
-                            ? "#dbeafe"
-                            : feedback.status === "Reviewed"
-                            ? "#dcfce7"
-                            : "#fef3c7",
-                        color:
-                          feedback.status === "Acknowledged"
-                            ? "#0F62FE"
-                            : feedback.status === "Reviewed"
-                            ? "#24A148"
-                            : "#E2B93B",
-                        padding: "4px 10px",
-                        fontSize: "0.75rem",
-                        borderRadius: "6px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {feedback.status}
-                    </span>
-                    <div className="d-flex align-items-center gap-1">
-                      <Star
-                        size={14}
-                        style={{ color: "#FFB800", fill: "#FFB800" }}
-                      />
-                      <span
-                        className="fw-bold"
-                        style={{ fontSize: "0.813rem" }}
-                      >
-                        {feedback.rating}/5
+        <div className="sme-sla-table-wrapper">
+          <div className="table-responsive">
+            <table className="table table-hover mb-0 sme-sla-table">
+              <thead className="sme-sla-table-header">
+                <tr>
+                  <th>EMPLOYEE</th>
+                  <th>SKILL</th>
+                  <th>RATING</th>
+                  <th>SUBMITTED</th>
+              
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredFeedbacks.map((feedback) => (
+                  <tr
+                    key={feedback.trackingId}
+                    className="sme-sla-clickable-row"
+                    onClick={() => setSelectedFeedback(feedback)}
+                  >
+                    <td>
+                      <div className="sme-sla-employee-cell">
+                        <User size={16} className="sme-sla-employee-icon" />
+                        <div className="sme-sla-employee-info">
+                          <div className="sme-sla-employee-name">
+                            {feedback.isAnonymous ? "Anonymous" : feedback.menteeName}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="sme-sla-badge sme-sla-badge-skill">
+                        {feedback.skillName}
                       </span>
-                    </div>
-                  </div>
-
-                  <h6
-                    className="fw-bold mb-2"
-                    style={{ fontSize: "0.875rem", color: "#0f172a" }}
-                  >
-                    {feedback.skillName}
-                  </h6>
-
-                  <div className="mb-3">
-                    <small style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                      Feedback from
-                    </small>
-                    <div
-                      className="d-flex align-items-center gap-1"
-                      style={{
-                        fontSize: "0.875rem",
-                        fontWeight: 600,
-                        color: "#0f172a",
-                      }}
-                    >
-                      <User size={14} />
-                      {feedback.isAnonymous ? "Anonymous" : feedback.menteeName}
-                    </div>
-                  </div>
-
-                  <div
-                    className="mb-3"
-                    style={{ fontSize: "0.75rem", color: "#64748b" }}
-                  >
-                    <Calendar
-                      size={12}
-                      className="me-1"
-                      style={{ display: "inline" }}
-                    />
-                    {feedback.createdAtFormatted}
-                  </div>
-
-                  {feedback.feedbackComments && (
-                    <p
-                      className="mb-3"
-                      style={{
-                        fontSize: "0.813rem",
-                        color: "#475569",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                        minHeight: "60px",
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {feedback.feedbackComments}
-                    </p>
-                  )}
-
-                  <div className="d-flex gap-2">
-                    <button
-                      className="btn btn-sm btn-outline-secondary flex-grow-1"
-                      onClick={() => setSelectedFeedback(feedback)}
-                      style={{
-                        fontSize: "0.813rem",
-                        borderRadius: "6px",
-                        padding: "6px",
-                      }}
-                    >
-                      <Eye
-                        size={14}
-                        className="me-1"
-                        style={{ display: "inline" }}
-                      />
-                      View
-                    </button>
-                    {feedback.status === "Submitted" && (
-                      <button
-                        className="btn btn-sm btn-success"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAcknowledge(feedback.trackingId);
-                        }}
-                        style={{
-                          fontSize: "0.813rem",
-                          borderRadius: "6px",
-                          padding: "6px 10px",
-                        }}
-                        title="Acknowledge"
-                      >
-                        <ThumbsUp size={14} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center gap-2 justify-content-center">
+                        <Star
+                          size={16}
+                          fill="#FFB800"
+                          stroke="#FFB800"
+                          strokeWidth={2}
+                        />
+                        <span className="sme-sla-rating-text">
+                          {feedback.rating}/5
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="sme-sla-date-cell">
+                        <Calendar size={14} className="sme-sla-date-icon" />
+                        {feedback.createdAtFormatted}
+                      </div>
+                    </td>
+                   
+                    <td>
+                      <div className="sme-sla-actions">
+                        <button
+                          className="btn btn-sm sme-sla-action-btn sme-sla-action-view"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedFeedback(feedback);
+                          }}
+                          title="View details"
+                        >
+                          <Eye size={14} />
+                        </button>
+                        {feedback.status === "Submitted" && (
+                          <button
+                            className="btn btn-sm sme-sla-action-btn sme-sla-action-acknowledge"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAcknowledge(feedback.trackingId);
+                            }}
+                            title="Acknowledge"
+                          >
+                            <ThumbsUp size={14} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {/* DETAIL MODAL */}
+      {/* Detail Modal */}
       {selectedFeedback && (
         <>
           <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              zIndex: 1040,
-            }}
+            className="modal-backdrop fade show"
+            style={{ zIndex: 1040 }}
             onClick={() => setSelectedFeedback(null)}
           />
           <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 1050,
-              width: "90%",
-              maxWidth: "700px",
-              maxHeight: "90vh",
-              overflowY: "auto",
+            className="modal fade show d-block"
+            tabIndex="-1"
+            style={{ zIndex: 1050 }}
+            onClick={(e) => {
+              if (e.target.classList.contains("modal")) {
+                setSelectedFeedback(null);
+              }
             }}
-            onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className="bg-white"
-              style={{
-                borderRadius: "12px",
-                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
-              }}
-            >
-              <div className="p-4 border-bottom">
-                <h5
-                  className="mb-0 fw-bold"
-                  style={{ color: "#0f172a", fontSize: "1.125rem" }}
-                >
-                  Feedback Details
-                </h5>
-              </div>
-              <div className="p-4">
-                <div className="row g-3 mb-4">
-                  <div className="col-6">
-                    <small style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                      Skill
-                    </small>
-                    <div className="fw-semibold" style={{ color: "#0f172a" }}>
-                      {selectedFeedback.skillName}
+            <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: "700px" }}>
+              <div className="modal-content sme-sla-modal-content">
+                <div className="modal-header sme-sla-modal-header">
+                  <h5 className="modal-title sme-sla-modal-title">
+                    Feedback Details
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    onClick={() => setSelectedFeedback(null)}
+                    aria-label="Close"
+                  />
+                </div>
+                <div className="modal-body sme-sla-modal-body">
+                  <div className="row g-3 mb-4">
+                    <div className="col-6">
+                      <small className="sme-sla-modal-label">Skill</small>
+                     
+                 <div className="sme-sla-modal-value" style={{ textAlign: "left" }}>
+                        {selectedFeedback.skillName}
+                  </div>
+
+                    </div>
+                    <div className="col-6">
+                      <small className="sme-sla-modal-label">Rating</small>
+                      <div className="d-flex align-items-center gap-2">
+                        {renderStars(selectedFeedback.rating)}
+                        <span className="fw-bold">
+                          {selectedFeedback.rating}/5
+                        </span>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <small className="sme-sla-modal-label" >From</small>
+                      <div className="sme-sla-modal-value"  style={{ textAlign: "left" }}>
+                        {selectedFeedback.isAnonymous
+                          ? "Anonymous"
+                          : selectedFeedback.menteeName}
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <small className="sme-sla-modal-label">Submitted</small>
+                      <div className="sme-sla-modal-value"  style={{ textAlign: "left" }}>
+                        {selectedFeedback.createdAtFormatted}
+                      </div>
                     </div>
                   </div>
-                  <div className="col-6">
-                    <small style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                      Rating
+
+                  <div>
+                    <small className="sme-sla-modal-label">
+                      Feedback Comments
                     </small>
-                    <div className="d-flex align-items-center gap-2">
-                      {renderStars(selectedFeedback.rating)}
-                      <span className="fw-bold">
-                        {selectedFeedback.rating}/5
-                      </span>
-                    </div>
-                  </div>
-                  <div className="col-6">
-                    <small style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                      From
-                    </small>
-                    <div className="fw-semibold" style={{ color: "#0f172a" }}>
-                      {selectedFeedback.isAnonymous
-                        ? "Anonymous"
-                        : selectedFeedback.menteeName}
-                    </div>
-                  </div>
-                  <div className="col-6">
-                    <small style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                      Submitted
-                    </small>
-                    <div className="fw-semibold" style={{ color: "#0f172a" }}>
-                      {selectedFeedback.createdAtFormatted}
+                    <div className="sme-sla-modal-comments">
+                      {selectedFeedback.feedbackComments}
                     </div>
                   </div>
                 </div>
-
-                <div>
-                  <small
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "#64748b",
-                      fontWeight: 600,
-                    }}
-                  >
-                    Feedback Comments
-                  </small>
-                  <div
-                    className="p-3 mt-2"
-                    style={{
-                      backgroundColor: "#f8fafc",
-                      borderRadius: "8px",
-                      borderLeft: "4px solid #0F62FE",
-                    }}
-                  >
-                    <p
-                      className="mb-0"
-                      style={{
-                        fontSize: "0.875rem",
-                        color: "#0f172a",
-                        lineHeight: 1.6,
-                        whiteSpace: "pre-wrap",
+                <div className="modal-footer sme-sla-modal-footer">
+                  {selectedFeedback.status === "Submitted" && (
+                    <button
+                      className="btn sme-sla-btn-acknowledge-modal"
+                      onClick={() => {
+                        handleAcknowledge(selectedFeedback.trackingId);
+                        setSelectedFeedback(null);
                       }}
                     >
-                      {selectedFeedback.feedbackComments}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="d-flex justify-content-end gap-2 p-4 border-top">
-                {selectedFeedback.status === "Submitted" && (
+                      <ThumbsUp size={16} />
+                      Acknowledge
+                    </button>
+                  )}
                   <button
-                    className="btn btn-success"
-                    onClick={() => {
-                      handleAcknowledge(selectedFeedback.trackingId);
-                      setSelectedFeedback(null);
-                    }}
-                    style={{
-                      borderRadius: "8px",
-                      padding: "0.625rem 1.25rem",
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                    }}
+                    className="btn sme-sla-btn-close-modal"
+                    onClick={() => setSelectedFeedback(null)}
                   >
-                    <ThumbsUp
-                      size={16}
-                      className="me-2"
-                      style={{ display: "inline" }}
-                    />
-                    Acknowledge
+                    Close
                   </button>
-                )}
-                <button
-                  className="btn"
-                  onClick={() => setSelectedFeedback(null)}
-                  style={{
-                    backgroundColor: "#64748b",
-                    color: "#fff",
-                    borderRadius: "8px",
-                    padding: "0.625rem 1.5rem",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    border: "none",
-                  }}
-                >
-                  Close
-                </button>
+                </div>
               </div>
             </div>
           </div>
         </>
       )}
-
-      <style>{`
-        .animate-spin { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-      `}</style>
     </div>
   );
 }
+

@@ -162,10 +162,12 @@ export const employeeApi = {
     try {
       // Get access token from storage (adjust as needed)
       const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.get("http://localhost:5307/api/LnD/employees/subordinates", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const response = await axios.get(
+  `${import.meta.env.VITE_LND_API_URL}/api/lnd-skills/employees/subordinates`,
+  {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
       });
       return response.data;
     } catch (error) {

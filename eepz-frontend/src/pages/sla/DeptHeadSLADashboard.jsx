@@ -294,43 +294,6 @@ const DeptHeadSLADashboard = () => {
         ))}
       </div>
 
-      <div className="dh-sla-filters-card">
-        <div className="dh-sla-search-wrapper">
-          <Search size={16} className="dh-sla-search-icon" />
-          <input
-            type="text"
-            className="dh-sla-search-input"
-            placeholder="Search escalations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        <select
-          className="dh-sla-select"
-          value={selectedPeriod}
-          onChange={(e) => setSelectedPeriod(e.target.value)}
-        >
-          <option value="all">All Periods</option>
-          <option value="Q4-2024">Q4 2024</option>
-          <option value="Q1-2025">Q1 2025</option>
-          <option value="Q2-2025">Q2 2025</option>
-          <option value="Q3-2025">Q3 2025</option>
-        </select>
-
-        <button
-          onClick={() => {
-            setSearchQuery("");
-            setSelectedPeriod("all");
-            setSelectedStatus("all");
-            setActiveTab("all");
-          }}
-          className="dh-sla-btn-clear"
-        >
-          Clear Filters
-        </button>
-      </div>
-
       <div className="dh-sla-table-wrapper">
         <div className="table-responsive">
           <table className="dh-sla-table">

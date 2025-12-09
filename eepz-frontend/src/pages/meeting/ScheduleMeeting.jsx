@@ -17,6 +17,7 @@ import {
   Home,
 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { employeeApi } from "../../services/feedbackmanagement/feedbackApi";
 
 const ScheduleMeeting = () => {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ const ScheduleMeeting = () => {
     const fetchParticipants = async () => {
       if (formData.meetingType === "One-on-One") {
         try {
-          const response = await meetingService.getSubordinates();
+          const response = await employeeApi.getSubordinates();
           if (response.success) {
             const items = response.data.items.map((item) => ({
               employeeId: item.employeeId,
@@ -67,7 +68,7 @@ const ScheduleMeeting = () => {
         }
       } else {
         try {
-          const response = await meetingService.getAllEmployees();
+          const response = await meetingService.getAll();
           if (response.success) {
             setEmployeeOptions(response.data);
           } else {

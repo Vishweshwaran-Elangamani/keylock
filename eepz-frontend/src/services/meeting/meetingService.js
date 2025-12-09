@@ -1,7 +1,10 @@
 import apii from "../../services/meeting/index";
+import axios from "axios";
 
 const meetingService = {
-  // ========= MEETING SCHEDULING (US059 - Manager) =========
+
+   getAll: () => apii.get("/employeemanagement/all"),
+ 
 
   scheduleMeeting: async (meetingData) => {
     try {
@@ -66,17 +69,19 @@ const meetingService = {
     try {
       // Get access token from storage (adjust as needed)
       const accessToken = localStorage.getItem("accessToken");
-      const response = await apii.get("http://localhost:5307/api/LnD/employees/subordinates", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const response = await axios.get(
+  `${import.meta.env.VITE_LND_API_URL}/api/LnD/employees/subordinates`,
+  {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
       });
       return response.data;
     } catch (error) {
       console.error("Get subordinates error:", error);
       throw error.response?.data || error;
     }
-  },
+  }
 };
 
 export default meetingService;

@@ -1,0 +1,739 @@
+/* ========================================
+   SME SLA DASHBOARD
+   All classes prefixed with sme-sla-
+   ======================================== */
+
+/* Wrapper */
+.sme-sla-wrapper {
+  padding: 1.5rem 2rem !important;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* ========================================
+   BREADCRUMBS
+   ======================================== */
+
+.sme-sla-breadcrumb {
+  font-size: 0.875rem !important;
+  color: #97247E !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb;
+}
+
+.sme-sla-breadcrumb-link {
+  color: #97247E !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  transition: color 0.2s !important;
+}
+
+.sme-sla-breadcrumb-link:hover {
+  color: #7A1D66 !important;
+  text-decoration: underline !important;
+}
+
+.sme-sla-breadcrumb-active {
+  color: #7A1D66 !important;
+  font-weight: 600 !important;
+}
+
+/* ========================================
+   PAGE HEADER
+   ======================================== */
+
+.sme-sla-page-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #27235c !important;
+  letter-spacing: -0.025em !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  margin: 0 !important;
+}
+
+.sme-sla-badge-sme {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+  font-size: 0.75rem !important;
+  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+.sme-sla-page-subtitle {
+  color: #64748b !important;
+  font-size: 0.875rem !important;
+  margin: 0 !important;
+}
+
+.sme-sla-btn-refresh {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  background-color: transparent !important;
+  border: 1.5px solid #0F62FE !important;
+  color: #0F62FE !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+}
+
+.sme-sla-btn-refresh:hover:not(:disabled) {
+  background-color: #0F62FE !important;
+  color: white !important;
+}
+
+.sme-sla-btn-refresh:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.sme-sla-spin {
+  animation: sme-spin 1s linear infinite !important;
+}
+
+@keyframes sme-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   ERROR ALERT
+   ======================================== */
+
+.sme-sla-alert-error {
+  border-radius: 8px !important;
+  border: none !important;
+  background-color: #fee2e2 !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.sme-sla-alert-error p {
+  font-size: 0.875rem !important;
+  color: #991b1b !important;
+}
+
+/* ========================================
+   STATS CARDS
+   ======================================== */
+
+.sme-sla-stat-card {
+  background: #FFFFFF !important;
+  border-radius: 12px !important;
+  padding: 1.25rem !important;
+  text-align: center !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 2px solid #27235C !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  min-height: 150px !important;
+  justify-content: flex-start !important;
+  gap: 1.25rem !important;
+}
+
+.sme-sla-stat-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+
+.sme-sla-stat-icon {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.sme-sla-stat-value {
+  font-size: 2.25rem !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 0 0 0.5rem !important;
+  line-height: 1 !important;
+}
+
+.sme-sla-stat-label {
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  color: #6B7280 !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
+}
+
+/* ========================================
+   FILTERS CARD
+   ======================================== */
+
+.sme-sla-filters-card {
+  background: #FFFFFF !important;
+  border-radius: 12px !important;
+  padding: 1.25rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  border: 2px solid #27235C !important;
+  margin-bottom: 1rem !important;
+}
+
+.sme-sla-filter-icon {
+  color: #0f172a !important;
+}
+
+.sme-sla-filter-title {
+  color: #0f172a !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+}
+
+.sme-sla-label {
+  font-size: 0.813rem !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.sme-sla-select {
+  appearance: none !important;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="gray" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 1rem center !important;
+  background-color: #fff !important;
+  padding-right: 2.5rem !important;
+  border: 1px solid #ccc !important;
+  border-radius: 6px !important;
+  font-size: 0.875rem !important;
+  cursor: pointer !important;
+  padding: 0.6rem 0.75rem !important;
+  color: #475569 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s !important;
+}
+
+.sme-sla-select:focus {
+  outline: none !important;
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+
+.sme-sla-empty-state-wrapper {
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  border: 2px solid #27235C !important;
+  padding: 4rem 2rem !important;
+}
+
+.sme-sla-empty-state {
+  text-align: center !important;
+}
+
+.sme-sla-empty-icon {
+  color: #D1D5DB !important;
+  opacity: 0.5 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.sme-sla-empty-title {
+  font-weight: 700 !important;
+  color: #6B7280 !important;
+  font-size: 1.125rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.sme-sla-empty-text {
+  color: #94a3b8 !important;
+  font-size: 0.875rem !important;
+  margin: 0 !important;
+}
+
+/* ========================================
+   TABLE
+   ======================================== */
+
+.sme-sla-table-wrapper {
+  background: #FFFFFF !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  border: 2px solid #27235C !important;
+  overflow: hidden !important;
+}
+
+.table-responsive {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.sme-sla-table {
+  width: 100% !important;
+  margin-bottom: 0 !important;
+  color: #212529 !important;
+  vertical-align: middle !important;
+  border-color: transparent !important;
+}
+
+.sme-sla-table > :not(caption) > * > * {
+  padding: 0 !important;
+  background-color: transparent !important;
+  border-bottom-width: 0 !important;
+  box-shadow: none !important;
+}
+
+.sme-sla-table-header {
+  background: #27235C !important;
+  border-bottom: none !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.sme-sla-table-header tr {
+  border: none !important;
+}
+
+.sme-sla-table-header th {
+  padding: 1rem 1.25rem !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+  color: #FFFFFF !important;
+  background: #27235C !important;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.025em !important;
+}
+
+/* Center specific columns */
+.sme-sla-table-header th:nth-child(3),
+.sme-sla-table-header th:nth-child(4),
+.sme-sla-table-header th:nth-child(5),
+.sme-sla-table-header th:nth-child(6) {
+  text-align: center !important;
+}
+
+.sme-sla-table tbody {
+  border-top: none !important;
+}
+
+.sme-sla-table tbody tr {
+  border: none !important;
+  border-bottom: 1px solid #E5E7EB !important;
+  transition: all 0.15s ease !important;
+}
+
+.sme-sla-table tbody tr:last-child {
+  border-bottom: none !important;
+}
+
+.sme-sla-table tbody td {
+  padding: 1rem 1.25rem !important;
+  font-size: 0.875rem !important;
+  color: #111827 !important;
+  vertical-align: middle !important;
+  text-align: left !important;
+  background: #FFFFFF !important;
+  border: none !important;
+}
+
+/* Center specific columns in body */
+.sme-sla-table tbody td:nth-child(3),
+.sme-sla-table tbody td:nth-child(4),
+.sme-sla-table tbody td:nth-child(5),
+.sme-sla-table tbody td:nth-child(6) {
+  text-align: center !important;
+}
+
+/* Clickable Row Styles */
+.sme-sla-clickable-row {
+  cursor: pointer !important;
+}
+
+.sme-sla-clickable-row:hover {
+  background-color: #e0eaff !important;
+}
+
+.sme-sla-clickable-row:hover td {
+  background-color: #e0eaff !important;
+}
+
+/* Remove all Bootstrap table defaults */
+.sme-sla-table.table {
+  --bs-table-bg: transparent !important;
+  --bs-table-accent-bg: transparent !important;
+  --bs-table-striped-color: #212529 !important;
+  --bs-table-striped-bg: transparent !important;
+  --bs-table-active-color: #212529 !important;
+  --bs-table-active-bg: transparent !important;
+  --bs-table-hover-color: #212529 !important;
+  --bs-table-hover-bg: transparent !important;
+  border-collapse: collapse !important;
+}
+
+.sme-sla-table.table-hover > tbody > tr:hover > * {
+  --bs-table-accent-bg: #e0eaff !important;
+  color: inherit !important;
+  background-color: #e0eaff !important;
+}
+
+/* ========================================
+   TABLE CELLS
+   ======================================== */
+
+.sme-sla-employee-cell {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+}
+
+.sme-sla-employee-icon {
+  color: #64748b !important;
+  flex-shrink: 0 !important;
+}
+
+.sme-sla-employee-info {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.sme-sla-employee-name {
+  font-weight: 600 !important;
+  color: #111827 !important;
+  margin-bottom: 0 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.3 !important;
+  text-align: left !important;
+}
+
+.sme-sla-date-cell {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  font-size: 0.875rem !important;
+  color: #64748b !important;
+}
+
+.sme-sla-date-icon {
+  color: #94a3b8 !important;
+}
+
+.sme-sla-rating-text {
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  font-size: 0.875rem !important;
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+
+.sme-sla-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.375rem 0.75rem !important;
+  border-radius: 6px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+.sme-sla-badge-skill {
+  background: #E0F2FE !important;
+  color: #0369A1 !important;
+}
+
+.sme-sla-badge-status-submitted {
+  background: #FEF3C7 !important;
+  color: #D97706 !important;
+}
+
+.sme-sla-badge-status-acknowledged {
+  background: #DBEAFE !important;
+  color: #0F62FE !important;
+}
+
+.sme-sla-badge-status-reviewed {
+  background: #DCFCE7 !important;
+  color: #16A34A !important;
+}
+
+/* ========================================
+   ACTION BUTTONS
+   ======================================== */
+
+.sme-sla-actions {
+  display: flex !important;
+  gap: 0.5rem !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.sme-sla-action-btn {
+  padding: 0.375rem 0.75rem !important;
+  border-radius: 6px !important;
+  border-width: 1.5px !important;
+  border-style: solid !important;
+  background: transparent !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  font-size: 0.8125rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+.sme-sla-action-view {
+  border-color: #3B82F6 !important;
+  color: #3B82F6 !important;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+}
+
+.sme-sla-action-view:hover {
+  background: #3B82F6 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
+}
+
+.sme-sla-action-acknowledge {
+  border-color: #16A34A !important;
+  color: #16A34A !important;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+}
+
+.sme-sla-action-acknowledge:hover {
+  background: #16A34A !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3) !important;
+}
+
+/* ========================================
+   MODAL
+   ======================================== */
+
+.sme-sla-modal-content {
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+}
+
+.sme-sla-modal-header {
+  background-color: #27235c !important;
+  border-bottom: none !important;
+  padding: 1.25rem 1.5rem !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.sme-sla-modal-title {
+  color: white !important;
+  font-size: 1.125rem !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+}
+
+.sme-sla-modal-body {
+  padding: 1.5rem !important;
+}
+
+.sme-sla-modal-label {
+  font-size: 0.75rem !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
+  display: block !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.sme-sla-modal-value {
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  font-size: 0.875rem !important;
+}
+
+.sme-sla-modal-comments {
+  padding: 0.75rem 1rem !important;
+  margin-top: 0.5rem !important;
+  background-color: #f8fafc !important;
+  border-radius: 8px !important;
+  border-left: 4px solid #0F62FE !important;
+  font-size: 0.875rem !important;
+  color: #0f172a !important;
+  line-height: 1.6 !important;
+  white-space: pre-wrap !important;
+}
+
+.sme-sla-modal-footer {
+  padding: 1rem 1.5rem !important;
+  border-top: 1px solid #e5e7eb !important;
+  background-color: white !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 0.75rem !important;
+  border-radius: 0 0 12px 12px !important;
+}
+
+.sme-sla-btn-acknowledge-modal {
+  background-color: #16A34A !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.625rem 1.25rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  transition: all 0.2s !important;
+}
+
+.sme-sla-btn-acknowledge-modal:hover {
+  background-color: #15803d !important;
+}
+
+.sme-sla-btn-close-modal {
+  background-color: #64748b !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.625rem 1.5rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s !important;
+}
+
+.sme-sla-btn-close-modal:hover {
+  background-color: #475569 !important;
+}
+
+/* ========================================
+   SCROLLBAR
+   ======================================== */
+
+.sme-sla-table-wrapper::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.sme-sla-table-wrapper::-webkit-scrollbar-track,
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+  border-radius: 5px !important;
+}
+
+.sme-sla-table-wrapper::-webkit-scrollbar-thumb,
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #27235C !important;
+  border-radius: 5px !important;
+  border: 2px solid #f1f1f1 !important;
+}
+
+.sme-sla-table-wrapper::-webkit-scrollbar-thumb:hover,
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #1b193f !important;
+}
+
+/* Firefox */
+.sme-sla-table-wrapper,
+.table-responsive {
+  scrollbar-width: thin !important;
+  scrollbar-color: #27235C #f1f1f1 !important;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 992px) {
+  .sme-sla-wrapper {
+    padding: 1rem !important;
+  }
+
+  .sme-sla-stat-card {
+    min-height: 140px !important;
+    padding: 1rem !important;
+  }
+
+  .sme-sla-table {
+    min-width: 900px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .sme-sla-stat-value {
+    font-size: 2rem !important;
+  }
+
+  .sme-sla-stat-icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .sme-sla-table-header th,
+  .sme-sla-table tbody td {
+    padding: 0.875rem 1rem !important;
+    font-size: 0.8125rem !important;
+  }
+
+  .sme-sla-badge {
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  .sme-sla-action-btn {
+    font-size: 0.75rem !important;
+  }
+
+  .sme-sla-action-view,
+  .sme-sla-action-acknowledge {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .sme-sla-wrapper {
+    padding: 0.75rem !important;
+  }
+
+  .sme-sla-stat-card {
+    min-height: 120px !important;
+    padding: 0.875rem !important;
+  }
+
+  .sme-sla-stat-value {
+    font-size: 1.75rem !important;
+  }
+
+  .sme-sla-table-header th,
+  .sme-sla-table tbody td {
+    padding: 0.75rem 0.875rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .sme-sla-empty-state-wrapper {
+    padding: 2rem 1rem !important;
+  }
+}

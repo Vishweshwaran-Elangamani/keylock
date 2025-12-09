@@ -308,53 +308,6 @@ const EmployeeMomDashboard = () => {
         />
       </div>
 
-      <div className="card border-0 shadow-sm mb-4">
-        <div className="card-body py-3">
-          <div className="row g-3 align-items-center">
-            <div className="col-lg-4">
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0">
-                  <i className="bi bi-search text-muted"></i>
-                </span>
-                <input 
-                  type="text" 
-                  className="form-control border-start-0 ps-0" 
-                  placeholder="Search meetings, attendees, or action items..."
-                  style={{ boxShadow: 'none' }}
-                />
-              </div>
-            </div>
-            <div className="col-lg-2">
-              <select className="form-select" style={{ boxShadow: 'none' }}>
-                <option>All Status</option>
-                <option>Open</option>
-                <option>Closed</option>
-              </select>
-            </div>
-            <div className="col-lg-2">
-              <select className="form-select" style={{ boxShadow: 'none' }}>
-                <option>All Types</option>
-                <option>Team Meeting</option>
-                <option>Review</option>
-                <option>Planning</option>
-              </select>
-            </div>
-            <div className="col-lg-2">
-              <select className="form-select" style={{ boxShadow: 'none' }}>
-                <option>Date Range</option>
-                <option>Last 7 days</option>
-                <option>Last 30 days</option>
-                <option>Last 90 days</option>
-              </select>
-            </div>
-            <div className="col-lg-2 text-end">
-              <button className="btn btn-outline-secondary d-flex align-items-center gap-2 w-100 justify-content-center">
-                <i className="bi bi-funnel"></i> Filters
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Quick Action Buttons */}
       <div className="row g-3 mb-4">
