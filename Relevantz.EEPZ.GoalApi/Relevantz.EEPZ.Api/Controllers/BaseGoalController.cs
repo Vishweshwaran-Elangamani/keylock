@@ -22,7 +22,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             _service = service;
             _logger = logger;
-        }  
+        }   
         
         protected string GetUserRole()
         {
