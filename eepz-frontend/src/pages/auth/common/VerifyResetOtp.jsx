@@ -34,8 +34,10 @@ const VerifyResetOtp = () => {
    */
   const isValidGmailDomain = (email) => {
     if (!email) return false;
-    const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
-    return gmailPattern.test(email);
+    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+    const eepzRegex = /^[a-zA-Z0-9._%+-]+@eepz\.com$/i;
+    const relevantzRegex = /^[a-zA-Z0-9._%+-]+@relevantz\.com$/i;
+    return gmailRegex.test(email) || eepzRegex.test(email) || relevantzRegex.test(email);
   };
 
   // ========================
@@ -81,7 +83,9 @@ const VerifyResetOtp = () => {
 
     // -------- Validate Gmail Domain --------
     if (!isValidGmailDomain(email)) {
-      toast.error("Only Gmail addresses (@gmail.com) are allowed for password reset");
+      toast.error(
+        "Only Gmail addresses (@gmail.com) are allowed for password reset"
+      );
       navigate("/reset-password");
       return;
     }

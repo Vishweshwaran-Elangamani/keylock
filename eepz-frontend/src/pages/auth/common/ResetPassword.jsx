@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../../services/auth/authService";
@@ -13,9 +14,12 @@ const ResetPassword = () => {
 
   const navigate = useNavigate();
 
+  // Validate Gmail OR eepz.com
   const validateEmail = (email) => {
     const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
-    return gmailRegex.test(email);
+    const eepzRegex = /^[a-zA-Z0-9._%+-]+@eepz\.com$/i;
+    const relevantzRegex = /^[a-zA-Z0-9._%+-]+@relevantz\.com$/i;
+    return gmailRegex.test(email) || eepzRegex.test(email) || relevantzRegex.test(email);
   };
 
   const isEmailValid = validateEmail(email);
@@ -35,7 +39,7 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      const errorMsg = "Only Gmail addresses (@gmail.com) are allowed for password reset";
+      const errorMsg = "Only Gmail (@gmail.com) or Eepz (@eepz.com) addresses are allowed for password reset";
       setError(errorMsg);
       setEmailTouched(true);
       toast.error(errorMsg);
@@ -111,7 +115,7 @@ const ResetPassword = () => {
           </div>
           <h2 className="reset-title">Reset Password</h2>
           <p className="reset-subtitle">
-            Enter your Gmail address and we'll send you a verification code to
+            Enter your Gmail or Eepz email address and we'll send you a verification code to
             reset your password
           </p>
         </div>
@@ -142,7 +146,7 @@ const ResetPassword = () => {
             <div className="form-group-reset">
               <label htmlFor="email" className="form-label-reset">
                 <i className="bi bi-envelope"></i>
-                Gmail Address
+                Email Address
               </label>
               <div className="email-input-wrapper-reset">
                 <input
@@ -151,7 +155,7 @@ const ResetPassword = () => {
                     showEmailError ? "is-invalid" : ""
                   } ${emailTouched && isEmailValid ? "is-valid" : ""}`}
                   id="email"
-                  placeholder="youremail@gmail.com"
+                  placeholder="Enter your Email Address"
                   value={email}
                   onChange={handleEmailChange}
                   onBlur={handleEmailBlur}
@@ -171,13 +175,13 @@ const ResetPassword = () => {
               {showEmailError && (
                 <small className="feedback-error-reset">
                   <i className="bi bi-info-circle"></i>
-                  Only Gmail addresses (@gmail.com) are allowed
+                  Only Gmail (@gmail.com) or Eepz (@eepz.com) addresses are allowed
                 </small>
               )}
               {emailTouched && isEmailValid && (
                 <small className="feedback-success-reset">
                   <i className="bi bi-check-circle"></i>
-                  Valid Gmail address
+                  Valid email address
                 </small>
               )}
             </div>
@@ -216,7 +220,7 @@ const ResetPassword = () => {
           <div className="security-note">
             <small>
               <i className="bi bi-shield-check"></i>
-              Password reset is only available for Gmail accounts. Your account
+              Password reset is only available for Gmail or Eepz accounts. Your account
               information is protected.
             </small>
           </div>

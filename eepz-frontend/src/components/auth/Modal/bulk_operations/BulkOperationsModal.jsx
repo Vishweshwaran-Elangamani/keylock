@@ -12,6 +12,13 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
   const [exportingUsers, setExportingUsers] = useState(false);
   const [exportingAll, setExportingAll] = useState(false);
   const fileInputRef = useRef(null);
+  const modalRef = useRef(null);
+
+  const handleBackdropClick = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      handleClose();
+    }
+  };
 
   useEffect(() => {
     if (uploadResult && uploadResult.errors && uploadResult.errors.length > 0) {
@@ -267,16 +274,16 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
       {/* Custom Backdrop */}
       <div
         style={{
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(39, 35, 92, 0.4)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          backgroundColor: "rgba(39, 35, 92, 0.4)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
           zIndex: 1040,
-          transition: 'all 0.3s ease'
+          transition: "all 0.3s ease",
         }}
         onClick={handleClose}
       />
@@ -284,52 +291,52 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
       {/* Modal Wrapper */}
       <div
         style={{
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           zIndex: 1050,
-          padding: '20px'
+          padding: "20px",
         }}
       >
         {/* Modal Dialog */}
         <div
           style={{
-            width: '100%',
-            maxWidth: '800px',
-            maxHeight: '90vh',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: '0.5rem',
-            overflow: 'hidden',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-            backgroundColor: '#ffffff'
+            width: "100%",
+            maxWidth: "800px",
+            maxHeight: "90vh",
+            display: "flex",
+            flexDirection: "column",
+            borderRadius: "0.5rem",
+            overflow: "hidden",
+            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.3)",
+            backgroundColor: "#ffffff",
           }}
         >
           {/* Modal Header */}
           <div
             style={{
-              background: '#27235C',
-              color: '#ffffff',
-              padding: '16px 20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexShrink: 0
+              background: "#27235C",
+              color: "#ffffff",
+              padding: "16px 20px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexShrink: 0,
             }}
           >
             <div
               style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#ffffff'
+                fontSize: "16px",
+                fontWeight: "600",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "#ffffff",
               }}
             >
               <i className="bi bi-database"></i>
@@ -338,17 +345,17 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
             <button
               onClick={handleClose}
               style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#ffffff',
-                fontSize: '20px',
-                cursor: 'pointer',
-                padding: '0',
-                width: '24px',
-                height: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                background: "transparent",
+                border: "none",
+                color: "#ffffff",
+                fontSize: "20px",
+                cursor: "pointer",
+                padding: "0",
+                width: "24px",
+                height: "24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <i className="bi bi-x-lg"></i>
@@ -358,28 +365,31 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
           {/* Tabs Container */}
           <div
             style={{
-              display: 'flex',
-              borderBottom: '2px solid #e5e7eb',
-              backgroundColor: '#f9fafb'
+              display: "flex",
+              borderBottom: "2px solid #e5e7eb",
+              backgroundColor: "#f9fafb",
             }}
           >
             <button
               onClick={() => setActiveTab("import")}
               style={{
                 flex: 1,
-                padding: '12px 20px',
-                fontSize: '14px',
-                fontWeight: '600',
-                border: 'none',
-                background: activeTab === "import" ? '#ffffff' : 'transparent',
-                color: activeTab === "import" ? '#27235C' : '#64748b',
-                borderBottom: activeTab === "import" ? '3px solid #27235C' : '3px solid transparent',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
+                padding: "12px 20px",
+                fontSize: "14px",
+                fontWeight: "600",
+                border: "none",
+                background: activeTab === "import" ? "#ffffff" : "transparent",
+                color: activeTab === "import" ? "#27235C" : "#64748b",
+                borderBottom:
+                  activeTab === "import"
+                    ? "3px solid #27235C"
+                    : "3px solid transparent",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
               }}
             >
               <i className="bi bi-download"></i>
@@ -389,19 +399,22 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
               onClick={() => setActiveTab("export")}
               style={{
                 flex: 1,
-                padding: '12px 20px',
-                fontSize: '14px',
-                fontWeight: '600',
-                border: 'none',
-                background: activeTab === "export" ? '#ffffff' : 'transparent',
-                color: activeTab === "export" ? '#27235C' : '#64748b',
-                borderBottom: activeTab === "export" ? '3px solid #27235C' : '3px solid transparent',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
+                padding: "12px 20px",
+                fontSize: "14px",
+                fontWeight: "600",
+                border: "none",
+                background: activeTab === "export" ? "#ffffff" : "transparent",
+                color: activeTab === "export" ? "#27235C" : "#64748b",
+                borderBottom:
+                  activeTab === "export"
+                    ? "3px solid #27235C"
+                    : "3px solid transparent",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
               }}
             >
               <i className="bi bi-upload"></i>
@@ -412,11 +425,11 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
           {/* Modal Body */}
           <div
             style={{
-              padding: '20px',
-              overflowY: 'auto',
+              padding: "20px",
+              overflowY: "auto",
               flex: 1,
-              backgroundColor: '#ffffff',
-              maxHeight: 'calc(90vh - 200px)'
+              backgroundColor: "#ffffff",
+              maxHeight: "calc(90vh - 200px)",
             }}
           >
             {/* EXPORT TAB */}
@@ -425,95 +438,121 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                 {/* Section Header - CENTERED */}
                 <div
                   style={{
-                    textAlign: 'center',
-                    marginBottom: '32px'
+                    textAlign: "center",
+                    marginBottom: "32px",
                   }}
                 >
-                  <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
-                  <i className="bi bi-file-earmark-spreadsheet" style={{ fontSize: '24px', color: '#27235C' }}></i>Download data in Excel format for backup or analysis
+                  <p style={{ fontSize: "13px", color: "#64748b", margin: 0 }}>
+                    <i
+                      className="bi bi-file-earmark-spreadsheet"
+                      style={{ fontSize: "24px", color: "#27235C" }}
+                    ></i>
+                    Download data in Excel format for backup or analysis
                   </p>
                 </div>
 
                 {/* Export Cards Grid - CENTERED */}
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    gap: '24px',
-                    flexWrap: 'wrap'
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "24px",
+                    flexWrap: "wrap",
                   }}
                 >
                   {/* Users Export Card */}
                   <div
                     style={{
-                      width: '320px',
-                      border: '2px solid #27235C',
-                      borderRadius: '12px',
-                      padding: '24px',
-                      background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 2px 8px rgba(39,35,92,0.1)'
+                      width: "320px",
+                      border: "2px solid #27235C",
+                      borderRadius: "12px",
+                      padding: "24px",
+                      background:
+                        "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+                      transition: "all 0.2s ease",
+                      boxShadow: "0 2px 8px rgba(39,35,92,0.1)",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(39,35,92,0.2)';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow =
+                        "0 6px 20px rgba(39,35,92,0.2)";
+                      e.currentTarget.style.transform = "translateY(-2px)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(39,35,92,0.1)';
-                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow =
+                        "0 2px 8px rgba(39,35,92,0.1)";
+                      e.currentTarget.style.transform = "translateY(0)";
                     }}
                   >
                     <div
                       style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #27235C 0%, #1e1a47 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '20px'
+                        width: "56px",
+                        height: "56px",
+                        borderRadius: "50%",
+                        background:
+                          "linear-gradient(135deg, #27235C 0%, #1e1a47 100%)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: "20px",
                       }}
                     >
-                      <i className="bi bi-people" style={{ fontSize: '28px', color: '#ffffff' }}></i>
+                      <i
+                        className="bi bi-people"
+                        style={{ fontSize: "28px", color: "#ffffff" }}
+                      ></i>
                     </div>
-                    <h6 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+                    <h6
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        color: "#1e293b",
+                        marginBottom: "8px",
+                      }}
+                    >
                       Users
                     </h6>
-                    <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '20px', lineHeight: '1.5' }}>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        color: "#64748b",
+                        marginBottom: "20px",
+                        lineHeight: "1.5",
+                      }}
+                    >
                       Export all users and their information
                     </p>
                     <button
                       onClick={() => handleExport("users")}
                       disabled={exportingUsers}
                       style={{
-                        width: '100%',
-                        padding: '12px 20px',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        borderRadius: '8px',
-                        border: 'none',
-                        background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                        color: '#ffffff',
-                        cursor: exportingUsers ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)'
+                        width: "100%",
+                        padding: "12px 20px",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        borderRadius: "8px",
+                        border: "none",
+                        background:
+                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                        color: "#ffffff",
+                        cursor: exportingUsers ? "not-allowed" : "pointer",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
                       }}
                     >
                       {exportingUsers ? (
                         <span
                           style={{
-                            width: '16px',
-                            height: '16px',
-                            border: '2px solid #ffffff',
-                            borderTopColor: 'transparent',
-                            borderRadius: '50%',
-                            animation: 'spin 0.6s linear infinite',
-                            display: 'inline-block'
+                            width: "16px",
+                            height: "16px",
+                            border: "2px solid #ffffff",
+                            borderTopColor: "transparent",
+                            borderRadius: "50%",
+                            animation: "spin 0.6s linear infinite",
+                            display: "inline-block",
                           }}
                         />
                       ) : (
@@ -526,74 +565,96 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                   {/* Complete Export Card - Featured with Pink Gradient */}
                   <div
                     style={{
-                      width: '320px',
-                      border: '2px solid #27235C',
-                      borderRadius: '12px',
-                      padding: '24px',
-                      background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 2px 8px rgba(39,35,92,0.1)'
+                      width: "320px",
+                      border: "2px solid #27235C",
+                      borderRadius: "12px",
+                      padding: "24px",
+                      background:
+                        "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+                      transition: "all 0.2s ease",
+                      boxShadow: "0 2px 8px rgba(39,35,92,0.1)",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(39,35,92,0.2)';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow =
+                        "0 6px 20px rgba(39,35,92,0.2)";
+                      e.currentTarget.style.transform = "translateY(-2px)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(39,35,92,0.1)';
-                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow =
+                        "0 2px 8px rgba(39,35,92,0.1)";
+                      e.currentTarget.style.transform = "translateY(0)";
                     }}
                   >
                     <div
                       style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #27235C 0%, #1e1a47 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '20px'
+                        width: "56px",
+                        height: "56px",
+                        borderRadius: "50%",
+                        background:
+                          "linear-gradient(135deg, #27235C 0%, #1e1a47 100%)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: "20px",
                       }}
                     >
-                      <i className="bi bi-database" style={{ fontSize: '28px', color: '#ffffff' }}></i>
+                      <i
+                        className="bi bi-database"
+                        style={{ fontSize: "28px", color: "#ffffff" }}
+                      ></i>
                     </div>
-                    <h6 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+                    <h6
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        color: "#1e293b",
+                        marginBottom: "8px",
+                      }}
+                    >
                       Complete Export
                     </h6>
-                    <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '20px', lineHeight: '1.5' }}>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        color: "#64748b",
+                        marginBottom: "20px",
+                        lineHeight: "1.5",
+                      }}
+                    >
                       Export everything in one file with multiple sheets
                     </p>
                     <button
                       onClick={() => handleExport("all")}
                       disabled={exportingAll}
                       style={{
-                        width: '100%',
-                        padding: '12px 20px',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        borderRadius: '8px',
-                        border: 'none',
-                        background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                        color: '#ffffff',
-                        cursor: exportingAll ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)'
+                        width: "100%",
+                        padding: "12px 20px",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        borderRadius: "8px",
+                        border: "none",
+                        background:
+                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                        color: "#ffffff",
+                        cursor: exportingAll ? "not-allowed" : "pointer",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
                       }}
                     >
                       {exportingAll ? (
                         <span
                           style={{
-                            width: '16px',
-                            height: '16px',
-                            border: '2px solid #ffffff',
-                            borderTopColor: 'transparent',
-                            borderRadius: '50%',
-                            animation: 'spin 0.6s linear infinite',
-                            display: 'inline-block'
+                            width: "16px",
+                            height: "16px",
+                            border: "2px solid #ffffff",
+                            borderTopColor: "transparent",
+                            borderRadius: "50%",
+                            animation: "spin 0.6s linear infinite",
+                            display: "inline-block",
                           }}
                         />
                       ) : (
@@ -612,50 +673,52 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                 {/* Template Download Section */}
                 <div
                   style={{
-                    padding: '16px',
-                    background: '#f0f9ff',
-                    border: '1px solid #bae6fd',
-                    borderRadius: '8px',
-                    marginBottom: '20px',
-                    textAlign: 'center'
+                    padding: "16px",
+                    background: "#f0f9ff",
+                    border: "1px solid #bae6fd",
+                    borderRadius: "8px",
+                    marginBottom: "20px",
+                    textAlign: "center",
                   }}
                 >
                   <button
                     onClick={handleDownloadTemplate}
                     disabled={isDownloadingTemplate}
                     style={{
-                      padding: '10px 20px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      borderRadius: '6px',
-                      border: 'none',
-                      background: '#0ea5e9',
-                      color: '#ffffff',
-                      cursor: isDownloadingTemplate ? 'not-allowed' : 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      marginBottom: '8px'
+                      padding: "10px 20px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      borderRadius: "6px",
+                      border: "none",
+                      background: "#0ea5e9",
+                      color: "#ffffff",
+                      cursor: isDownloadingTemplate ? "not-allowed" : "pointer",
+                      transition: "all 0.2s ease",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      marginBottom: "8px",
                     }}
                     onMouseEnter={(e) => {
-                      if (!isDownloadingTemplate) e.target.style.background = '#0284c7';
+                      if (!isDownloadingTemplate)
+                        e.target.style.background = "#0284c7";
                     }}
                     onMouseLeave={(e) => {
-                      if (!isDownloadingTemplate) e.target.style.background = '#0ea5e9';
+                      if (!isDownloadingTemplate)
+                        e.target.style.background = "#0ea5e9";
                     }}
                   >
                     {isDownloadingTemplate ? (
                       <>
                         <span
                           style={{
-                            width: '14px',
-                            height: '14px',
-                            border: '2px solid #ffffff',
-                            borderTopColor: 'transparent',
-                            borderRadius: '50%',
-                            animation: 'spin 0.6s linear infinite',
-                            display: 'inline-block'
+                            width: "14px",
+                            height: "14px",
+                            border: "2px solid #ffffff",
+                            borderTopColor: "transparent",
+                            borderRadius: "50%",
+                            animation: "spin 0.6s linear infinite",
+                            display: "inline-block",
                           }}
                         />
                         Downloading...
@@ -667,38 +730,57 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                       </>
                     )}
                   </button>
-                  <small style={{ fontSize: '12px', color: '#0369a1', display: 'block' }}>
-                    Download the template, fill in user details, and upload it below
+                  <small
+                    style={{
+                      fontSize: "12px",
+                      color: "#0369a1",
+                      display: "block",
+                    }}
+                  >
+                    Download the template, fill in user details, and upload it
+                    below
                   </small>
                 </div>
 
                 {/* Info Alert - LEFT ALIGNED */}
                 <div
                   style={{
-                    padding: '12px 16px',
-                    backgroundColor: '#d1ecf1',
-                    border: '1px solid #bee5eb',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '12px',
-                    fontSize: '13px',
-                    color: '#0c5460',
-                    marginBottom: '20px'
+                    padding: "12px 16px",
+                    backgroundColor: "#d1ecf1",
+                    border: "1px solid #bee5eb",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "12px",
+                    fontSize: "13px",
+                    color: "#0c5460",
+                    marginBottom: "20px",
                   }}
                 >
-                  <i 
-                    className="bi bi-info-circle-fill" 
-                    style={{ 
-                      fontSize: '20px', 
+                  <i
+                    className="bi bi-info-circle-fill"
+                    style={{
+                      fontSize: "20px",
                       flexShrink: 0,
-                      marginTop: '2px'
+                      marginTop: "2px",
                     }}
                   ></i>
-                  <div style={{ textAlign: 'left' }}>
-                    <strong style={{ display: 'block', marginBottom: '8px' }}>Excel Format Requirements:</strong>
-                    <ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6', textAlign: 'left' }}>
-                      <li>Required columns: EmployeeCompanyId, Email, FirstName, LastName, Role, Department</li>
+                  <div style={{ textAlign: "left" }}>
+                    <strong style={{ display: "block", marginBottom: "8px" }}>
+                      Excel Format Requirements:
+                    </strong>
+                    <ul
+                      style={{
+                        margin: 0,
+                        paddingLeft: "20px",
+                        lineHeight: "1.6",
+                        textAlign: "left",
+                      }}
+                    >
+                      <li>
+                        Required columns: EmployeeCompanyId, Email, FirstName,
+                        LastName, Role, Department
+                      </li>
                       <li>File format: .xlsx or .xls (max 5MB)</li>
                       <li>First row must contain column headers</li>
                       <li>Follow template format with dropdown validations</li>
@@ -707,7 +789,7 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                 </div>
 
                 {/* File Upload */}
-                <div style={{ marginBottom: '20px' }}>
+                <div style={{ marginBottom: "20px" }}>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -718,32 +800,41 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                   <button
                     onClick={handleFileUploadClick}
                     style={{
-                      width: '100%',
-                      padding: '40px 20px',
-                      border: '2px dashed #cbd5e1',
-                      borderRadius: '8px',
-                      background: '#f9fafb',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '12px'
+                      width: "100%",
+                      padding: "40px 20px",
+                      border: "2px dashed #cbd5e1",
+                      borderRadius: "8px",
+                      background: "#f9fafb",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "12px",
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.borderColor = '#27235C';
-                      e.target.style.background = '#f0f9ff';
+                      e.target.style.borderColor = "#27235C";
+                      e.target.style.background = "#f0f9ff";
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.borderColor = '#cbd5e1';
-                      e.target.style.background = '#f9fafb';
+                      e.target.style.borderColor = "#cbd5e1";
+                      e.target.style.background = "#f9fafb";
                     }}
                   >
-                    <i className="bi bi-cloud-upload" style={{ fontSize: '48px', color: '#64748b' }}></i>
-                    <span style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>
+                    <i
+                      className="bi bi-cloud-upload"
+                      style={{ fontSize: "48px", color: "#64748b" }}
+                    ></i>
+                    <span
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        color: "#1e293b",
+                      }}
+                    >
                       Click to select Excel file
                     </span>
-                    <small style={{ fontSize: '12px', color: '#64748b' }}>
+                    <small style={{ fontSize: "12px", color: "#64748b" }}>
                       Supported: .xlsx, .xls (Max 5MB)
                     </small>
                   </button>
@@ -751,26 +842,41 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
 
                 {/* Selected File Display - CENTERED */}
                 {selectedFile && (
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginBottom: "20px",
+                    }}
+                  >
                     <div
                       style={{
-                        maxWidth: '400px',
-                        width: '100%',
-                        padding: '12px 16px',
-                        background: '#f0fdf4',
-                        border: '1px solid #86efac',
-                        borderRadius: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
+                        maxWidth: "400px",
+                        width: "100%",
+                        padding: "12px 16px",
+                        background: "#f0fdf4",
+                        border: "1px solid #86efac",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
                       }}
                     >
-                      <i className="bi bi-file-earmark-excel-fill" style={{ fontSize: '32px', color: '#22c55e' }}></i>
+                      <i
+                        className="bi bi-file-earmark-excel-fill"
+                        style={{ fontSize: "32px", color: "#22c55e" }}
+                      ></i>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#166534' }}>
+                        <div
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            color: "#166534",
+                          }}
+                        >
                           {selectedFile.name}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#15803d' }}>
+                        <div style={{ fontSize: "12px", color: "#15803d" }}>
                           {(selectedFile.size / 1024).toFixed(2)} KB
                         </div>
                       </div>
@@ -783,15 +889,15 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                           }
                         }}
                         style={{
-                          background: 'transparent',
-                          border: 'none',
-                          color: '#dc2626',
-                          fontSize: '20px',
-                          cursor: 'pointer',
-                          padding: '4px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
+                          background: "transparent",
+                          border: "none",
+                          color: "#dc2626",
+                          fontSize: "20px",
+                          cursor: "pointer",
+                          padding: "4px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
                         <i className="bi bi-x"></i>
@@ -802,39 +908,46 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
 
                 {/* Import Button - CENTERED */}
                 {selectedFile && (
-                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginBottom: "20px",
+                    }}
+                  >
                     <button
                       onClick={handleBulkImport}
                       disabled={loading}
                       style={{
-                        width: '300px',
-                        padding: '12px 20px',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        borderRadius: '6px',
-                        border: 'none',
-                        background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-                        color: '#ffffff',
-                        cursor: loading ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.2s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px',
-                        boxShadow: '0 2px 8px rgba(151, 36, 126, 0.25)'
+                        width: "300px",
+                        padding: "12px 20px",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        borderRadius: "6px",
+                        border: "none",
+                        background:
+                          "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+                        color: "#ffffff",
+                        cursor: loading ? "not-allowed" : "pointer",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        boxShadow: "0 2px 8px rgba(151, 36, 126, 0.25)",
                       }}
                     >
                       {loading ? (
                         <>
                           <span
                             style={{
-                              width: '16px',
-                              height: '16px',
-                              border: '2px solid #ffffff',
-                              borderTopColor: 'transparent',
-                              borderRadius: '50%',
-                              animation: 'spin 0.6s linear infinite',
-                              display: 'inline-block'
+                              width: "16px",
+                              height: "16px",
+                              border: "2px solid #ffffff",
+                              borderTopColor: "transparent",
+                              borderRadius: "50%",
+                              animation: "spin 0.6s linear infinite",
+                              display: "inline-block",
                             }}
                           />
                           Processing...
@@ -853,14 +966,24 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                 {uploadResult && (
                   <div
                     style={{
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      padding: '20px',
-                      background: '#ffffff',
-                      marginTop: '20px'
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                      padding: "20px",
+                      background: "#ffffff",
+                      marginTop: "20px",
                     }}
                   >
-                    <h6 style={{ fontSize: '15px', fontWeight: '600', color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h6
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "600",
+                        color: "#1e293b",
+                        marginBottom: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
                       <i className="bi bi-bar-chart-fill"></i>
                       Import Results
                     </h6>
@@ -868,83 +991,206 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                     {/* Stats Grid */}
                     <div
                       style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '12px',
-                        marginBottom: '20px'
+                        display: "grid",
+                        gridTemplateColumns: "repeat(3, 1fr)",
+                        gap: "12px",
+                        marginBottom: "20px",
                       }}
                     >
                       <div
                         style={{
-                          padding: '16px',
-                          background: '#f9fafb',
-                          borderRadius: '6px',
-                          textAlign: 'center'
+                          padding: "16px",
+                          background: "#f9fafb",
+                          borderRadius: "6px",
+                          textAlign: "center",
                         }}
                       >
-                        <i className="bi bi-file-earmark-text" style={{ fontSize: '24px', color: '#64748b', marginBottom: '8px' }}></i>
-                        <div style={{ fontSize: '24px', fontWeight: '700', color: '#1e293b' }}>
+                        <i
+                          className="bi bi-file-earmark-text"
+                          style={{
+                            fontSize: "24px",
+                            color: "#64748b",
+                            marginBottom: "8px",
+                          }}
+                        ></i>
+                        <div
+                          style={{
+                            fontSize: "24px",
+                            fontWeight: "700",
+                            color: "#1e293b",
+                          }}
+                        >
                           {uploadResult.totalRecords}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#64748b' }}>
+                        <div style={{ fontSize: "12px", color: "#64748b" }}>
                           Total Records
                         </div>
                       </div>
                       <div
                         style={{
-                          padding: '16px',
-                          background: '#f0fdf4',
-                          borderRadius: '6px',
-                          textAlign: 'center'
+                          padding: "16px",
+                          background: "#f0fdf4",
+                          borderRadius: "6px",
+                          textAlign: "center",
                         }}
                       >
-                        <i className="bi bi-check-circle-fill" style={{ fontSize: '24px', color: '#22c55e', marginBottom: '8px' }}></i>
-                        <div style={{ fontSize: '24px', fontWeight: '700', color: '#166534' }}>
+                        <i
+                          className="bi bi-check-circle-fill"
+                          style={{
+                            fontSize: "24px",
+                            color: "#22c55e",
+                            marginBottom: "8px",
+                          }}
+                        ></i>
+                        <div
+                          style={{
+                            fontSize: "24px",
+                            fontWeight: "700",
+                            color: "#166534",
+                          }}
+                        >
                           {uploadResult.successCount}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#166534' }}>
+                        <div style={{ fontSize: "12px", color: "#166534" }}>
                           Successful
                         </div>
                       </div>
                       <div
                         style={{
-                          padding: '16px',
-                          background: '#fef2f2',
-                          borderRadius: '6px',
-                          textAlign: 'center'
+                          padding: "16px",
+                          background: "#fef2f2",
+                          borderRadius: "6px",
+                          textAlign: "center",
                         }}
                       >
-                        <i className="bi bi-x-circle-fill" style={{ fontSize: '24px', color: '#ef4444', marginBottom: '8px' }}></i>
-                        <div style={{ fontSize: '24px', fontWeight: '700', color: '#dc2626' }}>
+                        <i
+                          className="bi bi-x-circle-fill"
+                          style={{
+                            fontSize: "24px",
+                            color: "#ef4444",
+                            marginBottom: "8px",
+                          }}
+                        ></i>
+                        <div
+                          style={{
+                            fontSize: "24px",
+                            fontWeight: "700",
+                            color: "#dc2626",
+                          }}
+                        >
                           {uploadResult.failureCount}
                         </div>
-                        <div style={{ fontSize: '12px', color: '#dc2626' }}>
+                        <div style={{ fontSize: "12px", color: "#dc2626" }}>
                           Failed
                         </div>
                       </div>
                     </div>
+                    {/* Success Details Section - ADD THIS */}
+                    {uploadResult.successCount > 0 &&
+                      uploadResult.failureCount === 0 && (
+                        <div
+                          className="success-details-bulk"
+                          style={{
+                            border: "1px solid #86efac",
+                            borderRadius: "8px",
+                            background: "#f0fdf4",
+                            padding: "16px",
+                            marginTop: "20px",
+                          }}
+                        >
+                          {/* Success Header - CENTERED */}
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "8px",
+                              marginBottom: "12px",
+                            }}
+                          >
+                            <i
+                              className="bi bi-check-circle-fill"
+                              style={{ fontSize: "20px", color: "#22c55e" }}
+                            ></i>
+                            <span
+                              style={{
+                                fontSize: "14px",
+                                fontWeight: "600",
+                                color: "#166534",
+                              }}
+                            >
+                              Import Successful
+                            </span>
+                          </div>
+
+                          {/* Success Summary - CENTERED */}
+                          <div
+                            style={{
+                              padding: "12px",
+                              background: "#dcfce7",
+                              border: "1px solid #86efac",
+                              borderRadius: "6px",
+                              textAlign: "center",
+                            }}
+                          >
+                            <strong
+                              style={{
+                                display: "block",
+                                marginBottom: "4px",
+                                fontSize: "13px",
+                                color: "#166534",
+                              }}
+                            >
+                              ✓ {uploadResult.successCount} user
+                              {uploadResult.successCount !== 1 ? "s" : ""}{" "}
+                              imported successfully!
+                            </strong>
+                            <p
+                              style={{
+                                margin: 0,
+                                fontSize: "12px",
+                                color: "#15803d",
+                              }}
+                            >
+                              All records have been processed and added to the
+                              system.
+                            </p>
+                          </div>
+                        </div>
+                      )}
 
                     {/* Errors Section */}
                     {uploadResult.errors && uploadResult.errors.length > 0 && (
                       <div
                         className="error-details-bulk"
                         style={{
-                          border: '1px solid #fee2e2',
-                          borderRadius: '8px',
-                          background: '#fef2f2',
-                          padding: '16px'
+                          border: "1px solid #fee2e2",
+                          borderRadius: "8px",
+                          background: "#fef2f2",
+                          padding: "16px",
                         }}
                       >
                         {/* Error Header - CENTERED */}
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center',
-                          gap: '8px', 
-                          marginBottom: '12px' 
-                        }}>
-                          <i className="bi bi-exclamation-triangle-fill" style={{ fontSize: '20px', color: '#dc2626' }}></i>
-                          <span style={{ fontSize: '14px', fontWeight: '600', color: '#991b1b' }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                            marginBottom: "12px",
+                          }}
+                        >
+                          <i
+                            className="bi bi-exclamation-triangle-fill"
+                            style={{ fontSize: "20px", color: "#dc2626" }}
+                          ></i>
+                          <span
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "600",
+                              color: "#991b1b",
+                            }}
+                          >
                             Detailed Error Information
                           </span>
                         </div>
@@ -952,19 +1198,35 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                         {/* Error Summary - CENTERED */}
                         <div
                           style={{
-                            padding: '12px',
-                            background: '#fff7ed',
-                            border: '1px solid #fed7aa',
-                            borderRadius: '6px',
-                            marginBottom: '16px',
-                            textAlign: 'center'
+                            padding: "12px",
+                            background: "#fff7ed",
+                            border: "1px solid #fed7aa",
+                            borderRadius: "6px",
+                            marginBottom: "16px",
+                            textAlign: "center",
                           }}
                         >
-                          <strong style={{ display: 'block', marginBottom: '4px', fontSize: '13px', color: '#9a3412' }}>
-                            {uploadResult.failureCount} record{uploadResult.failureCount !== 1 ? "s" : ""} failed to import
+                          <strong
+                            style={{
+                              display: "block",
+                              marginBottom: "4px",
+                              fontSize: "13px",
+                              color: "#9a3412",
+                            }}
+                          >
+                            {uploadResult.failureCount} record
+                            {uploadResult.failureCount !== 1 ? "s" : ""} failed
+                            to import
                           </strong>
-                          <p style={{ margin: 0, fontSize: '12px', color: '#9a3412' }}>
-                            Review each error below. Format: Row number (Email) - Error description
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: "12px",
+                              color: "#9a3412",
+                            }}
+                          >
+                            Review each error below. Format: Row number (Email)
+                            - Error description
                           </p>
                         </div>
 
@@ -972,224 +1234,301 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
                         {uploadResult.categorizedErrors ? (
                           <div>
                             {/* Duplicate Emails */}
-                            {uploadResult.categorizedErrors.duplicateEmails.length > 0 && (
+                            {uploadResult.categorizedErrors.duplicateEmails
+                              .length > 0 && (
                               <details
                                 open
                                 style={{
-                                  marginBottom: '12px',
-                                  border: '1px solid #fecaca',
-                                  borderRadius: '6px',
-                                  background: '#ffffff'
+                                  marginBottom: "12px",
+                                  border: "1px solid #fecaca",
+                                  borderRadius: "6px",
+                                  background: "#ffffff",
                                 }}
                               >
                                 <summary
                                   style={{
-                                    padding: '12px',
-                                    cursor: 'pointer',
-                                    fontWeight: '600',
-                                    fontSize: '13px',
-                                    color: '#dc2626',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between'
+                                    padding: "12px",
+                                    cursor: "pointer",
+                                    fontWeight: "600",
+                                    fontSize: "13px",
+                                    color: "#dc2626",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
                                   }}
                                 >
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "8px",
+                                    }}
+                                  >
                                     <i className="bi bi-envelope-x-fill"></i>
                                     <span>Duplicate Email Addresses</span>
                                     <span
                                       style={{
-                                        padding: '2px 8px',
-                                        borderRadius: '12px',
-                                        background: '#fee2e2',
-                                        fontSize: '11px',
-                                        fontWeight: '700'
+                                        padding: "2px 8px",
+                                        borderRadius: "12px",
+                                        background: "#fee2e2",
+                                        fontSize: "11px",
+                                        fontWeight: "700",
                                       }}
                                     >
-                                      {uploadResult.categorizedErrors.duplicateEmails.length}
+                                      {
+                                        uploadResult.categorizedErrors
+                                          .duplicateEmails.length
+                                      }
                                     </span>
                                   </div>
                                   <i className="bi bi-chevron-down"></i>
                                 </summary>
-                                <div style={{ padding: '0 12px 12px 12px' }}>
-                                  <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                                    {uploadResult.categorizedErrors.duplicateEmails.map((error, index) => (
-                                      <li
-                                        key={`dup-${index}`}
-                                        style={{
-                                          padding: '8px 12px',
-                                          marginBottom: '8px',
-                                          background: '#fef2f2',
-                                          border: '1px solid #fecaca',
-                                          borderRadius: '4px',
-                                          fontSize: '12px',
-                                          color: '#991b1b',
-                                          display: 'flex',
-                                          alignItems: 'flex-start',
-                                          gap: '8px'
-                                        }}
-                                      >
-                                        <i className="bi bi-envelope-x" style={{ flexShrink: 0, marginTop: '2px' }}></i>
-                                        <span>{error}</span>
-                                      </li>
-                                    ))}
+                                <div style={{ padding: "0 12px 12px 12px" }}>
+                                  <ul
+                                    style={{
+                                      margin: 0,
+                                      padding: 0,
+                                      listStyle: "none",
+                                    }}
+                                  >
+                                    {uploadResult.categorizedErrors.duplicateEmails.map(
+                                      (error, index) => (
+                                        <li
+                                          key={`dup-${index}`}
+                                          style={{
+                                            padding: "8px 12px",
+                                            marginBottom: "8px",
+                                            background: "#fef2f2",
+                                            border: "1px solid #fecaca",
+                                            borderRadius: "4px",
+                                            fontSize: "12px",
+                                            color: "#991b1b",
+                                            display: "flex",
+                                            alignItems: "flex-start",
+                                            gap: "8px",
+                                          }}
+                                        >
+                                          <i
+                                            className="bi bi-envelope-x"
+                                            style={{
+                                              flexShrink: 0,
+                                              marginTop: "2px",
+                                            }}
+                                          ></i>
+                                          <span>{error}</span>
+                                        </li>
+                                      )
+                                    )}
                                   </ul>
                                 </div>
                               </details>
                             )}
 
                             {/* Validation Errors */}
-                            {uploadResult.categorizedErrors.validationErrors.length > 0 && (
+                            {uploadResult.categorizedErrors.validationErrors
+                              .length > 0 && (
                               <details
                                 open
                                 style={{
-                                  marginBottom: '12px',
-                                  border: '1px solid #fed7aa',
-                                  borderRadius: '6px',
-                                  background: '#ffffff'
+                                  marginBottom: "12px",
+                                  border: "1px solid #fed7aa",
+                                  borderRadius: "6px",
+                                  background: "#ffffff",
                                 }}
                               >
                                 <summary
                                   style={{
-                                    padding: '12px',
-                                    cursor: 'pointer',
-                                    fontWeight: '600',
-                                    fontSize: '13px',
-                                    color: '#ea580c',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between'
+                                    padding: "12px",
+                                    cursor: "pointer",
+                                    fontWeight: "600",
+                                    fontSize: "13px",
+                                    color: "#ea580c",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
                                   }}
                                 >
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "8px",
+                                    }}
+                                  >
                                     <i className="bi bi-exclamation-circle-fill"></i>
                                     <span>Data Validation Errors</span>
                                     <span
                                       style={{
-                                        padding: '2px 8px',
-                                        borderRadius: '12px',
-                                        background: '#ffedd5',
-                                        fontSize: '11px',
-                                        fontWeight: '700'
+                                        padding: "2px 8px",
+                                        borderRadius: "12px",
+                                        background: "#ffedd5",
+                                        fontSize: "11px",
+                                        fontWeight: "700",
                                       }}
                                     >
-                                      {uploadResult.categorizedErrors.validationErrors.length}
+                                      {
+                                        uploadResult.categorizedErrors
+                                          .validationErrors.length
+                                      }
                                     </span>
                                   </div>
                                   <i className="bi bi-chevron-down"></i>
                                 </summary>
-                                <div style={{ padding: '0 12px 12px 12px' }}>
-                                  <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                                    {uploadResult.categorizedErrors.validationErrors.map((error, index) => (
-                                      <li
-                                        key={`val-${index}`}
-                                        style={{
-                                          padding: '8px 12px',
-                                          marginBottom: '8px',
-                                          background: '#fffbeb',
-                                          border: '1px solid #fed7aa',
-                                          borderRadius: '4px',
-                                          fontSize: '12px',
-                                          color: '#9a3412',
-                                          display: 'flex',
-                                          alignItems: 'flex-start',
-                                          gap: '8px'
-                                        }}
-                                      >
-                                        <i className="bi bi-x-circle" style={{ flexShrink: 0, marginTop: '2px' }}></i>
-                                        <span>{error}</span>
-                                      </li>
-                                    ))}
+                                <div style={{ padding: "0 12px 12px 12px" }}>
+                                  <ul
+                                    style={{
+                                      margin: 0,
+                                      padding: 0,
+                                      listStyle: "none",
+                                    }}
+                                  >
+                                    {uploadResult.categorizedErrors.validationErrors.map(
+                                      (error, index) => (
+                                        <li
+                                          key={`val-${index}`}
+                                          style={{
+                                            padding: "8px 12px",
+                                            marginBottom: "8px",
+                                            background: "#fffbeb",
+                                            border: "1px solid #fed7aa",
+                                            borderRadius: "4px",
+                                            fontSize: "12px",
+                                            color: "#9a3412",
+                                            display: "flex",
+                                            alignItems: "flex-start",
+                                            gap: "8px",
+                                          }}
+                                        >
+                                          <i
+                                            className="bi bi-x-circle"
+                                            style={{
+                                              flexShrink: 0,
+                                              marginTop: "2px",
+                                            }}
+                                          ></i>
+                                          <span>{error}</span>
+                                        </li>
+                                      )
+                                    )}
                                   </ul>
                                 </div>
                               </details>
                             )}
 
                             {/* Other Errors */}
-                            {uploadResult.categorizedErrors.otherErrors.length > 0 && (
+                            {uploadResult.categorizedErrors.otherErrors.length >
+                              0 && (
                               <details
                                 open
                                 style={{
-                                  border: '1px solid #bfdbfe',
-                                  borderRadius: '6px',
-                                  background: '#ffffff'
+                                  border: "1px solid #bfdbfe",
+                                  borderRadius: "6px",
+                                  background: "#ffffff",
                                 }}
                               >
                                 <summary
                                   style={{
-                                    padding: '12px',
-                                    cursor: 'pointer',
-                                    fontWeight: '600',
-                                    fontSize: '13px',
-                                    color: '#2563eb',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between'
+                                    padding: "12px",
+                                    cursor: "pointer",
+                                    fontWeight: "600",
+                                    fontSize: "13px",
+                                    color: "#2563eb",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
                                   }}
                                 >
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "8px",
+                                    }}
+                                  >
                                     <i className="bi bi-info-circle-fill"></i>
                                     <span>Other Issues</span>
                                     <span
                                       style={{
-                                        padding: '2px 8px',
-                                        borderRadius: '12px',
-                                        background: '#dbeafe',
-                                        fontSize: '11px',
-                                        fontWeight: '700'
+                                        padding: "2px 8px",
+                                        borderRadius: "12px",
+                                        background: "#dbeafe",
+                                        fontSize: "11px",
+                                        fontWeight: "700",
                                       }}
                                     >
-                                      {uploadResult.categorizedErrors.otherErrors.length}
+                                      {
+                                        uploadResult.categorizedErrors
+                                          .otherErrors.length
+                                      }
                                     </span>
                                   </div>
                                   <i className="bi bi-chevron-down"></i>
                                 </summary>
-                                <div style={{ padding: '0 12px 12px 12px' }}>
-                                  <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                                    {uploadResult.categorizedErrors.otherErrors.map((error, index) => (
-                                      <li
-                                        key={`other-${index}`}
-                                        style={{
-                                          padding: '8px 12px',
-                                          marginBottom: '8px',
-                                          background: '#eff6ff',
-                                          border: '1px solid #bfdbfe',
-                                          borderRadius: '4px',
-                                          fontSize: '12px',
-                                          color: '#1e40af',
-                                          display: 'flex',
-                                          alignItems: 'flex-start',
-                                          gap: '8px'
-                                        }}
-                                      >
-                                        <i className="bi bi-info-circle" style={{ flexShrink: 0, marginTop: '2px' }}></i>
-                                        <span>{error}</span>
-                                      </li>
-                                    ))}
+                                <div style={{ padding: "0 12px 12px 12px" }}>
+                                  <ul
+                                    style={{
+                                      margin: 0,
+                                      padding: 0,
+                                      listStyle: "none",
+                                    }}
+                                  >
+                                    {uploadResult.categorizedErrors.otherErrors.map(
+                                      (error, index) => (
+                                        <li
+                                          key={`other-${index}`}
+                                          style={{
+                                            padding: "8px 12px",
+                                            marginBottom: "8px",
+                                            background: "#eff6ff",
+                                            border: "1px solid #bfdbfe",
+                                            borderRadius: "4px",
+                                            fontSize: "12px",
+                                            color: "#1e40af",
+                                            display: "flex",
+                                            alignItems: "flex-start",
+                                            gap: "8px",
+                                          }}
+                                        >
+                                          <i
+                                            className="bi bi-info-circle"
+                                            style={{
+                                              flexShrink: 0,
+                                              marginTop: "2px",
+                                            }}
+                                          ></i>
+                                          <span>{error}</span>
+                                        </li>
+                                      )
+                                    )}
                                   </ul>
                                 </div>
                               </details>
                             )}
                           </div>
                         ) : (
-                          <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                          <ul
+                            style={{ margin: 0, padding: 0, listStyle: "none" }}
+                          >
                             {uploadResult.errors.map((error, index) => (
                               <li
                                 key={index}
                                 style={{
-                                  padding: '8px 12px',
-                                  marginBottom: '8px',
-                                  background: '#fef2f2',
-                                  border: '1px solid #fecaca',
-                                  borderRadius: '4px',
-                                  fontSize: '12px',
-                                  color: '#991b1b',
-                                  display: 'flex',
-                                  alignItems: 'flex-start',
-                                  gap: '8px'
+                                  padding: "8px 12px",
+                                  marginBottom: "8px",
+                                  background: "#fef2f2",
+                                  border: "1px solid #fecaca",
+                                  borderRadius: "4px",
+                                  fontSize: "12px",
+                                  color: "#991b1b",
+                                  display: "flex",
+                                  alignItems: "flex-start",
+                                  gap: "8px",
                                 }}
                               >
-                                <i className="bi bi-x-circle" style={{ flexShrink: 0, marginTop: '2px' }}></i>
+                                <i
+                                  className="bi bi-x-circle"
+                                  style={{ flexShrink: 0, marginTop: "2px" }}
+                                ></i>
                                 <span>{error}</span>
                               </li>
                             ))}
@@ -1206,41 +1545,41 @@ const BulkOperationsModal = ({ show, onClose, onSuccess }) => {
           {/* Modal Footer */}
           <div
             style={{
-              padding: '12px 20px',
-              borderTop: '1px solid #e2e8f0',
-              background: '#ffffff',
+              padding: "12px 20px",
+              borderTop: "1px solid #e2e8f0",
+              background: "#ffffff",
               flexShrink: 0,
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '8px',
-              borderBottomLeftRadius: '12px',
-              borderBottomRightRadius: '12px'
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "8px",
+              borderBottomLeftRadius: "12px",
+              borderBottomRightRadius: "12px",
             }}
           >
             <button
               onClick={handleClose}
               style={{
-                background: '#6c757d',
-                borderColor: '#6c757d',
-                color: '#ffffff',
-                fontWeight: '600',
-                padding: '8px 16px',
-                fontSize: '13px',
-                borderRadius: '6px',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
+                background: "#6c757d",
+                borderColor: "#6c757d",
+                color: "#ffffff",
+                fontWeight: "600",
+                padding: "8px 16px",
+                fontSize: "13px",
+                borderRadius: "6px",
+                border: "none",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
               }}
               onMouseEnter={(e) => {
-                e.target.style.background = '#5a6268';
-                e.target.style.borderColor = '#5a6268';
+                e.target.style.background = "#5a6268";
+                e.target.style.borderColor = "#5a6268";
               }}
               onMouseLeave={(e) => {
-                e.target.style.background = '#6c757d';
-                e.target.style.borderColor = '#6c757d';
+                e.target.style.background = "#6c757d";
+                e.target.style.borderColor = "#6c757d";
               }}
             >
               <i className="bi bi-x-circle"></i>
