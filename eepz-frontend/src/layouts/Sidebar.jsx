@@ -154,11 +154,6 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Top Performers",
         path: "/department-head/dashboard/performance/top-performers",
       },
-      {
-       // icon: "bi-chat-left-text",
-       // label: "Feedback Management",
-       //path: "/department-head/dashboard/feedback",
-      }
     ],
     Manager: [
       {
@@ -176,11 +171,6 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Nominations",
         path: "/internal/nominations",
       },
-      // {
-      //   icon: "bi-arrow-up-circle",
-      //   label: "Career Progression",
-      //   path: "/hr/operations/promotions",
-      // },
       {
         icon: "bi-shield-check",
         label: "Company Policies",
