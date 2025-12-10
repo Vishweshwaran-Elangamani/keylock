@@ -51,8 +51,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var result = await _lndService.ProcessApproval(approverId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
-        }
-
+        }  
+ 
         /// <summary>
         /// Get complete approval history for the logged-in user (as requester or approver)
         /// </summary>

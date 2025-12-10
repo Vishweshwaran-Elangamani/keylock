@@ -24,7 +24,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         /// <summary>
         /// Get list of subordinate employees with pagination and search
         /// </summary>
-        [HttpGet("employees/subordinates")]
+        [HttpGet("employees/subordinates")]                                                                      
         public async Task<IActionResult> GetSubordinateEmployees(
             [FromQuery] string? searchTerm,
             [FromQuery] int pageNumber = 1,

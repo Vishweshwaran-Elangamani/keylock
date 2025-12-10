@@ -16,14 +16,14 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
     public abstract class BaseGoalController : ControllerBase
     {
         protected readonly IGoalModuleService _service;
-        protected readonly ILogger _logger;
+        protected readonly ILogger _logger; 
 
         protected BaseGoalController(IGoalModuleService service, ILogger logger)
         {
             _service = service;
             _logger = logger;
         }   
-        
+         
         protected string GetUserRole()
         {
             return User.FindFirst("role")?.Value

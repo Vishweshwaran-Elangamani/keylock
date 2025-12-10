@@ -17,10 +17,10 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
         public LnDSmeController(ILnDService lndService)
         {
-            _lndService = lndService;
+            _lndService = lndService;  
         }
 
-        [HttpGet("check")]
+        [HttpGet("check")]    
         public async Task<IActionResult> CheckIfEmployeeIsSme()
         {
             var employeeId = GetCurrentEmployeeId();
@@ -29,14 +29,14 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPost("apply")]
+        [HttpPost("apply")]    
         public async Task<IActionResult> ApplyToBecomeSme([FromForm] BecomeSmeRequest request)
         {
             var employeeId = GetCurrentEmployeeId();
             var result = await _lndService.ApplyToBecomeSme(employeeId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
-        }
+        }    
 
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableSmes(

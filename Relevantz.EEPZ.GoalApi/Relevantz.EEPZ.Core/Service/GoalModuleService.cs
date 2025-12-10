@@ -3233,47 +3233,86 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         // ==================== DASHBOARD ====================
-        public async Task<GoalDashboardSummaryDto> GetDashboardSummaryAsync(
-            int currentUserEmployeeMasterId
-        )
+        // DASHBOARD
+        public async Task<GoalDashboardSummaryDto> GetDashboardSummaryAsync(int currentUserEmployeeMasterId)
         {
-            var completed = await _repo.QueryGoalsAsync(
-                new GoalQueryDto
+            try
+            {
+                Log.Information("GetDashboardSummaryAsync - Starting for user {UserId}", currentUserEmployeeMasterId);
+
+
+                var userRole = await _repo.GetUserRoleAsync(currentUserEmployeeMasterId);
+
+                Log.Information("GetDashboardSummaryAsync - User role: {Role}", userRole);
+
+
+                var allGoals = await _repo.QueryGoalsAsync(new GoalQueryDto
                 {
                     CurrentUserEmpMasterID = currentUserEmployeeMasterId,
-                    Status = "completed",
+                    CurrentUserRole = userRole,
                     Page = 1,
-                    PageSize = 1_000_000,
-                }
-            );
+                    PageSize = 1000000,
+                });
 
-            var all = await _repo.QueryGoalsAsync(
-                new GoalQueryDto { Page = 1, PageSize = 1_000_000 }
-            );
+                Log.Information("GetDashboardSummaryAsync - Retrieved {Count} total goals", allGoals.Count);
 
-            var pending = all.Where(g => g.Goalstatus == GOAL_STATUS.PENDING).ToList();
-            var ongoing = all.Where(g => g.Goalstatus == GOAL_STATUS.IN_PROGRESS).ToList();
-            var overdue = all.Where(g =>
-                    g.Goalendat.HasValue
-                    && g.Goalendat.Value < DateTime.UtcNow
-                    && g.Goalstatus != GOAL_STATUS.COMPLETED
-                    && g.Goalstatus != GOAL_STATUS.CLOSED
-                )
-                .ToList();
 
-            var pendingApprovals = await _repo.CountPendingApprovalsForUserAsync(
-                currentUserEmployeeMasterId
-            );
+                var completed = allGoals.Where(g =>
+                    g.Goalstatus?.ToLower() == GOAL_STATUS.COMPLETED.ToLower()
+                ).ToList();
 
-            return new GoalDashboardSummaryDto
+                var pending = allGoals.Where(g =>
+                    g.Goalstatus?.ToLower() == GOAL_STATUS.PENDING.ToLower()
+                ).ToList();
+
+                var ongoing = allGoals.Where(g =>
+                    g.Goalstatus?.ToLower() == GOAL_STATUS.IN_PROGRESS.ToLower() ||
+                    g.Goalstatus?.ToLower() == GOAL_STATUS.OPEN.ToLower() ||
+                    g.Goalstatus?.ToLower() == GOAL_STATUS.REOPENED.ToLower()
+                ).ToList();
+
+                var overdue = allGoals.Where(g =>
+                    g.Goalendat.HasValue &&
+                    g.Goalendat.Value < DateTime.UtcNow &&
+                    g.Goalstatus?.ToLower() != GOAL_STATUS.COMPLETED.ToLower() &&
+                    g.Goalstatus?.ToLower() != GOAL_STATUS.CLOSED.ToLower()
+                ).ToList();
+
+
+                var pendingApprovals = await _repo.CountPendingApprovalsForUserAsync(currentUserEmployeeMasterId);
+
+                Log.Information(
+                    "GetDashboardSummaryAsync - Summary: Completed={Completed}, Ongoing={Ongoing}, Pending={Pending}, Overdue={Overdue}, PendingApprovals={PendingApprovals}",
+                    completed.Count, ongoing.Count, pending.Count, overdue.Count, pendingApprovals
+                );
+
+                return new GoalDashboardSummaryDto
+                {
+                    Completed = completed.Count,
+                    Ongoing = ongoing.Count,
+                    Pending = pending.Count,
+                    Overdue = overdue.Count,
+                    PendingApprovals = pendingApprovals,
+                };
+            }
+            catch (Exception ex)
             {
-                Completed = completed.Count,
-                Ongoing = ongoing.Count,
-                Pending = pending.Count,
-                Overdue = overdue.Count,
-                PendingApprovals = pendingApprovals,
-            };
+                Log.Error(ex, "GetDashboardSummaryAsync - Error calculating dashboard summary for user {UserId}", currentUserEmployeeMasterId);
+
+
+                return new GoalDashboardSummaryDto
+                {
+                    Completed = 0,
+                    Ongoing = 0,
+                    Pending = 0,
+                    Overdue = 0,
+                    PendingApprovals = 0,
+                };
+            }
         }
+
+
+
 
         public async Task<List<GoalSummaryDto>> GetOngoingAsync(
             string type,
