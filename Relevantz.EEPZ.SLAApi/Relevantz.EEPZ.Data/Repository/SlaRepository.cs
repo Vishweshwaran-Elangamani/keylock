@@ -167,6 +167,23 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
+        public async Task<Slahistory> CreateHistoryAsync(Slahistory history)
+{
+    try
+    {
+        _context.Slahistories.Add(history);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation($"History created successfully. SLA ID: {history.Slaid}");
+        return history;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error creating history");
+        throw;
+    }
+}
+
         public async Task<Sla> UpdateSlaAsync(Sla sla)
         {
             try
@@ -306,23 +323,23 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-        public async Task<Slaescalation> CreateEscalationAsync(Slaescalation escalation)
-        {
-            try
-            {
-                escalation.SubmittedAt = DateTime.Now;
-                _context.Slaescalations.Add(escalation);
-                await _context.SaveChangesAsync();
-                
-                _logger.LogInformation($"Escalation created successfully. Escalation ID: {escalation.EscalationId}");
-                return escalation;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating escalation");
-                throw;
-            }
-        }
+       public async Task<Slaescalation> CreateEscalationAsync(Slaescalation escalation)
+{
+    try
+    {
+        escalation.SubmittedAt = DateTime.Now;
+        _context.Slaescalations.Add(escalation);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation($"Escalation created successfully. Escalation ID: {escalation.EscalationId}");
+        return escalation;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error creating escalation");
+        throw;
+    }
+}
 
         public async Task<Slaescalation> UpdateEscalationAsync(Slaescalation escalation)
         {
@@ -341,33 +358,6 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
-        public async Task CallSubmitEscalationProcedureAsync(int slaid, string reason, string description,
-            string escalationLevel, int escalatedToEmployeeId, int submittedByEmployeeId)
-        {
-            try
-            {
-                var parameters = new[]
-                {
-                    new MySqlParameter("@p_SLAId", slaid),
-                    new MySqlParameter("@p_Reason", reason),
-                    new MySqlParameter("@p_Description", description ?? string.Empty),
-                    new MySqlParameter("@p_EscalationLevel", escalationLevel),
-                    new MySqlParameter("@p_EscalatedToEmployeeId", escalatedToEmployeeId),
-                    new MySqlParameter("@p_SubmittedByEmployeeId", submittedByEmployeeId)
-                };
-
-                await _context.Database.ExecuteSqlRawAsync(
-                    "CALL sp_SubmitSLAEscalation(@p_SLAId, @p_Reason, @p_Description, @p_EscalationLevel, @p_EscalatedToEmployeeId, @p_SubmittedByEmployeeId)",
-                    parameters);
-                
-                _logger.LogInformation($"Escalation procedure executed. SLA ID: {slaid}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calling escalation procedure");
-                throw;
-            }
-        }
 
         #endregion
 
@@ -499,6 +489,76 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
             }
         }
 
+        public async Task<bool> CalculateComplianceAsync(int departmentId, string period, DateOnly periodStartDate, DateOnly periodEndDate)
+{
+    try
+    {
+        // 1. Query SLA counts
+        var slas = await _context.Slas
+            .Where(s => s.DepartmentId == departmentId &&
+                        s.Deadline >= periodStartDate.ToDateTime(TimeOnly.MinValue) &&
+                        s.Deadline <= periodEndDate.ToDateTime(TimeOnly.MaxValue))
+            .ToListAsync();
+
+        int totalSlas = slas.Count;
+        int onTimeSlas = slas.Count(s => s.ComplianceStatus == "OnTime" && s.Status == "Closed");
+        int breachedSlas = slas.Count(s => s.ComplianceStatus == "Breached");
+        int extendedSlas = slas.Count(s => s.ComplianceStatus == "Extended");
+        int pendingSlas = slas.Count(s => s.Status == "Open" || s.Status == "InProgress");
+
+        // 2. Check if compliance record exists
+        var compliance = await _context.Slacompliances
+            .FirstOrDefaultAsync(c => c.DepartmentId == departmentId && c.Period == period);
+
+        if (compliance == null)
+        {
+            // Insert new compliance record
+            compliance = new Slacompliance
+            {
+                DepartmentId = departmentId,
+                Period = period,
+                PeriodStartDate = periodStartDate,   // ✅ DateOnly
+                PeriodEndDate = periodEndDate,       // ✅ DateOnly
+                TotalSlas = totalSlas,
+                OnTimeSlas = onTimeSlas,
+                BreachedSlas = breachedSlas,
+                ExtendedSlas = extendedSlas,
+                PendingSlas = pendingSlas,
+                CalculatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now
+            };
+            _context.Slacompliances.Add(compliance);
+        }
+        else
+        {
+            // Update existing compliance record
+            compliance.PeriodStartDate = periodStartDate;   // ✅ DateOnly
+            compliance.PeriodEndDate = periodEndDate;       // ✅ DateOnly
+            compliance.TotalSlas = totalSlas;
+            compliance.OnTimeSlas = onTimeSlas;
+            compliance.BreachedSlas = breachedSlas;
+            compliance.ExtendedSlas = extendedSlas;
+            compliance.PendingSlas = pendingSlas;
+            compliance.CalculatedAt = DateTime.Now;
+            compliance.UpdatedAt = DateTime.Now;
+
+            _context.Slacompliances.Update(compliance);
+        }
+
+        // 3. Save changes
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation($"Compliance calculated for Department ID: {departmentId}, Period: {period}");
+        return true;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error calculating compliance via EF Core");
+        throw;
+    }
+}
+
+
         public async Task CallCalculateComplianceProcedureAsync(int departmentId, string period,
             DateOnly periodStartDate, DateOnly periodEndDate)
         {
@@ -529,31 +589,47 @@ public async Task<Employee> GetEmployeeByIdAsync(int employeeId)
 
         #region Reopen Operations
 
-        public async Task CallReopenSlaProcedureAsync(int slaid, int extensionDays, string reopenReason,
-            int reopenedByEmployeeId)
-        {
-            try
-            {
-                var parameters = new[]
-                {
-                    new MySqlParameter("@p_SLAId", slaid),
-                    new MySqlParameter("@p_ExtensionDays", extensionDays),
-                    new MySqlParameter("@p_ReopenReason", reopenReason),
-                    new MySqlParameter("@p_ReopenedByEmployeeId", reopenedByEmployeeId)
-                };
+       public async Task<bool> ReopenSlaAsync(int slaid, int extensionDays, string reopenReason, int reopenedByEmployeeId)
+{
+    try
+    {
+        var sla = await _context.Slas.FirstOrDefaultAsync(s => s.Slaid == slaid);
+        if (sla == null)
+            return false;
 
-                await _context.Database.ExecuteSqlRawAsync(
-                    "CALL sp_ReopenSLA(@p_SLAId, @p_ExtensionDays, @p_ReopenReason, @p_ReopenedByEmployeeId)",
-                    parameters);
-                
-                _logger.LogInformation($"SLA reopen procedure executed. SLA ID: {slaid}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calling reopen procedure");
-                throw;
-            }
-        }
+        // Update SLA fields
+        sla.ReopenCount += 1;
+        sla.ReopenReason = reopenReason;
+        sla.ReopenedByEmployeeId = reopenedByEmployeeId;
+        sla.ReopenedAt = DateTime.Now;
+        sla.ReopenExtensionDays = extensionDays;
+        sla.Deadline = DateTime.Now.AddDays(extensionDays);
+        sla.Status = "InProgress";
+
+        _context.Slas.Update(sla);
+
+        // Add history record
+        var history = new Slahistory
+        {
+            Slaid = slaid,
+            ChangeType = "Reopened",
+            ChangedTo = sla.Deadline.ToString("yyyy-MM-dd"),
+            ChangedByEmployeeId = reopenedByEmployeeId,
+            Reason = reopenReason,
+            CreatedAt = DateTime.Now
+        };
+        _context.Slahistories.Add(history);
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error reopening SLA");
+        throw;
+    }
+}
+
 
         #endregion
 

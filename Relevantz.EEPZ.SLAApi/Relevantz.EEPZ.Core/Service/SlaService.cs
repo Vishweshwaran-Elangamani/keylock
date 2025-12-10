@@ -64,82 +64,104 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 return new ApiResponse<List<SlaResponse>> { Success = false, Message = ex.Message };
             }
         }
-        public async Task<ApiResponse<EscalationResponse>> SubmitEscalation(SubmitSlaEscalationRequest request)
+       public async Task<ApiResponse<EscalationResponse>> SubmitEscalation(SubmitSlaEscalationRequest request)
+{
+    try
+    {
+        _logger.LogInformation("Submitting escalation for SLA {Slaid}", request.Slaid);
+        var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid);
+        if (sla == null)
+            return new ApiResponse<EscalationResponse> { Success = false, Message = "SLA not found" };
+
+        int escalatedId = request.EscalatedToEmployeeId ?? 0;
+        int submittedId = request.SubmittedByEmployeeId ?? 0;
+
+        // ✅ Instead of calling stored procedure, use EF Core
+        var escalation = new Slaescalation
         {
-            try
-            {
-                _logger.LogInformation("Submitting escalation for SLA {Slaid}", request.Slaid);
-                var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid);
-                if (sla == null)
-                    return new ApiResponse<EscalationResponse> { Success = false, Message = "SLA not found" };
+            Slaid = request.Slaid,
+            Reason = request.Reason,
+            Description = request.Description ?? string.Empty,
+            EscalationLevel = request.EscalationLevel ?? "L1",
+            EscalatedToEmployeeId = escalatedId,
+            SubmittedByEmployeeId = submittedId,
+            SubmittedAt = DateTime.Now,
+            EscalationStatus = "InProgress"
+        };
 
-                int escalatedId = request.EscalatedToEmployeeId ?? 0;
-                int submittedId = request.SubmittedByEmployeeId ?? 0;
+        await _slaRepository.CreateEscalationAsync(escalation);
 
-                await _slaRepository.CallSubmitEscalationProcedureAsync(
-                    request.Slaid,
-                    request.Reason,
-                    request.Description ?? string.Empty,
-                    request.EscalationLevel ?? "L1",
-                    escalatedId,
-                    submittedId
-                );
+        // Update SLA status
+        sla.Status = "InProgress";
+        await _slaRepository.UpdateSlaAsync(sla);
 
-                var escalations = await _slaRepository.GetEscalationsBySlaIdAsync(request.Slaid);
-                var escalation = escalations.FirstOrDefault();
+    
+       var history = new Slahistory
+{
+    Slaid = escalation.Slaid,
+    ChangeType = "Escalated",
+    ChangedTo = escalation.EscalationLevel,
+    ChangedByEmployeeId = escalation.SubmittedByEmployeeId,
+    Reason = escalation.Reason,
+    CreatedAt = DateTime.Now
+};
 
-                var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
-                var employeeName = GetEmployeeName(sla.Employee);
-               
-                if (!string.IsNullOrEmpty(employeeEmail))
-                {
-                    await _emailService.SendEmployeeEscalationEmailAsync(
-                        employeeEmail,
-                        employeeName,
-                        sla.Slatype,
-                        request.Reason
-                    );
-                    _logger.LogInformation("Escalation acknowledgment email sent to {Email}", employeeEmail);
-                }
+        await _slaRepository.AddHistoryAsync(history);
 
-                var manager = sla.AssignedToEmployee;
-                var managerEmail = manager?.Userprofile?.PersonalEmail;
-               
-                if (!string.IsNullOrEmpty(managerEmail))
-                {
-                    int daysOverdue = (int)(DateTime.Now - sla.Deadline).TotalDays;
-                    await _emailService.SendManagerEscalationEmailAsync(
-                        managerEmail,
-                        GetEmployeeName(manager),
-                        employeeName,
-                        sla.Slatype,
-                        sla.Deadline,
-                        daysOverdue
-                    );
-                    _logger.LogInformation("Manager escalation email sent to {Email}", managerEmail);
-                }
+        // Email notifications
+        var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
+        var employeeName = GetEmployeeName(sla.Employee);
 
-                return new ApiResponse<EscalationResponse>
-                {
-                    Success = true,
-                    Message = "Escalation submitted successfully",
-                    Data = new EscalationResponse
-                    {
-                        EscalationId = escalation?.EscalationId ?? 0,
-                        Slaid = request.Slaid,
-                        Reason = request.Reason,
-                        Description = request.Description,
-                        EscalationLevel = request.EscalationLevel ?? "L1",
-                        Message = "Escalation submitted successfully"
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SubmitEscalation");
-                return new ApiResponse<EscalationResponse> { Success = false, Message = ex.Message };
-            }
+        if (!string.IsNullOrEmpty(employeeEmail))
+        {
+            await _emailService.SendEmployeeEscalationEmailAsync(
+                employeeEmail,
+                employeeName,
+                sla.Slatype,
+                request.Reason
+            );
+            _logger.LogInformation("Escalation acknowledgment email sent to {Email}", employeeEmail);
         }
+
+        var manager = sla.AssignedToEmployee;
+        var managerEmail = manager?.Userprofile?.PersonalEmail;
+
+        if (!string.IsNullOrEmpty(managerEmail))
+        {
+            int daysOverdue = (int)(DateTime.Now - sla.Deadline).TotalDays;
+            await _emailService.SendManagerEscalationEmailAsync(
+                managerEmail,
+                GetEmployeeName(manager),
+                employeeName,
+                sla.Slatype,
+                sla.Deadline,
+                daysOverdue
+            );
+            _logger.LogInformation("Manager escalation email sent to {Email}", managerEmail);
+        }
+
+        return new ApiResponse<EscalationResponse>
+        {
+            Success = true,
+            Message = "Escalation submitted successfully",
+            Data = new EscalationResponse
+            {
+                EscalationId = escalation.EscalationId,
+                Slaid = request.Slaid,
+                Reason = request.Reason,
+                Description = request.Description,
+                EscalationLevel = request.EscalationLevel ?? "L1",
+                Message = "Escalation submitted successfully"
+            }
+        };
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error in SubmitEscalation");
+        return new ApiResponse<EscalationResponse> { Success = false, Message = ex.Message };
+    }
+}
+
 
         #endregion
 
@@ -219,57 +241,62 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         }
 
         public async Task<ApiResponse<ReopenSlaResponse>> ReopenSla(ReopenSlaRequest request)
+{
+    try
+    {
+        var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid);
+        if (sla == null)
+            return new ApiResponse<ReopenSlaResponse> { Success = false, Message = "SLA not found" };
+
+        DateTime oldDeadline = sla.Deadline;
+
+        var result = await _slaRepository.ReopenSlaAsync(
+            request.Slaid,
+            request.ExtensionDays,
+            request.ReopenReason,
+            request.ReopenedByEmployeeId
+        );
+
+        if (!result)
+            return new ApiResponse<ReopenSlaResponse> { Success = false, Message = "Failed to reopen SLA" };
+
+        DateTime newDeadline = DateTime.Now.AddDays(request.ExtensionDays);
+
+        var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
+        var employeeName = GetEmployeeName(sla.Employee);
+
+        if (!string.IsNullOrEmpty(employeeEmail))
         {
-            try
-            {
-                var sla = await _slaRepository.GetSlaByIdAsync(request.Slaid);
-                if (sla == null)
-                    return new ApiResponse<ReopenSlaResponse> { Success = false, Message = "SLA not found" };
-
-                DateTime oldDeadline = sla.Deadline;
-
-                await _slaRepository.CallReopenSlaProcedureAsync(
-                    request.Slaid,
-                    request.ExtensionDays,
-                    request.ReopenReason,
-                    request.ReopenedByEmployeeId
-                );
-
-                DateTime newDeadline = DateTime.Now.AddDays(request.ExtensionDays);
-
-                var employeeEmail = sla.Employee?.Userprofile?.PersonalEmail;
-                var employeeName = GetEmployeeName(sla.Employee);
-               
-                if (!string.IsNullOrEmpty(employeeEmail))
-                {
-                    await _emailService.SendSlaReopenEmailAsync(
-                        employeeEmail,
-                        employeeName,
-                        sla.Slatype,
-                        newDeadline
-                    );
-                    _logger.LogInformation("SLA reopen email sent to {Email}", employeeEmail);
-                }
-
-                return new ApiResponse<ReopenSlaResponse>
-                {
-                    Success = true,
-                    Data = new ReopenSlaResponse
-                    {
-                        Message = "SLA reopened successfully",
-                        OldDeadline = oldDeadline,
-                        NewDeadline = newDeadline,
-                        ExtensionDays = request.ExtensionDays
-                    }
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ReopenSla");
-                return new ApiResponse<ReopenSlaResponse> { Success = false, Message = ex.Message };
-            }
+            await _emailService.SendSlaReopenEmailAsync(
+                employeeEmail,
+                employeeName,
+                sla.Slatype,
+                newDeadline
+            );
+            _logger.LogInformation("SLA reopen email sent to {Email}", employeeEmail);
         }
-        public async Task<ApiResponse<EscalationResponse>> EscalateToDeptHead(SubmitSlaEscalationRequest request)
+
+        return new ApiResponse<ReopenSlaResponse>
+        {
+            Success = true,
+            Data = new ReopenSlaResponse
+            {
+                Message = "SLA reopened successfully",
+                OldDeadline = oldDeadline,
+                NewDeadline = newDeadline,
+                ExtensionDays = request.ExtensionDays
+            }
+        };
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error in ReopenSla");
+        return new ApiResponse<ReopenSlaResponse> { Success = false, Message = ex.Message };
+    }
+}
+
+
+                public async Task<ApiResponse<EscalationResponse>> EscalateToDeptHead(SubmitSlaEscalationRequest request)
         {
             try
             {
@@ -399,12 +426,12 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 DateOnly startDate = DateOnly.FromDateTime(request.PeriodStartDate);
                 DateOnly endDate = DateOnly.FromDateTime(request.PeriodEndDate);
 
-                await _slaRepository.CallCalculateComplianceProcedureAsync(
-                    request.DepartmentId,
-                    request.Period,
-                    startDate,
-                    endDate
-                );
+                await _slaRepository.CalculateComplianceAsync(
+    request.DepartmentId,
+    request.Period,
+    DateOnly.FromDateTime(request.PeriodStartDate),
+    DateOnly.FromDateTime(request.PeriodEndDate)    
+);
 
                 var compliance = await _slaRepository.GetComplianceByDepartmentAndPeriodAsync(
                     request.DepartmentId,

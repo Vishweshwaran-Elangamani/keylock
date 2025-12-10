@@ -31,9 +31,7 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         
         Task<Slaescalation> CreateEscalationAsync(Slaescalation escalation);
         Task<Slaescalation> UpdateEscalationAsync(Slaescalation escalation);
-        Task CallSubmitEscalationProcedureAsync(int slaid, string reason, string description, 
-            string escalationLevel, int escalatedToEmployeeId, int submittedByEmployeeId);
-
+       
         
         Task<List<Slahistory>> GetSlaHistoryAsync(int slaid);
         Task<Slahistory> AddHistoryAsync(Slahistory history);
@@ -42,12 +40,8 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<List<Slareviewtracking>> GetReviewTrackingByEmployeeIdAsync(int employeeId);
         Task<List<Slacompliance>> GetAllComplianceAsync(string? period = null);
         Task<Slacompliance?> GetComplianceByDepartmentAndPeriodAsync(int departmentId, string period);
-        Task CallCalculateComplianceProcedureAsync(int departmentId, string period, 
-            DateOnly periodStartDate, DateOnly periodEndDate);
-
-
-        Task CallReopenSlaProcedureAsync(int slaid, int extensionDays, string reopenReason, 
-            int reopenedByEmployeeId);
+        Task<bool> CalculateComplianceAsync(int departmentId, string period, DateOnly periodStartDate, DateOnly periodEndDate);
+        Task<bool> ReopenSlaAsync(int slaid, int extensionDays, string reopenReason, int reopenedByEmployeeId);
 
 
         Task<List<Sla>> GetOverdueSlas(DateTime? cutoffDate = null, int? departmentId = null);
