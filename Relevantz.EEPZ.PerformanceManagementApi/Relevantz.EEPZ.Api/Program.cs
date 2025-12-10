@@ -1,4 +1,3 @@
- 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,8 +10,19 @@ using Relevantz.EEPZ.Data.Repository.Interfaces;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using System.IdentityModel.Tokens.Jwt;
+using Serilog;
  
 var builder = WebApplication.CreateBuilder(args);
+ 
+// ============ SERILOG CONFIGURATION ============
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+ 
+builder.Host.UseSerilog();
+ 
+Log.Information("Starting EEPZ Performance Management Application...");
  
 // ============ CORE SERVICES ============
 builder.Services.AddControllers();
@@ -63,16 +73,11 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
  
 // ============ JWT AUTHENTICATION ============
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"];
+var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
  
-if (string.IsNullOrEmpty(secretKey))
-{
-    throw new InvalidOperationException("❌ JWT SecretKey not configured in appsettings.json");
-}
- 
-Console.WriteLine($"✅ JWT Issuer: {jwtSettings["Issuer"]}");
-Console.WriteLine($"✅ JWT Audience: {jwtSettings["Audience"]}");
-Console.WriteLine($"✅ JWT SecretKey Length: {secretKey.Length} characters");
+Log.Information("JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
+Log.Information("JWT Audience: {Audience}", jwtSettings["Audience"]);
+Log.Information("JWT SecretKey Length: {Length} characters", secretKey.Length);
  
 builder.Services.AddAuthentication(options =>
 {
@@ -91,13 +96,10 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero,
-       
-        // ✅ FIXED: Match the claim type used in JwtHelper (ClaimTypes.Role)
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = JwtRegisteredClaimNames.Sub
     };
  
-    // ✅ DEBUG: Log JWT validation
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -106,27 +108,27 @@ builder.Services.AddAuthentication(options =>
             if (!string.IsNullOrEmpty(authHeader))
             {
                 var token = authHeader.Replace("Bearer ", "");
-                Console.WriteLine($"📥 Token received (first 30 chars): {token.Substring(0, Math.Min(30, token.Length))}...");
+                Log.Debug("Token received (first 30 chars): {Token}...", token.Substring(0, Math.Min(30, token.Length)));
             }
             else
             {
-                Console.WriteLine("⚠️ No Authorization header found");
+                Log.Warning("No Authorization header found");
             }
             return Task.CompletedTask;
         },
        
         OnAuthenticationFailed = context =>
         {
-            Console.WriteLine($"❌ Authentication failed: {context.Exception.Message}");
+            Log.Error("Authentication failed: {Message}", context.Exception.Message);
            
             if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
             {
-                Console.WriteLine("⏰ Token expired");
+                Log.Warning("Token expired");
                 context.Response.Headers.Add("Token-Expired", "true");
             }
             else if (context.Exception.Message.Contains("signature"))
             {
-                Console.WriteLine("🔑 Signature validation failed - Check JWT SecretKey!");
+                Log.Error("Signature validation failed - Check JWT SecretKey!");
             }
            
             return Task.CompletedTask;
@@ -134,21 +136,20 @@ builder.Services.AddAuthentication(options =>
        
         OnTokenValidated = context =>
         {
-            Console.WriteLine("✅ Token validated successfully!");
+            Log.Information("Token validated successfully");
            
             var claims = context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}");
-            Console.WriteLine($"📋 All Claims: {string.Join(" | ", claims ?? new List<string>())}");
+            Log.Debug("All Claims: {Claims}", string.Join(" | ", claims ?? new List<string>()));
            
-            // Check role claim
             var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
            
             if (roleClaim != null)
             {
-                Console.WriteLine($"✅ Role found: {roleClaim.Value}");
+                Log.Information("Role found: {Role}", roleClaim.Value);
             }
             else
             {
-                Console.WriteLine("⚠️ WARNING: No role claim found in token!");
+                Log.Warning("No role claim found in token");
             }
            
             return Task.CompletedTask;
@@ -156,7 +157,7 @@ builder.Services.AddAuthentication(options =>
        
         OnChallenge = context =>
         {
-            Console.WriteLine($"⚠️ Authentication Challenge: {context.Error} - {context.ErrorDescription}");
+            Log.Warning("Authentication Challenge: {Error} - {ErrorDescription}", context.Error, context.ErrorDescription);
             return Task.CompletedTask;
         }
     };
@@ -182,7 +183,7 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .WithExposedHeaders("Content-Disposition", "Content-Type"); // ✅ THIS IS THE KEY FIX!
+              .WithExposedHeaders("Content-Disposition", "Content-Type");
     });
 });
  
@@ -200,14 +201,35 @@ if (app.Environment.IsDevelopment())
     });
 }
  
-// ✅ CRITICAL: Middleware order
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+        diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+    };
+});
+ 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
-app.UseAuthentication();  // ✅ Must be BEFORE UseAuthorization
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
  
-Console.WriteLine("🚀 Performance Management API started on port 5253");
-app.Run();
+try
+{
+    Log.Information("EEPZ Performance Management API started successfully on port 5253");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
  
  
