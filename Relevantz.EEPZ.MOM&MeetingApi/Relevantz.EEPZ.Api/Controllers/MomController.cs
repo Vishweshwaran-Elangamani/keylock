@@ -9,7 +9,7 @@ namespace eepzbackend.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class MomController : ControllerBase
+    public partial class MomController : ControllerBase
     {
         private readonly IMomService _momService;
 
@@ -18,6 +18,11 @@ namespace eepzbackend.Controllers
             _momService = momService;
         }
 
+        // ========== CORE MOM OPERATIONS (5 endpoints) ==========
+
+        /// <summary>
+        /// Create a new MOM
+        /// </summary>
         [HttpPost("create")]
         public async Task<ActionResult<MomResponseDto>> CreateMom([FromBody] CreateMomDto createMomDto)
         {
@@ -39,7 +44,9 @@ namespace eepzbackend.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Update an existing MOM
+        /// </summary>
         [HttpPut("update")]
         public async Task<ActionResult<MomResponseDto>> UpdateMom([FromBody] UpdateMomDto updateMomDto)
         {
@@ -61,9 +68,11 @@ namespace eepzbackend.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Get MOMs submitted by the current user
+        /// </summary>
         [HttpGet("my-moms")]
-        [Authorize(Roles ="Manager,Employee")]
+        [Authorize(Roles = "Manager,Employee")]
         public async Task<ActionResult<List<MomResponseDto>>> GetMyMoms()
         {
             try
@@ -78,6 +87,9 @@ namespace eepzbackend.Controllers
             }
         }
 
+        /// <summary>
+        /// Get a specific MOM by ID
+        /// </summary>
         [HttpGet("{momId}")]
         public async Task<ActionResult<MomResponseDto>> GetMomById(int momId)
         {
@@ -95,7 +107,9 @@ namespace eepzbackend.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Delete a MOM
+        /// </summary>
         [HttpDelete("{momId}")]
         public async Task<ActionResult> DeleteMom(int momId)
         {
@@ -121,163 +135,11 @@ namespace eepzbackend.Controllers
             }
         }
 
- 
-        [HttpPost("share")]
-        public async Task<ActionResult<List<MomSharingResponseDto>>> ShareMom([FromBody] ShareMomDto shareMomDto)
-        {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.ShareMomAsync(shareMomDto, employeeId);
-                return Ok(new { success = true, message = "MOM shared successfully", data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
+        // ========== HELPER METHODS ==========
 
-        [HttpGet("shared-by-me")]
-        public async Task<ActionResult<List<MomSharingResponseDto>>> GetMomsSharedByMe()
-        {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetMomsSharedByEmployeeAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
-        [HttpGet("shared-with-me")]
-        public async Task<ActionResult<List<MomResponseDto>>> GetMomsSharedWithMe()
-        {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetMomsSharedWithEmployeeAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
-
-        [HttpGet("all-moms")]
-        [Authorize(Roles = "HR")] 
-        public async Task<ActionResult<PaginatedMomResponseDto>> GetAllMomsForHR(
-            [FromQuery] string? searchTerm = null,
-            [FromQuery] string? meetingType = null,
-            [FromQuery] int? departmentId = null,
-            [FromQuery] DateTime? startDate = null,
-            [FromQuery] DateTime? endDate = null,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20)
-        {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var role = GetRoleFromClaims();
-
-                var result = await _momService.GetAllMomsForHRAsync(
-                    employeeId,
-                    role,
-                    searchTerm,
-                    meetingType,
-                    departmentId,
-                    startDate,
-                    endDate,
-                    pageNumber,
-                    pageSize);
-
-                return Ok(new { success = true, data = result });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(403, new { success = false, message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
-
-        [HttpPatch("action-items/{actionItemId}/status")]
-        public async Task<ActionResult> UpdateActionItemStatus(int actionItemId, [FromBody] string status)
-        {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                
-                var result = await _momService.UpdateActionItemStatusAsync(actionItemId, status, employeeId);
-                
-                if (!result)
-                    return NotFound(new { success = false, message = "Action item not found" });
-
-                return Ok(new { success = true, message = "Action item status updated successfully" });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return StatusCode(403, new { success = false, message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
-        [HttpGet("action-items/my-tasks")]
-        public async Task<ActionResult<List<ActionItemResponseDto>>> GetMyActionItems()
-        {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetMyActionItemsAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
-        [HttpGet("action-items/assigned-by-me")]
-        public async Task<ActionResult<List<ActionItemResponseDto>>> GetActionItemsAssignedByMe()
-        {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetActionItemsAssignedByMeAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
-        [HttpGet("action-items/overdue")]
-        public async Task<ActionResult<List<ActionItemResponseDto>>> GetOverdueActionItems()
-        {
-            try
-            {
-                var employeeId = GetEmployeeIdFromClaims();
-                var result = await _momService.GetOverdueActionItemsAsync(employeeId);
-                return Ok(new { success = true, data = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
-        
+        /// <summary>
+        /// Extract employee ID from JWT claims
+        /// </summary>
         private int GetEmployeeIdFromClaims()
         {
             var employeeIdClaim = User.FindFirst("empId");
@@ -297,25 +159,27 @@ namespace eepzbackend.Controllers
             throw new UnauthorizedAccessException("Employee ID not found in token");
         }
 
+        /// <summary>
+        /// Extract role from JWT claims
+        /// </summary>
         private string GetRoleFromClaims()
-{
-    var roleClaim = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
-    
-    if (roleClaim != null)
-        return roleClaim.Value;
- 
-    roleClaim = User.FindFirst(ClaimTypes.Role);
-    
-    if (roleClaim != null)
-        return roleClaim.Value;
-    
-    roleClaim = User.FindFirst("role");
-    
-    if (roleClaim != null)
-        return roleClaim.Value;
-   
-    return "Employee";
-}
-
+        {
+            var roleClaim = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+            
+            if (roleClaim != null)
+                return roleClaim.Value;
+         
+            roleClaim = User.FindFirst(ClaimTypes.Role);
+            
+            if (roleClaim != null)
+                return roleClaim.Value;
+            
+            roleClaim = User.FindFirst("role");
+            
+            if (roleClaim != null)
+                return roleClaim.Value;
+           
+            return "Employee";
+        }
     }
 }
