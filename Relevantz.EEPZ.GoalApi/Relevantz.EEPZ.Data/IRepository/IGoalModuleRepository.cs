@@ -3,15 +3,22 @@ using Relevantz.EEPZ.Common.Entities;
 
 namespace Relevantz.EEPZ.Data.Repository.Interface
 {
+    /// <summary>
+    /// Data access contract for goals, approvals, progress, attachments, comments, hierarchy and project information.
+    /// </summary>
     public interface IGoalModuleRepository
     {
-        // Goals
+        #region Goals
+
         Task<Goal?> GetGoalByIdAsync(int goalId);
         Task<List<Goal>> QueryGoalsAsync(GoalQueryDto request);
         Task AddGoalAsync(Goal goal);
         Task UpdateGoalAsync(Goal goal);
 
-        // Projects
+        #endregion
+
+        #region Projects
+
         Task<List<Project>> GetUserProjectsAsync(int employeeMasterId);
         Task<List<Project>> GetAllProjectsAsync();
         Task<Project> GetProjectAsync(int projectId);
@@ -21,7 +28,10 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
             int managerEmployeeMasterId
         );
 
-        // Checklist
+        #endregion
+
+        #region Checklist
+
         Task<List<GoalChecklist>> GetChecklistByGoalAsync(int goalId);
         Task AddChecklistRangeAsync(List<GoalChecklist> items);
         Task<GoalChecklist?> GetChecklistItemAsync(int checklistId);
@@ -31,7 +41,10 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
             string[] approvalTypes
         );
 
-        // Progress
+        #endregion
+
+        #region Progress
+
         Task<Goalchecklistprogress?> GetChecklistProgressAsync(
             int checklistId,
             int userEmployeeMasterId
@@ -40,14 +53,20 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
         Task<int> CountCompletedForUserAsync(int goalId, int userEmployeeMasterId);
         Task<int> CountTotalForUserAsync(int goalId, int userEmployeeMasterId);
 
-        // Assignments
+        #endregion
+
+        #region Assignments
+
         Task<List<GoalAssignment>> GetAssigneesAsync(int goalId);
         Task AddAssignmentsAsync(List<GoalAssignment> assignments);
         Task<bool> IsUserAssignedToGoalAsync(int goalId, int employeeMasterId);
         Task<GoalAssignment> GetGoalAssignmentAsync(int goalId, int assignedTo);
         Task UpdateGoalAssignmentAsync(GoalAssignment assignment);
 
-        // Approvals
+        #endregion
+
+        #region Approvals
+
         Task AddApprovalAsync(GoalApproval approval);
         Task<GoalApproval?> GetApprovalByIdAsync(int approvalId);
         Task<List<GoalApproval>> GetPendingApprovalsForApproverAsync(int approverEmployeeMasterId);
@@ -58,11 +77,12 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
         Task<int> CountAsync<T>(IQueryable<T> query);
         Task<List<T>> GetPagedAsync<T>(IQueryable<T> query, int page, int pageSize);
         Task<bool> HasPendingApprovalAsync(int goalId, int userId);
-
-        // Add this method for closure/reactivation
         Task<GoalApproval?> GetPendingApprovalByGoalAndTypeAsync(int goalId, string approvalType);
 
-        // Attachments
+        #endregion
+
+        #region Attachments
+
         Task AddAttachmentAsync(GoalAttachment attachment);
         Task<List<GoalAttachment>> GetAttachmentsByGoalAsync(int goalId);
         Task<GoalAttachment?> GetAttachmentByIdAsync(int attachmentId);
@@ -70,22 +90,28 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
         Task DeleteAttachmentAsync(int attachmentId);
         Task<List<GoalAttachment>> GetProofAttachmentsForApprovalAsync(int approvalId);
         Task UnmarkProofAttachmentsAsync(int approvalId);
-      
 
+        #endregion
 
+        #region Comments
 
-        // Comments
         Task AddCommentAsync(GoalComment comment);
         Task<List<GoalComment>> GetCommentsByGoalAsync(int goalId);
         Task<bool> CanUserCommentOnGoalAsync(int goalId, int employeeMasterId, string role);
         Task<bool> IsGoalCommentableAsync(int goalId);
 
-        // Progress Logs
+        #endregion
+
+        #region Progress logs
+
         Task AddProgressLogAsync(Goalprogresslog log);
         Task<List<Goalprogresslog>> GetProgressLogsByGoalAsync(int goalId);
         Task<Goalprogresslog?> GetLatestProgressLogAsync(int goalId);
 
-        // Employee Hierarchy
+        #endregion
+
+        #region Employee hierarchy
+
         Task<int?> GetReportingManagerEmployeeMasterIdAsync(int employeeMasterId);
         Task<List<int>> GetSubordinateEmployeeMasterIdsAsync(int managerEmployeeMasterId);
         Task<bool> IsManagerOfAsync(int managerEmployeeMasterId, int employeeEmployeeMasterId);
@@ -94,21 +120,34 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
         Task<bool> IsEmployeeInDepartmentAsync(int goalId, int departmentId);
         Task<bool> IsManagerOfGoalAssigneesAsync(int goalId, int managerId);
 
-        // Project Info
+        #endregion
+
+        #region Project info
+
         Task<Project?> GetProjectByIdAsync(int projectId);
         Task<bool> IsEmployeeInProjectAsync(int employeeMasterId, int projectId);
         Task<List<Project>> GetUserProjectsByEmployeeIdAsync(int employeeId);
         Task<List<AssigneeDto>> GetAssigneesWithDetailsAsync(int goalId);
 
-        // Goal Access
+        #endregion
+
+        #region Goal access
+
         Task<bool> IsGoalCreatorAsync(int goalId, int employeeMasterId);
         Task<bool> IsGoalParticipantAsync(int goalId, int employeeMasterId);
         Task<List<int>> GetGoalParticipantIdsAsync(int goalId);
 
-        // Cascading Progress
+        #endregion
+
+        #region Cascading progress
+
         Task<List<int>> GetSubordinatesAssignedToGoalAsync(int goalId, int managerEmployeeMasterId);
         Task<List<GoalChecklist>> GetUserOwnChecklistItemsAsync(int goalId, int userId);
         Task<int> CountUserOwnCompletedItemsAsync(int goalId, int userId);
+
+        #endregion
+
+        #region Checklist maintenance
 
         Task<List<GoalChecklist>> GetChecklistItemsByGoalIdAsync(int goalId);
         Task AddChecklistItemAsync(GoalChecklist item);
@@ -116,6 +155,12 @@ namespace Relevantz.EEPZ.Data.Repository.Interface
         Task<bool> ChecklistHasProgressAsync(int checklistId, int userId);
         Task UpdateGoalProgressAsync(int goalId, decimal progress, int userId);
 
+        #endregion
+
+        #region Unit of work
+
         Task SaveChangesAsync();
+
+        #endregion
     }
 }
