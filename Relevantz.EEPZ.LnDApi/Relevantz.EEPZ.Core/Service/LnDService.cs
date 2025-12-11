@@ -1413,14 +1413,15 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
         #region Approvals Management
 
         public async Task<ApiResponse<PaginatedResponse<ApprovalDto>>> GetMyApprovals(
-            int employeeId,
-            string? approvalType,
-            string? status,
-            string? sortField,
-            string? sortOrder,
-            int pageNumber,
-            int pageSize
-        )
+     int employeeId,
+     string? approvalType,
+     string? status,
+     string? sortField,
+     string? sortOrder,
+     int pageNumber,
+     int pageSize,
+     string? searchTerm  // ← ADD THIS
+ )
         {
             try
             {
@@ -1431,7 +1432,8 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     sortField,
                     sortOrder,
                     pageNumber,
-                    pageSize
+                    pageSize,
+                    searchTerm  // ← ADD THIS
                 );
 
                 var approvalDtos = items
@@ -1480,6 +1482,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
+
 
         public async Task<ApiResponse<bool>> ProcessApproval(
             int approverId,

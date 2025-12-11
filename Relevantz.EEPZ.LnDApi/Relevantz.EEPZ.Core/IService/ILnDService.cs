@@ -111,7 +111,8 @@ namespace Relevantz.EEPZ.Core.Services.Interface
             string? sortField,
             string? sortOrder,
             int pageNumber,
-            int pageSize
+            int pageSize,
+            string? searchTerm  
         );
 
         Task<ApiResponse<bool>> ProcessApproval(int approverId, ApprovalDecisionRequest request);

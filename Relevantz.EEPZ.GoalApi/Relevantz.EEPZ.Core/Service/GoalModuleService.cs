@@ -3310,11 +3310,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 };
             }
         }
-
-
-
-
-        public async Task<List<GoalSummaryDto>> GetOngoingAsync(
+          public async Task<List<GoalSummaryDto>> GetOngoingAsync(
             string type,
             int currentUserEmployeeMasterId
         )
@@ -3329,7 +3325,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                     || g.Goalstatus == GOAL_STATUS.IN_PROGRESS
                     || g.Goalstatus == GOAL_STATUS.REOPENED
                 )
-                .ToList();
+                .ToList();                                                                                                                             
 
             var result = new List<GoalSummaryDto>();
             foreach (var g in ongoing)
@@ -3476,7 +3472,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                         APPROVAL_TYPE.CLOSURE => $"Closure request {a.ApprovalStatus}",
                         APPROVAL_TYPE.REACTIVATION => $"Reactivation request {a.ApprovalStatus}",
                         _ => $"{a.ApprovalType} {a.ApprovalStatus}",
-                    };
+                    };        
 
                     events.Add(
                         new TimelineEventDto

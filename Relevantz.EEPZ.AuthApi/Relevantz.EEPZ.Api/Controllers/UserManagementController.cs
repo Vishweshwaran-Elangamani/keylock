@@ -25,35 +25,35 @@ namespace Relevantz.EEPZ.Api.Controllers
         {
             var createdByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _userManagementService.CreateUserAsync(request, createdByUserId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
             return Ok(result);
-        }
+        }       
 
-        [HttpPut("update")]
+        [HttpPut("update")] 
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestDto request)
         {
             var updatedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var result = await _userManagementService.UpdateUserAsync(request, updatedByUserId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
             return Ok(result);
-        }
+        } 
 
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserById(int userId)
         {
             var result = await _userManagementService.GetUserByIdAsync(userId);
-            
+
             if (!result.Success)
                 return NotFound(result);
 
             return Ok(result);
-        }
+        }       
 
         [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
@@ -66,7 +66,7 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> DeactivateUser(int userId)
         {
             var result = await _userManagementService.DeactivateUserAsync(userId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
@@ -77,43 +77,43 @@ namespace Relevantz.EEPZ.Api.Controllers
         public async Task<IActionResult> ActivateUser(int userId)
         {
             var result = await _userManagementService.ActivateUserAsync(userId);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
             return Ok(result);
         }
         [HttpGet("manager/{managerId}/employees")]
-[Authorize]
-public async Task<IActionResult> GetEmployeesByManager(int managerId)
-{
-    try
-    {
-        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
-
-        if (userRole != "HR" && userRole != "Admin" && currentUserId != managerId)
+        [Authorize]
+        public async Task<IActionResult> GetEmployeesByManager(int managerId)
         {
-            return Forbid("You can only view your own employees");
-        }
+            try
+            {
+                var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
 
-        var result = await _userManagementService.GetEmployeesByManagerAsync(managerId);
-        if (!result.Success)
-            return NotFound(result);
+                if (userRole != "HR" && userRole != "Admin" && currentUserId != managerId)
+                {
+                    return Forbid("You can only view your own employees");
+                }
 
-        return Ok(result);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { message = ex.Message });
-    }
-}
+                var result = await _userManagementService.GetEmployeesByManagerAsync(managerId);
+                if (!result.Success)
+                    return NotFound(result);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        } 
 
         [HttpPost("assign-role-department")]
         public async Task<IActionResult> AssignRoleAndDepartment([FromBody] AssignRoleDepartmentRequestDto request)
         {
             var result = await _userManagementService.AssignRoleAndDepartmentAsync(request);
-            
+
             if (!result.Success)
                 return BadRequest(result);
 
