@@ -10,7 +10,7 @@ const goalApi = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-});
+});   
 
 // Add request interceptor for authentication
 goalApi.interceptors.request.use(
@@ -47,7 +47,7 @@ goalApi.interceptors.response.use(
 
 // ==================== HELPER FUNCTIONS FOR FILE PREVIEW ====================
 
-const PREVIEWABLE_EXTENSIONS = [
+const PREVIEWABLE_EXTENSIONS = [ 
   ".pdf",
   ".png",
   ".jpg",
@@ -68,6 +68,7 @@ const NON_PREVIEWABLE_EXTENSIONS = [
   ".rar",
   ".7z",
 ];
+
 
 export const isFilePreviewable = (filename) => {
   if (!filename) return false;
@@ -150,6 +151,7 @@ const goalService = {
       throw error;
     }
   },
+
 
   getProject: async (projectId) => {
     try {
@@ -297,7 +299,7 @@ const goalService = {
       console.error("Error fetching pending approvals:", error);
       throw error;
     }
-  },
+  }, 
 
   /**
    *  FIXED: Changed to /goal-approvals/{approvalId}

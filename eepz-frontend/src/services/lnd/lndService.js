@@ -670,6 +670,7 @@ export const lndService = {
    * @param {string} sortField - Sort field (optional)
    * @param {string} sortOrder - Sort order (default: asc)
    * @param {number} pageSize - Items per page (default: 10)
+   * @param {string} searchTerm
    * @returns {Promise} API response
    */
   getMyApprovals: async (
@@ -678,7 +679,8 @@ export const lndService = {
     status = "",
     sortField = "",
     sortOrder = "asc",
-    pageSize = 10
+    pageSize = 10,
+    searchTerm=""
   ) => {
     try {
       const query = buildQueryString({
@@ -688,6 +690,7 @@ export const lndService = {
         sortField,
         sortOrder,
         pageSize,
+        searchTerm
       });
       const response = await axios.get(
         `${API_BASE_URL}/lnd-approvals/my-approvals${query}`,
@@ -902,4 +905,4 @@ export const previewFile = (blob, contentType = "application/pdf") => {
   }, 100);
 };
 
-export default lndService; 
+export default lndService;                      

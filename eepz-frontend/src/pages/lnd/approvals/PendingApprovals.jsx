@@ -87,7 +87,7 @@ const PendingApprovals = () => {
         setApprovals(response.data.data.items);
         setTotalItems(response.data.data.totalCount);
         setTotalPages(response.data.data.totalPages);
-      }
+      }  
     } catch (error) {
       console.error("Failed to fetch pending approvals:", error);
       toast.error("Failed to load pending approvals");

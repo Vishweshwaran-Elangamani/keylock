@@ -72,7 +72,7 @@ const ManagerDashboard = () => {
     } catch {
       return null;
     }
-  };
+  };          
 
   const extractData = (response) => {
     if (!response) return [];
@@ -162,7 +162,7 @@ const ManagerDashboard = () => {
         const title = (g.title || "").toLowerCase();
         const type = (g.goalType || g.type || "").toLowerCase();
         return title.includes("self") || title.includes("personal") || type === "self";
-      });
+      }); 
 
       const extractedTeamGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();

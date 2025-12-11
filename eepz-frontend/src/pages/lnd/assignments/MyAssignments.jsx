@@ -98,7 +98,7 @@ const MyAssignments = () => {
 
   const handleSearchInputChange = (e) => {
     setSearchInput(e.target.value);
-  };
+  }; 
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -149,6 +149,7 @@ const MyAssignments = () => {
       downloadFile(response.data, filename);
       toast.success("File downloaded successfully");
     } catch (error) {
+
       console.error("Failed to download proof:", error);
       toast.error("Failed to download proof");
     }
@@ -290,7 +291,7 @@ const MyAssignments = () => {
           <option value={ASSIGNMENT_STATUS.COMPLETED}>Completed</option>
           <option value={ASSIGNMENT_STATUS.OVERDUE}>Overdue</option>
         </select>
-      </div>
+      </div>           
 
       {assignments.length === 0 && !loading ? (
         <EmptyState
