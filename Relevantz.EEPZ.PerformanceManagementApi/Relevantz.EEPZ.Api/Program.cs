@@ -11,23 +11,23 @@ using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.DBContexts;
 using System.IdentityModel.Tokens.Jwt;
 using Serilog;
- 
+
 var builder = WebApplication.CreateBuilder(args);
- 
+
 // ============ SERILOG CONFIGURATION ============
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
- 
+
 builder.Host.UseSerilog();
- 
+
 Log.Information("Starting EEPZ Performance Management Application...");
- 
+
 // ============ CORE SERVICES ============
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
- 
+
 // ============ SWAGGER CONFIGURATION ============
 builder.Services.AddSwaggerGen(options =>
 {
@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "Performance Management API"
     });
- 
+
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -47,7 +47,7 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter 'Bearer' followed by your JWT token"
     });
- 
+
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -62,23 +62,23 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
- 
+
     options.CustomSchemaIds(type => type.FullName.Replace("+", "."));
 });
- 
+
 // ============ DATABASE CONFIGURATION ============
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
- 
+
 // ============ JWT AUTHENTICATION ============
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
- 
+
 Log.Information("JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
 Log.Information("JWT Audience: {Audience}", jwtSettings["Audience"]);
 Log.Information("JWT SecretKey Length: {Length} characters", secretKey.Length);
- 
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -99,7 +99,6 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role,
         NameClaimType = JwtRegisteredClaimNames.Sub
     };
- 
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -116,11 +115,11 @@ builder.Services.AddAuthentication(options =>
             }
             return Task.CompletedTask;
         },
-       
+        
         OnAuthenticationFailed = context =>
         {
             Log.Error("Authentication failed: {Message}", context.Exception.Message);
-           
+            
             if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
             {
                 Log.Warning("Token expired");
@@ -130,19 +129,19 @@ builder.Services.AddAuthentication(options =>
             {
                 Log.Error("Signature validation failed - Check JWT SecretKey!");
             }
-           
+            
             return Task.CompletedTask;
         },
-       
+        
         OnTokenValidated = context =>
         {
             Log.Information("Token validated successfully");
-           
+            
             var claims = context.Principal?.Claims.Select(c => $"{c.Type}={c.Value}");
             Log.Debug("All Claims: {Claims}", string.Join(" | ", claims ?? new List<string>()));
-           
+            
             var roleClaim = context.Principal?.FindFirst(ClaimTypes.Role);
-           
+            
             if (roleClaim != null)
             {
                 Log.Information("Role found: {Role}", roleClaim.Value);
@@ -151,10 +150,10 @@ builder.Services.AddAuthentication(options =>
             {
                 Log.Warning("No role claim found in token");
             }
-           
+            
             return Task.CompletedTask;
         },
-       
+        
         OnChallenge = context =>
         {
             Log.Warning("Authentication Challenge: {Error} - {ErrorDescription}", context.Error, context.ErrorDescription);
@@ -162,9 +161,9 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
- 
+
 builder.Services.AddAuthorization();
- 
+
 // ============ DEPENDENCY INJECTION ============
 builder.Services.AddScoped<IFormManagementService, FormManagementService>();
 builder.Services.AddScoped<IAppraisalProcessService, AppraisalProcessService>();
@@ -174,7 +173,7 @@ builder.Services.AddScoped<ILeadershipRepository, LeadershipRepository>();
 builder.Services.AddScoped<ILeadershipService, LeadershipService>();
 builder.Services.AddScoped<IRecognitionRewardRepository, RecognitionRewardRepository>();
 builder.Services.AddScoped<IRecognitionRewardService, RecognitionRewardService>();
- 
+
 // ============ CORS CONFIGURATION ============
 builder.Services.AddCors(options =>
 {
@@ -186,10 +185,10 @@ builder.Services.AddCors(options =>
               .WithExposedHeaders("Content-Disposition", "Content-Type");
     });
 });
- 
+
 // ============ BUILD APPLICATION ============
 var app = builder.Build();
- 
+
 // ============ HTTP REQUEST PIPELINE ============
 if (app.Environment.IsDevelopment())
 {
@@ -200,7 +199,6 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
- 
 app.UseSerilogRequestLogging(options =>
 {
     options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
@@ -210,13 +208,11 @@ app.UseSerilogRequestLogging(options =>
         diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
     };
 });
- 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
- 
 try
 {
     Log.Information("EEPZ Performance Management API started successfully on port 5253");
@@ -231,5 +227,3 @@ finally
 {
     Log.CloseAndFlush();
 }
- 
- 
