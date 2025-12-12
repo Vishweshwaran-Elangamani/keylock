@@ -52,8 +52,8 @@ app = FastAPI(
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
+    "http://localhost:3007",
+    "http://127.0.0.1:3007",
     "http://localhost:8080",
 ]
 
@@ -1756,7 +1756,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "feedback_api:app",
         host="0.0.0.0",
-        port=8000,
+        port=5111,
         reload=True,
         log_level="info"
     )

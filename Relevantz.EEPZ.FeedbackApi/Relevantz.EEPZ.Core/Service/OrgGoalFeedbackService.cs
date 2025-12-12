@@ -39,12 +39,13 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 {
                     RelatedGoalId = dto.GoalId, 
                     SubmittedByEmployeeId = dto.SubmittedByEmployeeId,
-                    RecipientEmployeeId = dto.RecipientEmployeeId, 
+                    RecipientEmployeeId = dto.SubmittedByEmployeeId, 
                     Rating = dto.Rating,
                     Comments = dto.FeedbackComments,
                     IsAnonymous = dto.IsAnonymous,
                     Status = "Submitted",
-                    FeedbackType = "Organization Goal"
+                    FeedbackType = "OrganizationalGoal"
+
                 };
 
                 var feedbackId = await _orgGoalFeedbackRepo.CreateOrgGoalFeedbackAsync(feedback);

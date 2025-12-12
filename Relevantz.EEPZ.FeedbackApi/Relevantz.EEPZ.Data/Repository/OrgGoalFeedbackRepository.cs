@@ -35,7 +35,7 @@ namespace Relevantz.EEPZ.Data.Repository.Implementations
 
                 feedback.CreatedAt = DateTime.UtcNow;
                 feedback.Status = "Submitted";
-                feedback.FeedbackType = "Organization Goal";
+                feedback.FeedbackType = "OrganizationalGoal";
                 
                 _context.Feedbacks.Add(feedback);
                 await _context.SaveChangesAsync();
