@@ -18,7 +18,7 @@ namespace Relevantz.EEPZ.Api.Controllers
     [Route("api/[controller]")]
     public class ComplianceController : ControllerBase
     {
-        private readonly IComplianceService _complianceService;
+       private readonly IComplianceService _complianceService;
         private readonly EEPZDbContext _context;
         private readonly IEmailService _emailService;
         private readonly ILogger<ComplianceController> _logger;
