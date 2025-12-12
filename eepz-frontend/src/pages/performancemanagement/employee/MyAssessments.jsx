@@ -15,8 +15,9 @@ function getTimeLeft(deadline) {
   return { days, hours, expired: ms === 0 };
 }
 
-
 function Breadcrumbs({ items = [] }) {
+  if (!items || items.length === 0) return null;
+
   return (
     <nav aria-label="breadcrumb" className="empassper-breadcrumbs">
       <ol>
@@ -25,15 +26,23 @@ function Breadcrumbs({ items = [] }) {
 
           return (
             <li key={index} className={last ? "current" : ""}>
-              {!last ? (
-                <Link to={item.to || "#"} className="breadcrumb-link">
+              {last ? (
+                <span className="breadcrumb-current" aria-current="page">
+                  {item.label}
+                </span>
+              ) : item.to ? (
+                <Link
+                  to={item.to}
+                  className="breadcrumb-link"
+                  aria-label={item.isIcon ? "Home" : undefined}
+                >
                   {item.label}
                 </Link>
               ) : (
-                <span className="breadcrumb-current" aria-current="page">{item.label}</span>
+                <span className="breadcrumb-link">{item.label}</span>
               )}
 
-              {!last && <span className="breadcrumb-sep">{'>'}</span>}
+              {!last && <span className="breadcrumb-sep">/</span>}
             </li>
           );
         })}
@@ -835,11 +844,11 @@ function MyAssessments() {
                                 disabled={submitting}
                               >
                                 <option value="">-</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
+                                <option value="1">1 - Poor</option>
+                                <option value="2">2 - Fair</option>
+                                <option value="3">3 - Good</option>
+                                <option value="4">4 - Very Good</option>
+                                <option value="5">5 - Excellent</option>
                               </select>
                             )}
                           </td>

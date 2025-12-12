@@ -749,11 +749,17 @@
     outline-offset: 2px;
   }
    
-  .manevap-form-header-strict {
-    padding: 32px 32px 0 32px;
-    background: #fff;
-    border-radius: 8px 8px 0 0;
-  }
+  /* UPDATE: .manevap-form-header-strict */
+.manevap-form-header-strict {
+  padding: 12px 20px;
+  background: #fff;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid #2E2B5F;  /* Changed from #E0E0E0 to dark blue */
+  min-height: auto;
+}
+
+/* UPDATE: .manevap-strict-form-body */
+
   .manevap-form-header-inner {
     display: flex;
     align-items: center;
@@ -808,8 +814,9 @@
   }
   .manevap-strict-form-body {
     background: #fff;
-    padding: 28px 37px 0 37px;
+    padding: 20px 24px;  /* Reduced from 28px 37px */
   }
+  
   .manevap-strict-table {
     width: 100%;
     border-collapse: separate;
@@ -838,6 +845,48 @@
   .manevap-strict-table tr:not(:last-child) td {
     border-bottom: 1px solid #2E2B5F;
   }
+
+  /* Make modal body scrollable when content exceeds height */
+.manevap-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.manevap-form-header-strict {
+  flex-shrink: 0;  /* Header stays fixed at top */
+}
+
+.manevap-strict-form-body {
+  flex: 1;
+  overflow-y: auto;  /* Enable vertical scrolling */
+  overflow-x: auto;  /* Enable horizontal scrolling for table */
+  min-height: 0;     /* Important for flex items */
+}
+
+.manevap-modal-actions {
+  flex-shrink: 0;  /* Footer stays fixed at bottom */
+}
+
+/* Scrollbar styling */
+.manevap-strict-form-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.manevap-strict-form-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.manevap-strict-form-body::-webkit-scrollbar-thumb {
+  background: #26225A;
+  border-radius: 4px;
+}
+
+.manevap-strict-form-body::-webkit-scrollbar-thumb:hover {
+  background: #1a1840;
+}
+
   .manevap-cell-bold {
     font-weight: 700;
     color: #23234C;

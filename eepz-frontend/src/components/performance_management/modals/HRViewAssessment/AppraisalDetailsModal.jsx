@@ -1,7 +1,6 @@
 import React from "react";
 import api from "../../../../services/performancemanagement/hr/api";
 
-
 function statusRender(status) {
   if (typeof status !== "string") return "-";
   const s = status.toLowerCase();
@@ -23,7 +22,6 @@ function statusRender(status) {
   return <span>{status}</span>;
 }
 
-
 const fieldOrder = [
   ["Competency", "competencyName"],
   ["Employee Rating", "employeeRating"],
@@ -37,8 +35,6 @@ const fieldOrder = [
   ["Status", "status"],
 ];
 
-
-
 function formatFileSize(bytes) {
   if (!bytes || bytes === 0) return "0 B";
   const k = 1024;
@@ -46,8 +42,6 @@ function formatFileSize(bytes) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
 }
-
-
 
 function formatDate(dateString) {
   if (!dateString) return "-";
@@ -58,13 +52,12 @@ function formatDate(dateString) {
       month: "short",
       day: "numeric",
       hour: "2-digit",
-      minute: "2-digit"
+      minute: "2-digit",
     });
   } catch (e) {
     return dateString;
   }
 }
-
 
 function getFileIcon(fileType, fileName) {
   if (!fileType && !fileName) return "bi-file";
@@ -73,63 +66,71 @@ function getFileIcon(fileType, fileName) {
   const type = (fileType || "").toLowerCase();
 
   if (type.includes("pdf") || name.endsWith(".pdf")) return "bi-file-pdf";
-  if (type.includes("word") || name.endsWith(".doc") || name.endsWith(".docx")) return "bi-file-word";
-  if (type.includes("excel") || type.includes("spreadsheet") || name.endsWith(".xls") || name.endsWith(".xlsx")) return "bi-file-earmark-spreadsheet";
-  if (type.includes("image") || name.match(/\.(jpg|jpeg|png|gif)$/i)) return "bi-file-image";
-  if (type.includes("video") || name.match(/\.(mp4|avi|mov)$/i)) return "bi-file-play";
-  if (type.includes("audio") || name.match(/\.(mp3|wav|m4a)$/i)) return "bi-file-music";
+  if (type.includes("word") || name.endsWith(".doc") || name.endsWith(".docx"))
+    return "bi-file-word";
+  if (
+    type.includes("excel") ||
+    type.includes("spreadsheet") ||
+    name.endsWith(".xls") ||
+    name.endsWith(".xlsx")
+  )
+    return "bi-file-earmark-spreadsheet";
+  if (type.includes("image") || name.match(/\.(jpg|jpeg|png|gif)$/i))
+    return "bi-file-image";
+  if (type.includes("video") || name.match(/\.(mp4|avi|mov)$/i))
+    return "bi-file-play";
+  if (type.includes("audio") || name.match(/\.(mp3|wav|m4a)$/i))
+    return "bi-file-music";
   if (type === "text/csv" || name.endsWith(".csv")) return "bi-file-earmark-text";
   if (type.includes("text") || name.endsWith(".txt")) return "bi-file-text";
-  if (type.includes("zip") || type.includes("compressed") || name.match(/\.(zip|rar|7z)$/i)) return "bi-file-zip";
+  if (type.includes("zip") || type.includes("compressed") || name.match(/\.(zip|rar|7z)$/i))
+    return "bi-file-zip";
 
   return "bi-file";
 }
 
-
-
 function getExtensionFromMime(mimeType) {
-  if (!mimeType) return '';
+  if (!mimeType) return "";
 
   const type = mimeType.toLowerCase().trim();
 
   const mimeMap = {
-    'application/pdf': '.pdf',
-    'text/csv': '.csv',
-    'text/plain': '.txt',
-    'application/msword': '.doc',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
-    'application/vnd.ms-excel': '.xls',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
-    'application/vnd.ms-powerpoint': '.ppt',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
-    'image/jpeg': '.jpg',
-    'image/png': '.png',
-    'image/gif': '.gif',
-    'image/webp': '.webp',
-    'application/zip': '.zip',
-    'application/x-rar-compressed': '.rar',
-    'application/x-7z-compressed': '.7z',
-    'video/mp4': '.mp4',
-    'video/x-msvideo': '.avi',
-    'video/quicktime': '.mov',
-    'audio/mpeg': '.mp3',
-    'audio/wav': '.wav',
-    'audio/m4a': '.m4a',
-    'application/json': '.json',
-    'application/xml': '.xml',
-    'text/xml': '.xml',
-    'text/html': '.html',
+    "application/pdf": ".pdf",
+    "text/csv": ".csv",
+    "text/plain": ".txt",
+    "application/msword": ".doc",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      ".docx",
+    "application/vnd.ms-excel": ".xls",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
+    "application/vnd.ms-powerpoint": ".ppt",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      ".pptx",
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/gif": ".gif",
+    "image/webp": ".webp",
+    "application/zip": ".zip",
+    "application/x-rar-compressed": ".rar",
+    "application/x-7z-compressed": ".7z",
+    "video/mp4": ".mp4",
+    "video/x-msvideo": ".avi",
+    "video/quicktime": ".mov",
+    "audio/mpeg": ".mp3",
+    "audio/wav": ".wav",
+    "audio/m4a": ".m4a",
+    "application/json": ".json",
+    "application/xml": ".xml",
+    "text/xml": ".xml",
+    "text/html": ".html",
   };
 
-  return mimeMap[type] || '';
+  return mimeMap[type] || "";
 }
-
-
 
 function hasExtension(filename) {
   return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
 }
-
 
 const AppraisalDetailsModal = ({
   show,
@@ -143,15 +144,11 @@ const AppraisalDetailsModal = ({
   const [downloadingId, setDownloadingId] = React.useState(null);
   const [error, setError] = React.useState(null);
 
-
-
   const handleDownloadAttachment = async (attachment) => {
     try {
-      console.log('=== DOWNLOAD START ===');
+      console.log("=== DOWNLOAD START ===");
       setDownloadingId(attachment.attachmentId);
       setError(null);
-
-
 
       const downloadUrl = `${api.defaults.baseURL}/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
       console.log(`[DOWNLOAD] URL: ${downloadUrl}`);
@@ -161,25 +158,22 @@ const AppraisalDetailsModal = ({
       console.log(`[RESPONSE] Status: ${response.status}`);
       console.log(`[RESPONSE] OK: ${response.ok}`);
 
-
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers.get("content-type");
       console.log(`[HEADER] Content-Type: ${contentType}`);
-
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`[ERROR] HTTP ${response.status}:`, errorText);
-        throw new Error(`Download failed with status ${response.status}: ${errorText}`);
+        throw new Error(
+          `Download failed with status ${response.status}: ${errorText}`
+        );
       }
 
-
-
-      if (contentType && contentType.includes('text/html')) {
+      if (contentType && contentType.includes("text/html")) {
         const errorText = await response.text();
-        console.error('[ERROR] Backend returned HTML error page:', errorText);
-        throw new Error('Backend returned error page. Check console for details.');
+        console.error("[ERROR] Backend returned HTML error page:", errorText);
+        throw new Error("Backend returned error page. Check console for details.");
       }
-
 
       const blob = await response.blob();
       console.log(`[BLOB] Type: ${blob.type}, Size: ${blob.size}`);
@@ -187,11 +181,9 @@ const AppraisalDetailsModal = ({
       let filename = attachment.fileName || "attachment";
       console.log(`[FILENAME] Original: "${filename}"`);
 
-
       if (!hasExtension(filename)) {
         console.log(`[EXTENSION] Missing - detecting...`);
-        let extension = '';
-
+        let extension = "";
 
         if (contentType) {
           extension = getExtensionFromMime(contentType);
@@ -209,7 +201,7 @@ const AppraisalDetailsModal = ({
         }
 
         if (!extension) {
-          extension = '.bin';
+          extension = ".bin";
           console.log(`[EXTENSION] Default: ".bin"`);
         }
 
@@ -228,24 +220,24 @@ const AppraisalDetailsModal = ({
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
 
-      console.log(` Downloaded: ${filename}`);
-      console.log('=== DOWNLOAD END ===');
+      console.log(`✓ Downloaded: ${filename}`);
+      console.log("=== DOWNLOAD END ===");
     } catch (err) {
-      console.error(" Download error:", err);
+      console.error("✗ Download error:", err);
       console.error("Error stack:", err.stack);
-      setError(`Failed to download ${attachment.fileName}: ${err.message}`);
+      setError(
+        `Failed to download ${attachment.fileName}: ${err.message}`
+      );
     } finally {
       setDownloadingId(null);
     }
   };
 
-
   if (!show) return null;
-
 
   return (
     <>
-
+      {/* Overlay */}
       <div
         style={{
           position: "fixed",
@@ -261,6 +253,7 @@ const AppraisalDetailsModal = ({
         onClick={onClose}
       />
 
+      {/* Modal Container with Dark Blue Border */}
       <div
         style={{
           position: "fixed",
@@ -278,10 +271,11 @@ const AppraisalDetailsModal = ({
           zIndex: 1050,
           display: "flex",
           flexDirection: "column",
+          border: "2px solid #27235C",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-
+        {/* Header with Close Icon */}
         <div
           style={{
             background: "#27235C",
@@ -327,7 +321,6 @@ const AppraisalDetailsModal = ({
             </div>
           </div>
 
-
           {attachments && attachments.length > 0 && (
             <div
               style={{
@@ -339,6 +332,7 @@ const AppraisalDetailsModal = ({
                 padding: "6px 12px",
                 borderRadius: "8px",
                 border: "1px solid rgba(255, 255, 255, 0.2)",
+                marginRight: "12px",
               }}
             >
               <i
@@ -360,21 +354,45 @@ const AppraisalDetailsModal = ({
               </span>
             </div>
           )}
+
+          {/* Close Button - Small X Icon */}
+          <button
+            onClick={onClose}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#fff",
+              fontSize: "28px",
+              cursor: "pointer",
+              padding: "0",
+              lineHeight: "1",
+              transition: "color 0.2s ease",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "36px",
+              height: "36px",
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#E3DDFE")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#fff")}
+            aria-label="Close modal"
+          >
+            ×
+          </button>
         </div>
 
-
-
+        {/* Scrollable Content Area */}
         <div
           style={{
             flex: 1,
             padding: "32px 36px 18px 36px",
             overflowY: "auto",
             background: "#fff",
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
+            scrollbarWidth: "thin",
+            scrollbarColor: "#27235C #f0f0f0",
           }}
         >
-
           {error && (
             <div
               style={{
@@ -395,6 +413,7 @@ const AppraisalDetailsModal = ({
             </div>
           )}
 
+          {/* Competency Evaluations Section */}
           <div style={{ marginBottom: "32px" }}>
             <div
               style={{
@@ -408,7 +427,10 @@ const AppraisalDetailsModal = ({
                 letterSpacing: ".02em",
               }}
             >
-              <i className="bi bi-list-check" style={{ marginRight: 4 }}></i>
+              <i
+                className="bi bi-list-check"
+                style={{ marginRight: 4 }}
+              ></i>
               Competency Evaluations
             </div>
             {competencies.length === 0 ? (
@@ -437,7 +459,6 @@ const AppraisalDetailsModal = ({
                     textAlign: "left",
                   }}
                 >
-
                   <div
                     style={{
                       fontWeight: 700,
@@ -486,8 +507,8 @@ const AppraisalDetailsModal = ({
                               fontWeight: key === "status" ? 700 : 500,
                               whiteSpace:
                                 key === "employeeComments" ||
-                                  key === "l1Comments" ||
-                                  key === "l2Comments"
+                                key === "l1Comments" ||
+                                key === "l2Comments"
                                   ? "pre-wrap"
                                   : "inherit",
                               wordBreak: "break-word",
@@ -514,33 +535,39 @@ const AppraisalDetailsModal = ({
             )}
           </div>
 
-
+          {/* Attachments Section */}
           {attachments && attachments.length > 0 && (
-            <div style={{
-              margin: "20px 0",
-              padding: "16px",
-              background: "#f8f9fa",
-              borderRadius: "8px",
-              border: "1px solid #dee2e6"
-            }}>
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                marginBottom: "12px",
-                fontWeight: 600,
-                fontSize: "14px",
-                color: "#26225A"
-              }}>
+            <div
+              style={{
+                margin: "20px 0",
+                padding: "16px",
+                background: "#f8f9fa",
+                borderRadius: "8px",
+                border: "1px solid #dee2e6",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "12px",
+                  fontWeight: 600,
+                  fontSize: "14px",
+                  color: "#26225A",
+                }}
+              >
                 <i className="bi bi-paperclip"></i>
                 <span>Employee Attachments</span>
               </div>
 
-              <div style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px"
-              }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                }}
+              >
                 {attachments.map((att, idx) => (
                   <div
                     key={idx}
@@ -552,50 +579,68 @@ const AppraisalDetailsModal = ({
                       background: "white",
                       border: "1px solid #dee2e6",
                       borderRadius: "6px",
-                      transition: "all 0.2s"
+                      transition: "all 0.2s",
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = "#26225A";
-                      e.currentTarget.style.boxShadow = "0 2px 4px rgba(38, 34, 90, 0.1)";
+                      e.currentTarget.style.boxShadow =
+                        "0 2px 4px rgba(38, 34, 90, 0.1)";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = "#dee2e6";
                       e.currentTarget.style.boxShadow = "none";
                     }}
                   >
-                    <div style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      flex: 1
-                    }}>
-
-                      <div style={{
+                    <div
+                      style={{
                         display: "flex",
-                        flexDirection: "column",
-                        gap: "2px"
-                      }}>
-                        <div style={{
-                          fontWeight: 500,
-                          fontSize: "14px",
-                          color: "#212529"
-                        }}>
+                        alignItems: "center",
+                        gap: "10px",
+                        flex: 1,
+                      }}
+                    >
+                      <i
+                        className={`bi ${getFileIcon(att.fileType, att.fileName)}`}
+                        style={{
+                          fontSize: "20px",
+                          color: "#26225A",
+                        }}
+                      ></i>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "2px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontWeight: 500,
+                            fontSize: "14px",
+                            color: "#212529",
+                          }}
+                        >
                           {att.fileName}
                         </div>
-                        <div style={{
-                          fontSize: "12px",
-                          color: "#6c757d"
-                        }}>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#6c757d",
+                          }}
+                        >
                           {formatFileSize(att.fileSize)}
                           {att.uploadedAt && ` • ${formatDate(att.uploadedAt)}`}
                         </div>
                         {att.note && (
-                          <div style={{
-                            fontSize: "12px",
-                            color: "#495057",
-                            fontStyle: "italic",
-                            marginTop: "2px"
-                          }}>
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              color: "#495057",
+                              fontStyle: "italic",
+                              marginTop: "2px",
+                            }}
+                          >
                             Note: {att.note}
                           </div>
                         )}
@@ -606,16 +651,22 @@ const AppraisalDetailsModal = ({
                       disabled={downloadingId === att.attachmentId}
                       style={{
                         padding: "6px 12px",
-                        background: downloadingId === att.attachmentId ? "#6c757d" : "#26225A",
+                        background:
+                          downloadingId === att.attachmentId
+                            ? "#6c757d"
+                            : "#26225A",
                         color: "white",
                         border: "none",
                         borderRadius: "4px",
-                        cursor: downloadingId === att.attachmentId ? "not-allowed" : "pointer",
+                        cursor:
+                          downloadingId === att.attachmentId
+                            ? "not-allowed"
+                            : "pointer",
                         fontSize: "13px",
                         display: "flex",
                         alignItems: "center",
                         gap: "6px",
-                        transition: "background 0.2s"
+                        transition: "background 0.2s",
                       }}
                       onMouseEnter={(e) => {
                         if (downloadingId !== att.attachmentId) {
@@ -648,7 +699,19 @@ const AppraisalDetailsModal = ({
           )}
 
           <style>{`
-            div[style*="overflow-y: auto"]::-webkit-scrollbar {display:none;}
+            div[style*="overflow-y: auto"]::-webkit-scrollbar {
+              width: 8px;
+            }
+            div[style*="overflow-y: auto"]::-webkit-scrollbar-track {
+              background: #f0f0f0;
+            }
+            div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb {
+              background: #27235C;
+              border-radius: 4px;
+            }
+            div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb:hover {
+              background: #1a1740;
+            }
             @keyframes spin {
               from { transform: rotate(0deg); }
               to { transform: rotate(360deg); }
@@ -656,8 +719,7 @@ const AppraisalDetailsModal = ({
           `}</style>
         </div>
 
-
-
+        {/* Footer */}
         <div
           style={{
             background: "#F5F5F7",
@@ -692,6 +754,5 @@ const AppraisalDetailsModal = ({
     </>
   );
 };
-
 
 export default AppraisalDetailsModal;

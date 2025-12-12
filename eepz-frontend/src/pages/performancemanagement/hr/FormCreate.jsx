@@ -11,7 +11,7 @@ function FormCreate() {
   const navigate = useNavigate();
   const isEditMode = !!formId;
 
-  const [currentStep, setCurrentStep] = useState(1); 
+  const [currentStep, setCurrentStep] = useState(1);
 
   const [model, setModel] = useState({
     name: "",
@@ -57,7 +57,6 @@ function FormCreate() {
     loadFormData();
   }, [formId, isEditMode]);
 
-  
   const isStep1Complete = () => {
     return model.name?.trim() && model.type && model.deliveryEnablement;
   };
@@ -129,7 +128,6 @@ function FormCreate() {
     });
   };
 
- 
   const validateStep1 = () => {
     const errors = {};
 
@@ -283,30 +281,34 @@ function FormCreate() {
   }
 
   return (
-    <div className="pmhr-fc-page">
-      <div className="pmhr-fc-top-bar">
-        <ol className="pmhr-fc-breadcrumb">
-          <li
-            className="pmhr-fc-breadcrumb-item"
-            onClick={() => navigate("/dashboard")}
-          >
-            <i className="bi bi-house-door"></i>
-          </li>
-          <span className="pmhr-fc-breadcrumb-separator">/</span>
-          <li
-            className="pmhr-fc-breadcrumb-item"
-            onClick={() => navigate("/hr/dashboard/performance")}
-          >
-            Performance
-          </li>
-          <span className="pmhr-fc-breadcrumb-separator">/</span>
-          <li className="pmhr-fc-breadcrumb-item pmhr-fc-breadcrumb-active">
-            {isEditMode ? "Edit Form" : "Create Form"}
-          </li>
-        </ol>
-      </div>
+    <div className="pmhr-fc-layout">
+      {/* Top header / breadcrumb area */}
+      <div className="pmhr-fc-header">
+        <div className="pmhr-fc-header-left">
+          <ol className="pmhr-fc-breadcrumb">
+            <li
+              className="pmhr-fc-breadcrumb-item"
+              onClick={() => navigate("/dashboard")}
+            >
+              <i className="bi bi-house-door"></i>
+            </li>
+            <span className="pmhr-fc-breadcrumb-separator">/</span>
+            <li
+              className="pmhr-fc-breadcrumb-item"
+              onClick={() => navigate("/hr/dashboard/performance")}
+            >
+              Performance
+            </li>
+            <span className="pmhr-fc-breadcrumb-separator">/</span>
+            <li className="pmhr-fc-breadcrumb-item pmhr-fc-breadcrumb-active">
+              {isEditMode ? "Edit Form" : "Create Form"}
+            </li>
+          </ol>
+         
+        </div>
 
-      <div className="pmhr-fc-step-indicator-wrapper">
+        {/* Step indicator aligned right in header, like dashboards */}
+        <div className="pmhr-fc-step-center">
         <div className="pmhr-fc-step-indicator">
           <div className="pmhr-fc-step-item">
             <button
@@ -365,24 +367,24 @@ function FormCreate() {
           </div>
         </div>
       </div>
+      </div>
 
-      <div className="pmhr-fc-form-wrapper">
+      {/* Main content – wider & more compact form card */}
+      <div className="pmhr-fc-content">
         <form
           onSubmit={currentStep === 2 ? onSubmit : proceedToStep2}
           className="pmhr-fc-form-container"
         >
-        
           {currentStep === 1 && (
             <div className="pmhr-fc-form-content">
               <div className="pmhr-fc-section pmhr-fc-general-details">
                 <div className="pmhr-fc-section-header">
-                    <div className="pmhr-fc-section-header-left">
-
-                  <i className="bi bi-info-circle"></i>
-                  <h3 className="pmhr-fc-section-title">General Details</h3>
+                  <div className="pmhr-fc-section-header-left">
+                    <i className="bi bi-info-circle"></i>
+                    <h3 className="pmhr-fc-section-title">General Details</h3>
+                  </div>
                 </div>
-                </div>
-                <div className="pmhr-fc-section-body">
+                <div className="pmhr-fc-section-body pmhr-fc-section-body-compact">
                   <div className="pmhr-fc-form-group pmhr-fc-full-width">
                     <label className="pmhr-fc-label">
                       Form Name <span className="pmhr-fc-required">*</span>
@@ -412,7 +414,8 @@ function FormCreate() {
                       )}
                     </div>
                   </div>
-                  <div className="pmhr-fc-form-row-two">
+
+                  <div className="pmhr-fc-form-row-two pmhr-fc-form-row-inline">
                     <div className="pmhr-fc-form-group">
                       <label className="pmhr-fc-label">
                         Form Type <span className="pmhr-fc-required">*</span>
@@ -444,6 +447,7 @@ function FormCreate() {
                         )}
                       </div>
                     </div>
+
                     <div className="pmhr-fc-form-group">
                       <label className="pmhr-fc-label">
                         Category <span className="pmhr-fc-required">*</span>
@@ -483,11 +487,14 @@ function FormCreate() {
                   </div>
                 </div>
               </div>
-              <div className="pmhr-fc-form-actions">
+
+              <div className="pmhr-fc-form-actions pmhr-fc-form-actions-inline">
                 <button
                   type="button"
                   className="pmhr-fc-btn-cancel"
-                  onClick={() => navigate("/hr/dashboard/performance/formslist")}
+                  onClick={() =>
+                    navigate("/hr/dashboard/performance/formslist")
+                  }
                   disabled={busy}
                 >
                   Cancel
@@ -640,7 +647,9 @@ function FormCreate() {
                             {validationErrors[`comp_${index}_description`] && (
                               <span className="pmhr-fc-error-text">
                                 <i className="bi bi-exclamation-circle"></i>
-                                {validationErrors[`comp_${index}_description`]}
+                                {validationErrors[
+                                  `comp_${index}_description`
+                                ]}
                               </span>
                             )}
                           </div>
@@ -650,7 +659,8 @@ function FormCreate() {
                   ))}
                 </div>
               </div>
-              <div className="pmhr-fc-form-actions">
+
+              <div className="pmhr-fc-form-actions pmhr-fc-form-actions-inline">
                 <button
                   type="button"
                   className="pmhr-fc-btn-cancel"

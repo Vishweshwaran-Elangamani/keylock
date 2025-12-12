@@ -12,27 +12,32 @@ const calculateAverageRating = (items) => {
     .filter((item) => item.employeeRating && item.employeeRating > 0)
     .map((item) => item.employeeRating);
   if (validRatings.length === 0) return 0;
-  return (validRatings.reduce((a, b) => a + b, 0) / validRatings.length).toFixed(2);
+  return (
+    validRatings.reduce((a, b) => a + b, 0) / validRatings.length
+  ).toFixed(2);
 };
 
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
 
   const mimeToExt = {
-    'application/pdf': '.pdf',
-    'application/msword': '.doc',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
-    'application/vnd.ms-excel': '.xls',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
-    'application/vnd.ms-powerpoint': '.ppt',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
-    'text/plain': '.txt',
-    'text/csv': '.csv',
-    'image/jpeg': '.jpg',
-    'image/png': '.png',
-    'image/gif': '.gif',
-    'application/zip': '.zip',
-    'application/x-zip-compressed': '.zip',
+    "application/pdf": ".pdf",
+    "application/msword": ".doc",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      ".docx",
+    "application/vnd.ms-excel": ".xls",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      ".xlsx",
+    "application/vnd.ms-powerpoint": ".ppt",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      ".pptx",
+    "text/plain": ".txt",
+    "text/csv": ".csv",
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/gif": ".gif",
+    "application/zip": ".zip",
+    "application/x-zip-compressed": ".zip",
   };
 
   return mimeToExt[contentType.toLowerCase()] || null;
@@ -49,7 +54,8 @@ const isL1Complete = (assess) => {
 };
 
 const getL1Categories = (allSubs) => {
-  if (!Array.isArray(allSubs)) return { pending: [], submitted: [], rejected: [] };
+  if (!Array.isArray(allSubs))
+    return { pending: [], submitted: [], rejected: [] };
   const rejected = [];
   const pending = [];
   const submitted = [];
@@ -95,9 +101,13 @@ function TeamLeadPage() {
     try {
       if (active === "l1") {
         const [pendingResp, reworkResp] = await Promise.all([
-          api.get(`/approver/${userId}/assessments`, { params: { page: 1, pageSize: 25 } }),
+          api.get(`/approver/${userId}/assessments`, {
+            params: { page: 1, pageSize: 25 },
+          }),
           api
-            .get(`/approver/${userId}/rework-forms`, { params: { page: 1, pageSize: 25 } })
+            .get(`/approver/${userId}/rework-forms`, {
+              params: { page: 1, pageSize: 25 },
+            })
             .catch(() => ({ data: [] })),
         ]);
 
@@ -106,12 +116,12 @@ function TeamLeadPage() {
           return Array.isArray(respData)
             ? respData
             : Array.isArray(respData?.data)
-              ? respData.data
-              : Array.isArray(respData?.data?.assessments)
-                ? respData.data.assessments
-                : Array.isArray(respData?.assessments)
-                  ? respData.assessments
-                  : [];
+            ? respData.data
+            : Array.isArray(respData?.data?.assessments)
+            ? respData.data.assessments
+            : Array.isArray(respData?.assessments)
+            ? respData.assessments
+            : [];
         };
 
         const pendingAssessments = extractAssessments(pendingResp);
@@ -124,12 +134,18 @@ function TeamLeadPage() {
         const allWithDetails = await Promise.all(
           allAssessmentIds.map(async (assessmentId) => {
             try {
-              const detailResp = await api.get(`/approver/${userId}/assessment/${assessmentId}`);
+              const detailResp = await api.get(
+                `/approver/${userId}/assessment/${assessmentId}`
+              );
               return detailResp.data;
             } catch (err) {
               return (
-                pendingAssessments.find((a) => a.assessmentId === assessmentId) ||
-                reworkAssessmentsList.find((a) => a.assessmentId === assessmentId)
+                pendingAssessments.find(
+                  (a) => a.assessmentId === assessmentId
+                ) ||
+                reworkAssessmentsList.find(
+                  (a) => a.assessmentId === assessmentId
+                )
               );
             }
           })
@@ -161,12 +177,12 @@ function TeamLeadPage() {
         const assessments = Array.isArray(respData)
           ? respData
           : Array.isArray(respData?.data)
-            ? respData.data
-            : Array.isArray(respData?.data?.assessments)
-              ? respData.data.assessments
-              : Array.isArray(respData?.assessments)
-                ? respData.assessments
-                : [];
+          ? respData.data
+          : Array.isArray(respData?.data?.assessments)
+          ? respData.data.assessments
+          : Array.isArray(respData?.assessments)
+          ? respData.assessments
+          : [];
         setL2Subs(assessments);
       }
     } catch (error) {
@@ -197,22 +213,24 @@ function TeamLeadPage() {
     setRejectionReason("");
 
     try {
-      const endpoint = active === "l1"
-        ? `/approver/${userId}/assessment/${assess.assessmentId}/attachments`
-        : `/reviewer/${userId}/assessment/${assess.assessmentId}/attachments`;
+      const endpoint =
+        active === "l1"
+          ? `/approver/${userId}/assessment/${assess.assessmentId}/attachments`
+          : `/reviewer/${userId}/assessment/${assess.assessmentId}/attachments`;
 
       const attachmentsResp = await api.get(endpoint);
-      const attachments = attachmentsResp.data?.data || attachmentsResp.data || [];
+      const attachments =
+        attachmentsResp.data?.data || attachmentsResp.data || [];
 
-      setModalData(prev => ({
+      setModalData((prev) => ({
         ...assess,
-        attachments: attachments
+        attachments: attachments,
       }));
     } catch (error) {
       console.error("Error fetching attachments:", error);
-      setModalData(prev => ({
+      setModalData((prev) => ({
         ...assess,
-        attachments: []
+        attachments: [],
       }));
     }
 
@@ -272,14 +290,23 @@ function TeamLeadPage() {
       const items = (modalData.items || [])
         .map((item) => {
           const fieldData = modalRatings[item.detailId];
-          if (fieldData && fieldData.rating && fieldData.comment && fieldData.comment.trim().length > 0) {
+          if (
+            fieldData &&
+            fieldData.rating &&
+            fieldData.comment &&
+            fieldData.comment.trim().length > 0
+          ) {
             return {
               detailId: item.detailId,
               rating: Number(fieldData.rating),
               comments: fieldData.comment,
             };
           }
-          if (item.reviewerRating && item.reviewerRating > 0 && item.reviewerComments) {
+          if (
+            item.reviewerRating &&
+            item.reviewerRating > 0 &&
+            item.reviewerComments
+          ) {
             return {
               detailId: item.detailId,
               rating: item.reviewerRating,
@@ -339,53 +366,45 @@ function TeamLeadPage() {
 
   const handleDownloadAttachment = async (attachmentId) => {
     try {
-      console.log(`Downloading attachment ${attachmentId} for ${active} role`);
-
-      const endpoint = active === "l1"
-        ? `/approver/${userId}/attachments/${attachmentId}/download`
-        : `/reviewer/${userId}/attachments/${attachmentId}/download`;
-
-      console.log(`Download endpoint: ${endpoint}`);
+      const endpoint =
+        active === "l1"
+          ? `/approver/${userId}/attachments/${attachmentId}/download`
+          : `/reviewer/${userId}/attachments/${attachmentId}/download`;
 
       const response = await api.get(endpoint, {
-        responseType: 'blob'
+        responseType: "blob",
       });
 
-      console.log('Full Response:', response);
-      console.log('Response headers object:', response.headers);
+      let filename = "attachment";
 
-      let filename = 'attachment';
-
-      const contentDisposition = response.headers['content-disposition'];
-      console.log('Content-Disposition header:', contentDisposition);
+      const contentDisposition = response.headers["content-disposition"];
 
       if (contentDisposition) {
-        const matches = contentDisposition.match(/filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/);
+        const matches = contentDisposition.match(
+          /filename\s*=\s*(?:"([^"]*)"|([^;,\n]*))/
+        );
         if (matches && (matches[1] || matches[2])) {
           filename = matches[1] || matches[2];
           filename = filename.trim();
-          console.log('✅ Extracted filename from header:', filename);
         }
       }
 
-      const contentType = response.headers['content-type'];
-      console.log('Content-Type:', contentType);
+      const contentType = response.headers["content-type"];
 
-      if (!filename.includes('.') && contentType) {
+      if (!filename.includes(".") && contentType) {
         const extension = getExtensionFromContentType(contentType);
         if (extension) {
           filename = `${filename}${extension}`;
-          console.log('Added extension based on content-type:', filename);
         }
       }
 
-      console.log('Final filename for download:', filename);
-
-      const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
+      const blob = new Blob([response.data], {
+        type: contentType || "application/octet-stream",
+      });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', filename);
+      link.setAttribute("download", filename);
 
       document.body.appendChild(link);
       link.click();
@@ -398,7 +417,6 @@ function TeamLeadPage() {
       toast.success(`Downloaded: ${filename}`);
     } catch (error) {
       console.error("Error downloading attachment:", error);
-      console.error("Error response:", error.response);
       toast.error("Failed to download attachment.");
     }
   };
@@ -413,14 +431,14 @@ function TeamLeadPage() {
 
     return (
       <>
-        <div 
+        <div
           className="tl-tabs-bar"
           style={{
-            backgroundColor: '#27235c',
-            border: '2px solid #27235c',
-            borderRadius: '12px',
-            padding: '12px',
-            marginBottom: '16px'
+            backgroundColor: "#27235c",
+            border: "2px solid #27235c",
+            borderRadius: "12px",
+            padding: "8px 10px",
+            marginBottom: "14px",
           }}
         >
           {tabs.map((tab) => (
@@ -429,31 +447,37 @@ function TeamLeadPage() {
               className={`tl-tab ${activeL1Tab === tab.key ? "active" : ""}`}
               onClick={() => setActiveL1Tab(tab.key)}
               style={{
-                padding: '8px 14px',
-                fontWeight: '700',
-                background: activeL1Tab === tab.key ? '#ffffff' : 'transparent',
-                border: activeL1Tab === tab.key ? 'none' : 'none',
-                color: activeL1Tab === tab.key ? '#27235c' : '#ffffff',
-                cursor: 'pointer',
-                borderRadius: '999px',
-                fontSize: '13px'
+                padding: "5px 12px",
+                fontWeight: "700",
+                background:
+                  activeL1Tab === tab.key ? "#ffffff" : "transparent",
+                border: "none",
+                color:
+                  activeL1Tab === tab.key ? "#27235c" : "#ffffff",
+                cursor: "pointer",
+                borderRadius: "999px",
+                fontSize: "12px",
               }}
             >
               {tab.label}
-              <span 
+              <span
                 className="tl-count"
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minWidth: '22px',
-                  height: '22px',
-                  background: activeL1Tab === tab.key ? 'rgba(39,35,92,0.15)' : 'rgba(255,255,255,0.2)',
-                  color: activeL1Tab === tab.key ? '#27235c' : '#ffffff',
-                  borderRadius: '50%',
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  marginLeft: '8px'
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "18px",
+                  height: "18px",
+                  background:
+                    activeL1Tab === tab.key
+                      ? "rgba(39,35,92,0.15)"
+                      : "rgba(255,255,255,0.2)",
+                  color:
+                    activeL1Tab === tab.key ? "#27235c" : "#ffffff",
+                  borderRadius: "50%",
+                  fontSize: "10px",
+                  fontWeight: "700",
+                  marginLeft: "6px",
                 }}
               >
                 {tab.subs.length}
@@ -468,7 +492,17 @@ function TeamLeadPage() {
           </div>
         ) : (
           <>
-            <table className="cg-employee-table" style={{ border: '2px solid #27235c', borderRadius: '12px', overflow: 'hidden' }}>
+            <table
+              className="cg-employee-table"
+              style={{
+                border: "2px solid #27235c",
+                borderRadius: "12px",
+                overflow: "hidden",
+                borderCollapse: "separate",
+                borderSpacing: 0,
+                background: "#ffffff",
+              }}
+            >
               <thead>
                 <tr>
                   <th>Employee</th>
@@ -483,35 +517,47 @@ function TeamLeadPage() {
                 {currentSubs.map((assess) => {
                   const avgRating = calculateAverageRating(assess.items);
                   const l1Complete = isL1Complete(assess);
-                  const showReviewBtn = !l1Complete || assess.l2Decision === "Rejected";
+                  const showReviewBtn =
+                    !l1Complete || assess.l2Decision === "Rejected";
                   return (
                     <tr key={assess.assessmentId}>
                       <td>{assess.employeeName}</td>
                       <td>{assess.formName}</td>
                       <td>
-                        <span className="cg-days-badge badge-info">{avgRating}/5</span>
+                        <span className="cg-days-badge badge-info">
+                          {avgRating}/5
+                        </span>
                       </td>
                       <td>
                         <span
-                          className={`cg-days-badge ${assess.l2Decision === "Rejected"
+                          className={`cg-days-badge ${
+                            assess.l2Decision === "Rejected"
                               ? "badge-danger"
                               : l1Complete
-                                ? "badge-warning"
-                                : "badge-info"
-                            }`}
+                              ? "badge-warning"
+                              : "badge-info"
+                          }`}
                         >
                           {assess.l2Decision === "Rejected"
                             ? "Rejected"
                             : l1Complete
-                              ? "Submitted"
-                              : "Pending"}
+                            ? "Submitted"
+                            : "Pending"}
                         </span>
                       </td>
-                      <td>{new Date(assess.submittedAt).toLocaleDateString()}</td>
+                      <td>
+                        {new Date(
+                          assess.submittedAt
+                        ).toLocaleDateString()}
+                      </td>
                       <td>
                         {showReviewBtn && (
-                          <button className="cg-bulk-btn" onClick={() => openModal(assess)}>
-                            <i className="bi bi-pencil-square"></i> Review & Submit
+                          <button
+                            className="cg-bulk-btn"
+                            onClick={() => openModal(assess)}
+                          >
+                            <i className="bi bi-pencil-square"></i>{" "}
+                            Review &amp; Submit
                           </button>
                         )}
                       </td>
@@ -520,32 +566,75 @@ function TeamLeadPage() {
                 })}
               </tbody>
             </table>
-            <div className="pagination-container">
-              <div className="pagination-info">
+            <div
+              className="pagination-container"
+              style={{ marginTop: "6px", padding: "4px 0" }}
+            >
+              <div
+                className="pagination-info"
+                style={{ fontSize: "11px", gap: "4px" }}
+              >
                 <span className="pagination-label">Show</span>
-                <select className="pagination-select">
-                  <option value="10">5</option>
+                <select
+                  className="pagination-select"
+                  style={{
+                    height: "24px",
+                    padding: "1px 6px",
+                    fontSize: "11px",
+                  }}
+                >
+                  <option value="5">5</option>
                   <option value="10">10</option>
                   <option value="25">25</option>
                   <option value="50">50</option>
                 </select>
                 <span className="pagination-label">entries</span>
               </div>
-              <div className="pagination-status">
-                Showing 1 to {currentSubs.length} of {currentSubs.length} entries
+              <div
+                className="pagination-status"
+                style={{ fontSize: "11px" }}
+              >
+                Showing 1 to {currentSubs.length} of{" "}
+                {currentSubs.length} entries
               </div>
               <nav className="pagination-nav">
-                <ul className="pagination">
+                <ul
+                  className="pagination"
+                  style={{ margin: 0, gap: "3px" }}
+                >
                   <li className="page-item disabled">
-                    <button className="page-link">
+                    <button
+                      className="page-link"
+                      style={{
+                        padding: "3px 6px",
+                        fontSize: "11px",
+                        minHeight: "0",
+                      }}
+                    >
                       <i className="bi bi-chevron-left"></i>
                     </button>
                   </li>
                   <li className="page-item active">
-                    <button className="page-link">1</button>
+                    <button
+                      className="page-link"
+                      style={{
+                        padding: "3px 8px",
+                        fontSize: "11px",
+                        minHeight: "0",
+                      }}
+                    >
+                      1
+                    </button>
                   </li>
                   <li className="page-item disabled">
-                    <button className="page-link">
+                    <button
+                      className="page-link"
+                      style={{
+                        padding: "3px 6px",
+                        fontSize: "11px",
+                        minHeight: "0",
+                      }}
+                    >
                       <i className="bi bi-chevron-right"></i>
                     </button>
                   </li>
@@ -566,13 +655,16 @@ function TeamLeadPage() {
       </div>
     ) : (
       <>
-        <table 
-          className="cg-employee-table" 
-          style={{ 
-            border: '2px solid #27235c', 
-            borderRadius: '12px', 
-            overflow: 'hidden',
-            marginTop: '16px'
+        <table
+          className="cg-employee-table"
+          style={{
+            border: "2px solid #27235c",
+            borderRadius: "12px",
+            overflow: "hidden",
+            borderCollapse: "separate",
+            borderSpacing: 0,
+            background: "#ffffff",
+            marginTop: "16px",
           }}
         >
           <thead>
@@ -589,31 +681,47 @@ function TeamLeadPage() {
           <tbody>
             {l2Subs.map((assess) => {
               const empAvg = calculateAverageRating(assess.items);
-              const l1AvgRating = (assess.items || [])
-                .filter((i) => i.approverRating && i.approverRating > 0)
-                .reduce((a, b) => a + b.approverRating, 0);
+              const l1Ratings = (assess.items || []).filter(
+                (i) => i.approverRating && i.approverRating > 0
+              );
               const l1Avg =
-                assess.items && assess.items.length > 0
-                  ? (l1AvgRating /
-                    (assess.items || []).filter((i) => i.approverRating && i.approverRating > 0).length
-                  ).toFixed(2)
+                l1Ratings.length > 0
+                  ? (
+                      l1Ratings.reduce(
+                        (sum, i) => sum + i.approverRating,
+                        0
+                      ) / l1Ratings.length
+                    ).toFixed(2)
                   : 0;
               return (
                 <tr key={assess.assessmentId}>
                   <td>{assess.employeeName}</td>
                   <td>{assess.formName}</td>
                   <td>
-                    <span className="cg-days-badge badge-info">{empAvg}/5</span>
+                    <span className="cg-days-badge badge-info">
+                      {empAvg}/5
+                    </span>
                   </td>
                   <td>
-                    <span className="cg-days-badge badge-warning">{l1Avg}/5</span>
+                    <span className="cg-days-badge badge-warning">
+                      {l1Avg}/5
+                    </span>
                   </td>
                   <td>
-                    <span className="cg-days-badge badge-info">Awaiting</span>
+                    <span className="cg-days-badge badge-info">
+                      Awaiting
+                    </span>
                   </td>
-                  <td>{new Date(assess.submittedAt).toLocaleDateString()}</td>
                   <td>
-                    <button className="cg-bulk-btn" onClick={() => openModal(assess)}>
+                    {new Date(
+                      assess.submittedAt
+                    ).toLocaleDateString()}
+                  </td>
+                  <td>
+                    <button
+                      className="cg-bulk-btn"
+                      onClick={() => openModal(assess)}
+                    >
                       <i className="bi bi-pencil-square"></i> Review
                     </button>
                   </td>
@@ -622,31 +730,73 @@ function TeamLeadPage() {
             })}
           </tbody>
         </table>
-        <div className="pagination-container">
-          <div className="pagination-info">
+        <div
+          className="pagination-container"
+          style={{ marginTop: "6px", padding: "4px 0" }}
+        >
+          <div
+            className="pagination-info"
+            style={{ fontSize: "11px", gap: "4px" }}
+          >
             <span className="pagination-label">Show</span>
-            <select className="pagination-select">
+            <select
+              className="pagination-select"
+              style={{
+                height: "24px",
+                padding: "1px 6px",
+                fontSize: "11px",
+              }}
+            >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
             </select>
             <span className="pagination-label">entries</span>
           </div>
-          <div className="pagination-status">
+          <div
+            className="pagination-status"
+            style={{ fontSize: "11px" }}
+          >
             Showing 1 to {l2Subs.length} of {l2Subs.length} entries
           </div>
           <nav className="pagination-nav">
-            <ul className="pagination">
+            <ul
+              className="pagination"
+              style={{ margin: 0, gap: "3px" }}
+            >
               <li className="page-item disabled">
-                <button className="page-link">
+                <button
+                  className="page-link"
+                  style={{
+                    padding: "3px 6px",
+                    fontSize: "11px",
+                    minHeight: "0",
+                  }}
+                >
                   <i className="bi bi-chevron-left"></i>
                 </button>
               </li>
               <li className="page-item active">
-                <button className="page-link">1</button>
+                <button
+                  className="page-link"
+                  style={{
+                    padding: "3px 8px",
+                    fontSize: "11px",
+                    minHeight: "0",
+                  }}
+                >
+                  1
+                </button>
               </li>
               <li className="page-item disabled">
-                <button className="page-link">
+                <button
+                  className="page-link"
+                  style={{
+                    padding: "3px 6px",
+                    fontSize: "11px",
+                    minHeight: "0",
+                  }}
+                >
                   <i className="bi bi-chevron-right"></i>
                 </button>
               </li>
@@ -683,7 +833,12 @@ function TeamLeadPage() {
               <Link
                 to="/employee/dashboard"
                 aria-label="Home"
-                style={{ color: "#9B287B", textDecoration: "none", display: "flex", alignItems: "center" }}
+                style={{
+                  color: "#9B287B",
+                  textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                }}
               >
                 <i className="bi bi-house-door" />
               </Link>

@@ -879,3 +879,40 @@
   font-weight: 700;
   cursor: default;
 }
+/* Table - ALL LEFT ALIGNED */
+.hrvasspm-table th {
+  text-align: left !important;
+}
+
+.hrvasspm-table th:first-child {
+  text-align: left !important;
+}
+
+.hrvasspm-table th:last-child {
+  text-align: left !important;
+}
+
+.hrvasspm-table td {
+  text-align: left !important;
+}
+
+.hrvasspm-table td:first-child {
+  text-align: left !important;
+}
+
+.hrvasspm-table td:last-child {
+  text-align: left !important;
+}
+
+/* Action Buttons - Left Aligned */
+.hrvasspm-action-buttons {
+  justify-content: flex-start !important;
+}
+
+/* Mobile - Maintain Left Alignment */
+@media (max-width: 768px) {
+  .hrvasspm-table th,
+  .hrvasspm-table td {
+    text-align: left !important;
+  }
+}
