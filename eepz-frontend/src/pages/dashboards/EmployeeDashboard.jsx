@@ -20,10 +20,8 @@ import {
   AlertTriangle,
   TrendingUp,
 } from "lucide-react";
-
 import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
-import meetingService from "../../services/meeting/meetingService";
 import rsvpService from "../../services/meeting/rsvpService";
 import slaService from "../../services/sla/slaService";
 import {
@@ -39,7 +37,6 @@ import "../../styles/common/Dashboard.css";
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
   const [dashboardData, setDashboardData] = useState({
     goals: [],
     lndAssignments: [],
@@ -66,30 +63,44 @@ const EmployeeDashboard = () => {
     }
   };
 
+  // SIMPLIFIED & ROBUST extractData function
   const extractData = (response) => {
-    if (!response) return [];
-    if (Array.isArray(response)) return response;
+    console.log("🔍 extractData input:", response);
+    
+    if (!response) {
+      console.log("⚠️ Response is null/undefined");
+      return [];
+    }
+    
+    if (Array.isArray(response)) {
+      console.log(" Direct array response:", response.length);
+      return response;
+    }
 
-    if (response.success === true || response.success === false) {
-      if (response.data) {
-        if (Array.isArray(response.data)) return response.data;
-        if (response.data.$values) return response.data.$values;
+    // Unwrap axios response
+    const data = response.data || response;
+    
+    // Try all possible paths and return first valid array found
+    const paths = [
+      data?.data?.items,           // { data: { data: { items: [...] } } }
+      data?.data?.$values,         // { data: { data: { $values: [...] } } }
+      data?.data?.values,          // { data: { data: { values: [...] } } }
+      data?.data,                  // { data: { data: [...] } }
+      data?.items,                 // { data: { items: [...] } }
+      data?.$values,               // { data: { $values: [...] } }
+      data?.values,                // { data: { values: [...] } }
+      data,                        // { data: [...] }
+    ];
+
+    for (let i = 0; i < paths.length; i++) {
+      const path = paths[i];
+      if (Array.isArray(path) && path.length >= 0) {
+        console.log(` Found data at path index ${i}:`, path.length, "items");
+        return path;
       }
     }
 
-    if (response.data) {
-      if (Array.isArray(response.data)) return response.data;
-      if (response.data.$values) return response.data.$values;
-      if (response.data.data) {
-        if (Array.isArray(response.data.data)) return response.data.data;
-        if (response.data.data.$values) return response.data.data.$values;
-        if (response.data.data.items?.$values)
-          return response.data.data.items.$values;
-        if (response.data.data.items) return response.data.data.items;
-      }
-    }
-
-    if (response.$values) return response.$values;
+    console.log("⚠️ No valid array found, returning empty array");
     return [];
   };
 
@@ -118,31 +129,87 @@ const EmployeeDashboard = () => {
       ] = await Promise.all([
         goalService
           .queryGoals({ type: "self", pageSize: 1000 })
-          .catch(() => ({ data: [] })),
+          .catch((err) => {
+            console.error("Error fetching self goals:", err);
+            return { data: [] };
+          }),
         goalService
           .queryGoals({ type: "org", pageSize: 1000 })
-          .catch(() => ({ data: [] })),
-        goalService.getMyAssignments().catch(() => ({ data: [] })),
-        lndService.getMyAssignments().catch(() => ({ data: [] })),
-        lndService.getMySkills().catch(() => ({ data: [] })),
-        rsvpService.getMyInvitations().catch(() => []),
-        slaService.getEmployeeSLAs(empId).catch(() => ({ data: [] })),
-        getApprovedProfiles().catch(() => ({ data: [] })),
-        getStatistics().catch(() => ({ data: null })),
+          .catch((err) => {
+            console.error(" Error fetching org goals:", err);
+            return { data: [] };
+          }),
+        goalService
+          .queryGoals({ type: "team", pageSize: 1000 })
+          .catch((err) => {
+            console.error(" Error fetching team goals:", err);
+            return { data: [] };
+          }),
+        lndService
+          .getMyAssignments(1, "", "", "", "", 1000)
+          .catch((err) => {
+            console.error("Error fetching LnD assignments:", err);
+            return { data: [] };
+          }),
+        lndService
+          .getMySkills(1, "", "", "asc", 1000)
+          .catch((err) => {
+            console.error(" Error fetching LnD skills:", err);
+            return { data: { items: [] } };
+          }),
+        rsvpService.getMyInvitations().catch((err) => {
+          console.error("Error fetching meetings:", err);
+          return [];
+        }),
+        slaService.getEmployeeSLAs(empId).catch((err) => {
+          console.error("Error fetching SLAs:", err);
+          return { data: [] };
+        }),
+        getApprovedProfiles().catch((err) => {
+          console.error(" Error fetching approved profiles:", err);
+          return { data: [] };
+        }),
+        getStatistics().catch((err) => {
+          console.error(" Error fetching statistics:", err);
+          return { data: null };
+        }),
       ]);
+
+      console.log("===========================================");
+      console.log(" RAW API RESPONSES:");
+      console.log("===========================================");
+      console.log("Self Goals Response:", JSON.stringify(selfGoalsRes, null, 2));
+      console.log("Org Goals Response:", JSON.stringify(orgGoalsRes, null, 2));
+      console.log("Team Goals Response:", JSON.stringify(teamGoalsRes, null, 2));
+      console.log("LnD Assignments Response:", JSON.stringify(myLndAssignmentsRes, null, 2));
+      console.log("LnD Skills Response:", JSON.stringify(myLndSkillsRes, null, 2));
+      console.log("Meetings Response:", JSON.stringify(myMeetingsRes, null, 2));
+      console.log("SLAs Response:", JSON.stringify(mySlasRes, null, 2));
+      console.log("===========================================");
 
       const selfGoals = extractData(selfGoalsRes);
       const orgGoals = extractData(orgGoalsRes);
       const teamGoals = extractData(teamGoalsRes);
       const lndAssignments = extractData(myLndAssignmentsRes);
       const lndSkills = extractData(myLndSkillsRes);
-
       const meetings = Array.isArray(myMeetingsRes)
         ? myMeetingsRes
         : extractData(myMeetingsRes);
-
       const slas = extractData(mySlasRes);
 
+      console.log("===========================================");
+      console.log(" EXTRACTED DATA COUNTS:");
+      console.log("===========================================");
+      console.log("Self Goals:", selfGoals.length);
+      console.log("Org Goals:", orgGoals.length);
+      console.log("Team Goals:", teamGoals.length);
+      console.log("LnD Assignments:", lndAssignments.length);
+      console.log(" LnD Skills:", lndSkills.length);
+      console.log("Meetings:", meetings.length);
+      console.log("SLAs:", slas.length);
+      console.log("===========================================");
+
+      // Combine all goals (self, org, team)
       const allGoals = [
         ...selfGoals.map((g) => ({ ...g, goalType: "self" })),
         ...orgGoals.map((g) => ({ ...g, goalType: "org" })),
@@ -150,8 +217,6 @@ const EmployeeDashboard = () => {
       ];
 
       const allApprovedProfiles = extractData(approvedProfilesRes);
-      console.log("Approved profiles:", allApprovedProfiles);
-      console.log("Current empId:", empId);
 
       const myRecognitions = allApprovedProfiles.filter((p) => {
         const nomineeId =
@@ -159,25 +224,21 @@ const EmployeeDashboard = () => {
           p.employeeId ||
           p.employeeMasterId ||
           p.nomineeEmployeeId;
-
-        console.log(
-          "Checking profile:",
-          p,
-          "nomineeId:",
-          nomineeId,
-          "empId:",
-          empId,
-          "match:",
-          nomineeId === empId
-        );
-        return nomineeId === empId;
+        return nomineeId == empId;
       });
 
-      console.log("My recognitions after filter:", myRecognitions);
-
-      console.log("Statistics response:", statsRes);
       const stats = statsRes?.data || statsRes?.data?.data || null;
-      console.log("Parsed stats:", stats);
+
+      console.log("===========================================");
+      console.log("FINAL DASHBOARD STATE:");
+      console.log("===========================================");
+      console.log("All Goals:", allGoals.length);
+      console.log("LnD Assignments:", lndAssignments.length);
+      console.log("LnD Skills:", lndSkills.length);
+      console.log("Meetings:", meetings.length);
+      console.log("SLAs:", slas.length);
+      console.log("My Recognitions:", myRecognitions.length);
+      console.log("===========================================");
 
       setDashboardData({
         goals: allGoals,
@@ -191,7 +252,7 @@ const EmployeeDashboard = () => {
         },
       });
     } catch (err) {
-      console.error("Error fetching employee dashboard data:", err);
+      console.error(" FATAL ERROR in fetchAllData:", err);
       toast.error("Failed to load dashboard data");
     } finally {
       setLoading(false);
@@ -200,13 +261,13 @@ const EmployeeDashboard = () => {
 
   const isOverdue = (deadline) => {
     if (!deadline) return false;
-    if (!slaService || typeof slaService.isOverdue !== "function") return false;
+    if (!slaService || typeof slaService.isOverdue !== "function")
+      return false;
     return slaService.isOverdue(deadline);
   };
 
   const getKPIStats = () => {
     const now = new Date();
-
     const totalGoals = dashboardData.goals.length;
     const totalLndAssignments = dashboardData.lndAssignments.length;
     const totalMeetings = dashboardData.meetings.length;
@@ -214,7 +275,7 @@ const EmployeeDashboard = () => {
 
     const upcomingMeetings = dashboardData.meetings.filter((m) => {
       const d = new Date(m.meetingDate || m.date);
-      return d > now;
+      return d >= now;
     }).length;
 
     const overdueSlas = dashboardData.slas.filter((s) =>
@@ -233,7 +294,6 @@ const EmployeeDashboard = () => {
 
   const getPerformanceOverview = () => {
     const { myRecognitions, stats } = dashboardData.performance;
-
     const totalRecognitions = myRecognitions.length;
 
     const byRewardType = {};
@@ -282,6 +342,10 @@ const EmployeeDashboard = () => {
 
   const getGoalsOverview = () => {
     const goals = dashboardData.goals;
+
+    console.log("getGoalsOverview - goals:", goals);
+    console.log("getGoalsOverview - goals count:", goals?.length || 0);
+
     if (!goals || goals.length === 0) {
       return {
         total: 0,
@@ -307,19 +371,13 @@ const EmployeeDashboard = () => {
     const pending = goals.filter((g) => {
       const status = (g.status || g.goalStatus || "").toLowerCase();
       return (
-        status === "pending" ||
-        status === "open" ||
-        status === "approved"
+        status === "pending" || status === "open" || status === "approved"
       );
     }).length;
 
     const chartData = [];
     if (completed > 0)
-      chartData.push({
-        name: "Completed",
-        value: completed,
-        fill: "#10b981",
-      });
+      chartData.push({ name: "Completed", value: completed, fill: "#10b981" });
     if (inProgress > 0)
       chartData.push({
         name: "In Progress",
@@ -327,11 +385,9 @@ const EmployeeDashboard = () => {
         fill: "#0F62FE",
       });
     if (pending > 0)
-      chartData.push({
-        name: "Pending",
-        value: pending,
-        fill: "#f59e0b",
-      });
+      chartData.push({ name: "Pending", value: pending, fill: "#f59e0b" });
+
+    console.log("Goals Chart Data:", chartData);
 
     return {
       total: goals.length,
@@ -343,9 +399,12 @@ const EmployeeDashboard = () => {
   };
 
   const getLndOverview = () => {
-    const skills = dashboardData.lndSkills || [];
+    const skills = dashboardData.lndSkills;
 
-    if (!skills.length) {
+    console.log("getLndOverview - skills:", skills);
+    console.log("getLndOverview - skills count:", skills?.length || 0);
+
+    if (!skills || !skills.length) {
       return {
         total: 0,
         low: 0,
@@ -361,17 +420,19 @@ const EmployeeDashboard = () => {
 
     skills.forEach((s) => {
       const rating =
-        s.rating ||
-        s.proficiency ||
-        s.proficiencyLevel ||
-        s.score ||
-        0;
+        s.rating || s.proficiency || s.proficiencyLevel || s.score || 0;
       const r = Number(rating);
+      
+      console.log(`Skill: ${s.skillName}, Rating: ${rating}, Parsed: ${r}`);
+      
       if (isNaN(r)) return;
+
       if (r <= 4) low += 1;
       else if (r <= 7) medium += 1;
       else high += 1;
     });
+
+    console.log(`Skill Distribution - Low: ${low}, Medium: ${medium}, High: ${high}`);
 
     const chartData = [];
     if (low > 0)
@@ -380,6 +441,8 @@ const EmployeeDashboard = () => {
       chartData.push({ name: "Level 5-7", value: medium, fill: "#0F62FE" });
     if (high > 0)
       chartData.push({ name: "Level 8-10", value: high, fill: "#10b981" });
+
+    console.log("LnD Chart Data:", chartData);
 
     return {
       total: skills.length,
@@ -394,22 +457,28 @@ const EmployeeDashboard = () => {
     const meetings = dashboardData.meetings;
     const now = new Date();
 
+    console.log("getMeetingsOverview - meetings:", meetings);
+    console.log("getMeetingsOverview - meetings count:", meetings?.length || 0);
+
     const upcoming = meetings.filter((m) => {
       const d = new Date(m.meetingDate || m.date);
-      return d > now;
+      return d >= now;
     }).length;
+
     const completed = meetings.filter((m) => {
       const d = new Date(m.meetingDate || m.date);
-      return d <= now;
+      return d < now;
     }).length;
 
     const monthlyData = {};
     meetings.forEach((m) => {
       const date = new Date(m.meetingDate || m.date || m.createdDate);
       if (isNaN(date.getTime())) return;
-      const key = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}`;
       monthlyData[key] = (monthlyData[key] || 0) + 1;
     });
 
@@ -424,6 +493,8 @@ const EmployeeDashboard = () => {
         count,
       }));
 
+    console.log(" Meetings Chart Data:", chartData);
+
     return {
       total: meetings.length,
       upcoming,
@@ -434,6 +505,9 @@ const EmployeeDashboard = () => {
 
   const getSlaOverview = () => {
     const slas = dashboardData.slas;
+
+    console.log(" getSlaOverview - slas:", slas);
+    console.log("getSlaOverview - slas count:", slas?.length || 0);
 
     if (!slas || slas.length === 0) {
       return {
@@ -449,9 +523,8 @@ const EmployeeDashboard = () => {
       (s) => (s.status || "").toLowerCase() === "closed"
     ).length;
     const open = slas.length - closed;
-    const overdue = slas.filter((s) =>
-      isOverdue(s.deadline || s.dueDate)
-    ).length;
+    const overdue = slas.filter((s) => isOverdue(s.deadline || s.dueDate))
+      .length;
 
     const chartData = [];
     if (open > 0)
@@ -461,17 +534,11 @@ const EmployeeDashboard = () => {
         fill: "#0F62FE",
       });
     if (overdue > 0)
-      chartData.push({
-        name: "Overdue",
-        value: overdue,
-        fill: "#ef4444",
-      });
+      chartData.push({ name: "Overdue", value: overdue, fill: "#ef4444" });
     if (closed > 0)
-      chartData.push({
-        name: "Closed",
-        value: closed,
-        fill: "#10b981",
-      });
+      chartData.push({ name: "Closed", value: closed, fill: "#10b981" });
+
+    console.log("SLA Chart Data:", chartData);
 
     return {
       total: slas.length,
@@ -499,18 +566,15 @@ const EmployeeDashboard = () => {
   const meetingsData = getMeetingsOverview();
   const slaData = getSlaOverview();
 
-  const CHART_COLORS = [
-    "#2c2c54",
-    "#0F62FE",
-    "#10b981",
-    "#f59e0b",
-    "#E01950",
-    "#8b5cf6",
-  ];
-
   return (
     <div className="hr-dashboard-container">
-      <Breadcrumb items={[{ label: "Employee Dashboard" }]} />
+      <Breadcrumb
+        items={[
+          {
+            label: "Employee Dashboard",
+          },
+        ]}
+      />
 
       {/* KPI CARDS */}
       <div className="admin-kpi-grid">
@@ -545,7 +609,7 @@ const EmployeeDashboard = () => {
             </h2>
             <p>My Goals</p>
             <span className="admin-kpi-subtitle">
-              <TrendingUp size={12} /> Self / Team / Org
+              <TrendingUp size={12} /> Self, Team & Org
             </span>
           </div>
         </div>
@@ -605,7 +669,7 @@ const EmployeeDashboard = () => {
 
       {/* ANALYTICS CARDS */}
       <div className="dashboard-cards-container">
-        {/* ROW 1: Performance + Goals */}
+        {/* ROW 1: Performance & Goals */}
         <div className="dashboard-row">
           {/* Performance card */}
           <div className="dashboard-card card-medium">
@@ -617,72 +681,61 @@ const EmployeeDashboard = () => {
             </div>
             <div className="card-body">
               {perfOverview.totalRecognitions > 0 ? (
-                <>
-                  <div style={{ marginBottom: "1rem" }}>
+                <div style={{ marginBottom: "1rem" }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: "0.75rem",
+                      marginBottom: "1rem",
+                    }}
+                  >
                     <div
                       style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
-                        gap: "0.75rem",
-                        marginBottom: "1rem",
+                        background: "#f0f9ff",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #bfdbfe",
                       }}
                     >
                       <div
                         style={{
-                          background: "#f0f9ff",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #bfdbfe",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#0F62FE",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#0F62FE",
-                          }}
-                        >
-                          {perfOverview.totalRecognitions}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#1e40af",
-                          }}
-                        >
-                          My Recognitions
-                        </div>
+                        {perfOverview.totalRecognitions}
                       </div>
+                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                        My Recognitions
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#f0fdf4",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #86efac",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "#f0fdf4",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #86efac",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#10b981",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#10b981",
-                          }}
-                        >
-                          {perfOverview.orgTotalNoms}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#047857",
-                          }}
-                        >
-                          Org Nominations
-                        </div>
+                        {perfOverview.orgTotalNoms}
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
+                        Org Nominations
                       </div>
                     </div>
                   </div>
+
                   {perfOverview.chartData.length > 0 ? (
                     <ResponsiveContainer width="100%" height={200}>
                       <PieChart>
@@ -697,10 +750,7 @@ const EmployeeDashboard = () => {
                           label={({ name, value }) => `${name}: ${value}`}
                         >
                           {perfOverview.chartData.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={entry.fill}
-                            />
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
                           ))}
                         </Pie>
                         <Tooltip />
@@ -711,7 +761,7 @@ const EmployeeDashboard = () => {
                       No breakdown by reward type
                     </div>
                   )}
-                </>
+                </div>
               ) : (
                 <div className="no-data-message">
                   No approved recognitions yet
@@ -736,117 +786,105 @@ const EmployeeDashboard = () => {
             </div>
             <div className="card-body">
               {goalsData.total > 0 ? (
-                <>
-                  <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      gap: "0.75rem",
+                      marginBottom: "1rem",
+                    }}
+                  >
                     <div
                       style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr",
-                        gap: "0.75rem",
-                        marginBottom: "1rem",
+                        background: "#f0f9ff",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #bfdbfe",
                       }}
                     >
                       <div
                         style={{
-                          background: "#f0f9ff",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #bfdbfe",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#0F62FE",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#0F62FE",
-                          }}
-                        >
-                          {goalsData.total}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#1e40af",
-                          }}
-                        >
-                          Total
-                        </div>
+                        {goalsData.total}
                       </div>
+                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                        Total
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#f0fdf4",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #86efac",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "#f0fdf4",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #86efac",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#10b981",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#10b981",
-                          }}
-                        >
-                          {goalsData.completed}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#047857",
-                          }}
-                        >
-                          Completed
-                        </div>
+                        {goalsData.completed}
                       </div>
+                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
+                        Completed
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#fef3c7",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #fcd34d",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "#fef3c7",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #fcd34d",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#d97706",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#d97706",
-                          }}
-                        >
-                          {goalsData.inProgress}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#b45309",
-                          }}
-                        >
-                          In Progress
-                        </div>
+                        {goalsData.inProgress}
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
+                        In Progress
                       </div>
                     </div>
                   </div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={goalsData.chartData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={70}
-                        dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}`}
-                      >
-                        {goalsData.chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </>
+
+                  {goalsData.chartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={goalsData.chartData}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={70}
+                          dataKey="value"
+                          label={({ name, value }) => `${name}: ${value}`}
+                        >
+                          {goalsData.chartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="no-data-message">No chart data available</div>
+                  )}
+                </div>
               ) : (
                 <div className="no-data-message">No goal data</div>
               )}
@@ -860,7 +898,7 @@ const EmployeeDashboard = () => {
           </div>
         </div>
 
-        {/* ROW 2: Meetings + L&D + SLAs */}
+        {/* ROW 2: Meetings, L&D, SLAs */}
         <div className="dashboard-row">
           {/* Meetings */}
           <div className="dashboard-card card-medium">
@@ -871,126 +909,116 @@ const EmployeeDashboard = () => {
               </div>
             </div>
             <div className="card-body">
-              <div style={{ marginBottom: "1rem" }}>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr",
-                    gap: "0.75rem",
-                    marginBottom: "1rem",
-                  }}
-                >
+              {meetingsData.total > 0 ? (
+                <div style={{ marginBottom: "1rem" }}>
                   <div
                     style={{
-                      background: "#f0f9ff",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #bfdbfe",
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      gap: "0.75rem",
+                      marginBottom: "1rem",
                     }}
                   >
                     <div
                       style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#0F62FE",
-                      }}
-                    >
-                      {meetingsData.total}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "0.7rem",
-                        color: "#1e40af",
-                      }}
-                    >
-                      Total
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      background: "#f0fdf4",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #86efac",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#10b981",
-                      }}
-                    >
-                      {meetingsData.upcoming}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "0.7rem",
-                        color: "#047857",
-                      }}
-                    >
-                      Upcoming
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      background: "#fef3c7",
-                      padding: "0.75rem",
-                      borderRadius: "6px",
-                      textAlign: "center",
-                      border: "1px solid #fcd34d",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        color: "#d97706",
-                      }}
-                    >
-                      {meetingsData.completed}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "0.7rem",
-                        color: "#b45309",
-                      }}
-                    >
-                      Completed
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {meetingsData.chartData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={meetingsData.chartData}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#f3f4f6"
-                      vertical={false}
-                    />
-                    <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
-                    <YAxis stroke="#9ca3af" fontSize={11} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        border: "1px solid #e5e7eb",
+                        background: "#f0f9ff",
+                        padding: "0.75rem",
                         borderRadius: "6px",
-                        fontSize: "12px",
+                        textAlign: "center",
+                        border: "1px solid #bfdbfe",
                       }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="count"
-                      stroke="#2c2c54"
-                      strokeWidth={2}
-                      dot={{ fill: "#2c2c54", r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                    >
+                      <div
+                        style={{
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#0F62FE",
+                        }}
+                      >
+                        {meetingsData.total}
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                        Total
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#f0fdf4",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #86efac",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#10b981",
+                        }}
+                      >
+                        {meetingsData.upcoming}
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
+                        Upcoming
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#fef3c7",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #fcd34d",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#d97706",
+                        }}
+                      >
+                        {meetingsData.completed}
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "#b45309" }}>
+                        Completed
+                      </div>
+                    </div>
+                  </div>
+
+                  {meetingsData.chartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <LineChart data={meetingsData.chartData}>
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke="#f3f4f6"
+                          vertical={false}
+                        />
+                        <XAxis dataKey="month" stroke="#9ca3af" fontSize={10} />
+                        <YAxis stroke="#9ca3af" fontSize={11} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "1px solid #e5e7eb",
+                            borderRadius: "6px",
+                            fontSize: "12px",
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="count"
+                          stroke="#2c2c54"
+                          strokeWidth={2}
+                          dot={{ fill: "#2c2c54", r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="no-data-message">No chart data available</div>
+                  )}
+                </div>
               ) : (
                 <div className="no-data-message">No meeting data</div>
               )}
@@ -1003,7 +1031,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
 
-          {/* L&D (skills based) */}
+          {/* L&D (skills-based) */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -1013,144 +1041,127 @@ const EmployeeDashboard = () => {
             </div>
             <div className="card-body">
               {lndData.total > 0 ? (
-                <>
-                  <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ marginBottom: "1.5rem" }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr 1fr",
+                      gap: "0.75rem",
+                      marginBottom: "1rem",
+                    }}
+                  >
                     <div
                       style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr 1fr",
-                        gap: "0.75rem",
-                        marginBottom: "1rem",
+                        background: "#f0f9ff",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #bfdbfe",
                       }}
                     >
                       <div
                         style={{
-                          background: "#f0f9ff",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #bfdbfe",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#0F62FE",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#0F62FE",
-                          }}
-                        >
-                          {lndData.total}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#1e40af",
-                          }}
-                        >
-                          Total Skills
-                        </div>
+                        {lndData.total}
                       </div>
+                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                        Total Skills
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#fee2e2",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #fecaca",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "#fee2e2",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #fecaca",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#f97316",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#f97316",
-                          }}
-                        >
-                          {lndData.low}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#c2410c",
-                          }}
-                        >
-                          Level 1-4
-                        </div>
+                        {lndData.low}
                       </div>
+                      <div style={{ fontSize: "0.7rem", color: "#c2410c" }}>
+                        Level 1-4
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#dbeafe",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #93c5fd",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "#dbeafe",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #93c5fd",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#0F62FE",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#0F62FE",
-                          }}
-                        >
-                          {lndData.medium}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#1d4ed8",
-                          }}
-                        >
-                          Level 5-7
-                        </div>
+                        {lndData.medium}
                       </div>
+                      <div style={{ fontSize: "0.7rem", color: "#1d4ed8" }}>
+                        Level 5-7
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#f0fdf4",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #86efac",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "#f0fdf4",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #86efac",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#10b981",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#10b981",
-                          }}
-                        >
-                          {lndData.high}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#047857",
-                          }}
-                        >
-                          Level 8-10
-                        </div>
+                        {lndData.high}
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
+                        Level 8-10
                       </div>
                     </div>
                   </div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={lndData.chartData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={70}
-                        dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}`}
-                      >
-                        {lndData.chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </>
+
+                  {lndData.chartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={lndData.chartData}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={70}
+                          dataKey="value"
+                          label={({ name, value }) => `${name}: ${value}`}
+                        >
+                          {lndData.chartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="no-data-message">No chart data available</div>
+                  )}
+                </div>
               ) : (
                 <div className="no-data-message">
                   No skills recorded in L&D
@@ -1175,122 +1186,107 @@ const EmployeeDashboard = () => {
             </div>
             <div className="card-body">
               {slaData.total > 0 ? (
-                <>
-                  <div style={{ marginBottom: "1rem" }}>
+                <div style={{ marginBottom: "1rem" }}>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      gap: "0.75rem",
+                      marginBottom: "1rem",
+                    }}
+                  >
                     <div
                       style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr",
-                        gap: "0.75rem",
-                        marginBottom: "1rem",
+                        background: "#f0f9ff",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #bfdbfe",
                       }}
                     >
                       <div
                         style={{
-                          background: "#f0f9ff",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #bfdbfe",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#0F62FE",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#0F62FE",
-                          }}
-                        >
-                          {slaData.total}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#1e40af",
-                          }}
-                        >
-                          Total
-                        </div>
+                        {slaData.total}
                       </div>
+                      <div style={{ fontSize: "0.7rem", color: "#1e40af" }}>
+                        Total
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#fee2e2",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #fca5a5",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "#fee2e2",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #fca5a5",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#ef4444",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#ef4444",
-                          }}
-                        >
-                          {slaData.overdue}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#dc2626",
-                          }}
-                        >
-                          Overdue
-                        </div>
+                        {slaData.overdue}
                       </div>
+                      <div style={{ fontSize: "0.7rem", color: "#dc2626" }}>
+                        Overdue
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: "#f0fdf4",
+                        padding: "0.75rem",
+                        borderRadius: "6px",
+                        textAlign: "center",
+                        border: "1px solid #86efac",
+                      }}
+                    >
                       <div
                         style={{
-                          background: "#f0fdf4",
-                          padding: "0.75rem",
-                          borderRadius: "6px",
-                          textAlign: "center",
-                          border: "1px solid #86efac",
+                          fontSize: "1.5rem",
+                          fontWeight: "bold",
+                          color: "#10b981",
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: "1.5rem",
-                            fontWeight: "bold",
-                            color: "#10b981",
-                          }}
-                        >
-                          {slaData.closed}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "0.7rem",
-                            color: "#047857",
-                          }}
-                        >
-                          Closed
-                        </div>
+                        {slaData.closed}
+                      </div>
+                      <div style={{ fontSize: "0.7rem", color: "#047857" }}>
+                        Closed
                       </div>
                     </div>
                   </div>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={slaData.chartData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={50}
-                        outerRadius={70}
-                        paddingAngle={3}
-                        dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}`}
-                      >
-                        {slaData.chartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.fill}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </>
+
+                  {slaData.chartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={slaData.chartData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={70}
+                          paddingAngle={3}
+                          dataKey="value"
+                          label={({ name, value }) => `${name}: ${value}`}
+                        >
+                          {slaData.chartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="no-data-message">No chart data available</div>
+                  )}
+                </div>
               ) : (
                 <div className="no-data-message">No SLA data</div>
               )}
@@ -1309,3 +1305,5 @@ const EmployeeDashboard = () => {
 };
 
 export default EmployeeDashboard;
+
+
