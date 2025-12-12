@@ -21,14 +21,16 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
 
         [HttpGet("my-approvals")]
+
         public async Task<IActionResult> GetMyApprovals(
-            [FromQuery] string? approvalType,
-            [FromQuery] string? status,
-            [FromQuery] string? sortField,
-            [FromQuery] string? sortOrder,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10
-        )
+    [FromQuery] string? approvalType,
+    [FromQuery] string? status,
+    [FromQuery] string? sortField,
+    [FromQuery] string? sortOrder,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] string? searchTerm = null
+)
         {
             var employeeId = GetCurrentEmployeeId();
             var result = await _lndService.GetMyApprovals(
@@ -38,11 +40,13 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
                 sortField,
                 sortOrder,
                 pageNumber,
-                pageSize
+                pageSize,
+                searchTerm
             );
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
+
 
         [HttpPost("process")]
         public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequest request)
@@ -51,8 +55,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var result = await _lndService.ProcessApproval(approverId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
-        }  
- 
+        }
+
         /// <summary>
         /// Get complete approval history for the logged-in user (as requester or approver)
         /// </summary>

@@ -147,7 +147,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 var summary = await _service.GetDashboardSummaryAsync(userId);
 
                 var response = ApiResponseDto<GoalDashboardSummaryDto>.SuccessResponse(
-                    ResponseMessages.Codes.DASHBOARD_RETRIEVED_SUCCESS,
+                    ResponseMessages.Codes.DASHBOARD_RETRIEVED_SUCCESS,  
                     summary,
                     new { UserId = userId }
                 );
@@ -159,7 +159,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 var response = ApiResponseDto<GoalDashboardSummaryDto>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
-                return StatusCode(500, response);
+                return StatusCode(500, response);  
             }
         }
 

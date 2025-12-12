@@ -24,12 +24,13 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             _logger = logger;
         }   
          
+
         protected string GetUserRole()
         {
             return User.FindFirst("role")?.Value
                 ?? User.FindFirst(ClaimTypes.Role)?.Value
                 ?? throw new UnauthorizedAccessException("Role claim not found");
-        }
+        } 
 
         protected int GetEmpMasterId()
         {
@@ -38,5 +39,6 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 throw new UnauthorizedAccessException("Employee Master ID not found");
             return int.Parse(claim);
         }
-    }
+    } 
 }
+  
