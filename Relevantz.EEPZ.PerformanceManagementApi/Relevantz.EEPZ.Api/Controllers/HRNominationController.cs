@@ -389,41 +389,7 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             }
         }
 
-        [HttpDelete("reward-types/{rewardTypeId}")]
-        public async Task<IActionResult> DeleteRewardType(int rewardTypeId)
-        {
-            try
-            {
-                var rewardType = await _context.Rewardtypes.FindAsync(rewardTypeId);
-                if (rewardType == null)
-                {
-                    return NotFound(new { success = false, message = "Reward type not found" });
-                }
-
-                var hasOpportunities = await _context.Recognitiondetails
-                    .AnyAsync(o => o.RewardTypeId == rewardTypeId);
-
-                if (hasOpportunities)
-                {
-                    return BadRequest(new { success = false, message = "Cannot delete reward type with existing opportunities" });
-                }
-
-                _context.Rewardtypes.Remove(rewardType);
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    success = true,
-                    message = "Reward type deleted successfully"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[DELETE_REWARD_TYPE] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
-
+       
         [HttpGet("reward-types/{rewardTypeId}/parameters")]
         public async Task<IActionResult> GetParametersByRewardType(int rewardTypeId)
         {
@@ -555,49 +521,7 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             }
         }
 
-        [HttpGet("hr/dashboard/summary")]
-        public async Task<IActionResult> GetHRDashboardSummary()
-        {
-            try
-            {
-                var summary = await _context.Recognitiondetails
-                    .Where(o => o.Status == "Active")
-                    .Include(o => o.RewardType)
-                    .Select(o => new
-                    {
-                        o.OpportunityId,
-                        o.OpportunityName,
-                        o.Deadline,
-                        RewardType = new
-                        {
-                            o.RewardType.RewardName,
-                            o.RewardType.RewardCategory
-                        },
-                        TotalNominations = _context.Recognitionstatuses.Count(n =>
-                            n.OpportunityId == o.OpportunityId && n.NominationType == "ManagerNomination"),
-                        PendingReview = _context.Recognitionstatuses.Count(n =>
-                            n.OpportunityId == o.OpportunityId && n.Status == "Pending"),
-                        Approved = _context.Recognitionstatuses.Count(n =>
-                            n.OpportunityId == o.OpportunityId && n.Status == "Approved"),
-                        Rejected = _context.Recognitionstatuses.Count(n =>
-                            n.OpportunityId == o.OpportunityId && n.Status == "Rejected")
-                    })
-                    .ToListAsync();
 
-                return Ok(new
-                {
-                    success = true,
-                    data = summary,
-                    totalPendingReview = summary.Sum(s => s.PendingReview),
-                    message = "Dashboard summary retrieved"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[HR_DASHBOARD] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
 
         [HttpGet("nomination-details/{nominationId}")]
         public async Task<IActionResult> GetNominationDetails(int nominationId)
@@ -810,26 +734,6 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
             }
         }
 
-        [HttpGet("debug/nominations")]
-        public async Task<IActionResult> DebugNominations()
-        {
-            try
-            {
-                var allNominations = await _context.Recognitionstatuses.ToListAsync();
-                var byStatus = allNominations.GroupBy(n => n.Status).ToDictionary(g => g.Key, g => g.Count());
-
-                return Ok(new
-                {
-                    success = true,
-                    totalCount = allNominations.Count,
-                    byStatus = byStatus
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
 
 [HttpGet("statistics")]
 public async Task<IActionResult> GetStatistics()

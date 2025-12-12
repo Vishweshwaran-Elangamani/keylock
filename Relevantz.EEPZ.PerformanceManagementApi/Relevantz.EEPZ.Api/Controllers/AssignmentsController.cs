@@ -123,7 +123,7 @@ namespace PerformanceManagement.Controllers
                 if (form.Type == "Self")
                 {
                     var today = DateTime.UtcNow.Date;
-                    var reminderDays = 30;
+                    var reminderDays = 0;
                     var reminderDate = today.AddDays(reminderDays);
                     var targetMonth = reminderDate.Month;
 
@@ -289,13 +289,15 @@ namespace PerformanceManagement.Controllers
             }
         }
 
+        
+
         [HttpGet("upcoming-eligible")]
         public async Task<IActionResult> GetUpcomingEligibleEmployees([FromQuery] int? formId = null)
         {
             try
             {
                 var today = DateTime.UtcNow.Date;
-                var reminderDays = 30;
+                var reminderDays = 10;
                 var reminderDate = today.AddDays(reminderDays);
                 var targetMonth = reminderDate.Month;
                 var currentYear = today.Year;

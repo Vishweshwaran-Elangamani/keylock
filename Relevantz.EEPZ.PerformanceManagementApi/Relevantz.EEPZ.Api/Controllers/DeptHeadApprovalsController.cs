@@ -236,7 +236,7 @@ namespace PerformanceManagement.Controllers
                                 continue;
                             }
 
-                            _logger.LogInformation($"✅ Including AssessmentId {selfAssessment.AssessmentId} - L2 approved");
+                            _logger.LogInformation($" Including AssessmentId {selfAssessment.AssessmentId} - L2 approved");
 
                             string l1ReviewerName = "No L1";
                             if (hasL1 && project.L1approverEmployeeId.HasValue)
