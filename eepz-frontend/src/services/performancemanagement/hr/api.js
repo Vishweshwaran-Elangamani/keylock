@@ -7,7 +7,6 @@ const api = axios.create({
   timeout: 30000,
 });
 
-
 api.interceptors.request.use(
   (config) => {
     const token = authService.getToken();
@@ -26,7 +25,6 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
 
 api.interceptors.response.use(
   (response) => {
@@ -109,45 +107,30 @@ export const getAllManagerNominations = () => {
   return api.get("/HRNomination/hr/manager-nominations");
 };
 
-
 export const approveNominations = (payload) => {
   return api.post("/HRNomination/hr/nominations/approve", payload);
 };
-
-
 
 export const rejectNominations = (payload) => {
   return api.post("/HRNomination/hr/nominations/reject", payload);
 };
 
 
-export const getDashboardSummary = () => {
-  return api.get("/HRNomination/hr/dashboard/summary");
-};
-
 
 export const getNominationDetails = (nominationId) => {
   return api.get(`/HRNomination/nomination-details/${nominationId}`);
 };
 
-
 export const getApprovedProfiles = () => {
   return api.get("/HRNomination/approved-profiles");
 };
-
 
 export const getRejectedProfiles = () => {
   return api.get("/HRNomination/rejected-profiles");
 };
 
-
 export const getStatistics = () => {
   return api.get("/HRNomination/statistics");
-};
-
-
-export const debugNominations = () => {
-  return api.get("/HRNomination/debug/nominations");
 };
 
 
@@ -155,19 +138,12 @@ export const getRewardTypes = (activeOnly = false) => {
   return api.get("/HRNomination/reward-types", { params: { activeOnly } });
 };
 
-
 export const createRewardType = (payload) => {
   return api.post("/HRNomination/reward-types", payload);
 };
 
-
 export const updateRewardType = (rewardTypeId, payload) => {
   return api.put(`/HRNomination/reward-types/${rewardTypeId}`, payload);
-};
-
-
-export const deleteRewardType = (rewardTypeId) => {
-  return api.delete(`/HRNomination/reward-types/${rewardTypeId}`);
 };
 
 
@@ -175,16 +151,13 @@ export const getParametersByRewardType = (rewardTypeId) => {
   return api.get(`/HRNomination/reward-types/${rewardTypeId}/parameters`);
 };
 
-
 export const createParameter = (payload) => {
   return api.post("/HRNomination/parameters", payload);
 };
 
-
 export const updateParameter = (parameterId, payload) => {
   return api.put(`/HRNomination/parameters/${parameterId}`, payload);
 };
-
 
 export const deleteParameter = (parameterId) => {
   return api.delete(`/HRNomination/parameters/${parameterId}`);
@@ -199,48 +172,39 @@ export const getMyNominations = (managerId) => {
   return api.get(`/AppraisalProcess/manager/${managerId}/nominations`);
 };
 
-
 export const submitNomination = (payload) => {
   return api.post("/EmployeeNomination/submit", payload);
 };
 
-
 export const getDeptHeadSubmittedRatings = () => {
-  return api.get('/AppraisalProcess/depthead/submitted-ratings');
+  return api.get('/DeptHeadApprovals/submitted-ratings');
 };
-
 
 export const approveDeptHeadEmployee = (payload) => {
-  return api.post('/AppraisalProcess/depthead/approve-employee', payload);
+  return api.post('/DeptHeadApprovals/approve-employee', payload);
 };
-
 
 export const getDeptHeadApprovedNominations = (deptHeadId) => {
   return api.get(`/DepartmentHeadNomination/depthead/${deptHeadId}/approved-nominations`);
 };
 
-
 export const getApprovedEmployees = (page = 1, pageSize = 5) => {
-  return api.get('/AppraisalProcess/manager/approved-employees', {
+  return api.get('/DeptHeadApprovals/approved-employees', {
     params: { page, pageSize }
   });
 };
 
-
 export const getPendingAcknowledgments = () => {
-  return api.get('/AppraisalProcess/employee/pending-acknowledgments');
+  return api.get('/DeptHeadApprovals/employee/pending-acknowledgments');
 };
-
 
 export const acknowledgeRating = (payload) => {
-  return api.post('/AppraisalProcess/employee/acknowledge', payload);
+  return api.post('/DeptHeadApprovals/employee/acknowledge', payload);
 };
-
 
 export const getManagerEmployeeAcknowledgments = () => {
-  return api.get("/AppraisalProcess/manager/employee-acknowledged-comments");
+  return api.get("/DeptHeadApprovals/manager/employee-acknowledged-comments");
 };
-
 
 export const getEmployeeNominations = (employeeId) => {
   return api.get(`/EmployeeNomination/search?employeeId=${employeeId}`);

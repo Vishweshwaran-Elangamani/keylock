@@ -269,7 +269,7 @@ function MyAssessments() {
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/AppraisalProcess/employee/${userId}`);
+      const { data } = await api.get(`/Assignments/employee/${userId}`);
       if (data.success) {
         setAssignments(data.data || []);
       } else {

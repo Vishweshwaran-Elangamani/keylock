@@ -179,17 +179,7 @@ function RewardConfiguration() {
 
   const handleConfirmDelete = async () => {
     try {
-      if (deleteType === "rewardType") {
-        const { data } = await api.deleteRewardType(toDeleteId);
-        if (data.success) {
-          toast.success("Reward type deleted successfully");
-          fetchRewardTypes();
-          if (selectedRewardType?.rewardTypeId === toDeleteId) {
-            setSelectedRewardType(null);
-            setParameters([]);
-          }
-        }
-      } else if (deleteType === "parameter") {
+       if (deleteType === "parameter") {
         const { data } = await api.deleteParameter(toDeleteId);
         if (data.success) {
           toast.success("Parameter deleted successfully");

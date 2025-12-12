@@ -131,7 +131,7 @@ function FormsList() {
 
   const fetchAssignedUsers = useCallback(async (formId) => {
     try {
-      const response = await api.get(`/AppraisalProcess/form/${formId}`);
+      const response = await api.get(`/Assignments/form/${formId}`);
       const apiData = response.data?.data || response.data || [];
       const ids = apiData
         .filter((a) => (a.action || a.Action) === "Send")
@@ -160,12 +160,12 @@ function FormsList() {
 
         let filteredUsersData = [];
         if (selectedForm.type === "Manager") {
-          const managersRes = await api.get("/AppraisalProcess/all-managers");
+          const managersRes = await api.get("/Assignments/all-managers");
           filteredUsersData = Array.isArray(managersRes.data?.data)
             ? managersRes.data.data
             : [];
         } else {
-          const usersRes = await api.get("/AppraisalProcess/upcoming-eligible");
+          const usersRes = await api.get("/Assignments/upcoming-eligible");
           filteredUsersData = Array.isArray(usersRes.data?.data)
             ? usersRes.data.data
             : [];
@@ -352,7 +352,7 @@ function FormsList() {
         deadlineInDays: deadlineInDays || 7,
       };
 
-      const { data } = await api.post("/AppraisalProcess/initiate", payload);
+      const { data } = await api.post("/Assignments/initiate", payload);
 
       if (data?.success) {
         const appraisals = data.data || [];

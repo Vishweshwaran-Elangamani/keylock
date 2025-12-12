@@ -72,7 +72,7 @@ export default function ManagerDashboard() {
     setLoading(true);
     setAssignments([]);
     try {
-      const roleResponse = await api.get(`/AppraisalProcess/user/${userId}/role`);
+      const roleResponse = await api.get(`/Employees/user/${userId}/role`);
       if (!roleResponse.data.success) {
         safeToast("error", "User not found.", "user-not-found");
         return;
@@ -82,7 +82,7 @@ export default function ManagerDashboard() {
         safeToast("error", "This user is not a Manager.", "not-manager");
         return;
       }
-      const assignmentRes = await api.get(`/AppraisalProcess/employee/${userId}`);
+      const assignmentRes = await api.get(`/Assignments/employee/${userId}`);
       if (assignmentRes.data.success) {
         setAssignments(assignmentRes.data.data);
         const pending = assignmentRes.data.data.filter((a) => !a.isCompleted).length;

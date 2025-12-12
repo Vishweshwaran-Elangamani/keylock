@@ -88,7 +88,7 @@ function HRViewAppraisals() {
   useEffect(() => {
     async function fetchAppraisals() {
       try {
-        const response = await api.get("/AppraisalProcess/all-details");
+        const response = await api.get("/AssessmentDetails/all-details");
         if (response.data?.success) {
           const initiatedAppraisals = response.data.data.filter((appraisal) => {
             const hasInitiatedCompetency = appraisal.competencies.some((comp) => {
