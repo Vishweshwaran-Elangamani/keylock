@@ -196,27 +196,32 @@ export default function MySubmissions() {
           map[emp.employeeId] = `${emp.firstName} ${emp.lastName}`;
         });
         setEmployeeMap(map);
+        console.log("Employee Map loaded:", map);
       }
     } catch (err) {
       console.error("Error fetching employee map:", err.message);
     }
   }, []);
 
-  // Fetch objectives/goals using service
+  // Fetch objectives/goals using service - FIXED
   const fetchObjectives = useCallback(async () => {
     try {
       const response = await goalsApi.getAll(1, 100);
-      const goalsData = response?.data || [];
+      
+      // Handle nested data structure
+      const goalsData = response?.data?.data || response?.data || [];
 
       if (Array.isArray(goalsData)) {
         const map = {};
         goalsData.forEach((goal) => {
-          const goalId = goal.goalId || goal.goalid;
-          const goalTitle = goal.goalName || goal.goaltitle || goal.title;
+          // Try multiple field name variations
+          const goalId = goal.goalId || goal.goalid || goal.GoalId;
+          const goalTitle = goal.goalName || goal.organizationGoalName || goal.goaltitle || goal.title;
           if (goalId) {
             map[goalId] = goalTitle || `Goal ${goalId}`;
           }
         });
+        console.log("Goals Map loaded:", map);
         setObjectives(map);
       }
     } catch (err) {
@@ -224,7 +229,7 @@ export default function MySubmissions() {
     }
   }, []);
 
-  // Fetch all submission data using services
+  // Fetch all submission data using services - FIXED
   const fetchData = useCallback(async () => {
     setRefreshing(true);
     setLoading(true);
@@ -232,6 +237,7 @@ export default function MySubmissions() {
 
     try {
       const userEmpId = Number(user?.empId) || 1004;
+      console.log("Fetching data for Employee ID:", userEmpId);
 
       // HR Forms
       try {
@@ -244,6 +250,7 @@ export default function MySubmissions() {
           daysAgo: getDaysAgo(hr.submittedAt),
         }));
         setHrForms(enriched);
+        console.log("HR Forms loaded:", enriched.length);
       } catch (hrErr) {
         console.error("HR Forms fetch error:", hrErr);
         setHrForms([]);
@@ -265,6 +272,7 @@ export default function MySubmissions() {
           trackingId: m.mentorFeedbackId || m.trackingId || m.id,
         }));
         setMentor(enriched);
+        console.log("Mentor Feedback loaded:", enriched.length);
       } catch (mentorErr) {
         console.error("Mentor feedback fetch error:", mentorErr);
         setMentor([]);
@@ -290,33 +298,47 @@ export default function MySubmissions() {
           queueId: p.queueId || p.id,
         }));
         setPeer(enriched);
+        console.log("Peer Feedback loaded:", enriched.length);
       } catch (peerErr) {
         console.error("Peer feedback fetch error:", peerErr);
         setPeer([]);
       }
 
-      // Goal feedback
+      // Goal feedback - MAJOR FIX HERE
       try {
         const goalRes = await orgGoalFeedbackApi.list(1, 100);
-        const goalData = goalRes?.data || [];
+        
+        // Fix: Handle nested data structure properly
+        const allGoalData = goalRes?.data?.data || goalRes?.data || [];
+        
+        console.log("Raw Goal API Response:", goalRes);
+        console.log("Extracted Goal Data:", allGoalData);
 
-        if (Array.isArray(goalData)) {
-          const myGoals = goalData
-            .filter((g) => Number(g.submittedByEmployeeId) === userEmpId)
+        if (Array.isArray(allGoalData)) {
+          const myGoals = allGoalData
+            .filter((g) => {
+              const matches = Number(g.submittedByEmployeeId) === userEmpId;
+              console.log(`Goal ${g.orgGoalFeedbackId}: submittedBy=${g.submittedByEmployeeId}, currentUser=${userEmpId}, matches=${matches}`);
+              return matches;
+            })
             .map((g) => ({
               ...g,
+              // Fix: Use goalId instead of organizationObjectiveId
               objectiveTitle:
-                objectives[g.organizationObjectiveId] ||
-                `Goal #${g.organizationObjectiveId}`,
-              submittedAtFormatted: formatDate(g.createdAt),
-              daysAgo: getDaysAgo(g.createdAt),
+                objectives[g.goalId] ||
+                g.organizationGoalName ||
+                `Goal #${g.goalId}`,
+              submittedAtFormatted: formatDate(g.createdAt || g.submittedAt),
+              daysAgo: getDaysAgo(g.createdAt || g.submittedAt),
               feedbackId: g.orgGoalFeedbackId,
               rating: g.rating || 0,
               feedbackComments: g.feedbackComments || "",
             }));
 
+          console.log("Filtered Goal Feedback:", myGoals);
           setGoalFeedback(myGoals);
         } else {
+          console.warn("Goal data is not an array:", allGoalData);
           setGoalFeedback([]);
         }
       } catch (goalErr) {
@@ -340,7 +362,7 @@ export default function MySubmissions() {
     if (Object.keys(employeeMap).length > 0) {
       fetchData();
     }
-  }, [employeeMap, fetchData]);
+  }, [employeeMap, objectives, fetchData]);
 
   // View response
   const handleViewResponse = (data, type) => {
@@ -669,7 +691,6 @@ export default function MySubmissions() {
                               </div>
                             </div>
                           </div>
-                         
                         </div>
 
                         <div className="d-flex align-items-start gap-2 mb-3">
@@ -699,7 +720,7 @@ export default function MySubmissions() {
 
                         <div className="fm-mysub-card__preview mb-3">
                           <p className="fm-mysub-card__preview-text">
-                            {hr.formName || "[sample] sample..."}
+                            {hr.formName || "HR Form Submission"}
                           </p>
                         </div>
 
@@ -712,7 +733,13 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                         
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-danger d-flex align-items-center justify-content-center"
+                            onClick={() => deleteHRForm(hr.responseId, hr.formName)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -743,7 +770,6 @@ export default function MySubmissions() {
                               </div>
                             </div>
                           </div>
-                          
                         </div>
 
                         <div className="d-flex align-items-start gap-2 mb-3">
@@ -753,7 +779,7 @@ export default function MySubmissions() {
                           />
                           <div className="text-start">
                             <div className="fm-mysub-card__label-small mb-1">
-                              To
+                              Goal
                             </div>
                             <div className="fm-mysub-card__primary-text">
                               {goal.objectiveTitle}
@@ -800,7 +826,13 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                         
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-danger d-flex align-items-center justify-content-center"
+                            onClick={() => deleteGoalFeedback(goal.feedbackId, goal.objectiveTitle)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -831,7 +863,6 @@ export default function MySubmissions() {
                               </div>
                             </div>
                           </div>
-                          
                         </div>
 
                         <div className="d-flex align-items-start gap-2 mb-3">
@@ -876,7 +907,13 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                         
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-danger d-flex align-items-center justify-content-center"
+                            onClick={() => deleteMentor(m.trackingId, m.mentorNameFull)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -907,7 +944,6 @@ export default function MySubmissions() {
                               </div>
                             </div>
                           </div>
-                          
                         </div>
 
                         <div className="d-flex align-items-start gap-2 mb-3">
@@ -950,7 +986,13 @@ export default function MySubmissions() {
                             <Eye size={16} />
                             View
                           </button>
-                          
+                          <button
+                            type="button"
+                            className="btn fm-mysub-btn-danger d-flex align-items-center justify-content-center"
+                            onClick={() => deletePeer(p.queueId, p.recipientNameFull)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </div>
                     </div>

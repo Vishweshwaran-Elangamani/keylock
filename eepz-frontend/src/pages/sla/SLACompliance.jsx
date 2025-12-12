@@ -9,6 +9,9 @@ import {
   Filter,
   FileText,
   AlertCircle,
+  Users,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
 import ComplianceCard from "../../components/sla/cards/ComplianceCard";
 import slaService from "../../services/sla/slaService";
@@ -202,7 +205,7 @@ const SLACompliance = () => {
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <p className="text-muted mb-0">
+          <p className="text-muted mb-0" style={{ fontSize: "14px" }}>
             Department-wise SLA compliance metrics (Based on Closed SLAs)
           </p>
         </div>
@@ -215,104 +218,211 @@ const SLACompliance = () => {
             <RefreshCw size={16} />
             Refresh
           </button>
-          <button
-            className="btn btn-primary d-flex align-items-center gap-2"
-            onClick={handleExportReport}
-            disabled={complianceData.length === 0}
-            style={{ borderRadius: "8px" }}
-          >
-            <Download size={16} />
-            Export CSV
-          </button>
         </div>
       </div>
 
       {/* Overall Stats Cards */}
       <div className="row g-3 mb-4">
+        {/* Total Escalations Card */}
         <div className="col-md-3">
           <div
-            className="card border-0 shadow-sm h-100"
-            style={{ borderRadius: "12px" }}
+            className="card h-100"
+            style={{
+              borderRadius: "12px",
+              border: "2px solid #2C3E50",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            }}
           >
-            <div className="card-body p-3">
+            <div
+              className="card-body d-flex flex-column align-items-center justify-content-center text-center"
+              style={{ padding: "20px 16px" }}
+            >
               <div
-                className="rounded-circle d-flex align-items-center justify-content-center mb-2"
+                className="d-flex align-items-center justify-content-center mb-2"
                 style={{
-                  width: "40px",
-                  height: "40px",
-                  backgroundColor: "#0F62FE15",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "12px",
+                  backgroundColor: "#E8F1FF",
                 }}
               >
-                <FileText size={20} color="#0F62FE" />
+                <Users size={24} style={{ color: "#5B93FF" }} />
               </div>
-              <h4 className="fw-bold mb-1">{stats.totalSLAs}</h4>
-              <small className="text-muted">Total SLAs</small>
+              <h2
+                className="fw-bold mb-1"
+                style={{
+                  fontSize: "32px",
+                  color: "#1a1a1a",
+                  lineHeight: "1",
+                  margin: "0",
+                }}
+              >
+                {stats.totalSLAs}
+              </h2>
+              <p
+                className="mb-0"
+                style={{
+                  fontSize: "13px",
+                  color: "#6B7280",
+                  fontWeight: "500",
+                }}
+              >
+                Total Escalations
+              </p>
             </div>
           </div>
         </div>
 
+        {/* Approved Card */}
         <div className="col-md-3">
           <div
-            className="card border-0 shadow-sm h-100"
-            style={{ borderRadius: "12px" }}
+            className="card h-100"
+            style={{
+              borderRadius: "12px",
+              border: "2px solid #2C3E50",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            }}
           >
-            <div className="card-body p-3">
+            <div
+              className="card-body d-flex flex-column align-items-center justify-content-center text-center"
+              style={{ padding: "20px 16px" }}
+            >
               <div
-                className="rounded-circle d-flex align-items-center justify-content-center mb-2"
+                className="d-flex align-items-center justify-content-center mb-2"
                 style={{
-                  width: "40px",
-                  height: "40px",
-                  backgroundColor: "#E2B93B15",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "12px",
+                  backgroundColor: "#D1FAE5",
                 }}
               >
-                <TrendingUp size={20} color="#E2B93B" />
+                <CheckCircle size={24} style={{ color: "#10B981" }} />
               </div>
-              <h4 className="fw-bold mb-1">{stats.closedSLAs}</h4>
-              <small className="text-muted">Closed</small>
+              <h2
+                className="fw-bold mb-1"
+                style={{
+                  fontSize: "32px",
+                  color: "#1a1a1a",
+                  lineHeight: "1",
+                  margin: "0",
+                }}
+              >
+                {stats.closedSLAs}
+              </h2>
+              <p
+                className="mb-0"
+                style={{
+                  fontSize: "13px",
+                  color: "#6B7280",
+                  fontWeight: "500",
+                }}
+              >
+                Approved
+              </p>
             </div>
           </div>
         </div>
 
+        {/* Pending Card */}
         <div className="col-md-3">
           <div
-            className="card border-0 shadow-sm h-100"
-            style={{ borderRadius: "12px" }}
+            className="card h-100"
+            style={{
+              borderRadius: "12px",
+              border: "2px solid #2C3E50",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            }}
           >
-            <div className="card-body p-3">
+            <div
+              className="card-body d-flex flex-column align-items-center justify-content-center text-center"
+              style={{ padding: "20px 16px" }}
+            >
               <div
-                className="rounded-circle d-flex align-items-center justify-content-center mb-2"
+                className="d-flex align-items-center justify-content-center mb-2"
                 style={{
-                  width: "40px",
-                  height: "40px",
-                  backgroundColor: "#0F62FE15",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "12px",
+                  backgroundColor: "#FEF3C7",
                 }}
               >
-                <TrendingUp size={20} color="#0F62FE" />
+                <Clock size={24} style={{ color: "#F59E0B" }} />
               </div>
-              <h4 className="fw-bold mb-1">{stats.onTimeSLAs}</h4>
-              <small className="text-muted">On-Time</small>
+              <h2
+                className="fw-bold mb-1"
+                style={{
+                  fontSize: "32px",
+                  color: "#1a1a1a",
+                  lineHeight: "1",
+                  margin: "0",
+                }}
+              >
+                {stats.openSLAs}
+              </h2>
+              <p
+                className="mb-0"
+                style={{
+                  fontSize: "13px",
+                  color: "#6B7280",
+                  fontWeight: "500",
+                }}
+              >
+                Pending
+              </p>
             </div>
           </div>
         </div>
 
+        {/* Rejected Card */}
         <div className="col-md-3">
           <div
-            className="card border-0 shadow-sm h-100"
-            style={{ borderRadius: "12px" }}
+            className="card h-100"
+            style={{
+              borderRadius: "12px",
+              border: "2px solid #2C3E50",
+              backgroundColor: "#FFFFFF",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            }}
           >
-            <div className="card-body p-3">
+            <div
+              className="card-body d-flex flex-column align-items-center justify-content-center text-center"
+              style={{ padding: "20px 16px" }}
+            >
               <div
-                className="rounded-circle d-flex align-items-center justify-content-center mb-2"
+                className="d-flex align-items-center justify-content-center mb-2"
                 style={{
-                  width: "40px",
-                  height: "40px",
-                  backgroundColor: "#E0195015",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "12px",
+                  backgroundColor: "#FEE2E2",
                 }}
               >
-                <TrendingDown size={20} color="#E01950" />
+                <AlertCircle size={24} style={{ color: "#EF4444" }} />
               </div>
-              <h4 className="fw-bold mb-1">{stats.breachedSLAs}</h4>
-              <small className="text-muted">Breached</small>
+              <h2
+                className="fw-bold mb-1"
+                style={{
+                  fontSize: "32px",
+                  color: "#1a1a1a",
+                  lineHeight: "1",
+                  margin: "0",
+                }}
+              >
+                {stats.breachedSLAs}
+              </h2>
+              <p
+                className="mb-0"
+                style={{
+                  fontSize: "13px",
+                  color: "#6B7280",
+                  fontWeight: "500",
+                }}
+              >
+                Rejected
+              </p>
             </div>
           </div>
         </div>
@@ -552,17 +662,41 @@ const SLACompliance = () => {
         </>
       )}
 
-      {/* Empty State */}
+      {/* Empty State - CENTERED WITH IMPROVED STYLING */}
       {!loading && sortedData.length === 0 && (
         <div
-          className="card border-0 shadow-sm text-center py-5"
-          style={{ borderRadius: "12px" }}
+          className="d-flex flex-column align-items-center justify-content-center text-center"
+          style={{ 
+            minHeight: "400px",
+            padding: "60px 20px"
+          }}
         >
-          <div className="card-body">
-            {/* <FileText size={64} className="text-muted mb-3" /> */}
-            <h5 className="text-muted">No Compliance Data</h5>
-            <p className="text-muted mb-0">No SLA data available to display</p>
-          </div>
+          <FileText 
+            size={48} 
+            className="mb-3" 
+            style={{ 
+              strokeWidth: 1.5,
+              color: "#9CA3AF"
+            }}
+          />
+          <h5 
+            className="fw-semibold mb-2" 
+            style={{ 
+              fontSize: "18px",
+              color: "#374151" 
+            }}
+          >
+            No Compliance Data
+          </h5>
+          <p 
+            className="mb-0" 
+            style={{ 
+              fontSize: "14px",
+              color: "#6B7280" 
+            }}
+          >
+            No SLA data available to display
+          </p>
         </div>
       )}
     </div>

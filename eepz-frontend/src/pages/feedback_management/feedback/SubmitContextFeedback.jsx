@@ -1,5 +1,3 @@
-// src/pages/feedback_management/feedback/SubmitContextFeedback.jsx
-
 import React, { useEffect, useMemo, useState } from "react";
 import {
   CheckCircle,
@@ -19,16 +17,16 @@ import {
   employeeApi,
   goalsApi,
 } from "../../../services/feedbackmanagement/feedbackApi";
-
+ 
 export default function SubmitContextFeedback() {
   const navigate = useNavigate();
-  
+ 
   // Get logged-in user from localStorage
   const user = useMemo(
     () => JSON.parse(localStorage.getItem("user") || "{}") || {},
     []
   );
-
+ 
   const [activeTab, setActiveTab] = useState("goal");
   const [goalForm, setGoalForm] = useState({
     organizationObjectiveId: "",
@@ -50,20 +48,20 @@ export default function SubmitContextFeedback() {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [error, setError] = useState("");
-
+ 
   // Fetch goals and employees on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoadingData(true);
         setError("");
-
+ 
         // Fetch organization-level goals
         try {
           const goalsResponse = await goalsApi.getOrganizationLevel();
-          
+         
           let goalsList = [];
-          
+         
           // Handle different response structures
           if (Array.isArray(goalsResponse.data)) {
             goalsList = goalsResponse.data;
@@ -72,18 +70,18 @@ export default function SubmitContextFeedback() {
           } else if (goalsResponse.data?.$values && Array.isArray(goalsResponse.data.$values)) {
             goalsList = goalsResponse.data.$values;
           }
-          
+         
           setObjectives(goalsList);
         } catch (goalsError) {
           console.error("Failed to fetch goals:", goalsError);
           setObjectives([]);
         }
-
+ 
         // Fetch employees
         try {
           const empResponse = await employeeApi.getAll();
-          const employeesList = Array.isArray(empResponse.data) 
-            ? empResponse.data 
+          const employeesList = Array.isArray(empResponse.data)
+            ? empResponse.data
             : empResponse.data?.data || empResponse.data?.$values || [];
           setEmployees(employeesList);
         } catch (empError) {
@@ -91,7 +89,7 @@ export default function SubmitContextFeedback() {
           setError("Failed to load employees. Please refresh the page.");
           setEmployees([]);
         }
-
+ 
       } catch (err) {
         console.error("Error in fetchData:", err);
         setError("Failed to load data. Please refresh the page.");
@@ -99,60 +97,59 @@ export default function SubmitContextFeedback() {
         setLoadingData(false);
       }
     };
-
+ 
     fetchData();
   }, []);
-
+ 
   // Handle goal selection
   const handleObjectiveChange = (e) => {
     const selectedId = Number(e.target.value);
-    
+   
     const selectedObjective = objectives.find(
       (obj) => {
         const objId = obj.goalId || obj.objectiveId || obj.id;
         return objId === selectedId;
       }
     );
-    
+   
     setGoalForm({
       ...goalForm,
       organizationObjectiveId: selectedId,
-      objectiveTitle: selectedObjective?.goalName || 
-                     selectedObjective?.title || 
-                     selectedObjective?.name || 
+      objectiveTitle: selectedObjective?.goalName ||
+                     selectedObjective?.title ||
+                     selectedObjective?.name ||
                      selectedObjective?.goalTitle || "",
     });
   };
-
+ 
   // Submit goal feedback
   const submitGoal = async (e) => {
     e.preventDefault();
     setSuccessMsg("");
     setError("");
-
+ 
     if (!goalForm.organizationObjectiveId || !goalForm.feedbackComments?.trim()) {
       setError("Goal and comments are required.");
       return;
     }
-
+ 
     setLoading(true);
     try {
-      const payload = {
-         organizationObjectiveId: Number(goalForm.organizationObjectiveId),
+    const payload = {
+  goalId: Number(goalForm.organizationObjectiveId),
   submittedByEmployeeId: Number(user?.empId),
-  managerEmployeeId: null,
+  recipientEmployeeId: Number(user?.empId),  // self
   rating: Number(goalForm.rating || 0),
   feedbackComments: goalForm.feedbackComments,
-  feedbackFrom: "Employee",
-  isAnonymous: !!goalForm.isAnonymous,
-  feedbackType: "OrganizationalGoal" // or whatever valid value your DB expects
-      };
-
-      await orgGoalFeedbackApi.create(payload);
-
+  isAnonymous: !!goalForm.isAnonymous
+};
+ 
+await orgGoalFeedbackApi.create(payload);
+ 
+ 
       setSuccessMsg("Goal feedback submitted successfully!");
       setGoalForm({
-        organizationObjectiveId: "",
+        organizationObjectiveId: null,
         objectiveTitle: "",
         rating: 4,
         feedbackComments: "",
@@ -170,7 +167,7 @@ export default function SubmitContextFeedback() {
       setLoading(false);
     }
   };
-
+ 
   // Handle employee selection
   const handleEmployeeChange = (e) => {
     const selectedId = Number(e.target.value);
@@ -185,13 +182,13 @@ export default function SubmitContextFeedback() {
         : "",
     });
   };
-
+ 
   // Submit context feedback
   const submitContext = async (e) => {
     e.preventDefault();
     setSuccessMsg("");
     setError("");
-
+ 
     if (
       !contextForm.recipientEmployeeId ||
       !contextForm.feedbackContent?.trim() ||
@@ -200,30 +197,30 @@ export default function SubmitContextFeedback() {
       setError("Recipient, project context, and feedback are required.");
       return;
     }
-
+ 
     setLoading(true);
     try {
       const contextPrefix = contextForm.projectContext
         ? `[${contextForm.projectContext}] `
         : "";
-      
+     
       const peerPayload = {
         submittedByEmployeeId: Number(user?.empId),
         recipientEmployeeId: Number(contextForm.recipientEmployeeId),
         feedbackContent: contextPrefix + contextForm.feedbackContent,
         isAnonymous: !!contextForm.isAnonymous,
       };
-
+ 
       const createResponse = await peerQueueApi.create(peerPayload);
-
+ 
       if (createResponse?.data?.success || createResponse?.success) {
-        const queueId = createResponse.data?.data?.queueId || 
+        const queueId = createResponse.data?.data?.queueId ||
                        createResponse.data?.queueId;
-
+ 
         if (!queueId) {
           throw new Error("Queue ID not returned from server");
         }
-
+ 
         // Attempt auto-approval
         try {
           const approveResponse = await peerQueueApi.approve(queueId, {
@@ -231,7 +228,7 @@ export default function SubmitContextFeedback() {
             isRelevant: true,
             approvedByHRId: Number(user?.empId),
           });
-
+ 
           if (approveResponse?.success || approveResponse?.data?.success) {
             setSuccessMsg(
               `Context feedback submitted successfully for ${contextForm.recipientName}!`
@@ -247,7 +244,7 @@ export default function SubmitContextFeedback() {
             `Context feedback submitted to ${contextForm.recipientName}, pending approval.`
           );
         }
-
+ 
         setContextForm({
           recipientEmployeeId: "",
           recipientName: "",
@@ -274,7 +271,7 @@ export default function SubmitContextFeedback() {
       setLoading(false);
     }
   };
-
+ 
   // Get selected goal/employee for display
   const selectedObjective = objectives.find(
     (obj) => {
@@ -282,11 +279,11 @@ export default function SubmitContextFeedback() {
       return objId == goalForm.organizationObjectiveId;
     }
   );
-  
+ 
   const selectedEmployee = employees.find(
     (emp) => emp.employeeId == contextForm.recipientEmployeeId
   );
-
+ 
   // Render star rating
   const renderStars = (rating) => {
     return [...Array(5)].map((_, index) => {
@@ -304,17 +301,17 @@ export default function SubmitContextFeedback() {
       );
     });
   };
-
+ 
   // Helper function to get goal display name
   const getGoalDisplayName = (goal) => {
-    return goal.goalName || 
-           goal.title || 
-           goal.name || 
-           goal.goalTitle || 
+    return goal.goalName ||
+           goal.title ||
+           goal.name ||
+           goal.goalTitle ||
            goal.objectiveName ||
            `Untitled Goal`;
   };
-
+ 
   return (
     <div
       style={{
@@ -392,7 +389,7 @@ export default function SubmitContextFeedback() {
             </li>
           </ol>
         </nav>
-
+ 
         {/* Error alert */}
         {error && (
           <div
@@ -425,7 +422,7 @@ export default function SubmitContextFeedback() {
             />
           </div>
         )}
-
+ 
         {/* Success alert */}
         {successMsg && (
           <div
@@ -456,7 +453,7 @@ export default function SubmitContextFeedback() {
             />
           </div>
         )}
-
+ 
         {/* Tab selector - NEW DESIGN */}
         <div
           style={{
@@ -491,7 +488,7 @@ export default function SubmitContextFeedback() {
             <Target size={16} />
             Goal Feedback
           </button>
-
+ 
           <button
             type="button"
             onClick={() => setActiveTab("context")}
@@ -515,7 +512,7 @@ export default function SubmitContextFeedback() {
             Context Feedback
           </button>
         </div>
-
+ 
         {/* Loading state */}
         {loadingData && (
           <div
@@ -540,7 +537,7 @@ export default function SubmitContextFeedback() {
             </div>
           </div>
         )}
-
+ 
         {/* Goal feedback form */}
         {!loadingData && activeTab === "goal" && (
           <div
@@ -585,7 +582,7 @@ export default function SubmitContextFeedback() {
                     </small>
                   )}
                 </div>
-
+ 
                 {selectedObjective && (
                   <div
                     className="mb-4 p-3"
@@ -611,14 +608,14 @@ export default function SubmitContextFeedback() {
                         marginBottom: 0,
                       }}
                     >
-                      {selectedObjective.description || 
-                       selectedObjective.goalDescription || 
+                      {selectedObjective.description ||
+                       selectedObjective.goalDescription ||
                        selectedObjective.objectiveDescription ||
                        "No description available"}
                     </p>
                   </div>
                 )}
-
+ 
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2"
@@ -646,7 +643,7 @@ export default function SubmitContextFeedback() {
                     </span>
                   </div>
                 </div>
-
+ 
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2"
@@ -695,7 +692,7 @@ export default function SubmitContextFeedback() {
                     </span>
                   </div>
                 </div>
-
+ 
                 <div className="mb-4">
                   <div className="form-check">
                     <input
@@ -719,7 +716,7 @@ export default function SubmitContextFeedback() {
                     </label>
                   </div>
                 </div>
-
+ 
                 <button
                   type="submit"
                   className="btn w-100 d-flex align-items-center justify-content-center gap-2"
@@ -764,7 +761,7 @@ export default function SubmitContextFeedback() {
             </div>
           </div>
         )}
-
+ 
         {/* Context feedback form */}
         {!loadingData && activeTab === "context" && (
           <div
@@ -800,7 +797,7 @@ export default function SubmitContextFeedback() {
                     ))}
                   </select>
                 </div>
-
+ 
                 {selectedEmployee && (
                   <div
                     className="mb-4 p-3"
@@ -833,7 +830,7 @@ export default function SubmitContextFeedback() {
                     </small>
                   </div>
                 )}
-
+ 
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2"
@@ -861,7 +858,7 @@ export default function SubmitContextFeedback() {
                     }}
                   />
                 </div>
-
+ 
                 <div className="mb-4">
                   <label
                     className="form-label fw-semibold mb-2"
@@ -910,7 +907,7 @@ export default function SubmitContextFeedback() {
                     </span>
                   </div>
                 </div>
-
+ 
                 <div className="mb-4">
                   <div className="form-check">
                     <input
@@ -934,7 +931,7 @@ export default function SubmitContextFeedback() {
                     </label>
                   </div>
                 </div>
-
+ 
                 <button
                   type="submit"
                   className="btn w-100 d-flex align-items-center justify-content-center gap-2"
@@ -984,7 +981,7 @@ export default function SubmitContextFeedback() {
           </div>
         )}
       </div>
-
+ 
       <style>{`
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -992,7 +989,7 @@ export default function SubmitContextFeedback() {
           border-color: #27235C;
           box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
         }
-
+ 
         .form-select {
   -webkit-appearance: none;
   -moz-appearance: none;
