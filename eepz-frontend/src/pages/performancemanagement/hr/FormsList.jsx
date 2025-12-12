@@ -160,7 +160,7 @@ function FormsList() {
 
         let filteredUsersData = [];
         if (selectedForm.type === "Manager") {
-          const managersRes = await api.get("/Assignments/all-managers");
+          const managersRes = await api.get("/Employees/all-managers");
           filteredUsersData = Array.isArray(managersRes.data?.data)
             ? managersRes.data.data
             : [];
