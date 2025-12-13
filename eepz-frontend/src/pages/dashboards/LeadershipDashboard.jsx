@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -17,41 +19,34 @@ import CountUp from "react-countup";
 import {
   DollarSign,
   Target,
-  TrendingUp,
-  TrendingDown,
-  Users,
   Briefcase,
-  Award,
-  BookOpen,
+  Users,
+  TrendingUp,
 } from "lucide-react";
 import budgetAllocationService from "../../services/hr_operations/hr/budgetAllocationService";
 import goalService from "../../services/goals/goalService";
-import employeePolicyService from "../../services/hr_operations/employee/employeePolicyService";
 import { employeeApi } from "../../services/feedbackmanagement/feedbackApi";
 import projectService from "../../services/project_management/projectService";
-import lndService from "../../services/lnd/lndService";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
-import "../../styles/common/Dashboard.css";
+import "../../styles/auth/AdminDashboard.css";
 
-const formatCurrency = (amount) => {
-  if (!amount) return "₹0";
-  return `₹${Number(amount).toLocaleString("en-IN")}`;
+const formatStatusLabel = (raw) => {
+  if (!raw) return "";
+  const lower = String(raw).toLowerCase().replace(/_/g, " ");
+  return lower.replace(/\b\w/g, (c) => c.toUpperCase());
 };
 
 const LeadershipDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [selectedDepartment, setSelectedDepartment] =
-    useState("All Departments");
+  const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
   const [dashboardData, setDashboardData] = useState({
     budgets: [],
     departments: [],
     goals: [],
-    policies: [],
     employees: [],
     projects: [],
-    lndAssignments: [],
   });
 
   useEffect(() => {
@@ -86,61 +81,33 @@ const LeadershipDashboard = () => {
     try {
       setLoading(true);
 
-      const [
-        budgetsRes,
-        departmentsRes,
-        goalsRes,
-        policiesRes,
-        employeesRes,
-        projectsRes,
-        lndAssignmentsRes,
-      ] = await Promise.all([
-        budgetAllocationService
-          .getAllDepartmentBudgets()
-          .catch(() => ({ data: [] })),
-        budgetAllocationService
-          .getAllDepartments()
-          .catch(() => ({ data: [] })),
-        goalService
-          .queryGoals({ page: 1, pageSize: 1000 })
-          .catch(() => ({ data: [] })),
-        employeePolicyService.getPublishedPolicies().catch(() => []),
-        employeeApi.getAll().catch(() => ({ data: [] })),
-        projectService.getAllProjects().catch(() => ({ data: [] })),
-        lndService
-          .getAllOrganizationAssignments(1, "", "", "", "", 1000)
-          .catch(() => ({ data: { items: [], totalCount: 0 } })),
-      ]);
+      const [budgetsRes, departmentsRes, goalsRes, employeesRes, projectsRes] =
+        await Promise.all([
+          budgetAllocationService
+            .getAllDepartmentBudgets()
+            .catch(() => ({ data: [] })),
+          budgetAllocationService
+            .getAllDepartments()
+            .catch(() => ({ data: [] })),
+          goalService
+            .queryGoals({ pageSize: 1000, status: "" })
+            .catch(() => ({ data: [] })),
+          employeeApi.getAll().catch(() => ({ data: [] })),
+          projectService.getAllProjects().catch(() => ({ data: [] })),
+        ]);
 
       const extractedBudgets = extractData(budgetsRes);
       const extractedDepartments = extractData(departmentsRes);
       const extractedGoals = extractData(goalsRes);
-      const extractedPolicies = Array.isArray(policiesRes)
-        ? policiesRes
-        : extractData(policiesRes);
       const extractedEmployees = extractData(employeesRes);
       const extractedProjects = extractData(projectsRes);
-
-      let extractedLndAssignments = [];
-      if (lndAssignmentsRes?.data?.data?.items?.$values) {
-        extractedLndAssignments = lndAssignmentsRes.data.data.items.$values;
-      } else if (Array.isArray(lndAssignmentsRes?.data?.data?.items)) {
-        extractedLndAssignments = lndAssignmentsRes.data.data.items;
-      } else if (Array.isArray(lndAssignmentsRes?.data)) {
-        extractedLndAssignments = lndAssignmentsRes.data;
-      }
-
-      console.log("📊 Employees Data:", extractedEmployees);
-      console.log("📊 Goals Data:", extractedGoals);
 
       setDashboardData({
         budgets: extractedBudgets,
         departments: extractedDepartments,
         goals: extractedGoals,
-        policies: extractedPolicies,
         employees: extractedEmployees,
         projects: extractedProjects,
-        lndAssignments: extractedLndAssignments,
       });
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -155,65 +122,72 @@ const LeadershipDashboard = () => {
       (sum, b) => sum + (parseFloat(b.totalBudget) || 0),
       0
     );
-    const utilizedBudget = dashboardData.budgets.reduce(
-      (sum, b) => sum + (parseFloat(b.utilizedAmount) || 0),
-      0
-    );
 
-    const activeGoals = dashboardData.goals.filter((g) => {
-      const status = (g.status || "").toLowerCase();
+    const totalActiveGoals = dashboardData.goals.filter((g) => {
+      const status = (g.status || g.goalStatus || "").toLowerCase();
       return (
-        status === "open" || status === "inprogress" || status === "reopened"
+        status === "inprogress" ||
+        status === "pending" ||
+        status === "approved" ||
+        status === "open" ||
+        status === "active"
       );
     }).length;
 
-    const completedGoals = dashboardData.goals.filter(
-      (g) => (g.status || "").toLowerCase() === "completed"
-    ).length;
-
-    const goalCompletionRate =
-      dashboardData.goals.length > 0
-        ? Math.round((completedGoals / dashboardData.goals.length) * 100)
-        : 0;
-
-    const activeProjects = dashboardData.projects.filter(
-      (p) => p.isActive === true
-    ).length;
-
-    const completedLnd = dashboardData.lndAssignments.filter((a) => {
-      const status = (a.assignmentStatus || a.status || "")
-        .toLowerCase()
-        .replace(/\s/g, "");
-      return status === "completed";
+    const activeProjects = dashboardData.projects.filter((p) => {
+      if (p.isActive === true || p.isActive === 1) return true;
+      if (p.status) {
+        const status = p.status.toLowerCase();
+        return status === "active" || status === "inprogress" || status === "in progress";
+      }
+      if (p.projectStatus) {
+        const status = p.projectStatus.toLowerCase();
+        return status === "active" || status === "inprogress" || status === "in progress";
+      }
+      return false;
     }).length;
 
-    const lndCompletionRate =
-      dashboardData.lndAssignments.length > 0
+    const totalProjects = dashboardData.projects.length;
+
+    const totalDepartments = dashboardData.departments.length;
+    const totalEmployees = dashboardData.employees.length;
+
+    const budgetUtilization = dashboardData.budgets.reduce((sum, b) => {
+      const total = parseFloat(b.totalBudget) || 0;
+      const utilized = parseFloat(b.utilizedAmount) || 0;
+      return sum + (total > 0 ? (utilized / total) * 100 : 0);
+    }, 0);
+
+    const avgUtilization =
+      dashboardData.budgets.length > 0
+        ? Math.round(budgetUtilization / dashboardData.budgets.length)
+        : 0;
+
+    const completionRate =
+      dashboardData.goals.length > 0
         ? Math.round(
-            (completedLnd / dashboardData.lndAssignments.length) * 100
+            (dashboardData.goals.filter(
+              (g) =>
+                g.status?.toLowerCase() === "completed" ||
+                g.goalStatus?.toLowerCase() === "completed"
+            ).length /
+              dashboardData.goals.length) *
+              100
           )
         : 0;
 
     return {
       totalBudget,
-      utilizedBudget,
-      budgetUtilization:
-        totalBudget > 0 ? Math.round((utilizedBudget / totalBudget) * 100) : 0,
-      totalDepartments: dashboardData.departments.length,
-      activeGoals,
-      completedGoals,
-      totalGoals: dashboardData.goals.length,
-      goalCompletionRate,
-      totalEmployees: dashboardData.employees.length,
+      totalActiveGoals,
       activeProjects,
-      totalProjects: dashboardData.projects.length,
-      totalLndAssignments: dashboardData.lndAssignments.length,
-      completedLnd,
-      lndCompletionRate,
+      totalProjects,
+      totalDepartments,
+      totalEmployees,
+      avgUtilization,
+      completionRate,
     };
   };
 
-  // ✅ Employee Status Distribution
   const getEmployeeStatus = () => {
     const statusCount = {
       fulltime: 0,
@@ -245,7 +219,6 @@ const LeadershipDashboard = () => {
     };
   };
 
-  // ✅ Budget By Department
   const getBudgetByDepartment = () => {
     let filteredBudgets = dashboardData.budgets;
 
@@ -279,47 +252,16 @@ const LeadershipDashboard = () => {
       .slice(0, 5);
   };
 
-  // ✅ Goals Distribution
-  const getGoalDistribution = () => {
-    const statusMap = {
-      open: 0,
-      inprogress: 0,
-      completed: 0,
-      onhold: 0,
-      cancelled: 0,
-    };
-
+  const getGoalStatusDistribution = () => {
+    const statusCount = {};
     dashboardData.goals.forEach((goal) => {
-      const status = (goal.status || "open").toLowerCase().replace(/\s/g, "");
-      if (statusMap.hasOwnProperty(status)) {
-        statusMap[status]++;
-      } else {
-        statusMap.open++;
-      }
+      const raw = goal.status || goal.goalStatus || "Unknown";
+      const key = formatStatusLabel(raw);
+      statusCount[key] = (statusCount[key] || 0) + 1;
     });
-
-    const colors = {
-      Open: "#f59e0b",
-      "In Progress": "#0F62FE",
-      Completed: "#10b981",
-      "On Hold": "#6b7280",
-      Cancelled: "#ef4444",
-    };
-
-    return Object.entries(statusMap)
-      .filter(([_, count]) => count > 0)
-      .map(([status, count]) => {
-        const label = status
-          .charAt(0)
-          .toUpperCase() + status.slice(1)
-          .replace("inprogress", "In Progress")
-          .replace("onhold", "On Hold");
-        return {
-          name: label,
-          value: count,
-          color: colors[label] || "#8b5cf6",
-        };
-      });
+    return Object.entries(statusCount)
+      .map(([name, value]) => ({ name, value }))
+      .filter((item) => item.value > 0);
   };
 
   if (loading) {
@@ -335,58 +277,48 @@ const LeadershipDashboard = () => {
   const kpiStats = getKPIStats();
   const employeeStatus = getEmployeeStatus();
   const budgetByDept = getBudgetByDepartment();
-  const goalDistribution = getGoalDistribution();
+  const goalStatusDistribution = getGoalStatusDistribution();
+
+  const GOAL_CHART_COLORS = [
+    "#84cc16",
+    "#65a30d",
+    "#a3e635",
+    "#bef264",
+    "#d9f99d",
+    "#ecfccb",
+  ];
 
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Leadership Dashboard" }]} />
 
-      {/* KPI Section */}
-      <div className="admin-kpi-grid">
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("/leadership/budget-management")}
-          style={{ cursor: "pointer" }}
-        >
+      <div className="admin-kpi-grid" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+        <div className="admin-kpi-card">
           <div className="admin-kpi-icon admin-pink">
             <DollarSign size={28} />
           </div>
           <div className="admin-kpi-content">
             <h2>
-              <CountUp
-                end={kpiStats.totalBudget}
-                duration={2}
-                prefix="₹"
-                separator=","
-              />
+              ₹<CountUp end={kpiStats.totalBudget} duration={2} separator="," />
             </h2>
             <p>Total Budget</p>
             <span className="admin-kpi-subtitle">
-              {kpiStats.budgetUtilization >= 75 ? (
-                <TrendingUp size={12} color="#ef4444" />
-              ) : (
-                <TrendingDown size={12} color="#10b981" />
-              )}{" "}
-              {kpiStats.budgetUtilization}% utilized
+              <TrendingUp size={12} /> {kpiStats.avgUtilization}% utilized
             </span>
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("/leadership/dashboard/goals")}
-          style={{ cursor: "pointer" }}
-        >
-          <div className="admin-kpi-icon admin-green">
+        <div className="admin-kpi-card">
+          <div className="admin-kpi-icon admin-yellow">
             <Target size={28} />
           </div>
           <div className="admin-kpi-content">
             <h2>
-              <CountUp end={kpiStats.activeGoals} duration={2} />
+              <CountUp end={kpiStats.totalActiveGoals} duration={2} />
             </h2>
             <p>Active Goals</p>
             <span className="admin-kpi-subtitle">
-              <Award size={12} /> {kpiStats.goalCompletionRate}% completion rate
+              <Target size={12} /> {kpiStats.completionRate}% completion rate
             </span>
           </div>
         </div>
@@ -406,27 +338,8 @@ const LeadershipDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("/leadership/lnd/dashboard")}
-          style={{ cursor: "pointer" }}
-        >
-          <div className="admin-kpi-icon admin-purple">
-            <BookOpen size={28} />
-          </div>
-          <div className="admin-kpi-content">
-            <h2>
-              <CountUp end={kpiStats.totalLndAssignments} duration={2} />
-            </h2>
-            <p>L&D Programs</p>
-            <span className="admin-kpi-subtitle">
-              {kpiStats.lndCompletionRate}% completion rate
-            </span>
-          </div>
-        </div>
-
         <div className="admin-kpi-card">
-          <div className="admin-kpi-icon admin-yellow">
+          <div className="admin-kpi-icon admin-green">
             <Users size={28} />
           </div>
           <div className="admin-kpi-content">
@@ -441,10 +354,8 @@ const LeadershipDashboard = () => {
         </div>
       </div>
 
-      {/* ✅ MAIN SECTION - 3 CARDS: Employee Status, Budget, Goals */}
       <div className="dashboard-cards-container">
         <div className="dashboard-row">
-          {/* Card 1: Employee Status */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -546,7 +457,6 @@ const LeadershipDashboard = () => {
             </div>
           </div>
 
-          {/* Card 2: Budget Allocation */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -615,64 +525,49 @@ const LeadershipDashboard = () => {
             </div>
           </div>
 
-          {/* Card 3: Goals Distribution */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
-                <i className="bi bi-pie-chart-fill"></i>
-                <h3>Goals Distribution</h3>
+                <i className="bi bi-bullseye"></i>
+                <h3>Goal Status Distribution</h3>
               </div>
             </div>
             <div className="card-body">
-              {goalDistribution.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={240}>
-                    <PieChart>
-                      <Pie
-                        data={goalDistribution}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={4}
-                        dataKey="value"
-                      >
-                        {goalDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div style={{ marginTop: "1rem", textAlign: "center" }}>
-                    {goalDistribution.map((item, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          display: "inline-block",
-                          margin: "0 0.75rem",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        <span
-                          style={{
-                            display: "inline-block",
-                            width: "12px",
-                            height: "12px",
-                            backgroundColor: item.color,
-                            borderRadius: "2px",
-                            marginRight: "0.3rem",
-                          }}
-                        ></span>
-                        <span style={{ color: "#374151" }}>
-                          {item.name}: {item.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
+              {goalStatusDistribution.length > 0 ? (
+                <ResponsiveContainer width="100%" height={280}>
+                  <PieChart>
+                    <Pie
+                      data={goalStatusDistribution}
+                      cx="50%"
+                      cy="45%"
+                      outerRadius={80}
+                      dataKey="value"
+                      label={false}
+                    >
+                      {goalStatusDistribution.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={GOAL_CHART_COLORS[index % GOAL_CHART_COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                      formatter={(value, entry) => {
+                        const item = goalStatusDistribution.find(
+                          (d) => d.name === entry.value
+                        );
+                        return `${item?.name || value}: ${item?.value || 0}`;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               ) : (
-                <div className="no-data-message">No goals data</div>
+                <div className="no-data-message">No goal data available</div>
               )}
             </div>
           </div>
@@ -682,4 +577,4 @@ const LeadershipDashboard = () => {
   );
 };
 
-export default LeadershipDashboard;  
+export default LeadershipDashboard;

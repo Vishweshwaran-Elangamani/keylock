@@ -1,3 +1,6 @@
+
+
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -548,10 +551,7 @@ const HRDashboard = () => {
       <Breadcrumb items={[{ label: "HR Dashboard" }]} />
 
       <div className="admin-kpi-grid">
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("/auth/admin/users")}
-        >
+        <div className="admin-kpi-card">
           <div className="admin-kpi-icon admin-pink">
             <Users size={28} />
           </div>
@@ -567,10 +567,7 @@ const HRDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("/auth/admin/users")}
-        >
+        <div className="admin-kpi-card">
           <div className="admin-kpi-icon admin-green">
             <UserCheck size={28} />
           </div>
@@ -583,12 +580,7 @@ const HRDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() =>
-            navigate("/performancemanagement/hr/hrnomination")
-          }
-        >
+        <div className="admin-kpi-card">
           <div className="admin-kpi-icon admin-yellow">
             <Award size={28} />
           </div>
@@ -603,10 +595,7 @@ const HRDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("/hr/departments")}
-        >
+        <div className="admin-kpi-card">
           <div className="admin-kpi-icon admin-blue">
             <Briefcase size={28} />
           </div>
@@ -621,12 +610,7 @@ const HRDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() =>
-            navigate("/performancemanagement/hr/formslist")
-          }
-        >
+        <div className="admin-kpi-card">
           <div className="admin-kpi-icon admin-purple">
             <Shield size={28} />
           </div>
@@ -642,7 +626,6 @@ const HRDashboard = () => {
 
       <div className="dashboard-cards-container">
         <div className="dashboard-row">
-          {/* Employee Status */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -748,7 +731,6 @@ const HRDashboard = () => {
             </div>
           </div>
 
-          {/* Budget Allocation */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -817,7 +799,6 @@ const HRDashboard = () => {
             </div>
           </div>
 
-          {/* Period Allocations */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -886,9 +867,7 @@ const HRDashboard = () => {
           </div>
         </div>
 
-        {/* SECOND ROW: project, nominations, performance, L&D */}
         <div className="dashboard-row">
-          {/* Project Status */}
           <div className="dashboard-card card-small">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -899,15 +878,15 @@ const HRDashboard = () => {
             <div className="card-body">
               {projectStatus.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height={200}>
+                  <ResponsiveContainer width="100%" height={240}>
                     <PieChart>
                       <Pie
                         data={projectStatus}
                         cx="50%"
-                        cy="50%"
+                        cy="45%"
                         outerRadius={70}
                         dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}`}
+                        label={false}
                       >
                         {projectStatus.map((entry, index) => (
                           <Cell
@@ -917,6 +896,16 @@ const HRDashboard = () => {
                         ))}
                       </Pie>
                       <Tooltip />
+                      <Legend
+                        layout="horizontal"
+                        align="center"
+                        verticalAlign="bottom"
+                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                        formatter={(value, entry) => {
+                          const item = projectStatus.find(d => d.name === entry.value);
+                          return `${item?.name || value}: ${item?.value || 0}`;
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                   <button
@@ -932,7 +921,6 @@ const HRDashboard = () => {
             </div>
           </div>
 
-          {/* Nominations */}
           <div className="dashboard-card card-small">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -943,17 +931,17 @@ const HRDashboard = () => {
             <div className="card-body">
               {nominationStatus.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height={200}>
+                  <ResponsiveContainer width="100%" height={240}>
                     <PieChart>
                       <Pie
                         data={nominationStatus}
                         cx="50%"
-                        cy="50%"
+                        cy="45%"
                         innerRadius={50}
                         outerRadius={70}
                         paddingAngle={3}
                         dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}`}
+                        label={false}
                       >
                         {nominationStatus.map((entry, index) => (
                           <Cell
@@ -963,6 +951,16 @@ const HRDashboard = () => {
                         ))}
                       </Pie>
                       <Tooltip />
+                      <Legend
+                        layout="horizontal"
+                        align="center"
+                        verticalAlign="bottom"
+                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                        formatter={(value, entry) => {
+                          const item = nominationStatus.find(d => d.name === entry.value);
+                          return `${item?.name || value}: ${item?.value || 0}`;
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                   <button
@@ -978,7 +976,6 @@ const HRDashboard = () => {
             </div>
           </div>
 
-          {/* Performance Management */}
           <div className="dashboard-card card-small">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -1146,7 +1143,6 @@ const HRDashboard = () => {
             </div>
           </div>
 
-          {/* Learning & Development */}
           <div className="dashboard-card card-small">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -1190,17 +1186,17 @@ const HRDashboard = () => {
 
                 return (
                   <>
-                    <ResponsiveContainer width="100%" height={200}>
+                    <ResponsiveContainer width="100%" height={240}>
                       <PieChart>
                         <Pie
                           data={lndData}
                           cx="50%"
-                          cy="50%"
+                          cy="45%"
                           innerRadius={50}
                           outerRadius={70}
                           paddingAngle={3}
                           dataKey="value"
-                          label={({ name, value }) => `${name}: ${value}`}
+                          label={false}
                         >
                           {lndData.map((entry, index) => (
                             <Cell
@@ -1210,6 +1206,16 @@ const HRDashboard = () => {
                           ))}
                         </Pie>
                         <Tooltip />
+                        <Legend
+                          layout="horizontal"
+                          align="center"
+                          verticalAlign="bottom"
+                          wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                          formatter={(value, entry) => {
+                            const item = lndData.find(d => d.name === entry.value);
+                            return `${item?.name || value}: ${item?.value || 0}`;
+                          }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                     <button

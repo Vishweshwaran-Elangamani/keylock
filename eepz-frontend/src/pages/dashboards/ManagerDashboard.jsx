@@ -10,6 +10,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
   LineChart,
   Line,
@@ -539,7 +540,6 @@ const ManagerDashboard = () => {
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Manager Dashboard" }]} />
 
-      {/* KPI CARDS */}
       <div className="admin-kpi-grid">
         <div
           className="admin-kpi-card"
@@ -633,9 +633,7 @@ const ManagerDashboard = () => {
       </div>
 
       <div className="dashboard-cards-container">
-        {/* ROW 1: Goals + Nominations */}
         <div className="dashboard-row">
-          {/* Goals Overview */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -796,32 +794,35 @@ const ManagerDashboard = () => {
                       <Pie
                         data={goalsData.chartData}
                         cx="50%"
-                        cy="50%"
+                        cy="45%"
                         outerRadius={70}
                         dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}`}
+                        label={false}
                       >
                         {goalsData.chartData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
                         ))}
                       </Pie>
                       <Tooltip />
+                      <Legend
+                        layout="horizontal"
+                        align="center"
+                        verticalAlign="bottom"
+                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                        formatter={(value, entry) => {
+                          const item = goalsData.chartData.find(d => d.name === entry.value);
+                          return `${item?.name || value}: ${item?.value || 0}`;
+                        }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </>
               ) : (
                 <div className="no-data-message">No goal data</div>
               )}
-              <button
-                className="card-view-btn"
-                onClick={() => navigate("/manager/dashboard/goals")}
-              >
-                View All Goals
-              </button>
             </div>
           </div>
 
-          {/* Nomination History (single bar) */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -930,19 +931,9 @@ const ManagerDashboard = () => {
               ) : (
                 <div className="no-data-message">No nominations yet</div>
               )}
-              <button
-                className="card-view-btn"
-                onClick={() => navigate("/internal/nominations")}
-              >
-                View All Nominations
-              </button>
             </div>
           </div>
-        </div>
 
-        {/* ROW 2: Meetings + Escalations + L&D */}
-        <div className="dashboard-row">
-          {/* Meetings */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -1059,16 +1050,11 @@ const ManagerDashboard = () => {
               ) : (
                 <div className="no-data-message">No meeting data</div>
               )}
-              <button
-                className="card-view-btn"
-                onClick={() => navigate("/manager/dashboard/meetmom")}
-              >
-                View All Meetings
-              </button>
             </div>
           </div>
+        </div>
 
-          {/* Escalations */}
+        <div className="dashboard-row">
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -1182,12 +1168,12 @@ const ManagerDashboard = () => {
                     <Pie
                       data={escalationHistory.chartData}
                       cx="50%"
-                      cy="50%"
+                      cy="45%"
                       innerRadius={50}
                       outerRadius={70}
                       paddingAngle={3}
                       dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}`}
+                      label={false}
                     >
                       {escalationHistory.chartData.map((entry, index) => (
                         <Cell
@@ -1197,21 +1183,24 @@ const ManagerDashboard = () => {
                       ))}
                     </Pie>
                     <Tooltip />
+                    <Legend
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                      formatter={(value, entry) => {
+                        const item = escalationHistory.chartData.find(d => d.name === entry.value);
+                        return `${item?.name || value}: ${item?.value || 0}`;
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="no-data-message">No escalation data</div>
               )}
-              <button
-                className="card-view-btn"
-                onClick={() => navigate("/manager/dashboard/sla")}
-              >
-                View All Escalations
-              </button>
             </div>
           </div>
 
-          {/* L&D Assignments */}
           <div className="dashboard-card card-medium">
             <div className="card-header-dark">
               <div className="card-header-content">
@@ -1221,31 +1210,33 @@ const ManagerDashboard = () => {
             </div>
             <div className="card-body">
               {teamAssignmentStatus.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={220}>
-                    <PieChart>
-                      <Pie
-                        data={teamAssignmentStatus}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={70}
-                        dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}`}
-                      >
-                        {teamAssignmentStatus.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <button
-                    className="card-view-btn"
-                    onClick={() => navigate("/manager/lnd/dashboard")}
-                  >
-                    View All Assignments
-                  </button>
-                </>
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie
+                      data={teamAssignmentStatus}
+                      cx="50%"
+                      cy="45%"
+                      outerRadius={70}
+                      dataKey="value"
+                      label={false}
+                    >
+                      {teamAssignmentStatus.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                      formatter={(value, entry) => {
+                        const item = teamAssignmentStatus.find(d => d.name === entry.value);
+                        return `${item?.name || value}: ${item?.value || 0}`;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="no-data-message">No team assignments</div>
               )}
