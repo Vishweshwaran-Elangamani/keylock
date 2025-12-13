@@ -54,41 +54,87 @@ namespace eepzbackend.Controllers
         }
 
         [HttpGet("attachments/{attachmentId:int}/download")]
-        public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
+public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
+{
+    try
+    {
+        var attachment = await _context.Selfassessmentattachments
+            .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+
+        if (attachment == null)
+            return NotFound(new { success = false, message = "Attachment not found." });
+
+        if (string.IsNullOrWhiteSpace(attachment.FilePath))
+            return NotFound(new { success = false, message = "File path missing." });
+
+        // LOG THE STORED PATH FOR DEBUGGING
+        Console.WriteLine($"Database FilePath: {attachment.FilePath}");
+
+        // Construct the full file path
+        string filePath;
+        
+        // Check if FilePath is already an absolute path
+        if (Path.IsPathRooted(attachment.FilePath))
         {
-            try
+            filePath = attachment.FilePath;
+        }
+        else
+        {
+            // If it's relative, combine with the application's content root
+            filePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                attachment.FilePath.TrimStart('/', '\\')  // Remove leading slashes
+            );
+        }
+
+        // LOG THE CONSTRUCTED PATH FOR DEBUGGING
+        Console.WriteLine($"Constructed FilePath: {filePath}");
+        Console.WriteLine($"File Exists: {System.IO.File.Exists(filePath)}");
+
+        if (!System.IO.File.Exists(filePath))
+        {
+            // Try alternate path construction (sometimes files are in wwwroot)
+            var alternateFilePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                attachment.FilePath.TrimStart('/', '\\')
+            );
+            
+            Console.WriteLine($"Trying Alternate Path: {alternateFilePath}");
+            
+            if (System.IO.File.Exists(alternateFilePath))
             {
-                var attachment = await _context.Selfassessmentattachments
-                    .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
-
-                if (attachment == null)
-                    return NotFound(new { success = false, message = "Attachment not found." });
-
-                if (string.IsNullOrWhiteSpace(attachment.FilePath))
-                    return NotFound(new { success = false, message = "File path missing." });
-
-                var filePath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    attachment.FilePath
-                );
-
-                if (!System.IO.File.Exists(filePath))
-                    return NotFound(new { success = false, message = "File not found on server." });
-
-                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-                var contentType = attachment.FileType ?? "application/octet-stream";
-
-                return File(fileBytes, contentType, attachment.FileName);
+                filePath = alternateFilePath;
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, new
-                {
-                    success = false,
-                    message = $"Error downloading file: {ex.Message}"
+                return NotFound(new { 
+                    success = false, 
+                    message = "File not found on server.",
+                    attemptedPath = filePath,  // Include this for debugging
+                    alternatePath = alternateFilePath
                 });
             }
         }
+
+        var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+        var contentType = attachment.FileType ?? "application/octet-stream";
+
+        return File(fileBytes, contentType, attachment.FileName);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Download Error: {ex.Message}");
+        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+        
+        return StatusCode(500, new
+        {
+            success = false,
+            message = $"Error downloading file: {ex.Message}"
+        });
+    }
+}
+
 
         [HttpPost("reviews")]
         public async Task<IActionResult> PostApproverReviews(
