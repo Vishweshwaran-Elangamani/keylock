@@ -36,8 +36,6 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Nominations",
         path: "/internal/nominations",
       },
-      // { icon: "bi-arrow-up-circle", label: "Promotions", path: "/internal/promotions" },
-      // { icon: "bi-bar-chart-line", label: "Career Progression", path: "/hr/operations/promotions" },
       {
         icon: "bi-book",
         label: "Learning & Development",
@@ -108,7 +106,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Dashboard",
         path: "/department-head/dashboard",
       },
-      
+
       {
         icon: "bi-pie-chart",
         label: "Budget Utilization",
@@ -124,6 +122,7 @@ const Sidebar = ({ allowedRoles = [], currentRole }) => {
         label: "Department Compliance",
         path: "/department-head/dashboard/sla/compliance",
       },
+      { icon: "bi-hand-thumbs-up", label: "Nominations", path: "/internal/nominations" },
       {
         icon: "bi-graph-up",
         label: "Performance",

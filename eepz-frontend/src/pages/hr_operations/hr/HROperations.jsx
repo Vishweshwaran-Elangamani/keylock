@@ -3,10 +3,7 @@ import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
 import PolicyManagement from "./compliance/PolicyManagement";
 import CareerGoals from "./compliance/CareerGoals";
 import ComplianceIssues from "./compliance/ComplianceIssues";
-import BudgetAllocationBreakdown from "./compliance/BudgetAllocationBreakdown";
 import PeriodAllocationManagement from "./compliance/PeriodAllocationManagement";
-import WorkloadDistribution from "./compliance/WorkloadDistribution";
-import PromotionsManagement from "./compliance/PromotionsManagement";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import "../../../styles/hr_operations/hr/HROperations.css";
 
@@ -22,10 +19,7 @@ const HROperations = () => {
     if (path.includes("/policies")) return "policies";
     if (path.includes("/career-goals")) return "career-goals";
     if (path.includes("/compliance")) return "compliance";
-    if (path.includes("/budget-allocation")) return "budget";
     if (path.includes("/period-allocations")) return "period-allocations";
-    if (path.includes("/workload")) return "workload";
-    if (path.includes("/promotions")) return "promotions";
     return "policies";
   };
 
@@ -52,12 +46,6 @@ const HROperations = () => {
       label: "Budget Allocations",
       path: "/hr/operations/period-allocations",
     },
-    // { key: "workload", label: "Workload", path: "/hr/operations/workload" },
-    // {
-    //   key: "promotions",
-    //   label: "Promotions",
-    //   path: "/hr/operations/promotions",
-    // },
   ];
 
   const handleTabChange = (tab) => {
@@ -123,10 +111,6 @@ const HROperations = () => {
               <Route path="policies" element={<PolicyManagement />} />
               <Route path="career-goals" element={<CareerGoals />} />
               <Route path="compliance" element={<ComplianceIssues />} />
-              <Route
-                path="budget-allocation"
-                element={<BudgetAllocationBreakdown />}
-              />
               <Route
                 path="period-allocations"
                 element={<PeriodAllocationManagement />}

@@ -101,7 +101,6 @@ const CreateBudgetModal = ({ show, onHide, onBudgetCreated }) => {
       });
 
       console.log("Budget created successfully");
-      toast.success("Budget created successfully!");
       onBudgetCreated();
       handleClose();
     } catch (err) {

@@ -40,10 +40,8 @@ import SLADetails from "./pages/sla/SLADetails";
 // Internal Opportunity
 import InternalOpportunityManagement from "./pages/internal/InternalOpportunityManagement";
 import NominationManagement from "./pages/internal/NominationManagement";
-import PromotionManagement from "./pages/internal/PromotionManagement";
 import LeadershipDashboard from "./pages/dashboards/LeadershipDashboard";
 import BudgetAllocation from "./pages/hr_operations/hr/compliance/BudgetAllocation";
-import LeadershipApproval from "./pages/hr_operations/hr/LeadershipApproval";
 import DepartmentHeadDashboard from "./pages/dashboards/DepartmentHeadDashboard";
 import DeptHeadPage from "./pages/performancemanagement/departmenthead/DeptHeadPage";
 import DeptHeadSLADashboard from "./pages/sla/DeptHeadSLADashboard";
@@ -462,17 +460,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      {/*  PROMOTIONS - HR creates from approved nominations, Leadership approves/rejects */}
-      {/* <Route
-        path="/internal/promotions"
-        element={
-          <ProtectedRoute allowedRoles={["HR", "Leadership"]}>
-            <DashboardLayout role={["HR", "Leadership"]}>
-              <PromotionManagement />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      /> */}
       //region INTERNAL OPPORTUNITIES LEADERSHIP
       <Route
         path="/leadership/dashboard"
@@ -484,16 +471,6 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      {/* <Route
-        path="/leadership/promotions"
-        element={
-          <ProtectedRoute allowedRoles={["Leadership"]}>
-            <DashboardLayout role="Leadership">
-              <LeadershipApproval />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
-      /> */}
       <Route
         path="/leadership/budget-management"
         element={

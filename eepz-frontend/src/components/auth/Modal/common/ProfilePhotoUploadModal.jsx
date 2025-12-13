@@ -273,7 +273,7 @@ function ProfilePhotoUploadModal({ onClose, onPhotoUpdate }) {
           >
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <i className="bi bi-camera-fill"></i>
-              Upload Profile Photo
+              Add Profile Picture
             </div>
             <button
               type="button"

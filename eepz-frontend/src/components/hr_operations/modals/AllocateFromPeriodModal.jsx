@@ -16,10 +16,6 @@ const AllocateFromPeriodModal = ({ period, budget, onClose, onSuccess }) => {
     "Training",
     "Promotion",
     "Bonus",
-    "Recruitment",
-    "Equipment",
-    "Software",
-    "Travel",
     "Other",
   ];
 

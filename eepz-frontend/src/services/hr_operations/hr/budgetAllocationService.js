@@ -189,12 +189,11 @@ const budgetAllocationService = {
       );
     }
   },
-  // Add to existing budgetAllocationService.js after line 180
  
   // ========== HR: CREATE SUB-ALLOCATION FROM PERIOD ==========
   createFundAllocationFromPeriod: async (allocationData) => {
     try {
-      console.log("📊 Creating fund allocation from period:", allocationData);
+      console.log("Creating fund allocation from period:", allocationData);
       const response = await hrApi.post("/FundAllocation/create", {
         budgetId: allocationData.budgetId,
         departmentId: allocationData.departmentId,
@@ -203,13 +202,13 @@ const budgetAllocationService = {
         goalStatus: allocationData.goalStatus || "Approved",
         notes: allocationData.notes || "",
         allocatedByUserId: allocationData.allocatedByUserId,
-        period: allocationData.period,  // ✅ NEW
-        periodYear: allocationData.periodYear,  // ✅ NEW
+        period: allocationData.period,  // NEW
+        periodYear: allocationData.periodYear,  // NEW
       });
-      console.log("✅ Fund allocation created:", response.data);
+      console.log("Fund allocation created:", response.data);
       return response.data;
     } catch (error) {
-      console.error("❌ Error creating fund allocation:", error);
+      console.error("Error creating fund allocation:", error);
       throw (
         error.response?.data || {
           message: "Failed to create fund allocation",
@@ -262,12 +261,12 @@ getBudgetAllocationsByBudget: async (budgetId) => {
   // ========== GET FUND ALLOCATIONS BY DEPARTMENT ==========
   getFundAllocationsByDepartment: async (departmentId) => {
     try {
-      console.log("📊 Fetching fund allocations for department:", departmentId);
+      console.log("Fetching fund allocations for department:", departmentId);
       const response = await hrApi.get(`/FundAllocation/by-department/${departmentId}`);
-      console.log("✅ Fund allocations by department:", response.data);
+      console.log("Fund allocations by department:", response.data);
       return response.data;
     } catch (error) {
-      console.error("❌ Error fetching fund allocations by department:", error);
+      console.error("Error fetching fund allocations by department:", error);
       throw (
         error.response?.data || {
           message: "Failed to fetch fund allocations by department",
