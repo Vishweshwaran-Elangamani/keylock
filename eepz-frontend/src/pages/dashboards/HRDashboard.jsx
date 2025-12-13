@@ -1,6 +1,3 @@
-
-
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -877,44 +874,36 @@ const HRDashboard = () => {
             </div>
             <div className="card-body">
               {projectStatus.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={240}>
-                    <PieChart>
-                      <Pie
-                        data={projectStatus}
-                        cx="50%"
-                        cy="45%"
-                        outerRadius={70}
-                        dataKey="value"
-                        label={false}
-                      >
-                        {projectStatus.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={CHART_COLORS[index % CHART_COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend
-                        layout="horizontal"
-                        align="center"
-                        verticalAlign="bottom"
-                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                        formatter={(value, entry) => {
-                          const item = projectStatus.find(d => d.name === entry.value);
-                          return `${item?.name || value}: ${item?.value || 0}`;
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <button
-                    className="card-view-btn"
-                    onClick={() => navigate("/hr/dashboard/projectmgmt")}
-                  >
-                    View All Projects
-                  </button>
-                </>
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie
+                      data={projectStatus}
+                      cx="50%"
+                      cy="45%"
+                      outerRadius={70}
+                      dataKey="value"
+                      label={false}
+                    >
+                      {projectStatus.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={CHART_COLORS[index % CHART_COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                      formatter={(value, entry) => {
+                        const item = projectStatus.find(d => d.name === entry.value);
+                        return `${item?.name || value}: ${item?.value || 0}`;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="no-data-message">No project data</div>
               )}
@@ -930,46 +919,38 @@ const HRDashboard = () => {
             </div>
             <div className="card-body">
               {nominationStatus.length > 0 ? (
-                <>
-                  <ResponsiveContainer width="100%" height={240}>
-                    <PieChart>
-                      <Pie
-                        data={nominationStatus}
-                        cx="50%"
-                        cy="45%"
-                        innerRadius={50}
-                        outerRadius={70}
-                        paddingAngle={3}
-                        dataKey="value"
-                        label={false}
-                      >
-                        {nominationStatus.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={CHART_COLORS[index % CHART_COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend
-                        layout="horizontal"
-                        align="center"
-                        verticalAlign="bottom"
-                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                        formatter={(value, entry) => {
-                          const item = nominationStatus.find(d => d.name === entry.value);
-                          return `${item?.name || value}: ${item?.value || 0}`;
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <button
-                    className="card-view-btn"
-                    onClick={() => navigate("/internal/nominations")}
-                  >
-                    View All Nominations
-                  </button>
-                </>
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie
+                      data={nominationStatus}
+                      cx="50%"
+                      cy="45%"
+                      innerRadius={50}
+                      outerRadius={70}
+                      paddingAngle={3}
+                      dataKey="value"
+                      label={false}
+                    >
+                      {nominationStatus.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={CHART_COLORS[index % CHART_COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                      formatter={(value, entry) => {
+                        const item = nominationStatus.find(d => d.name === entry.value);
+                        return `${item?.name || value}: ${item?.value || 0}`;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="no-data-message">No nomination data</div>
               )}
@@ -1130,13 +1111,6 @@ const HRDashboard = () => {
                         {perfOverview.totalForms !== 1 ? "s" : ""} available
                       </div>
                     )}
-
-                    <button
-                      className="card-view-btn"
-                      onClick={() => navigate("/hr/dashboard/performance")}
-                    >
-                      View Performance Dashboard
-                    </button>
                   </>
                 );
               })()}
@@ -1185,46 +1159,38 @@ const HRDashboard = () => {
                 }
 
                 return (
-                  <>
-                    <ResponsiveContainer width="100%" height={240}>
-                      <PieChart>
-                        <Pie
-                          data={lndData}
-                          cx="50%"
-                          cy="45%"
-                          innerRadius={50}
-                          outerRadius={70}
-                          paddingAngle={3}
-                          dataKey="value"
-                          label={false}
-                        >
-                          {lndData.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={entry.color}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend
-                          layout="horizontal"
-                          align="center"
-                          verticalAlign="bottom"
-                          wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
-                          formatter={(value, entry) => {
-                            const item = lndData.find(d => d.name === entry.value);
-                            return `${item?.name || value}: ${item?.value || 0}`;
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <button
-                      className="card-view-btn"
-                      onClick={() => navigate("/hr/lnd/dashboard")}
-                    >
-                      View All Assignments ({totalAssignments})
-                    </button>
-                  </>
+                  <ResponsiveContainer width="100%" height={240}>
+                    <PieChart>
+                      <Pie
+                        data={lndData}
+                        cx="50%"
+                        cy="45%"
+                        innerRadius={50}
+                        outerRadius={70}
+                        paddingAngle={3}
+                        dataKey="value"
+                        label={false}
+                      >
+                        {lndData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={entry.color}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend
+                        layout="horizontal"
+                        align="center"
+                        verticalAlign="bottom"
+                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                        formatter={(value, entry) => {
+                          const item = lndData.find(d => d.name === entry.value);
+                          return `${item?.name || value}: ${item?.value || 0}`;
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 );
               })()}
             </div>
