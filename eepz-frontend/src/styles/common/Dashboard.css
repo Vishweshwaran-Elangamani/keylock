@@ -24,7 +24,7 @@
 .ada-stat-card {
   background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #1E40AF;
   padding: 1.125rem;
   display: flex;
   align-items: center;
@@ -173,7 +173,7 @@
 
 .dashboard-card {
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #1E40AF;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -270,7 +270,7 @@
   background: #FFFFFF;
   border-radius: 12px;
   padding: 1.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #1E40AF;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -725,7 +725,7 @@
 .admin-kpi-card {
   background: #ffffff;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #1E40AF;
   padding: 1.125rem;
   display: flex;
   align-items: center;
