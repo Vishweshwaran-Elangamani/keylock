@@ -1,11 +1,12 @@
 import hrApi from "../hr/hrApi";
 
+
 const careerGoalsService = {
   // Get career goals overview/statistics for dashboard
   getOverview: async () => {
     try {
       console.log(" Frontend: Fetching career goals overview");
-      const response = await hrApi.get("/Compliance/overview");
+      const response = await hrApi.get("/EmployeeData/goal-tracking/overview");
       console.log(" Frontend: Overview received", response.data);
       return response.data;
     } catch (error) {
@@ -16,11 +17,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Get detailed goal statistics
   getGoalStatistics: async () => {
     try {
       console.log(" Frontend: Fetching goal statistics");
-      const response = await hrApi.get("/Compliance/goal-statistics");
+      const response = await hrApi.get("/EmployeeData/goal-tracking/goal-statistics");
       console.log(" Frontend: Statistics received", response.data);
       return response.data;
     } catch (error) {
@@ -31,11 +33,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Get adoption rate of career goals (trend info + breakdown)
   getGoalAdoptionRate: async () => {
     try {
       console.log(" Frontend: Fetching goal adoption rate");
-      const response = await hrApi.get("/Compliance/goal-adoption-rate");
+      const response = await hrApi.get("/EmployeeData/goal-tracking/goal-adoption-rate");
       console.log(" Frontend: Adoption rate received", response.data);
       return response.data;
     } catch (error) {
@@ -48,13 +51,15 @@ const careerGoalsService = {
     }
   },
 
+
   // ========== EMPLOYEE GOALS ==========
+
 
   // Get employees who have not set any career goals
   getEmployeesWithoutGoals: async () => {
     try {
       console.log(" Frontend: Fetching employees without goals");
-      const response = await hrApi.get("/Compliance/employees-without-goals");
+      const response = await hrApi.get("/EmployeeData/goal-tracking/employees-without-goals");
       console.log(" Frontend: Employees without goals received", response.data);
       return response.data;
     } catch (error) {
@@ -70,11 +75,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Get all career goals for an employee
   getEmployeeGoals: async (userId) => {
     try {
       console.log(" Frontend: Fetching goals for employee:", userId);
-      const response = await hrApi.get(`/Compliance/employee-goals/${userId}`);
+      const response = await hrApi.get(`/EmployeeData/goal-tracking/employee-goals/${userId}`);
       console.log(" Frontend: Employee goals received", response.data);
       return response.data;
     } catch (error) {
@@ -85,11 +91,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Get suggested goals for a given userId
   getGoalSuggestions: async (userId) => {
     try {
       console.log(" Frontend: Fetching goal suggestions for user:", userId);
-      const response = await hrApi.get(`/Compliance/suggest-goals/${userId}`);
+      const response = await hrApi.get(`/EmployeeData/goal-tracking/suggest-goals/${userId}`);
       console.log(" Frontend: Goal suggestions received", response.data);
       return response.data;
     } catch (error) {
@@ -100,13 +107,15 @@ const careerGoalsService = {
     }
   },
 
+
   // ========== GOAL OPERATIONS ==========
+
 
   // Get all career goals
   getAllGoals: async () => {
     try {
       console.log(" Frontend: Fetching all career goals");
-      const response = await hrApi.get("/Compliance/goals");
+      const response = await hrApi.get("/EmployeeData/goal-tracking/goals");
       console.log(" Frontend: All goals received", response.data);
       return response.data;
     } catch (error) {
@@ -115,11 +124,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Get goal by ID
   getGoalById: async (goalId) => {
     try {
       console.log(" Frontend: Fetching goal ID:", goalId);
-      const response = await hrApi.get(`/Compliance/goal/${goalId}`);
+      const response = await hrApi.get(`/EmployeeData/goal-tracking/goal/${goalId}`);
       console.log(" Frontend: Goal received", response.data);
       return response.data;
     } catch (error) {
@@ -128,11 +138,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Create new career goal
   createGoal: async (goalData) => {
     try {
       console.log(" Frontend: Creating goal", goalData);
-      const response = await hrApi.post("/Compliance/goal/create", goalData);
+      const response = await hrApi.post("/EmployeeData/goal-tracking/goal/create", goalData);
       console.log(" Frontend: Goal created", response.data);
       return response.data;
     } catch (error) {
@@ -141,11 +152,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Update career goal
   updateGoal: async (goalData) => {
     try {
       console.log(" Frontend: Updating goal", goalData);
-      const response = await hrApi.put("/Compliance/goal/update", goalData);
+      const response = await hrApi.put("/EmployeeData/goal-tracking/goal/update", goalData);
       console.log(" Frontend: Goal updated", response.data);
       return response.data;
     } catch (error) {
@@ -154,11 +166,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Delete career goal
   deleteGoal: async (goalId) => {
     try {
       console.log(" Frontend: Deleting goal ID:", goalId);
-      const response = await hrApi.delete(`/Compliance/goal/${goalId}`);
+      const response = await hrApi.delete(`/EmployeeData/goal-tracking/goal/${goalId}`);
       console.log(" Frontend: Goal deleted", response.data);
       return response.data;
     } catch (error) {
@@ -167,12 +180,13 @@ const careerGoalsService = {
     }
   },
 
+
   // Update goal progress
   updateGoalProgress: async (goalId, progressData) => {
     try {
       console.log(" Frontend: Updating goal progress for ID:", goalId);
       const response = await hrApi.put(
-        `/Compliance/goal/${goalId}/progress`,
+        `/EmployeeData/goal-tracking/goal/${goalId}/progress`,
         progressData
       );
       console.log(" Frontend: Progress updated", response.data);
@@ -185,13 +199,15 @@ const careerGoalsService = {
     }
   },
 
+
   // ========== APPROVALS & REVIEWS ==========
+
 
   // Get pending goal approvals
   getPendingApprovals: async () => {
     try {
       console.log(" Frontend: Fetching pending approvals");
-      const response = await hrApi.get("/Compliance/goal-approvals/pending");
+      const response = await hrApi.get("/EmployeeData/goal-tracking/goal-approvals/pending");
       console.log(" Frontend: Pending approvals received", response.data);
       return response.data;
     } catch (error) {
@@ -202,12 +218,13 @@ const careerGoalsService = {
     }
   },
 
+
   // Approve goal
   approveGoal: async (goalId, approvalData) => {
     try {
       console.log(" Frontend: Approving goal ID:", goalId);
       const response = await hrApi.post(
-        `/Compliance/goal/${goalId}/approve`,
+        `/EmployeeData/goal-tracking/goal/${goalId}/approve`,
         approvalData
       );
       console.log(" Frontend: Goal approved", response.data);
@@ -218,12 +235,13 @@ const careerGoalsService = {
     }
   },
 
+
   // Reject goal
   rejectGoal: async (goalId, rejectionData) => {
     try {
       console.log(" Frontend: Rejecting goal ID:", goalId);
       const response = await hrApi.post(
-        `/Compliance/goal/${goalId}/reject`,
+        `/EmployeeData/goal-tracking/goal/${goalId}/reject`,
         rejectionData
       );
       console.log(" Frontend: Goal rejected", response.data);
@@ -234,11 +252,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Get goal approvals for a goal
   getGoalApprovals: async (goalId) => {
     try {
       console.log(" Frontend: Fetching approvals for goal ID:", goalId);
-      const response = await hrApi.get(`/Compliance/goal/${goalId}/approvals`);
+      const response = await hrApi.get(`/EmployeeData/goal-tracking/goal/${goalId}/approvals`);
       console.log(" Frontend: Goal approvals received", response.data);
       return response.data;
     } catch (error) {
@@ -249,14 +268,16 @@ const careerGoalsService = {
     }
   },
 
+
   // ========== COMMENTS & DISCUSSIONS ==========
+
 
   // Add comment to goal
   addComment: async (goalId, commentData) => {
     try {
       console.log(" Frontend: Adding comment to goal ID:", goalId);
       const response = await hrApi.post(
-        `/Compliance/goal/${goalId}/comment`,
+        `/EmployeeData/goal-tracking/goal/${goalId}/comment`,
         commentData
       );
       console.log(" Frontend: Comment added", response.data);
@@ -267,11 +288,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Get comments for a goal
   getGoalComments: async (goalId) => {
     try {
       console.log(" Frontend: Fetching comments for goal ID:", goalId);
-      const response = await hrApi.get(`/Compliance/goal/${goalId}/comments`);
+      const response = await hrApi.get(`/EmployeeData/goal-tracking/goal/${goalId}/comments`);
       console.log(" Frontend: Goal comments received", response.data);
       return response.data;
     } catch (error) {
@@ -282,14 +304,16 @@ const careerGoalsService = {
     }
   },
 
+
   // ========== EMAIL & NOTIFICATIONS ==========
+
 
   // Send one or more goal-setting reminder emails
   sendGoalReminders: async (reminderData) => {
     try {
       console.log(" Frontend: Sending goal reminders", reminderData);
       const response = await hrApi.post(
-        "/Compliance/send-goal-reminders",
+        "/EmployeeData/goal-tracking/send-goal-reminders",
         reminderData
       );
       console.log(" Frontend: Reminders sent", response.data);
@@ -302,6 +326,7 @@ const careerGoalsService = {
     }
   },
 
+
   // Send goal approval notification
   sendApprovalNotification: async (goalId, notificationData) => {
     try {
@@ -310,7 +335,7 @@ const careerGoalsService = {
         goalId
       );
       const response = await hrApi.post(
-        `/Compliance/goal/${goalId}/notify-approval`,
+        `/EmployeeData/goal-tracking/goal/${goalId}/notify-approval`,
         notificationData
       );
       console.log(" Frontend: Notification sent", response.data);
@@ -321,13 +346,15 @@ const careerGoalsService = {
     }
   },
 
+
   // ========== BULK OPERATIONS ==========
+
 
   // Bulk approve goals
   bulkApproveGoals: async (goalIds) => {
     try {
       console.log(" Frontend: Bulk approving goals:", goalIds);
-      const response = await hrApi.post("/Compliance/goals/bulk-approve", {
+      const response = await hrApi.post("/EmployeeData/goal-tracking/goals/bulk-approve", {
         goalIds,
       });
       console.log(" Frontend: Goals bulk approved", response.data);
@@ -338,11 +365,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Bulk delete goals
   bulkDeleteGoals: async (goalIds) => {
     try {
       console.log(" Frontend: Bulk deleting goals:", goalIds);
-      const response = await hrApi.post("/Compliance/goals/bulk-delete", {
+      const response = await hrApi.post("/EmployeeData/goal-tracking/goals/bulk-delete", {
         goalIds,
       });
       console.log(" Frontend: Goals bulk deleted", response.data);
@@ -353,13 +381,15 @@ const careerGoalsService = {
     }
   },
 
+
   // ========== EXPORT & DOWNLOAD ==========
+
 
   // Export goals to CSV
   exportGoalsToCSV: async (filters = {}) => {
     try {
       console.log(" Frontend: Exporting goals to CSV with filters:", filters);
-      const response = await hrApi.get("/Compliance/goals/export/csv", {
+      const response = await hrApi.get("/EmployeeData/goal-tracking/goals/export/csv", {
         params: filters,
       });
       return response.data;
@@ -369,11 +399,12 @@ const careerGoalsService = {
     }
   },
 
+
   // Export goals to PDF
   exportGoalsToPDF: async (filters = {}) => {
     try {
       console.log(" Frontend: Exporting goals to PDF with filters:", filters);
-      const response = await hrApi.get("/Compliance/goals/export/pdf", {
+      const response = await hrApi.get("/EmployeeData/goal-tracking/goals/export/pdf", {
         params: filters,
         responseType: "blob",
       });
@@ -386,5 +417,6 @@ const careerGoalsService = {
     }
   },
 };
+
 
 export default careerGoalsService;

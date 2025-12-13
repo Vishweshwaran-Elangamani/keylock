@@ -1,12 +1,13 @@
 import api from "./api";
 
+
 const EmployeeProfileService = {
   /**
    * Get current logged-in user's profile
    */
   getMyProfile: async () => {
     try {
-      const response = await api.get("/Profile");
+      const response = await api.get("/User/profile");
       return response.data;
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -19,7 +20,7 @@ const EmployeeProfileService = {
    */
   getProfile: async () => {
     try {
-      const response = await api.get("/Profile");
+      const response = await api.get("/User/profile");
       return response.data;
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -32,7 +33,7 @@ const EmployeeProfileService = {
    */
   updateProfile: async (profileData) => {
     try {
-      const response = await api.put("/Profile", profileData);
+      const response = await api.put("/User/profile", profileData);
       return response.data;
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -45,7 +46,7 @@ const EmployeeProfileService = {
    */
   getProfileById: async (userId) => {
     try {
-      const response = await api.get(`/Profile/${userId}`);
+      const response = await api.get(`/User/profile/${userId}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching profile by ID:", error);
@@ -55,15 +56,15 @@ const EmployeeProfileService = {
 
   /**
    * Upload/Update profile photo only
-   * Uses dedicated endpoint: PUT /Profile/upload-photo
+   * Uses dedicated endpoint: PUT /User/profile/upload-photo
    * @param {FormData} formData - Form data containing ProfilePhoto file
    * @returns {Promise} - API response with updated profile including photo
    */
   updateProfilePhoto: async (formData) => {
     try {
-      console.log("Calling API: PUT /Profile/upload-photo");
+      console.log("Calling API: PUT /User/profile/upload-photo");
       
-      const response = await api.put("/Profile/upload-photo", formData);
+      const response = await api.put("/User/profile/upload-photo", formData);
       
       console.log("Photo upload API response:", response.data);
       
@@ -75,5 +76,6 @@ const EmployeeProfileService = {
     }
   },
 };
+
 
 export default EmployeeProfileService;

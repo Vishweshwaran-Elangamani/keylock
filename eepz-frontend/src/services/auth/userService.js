@@ -1,9 +1,10 @@
 import api from "./api";
 
+
 const userService = {
   getAllUsers: async () => {
     try {
-      const response = await api.get("/UserManagement/all");
+      const response = await api.get("/User/all");
 
       return response.data;
     } catch (error) {
@@ -13,7 +14,7 @@ const userService = {
 
   getUserById: async (userId) => {
     try {
-      const response = await api.get(`/UserManagement/${userId}`);
+      const response = await api.get(`/User/${userId}`);
 
       return response.data;
     } catch (error) {
@@ -25,7 +26,7 @@ const userService = {
     try {
       console.log("Creating user with data:", userData);
 
-      const response = await api.post("/UserManagement/create", userData);
+      const response = await api.post("/User/create", userData);
 
       console.log("User created:", response.data);
 
@@ -39,7 +40,7 @@ const userService = {
 
   updateUser: async (userData) => {
     try {
-      const response = await api.put("/UserManagement/update", userData);
+      const response = await api.put("/User/update", userData);
 
       return response.data;
     } catch (error) {
@@ -49,7 +50,7 @@ const userService = {
 
   deactivateUser: async (userId) => {
     try {
-      const response = await api.post(`/UserManagement/deactivate/${userId}`);
+      const response = await api.post(`/User/deactivate/${userId}`);
 
       return response.data;
     } catch (error) {
@@ -59,7 +60,7 @@ const userService = {
 
   activateUser: async (userId) => {
     try {
-      const response = await api.post(`/UserManagement/activate/${userId}`);
+      const response = await api.post(`/User/activate/${userId}`);
 
       return response.data;
     } catch (error) {
@@ -70,7 +71,7 @@ const userService = {
   assignRoleDepartment: async (data) => {
     try {
       const response = await api.post(
-        "/UserManagement/assign-role-department",
+        "/User/assign-role-department",
 
         data
       );
@@ -86,7 +87,7 @@ const userService = {
       console.log("👥 Fetching employees for manager ID:", managerId);
 
       const response = await api.get(
-        `/UserManagement/manager/${managerId}/employees`
+        `/User/manager/${managerId}/employees`
       );
 
       console.log("Employees fetched:", response.data);
@@ -102,5 +103,6 @@ const userService = {
     }
   },
 };
+
 
 export default userService;

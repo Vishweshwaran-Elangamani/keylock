@@ -1,7 +1,9 @@
 import axios from "axios";
 
+
 const API_BASE_URL =
-  import.meta.env.VITE_EMPLOYEE_API_URL || "http://localhost:5104/api/employee";
+  import.meta.env.VITE_EMPLOYEE_API_URL || "http://localhost:5104/api";
+
 
 const employeeApi = axios.create({
   baseURL: API_BASE_URL,
@@ -9,6 +11,7 @@ const employeeApi = axios.create({
     "Content-Type": "application/json",
   },
 });
+
 
 employeeApi.interceptors.request.use(
   (config) => {
@@ -24,11 +27,12 @@ employeeApi.interceptors.request.use(
   }
 );
 
+
 const employeePolicyService = {
   getPublishedPolicies: async () => {
     try {
-      console.log("Fetching published policies from /EmployeePolicy/published");
-      const response = await employeeApi.get("/EmployeePolicy/published");
+      console.log("Fetching published policies from /EmployeeData/policy/published");
+      const response = await employeeApi.get("/EmployeeData/policy/published");
       console.log("Published policies fetched:", response.data);
       return response.data.data || [];
     } catch (error) {
@@ -37,10 +41,11 @@ const employeePolicyService = {
     }
   },
 
+
   getPolicyById: async (policyId) => {
     try {
-      console.log(`Fetching policy ${policyId} from /EmployeePolicy/${policyId}`);
-      const response = await employeeApi.get(`/EmployeePolicy/${policyId}`);
+      console.log(`Fetching policy ${policyId} from /EmployeeData/policy/${policyId}`);
+      const response = await employeeApi.get(`/EmployeeData/policy/${policyId}`);
       console.log(`Policy ${policyId} fetched:`, response.data);
       return response.data.data;
     } catch (error) {
@@ -48,6 +53,7 @@ const employeePolicyService = {
       throw error;
     }
   },
+
 
   getFullDocumentUrl: (url) => {
     if (!url) {
@@ -74,5 +80,6 @@ const employeePolicyService = {
     return fullUrl;
   },
 };
+
 
 export default employeePolicyService;

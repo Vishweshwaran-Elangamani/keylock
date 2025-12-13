@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import hrApi from "../../../../services/hr_operations/hr/hrApi";
+import careerGoalsService from "../../../../services/hr_operations/hr/careerGoalsService";
 import {
   Button,
   Spinner,
-  Alert,
   OverlayTrigger,
   Tooltip,
   Form,
@@ -26,13 +25,13 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { toast, Toaster } from "sonner";
 import GoalSuggestionsModal from "../../../../components/hr_operations/modals/GoalSuggestionsModal";
 import ReminderEmailModal from "../../../../components/hr_operations/modals/ReminderEmailModal";
 import BulkReminderModal from "../../../../components/hr_operations/modals/BulkReminderModal";
 import Breadcrumb from "../../../../components/common/Breadcrumb";
 import "../../../../styles/hr_operations/hr/CareerGoals.css";
 
-const ADMIN_EMPLOYEE_ID = "12560";
 const COLORS = [
   "#8B5CF6",
   "#EC4899",
@@ -56,7 +55,6 @@ const CareerGoals = () => {
   const [reminderTargetUser, setReminderTargetUser] = useState(null);
   const [sendingReminder, setSendingReminder] = useState(false);
   const [reminderResult, setReminderResult] = useState(null);
-  const [alert, setAlert] = useState(null);
 
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -78,8 +76,6 @@ const CareerGoals = () => {
     fetchGoalStats();
   }, []);
 
-  // Auto-apply only when data / non-text filters change.
-  // Search text is applied when Search button is clicked.
   useEffect(() => {
     applyFilters();
   }, [withoutGoals, departmentFilter, daysFilter]);
@@ -89,21 +85,13 @@ const CareerGoals = () => {
     setSelectAll(false);
   }, [filteredData]);
 
-  const excludeAdmin = (employees) => {
-    return employees.filter(
-      (emp) =>
-        (emp.employeeCompanyId ?? emp.EmployeeCompanyId) !== ADMIN_EMPLOYEE_ID
-    );
-  };
-
   const fetchWithoutGoals = () => {
     setLoadingWithoutGoals(true);
-    hrApi
-      .get("/Compliance/employees-without-goals")
+    careerGoalsService
+      .getEmployeesWithoutGoals()
       .then((res) => {
-        const employees = res.data.data.employees || [];
-        const filteredEmployees = excludeAdmin(employees);
-        setWithoutGoals(filteredEmployees);
+        const employees = res.data.employees || [];
+        setWithoutGoals(employees);
       })
       .catch(() => setWithoutGoals([]))
       .finally(() => setLoadingWithoutGoals(false));
@@ -111,25 +99,11 @@ const CareerGoals = () => {
 
   const fetchAdoptionStats = () => {
     setLoadingAdoption(true);
-    hrApi
-      .get("/Compliance/goal-adoption-rate")
+    careerGoalsService
+      .getGoalAdoptionRate()
       .then((res) => {
-        const stats = res.data.data;
-        const adjustedStats = {
-          ...stats,
-          totalEmployees:
-            stats.totalEmployees > 0
-              ? stats.totalEmployees - 1
-              : stats.totalEmployees,
-          adoptionRate:
-            stats.totalEmployees > 1
-              ? (
-                  (stats.employeesWithGoals / (stats.totalEmployees - 1)) *
-                  100
-                ).toFixed(1)
-              : stats.adoptionRate,
-        };
-        setAdoptionStats(adjustedStats);
+        const stats = res.data;
+        setAdoptionStats(stats);
       })
       .catch(() => setAdoptionStats(null))
       .finally(() => setLoadingAdoption(false));
@@ -137,18 +111,18 @@ const CareerGoals = () => {
 
   const fetchGoalStats = () => {
     setLoadingGoalStats(true);
-    hrApi
-      .get("/Compliance/goal-statistics")
-      .then((res) => setGoalStats(res.data.data))
+    careerGoalsService
+      .getGoalStatistics()
+      .then((res) => setGoalStats(res.data))
       .catch(() => setGoalStats(null))
       .finally(() => setLoadingGoalStats(false));
   };
 
   const fetchSuggestions = (userId) => {
     setLoadingSuggestions(true);
-    hrApi
-      .get(`/Compliance/suggest-goals/${userId}`)
-      .then((res) => setGoalSuggestions(res.data.data))
+    careerGoalsService
+      .getGoalSuggestions(userId)
+      .then((res) => setGoalSuggestions(res.data))
       .catch(() => setGoalSuggestions(null))
       .finally(() => setLoadingSuggestions(false));
   };
@@ -194,7 +168,7 @@ const CareerGoals = () => {
     setSearchTerm("");
     setDepartmentFilter("");
     setDaysFilter("");
-    setFilteredData(withoutGoals); // reset table to all employees
+    setFilteredData(withoutGoals);
     setCurrentPage(1);
   };
 
@@ -256,10 +230,7 @@ const CareerGoals = () => {
 
   const openBulkReminderModal = () => {
     if (selectedEmployees.length === 0) {
-      setAlert({
-        type: "warning",
-        message: "Please select at least one employee!",
-      });
+      toast("Please select at least one employee!");
       return;
     }
     setBulkReminderModal(true);
@@ -267,23 +238,20 @@ const CareerGoals = () => {
 
   const sendBulkReminders = () => {
     setSendingBulkReminder(true);
-    hrApi
-      .post("/Compliance/send-goal-reminders", {
+    careerGoalsService
+      .sendGoalReminders({
         sendType: "multiple",
         userIds: selectedEmployees,
         includeGoalSuggestions: true,
       })
       .then((res) => {
-        setAlert({
-          type: "success",
-          message: `Reminders sent to ${selectedEmployees.length} employees successfully!`,
-        });
+        toast(`Reminder sent successfully! Sent to ${selectedEmployees.length} employee(s).`);
         setBulkReminderModal(false);
         setSelectedEmployees([]);
         setSelectAll(false);
       })
       .catch(() => {
-        setAlert({ type: "danger", message: "Failed to send bulk reminders." });
+        toast("Failed to send bulk reminders.");
       })
       .finally(() => setSendingBulkReminder(false));
   };
@@ -296,22 +264,22 @@ const CareerGoals = () => {
 
   const sendReminder = () => {
     setSendingReminder(true);
-    hrApi
-      .post("/Compliance/send-goal-reminders", {
+    careerGoalsService
+      .sendGoalReminders({
         sendType: "single",
         userId: reminderTargetUser.userId ?? reminderTargetUser.UserId,
         includeGoalSuggestions: true,
       })
       .then((res) => {
-        setReminderResult(res.data.data);
-        setAlert({ type: "success", message: "Reminder sent successfully!" });
+        setReminderResult(res.data);
+        toast("Reminder sent successfully!");
         setTimeout(() => {
           setReminderEmailModal(false);
           setReminderResult(null);
         }, 1000);
       })
       .catch(() => {
-        setAlert({ type: "danger", message: "Failed to send reminder." });
+        toast("Failed to send reminder.");
       })
       .finally(() => setSendingReminder(false));
   };
@@ -366,16 +334,7 @@ const CareerGoals = () => {
 
   return (
     <div className="cg-root">
-      {alert && (
-        <Alert
-          variant={alert.type}
-          dismissible
-          onClose={() => setAlert(null)}
-          className="cg-alert"
-        >
-          {alert.message}
-        </Alert>
-      )}
+      <Toaster position="top-right" closeButton expand={false} />
 
       {adoptionStats && (
         <div className="cg-summary-cards">
@@ -421,7 +380,6 @@ const CareerGoals = () => {
 
       <div className="cag-filter-section">
         <div className="cg-filter-row-single">
-          {/* Combined search input + button */}
           <div className="cg-search-input-wrapper">
             <div className="cg-search-inner">
               <span className="cg-search-icon">

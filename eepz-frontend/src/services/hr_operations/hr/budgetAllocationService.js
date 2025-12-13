@@ -298,7 +298,7 @@ getBudgetAllocationsByBudget: async (budgetId) => {
   getAllDepartments: async () => {
     try {
       console.log("Fetching all departments");
-      const response = await hrApi.get("/Department/all");
+      const response = await hrApi.get("/EmployeeData/department/all");
       console.log("Departments:", response.data);
       return response.data;
     } catch (error) {
@@ -332,5 +332,3 @@ getBudgetAllocationsByBudget: async (budgetId) => {
 };
  
 export default budgetAllocationService;
- 
- 
