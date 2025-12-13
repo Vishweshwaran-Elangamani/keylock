@@ -1,4 +1,6 @@
+using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Common.DTOs.Request;
+using Relevantz.EEPZ.Common.DTOs.Response;
 using Relevantz.EEPZ.Core.IService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,23 +8,27 @@ using System.Security.Claims;
 
 namespace Relevantz.EEPZ.Api.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class ProfileController : ControllerBase
+    [Authorize]
+    public class UserController : ControllerBase
     {
         private readonly IProfileService _profileService;
+        private readonly IUserManagementService _userManagementService;
 
-        public ProfileController(IProfileService profileService)
+        public UserController(IProfileService profileService, IUserManagementService userManagementService)
         {
             _profileService = profileService;
+            _userManagementService = userManagementService;
         }
+
+        // ==================== PROFILE ENDPOINTS ====================
 
         /// <summary>
         /// Get current logged-in user's profile
-        /// GET: api/Profile
+        /// GET: api/User/profile
         /// </summary>
-        [HttpGet]
+        [HttpGet("profile")]
         public async Task<IActionResult> GetMyProfile()
         {
             try
@@ -51,9 +57,9 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Get profile by specific user ID (Admin/HR use)
-        /// GET: api/Profile/{userId}
+        /// GET: api/User/profile/{userId}
         /// </summary>
-        [HttpGet("{userId}")]
+        [HttpGet("profile/{userId}")]
         [Authorize(Roles = "Admin,HR")]
         public async Task<IActionResult> GetProfileById(int userId)
         {
@@ -76,9 +82,9 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Update current user's profile
-        /// PUT: api/Profile
+        /// PUT: api/User/profile
         /// </summary>
-        [HttpPut]
+        [HttpPut("profile")]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateProfileRequestDto request)
         {
             try
@@ -112,9 +118,9 @@ namespace Relevantz.EEPZ.Api.Controllers
 
         /// <summary>
         /// Upload/Update profile photo only
-        /// PUT: api/Profile/upload-photo
+        /// PUT: api/User/profile/upload-photo
         /// </summary>
-        [HttpPut("upload-photo")]
+        [HttpPut("profile/upload-photo")]
         public async Task<IActionResult> UploadProfilePhoto([FromForm] IFormFile ProfilePhoto)
         {
             try
@@ -183,6 +189,108 @@ namespace Relevantz.EEPZ.Api.Controllers
                     error = ex.Message 
                 });
             }
+        }
+
+        // ==================== USER MANAGEMENT ENDPOINTS ====================
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserRequestDto request)
+        {
+            var createdByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var result = await _userManagementService.CreateUserAsync(request, createdByUserId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }       
+
+        [HttpPut("update")] 
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestDto request)
+        {
+            var updatedByUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var result = await _userManagementService.UpdateUserAsync(request, updatedByUserId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        } 
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserById(int userId)
+        {
+            var result = await _userManagementService.GetUserByIdAsync(userId);
+
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
+        }       
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var result = await _userManagementService.GetAllUsersAsync();
+            return Ok(result);
+        }
+
+        [HttpPost("deactivate/{userId}")]
+        public async Task<IActionResult> DeactivateUser(int userId)
+        {
+            var result = await _userManagementService.DeactivateUserAsync(userId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpPost("activate/{userId}")]
+        public async Task<IActionResult> ActivateUser(int userId)
+        {
+            var result = await _userManagementService.ActivateUserAsync(userId);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
+        [HttpGet("manager/{managerId}/employees")]
+        public async Task<IActionResult> GetEmployeesByManager(int managerId)
+        {
+            try
+            {
+                var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+                if (userRole != "HR" && userRole != "Admin" && currentUserId != managerId)
+                {
+                    return Forbid("You can only view your own employees");
+                }
+
+                var result = await _userManagementService.GetEmployeesByManagerAsync(managerId);
+                if (!result.Success)
+                    return NotFound(result);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        } 
+
+        [HttpPost("assign-role-department")]
+        public async Task<IActionResult> AssignRoleAndDepartment([FromBody] AssignRoleDepartmentRequestDto request)
+        {
+            var result = await _userManagementService.AssignRoleAndDepartmentAsync(request);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
     }
 }
