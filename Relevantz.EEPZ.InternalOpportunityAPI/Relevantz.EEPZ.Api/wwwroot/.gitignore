@@ -1,0 +1,11 @@
+# Ignore everything in this folder
+*
+
+# Except these folders
+!css/
+!js/
+!images/
+!lib/
+
+# Except this file
+!.gitignore

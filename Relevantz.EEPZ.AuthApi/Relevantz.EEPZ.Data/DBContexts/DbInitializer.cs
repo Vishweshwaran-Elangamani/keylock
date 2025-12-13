@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Relevantz.EEPZ.Common.Entities;
-using Relevantz.EEPZ.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Utils;
 using Relevantz.EEPZ.Data.DBContexts;
 
 namespace Relevantz.EEPZ.Data.DBContexts
@@ -15,7 +15,10 @@ namespace Relevantz.EEPZ.Data.DBContexts
         /// <summary>
         /// Seeds all system roles and admin user
         /// </summary>
-        public static async Task InitializeAsync(EEPZDbContext context, IConfiguration configuration)
+        public static async Task InitializeAsync(
+            EEPZDbContext context,
+            IConfiguration configuration
+        )
         {
             try
             {
@@ -60,9 +63,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     RoleCode = "ADMIN",
                     Description = "System Administrator with full access",
                     IsSystemRole = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 },
-                 new Role
+                new Role
                 {
                     RoleName = "Leadership",
                     RoleCode = "LEADERSHIP",
@@ -76,7 +79,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     RoleCode = "HR",
                     Description = "Human Resources - Manages employees and HR processes",
                     IsSystemRole = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 },
                 new Role
                 {
@@ -84,7 +87,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     RoleCode = "DEPT_HEAD",
                     Description = "Department Head - Manages department operations",
                     IsSystemRole = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 },
                 new Role
                 {
@@ -92,7 +95,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     RoleCode = "MANAGER",
                     Description = "Manager - Manages team performance and operations",
                     IsSystemRole = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 },
                 new Role
                 {
@@ -100,14 +103,15 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     RoleCode = "EMPLOYEE",
                     Description = "Regular employee user",
                     IsSystemRole = true,
-                    CreatedAt = DateTime.UtcNow
-                }
+                    CreatedAt = DateTime.UtcNow,
+                },
             };
 
             foreach (var role in roles)
             {
-                var existingRole = await context.Roles
-                    .FirstOrDefaultAsync(r => r.RoleCode == role.RoleCode);
+                var existingRole = await context.Roles.FirstOrDefaultAsync(r =>
+                    r.RoleCode == role.RoleCode
+                );
 
                 if (existingRole == null)
                 {
@@ -138,42 +142,43 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     DepartmentName = "Administration",
                     BudgetAllocated = 0,
                     CostCenter = "ADMIN001",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 },
                 new Department
                 {
                     DepartmentName = "Human Resources",
                     BudgetAllocated = 0,
                     CostCenter = "HR001",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 },
                 new Department
                 {
                     DepartmentName = "Information Technology",
                     BudgetAllocated = 0,
                     CostCenter = "IT001",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 },
                 new Department
                 {
                     DepartmentName = "Finance",
                     BudgetAllocated = 0,
                     CostCenter = "FIN001",
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 },
                 new Department
                 {
                     DepartmentName = "Operations",
                     BudgetAllocated = 0,
                     CostCenter = "OPS001",
-                    CreatedAt = DateTime.UtcNow
-                }
+                    CreatedAt = DateTime.UtcNow,
+                },
             };
 
             foreach (var department in departments)
             {
-                var existingDepartment = await context.Departments
-                    .FirstOrDefaultAsync(d => d.DepartmentName == department.DepartmentName);
+                var existingDepartment = await context.Departments.FirstOrDefaultAsync(d =>
+                    d.DepartmentName == department.DepartmentName
+                );
 
                 if (existingDepartment == null)
                 {
@@ -182,7 +187,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 }
                 else
                 {
-                    Console.WriteLine($"    Department already exists: {department.DepartmentName}");
+                    Console.WriteLine(
+                        $"    Department already exists: {department.DepartmentName}"
+                    );
                 }
             }
 
@@ -193,16 +200,21 @@ namespace Relevantz.EEPZ.Data.DBContexts
         /// <summary>
         /// Seeds admin user with all required data
         /// </summary>
-        private static async Task SeedAdminUserAsync(EEPZDbContext context, IConfiguration configuration)
+        private static async Task SeedAdminUserAsync(
+            EEPZDbContext context,
+            IConfiguration configuration
+        )
         {
             Console.WriteLine(" Seeding admin user...");
 
             try
             {
                 // Check if admin already exists
-                var adminEmail = configuration["AdminSeedData:Email"] ?? "emailserviceeepz@gmail.com";
-                var existingAdmin = await context.Userauthentications
-                    .FirstOrDefaultAsync(u => u.Email == adminEmail);
+                var adminEmail =
+                    configuration["AdminSeedData:Email"] ?? "emailserviceeepz@gmail.com";
+                var existingAdmin = await context.Userauthentications.FirstOrDefaultAsync(u =>
+                    u.Email == adminEmail
+                );
 
                 if (existingAdmin != null)
                 {
@@ -214,15 +226,20 @@ namespace Relevantz.EEPZ.Data.DBContexts
                 var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.RoleCode == "ADMIN");
                 if (adminRole == null)
                 {
-                    throw new Exception("Admin role not found. Please ensure roles are seeded first.");
+                    throw new Exception(
+                        "Admin role not found. Please ensure roles are seeded first."
+                    );
                 }
 
                 // Get Administration Department
-                var adminDepartment = await context.Departments
-                    .FirstOrDefaultAsync(d => d.DepartmentName == "Administration");
+                var adminDepartment = await context.Departments.FirstOrDefaultAsync(d =>
+                    d.DepartmentName == "Administration"
+                );
                 if (adminDepartment == null)
                 {
-                    throw new Exception("Administration department not found. Please ensure departments are seeded first.");
+                    throw new Exception(
+                        "Administration department not found. Please ensure departments are seeded first."
+                    );
                 }
 
                 // Create Admin Employee
@@ -237,7 +254,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     WorkLocation = "Head Office",
                     NoticePeriodDays = 0,
                     IsActive = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 };
                 context.Employees.Add(adminEmployee);
                 await context.SaveChangesAsync();
@@ -252,7 +269,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     PasswordHash = PasswordHelper.HashPassword(adminPassword),
                     Status = Constants.UserStatuses.Active,
                     IsFirstLogin = false,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 };
                 context.Userauthentications.Add(adminAuth);
                 await context.SaveChangesAsync();
@@ -266,18 +283,20 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     LastName = configuration["AdminSeedData:LastName"] ?? "Administrator",
                     CallingName = "Admin",
                     Gender = Constants.Genders.PreferNotToSay,
-                    MobileNumber = configuration["AdminSeedData:MobileNumber"] ?? "+91-0000000000"
+                    MobileNumber = configuration["AdminSeedData:MobileNumber"] ?? "+91-0000000000",
                 };
                 context.Userprofiles.Add(adminProfile);
                 await context.SaveChangesAsync();
-                Console.WriteLine($"   Created admin profile: {adminProfile.FirstName} {adminProfile.LastName}");
+                Console.WriteLine(
+                    $"   Created admin profile: {adminProfile.FirstName} {adminProfile.LastName}"
+                );
 
                 // Assign Role and Department to Admin
                 var adminEmployeeDetails = new Employeedetailsmaster
                 {
                     EmployeeId = adminEmployee.EmployeeId,
                     RoleId = adminRole.RoleId,
-                    DepartmentId = adminDepartment.DepartmentId
+                    DepartmentId = adminDepartment.DepartmentId,
                 };
                 context.Employeedetailsmasters.Add(adminEmployeeDetails);
                 await context.SaveChangesAsync();
@@ -307,8 +326,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
         {
             await context.Database.EnsureCreatedAsync();
 
-            var existingProject = await context.Projects
-                .FirstOrDefaultAsync(p => p.ProjectName == "ORG.RZ.RESOURCEPOOL");
+            var existingProject = await context.Projects.FirstOrDefaultAsync(p =>
+                p.ProjectName == "ORG.RZ.RESOURCEPOOL"
+            );
 
             if (existingProject == null)
             {
@@ -331,7 +351,7 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     L2approverEmployeeId = null,
                     IsDeletable = false,
                     CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.UtcNow,
                 };
 
                 context.Projects.Add(resourcePoolProject);
@@ -367,7 +387,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Modern JavaScript and TypeScript development",
                     Category = "Programming",
                 },
-
                 // Frontend Skills
                 new MasterSkill
                 {
@@ -375,7 +394,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Frontend development using React framework",
                     Category = "Frontend",
                 },
-
                 // Backend Skills
                 new MasterSkill
                 {
@@ -395,7 +413,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "RESTful and GraphQL API design",
                     Category = "Backend",
                 },
-
                 // Database Skills
                 new MasterSkill
                 {
@@ -409,7 +426,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "NoSQL database development",
                     Category = "Database",
                 },
-
                 // Cloud Skills
                 new MasterSkill
                 {
@@ -429,7 +445,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Legacy to cloud migration strategies",
                     Category = "Cloud",
                 },
-
                 // DevOps Skills
                 new MasterSkill
                 {
@@ -443,7 +458,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Terraform and CloudFormation",
                     Category = "DevOps",
                 },
-
                 // Architecture Skills
                 new MasterSkill
                 {
@@ -457,7 +471,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Large-scale system design and architecture",
                     Category = "Architecture",
                 },
-
                 // Project Management Skills
                 new MasterSkill
                 {
@@ -465,7 +478,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Agile project management methodologies",
                     Category = "Project Management",
                 },
-
                 // Leadership Skills
                 new MasterSkill
                 {
@@ -473,7 +485,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Leading engineering teams",
                     Category = "Leadership",
                 },
-
                 // Quality Skills
                 new MasterSkill
                 {
@@ -487,7 +498,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "TDD methodology and practices",
                     Category = "Quality",
                 },
-
                 // Performance Skills
                 new MasterSkill
                 {
@@ -495,7 +505,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Application performance tuning",
                     Category = "Performance",
                 },
-
                 // Security Skills
                 new MasterSkill
                 {
@@ -503,7 +512,6 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Application security and OWASP",
                     Category = "Security",
                 },
-
                 // Sales Skills
                 new MasterSkill
                 {
@@ -517,14 +525,13 @@ namespace Relevantz.EEPZ.Data.DBContexts
                     Description = "Data-driven sales analysis and forecasting",
                     Category = "Sales",
                 },
-
                 // Tools Skills
                 new MasterSkill
                 {
                     SkillName = "Git Version Control",
                     Description = "Advanced Git workflows",
                     Category = "Tools",
-                }
+                },
             };
 
             int addedCount = 0;
@@ -532,8 +539,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
 
             foreach (var skill in skills)
             {
-                var existingSkill = await context.MasterSkills
-                    .FirstOrDefaultAsync(s => s.SkillName == skill.SkillName);
+                var existingSkill = await context.MasterSkills.FirstOrDefaultAsync(s =>
+                    s.SkillName == skill.SkillName
+                );
 
                 if (existingSkill == null)
                 {
@@ -550,7 +558,9 @@ namespace Relevantz.EEPZ.Data.DBContexts
             await context.SaveChangesAsync();
 
             Console.WriteLine($"Master skills seeding completed!");
-            Console.WriteLine($"Added: {addedCount} | Skipped: {skippedCount} | Total: {skills.Count}");
+            Console.WriteLine(
+                $"Added: {addedCount} | Skipped: {skippedCount} | Total: {skills.Count}"
+            );
             Console.WriteLine(new string('-', 50));
         }
     }

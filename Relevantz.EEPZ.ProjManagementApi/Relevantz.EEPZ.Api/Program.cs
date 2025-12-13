@@ -1,11 +1,11 @@
 global using Serilog;
 global using Serilog.Events;
-using Relevantz.EEPZ.Data.Repository.Implementations;
-using Relevantz.EEPZ.Data.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Core.Services.Implementations;
 using Relevantz.EEPZ.Core.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Relevantz.EEPZ.Data.DBContexts;
+using Relevantz.EEPZ.Data.Repository.Implementations;
+using Relevantz.EEPZ.Data.Repository.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building........");
@@ -26,13 +26,13 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
     options.UseMySql(
         connectionString,
         ServerVersion.AutoDetect(connectionString),
-        b => b.MigrationsAssembly("Relevantz.EEPZ.Data") 
-    ));
+        b => b.MigrationsAssembly("Relevantz.EEPZ.Data")
+    )
+);
 
 Log.Information("Database configured with migrations assembly: Relevantz.EEPZ.Data");
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-
 
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
@@ -41,12 +41,15 @@ Log.Information("Dependency Injection configured - 1 repository, 1 service");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "EEPZ API",
-        Version = "v1",
-        Description = "Project Management API"
-    });
+    options.SwaggerDoc(
+        "v1",
+        new Microsoft.OpenApi.Models.OpenApiInfo
+        {
+            Title = "EEPZ API",
+            Version = "v1",
+            Description = "Project Management API",
+        }
+    );
 
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -59,33 +62,22 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3007")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
+    options.AddPolicy(
+        "AllowReactApp",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173", "http://localhost:3007")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+    );
 });
 
 Log.Information("CORS configured for React app (localhost:5173, localhost:3007)");
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<EEPZDbContext>();
-    try
-    {
-        Log.Information("Starting database seeding...");
-        await DbInitializer.SeedAsync(dbContext);
-        Log.Information("Database seeding completed successfully");
-    }
-    catch (Exception ex)
-    {
-        Log.Error(ex, "Database seeding failed: {Message}", ex.Message);
-    }
-}
 
 if (app.Environment.IsDevelopment())
 {
