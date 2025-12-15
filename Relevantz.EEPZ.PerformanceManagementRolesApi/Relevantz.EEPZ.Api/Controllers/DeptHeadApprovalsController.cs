@@ -12,13 +12,18 @@ namespace PerformanceManagement.Controllers
     public class DeptHeadApprovalsController : ControllerBase
     {
         private readonly EEPZDbContext _context;
-        private readonly ILogger<DeptHeadApprovalsController> _logger;
+    private readonly ILogger<DeptHeadApprovalsController> _logger;
+    private readonly IConfiguration _configuration;  // ADD THIS LINE
 
-        public DeptHeadApprovalsController(EEPZDbContext context, ILogger<DeptHeadApprovalsController> logger)
-        {
-            _context = context;
-            _logger = logger;
-        }
+    public DeptHeadApprovalsController(
+        EEPZDbContext context, 
+        ILogger<DeptHeadApprovalsController> logger,
+        IConfiguration configuration)  // ADD THIS PARAMETER
+    {
+        _context = context;
+        _logger = logger;
+        _configuration = configuration;  // ADD THIS LINE
+    }
 
         [HttpPost("approve-employee")]
         public async Task<IActionResult> ApproveDeptHeadEmployee([FromBody] ApprovalRequestDto request)
@@ -798,36 +803,57 @@ namespace PerformanceManagement.Controllers
         }
 
         [HttpGet("{deptHeadEmployeeId}/attachments/{attachmentId}/download")]
-        public async Task<IActionResult> DownloadDeptHeadAttachment(int deptHeadEmployeeId, int attachmentId)
-        {
-            try
-            {
-                var attachment = await _context.Selfassessmentattachments
-                    .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
+public async Task<IActionResult> DownloadDeptHeadAttachment(int deptHeadEmployeeId, int attachmentId)
+{
+    try
+    {
+        var attachment = await _context.Selfassessmentattachments
+            .FirstOrDefaultAsync(a => a.AttachmentId == attachmentId);
 
-                if (attachment == null)
-                    return NotFound(new { success = false, message = "Attachment not found" });
+        if (attachment == null)
+            return NotFound(new { success = false, message = "Attachment not found." });
 
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), attachment.FilePath.TrimStart('/'));
+        if (string.IsNullOrWhiteSpace(attachment.FilePath))
+            return NotFound(new { success = false, message = "File path missing." });
 
-                if (!System.IO.File.Exists(filePath))
-                    return NotFound(new { success = false, message = "File not found on server" });
+        // Get base path from configuration
+        var basePath = _configuration["FileStorage:BasePath"] ?? "D:\\Capstone\\Backend\\eepz\\SharedUploads";
+        
+        // Remove "uploads\" prefix if it exists in the database path
+        var cleanPath = attachment.FilePath
+            .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
+            .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
+            .TrimStart('\\', '/');
+        
+        var filePath = Path.Combine(basePath, cleanPath);
 
-                var memory = new MemoryStream();
-                using (var stream = new FileStream(filePath, FileMode.Open))
-                {
-                    await stream.CopyToAsync(memory);
-                }
-                memory.Position = 0;
+        _logger.LogInformation($"=== DEPT HEAD DOWNLOAD DEBUG ===");
+        _logger.LogInformation($"Base Path: {basePath}");
+        _logger.LogInformation($"Database Path: {attachment.FilePath}");
+        _logger.LogInformation($"Cleaned Path: {cleanPath}");
+        _logger.LogInformation($"Full Path: {filePath}");
+        _logger.LogInformation($"File Exists: {System.IO.File.Exists(filePath)}");
 
-                var contentType = "application/octet-stream";
-                return File(memory, contentType, attachment.FileName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error downloading attachment: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
+        if (!System.IO.File.Exists(filePath))
+            return NotFound(new { 
+                success = false, 
+                message = "File not found on server.",
+                attemptedPath = filePath,
+                databasePath = attachment.FilePath
+            });
+
+        var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+        var contentType = attachment.FileType ?? "application/octet-stream";
+
+        return File(fileBytes, contentType, attachment.FileName);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error downloading attachment: {ex.Message}");
+        _logger.LogError($"Stack trace: {ex.StackTrace}");
+        return StatusCode(500, new { success = false, message = ex.Message });
+    }
+}
+
     }
 }

@@ -16,11 +16,16 @@ namespace PerformanceManagement.Controllers
     {
         private readonly ISelfAssessmentService _assessmentService;
         private readonly EEPZDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public SelfAssessmentController(ISelfAssessmentService assessmentService, EEPZDbContext context)
+        public SelfAssessmentController(
+            ISelfAssessmentService assessmentService, 
+            EEPZDbContext context,
+            IConfiguration configuration)
         {
             _assessmentService = assessmentService;
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpPost("submit")]
@@ -31,7 +36,6 @@ namespace PerformanceManagement.Controllers
 
             try
             {
-
                 var employeeId = request.UserId;
 
                 var userAuth = await _context.Userauthentications
@@ -90,7 +94,6 @@ namespace PerformanceManagement.Controllers
         {
             try
             {
-
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.EmployeeId == employeeId);
 
@@ -175,7 +178,6 @@ namespace PerformanceManagement.Controllers
         {
             try
             {
-
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.EmployeeId == employeeId);
 
@@ -223,7 +225,6 @@ namespace PerformanceManagement.Controllers
         {
             try
             {
-
                 var userAuth = await _context.Userauthentications
                     .FirstOrDefaultAsync(ua => ua.EmployeeId == employeeId);
 
@@ -324,13 +325,33 @@ namespace PerformanceManagement.Controllers
                 if (attachment == null)
                     return NotFound(new { success = false, message = "Attachment not found." });
 
-                var filePath = System.IO.Path.Combine(
-                    System.IO.Directory.GetCurrentDirectory(),
-                    attachment.FilePath
-                );
+                if (string.IsNullOrWhiteSpace(attachment.FilePath))
+                    return NotFound(new { success = false, message = "File path missing." });
+
+                // Get base path from configuration
+                var basePath = _configuration["FileStorage:BasePath"] ?? "D:\\Capstone\\Backend\\eepz\\SharedUploads";
+                
+                // Clean the file path from database
+                var relativePath = attachment.FilePath
+                    .Replace("uploads\\", "")
+                    .Replace("uploads/", "")
+                    .TrimStart('\\', '/');
+
+                // Construct full path
+                var filePath = Path.Combine(basePath, relativePath);
+
+                Console.WriteLine($"Base Path: {basePath}");
+                Console.WriteLine($"Database FilePath: {attachment.FilePath}");
+                Console.WriteLine($"Cleaned Relative Path: {relativePath}");
+                Console.WriteLine($"Full File Path: {filePath}");
+                Console.WriteLine($"File Exists: {System.IO.File.Exists(filePath)}");
 
                 if (!System.IO.File.Exists(filePath))
-                    return NotFound(new { success = false, message = "File not found on server." });
+                    return NotFound(new { 
+                        success = false, 
+                        message = "File not found on server.",
+                        attemptedPath = filePath
+                    });
 
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
                 var contentType = attachment.FileType ?? "application/octet-stream";
@@ -339,6 +360,7 @@ namespace PerformanceManagement.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Download Error: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,

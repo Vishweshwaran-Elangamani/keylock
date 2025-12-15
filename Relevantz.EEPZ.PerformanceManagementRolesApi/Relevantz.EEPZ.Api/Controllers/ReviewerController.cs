@@ -18,11 +18,16 @@ namespace eepzbackend.Controllers
     {
         private readonly IManagerReviewRepository _repo;
         private readonly EEPZDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ReviewerController(IManagerReviewRepository repo, EEPZDbContext context)
+        public ReviewerController(
+            IManagerReviewRepository repo, 
+            EEPZDbContext context,
+            IConfiguration configuration)
         {
             _repo = repo;
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpGet("submitted-forms")]
@@ -125,13 +130,34 @@ namespace eepzbackend.Controllers
                 if (attachment == null)
                     return NotFound(new { success = false, message = "Attachment not found." });
 
-                var filePath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    attachment.FilePath
-                );
+                if (string.IsNullOrWhiteSpace(attachment.FilePath))
+                    return NotFound(new { success = false, message = "File path missing." });
+
+                // Get base path from configuration
+                var basePath = _configuration["FileStorage:BasePath"] ?? "D:\\Capstone\\Backend\\eepz\\SharedUploads";
+                
+                // Remove "uploads\" prefix if it exists in the database path
+                var cleanPath = attachment.FilePath
+                    .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
+                    .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
+                    .TrimStart('\\', '/');
+                
+                var filePath = Path.Combine(basePath, cleanPath);
+
+                Console.WriteLine($"=== REVIEWER DEBUG INFO ===");
+                Console.WriteLine($"Base Path: {basePath}");
+                Console.WriteLine($"Database Path: {attachment.FilePath}");
+                Console.WriteLine($"Cleaned Path: {cleanPath}");
+                Console.WriteLine($"Full Path: {filePath}");
+                Console.WriteLine($"File Exists: {System.IO.File.Exists(filePath)}");
 
                 if (!System.IO.File.Exists(filePath))
-                    return NotFound(new { success = false, message = "File not found on server." });
+                    return NotFound(new { 
+                        success = false, 
+                        message = "File not found on server.",
+                        attemptedPath = filePath,
+                        databasePath = attachment.FilePath
+                    });
 
                 var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
                 var contentType = attachment.FileType ?? "application/octet-stream";
@@ -140,6 +166,7 @@ namespace eepzbackend.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Download Error: {ex.Message}");
                 return StatusCode(500, new
                 {
                     success = false,

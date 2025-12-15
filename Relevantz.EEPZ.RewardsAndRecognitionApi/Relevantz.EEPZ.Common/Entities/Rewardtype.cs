@@ -15,6 +15,8 @@ public partial class Rewardtype
 
     public bool? IsActive { get; set; }
 
+    public bool IsVisibleForManagerNomination { get; set; }
+
     public int? CreatedBy { get; set; }
 
     public DateTime CreatedAt { get; set; }

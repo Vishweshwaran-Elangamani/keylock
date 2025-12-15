@@ -42,5 +42,8 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
         Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId);
 
         Task<List<AttachmentInfoDto>> GetAssessmentAttachmentsAsync(int assessmentId);
+
+        Task<bool> SetApproverDecisionAsync(int approverUserId, int assessmentId, string decision, string? approverComment);
+
     }
 }

@@ -236,8 +236,9 @@ WHERE detail_id = @detailId
 INSERT INTO AssessmentReview
   (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
 VALUES
-  (@detailId, @approverUserId, 'Approver', @rating, @comments, NOW(), 'Pending');
+  (@detailId, @approverUserId, 'Approver', @rating, @comments, NOW(), 'Approved');
 ";
+
 
         var conn = _ctx.Database.GetDbConnection();
         if (conn.State != ConnectionState.Open) await conn.OpenAsync();
@@ -836,6 +837,126 @@ WHERE reviewer_role = 'Reviewer'
 
         return true;
     }
+    public async Task<bool> SetApproverDecisionAsync(
+    int approverUserId,
+    int assessmentId,
+    string decision,
+    string? approverComment)
+{
+    decision = (decision ?? "").Trim();
+    var approved = string.Equals(decision, "Approved", StringComparison.OrdinalIgnoreCase);
+    var rejected = string.Equals(decision, "Rejected", StringComparison.OrdinalIgnoreCase);
+
+    if (!approved && !rejected) return false;
+
+    const string scopeSql = @"
+WITH l1 AS (
+  SELECT e.EmployeeId AS L1EmployeeId
+  FROM UserAuthentication ua
+  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
+  WHERE ua.UserId = @approverUserId
+)
+SELECT COUNT(*)
+FROM SelfAssessment sa
+JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
+JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
+JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
+JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
+JOIN Project p ON p.ProjectId = pe.ProjectId
+JOIN l1 ON p.L1ApproverEmployeeId = l1.L1EmployeeId
+WHERE sa.assessment_id = @assessmentId
+  AND sa.status = 'Submitted';";
+
+    const string detailsSql = @"SELECT detail_id FROM AssessmentDetail WHERE assessment_id=@aid;";
+
+    const string updateRatingsSql = @"
+UPDATE AssessmentReview
+SET review_status = @decision, reviewed_at = NOW()
+WHERE reviewer_role = 'Approver'
+  AND reviewer_id = @approverUserId
+  AND detail_id IN @detailIds
+  AND rating > 0;";
+
+    const string updateOrInsertDecisionNoteSql = @"
+UPDATE AssessmentReview
+SET rating = 0, 
+    comments = @note, 
+    review_status = @decision,
+    reviewed_at = NOW()
+WHERE reviewer_role = 'Approver'
+  AND reviewer_id = @approverUserId
+  AND detail_id = @firstDetailId
+  AND rating = 0
+LIMIT 1;
+
+INSERT INTO AssessmentReview
+  (detail_id, reviewer_id, reviewer_role, rating, comments, reviewed_at, review_status)
+SELECT @firstDetailId, @approverUserId, 'Approver', 0, @note, NOW(), @decision
+WHERE NOT EXISTS (
+  SELECT 1 FROM AssessmentReview
+  WHERE detail_id = @firstDetailId
+    AND reviewer_id = @approverUserId
+    AND reviewer_role = 'Approver'
+    AND rating = 0
+);";
+
+    var conn = _ctx.Database.GetDbConnection();
+    if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+
+    var inScope = await conn.ExecuteScalarAsync<int>(scopeSql, new { approverUserId, assessmentId });
+    if (inScope <= 0) return false;
+
+    using var tx = await conn.BeginTransactionAsync();
+
+    try
+    {
+        var detailIds = (await conn.QueryAsync<int>(detailsSql, new { aid = assessmentId }, tx)).ToArray();
+        if (detailIds.Length == 0)
+        {
+            await tx.RollbackAsync();
+            return false;
+        }
+
+        var finalDecision = approved ? "Approved" : "Rejected";
+
+        // Update all L1 ratings to Approved/Rejected
+        await conn.ExecuteAsync(updateRatingsSql,
+            new { decision = finalDecision, approverUserId, detailIds }, tx);
+
+        if (rejected)
+        {
+            var note = approverComment ?? "Approver Rejected";
+            await conn.ExecuteAsync(updateOrInsertDecisionNoteSql,
+                new
+                {
+                    firstDetailId = detailIds[0],
+                    approverUserId,
+                    note,
+                    decision = finalDecision
+                }, tx);
+        }
+        else
+        {
+            // Delete rejection notes if approving
+            await conn.ExecuteAsync(@"
+DELETE FROM AssessmentReview
+WHERE reviewer_role = 'Approver'
+  AND reviewer_id = @approverUserId
+  AND detail_id IN @detailIds
+  AND rating = 0;",
+                new { approverUserId, detailIds }, tx);
+        }
+
+        await tx.CommitAsync();
+        return true;
+    }
+    catch
+    {
+        await tx.RollbackAsync();
+        throw;
+    }
+}
+
 
     public async Task<IEnumerable<ApproverAssignmentRowDto>> GetApproverReworkFormsAsync(
         int approverUserId, int page, int pageSize)
@@ -1062,13 +1183,13 @@ ORDER BY h.SubmittedAt DESC, c.display_order IS NULL, c.display_order, c.name;";
     }
 
     public async Task<IEnumerable<ReviewerAssessmentViewDto>> GetReviewerAssessmentsWithDetailsAsync(
-        int reviewerUserId, int page, int pageSize)
-    {
-        if (page < 1) page = 1;
-        if (pageSize < 1) pageSize = 25;
-        var offset = (page - 1) * pageSize;
+    int reviewerUserId, int page, int pageSize)
+{
+    if (page < 1) page = 1;
+    if (pageSize < 1) pageSize = 25;
+    var offset = (page - 1) * pageSize;
 
-        const string sql = @"
+    const string sql = @"
 WITH l2 AS (
   SELECT e.EmployeeId AS L2EmployeeId
   FROM UserAuthentication ua
@@ -1087,16 +1208,23 @@ scope_assessments AS (
   WHERE sa.status = 'Submitted'
 ),
 latest_l1 AS (
-  SELECT ar.detail_id, MAX(ar.review_id) AS max_id
+  SELECT ar.detail_id, ar.review_status, MAX(ar.review_id) AS max_id
   FROM AssessmentReview ar
   WHERE ar.reviewer_role = 'Approver' AND ar.detail_id IS NOT NULL
-  GROUP BY ar.detail_id
+  GROUP BY ar.detail_id, ar.review_status
 ),
-has_any_l1 AS (
+-- Only get assessments where ALL details have L1 approval
+l1_approved_assessments AS (
   SELECT ad.assessment_id
   FROM AssessmentDetail ad
-  JOIN latest_l1 t ON t.detail_id = ad.detail_id
+  JOIN latest_l1 l1 ON l1.detail_id = ad.detail_id
+  WHERE l1.review_status = 'Approved'
   GROUP BY ad.assessment_id
+  HAVING COUNT(DISTINCT ad.detail_id) = (
+    SELECT COUNT(*) 
+    FROM AssessmentDetail ad2 
+    WHERE ad2.assessment_id = ad.assessment_id
+  )
 ),
 latest_l1_rows AS (
   SELECT ar.*
@@ -1132,6 +1260,7 @@ decided AS (
 visible AS (
   SELECT sa.assessment_id
   FROM scope_assessments sa
+  JOIN l1_approved_assessments l1a ON l1a.assessment_id = sa.assessment_id
   LEFT JOIN decided d ON d.assessment_id = sa.assessment_id
   WHERE d.assessment_id IS NULL
 ),
@@ -1176,40 +1305,40 @@ LEFT JOIN latest_l1_rows l1 ON l1.detail_id = ad.detail_id
 LEFT JOIN latest_l2_rows l2 ON l2.detail_id = ad.detail_id
 ORDER BY h.SubmittedAt DESC, c.display_order IS NULL, c.display_order, c.name;";
 
-        var conn = _ctx.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open) await conn.OpenAsync();
+    var conn = _ctx.Database.GetDbConnection();
+    if (conn.State != ConnectionState.Open) await conn.OpenAsync();
 
-        var rows = (await conn.QueryAsync(sql, new { reviewerUserId, pageSize, offset })).ToList();
-        if (rows.Count == 0) return Enumerable.Empty<ReviewerAssessmentViewDto>();
+    var rows = (await conn.QueryAsync(sql, new { reviewerUserId, pageSize, offset })).ToList();
+    if (rows.Count == 0) return Enumerable.Empty<ReviewerAssessmentViewDto>();
 
-        var grouped = rows.GroupBy(r => (int)r.AssessmentId);
-        var list = new List<ReviewerAssessmentViewDto>();
-        foreach (var g in grouped)
-        {
-            var head = g.First();
-            var items = g.Select(r => new CompetencyReviewRowDto(
-                DetailId: (int)r.DetailId,
-                CompetencyName: (string)r.CompetencyName,
-                EmployeeRating: (int?)r.EmployeeRating,
-                EmployeeComments: (string?)r.EmployeeComments,
-                ApproverRating: (int?)r.ApproverRating,
-                ApproverComments: (string?)r.ApproverComments,
-                ReviewerRating: (int?)r.ReviewerRating,
-                ReviewerComments: (string?)r.ReviewerComments
-            )).ToList();
+    var grouped = rows.GroupBy(r => (int)r.AssessmentId);
+    var list = new List<ReviewerAssessmentViewDto>();
+    foreach (var g in grouped)
+    {
+        var head = g.First();
+        var items = g.Select(r => new CompetencyReviewRowDto(
+            DetailId: (int)r.DetailId,
+            CompetencyName: (string)r.CompetencyName,
+            EmployeeRating: (int?)r.EmployeeRating,
+            EmployeeComments: (string?)r.EmployeeComments,
+            ApproverRating: (int?)r.ApproverRating,
+            ApproverComments: (string?)r.ApproverComments,
+            ReviewerRating: (int?)r.ReviewerRating,
+            ReviewerComments: (string?)r.ReviewerComments
+        )).ToList();
 
-            list.Add(new ReviewerAssessmentViewDto(
-                AssessmentId: (int)head.AssessmentId,
-                EmployeeName: (string)head.EmployeeName,
-                FormName: (string)head.FormName,
-                SubmittedAt: (DateTime)head.SubmittedAt,
-                Project: (string)head.Project,
-                Items: items
-            ));
-        }
-
-        return list;
+        list.Add(new ReviewerAssessmentViewDto(
+            AssessmentId: (int)head.AssessmentId,
+            EmployeeName: (string)head.EmployeeName,
+            FormName: (string)head.FormName,
+            SubmittedAt: (DateTime)head.SubmittedAt,
+            Project: (string)head.Project,
+            Items: items
+        ));
     }
+
+    return list;
+}
 
     public async Task<ReviewerDecisionDto?> GetLatestReviewerDecisionAsync(int assessmentId)
     {

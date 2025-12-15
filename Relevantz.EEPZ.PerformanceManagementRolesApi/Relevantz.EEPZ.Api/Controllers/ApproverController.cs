@@ -18,11 +18,16 @@ namespace eepzbackend.Controllers
     {
         private readonly IManagerReviewRepository _repo;
         private readonly EEPZDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ApproverController(IManagerReviewRepository repo, EEPZDbContext context)
+        public ApproverController(
+            IManagerReviewRepository repo, 
+            EEPZDbContext context,
+            IConfiguration configuration)
         {
             _repo = repo;
-            _context = context;  
+            _context = context;
+            _configuration = configuration;
         }
 
         [HttpGet("submitted-forms")]
@@ -53,6 +58,7 @@ namespace eepzbackend.Controllers
             }
         }
 
+        
         [HttpGet("attachments/{attachmentId:int}/download")]
 public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)
 {
@@ -67,55 +73,29 @@ public async Task<IActionResult> DownloadAttachment(int approverUserId, int atta
         if (string.IsNullOrWhiteSpace(attachment.FilePath))
             return NotFound(new { success = false, message = "File path missing." });
 
-        // LOG THE STORED PATH FOR DEBUGGING
-        Console.WriteLine($"Database FilePath: {attachment.FilePath}");
-
-        // Construct the full file path
-        string filePath;
+        var basePath = _configuration["FileStorage:BasePath"] ?? "D:\\Capstone\\Backend\\eepz\\SharedUploads";
         
-        // Check if FilePath is already an absolute path
-        if (Path.IsPathRooted(attachment.FilePath))
-        {
-            filePath = attachment.FilePath;
-        }
-        else
-        {
-            // If it's relative, combine with the application's content root
-            filePath = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                attachment.FilePath.TrimStart('/', '\\')  // Remove leading slashes
-            );
-        }
+        var cleanPath = attachment.FilePath
+            .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
+            .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
+            .TrimStart('\\', '/');
+        
+        var filePath = Path.Combine(basePath, cleanPath);
 
-        // LOG THE CONSTRUCTED PATH FOR DEBUGGING
-        Console.WriteLine($"Constructed FilePath: {filePath}");
+        Console.WriteLine($"=== DEBUG INFO ===");
+        Console.WriteLine($"Base Path: {basePath}");
+        Console.WriteLine($"Database Path: {attachment.FilePath}");
+        Console.WriteLine($"Cleaned Path: {cleanPath}");
+        Console.WriteLine($"Full Path: {filePath}");
         Console.WriteLine($"File Exists: {System.IO.File.Exists(filePath)}");
 
         if (!System.IO.File.Exists(filePath))
-        {
-            // Try alternate path construction (sometimes files are in wwwroot)
-            var alternateFilePath = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                attachment.FilePath.TrimStart('/', '\\')
-            );
-            
-            Console.WriteLine($"Trying Alternate Path: {alternateFilePath}");
-            
-            if (System.IO.File.Exists(alternateFilePath))
-            {
-                filePath = alternateFilePath;
-            }
-            else
-            {
-                return NotFound(new { 
-                    success = false, 
-                    message = "File not found on server.",
-                    attemptedPath = filePath,  // Include this for debugging
-                    alternatePath = alternateFilePath
-                });
-            }
-        }
+            return NotFound(new { 
+                success = false, 
+                message = "File not found on server.",
+                attemptedPath = filePath,
+                databasePath = attachment.FilePath
+            });
 
         var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
         var contentType = attachment.FileType ?? "application/octet-stream";
@@ -125,8 +105,6 @@ public async Task<IActionResult> DownloadAttachment(int approverUserId, int atta
     catch (Exception ex)
     {
         Console.WriteLine($"Download Error: {ex.Message}");
-        Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-        
         return StatusCode(500, new
         {
             success = false,

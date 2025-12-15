@@ -14,6 +14,27 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ============ SHARED UPLOADS PATH CONFIGURATION ============
+var sharedUploadsPath = Path.GetFullPath(Path.Combine(
+    Directory.GetCurrentDirectory(), 
+    "..", "..", 
+    "SharedUploads"
+));
+
+// Ensure shared directory exists
+if (!Directory.Exists(sharedUploadsPath))
+{
+    Directory.CreateDirectory(sharedUploadsPath);
+    Console.WriteLine($"Created shared uploads directory at: {sharedUploadsPath}");
+}
+else
+{
+    Console.WriteLine($"Shared uploads directory exists at: {sharedUploadsPath}");
+}
+
+// Register shared path as singleton for DI
+builder.Services.AddSingleton(new FileUploadSettings { UploadPath = sharedUploadsPath });
+
 // ============ SERILOG CONFIGURATION ============
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -23,6 +44,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 Log.Information("Starting EEPZ Performance Management Application...");
+Log.Information("Shared Uploads Path: {Path}", sharedUploadsPath);
 
 // ============ CORE SERVICES ============
 builder.Services.AddControllers();
@@ -165,14 +187,16 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // ============ DEPENDENCY INJECTION ============
-//builder.Services.AddScoped<IFormManagementService, FormManagementService>();
-builder.Services.AddScoped<IAppraisalProcessService, AppraisalProcessService>();
+// builder.Services.AddScoped<IFormManagementService, FormManagementService>();
+// builder.Services.AddScoped<IAppraisalProcessService, AppraisalProcessService>();
 // builder.Services.AddScoped<ISelfAssessmentService, SelfAssessmentService>();
 // builder.Services.AddScoped<IManagerReviewRepository, ManagerReviewRepository>();
 // builder.Services.AddScoped<ILeadershipRepository, LeadershipRepository>();
 // builder.Services.AddScoped<ILeadershipService, LeadershipService>();
-builder.Services.AddScoped<IRecognitionRewardRepository, RecognitionRewardRepository>();
-builder.Services.AddScoped<IRecognitionRewardService, RecognitionRewardService>();
+
+// Add this line in your Program.cs where other services are registered
+builder.Services.AddScoped<IAppraisalProcessService, AppraisalProcessService>();
+
 
 // ============ CORS CONFIGURATION ============
 builder.Services.AddCors(options =>
@@ -215,7 +239,7 @@ app.UseAuthorization();
 app.MapControllers();
 try
 {
-    Log.Information("EEPZ Performance Rewards And Recognition Management API started successfully on port 5113");
+    Log.Information("EEPZ Performance Management API started successfully on port 5113");
     app.Run();
 }
 catch (Exception ex)
@@ -226,4 +250,10 @@ catch (Exception ex)
 finally
 {
     Log.CloseAndFlush();
+}
+
+// Simple settings class
+public class FileUploadSettings
+{
+    public string UploadPath { get; set; } = string.Empty;
 }

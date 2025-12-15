@@ -9,26 +9,31 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
     public class SelfAssessmentService : ISelfAssessmentService
     {
         private readonly EEPZDbContext _context;
-        private readonly string _uploadBasePath; 
+private readonly IConfiguration _configuration;
+private readonly string _uploadBasePath; 
 
-        public SelfAssessmentService(EEPZDbContext context)
-        {
-            _context = context;
-            
-            _uploadBasePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "assessments");
-            
-            
-            if (!Directory.Exists(_uploadBasePath))
-            {
-                Directory.CreateDirectory(_uploadBasePath);
-            }
-        }
+public SelfAssessmentService(EEPZDbContext context, IConfiguration configuration)
+{
+    _context = context;
+    _configuration = configuration;
+    
+    // Use shared uploads path from configuration
+    var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
+    _uploadBasePath = Path.Combine(basePath, "assessments");
+    
+    if (!Directory.Exists(_uploadBasePath))
+    {
+        Directory.CreateDirectory(_uploadBasePath);
+    }
+}
+
 
         public async Task<ApiResponse<SelfAssessmentResponseDto>> SubmitSelfAssessmentAsync(SubmitSelfAssessmentRequestDto request)
         {
@@ -197,7 +202,9 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 await File.WriteAllBytesAsync(fullPath, bytes);
 
                 
-                return Path.Combine("uploads", "assessments", assessmentId.ToString(), uniqueFileName);
+                // Save WITHOUT "uploads\" prefix - just the relative path
+return Path.Combine("assessments", assessmentId.ToString(), uniqueFileName);
+
             }
             catch (Exception ex)
             {
@@ -406,13 +413,20 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
 
                 
                 if (!string.IsNullOrEmpty(attachment.FilePath))
-                {
-                    var fullPath = Path.Combine(Directory.GetCurrentDirectory(), attachment.FilePath);
-                    if (File.Exists(fullPath))
-                    {
-                        File.Delete(fullPath);
-                    }
-                }
+{
+    var basePath = _configuration["FileStorage:BasePath"] ?? @"D:\Capstone\Backend Push\Backend\eepz\SharedUploads";
+    var cleanPath = attachment.FilePath
+        .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase)
+        .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
+        .TrimStart('\\', '/');
+    
+    var fullPath = Path.Combine(basePath, cleanPath);
+    if (File.Exists(fullPath))
+    {
+        File.Delete(fullPath);
+    }
+}
+
 
                 _context.Selfassessmentattachments.Remove(attachment);
                 await _context.SaveChangesAsync();

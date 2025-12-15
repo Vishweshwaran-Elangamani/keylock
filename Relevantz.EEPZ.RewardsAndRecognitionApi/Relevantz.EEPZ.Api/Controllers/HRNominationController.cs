@@ -26,107 +26,110 @@ namespace PerformanceManagement.Controllers
             _logger = logger;
         }
 
-        [HttpGet("hr/manager-nominations")]
-        public async Task<IActionResult> GetAllManagerNominationsForHR()
+       [HttpGet("hr/manager-nominations")]
+public async Task<IActionResult> GetAllManagerNominationsForHR()
+{
+    try
+    {
+        var nominations = await _context.Recognitionstatuses
+            .Where(n => n.NominationType == "ManagerNomination" 
+                     && n.Status == "Pending"
+                     && n.Opportunity.RewardType.IsVisibleForManagerNomination == true)  // ✅ FILTER BY VISIBILITY
+            .Include(n => n.NomineeEmployee)
+                .ThenInclude(e => e.Userprofile)
+            .Include(n => n.NominatedByEmployee)
+                .ThenInclude(e => e.Userprofile)
+            .Include(n => n.Opportunity)  // ✅ ADDED: CRITICAL!
+                .ThenInclude(o => o.RewardType)  // ✅ ADDED: CRITICAL!
+            .ToListAsync();
+
+        var nominationDtos = new List<object>();
+
+        foreach (var n in nominations)
         {
-            try
-            {
-                var nominations = await _context.Recognitionstatuses
-                    .Where(n => n.NominationType == "ManagerNomination" && n.Status == "Pending")
-                    .Include(n => n.NomineeEmployee)
-                        .ThenInclude(e => e.Userprofile)
-                    .Include(n => n.NominatedByEmployee)
-                        .ThenInclude(e => e.Userprofile)
-                    .ToListAsync();
+            var opportunity = await _context.Recognitiondetails
+                .Where(o => o.OpportunityId == n.OpportunityId)
+                .Include(o => o.RewardType)
+                .FirstOrDefaultAsync();
 
-                var nominationDtos = new List<object>();
+            var nomineeDept = await _context.Employeedetailsmasters
+                .Where(edm => edm.EmployeeId == n.NomineeEmployeeId)
+                .Include(edm => edm.Department)
+                .FirstOrDefaultAsync();
 
-                foreach (var n in nominations)
+            var parameterValues = await _context.Nominationparametervalues
+                .Where(pv => pv.NominationId == n.NominationId)
+                .Include(pv => pv.Parameter)
+                .Select(pv => new
                 {
+                    pv.ParameterId,
+                    ParameterName = pv.Parameter.ParameterName,
+                    ParameterType = pv.Parameter.ParameterType,
+                    pv.ParameterValue,
+                    IsRequired = pv.Parameter.IsRequired
+                })
+                .ToListAsync();
 
-                    var opportunity = await _context.Recognitiondetails
-                        .Where(o => o.OpportunityId == n.OpportunityId)
-                        .Include(o => o.RewardType)
-                        .FirstOrDefaultAsync();
-
-                    var nomineeDept = await _context.Employeedetailsmasters
-                        .Where(edm => edm.EmployeeId == n.NomineeEmployeeId)
-                        .Include(edm => edm.Department)
-                        .FirstOrDefaultAsync();
-
-                    var parameterValues = await _context.Nominationparametervalues
-                        .Where(pv => pv.NominationId == n.NominationId)
-                        .Include(pv => pv.Parameter)
-                        .Select(pv => new
-                        {
-                            pv.ParameterId,
-                            ParameterName = pv.Parameter.ParameterName,
-                            ParameterType = pv.Parameter.ParameterType,
-                            pv.ParameterValue,
-                            IsRequired = pv.Parameter.IsRequired
-                        })
-                        .ToListAsync();
-
-                    nominationDtos.Add(new
-                    {
-                        n.NominationId,
-                        n.OpportunityId,
-                        OpportunityName = opportunity?.OpportunityName ?? "Unknown",
-                        OpportunityDeadline = opportunity?.Deadline,
-                        RewardType = opportunity?.RewardType != null ? new
-                        {
-                            opportunity.RewardType.RewardTypeId,
-                            opportunity.RewardType.RewardName,
-                            opportunity.RewardType.RewardCategory
-                        } : null,
-                        NomineeEmployeeId = n.NomineeEmployeeId,
-                        NomineeName = n.NomineeEmployee.Userprofile.FirstName + " " + n.NomineeEmployee.Userprofile.LastName,
-                        NomineeEmail = n.NomineeEmployee.Userprofile.PersonalEmail,
-                        NomineeDepartmentId = nomineeDept?.DepartmentId,
-                        NomineeDepartmentName = nomineeDept?.Department?.DepartmentName ?? "Unknown",
-                        ManagerEmployeeId = n.NominatedByEmployeeId,
-                        ManagerName = n.NominatedByEmployee.Userprofile.FirstName + " " + n.NominatedByEmployee.Userprofile.LastName,
-                        n.Justification,
-                        n.SubmittedAt,
-                        n.Status,
-                        ParameterValues = parameterValues
-                    });
-                }
-
-                var groupedNominations = nominationDtos
-                    .GroupBy(n => new
-                    {
-                        ((dynamic)n).OpportunityId,
-                        ((dynamic)n).OpportunityName,
-                        ((dynamic)n).OpportunityDeadline,
-                        ((dynamic)n).RewardType
-                    })
-                    .Select(g => new
-                    {
-                        OpportunityId = g.Key.OpportunityId,
-                        OpportunityName = g.Key.OpportunityName,
-                        OpportunityDeadline = g.Key.OpportunityDeadline,
-                        RewardType = g.Key.RewardType,
-                        NominationCount = g.Count(),
-                        Nominations = g.ToList()
-                    })
-                    .ToList();
-
-                return Ok(new
-                {
-                    success = true,
-                    data = groupedNominations,
-                    totalNominations = nominationDtos.Count,
-                    totalOpportunities = groupedNominations.Count,
-                    message = $"Found {nominationDtos.Count} pending nominations"
-                });
-            }
-            catch (Exception ex)
+            nominationDtos.Add(new
             {
-                _logger.LogError($"[HR_ALL_NOMINATIONS] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
-            }
+                n.NominationId,
+                n.OpportunityId,
+                OpportunityName = opportunity?.OpportunityName ?? "Unknown",
+                OpportunityDeadline = opportunity?.Deadline,
+                RewardType = opportunity?.RewardType != null ? new
+                {
+                    opportunity.RewardType.RewardTypeId,
+                    opportunity.RewardType.RewardName,
+                    opportunity.RewardType.RewardCategory
+                } : null,
+                NomineeEmployeeId = n.NomineeEmployeeId,
+                NomineeName = n.NomineeEmployee.Userprofile.FirstName + " " + n.NomineeEmployee.Userprofile.LastName,
+                NomineeEmail = n.NomineeEmployee.Userprofile.PersonalEmail,
+                NomineeDepartmentId = nomineeDept?.DepartmentId,
+                NomineeDepartmentName = nomineeDept?.Department?.DepartmentName ?? "Unknown",
+                ManagerEmployeeId = n.NominatedByEmployeeId,
+                ManagerName = n.NominatedByEmployee.Userprofile.FirstName + " " + n.NominatedByEmployee.Userprofile.LastName,
+                n.Justification,
+                n.SubmittedAt,
+                n.Status,
+                ParameterValues = parameterValues
+            });
         }
+
+        var groupedNominations = nominationDtos
+            .GroupBy(n => new
+            {
+                ((dynamic)n).OpportunityId,
+                ((dynamic)n).OpportunityName,
+                ((dynamic)n).OpportunityDeadline,
+                ((dynamic)n).RewardType
+            })
+            .Select(g => new
+            {
+                OpportunityId = g.Key.OpportunityId,
+                OpportunityName = g.Key.OpportunityName,
+                OpportunityDeadline = g.Key.OpportunityDeadline,
+                RewardType = g.Key.RewardType,
+                NominationCount = g.Count(),
+                Nominations = g.ToList()
+            })
+            .ToList();
+
+        return Ok(new
+        {
+            success = true,
+            data = groupedNominations,
+            totalNominations = nominationDtos.Count,
+            totalOpportunities = groupedNominations.Count,
+            message = $"Found {nominationDtos.Count} pending nominations"
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[HR_ALL_NOMINATIONS] Error: {ex.Message}");
+        return StatusCode(500, new { success = false, message = $"Error: {ex.Message}" });
+    }
+}
 
         [HttpPost("hr/nominations/reject")]
         public async Task<IActionResult> RejectNominations([FromBody] HRNominationRejectDto dto)
@@ -285,109 +288,107 @@ public async Task<IActionResult> ApproveNominations([FromBody] HRNominationAppro
     }
 
 }
+[HttpGet("reward-types")]
+public async Task<IActionResult> GetAllRewardTypes([FromQuery] bool activeOnly = false)
+{
+    try
+    {
+        var rewardTypes = await _context.Rewardtypes
+            .Where(activeOnly ? rt => rt.IsActive == true : rt => true)
+            .OrderBy(rt => rt.RewardCategory)
+            .ThenBy(rt => rt.RewardName)
+            .Select(rt => new
+            {
+                rt.RewardTypeId,
+                rt.RewardCategory,
+                rt.RewardName,
+                rt.Description,
+                rt.IsActive,
+                IsVisibleForManagerNomination = rt.IsVisibleForManagerNomination,  // ✅ bool only
+                rt.CreatedAt,
+                ParameterCount = 0
+            })
+            .ToListAsync();
 
-        [HttpGet("reward-types")]
-        public async Task<IActionResult> GetAllRewardTypes([FromQuery] bool activeOnly = false)
+        return Ok(new
         {
-            try
-            {
-                var query = _context.Rewardtypes.AsQueryable();
+            success = true,
+            data = rewardTypes,
+            message = $"Found {rewardTypes.Count} reward types"
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[GET_REWARD_TYPES] Error: {ex.Message}");  // ✅ String interpolation
+        return StatusCode(500, new { success = false, message = ex.Message });
+    }
+}
 
-                if (activeOnly)
-                {
-                    query = query.Where(rt => rt.IsActive == true);
-                }
 
-                var rewardTypes = await query
-                    .Select(rt => new
-                    {
-                        rt.RewardTypeId,
-                        rt.RewardCategory,
-                        rt.RewardName,
-                        rt.Description,
-                        rt.IsActive,
-                        rt.CreatedAt,
-                        ParameterCount = _context.Nominationparameters.Count(p => p.RewardTypeId == rt.RewardTypeId)
-                    })
-                    .OrderBy(rt => rt.RewardCategory)
-                    .ThenBy(rt => rt.RewardName)
-                    .ToListAsync();
-
-                return Ok(new
-                {
-                    success = true,
-                    data = rewardTypes,
-                    message = $"Found {rewardTypes.Count} reward types"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[GET_REWARD_TYPES] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
 
         [HttpPost("reward-types")]
-        public async Task<IActionResult> CreateRewardType([FromBody] CreateRewardTypeDto dto)
+public async Task<IActionResult> CreateRewardType([FromBody] CreateRewardTypeDto dto)
+{
+    try
+    {
+        var rewardType = new Rewardtype
         {
-            try
-            {
-                var rewardType = new Rewardtype
-                {
-                    RewardCategory = dto.RewardCategory,
-                    RewardName = dto.RewardName,
-                    Description = dto.Description,
-                    IsActive = true,
-                    CreatedBy = dto.CreatedBy,
-                    CreatedAt = DateTime.UtcNow
-                };
+            RewardCategory = dto.RewardCategory,
+            RewardName = dto.RewardName,
+            Description = dto.Description,
+            IsActive = true,
+            IsVisibleForManagerNomination = dto.IsVisibleForManagerNomination,  // ADD THIS
+            CreatedBy = dto.CreatedBy,
+            CreatedAt = DateTime.UtcNow
+        };
 
-                _context.Rewardtypes.Add(rewardType);
-                await _context.SaveChangesAsync();
+        _context.Rewardtypes.Add(rewardType);
+        await _context.SaveChangesAsync();
 
-                return Ok(new
-                {
-                    success = true,
-                    data = new { rewardTypeId = rewardType.RewardTypeId },
-                    message = "Reward type created successfully"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[CREATE_REWARD_TYPE] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
+        return Ok(new
+        {
+            success = true,
+            data = new { rewardTypeId = rewardType.RewardTypeId },
+            message = "Reward type created successfully"
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[CREATE_REWARD_TYPE] Error: {ex.Message}");
+        return StatusCode(500, new { success = false, message = ex.Message });
+    }
+}
+
+       [HttpPut("reward-types/{rewardTypeId}")]
+public async Task<IActionResult> UpdateRewardType(int rewardTypeId, [FromBody] UpdateRewardTypeDto dto)
+{
+    try
+    {
+        var rewardType = await _context.Rewardtypes.FindAsync(rewardTypeId);
+        if (rewardType == null)
+        {
+            return NotFound(new { success = false, message = "Reward type not found" });
         }
 
-        [HttpPut("reward-types/{rewardTypeId}")]
-        public async Task<IActionResult> UpdateRewardType(int rewardTypeId, [FromBody] UpdateRewardTypeDto dto)
+        rewardType.RewardName = dto.RewardName;
+        rewardType.Description = dto.Description;
+        rewardType.IsActive = dto.IsActive;
+        rewardType.IsVisibleForManagerNomination = dto.IsVisibleForManagerNomination;  // ADD THIS
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new
         {
-            try
-            {
-                var rewardType = await _context.Rewardtypes.FindAsync(rewardTypeId);
-                if (rewardType == null)
-                {
-                    return NotFound(new { success = false, message = "Reward type not found" });
-                }
-
-                rewardType.RewardName = dto.RewardName;
-                rewardType.Description = dto.Description;
-                rewardType.IsActive = dto.IsActive;
-
-                await _context.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    success = true,
-                    message = "Reward type updated successfully"
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"[UPDATE_REWARD_TYPE] Error: {ex.Message}");
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
-        }
+            success = true,
+            message = "Reward type updated successfully"
+        });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"[UPDATE_REWARD_TYPE] Error: {ex.Message}");
+        return StatusCode(500, new { success = false, message = ex.Message });
+    }
+}
 
        
         [HttpGet("reward-types/{rewardTypeId}/parameters")]
