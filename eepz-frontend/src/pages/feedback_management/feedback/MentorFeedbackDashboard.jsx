@@ -79,20 +79,19 @@ export default function MentorFeedbackDashboard() {
     skill: "all",
   });
 
-  // Function to fetch employee name by ID
+ 
   const fetchEmployeeName = async (employeeId) => {
     try {
-      const response = await axios.get(
-        `http://localhost:5333/api/EmployeeManagement/${employeeId}`
-      );
-      
+  const response = await axios.get(
+    `${import.meta.env.VITE_PROJECT_API_URL}/api/EmployeeManagement/${employeeId}`
+  );
       if (response.data?.success && response.data.data) {
         const { firstName, lastName } = response.data.data;
         return `${firstName} ${lastName}`;
       }
       return `Employee ${employeeId}`;
     } catch (err) {
-      console.error(`Failed to fetch employee ${employeeId}:`, err);
+    
       return `Employee ${employeeId}`;
     }
   };
@@ -104,31 +103,31 @@ export default function MentorFeedbackDashboard() {
     try {
       const empId = user?.empId || user?.employeeId || 1;
 
-      console.log("📋 Fetching mentor feedback...");
+      
       const response = await mentorFeedbackApi.aboutMe(empId);
 
       if (response.data?.success && Array.isArray(response.data.data)) {
-        // Process each feedback to fetch mentee name
+
         const enrichedPromises = response.data.data.map(async (feedback) => {
           let menteeName = "Unknown";
 
-          // Extract menteeEmployeeId from the MenteeName field (which contains the ID as string)
+
           if (feedback.menteeName) {
-            // Convert string ID to number
+
             const menteeId = parseInt(feedback.menteeName, 10);
             
             if (!isNaN(menteeId)) {
-              // Fetch the actual employee name
+
               menteeName = await fetchEmployeeName(menteeId);
-              console.log(`✓ Fetched name for ID ${menteeId}: ${menteeName}`);
+              
             }
           } else if (feedback.menteeEmployeeId) {
-            // Fallback to menteeEmployeeId if menteeName is not available
+  
             const menteeId = parseInt(feedback.menteeEmployeeId, 10);
             
             if (!isNaN(menteeId)) {
               menteeName = await fetchEmployeeName(menteeId);
-              console.log(`✓ Fetched name for ID ${menteeId}: ${menteeName}`);
+            
             }
           }
 
@@ -144,13 +143,13 @@ export default function MentorFeedbackDashboard() {
 
         setFeedbacks(enriched);
         setFilteredFeedbacks(enriched);
-        console.log("✓ Feedback loaded:", enriched.length);
+        
       } else {
         setFeedbacks([]);
         setFilteredFeedbacks([]);
       }
     } catch (err) {
-      console.error("❌ Error fetching feedbacks:", err);
+      
       setError("Failed to load feedback. Please try again.");
       setFeedbacks([]);
       setFilteredFeedbacks([]);
@@ -200,7 +199,7 @@ export default function MentorFeedbackDashboard() {
         alert("✓ Feedback acknowledged successfully!");
       }
     } catch (err) {
-      console.error("Error acknowledging feedback:", err);
+      
       alert("Failed to acknowledge feedback");
     }
   };
@@ -257,7 +256,6 @@ export default function MentorFeedbackDashboard() {
 
   return (
     <div className="sme-sla-wrapper">
-      {/* Breadcrumb Navigation */}
       <nav aria-label="breadcrumb" className="mb-3">
         <ol
           className="breadcrumb mb-0 d-flex align-items-center"
@@ -374,7 +372,6 @@ export default function MentorFeedbackDashboard() {
         </div>
       )}
 
-      {/* Stats Cards */}
       <div className="row g-3 mb-3">
         {[
           {
@@ -407,7 +404,7 @@ export default function MentorFeedbackDashboard() {
         ))}
       </div>
 
-      {/* Filters Card */}
+
       <div className="sme-sla-filters-card">
         <div className="row g-3">
           <div className="col-md-4">
@@ -461,7 +458,7 @@ export default function MentorFeedbackDashboard() {
         </div>
       </div>
 
-      {/* Feedback Table */}
+
       {filteredFeedbacks.length === 0 ? (
         <div className="sme-sla-empty-state-wrapper">
           <div className="sme-sla-empty-state">
@@ -563,8 +560,6 @@ export default function MentorFeedbackDashboard() {
           </div>
         </div>
       )}
-
-      {/* Detail Modal */}
       {selectedFeedback && (
         <>
           <div
