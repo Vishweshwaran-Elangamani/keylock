@@ -45,5 +45,16 @@ namespace Relevantz.EEPZ.Data.Repository.Interfaces
 
         Task<bool> SetApproverDecisionAsync(int approverUserId, int assessmentId, string decision, string? approverComment);
 
+        Task<IEnumerable<ApproverAssignmentRowDto>> GetSubmittedL1RatingsAsync(
+    int approverUserId,
+    int page,
+    int pageSize
+);
+Task<IEnumerable<ApproverAssignmentRowDto>> GetReviewerSubmittedRatingsAsync(
+    int reviewerUserId,
+    int page,
+    int pageSize
+);
+
     }
 }

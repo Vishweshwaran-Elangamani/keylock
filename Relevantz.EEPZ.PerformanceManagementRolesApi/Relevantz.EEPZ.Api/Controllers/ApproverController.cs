@@ -58,6 +58,18 @@ namespace eepzbackend.Controllers
             }
         }
 
+               [HttpGet("submitted-l1-ratings")]
+public async Task<IActionResult> GetSubmittedL1Ratings(
+    int approverUserId,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 25)
+{
+    var rows = await _repo.GetSubmittedL1RatingsAsync(
+        approverUserId, page, pageSize);
+ 
+    return Ok(rows);
+}
+
         
         [HttpGet("attachments/{attachmentId:int}/download")]
 public async Task<IActionResult> DownloadAttachment(int approverUserId, int attachmentId)

@@ -548,6 +548,147 @@ ORDER BY c.display_order IS NULL, c.display_order, c.name;";
         );
     }
 
+    public async Task<IEnumerable<ApproverAssignmentRowDto>>
+GetSubmittedL1RatingsAsync(int approverUserId, int page, int pageSize)
+{
+    if (page < 1) page = 1;
+    if (pageSize < 1) pageSize = 25;
+    var offset = (page - 1) * pageSize;
+ 
+    const string sql = @"
+WITH l1 AS (
+  SELECT e.EmployeeId
+  FROM UserAuthentication ua
+  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
+  WHERE ua.UserId = @approverUserId
+),
+scope AS (
+  SELECT DISTINCT sa.assessment_id
+  FROM SelfAssessment sa
+  JOIN UserAuthentication ua ON ua.UserId = sa.employee_id
+  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
+  JOIN EmployeeDetailsMaster edm ON edm.EmployeeId = e.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = edm.EmployeeId AND pe.IsPrimary = 1
+  JOIN Project p ON p.ProjectId = pe.ProjectId
+  JOIN l1 ON p.L1ApproverEmployeeId = l1.EmployeeId
+  WHERE sa.status = 'Submitted'
+),
+l1_done AS (
+  SELECT DISTINCT ad.assessment_id
+  FROM AssessmentReview ar
+  JOIN AssessmentDetail ad ON ad.detail_id = ar.detail_id
+  WHERE ar.reviewer_role = 'Approver'
+    AND ar.rating > 0
+)
+SELECT
+  sa.assessment_id AS AssessmentId,
+  COALESCE(
+    NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''),
+    ua.Email,
+    e.EmployeeCompanyId
+  ) AS EmployeeName,
+  f.name AS FormName,
+  sa.submitted_at AS SubmittedAt,
+  sa.status AS Status,
+  GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName) AS Project
+FROM scope s
+JOIN l1_done l1d ON l1d.assessment_id = s.assessment_id
+JOIN SelfAssessment sa ON sa.assessment_id = s.assessment_id
+JOIN AssessmentForm f ON f.form_id = sa.form_id
+JOIN UserAuthentication ua ON ua.UserId = sa.employee_id
+JOIN Employee e ON e.EmployeeId = ua.EmployeeId
+LEFT JOIN UserProfile up ON up.EmployeeId = e.EmployeeId
+JOIN EmployeeDetailsMaster edm ON edm.EmployeeId = e.EmployeeId
+JOIN ProjectEmployees pe ON pe.EmployeeId = edm.EmployeeId AND pe.IsPrimary = 1
+JOIN Project p ON p.ProjectId = pe.ProjectId
+GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
+ORDER BY sa.submitted_at DESC
+LIMIT @pageSize OFFSET @offset;
+";
+ 
+    var conn = _ctx.Database.GetDbConnection();
+    if (conn.State != System.Data.ConnectionState.Open)
+        await conn.OpenAsync();
+ 
+    return await conn.QueryAsync<ApproverAssignmentRowDto>(
+        sql, new { approverUserId, pageSize, offset });
+}
+public async Task<IEnumerable<ApproverAssignmentRowDto>>
+GetReviewerSubmittedRatingsAsync(int reviewerUserId, int page, int pageSize)
+{
+    if (page < 1) page = 1;
+    if (pageSize < 1) pageSize = 25;
+    var offset = (page - 1) * pageSize;
+ 
+    const string sql = @"
+WITH l2 AS (
+  SELECT e.EmployeeId AS L2EmployeeId
+  FROM UserAuthentication ua
+  JOIN Employee e ON e.EmployeeId = ua.EmployeeId
+  WHERE ua.UserId = @reviewerUserId
+),
+scope_assessments AS (
+  SELECT DISTINCT sa.assessment_id
+  FROM SelfAssessment sa
+  JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
+  JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
+  JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
+  JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
+  JOIN Project p ON p.ProjectId = pe.ProjectId
+  JOIN l2 ON p.L2ApproverEmployeeId = l2.L2EmployeeId
+  WHERE sa.status = 'Submitted'
+),
+latest_l2_decision AS (
+  SELECT ar.detail_id, ar.review_status
+  FROM AssessmentReview ar
+  JOIN (
+    SELECT detail_id, MAX(review_id) AS max_id
+    FROM AssessmentReview
+    WHERE reviewer_role = 'Reviewer'
+      AND review_status IN ('Approved','Rejected')
+    GROUP BY detail_id
+  ) t ON t.max_id = ar.review_id
+),
+submitted_assessments AS (
+  SELECT DISTINCT ad.assessment_id
+  FROM AssessmentDetail ad
+  JOIN latest_l2_decision l2 ON l2.detail_id = ad.detail_id
+)
+SELECT
+  sa.assessment_id AS AssessmentId,
+  COALESCE(
+    NULLIF(CONCAT_WS(' ', up.FirstName, up.LastName), ''),
+    emp_ua.Email,
+    emp.EmployeeCompanyId
+  ) AS EmployeeName,
+  f.name AS FormName,
+  sa.submitted_at AS SubmittedAt,
+  sa.status AS Status,
+  GROUP_CONCAT(DISTINCT p.ProjectName ORDER BY p.ProjectName SEPARATOR ', ') AS Project
+FROM scope_assessments s
+JOIN submitted_assessments sub ON sub.assessment_id = s.assessment_id
+JOIN SelfAssessment sa ON sa.assessment_id = s.assessment_id
+JOIN AssessmentForm f ON f.form_id = sa.form_id
+JOIN UserAuthentication emp_ua ON emp_ua.UserId = sa.employee_id
+JOIN Employee emp ON emp.EmployeeId = emp_ua.EmployeeId
+LEFT JOIN UserProfile up ON up.EmployeeId = emp.EmployeeId
+JOIN EmployeeDetailsMaster emp_edm ON emp_edm.EmployeeId = emp.EmployeeId
+JOIN ProjectEmployees pe ON pe.EmployeeId = emp_edm.EmployeeId AND pe.IsPrimary = 1
+JOIN Project p ON p.ProjectId = pe.ProjectId
+GROUP BY sa.assessment_id, EmployeeName, FormName, SubmittedAt, Status
+ORDER BY sa.submitted_at DESC
+LIMIT @pageSize OFFSET @offset;
+";
+ 
+    var conn = _ctx.Database.GetDbConnection();
+    if (conn.State != ConnectionState.Open)
+        await conn.OpenAsync();
+ 
+    return await conn.QueryAsync<ApproverAssignmentRowDto>(
+        sql, new { reviewerUserId, pageSize, offset });
+}
+ 
+
     public async Task<int> SaveReviewerReviewAsync(int reviewerUserId, SubmitReviewDto dto)
     {
         if (dto is null || dto.Items is null || dto.Items.Count == 0) return 0;

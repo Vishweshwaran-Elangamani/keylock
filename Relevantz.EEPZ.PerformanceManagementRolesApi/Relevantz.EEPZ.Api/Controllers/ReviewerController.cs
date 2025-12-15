@@ -40,6 +40,18 @@ namespace eepzbackend.Controllers
             return Ok(rows);
         }
 
+          [HttpGet("submitted-ratings")]
+public async Task<IActionResult> GetReviewerSubmittedRatings(
+    int reviewerUserId,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 25)
+{
+    var rows = await _repo.GetReviewerSubmittedRatingsAsync(
+        reviewerUserId, page, pageSize);
+ 
+    return Ok(rows);
+}
+
         [HttpGet("assessment/{assessmentId:int}")]
         public async Task<IActionResult> GetAssessment(int reviewerUserId, int assessmentId)
         {
