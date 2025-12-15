@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
 import ChangeRequestService from "../../../services/auth/changeRequestService";
 import Breadcrumb from "../../../components/common/Breadcrumb";
 import { toast } from "sonner";
+import { FaSearch } from "react-icons/fa";
 import ApproveEmailChangeModal from "../../../components/auth/Modal/changerequest/ApproveEmailChangeModal";
 import RejectEmailChangeModal from "../../../components/auth/Modal/changerequest/RejectEmailChangeModal";
 import "../../../styles/auth/admin/ChangeRequestManagement.css";
@@ -12,6 +13,8 @@ const PendingRequests = ({
   requests,
   searchTerm,
   setSearchTerm,
+  activeSearchTerm,
+  handleSearch,
   filterDate,
   setFilterDate,
   clearFilters,
@@ -28,13 +31,13 @@ const PendingRequests = ({
 
   useEffect(() => {
     applyFilters();
-  }, [requests, searchTerm, filterDate]);
+  }, [requests, activeSearchTerm, filterDate]);
 
   const applyFilters = () => {
     let filtered = requests.filter((req) => req.status === "Pending");
 
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
+    if (activeSearchTerm.trim()) {
+      const search = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
         (req) =>
           req.employeeName?.toLowerCase().includes(search) ||
@@ -89,7 +92,6 @@ const PendingRequests = ({
         );
       }
     }
-
     return pages;
   };
 
@@ -98,15 +100,32 @@ const PendingRequests = ({
       {/* FILTERS CARD */}
       <div className="crm-filters-card">
         <div className="crm-filters-content">
+          {/* ✅ UPDATED: Search with Button */}
           <div className="crm-search-box">
-            <i className="bi bi-search crm-search-icon"></i>
-            <input
-              type="text"
-              className="crm-search-input"
-              placeholder="Search by name, ID, or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="crm-search-inner">
+              <span className="crm-search-icon">
+                <FaSearch />
+              </span>
+              <input
+                type="text"
+                className="crm-search-input"
+                placeholder="Search by name, ID, or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="crm-search-btn"
+                onClick={handleSearch}
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           <input
@@ -158,7 +177,6 @@ const PendingRequests = ({
                         #{request.requestId}
                       </span>
                     </td>
-
                     <td>
                       <div className="crm-user-info">
                         <div className="crm-user-avatar">
@@ -174,29 +192,24 @@ const PendingRequests = ({
                         </div>
                       </div>
                     </td>
-
                     <td>
                       <code className="crm-value-display crm-current-value">
                         {request.currentValue || "N/A"}
                       </code>
                     </td>
-
                     <td>
                       <code className="crm-value-display crm-new-value">
                         {request.newValue}
                       </code>
                     </td>
-
                     <td>
                       <span className={getStatusBadge(request.status)}>
                         {request.status}
                       </span>
                     </td>
-
                     <td className="text-muted">
                       {formatDate(request.requestedAt)}
                     </td>
-
                     <td>
                       <div className="crm-action-buttons">
                         <button
@@ -317,6 +330,8 @@ const AllRequests = ({
   requests,
   searchTerm,
   setSearchTerm,
+  activeSearchTerm,
+  handleSearch,
   filterStatus,
   setFilterStatus,
   filterDate,
@@ -335,13 +350,13 @@ const AllRequests = ({
 
   useEffect(() => {
     applyFilters();
-  }, [requests, searchTerm, filterStatus, filterDate]);
+  }, [requests, activeSearchTerm, filterStatus, filterDate]);
 
   const applyFilters = () => {
     let filtered = [...requests];
 
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
+    if (activeSearchTerm.trim()) {
+      const search = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(
         (req) =>
           req.employeeName?.toLowerCase().includes(search) ||
@@ -400,7 +415,6 @@ const AllRequests = ({
         );
       }
     }
-
     return pages;
   };
 
@@ -409,15 +423,32 @@ const AllRequests = ({
       {/* FILTERS CARD */}
       <div className="crm-filters-card">
         <div className="crm-filters-content">
+          {/* ✅ UPDATED: Search with Button */}
           <div className="crm-search-box">
-            <i className="bi bi-search crm-search-icon"></i>
-            <input
-              type="text"
-              className="crm-search-input"
-              placeholder="Search by name, ID, or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="crm-search-inner">
+              <span className="crm-search-icon">
+                <FaSearch />
+              </span>
+              <input
+                type="text"
+                className="crm-search-input"
+                placeholder="Search by name, ID, or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="crm-search-btn"
+                onClick={handleSearch}
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           <select
@@ -481,7 +512,6 @@ const AllRequests = ({
                         #{request.requestId}
                       </span>
                     </td>
-
                     <td>
                       <div className="crm-user-info">
                         <div className="crm-user-avatar">
@@ -497,29 +527,24 @@ const AllRequests = ({
                         </div>
                       </div>
                     </td>
-
                     <td>
                       <code className="crm-value-display crm-current-value">
                         {request.currentValue || "N/A"}
                       </code>
                     </td>
-
                     <td>
                       <code className="crm-value-display crm-new-value">
                         {request.newValue}
                       </code>
                     </td>
-
                     <td>
                       <span className={getStatusBadge(request.status)}>
                         {request.status}
                       </span>
                     </td>
-
                     <td className="text-muted">
                       {formatDate(request.requestedAt)}
                     </td>
-
                     <td>
                       <div className="crm-action-buttons">
                         {request.status === "Pending" ? (
@@ -657,13 +682,15 @@ const AllRequests = ({
 const ChangeRequestManagement = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
 
+  // ✅ UPDATED: Two-state search approach
+  const [searchTerm, setSearchTerm] = useState(""); // What user types
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // Used for filtering
+
   // Filter States
-  const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterDate, setFilterDate] = useState("");
 
@@ -711,7 +738,6 @@ const ChangeRequestManagement = () => {
   // FETCH ALL REQUESTS ONLY ONCE ON MOUNT
   useEffect(() => {
     fetchRequests();
-
     const refreshInterval = setInterval(() => {
       fetchRequests(true);
     }, 30000000);
@@ -722,13 +748,11 @@ const ChangeRequestManagement = () => {
   const fetchRequests = async (silent = false) => {
     try {
       setLoading(true);
-
       const response = await ChangeRequestService.getAllChangeRequests();
 
       if (response.success) {
         setRequests(response.data || []);
         setLastUpdated(new Date());
-
         if (!silent) {
           toast.dismiss();
         }
@@ -745,8 +769,15 @@ const ChangeRequestManagement = () => {
     }
   };
 
+  // ✅ NEW: Handle search button click
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  // ✅ UPDATED: Clear all filters including activeSearchTerm
   const clearFilters = () => {
     setSearchTerm("");
+    setActiveSearchTerm("");
     setFilterStatus("");
     setFilterDate("");
   };
@@ -1000,6 +1031,8 @@ const ChangeRequestManagement = () => {
                 requests={requests}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
+                activeSearchTerm={activeSearchTerm}
+                handleSearch={handleSearch}
                 filterDate={filterDate}
                 setFilterDate={setFilterDate}
                 clearFilters={clearFilters}
@@ -1014,6 +1047,7 @@ const ChangeRequestManagement = () => {
               />
             }
           />
+
           <Route
             path="all"
             element={
@@ -1021,6 +1055,8 @@ const ChangeRequestManagement = () => {
                 requests={requests}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
+                activeSearchTerm={activeSearchTerm}
+                handleSearch={handleSearch}
                 filterStatus={filterStatus}
                 setFilterStatus={setFilterStatus}
                 filterDate={filterDate}
@@ -1037,6 +1073,7 @@ const ChangeRequestManagement = () => {
               />
             }
           />
+
           <Route
             path="*"
             element={
@@ -1044,6 +1081,8 @@ const ChangeRequestManagement = () => {
                 requests={requests}
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
+                activeSearchTerm={activeSearchTerm}
+                handleSearch={handleSearch}
                 filterDate={filterDate}
                 setFilterDate={setFilterDate}
                 clearFilters={clearFilters}

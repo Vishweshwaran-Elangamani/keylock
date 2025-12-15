@@ -133,7 +133,9 @@
   text-align: center;
 }
 
-/* REQUEST TABS - HR OPS STYLE TOGGLE */
+/* ======================================== 
+   REQUEST TABS - HR OPS STYLE TOGGLE (FIXED)
+   ======================================== */
 .crm-request-tabs {
   display: flex;
   gap: 0;
@@ -145,12 +147,11 @@
   box-shadow: 0 4px 12px rgba(44, 39, 98, 0.3);
 }
 
-/* NON-ACTIVE TAB BUTTON */
 .crm-tab-btn {
   flex: 1;
   padding: 0.85rem 3rem;
   border: none;
-  border-radius: 40px;
+  border-radius: 40px !important; 
   background: transparent;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 600;
@@ -165,12 +166,12 @@
   min-width: 220px;
 }
 
-/* ACTIVE TAB BUTTON - WHITE PILL */
 .crm-tab-btn.active {
   background: #ffffff !important;
   color: #2c2762 !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
   font-weight: 700 !important;
+  border-radius: 40px !important;
 }
 
 .crm-tab-btn .badge {
@@ -195,32 +196,55 @@
   flex-wrap: nowrap;
 }
 
+/* ======================================== 
+   SEARCH BAR WITH BUTTON - UPDATED
+   ======================================== */
 .crm-search-box {
   flex: 1;
-  min-width: 280px;
-  max-width: 400px;
+  min-width: 250px;
+  max-width: 350px;
   position: relative;
   display: flex;
   align-items: center;
 }
 
+.crm-search-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.crm-search-inner:focus-within {
+  border-color: #27235c;
+  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+}
+
 .crm-search-icon {
-  position: absolute;
-  left: 12px;
-  color: #6c757d;
-  font-size: 14px;
-  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0.75rem;
+  font-size: 0.875rem;
+  color: #a0aec0;
 }
 
 .crm-search-input {
-  width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
   font-size: 14px;
-  background: #ffffff;
-  transition: all 0.2s ease;
-  height: 38px;
+  height: 100%;
+  padding: 0;
+  padding-right: 0.75rem;
+  background: transparent !important;
+  width: 100%;
+  flex: 1;
 }
 
 .crm-search-input::placeholder {
@@ -228,9 +252,32 @@
 }
 
 .crm-search-input:focus {
+  border: none;
   outline: none;
-  border-color: #27235c;
-  box-shadow: 0 0 0 3px rgba(39, 35, 92, 0.1);
+  box-shadow: none;
+}
+
+/* Search Button */
+.crm-search-btn {
+  border: none;
+  outline: none;
+  height: 100%;
+  padding: 0 1.1rem;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #27235c;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  border-radius: 0;
+}
+
+.crm-search-btn:hover {
+  background: #1f1c4b;
 }
 
 /* Native Select Dropdowns */
@@ -285,24 +332,32 @@
   border-color: #27235c;
 }
 
+/* ======================================== 
+   CLEAR FILTERS BUTTON - UPDATED STYLE
+   ======================================== */
 .btn-clear-crm {
   white-space: nowrap;
   padding: 0.5rem 1rem;
   font-weight: 500;
-  background: #ffffff;
-  border: 1px solid #ced4da;
+  background: #ffffff !important;
+  border: 1px solid #000000 !important;
   border-radius: 8px;
   font-size: 14px;
-  color: #212529;
+  color: #000000 !important;
   cursor: pointer;
   transition: all 0.2s ease;
   height: 38px;
 }
 
 .btn-clear-crm:hover {
-  background: #f8f9fa;
-  border-color: #6c757d;
-  color: #212529;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #ffffff !important;
+}
+
+.btn-clear-crm:active {
+  background: #4b5563 !important;
+  border-color: #4b5563 !important;
 }
 
 .results-count-inline-crm {
@@ -1015,6 +1070,15 @@
     max-width: 100%;
   }
 
+  .crm-search-inner {
+    width: 100%;
+  }
+
+  .crm-search-btn {
+    padding: 0 0.9rem;
+    font-size: 13px;
+  }
+
   .crm-filter-select,
   .crm-filter-date {
     min-width: 100%;
@@ -1061,6 +1125,7 @@
     padding: 0.7rem 1.8rem;
     font-size: 0.9rem;
     min-width: 160px;
+    border-radius: 40px !important; 
   }
 }
 
@@ -1082,12 +1147,13 @@
 
 @media (max-width: 480px) {
   .crm-request-tabs {
-    border-radius: 8px;
+    border-radius: 50px;
   }
 
   .crm-tab-btn {
     padding: 0.6rem 1.2rem;
     font-size: 0.8rem;
     min-width: 130px;
+    border-radius: 40px !important; 
   }
 }

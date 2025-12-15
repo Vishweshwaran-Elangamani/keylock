@@ -372,7 +372,7 @@ const Login = () => {
 
               <form onSubmit={handleSubmit} noValidate autoComplete="off">
                 <div className="mb-4">
-                  <label htmlFor="email" className="form-label fw-semibold">
+                  <label htmlFor="email" className="form-label-log fw-semibold">
                     <i className="bi bi-envelope me-2"></i>
                     Email Address
                   </label>
@@ -406,7 +406,7 @@ const Login = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label htmlFor="password" className="form-label fw-semibold">
+                  <label htmlFor="password" className="form-label-log fw-semibold">
                     <i className="bi bi-lock me-2"></i>
                     Password
                   </label>

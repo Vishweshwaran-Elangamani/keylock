@@ -33,6 +33,14 @@
   overflow: hidden;
   animation: eepz-gradientShift 15s ease infinite;
 }
+.form-label-log{
+  display: flex;
+  align-items: left;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #27235c;
+  margin-bottom: 0.5rem;
+}
 
 @keyframes eepz-gradientShift {
   0%, 100% {
