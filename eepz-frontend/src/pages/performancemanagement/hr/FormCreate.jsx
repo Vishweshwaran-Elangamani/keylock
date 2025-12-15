@@ -387,7 +387,7 @@ function FormCreate() {
                 <div className="pmhr-fc-section-body pmhr-fc-section-body-compact">
                   <div className="pmhr-fc-form-group pmhr-fc-full-width">
                     <label className="pmhr-fc-label">
-                      Form Name <span className="pmhr-fc-required">*</span>
+                      FORM NAME <span className="pmhr-fc-required">*</span>
                     </label>
                     <div className="pmhr-fc-error-wrapper">
                       <input
@@ -414,11 +414,12 @@ function FormCreate() {
                       )}
                     </div>
                   </div>
+                  
 
                   <div className="pmhr-fc-form-row-two pmhr-fc-form-row-inline">
                     <div className="pmhr-fc-form-group">
                       <label className="pmhr-fc-label">
-                        Form Type <span className="pmhr-fc-required">*</span>
+                        FORM TYPE <span className="pmhr-fc-required">*</span>
                       </label>
                       <div className="pmhr-fc-error-wrapper">
                         <select
@@ -450,7 +451,7 @@ function FormCreate() {
 
                     <div className="pmhr-fc-form-group">
                       <label className="pmhr-fc-label">
-                        Category <span className="pmhr-fc-required">*</span>
+                        CATEGORY <span className="pmhr-fc-required">*</span>
                       </label>
                       <div className="pmhr-fc-error-wrapper">
                         <select
@@ -510,11 +511,15 @@ function FormCreate() {
                       Next...
                     </>
                   ) : (
-                    <>Next: Add Competencies</>
+                    <>Add Competencies</>
                   )}
                 </button>
               </div>
+              <p className="pmhr-fc-info-text">
+      After completing the general details, continue to the next step to add competencies and finish setting up this appraisal form.
+    </p>
             </div>
+            
           )}
 
           {currentStep === 2 && (
