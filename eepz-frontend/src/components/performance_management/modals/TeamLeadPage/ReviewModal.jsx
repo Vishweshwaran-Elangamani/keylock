@@ -1,6 +1,6 @@
 import React from "react";
 import logoImage from "../../../../assets/logodark.png";
-
+ 
 const ReviewModal = ({
   showModal,
   closeModal,
@@ -18,16 +18,19 @@ const ReviewModal = ({
   l2ActionLoading,
   active,
   handleDownloadAttachment,
+  isReadOnly = false,
 }) => {
   if (!showModal) return null;
-
+ 
   const handleInputChange = (detailId, key, value) => {
-    setModalRatings((prev) => ({
-      ...prev,
-      [detailId]: { ...prev[detailId], [key]: value },
-    }));
+    if (!isReadOnly) {
+      setModalRatings((prev) => ({
+        ...prev,
+        [detailId]: { ...prev[detailId], [key]: value },
+      }));
+    }
   };
-
+ 
   const formatFileSize = (bytes) => {
     if (!bytes) return "0 Bytes";
     const k = 1024;
@@ -35,7 +38,7 @@ const ReviewModal = ({
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
-
+ 
   const getFileIcon = (fileType) => {
     if (!fileType) return "bi-file-earmark";
     if (fileType.includes("pdf")) return "bi-file-earmark-pdf";
@@ -45,7 +48,7 @@ const ReviewModal = ({
     if (fileType.includes("zip") || fileType.includes("compressed")) return "bi-file-earmark-zip";
     return "bi-file-earmark";
   };
-
+ 
   return (
     <div
       className="tl-modal-overlay"
@@ -79,7 +82,7 @@ const ReviewModal = ({
         .tl-comp {
           font-weight: 600;
         }
-
+ 
         /* Header – aligned with page style */
         .tl-modal {
           max-width: 960px;
@@ -93,13 +96,13 @@ const ReviewModal = ({
   background: #ffffff;
   border-bottom: 2px solid  #27235c;
 }
-
+ 
 .tl-modal-divider {
   height: 1px;
   background: #e5e7eb;
-  margin: 0; /* was: margin: 0 24px 10px 24px; */
+  margin: 0;
 }
-
+ 
         .tl-modal-header-left {
           position: absolute;
           left: 32px;
@@ -145,7 +148,7 @@ const ReviewModal = ({
           background: #e5e7eb;
           margin: 0 24px 10px 24px;
         }
-
+ 
         /* Attachments section */
         .tl-attachments-section {
           margin: 20px 0 10px 0;
@@ -228,50 +231,65 @@ const ReviewModal = ({
         .tl-attachment-download:hover {
           background: #1a1740;
         }
-
+ 
         .tl-no-attachments {
           text-align: center;
           padding: 18px;
           color: #6c757d;
           font-size: 13px;
         }
-          .tl-rating-select {
-  width: 120px;
-  padding: 6px 32px 6px 10px;
-  border-radius: 6px;
-  border: 1.8px solid #26225A;
-  font-size: 14px;
-  color: #111827;
-  background-color: #ffffff;
-  outline: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2326225A' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 14px 14px;
-}
+        .tl-rating-select {
+          width: 120px;
+          padding: 6px 32px 6px 10px;
+          border-radius: 6px;
+          border: 1.8px solid #26225A;
+          font-size: 14px;
+          color: #111827;
+          background-color: #ffffff;
+          outline: none;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2326225A' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 8px center;
+          background-size: 14px 14px;
+        }
+ 
+        .tl-rating-select:focus {
+          border-color: #111827;
+          box-shadow: 0 0 0 2px rgba(38, 34, 90, 0.18);
+        }
 
-.tl-rating-select:focus {
-  border-color: #111827;
-  box-shadow: 0 0 0 2px rgba(38, 34, 90, 0.18);
-}
+        .tl-rating-select:disabled {
+          background-color: #f3f4f6;
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
 
+        .tl-read-only-text {
+          padding: 6px 10px;
+          background: #f3f4f6;
+          border-radius: 6px;
+          font-size: 14px;
+          color: #374151;
+          font-weight: 500;
+        }
+ 
       `}</style>
-
+ 
       <div className="tl-modal" onClick={(e) => e.stopPropagation()}>
         {/* HEADER */}
         <div className="tl-modal-header">
           <div className="tl-modal-header-left">
             <img src={logoImage} alt="EEPZ Logo" className="tl-modal-logo" />
           </div>
-
+ 
           <div className="tl-modal-header-center" aria-hidden>
             <div className="tl-modal-title">
               {modalData?.formName || "Appraisal Form For Employee"}
             </div>
             <div className="tl-modal-subtitle">Self Assessment Form</div>
           </div>
-
+ 
           <button
             className="tl-modal-close"
             onClick={() => {
@@ -282,23 +300,23 @@ const ReviewModal = ({
             <i className="bi bi-x-lg" />
           </button>
         </div>
-
+ 
         <div className="tl-modal-divider" />
-
+ 
         {/* INFO STRIP */}
         <div className="tl-modal-info">
           <div className="tl-info-item">
             <span className="tl-label">Employee</span>
             <span className="tl-value">{modalData?.employeeName || "-"}</span>
           </div>
-
+ 
           <div className="tl-info-item">
             <span className="tl-label">Form</span>
             <span className="tl-value">{modalData?.formName || "-"}</span>
           </div>
         </div>
-
-        {active === "l1" && modalData?.l2Decision === "Rejected" && (
+ 
+        {active === "l1" && modalData?.l2Decision === "Rejected" && !isReadOnly && (
           <div className="tl-rejection">
             <div className="tl-rejection-header">
               <i className="bi bi-exclamation-circle-fill" />
@@ -307,7 +325,7 @@ const ReviewModal = ({
             <p className="tl-rejection-note">{modalData?.l2DecisionNote || "No reason provided"}</p>
           </div>
         )}
-
+ 
         {/* BODY */}
         <div className="tl-modal-body">
           <table className="tl-modal-table" role="table" aria-label="Competencies table">
@@ -320,56 +338,73 @@ const ReviewModal = ({
                 {active === "l2" && <th>L1 COMMENTS</th>}
                 {active === "l1" && <th>EMP RATING</th>}
                 {active === "l1" && <th>EMP COMMENTS</th>}
-                <th>RATING</th>
-                <th>COMMENTS</th>
+                <th>{active === "l1" ? "L1 RATING" : "L2 RATING"}</th>
+                <th>{active === "l1" ? "L1 COMMENTS" : "L2 COMMENTS"}</th>
               </tr>
             </thead>
-
+ 
             <tbody>
               {(modalData?.items || []).map((item) => (
                 <tr key={item.detailId}>
                   <td className="tl-comp">
                     <strong>{item.competencyName}</strong>
                   </td>
-
+ 
                   {active === "l2" && <td className="tl-center">{item.employeeRating ?? "-"}</td>}
                   {active === "l2" && <td>{item.employeeComments || "-"}</td>}
                   {active === "l2" && <td className="tl-center">{item.approverRating ?? "-"}</td>}
                   {active === "l2" && <td>{item.approverComments || "-"}</td>}
-
+ 
                   {active === "l1" && <td className="tl-center">{item.employeeRating ?? "-"}</td>}
                   {active === "l1" && <td>{item.employeeComments || "-"}</td>}
-
+ 
                   <td className="tl-center">
-  <select
-    className="tl-rating-select"
-    value={modalRatings[item.detailId]?.rating ?? ""}
-    onChange={(e) => handleInputChange(item.detailId, "rating", e.target.value)}
-    aria-label={`Rating for ${item.competencyName}`}
-  >
-    <option value="">-</option>
-    <option value="1">1 - Poor</option>
-    <option value="2">2 - Fair</option>
-    <option value="3">3 - Good</option>
-    <option value="4">4 - Very Good</option>
-    <option value="5">5 - Excellent</option>
-  </select>
-</td>
-
-
+                    {isReadOnly ? (
+                      <span className="tl-read-only-text">
+                        {modalRatings[item.detailId]?.rating || "-"}
+                      </span>
+                    ) : (
+                      <select
+                        className="tl-rating-select"
+                        value={modalRatings[item.detailId]?.rating ?? ""}
+                        onChange={(e) => handleInputChange(item.detailId, "rating", e.target.value)}
+                        aria-label={`Rating for ${item.competencyName}`}
+                      >
+                        <option value="">-</option>
+                        <option value="1">1 - Poor</option>
+                        <option value="2">2 - Fair</option>
+                        <option value="3">3 - Good</option>
+                        <option value="4">4 - Very Good</option>
+                        <option value="5">5 - Excellent</option>
+                      </select>
+                    )}
+                  </td>
+ 
                   <td>
-                    <textarea
-                      value={modalRatings[item.detailId]?.comment ?? ""}
-                      onChange={(e) => handleInputChange(item.detailId, "comment", e.target.value)}
-                      className="tl-input-text"
-                      placeholder="Justify through comments"
-                      rows="2"
-                      aria-label={`Comments for ${item.competencyName}`}
-                    />
+                    {isReadOnly ? (
+                      <div style={{ 
+                        padding: "8px 10px", 
+                        background: "#f3f4f6", 
+                        borderRadius: "6px",
+                        minHeight: "40px",
+                        color: "#374151"
+                      }}>
+                        {modalRatings[item.detailId]?.comment || "-"}
+                      </div>
+                    ) : (
+                      <textarea
+                        value={modalRatings[item.detailId]?.comment ?? ""}
+                        onChange={(e) => handleInputChange(item.detailId, "comment", e.target.value)}
+                        className="tl-input-text"
+                        placeholder="Justify through comments"
+                        rows="2"
+                        aria-label={`Comments for ${item.competencyName}`}
+                      />
+                    )}
                   </td>
                 </tr>
               ))}
-
+ 
               {(!modalData?.items || modalData.items.length === 0) && (
                 <tr>
                   <td colSpan={active === "l2" ? 9 : 6} style={{ textAlign: "center", padding: "18px" }}>
@@ -379,7 +414,7 @@ const ReviewModal = ({
               )}
             </tbody>
           </table>
-
+ 
           {modalData?.attachments && modalData.attachments.length > 0 && (
             <div className="tl-attachments-section">
               <div className="tl-attachments-header">
@@ -417,64 +452,76 @@ const ReviewModal = ({
             </div>
           )}
         </div>
-
+ 
         {/* FOOTER */}
         <div className="tl-modal-footer">
-          {active === "l1" && (
+          {isReadOnly ? (
+            <button
+              className="tl-btn tl-btn-cancel"
+              onClick={closeModal}
+              aria-label="Close"
+            >
+              <i className="bi bi-x-circle" /> Close
+            </button>
+          ) : (
             <>
-              <button
-                className="tl-btn tl-btn-cancel"
-                onClick={() => {
-                  if (!submitting) closeModal();
-                }}
-                disabled={submitting}
-                aria-label="Cancel"
-              >
-                <i className="bi bi-x-circle" /> Cancel
-              </button>
-
-              <button
-                className="tl-btn tl-btn-primary"
-                onClick={handleL1Submit}
-                disabled={submitting}
-                aria-label="Submit review"
-              >
-                <i className="bi bi-check-circle" />{" "}
-                {submitting ? "Submitting..." : "Submit Assessment"}
-              </button>
-            </>
-          )}
-
-          {active === "l2" && (
-            <>
-              <button
-                className="tl-btn tl-btn-primary"
-                onClick={handleL2Approve}
-                disabled={l2ActionLoading}
-                aria-label="Submit and approve"
-              >
-                <i className="bi bi-check-lg" />{" "}
-                {l2ActionLoading ? "Processing..." : "Submit & Approve"}
-              </button>
-
-              <button
-                className="tl-btn tl-btn-cancel"
-                onClick={() => setShowRejectReason(!showRejectReason)}
-                disabled={l2ActionLoading}
-                aria-label="Reject"
-              >
-                <i className="bi bi-x-lg" /> Reject
-              </button>
+              {active === "l1" && (
+                <>
+                  <button
+                    className="tl-btn tl-btn-cancel"
+                    onClick={() => {
+                      if (!submitting) closeModal();
+                    }}
+                    disabled={submitting}
+                    aria-label="Cancel"
+                  >
+                    <i className="bi bi-x-circle" /> Cancel
+                  </button>
+ 
+                  <button
+                    className="tl-btn tl-btn-primary"
+                    onClick={handleL1Submit}
+                    disabled={submitting}
+                    aria-label="Submit review"
+                  >
+                    <i className="bi bi-check-circle" />{" "}
+                    {submitting ? "Submitting..." : "Submit Assessment"}
+                  </button>
+                </>
+              )}
+ 
+              {active === "l2" && (
+                <>
+                  <button
+                    className="tl-btn tl-btn-primary"
+                    onClick={handleL2Approve}
+                    disabled={l2ActionLoading}
+                    aria-label="Submit and approve"
+                  >
+                    <i className="bi bi-check-lg" />{" "}
+                    {l2ActionLoading ? "Processing..." : "Submit & Approve"}
+                  </button>
+ 
+                  <button
+                    className="tl-btn tl-btn-cancel"
+                    onClick={() => setShowRejectReason(!showRejectReason)}
+                    disabled={l2ActionLoading}
+                    aria-label="Reject"
+                  >
+                    <i className="bi bi-x-lg" /> Reject
+                  </button>
+                </>
+              )}
             </>
           )}
         </div>
-
-        {active === "l2" && showRejectReason && (
+ 
+        {active === "l2" && showRejectReason && !isReadOnly && (
           <div className="tl-reject-box" role="region" aria-label="Rejection reason">
             <label className="tl-reject-label" htmlFor="tl-reason-textarea">
               <i className="bi bi-exclamation-triangle" /> Rejection Reason
             </label>
-
+ 
             <textarea
               id="tl-reason-textarea"
               value={rejectionReason}
@@ -484,7 +531,7 @@ const ReviewModal = ({
               rows="4"
               aria-label="Rejection reason"
             />
-
+ 
             <div className="tl-reject-actions">
               <button
                 className="tl-btn tl-btn-primary"
@@ -494,7 +541,7 @@ const ReviewModal = ({
               >
                 <i className="bi bi-check" /> Confirm Rejection
               </button>
-
+ 
               <button
                 className="tl-btn tl-btn-cancel"
                 onClick={() => setShowRejectReason(false)}
@@ -510,5 +557,5 @@ const ReviewModal = ({
     </div>
   );
 };
-
+ 
 export default ReviewModal;
