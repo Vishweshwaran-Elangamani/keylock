@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+<<<<<<< Updated upstream
 import {apiPort5222 as api} from "../../../services/performancemanagement/hr/api";
+=======
+import { apiPort5222 as api } from "../../../services/performancemanagement/hr/api";
+>>>>>>> Stashed changes
 import { Toaster, toast } from "sonner";
 import "../../../styles/performancemanagement/manager/TeamLeadPage.css";
 import "bootstrap-icons/font/bootstrap-icons.css";

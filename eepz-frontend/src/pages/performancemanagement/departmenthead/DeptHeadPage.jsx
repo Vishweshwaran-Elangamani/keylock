@@ -9,7 +9,7 @@ import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwt
 import { toast } from "sonner";
 import "../../../styles/performancemanagement/hr/DeptHeadPage.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import api from "../../../services/performancemanagement/hr/api";
+import api, { apiPort5222 } from "../../../services/performancemanagement/hr/api";
 
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
@@ -116,89 +116,91 @@ export default function DeptHeadPage() {
   };
 
   const fetchAttachments = async (assessmentId) => {
-    setLoadingAttachments(true);
-    try {
-      const departmentHeadId = getEmployeeIdForFilter();
-      const response = await api.get(`/AppraisalProcess/depthead/${departmentHeadId}/assessment/${assessmentId}/attachments`);
+  setLoadingAttachments(true);
+  try {
+    const departmentHeadId = getEmployeeIdForFilter();
+    // Changed: api.get to apiPort5222.get
+    const response = await apiPort5222.get(`/DeptHeadApprovals/${departmentHeadId}/assessment/${assessmentId}/attachments`);
 
-      if (response.data.success) {
-        setAttachments(response.data.data || []);
-      } else {
-        setAttachments([]);
-      }
-    } catch (error) {
-      console.error("Error fetching attachments:", error);
+    if (response.data.success) {
+      setAttachments(response.data.data || []);
+    } else {
       setAttachments([]);
-    } finally {
-      setLoadingAttachments(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching attachments:", error);
+    setAttachments([]);
+  } finally {
+    setLoadingAttachments(false);
+  }
+};
 
-  const handleDownloadAttachment = async (attachmentId) => {
-    try {
-      console.log(`Downloading attachment ${attachmentId}`);
+const handleDownloadAttachment = async (attachmentId) => {
+  try {
+    console.log(`Downloading attachment ${attachmentId}`);
 
-      const departmentHeadId = getEmployeeIdForFilter();
-      const response = await api.get(
-        `/AppraisalProcess/depthead/${departmentHeadId}/attachments/${attachmentId}/download`,
-        { responseType: 'blob' }
-      );
+    const departmentHeadId = getEmployeeIdForFilter();
+    // Changed: api.get to apiPort5222.get
+    const response = await apiPort5222.get(
+      `/DeptHeadApprovals/${departmentHeadId}/attachments/${attachmentId}/download`,
+      { responseType: 'blob' }
+    );
 
-      console.log('Full Response:', response);
-      console.log('Response headers object:', response.headers);
+    console.log('Full Response:', response);
+    console.log('Response headers object:', response.headers);
 
-      let filename = 'attachment';
+    let filename = 'attachment';
 
-      const contentDisposition = response.headers['content-disposition'];
-      console.log('Content-Disposition header:', contentDisposition);
+    const contentDisposition = response.headers['content-disposition'];
+    console.log('Content-Disposition header:', contentDisposition);
 
-      if (contentDisposition) {
-        const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
-        if (matches && matches[1]) {
-          filename = matches[1].trim();
-          console.log('✅ Extracted filename from header:', filename);
-        } else {
-          const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
-          if (matches2 && matches2[1]) {
-            filename = matches2[1].trim();
-            console.log('✅ Extracted filename from header (no quotes):', filename);
-          }
+    if (contentDisposition) {
+      const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
+      if (matches && matches[1]) {
+        filename = matches[1].trim();
+        console.log('✅ Extracted filename from header:', filename);
+      } else {
+        const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
+        if (matches2 && matches2[1]) {
+          filename = matches2[1].trim();
+          console.log('✅ Extracted filename from header (no quotes):', filename);
         }
       }
-
-      const contentType = response.headers['content-type'];
-      console.log('Content-Type:', contentType);
-
-      if (!filename.includes('.') && contentType) {
-        const extension = getExtensionFromContentType(contentType);
-        if (extension) {
-          filename = `${filename}${extension}`;
-          console.log('Added extension based on content-type:', filename);
-        }
-      }
-
-      console.log('Final filename for download:', filename);
-
-      const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-
-      document.body.appendChild(link);
-      link.click();
-
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-
-      toast.success(`Downloaded: ${filename}`);
-    } catch (error) {
-      console.error("Error downloading attachment:", error);
-      toast.error("Failed to download attachment.");
     }
-  };
+
+    const contentType = response.headers['content-type'];
+    console.log('Content-Type:', contentType);
+
+    if (!filename.includes('.') && contentType) {
+      const extension = getExtensionFromContentType(contentType);
+      if (extension) {
+        filename = `${filename}${extension}`;
+        console.log('Added extension based on content-type:', filename);
+      }
+    }
+
+    console.log('Final filename for download:', filename);
+
+    const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
+
+    document.body.appendChild(link);
+    link.click();
+
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 100);
+
+    toast.success(`Downloaded: ${filename}`);
+  } catch (error) {
+    console.error("Error downloading attachment:", error);
+    toast.error("Failed to download attachment.");
+  }
+};
 
 
 

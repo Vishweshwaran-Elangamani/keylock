@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import * as managerNominationApi from "../../../../services/performancemanagement/manager/managernominationapi";
-
+ 
 const NominationModal = ({
   show,
   onHide,
@@ -15,7 +15,7 @@ const NominationModal = ({
   const [parameters, setParameters] = useState([]);
   const [justification, setJustification] = useState("");
   const [parameterValues, setParameterValues] = useState({});
-
+ 
   useEffect(() => {
     if (show && Array.isArray(rewardTypes)) {
       const recognitionRewards = rewardTypes.filter(
@@ -24,7 +24,7 @@ const NominationModal = ({
       setCategoryRewards(recognitionRewards);
     }
   }, [show, rewardTypes]);
-
+ 
   const handleRewardTypeSelect = async (rewardTypeId) => {
     const rewardType = rewardTypes.find(
       (rt) => rt?.rewardTypeId === rewardTypeId
@@ -32,7 +32,7 @@ const NominationModal = ({
     setSelectedRewardType(rewardType || null);
     setParameters([]);
     setParameterValues({});
-
+ 
     if (rewardTypeId) {
       try {
         const { data } =
@@ -48,11 +48,11 @@ const NominationModal = ({
       }
     }
   };
-
+ 
   const handleParameterChange = (parameterId, value) => {
     setParameterValues((prev) => ({ ...prev, [parameterId]: value }));
   };
-
+ 
   const resetForm = () => {
     setSelectedRewardType(null);
     setJustification("");
@@ -63,12 +63,12 @@ const NominationModal = ({
     );
     setCategoryRewards(recognitionRewards);
   };
-
+ 
   const handleClose = () => {
     resetForm();
     onHide();
   };
-
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedRewardType) {
@@ -93,7 +93,7 @@ const NominationModal = ({
       );
       return;
     }
-
+ 
     try {
       const payload = {
         rewardTypeId: selectedRewardType.rewardTypeId,
@@ -107,7 +107,7 @@ const NominationModal = ({
           })
         ),
       };
-
+ 
       const { data } = await managerNominationApi.submitNomination(payload);
       if (data?.success) {
         toast.success("Nomination submitted successfully!");
@@ -126,9 +126,9 @@ const NominationModal = ({
       onHide();
     }
   };
-
-  // Inline styles (NO TypeScript annotations)
-
+ 
+  // Inline styles
+ 
   const modalOverlayStyle = {
     position: "fixed",
     top: 0,
@@ -143,7 +143,7 @@ const NominationModal = ({
     justifyContent: "center",
     padding: 20,
   };
-
+ 
   const modalStyle = {
     width: "min(980px, 98vw)",
     maxHeight: "90vh",
@@ -153,9 +153,9 @@ const NominationModal = ({
     boxShadow: "0 14px 40px rgba(15, 23, 42, 0.25)",
     display: "flex",
     flexDirection: "column",
-    border: "2px solid  #27235c", // dark blue outer border
+    border: "2px solid #27235c",
   };
-
+ 
   const headerStyle = {
     background: "#26225A",
     color: "#ffffff",
@@ -166,7 +166,7 @@ const NominationModal = ({
     gap: 12,
     flexShrink: 0,
   };
-
+ 
   const headerLeftStyle = {
     display: "flex",
     flexDirection: "column",
@@ -175,7 +175,7 @@ const NominationModal = ({
     flex: 1,
     textAlign: "left",
   };
-
+ 
   const titleStyle = {
     margin: 0,
     fontSize: 20,
@@ -183,7 +183,7 @@ const NominationModal = ({
     lineHeight: 1.3,
     textAlign: "left",
   };
-
+ 
   const subtitleStyle = {
     margin: 0,
     fontSize: 14,
@@ -191,7 +191,7 @@ const NominationModal = ({
     fontWeight: 500,
     textAlign: "left",
   };
-
+ 
   const closeBtnStyle = {
     background: "transparent",
     border: "none",
@@ -204,7 +204,7 @@ const NominationModal = ({
     alignSelf: "flex-start",
     flexShrink: 0,
   };
-
+ 
   const bodyWrapperStyle = {
     padding: 24,
     overflowY: "auto",
@@ -213,7 +213,7 @@ const NominationModal = ({
     flexDirection: "column",
     gap: 20,
   };
-
+ 
   const rewardGridBaseStyle = {
     width: "100%",
     display: "grid",
@@ -221,7 +221,7 @@ const NominationModal = ({
     gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
     alignItems: "stretch",
   };
-
+ 
   const rewardCardStyle = (active) => ({
     border: `2px solid ${active ? "#26225A" : "#e6e8eb"}`,
     background: active ? "#f8f9fa" : "#ffffff",
@@ -236,9 +236,9 @@ const NominationModal = ({
     transition: "all 0.18s ease",
     textAlign: "left",
   });
-
+ 
   const textInputStyle = {
-    border: "1px solid  #27235c",
+    border: "1px solid #27235c",
     borderRadius: 8,
     padding: "10px 12px",
     width: "100%",
@@ -247,19 +247,19 @@ const NominationModal = ({
     marginTop: 6,
     textAlign: "left",
   };
-
+ 
   const numberInputStyle = {
     ...textInputStyle,
-    maxWidth: 180, // compact for number/rating
+    maxWidth: 180,
   };
-
+ 
   const textareaStyle = {
     ...textInputStyle,
     minHeight: 90,
     resize: "vertical",
     fontFamily: "inherit",
   };
-
+ 
   const actionsAreaStyle = {
     display: "flex",
     gap: 12,
@@ -269,7 +269,7 @@ const NominationModal = ({
     background: "#ffffff",
     flexShrink: 0,
   };
-
+ 
   const cancelBtnStyle = {
     background: "#6b7280",
     color: "#ffffff",
@@ -280,7 +280,7 @@ const NominationModal = ({
     cursor: "pointer",
     transition: "background 0.2s",
   };
-
+ 
   const submitBtnStyle = {
     background: "#26225A",
     color: "#ffffff",
@@ -292,14 +292,28 @@ const NominationModal = ({
     boxShadow: "0 4px 12px rgba(38, 34, 90, 0.2)",
     transition: "background 0.2s",
   };
-
+ 
+  // ✅ NEW: Empty state styling
+  const emptyStateStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "48px 24px",
+    textAlign: "center",
+    background: "#f9fafb",
+    borderRadius: 10,
+    border: "2px dashed #d1d5db",
+    minHeight: 200,
+  };
+ 
   const renderParameterField = (parameter) => {
     if (!parameter) return null;
     const value = parameterValues[parameter.parameterId] ?? "";
     const type = (parameter.parameterType || "").toLowerCase();
-
+ 
     const isNumeric = type === "number" || type === "rating";
-
+ 
     const commonProps = {
       value,
       onChange: (e) =>
@@ -313,7 +327,7 @@ const NominationModal = ({
           ? numberInputStyle
           : textInputStyle,
     };
-
+ 
     switch (type) {
       case "text":
         return <input type="text" {...commonProps} />;
@@ -335,9 +349,9 @@ const NominationModal = ({
         return <input type="text" {...commonProps} />;
     }
   };
-
+ 
   if (!show) return null;
-
+ 
   return (
     <div style={modalOverlayStyle} onClick={handleClose}>
       <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
@@ -359,10 +373,10 @@ const NominationModal = ({
               </span>
             </div>
             <div style={subtitleStyle}>
-              Select a Recognition reward type and fill in the details
+              Select a Recognition reward type and provide nomination details
             </div>
           </div>
-
+ 
           <button
             aria-label="Close"
             onClick={handleClose}
@@ -371,7 +385,7 @@ const NominationModal = ({
             ×
           </button>
         </div>
-
+ 
         <form
           onSubmit={handleSubmit}
           style={{
@@ -384,97 +398,133 @@ const NominationModal = ({
           <div style={bodyWrapperStyle}>
             {!selectedRewardType && (
               <div style={{ width: "100%" }}>
+                {/* ✅ UPDATED: Centered professional label */}
                 <label
                   style={{
                     fontWeight: 700,
-                    marginBottom: 12,
+                    marginBottom: 16,
                     display: "block",
-                    color: "#374151",
-                    fontSize: 15,
-                    textAlign: "left",
+                    color: "#26225A",
+                    fontSize: 16,
+                    textAlign: "center",
                   }}
                 >
-                  Select Recognition Reward{" "}
+                  Choose Recognition Reward Type{" "}
                   <span style={{ color: "#ef4444" }}>*</span>
                 </label>
-
-                <div style={rewardGridBaseStyle}>
-                  {categoryRewards.length === 0 && (
+ 
+                {/* ✅ UPDATED: Professional empty state */}
+                {categoryRewards.length === 0 ? (
+                  <div style={emptyStateStyle}>
                     <div
                       style={{
-                        color: "#6b7280",
-                        padding: 12,
-                        textAlign: "left",
+                        width: 64,
+                        height: 64,
+                        borderRadius: "50%",
+                        background: "#e5e7eb",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginBottom: 16,
                       }}
                     >
-                      No recognition rewards available
-                    </div>
-                  )}
-                  {categoryRewards.map((reward) => {
-                    const isActive =
-                      selectedRewardType?.rewardTypeId ===
-                      reward.rewardTypeId;
-                    return (
-                      <div
-                        key={reward?.rewardTypeId}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() =>
-                          handleRewardTypeSelect(reward.rewardTypeId)
-                        }
-                        onKeyDown={(e) =>
-                          e.key === "Enter"
-                            ? handleRewardTypeSelect(reward.rewardTypeId)
-                            : null
-                        }
-                        style={rewardCardStyle(isActive)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = "#26225A";
-                          e.currentTarget.style.boxShadow =
-                            "0 4px 12px rgba(38, 34, 90, 0.15)";
+                      <i
+                        className="bi bi-award"
+                        style={{
+                          fontSize: 32,
+                          color: "#9ca3af",
                         }}
-                        onMouseLeave={(e) => {
-                          if (!isActive) {
-                            e.currentTarget.style.borderColor = "#e6e8eb";
-                            e.currentTarget.style.boxShadow = "none";
-                          } else {
+                      ></i>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        color: "#374151",
+                        marginBottom: 8,
+                      }}
+                    >
+                      No Recognition Rewards Available
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: "#6b7280",
+                        maxWidth: 400,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      There are currently no active recognition reward types configured for nominations. Please contact HR administration for assistance.
+                    </div>
+                  </div>
+                ) : (
+                  <div style={rewardGridBaseStyle}>
+                    {categoryRewards.map((reward) => {
+                      const isActive =
+                        selectedRewardType?.rewardTypeId ===
+                        reward.rewardTypeId;
+                      return (
+                        <div
+                          key={reward?.rewardTypeId}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() =>
+                            handleRewardTypeSelect(reward.rewardTypeId)
+                          }
+                          onKeyDown={(e) =>
+                            e.key === "Enter"
+                              ? handleRewardTypeSelect(reward.rewardTypeId)
+                              : null
+                          }
+                          style={rewardCardStyle(isActive)}
+                          onMouseEnter={(e) => {
                             e.currentTarget.style.borderColor = "#26225A";
                             e.currentTarget.style.boxShadow =
-                              "0 4px 12px rgba(38, 34, 90, 0.1)";
-                          }
-                        }}
-                        aria-pressed={isActive}
-                      >
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            color: "#26225A",
-                            fontSize: 15,
-                            marginBottom: 4,
-                            textAlign: "left",
+                              "0 4px 12px rgba(38, 34, 90, 0.15)";
                           }}
+                          onMouseLeave={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.borderColor = "#e6e8eb";
+                              e.currentTarget.style.boxShadow = "none";
+                            } else {
+                              e.currentTarget.style.borderColor = "#26225A";
+                              e.currentTarget.style.boxShadow =
+                                "0 4px 12px rgba(38, 34, 90, 0.1)";
+                            }
+                          }}
+                          aria-pressed={isActive}
                         >
-                          {reward?.rewardName || "Unnamed reward"}
-                        </div>
-                        {reward?.description && (
                           <div
                             style={{
-                              color: "#6b7280",
-                              fontSize: 13,
-                              lineHeight: 1.4,
+                              fontWeight: 700,
+                              color: "#26225A",
+                              fontSize: 15,
+                              marginBottom: 4,
                               textAlign: "left",
                             }}
                           >
-                            {reward.description}
+                            {reward?.rewardName || "Unnamed reward"}
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+                          {reward?.description && (
+                            <div
+                              style={{
+                                color: "#6b7280",
+                                fontSize: 13,
+                                lineHeight: 1.4,
+                                textAlign: "left",
+                              }}
+                            >
+                              {reward.description}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
-
+ 
             {selectedRewardType && (
               <div
                 style={{
@@ -501,8 +551,7 @@ const NominationModal = ({
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 12,
-                      boxShadow:
-                        "0 4px 12px rgba(38, 34, 90, 0.15)",
+                      boxShadow: "0 4px 12px rgba(38, 34, 90, 0.15)",
                     }}
                   >
                     <div
@@ -593,7 +642,7 @@ const NominationModal = ({
                     </button>
                   </div>
                 </div>
-
+ 
                 <div style={{ width: "100%" }}>
                   <label
                     style={{
@@ -605,20 +654,17 @@ const NominationModal = ({
                       textAlign: "left",
                     }}
                   >
-                    Justification{" "}
-                    <span style={{ color: "#ef4444" }}>*</span>
+                    Justification <span style={{ color: "#ef4444" }}>*</span>
                   </label>
                   <textarea
                     value={justification}
-                    onChange={(e) =>
-                      setJustification(e.target.value)
-                    }
+                    onChange={(e) => setJustification(e.target.value)}
                     placeholder="Explain why this employee deserves this nomination..."
                     required
                     style={textareaStyle}
                   />
                 </div>
-
+ 
                 {parameters.length > 0 && (
                   <div style={{ width: "100%" }}>
                     <div
@@ -662,9 +708,7 @@ const NominationModal = ({
                           >
                             {param.parameterName}{" "}
                             {param.isRequired ? (
-                              <span style={{ color: "#ef4444" }}>
-                                *
-                              </span>
+                              <span style={{ color: "#ef4444" }}>*</span>
                             ) : null}
                           </label>
                           {renderParameterField(param)}
@@ -676,7 +720,7 @@ const NominationModal = ({
               </div>
             )}
           </div>
-
+ 
           <div style={actionsAreaStyle}>
             <button
               type="button"
@@ -717,5 +761,7 @@ const NominationModal = ({
     </div>
   );
 };
-
+ 
 export default NominationModal;
+ 
+ 

@@ -22,11 +22,14 @@ function RewardConfiguration() {
   const [deleteType, setDeleteType] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRewardTypeId, setEditingRewardTypeId] = useState(null);
+  // ✅ NEW: Store parameter counts for all reward types
+  const [parameterCounts, setParameterCounts] = useState({});
 
   const [rewardTypeForm, setRewardTypeForm] = useState({
     rewardCategory: "Recognition",
     rewardName: "",
     description: "",
+    isVisibleForManagerNomination: false,
   });
   const [parameterForm, setParameterForm] = useState({
     parameterName: "",
@@ -46,6 +49,13 @@ function RewardConfiguration() {
     fetchRewardTypes();
   }, []);
 
+  // ✅ NEW: Fetch parameter counts for all reward types
+  useEffect(() => {
+    if (rewardTypes.length > 0) {
+      fetchAllParameterCounts();
+    }
+  }, [rewardTypes]);
+
   const fetchRewardTypes = async () => {
     setLoading(true);
     try {
@@ -58,10 +68,35 @@ function RewardConfiguration() {
     }
   };
 
+  // ✅ NEW: Fetch parameter counts for all rewards
+  const fetchAllParameterCounts = async () => {
+    const counts = {};
+    try {
+      await Promise.all(
+        rewardTypes.map(async (rt) => {
+          const { data } = await api.getParametersByRewardType(rt.rewardTypeId);
+          if (data.success) {
+            counts[rt.rewardTypeId] = data.data.length;
+          }
+        })
+      );
+      setParameterCounts(counts);
+    } catch (error) {
+      console.error("Failed to fetch parameter counts", error);
+    }
+  };
+
   const fetchParameters = async (rewardTypeId) => {
     try {
       const { data } = await api.getParametersByRewardType(rewardTypeId);
-      if (data.success) setParameters(data.data);
+      if (data.success) {
+        setParameters(data.data);
+        // ✅ Update the count for this specific reward type
+        setParameterCounts(prev => ({
+          ...prev,
+          [rewardTypeId]: data.data.length
+        }));
+      }
     } catch (error) {
       toast.error("Failed to fetch parameters");
     }
@@ -70,7 +105,12 @@ function RewardConfiguration() {
   const openAddRewardTypeModal = () => {
     setIsEditMode(false);
     setEditingRewardTypeId(null);
-    setRewardTypeForm({ rewardCategory: "Recognition", rewardName: "", description: "" });
+    setRewardTypeForm({
+      rewardCategory: "Recognition",
+      rewardName: "",
+      description: "",
+      isVisibleForManagerNomination: false,
+    });
     setShowRewardTypeModal(true);
   };
 
@@ -81,6 +121,7 @@ function RewardConfiguration() {
       rewardCategory: rt.rewardCategory,
       rewardName: rt.rewardName,
       description: rt.description || "",
+      isVisibleForManagerNomination: rt.isVisibleForManagerNomination || false,
     });
     setShowRewardTypeModal(true);
   };
@@ -117,7 +158,10 @@ function RewardConfiguration() {
           fetchRewardTypes();
         }
       } else {
-        const { data } = await api.createRewardType({ ...rewardTypeForm, createdBy: 1 });
+        const { data } = await api.createRewardType({
+          ...rewardTypeForm,
+          createdBy: 1,
+        });
         if (data.success) {
           toast.success("Reward type created successfully!");
           closeRewardTypeModal();
@@ -148,6 +192,36 @@ function RewardConfiguration() {
     }
   };
 
+  const handleBulkToggleActiveRewards = async () => {
+    const activeRewards = rewardTypes.filter((rt) => rt.isActive === true);
+    
+    if (activeRewards.length === 0) {
+      toast.warning("No active rewards to toggle");
+      return;
+    }
+
+    const allVisible = activeRewards.every((rt) => rt.isVisibleForManagerNomination === true);
+    const newVisibility = !allVisible;
+
+    try {
+      const updatePromises = activeRewards.map((rt) =>
+        api.updateRewardType(rt.rewardTypeId, {
+          ...rt,
+          isVisibleForManagerNomination: newVisibility,
+        })
+      );
+
+      await Promise.all(updatePromises);
+      
+      toast.success(
+        `All active rewards ${newVisibility ? "now visible to" : "hidden from"} managers!`
+      );
+      fetchRewardTypes();
+    } catch {
+      toast.error("Error updating bulk visibility");
+    }
+  };
+
   const handleCreateParameter = async (e) => {
     e.preventDefault();
     if (!selectedRewardType) {
@@ -164,7 +238,8 @@ function RewardConfiguration() {
       if (data.success) {
         toast.success("Parameter created successfully!");
         closeParameterModal();
-        fetchParameters(selectedRewardType.rewardTypeId);
+        // ✅ Refresh parameters for selected reward type
+        await fetchParameters(selectedRewardType.rewardTypeId);
       }
     } catch {
       toast.error("Error creating parameter");
@@ -179,11 +254,12 @@ function RewardConfiguration() {
 
   const handleConfirmDelete = async () => {
     try {
-       if (deleteType === "parameter") {
+      if (deleteType === "parameter") {
         const { data } = await api.deleteParameter(toDeleteId);
         if (data.success) {
           toast.success("Parameter deleted successfully");
-          fetchParameters(selectedRewardType.rewardTypeId);
+          // ✅ Refresh parameters for selected reward type
+          await fetchParameters(selectedRewardType.rewardTypeId);
         }
       }
     } catch {
@@ -210,12 +286,17 @@ function RewardConfiguration() {
   const inactiveRewardTypes = rewardTypes.filter((rt) => rt.isActive === false);
   const displayedRewards = activeTab === "Active" ? activeRewardTypes : inactiveRewardTypes;
 
+  const allActiveVisible = activeRewardTypes.length > 0 && activeRewardTypes.every((rt) => rt.isVisibleForManagerNomination === true);
+
+  // ✅ UPDATED: Get parameter count from cached state
+  const getParameterCount = (rewardTypeId) => {
+    return parameterCounts[rewardTypeId] ?? 0;
+  };
+
   const RL_PURPLE = "#97247e";
   const RL_DARK = "#27235c";
   const RL_BG = "#f8f9fc";
   const RL_BORDER = "#27235c";
-  const RL_TABLE_HEADER = "#f8f6fb";
-  const RL_LIGHT = "#f5f5fa";
   const BTN_RADIUS = "7px";
   const PREVIEW_CHAR_LIMIT = 280;
 
@@ -315,7 +396,6 @@ function RewardConfiguration() {
             )}
           </span>
         </div>
-
       </>
     );
   }
@@ -361,28 +441,18 @@ function RewardConfiguration() {
           marginBottom: "1.2rem",
         }}
       >
-        <nav
-          className="cg-breadcrumbs"
-          aria-label="breadcrumb"
-          style={{
-            marginBottom: 0,
-            background: "transparent"
-          }}
-        >
+        <nav className="cg-breadcrumbs" aria-label="breadcrumb" style={{ marginBottom: 0, background: "transparent" }}>
           <style>
             {`
-      .cg-breadcrumb-item + .cg-breadcrumb-item::before {
-        content: "/";
-        margin: 0 0.25rem;   /* smaller spacing */
-        color: #888;         /* lighter gray so it looks thinner */
-        font-weight: normal; /* prevents bold/thick look */
-      }
-    `}
+              .cg-breadcrumb-item + .cg-breadcrumb-item::before {
+                content: "/";
+                margin: 0 0.25rem;
+                color: #888;
+                font-weight: normal;
+              }
+            `}
           </style>
-          <ol
-            className="cg-breadcrumb"
-            style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}
-          >
+          <ol className="cg-breadcrumb" style={{ margin: 0, padding: 0, listStyle: "none", display: "flex" }}>
             <li
               className="cg-breadcrumb-item"
               onClick={() => navigate("/hr/dashboard")}
@@ -402,7 +472,6 @@ function RewardConfiguration() {
             </li>
           </ol>
         </nav>
-
 
         <button
           onClick={openAddRewardTypeModal}
@@ -460,7 +529,8 @@ function RewardConfiguration() {
               padding: "14px 18px 8px 18px",
               borderRadius: "12px 12px 0 0",
               display: "flex",
-              justifyContent: "center",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
             <div
@@ -507,7 +577,57 @@ function RewardConfiguration() {
                 Inactive ({inactiveRewardTypes.length})
               </button>
             </div>
+
+            {activeTab === "Active" && activeRewardTypes.length > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ 
+                  fontSize: "11px", 
+                  fontWeight: "600", 
+                  color: "#666",
+                  whiteSpace: "nowrap" 
+                }}>
+                  Manager Visibility:
+                </span>
+                <button
+                  onClick={handleBulkToggleActiveRewards}
+                  style={{
+                    width: "44px",
+                    height: "22px",
+                    borderRadius: "11px",
+                    border: "none",
+                    background: allActiveVisible ? "#10b981" : "#ef4444",
+                    position: "relative",
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
+                    flexShrink: 0
+                  }}
+                  title={allActiveVisible ? "Hide all active rewards from managers" : "Show all active rewards to managers"}
+                >
+                  <div style={{
+                    width: "16px",
+                    height: "16px",
+                    borderRadius: "50%",
+                    background: "#fff",
+                    position: "absolute",
+                    top: "3px",
+                    left: allActiveVisible ? "25px" : "3px",
+                    transition: "all 0.3s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "9px",
+                    color: allActiveVisible ? "#10b981" : "#ef4444",
+                    fontWeight: "700",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.2)"
+                  }}>
+                    <i className={allActiveVisible ? "bi bi-eye-fill" : "bi bi-eye-slash-fill"} />
+                  </div>
+                </button>
+              </div>
+            )}
           </div>
+
           <div
             style={{
               flex: 1,
@@ -559,8 +679,14 @@ function RewardConfiguration() {
                     transition: ".14s",
                   }}
                 >
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: "14px", color: RL_DARK, marginBottom: 3 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ 
+                      fontWeight: 700, 
+                      fontSize: "14px", 
+                      color: RL_DARK, 
+                      marginBottom: 3,
+                      textAlign: "left"
+                    }}>
                       {rt.rewardName}
                     </div>
                     <div
@@ -572,6 +698,7 @@ function RewardConfiguration() {
                         overflow: "hidden",
                         whiteSpace: "nowrap",
                         maxWidth: 190,
+                        textAlign: "left"
                       }}
                     >
                       {rt.description || "—"}
@@ -585,7 +712,8 @@ function RewardConfiguration() {
                           fontWeight: "500",
                         }}
                       >
-                        {rt.parameterCount} parameters
+                        {/* ✅ FIXED: Always show real-time parameter count */}
+                        {getParameterCount(rt.rewardTypeId)} parameters
                       </span>
                       <span
                         style={{
@@ -600,7 +728,7 @@ function RewardConfiguration() {
                       </span>
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                     <button
                       onClick={() => openEditRewardTypeModal(rt)}
                       title="Edit Reward Type"
@@ -852,7 +980,6 @@ function RewardConfiguration() {
                       ))}
                     </tbody>
                   </table>
-
                 )}
               </>
             ) : (
