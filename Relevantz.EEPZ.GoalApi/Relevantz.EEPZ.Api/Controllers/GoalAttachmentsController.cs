@@ -1,9 +1,5 @@
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
 using Relevantz.EEPZ.Core.Services.Interface;
@@ -14,14 +10,29 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
     [Route("api/goal-attachments")]
     public class GoalAttachmentsController : BaseGoalController
     {
-        public GoalAttachmentsController(IGoalModuleService service, ILogger<GoalAttachmentsController> logger)
-            : base(service, logger) { }
+        protected readonly IGoalAttachmentService _service;
+        protected readonly IBaseGoalService _baseService;
+
+        public GoalAttachmentsController(
+            IGoalAttachmentService service,
+            IBaseGoalService baseService,
+            ILogger<GoalAttachmentsController> logger
+        )
+            : base(baseService, logger)
+        {
+            _service = service;
+            _baseService = baseService;
+        }
 
         /// <summary>
         /// Upload a file attachment to a goal
         /// </summary>
         [HttpPost("{goalId:int}/upload")]
-        public async Task<IActionResult> UploadFile(int goalId, IFormFile file, [FromForm] string title)
+        public async Task<IActionResult> UploadFile(
+            int goalId,
+            IFormFile file,
+            [FromForm] string title
+        )
         {
             var userId = 0;
             try
@@ -197,7 +208,8 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 {
                     var response = ApiResponseDto<object>.ErrorResponse(
                         ResponseMessages.Codes.FILE_NOT_FOUND,
-                        "Attachment not found or access denied");
+                        "Attachment not found or access denied"
+                    );
                     return NotFound(response);
                 }
 
@@ -216,19 +228,22 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             catch (UnauthorizedAccessException)
             {
                 var response = ApiResponseDto<object>.ErrorResponse(
-                    ResponseMessages.Codes.FILE_ACCESS_DENIED);
+                    ResponseMessages.Codes.FILE_ACCESS_DENIED
+                );
                 return Forbid(response.Message);
             }
             catch (FileNotFoundException)
             {
                 var response = ApiResponseDto<object>.ErrorResponse(
-                    ResponseMessages.Codes.FILE_NOT_FOUND);
+                    ResponseMessages.Codes.FILE_NOT_FOUND
+                );
                 return NotFound(response);
             }
             catch (Exception)
             {
                 var response = ApiResponseDto<object>.ErrorResponse(
-                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR);
+                    ResponseMessages.Codes.INTERNAL_SERVER_ERROR
+                );
                 return StatusCode(500, response);
             }
         }
@@ -284,6 +299,3 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         }
     }
 }
-   
-
-

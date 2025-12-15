@@ -1,11 +1,7 @@
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Common.DTOs;
-using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -14,8 +10,19 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
     [Route("api/goals")]
     public class GoalInteractionsController : BaseGoalController
     {
-        public GoalInteractionsController(IGoalModuleService service, ILogger<GoalInteractionsController> logger)
-            : base(service, logger) { }
+        protected new readonly IGoalInteractionService _service;
+        protected readonly IBaseGoalService _baseService;
+
+        public GoalInteractionsController(
+            IGoalInteractionService service,
+            IBaseGoalService baseService,
+            ILogger<GoalInteractionsController> logger
+        )
+            : base(baseService, logger)
+        {
+            _service = service;
+            _baseService = baseService;
+        }
 
         // ==================== COMMENTS ====================
 
@@ -51,7 +58,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 );
                 return StatusCode(500, response);
             }
-        } 
+        }
 
         /// <summary>
         /// List all comments for a goal
@@ -147,7 +154,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 var summary = await _service.GetDashboardSummaryAsync(userId);
 
                 var response = ApiResponseDto<GoalDashboardSummaryDto>.SuccessResponse(
-                    ResponseMessages.Codes.DASHBOARD_RETRIEVED_SUCCESS,  
+                    ResponseMessages.Codes.DASHBOARD_RETRIEVED_SUCCESS,
                     summary,
                     new { UserId = userId }
                 );
@@ -159,7 +166,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 var response = ApiResponseDto<GoalDashboardSummaryDto>.ErrorResponse(
                     ResponseMessages.Codes.INTERNAL_SERVER_ERROR
                 );
-                return StatusCode(500, response);  
+                return StatusCode(500, response);
             }
         }
 
@@ -178,7 +185,12 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 var response = ApiResponseDto<List<GoalSummaryDto>>.SuccessResponse(
                     ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
                     list,
-                    new { UserId = userId, Type = type, GoalCount = list.Count, }
+                    new
+                    {
+                        UserId = userId,
+                        Type = type,
+                        GoalCount = list.Count,
+                    }
                 );
 
                 return Ok(response);
@@ -205,14 +217,15 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 var userId = GetEmpMasterId();
                 var role = GetUserRole();
 
-                var canComplete = await _service.CanMarkCompleteAsync(id, userId);
-                var goal = await _service.GetGoalAsync(id, userId, role);
+                var canComplete = await _baseService.CanMarkCompleteAsync(id, userId);
+                var goal = await _baseService.GetGoalAsync(id, userId, role);
 
                 var isOverdue = goal.IsOverdue;
                 var hasRequiredProgress = goal.ProgressPercent >= 100;
-                var hasValidStatus = goal.Status == GOAL_STATUS.OPEN || 
-                                     goal.Status == GOAL_STATUS.IN_PROGRESS || 
-                                     goal.Status == GOAL_STATUS.REOPENED;
+                var hasValidStatus =
+                    goal.Status == GOAL_STATUS.OPEN
+                    || goal.Status == GOAL_STATUS.IN_PROGRESS
+                    || goal.Status == GOAL_STATUS.REOPENED;
                 var isNotOverdue = !isOverdue || goal.Status == GOAL_STATUS.REOPENED;
 
                 bool isCreator = goal.CreatedByEmployeeMasterId == userId;
@@ -283,7 +296,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
             {
                 var userId = GetEmpMasterId();
 
-                var canView = await _service.CanViewGoalAsync(id, userId);
+                var canView = await _baseService.CanViewGoalAsync(id, userId);
 
                 var response = ApiResponseDto<object>.SuccessResponse(
                     ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,
@@ -313,7 +326,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 var userId = GetEmpMasterId();
                 var role = GetUserRole();
 
-                var canComment = await _service.CanCommentOnGoalAsync(id, userId, role);
+                var canComment = await _baseService.CanCommentOnGoalAsync(id, userId, role);
 
                 var response = ApiResponseDto<object>.SuccessResponse(
                     ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,

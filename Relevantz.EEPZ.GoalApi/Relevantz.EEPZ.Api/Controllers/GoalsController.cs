@@ -1,11 +1,8 @@
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Common.DTOs;
-using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -14,8 +11,19 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
     [Route("api/[controller]")]
     public class GoalsController : BaseGoalController
     {
-        public GoalsController(IGoalModuleService service, ILogger<GoalsController> logger)
-            : base(service, logger) { }
+        protected new readonly IGoalService _service;
+        protected readonly IBaseGoalService _baseService;
+
+        public GoalsController(
+            IGoalService service,
+            IBaseGoalService baseService,
+            ILogger<GoalsController> logger
+        )
+            : base(baseService, logger)
+        {
+            _service = service;
+            _baseService = baseService;
+        }
 
         /// <summary>
         /// Create a new goal (self, team, or org based on role)
@@ -48,7 +56,11 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                         result.Data,
                         userId
                     );
-                    return CreatedAtAction(nameof(GetGoalDetailsById), new { id = result.Data }, result);
+                    return CreatedAtAction(
+                        nameof(GetGoalDetailsById),
+                        new { id = result.Data },
+                        result
+                    );
                 }
 
                 _logger.LogWarning(
@@ -83,7 +95,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
 
                 _logger.LogInformation("User {UserId} requesting goal {GoalId}", userId, id);
 
-                var goal = await _service.GetGoalAsync(id, userId, role);
+                var goal = await _baseService.GetGoalAsync(id, userId, role);
 
                 var response = ApiResponseDto<GoalDetailDto>.SuccessResponse(
                     ResponseMessages.Codes.GOAL_RETRIEVED_SUCCESS,

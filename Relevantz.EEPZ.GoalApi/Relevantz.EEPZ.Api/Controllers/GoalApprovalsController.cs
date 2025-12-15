@@ -1,11 +1,9 @@
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Common.DTOs;
 using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -14,8 +12,19 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
     [Route("api/goal-approvals")]
     public class GoalApprovalsController : BaseGoalController
     {
-        public GoalApprovalsController(IGoalModuleService service, ILogger<GoalApprovalsController> logger)
-            : base(service, logger) { }
+        protected new readonly IGoalApprovalsService _service;
+        protected readonly IBaseGoalService _baseService;
+
+        public GoalApprovalsController(
+            IGoalApprovalsService service,
+            IBaseGoalService baseService,
+            ILogger<GoalApprovalsController> logger
+        )
+            : base(baseService, logger)
+        {
+            _service = service;
+            _baseService = baseService;
+        }
 
         /// <summary>
         /// Request approval (creation, completion, reopening, delegation)

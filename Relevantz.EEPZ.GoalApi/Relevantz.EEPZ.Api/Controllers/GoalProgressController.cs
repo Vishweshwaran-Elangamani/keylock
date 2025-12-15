@@ -1,11 +1,8 @@
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Relevantz.EEPZ.Common.Constants;
-using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Common.DTOs;
-using Relevantz.EEPZ.Common.Entities;
+using Relevantz.EEPZ.Common.Enums;
 using Relevantz.EEPZ.Core.Services.Interface;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -14,14 +11,28 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
     [Route("api/goal-progress")]
     public class GoalProgressController : BaseGoalController
     {
-        public GoalProgressController(IGoalModuleService service, ILogger<GoalProgressController> logger)
-            : base(service, logger) { }
+        protected new readonly IGoalProgressService _service;
+        protected readonly IBaseGoalService _baseService;
+
+        public GoalProgressController(
+            IGoalProgressService service,
+            IBaseGoalService baseService,
+            ILogger<GoalProgressController> logger
+        )
+            : base(baseService, logger)
+        {
+            _service = service;
+            _baseService = baseService;
+        }
 
         /// <summary>
         /// Toggle checklist item completion status
         /// </summary>
         [HttpPut("{goalId:int}/checklist/toggle")]
-        public async Task<IActionResult> ToggleChecklist(int goalId, [FromBody] ToggleChecklistDto dto)
+        public async Task<IActionResult> ToggleChecklist(
+            int goalId,
+            [FromBody] ToggleChecklistDto dto
+        )
         {
             try
             {
@@ -162,7 +173,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
                 );
                 return StatusCode(500, response);
             }
-        }  
+        }
 
         /// <summary>
         /// Get cascading progress for a user (includes subordinate progress)

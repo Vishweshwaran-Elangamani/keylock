@@ -208,8 +208,19 @@ builder.Services.AddAuthorization();
 
 // Register module DI (Goal Management)
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IGoalModuleRepository, GoalModuleRepository>();
-builder.Services.AddScoped<IGoalModuleService, GoalModuleService>();
+builder.Services.AddScoped<IBaseGoalRepository, BaseGoalRepository>();
+builder.Services.AddScoped<IGoalApprovalsRepository, GoalApprovalsRepository>();
+builder.Services.AddScoped<IGoalAttachmentRepository, GoalAttachmentRepository>();
+builder.Services.AddScoped<IGoalInteractionRepository, GoalInteractionRepository>();
+builder.Services.AddScoped<IGoalProgressRepository, GoalProgressRepository>();
+builder.Services.AddScoped<IGoalRepository, GoalRepository>();
+
+builder.Services.AddScoped<IBaseGoalService, BaseGoalService>();
+builder.Services.AddScoped<IGoalApprovalsService, GoalApprovalsService>();
+builder.Services.AddScoped<IGoalAttachmentService, GoalAttachmentService>();
+builder.Services.AddScoped<IGoalInteractionService, GoalInteractionService>();
+builder.Services.AddScoped<IGoalProgressService, GoalProgressService>();
+builder.Services.AddScoped<IGoalService, GoalService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
