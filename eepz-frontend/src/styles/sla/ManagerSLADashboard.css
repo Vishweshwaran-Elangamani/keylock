@@ -3,19 +3,359 @@
    All classes prefixed with mgr-sla-
    ======================================== */
 
+
+   /* ========== MY ESCALATION CARD STYLES ========== */
+
+
+   /* View Button - Icon Only */
+.mgr-sla-action-view {
+  color: #0F62FE !important;
+  background: transparent !important;
+  border: 1px solid #E5E7EB !important;
+  padding: 8px 10px !important;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  min-width: 36px;
+}
+
+
+.mgr-sla-action-view:hover {
+  background-color: #EFF6FF !important;
+  border-color: #0F62FE !important;
+  transform: scale(1.05);
+}
+
+
+/* Escalate Button - Icon Only */
+.mgr-sla-action-escalate {
+  color: #F59E0B !important;
+  background: transparent !important;
+  border: 1px solid #E5E7EB !important;
+  padding: 8px 10px !important;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  min-width: 36px;
+}
+
+
+.mgr-sla-action-escalate:hover {
+  background-color: #FEF3C7 !important;
+  border-color: #F59E0B !important;
+  transform: scale(1.05);
+}
+
+
+/* Resolve Button - Icon Only */
+.mgr-sla-action-resolve {
+  color: #16A34A !important;
+  background: transparent !important;
+  border: 1px solid #E5E7EB !important;
+  padding: 8px 10px !important;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  min-width: 36px;
+}
+
+
+.mgr-sla-action-resolve:hover {
+  background-color: #DCFCE7 !important;
+  border-color: #16A34A !important;
+  transform: scale(1.05);
+}
+
+
+/* Actions Group - Horizontal Layout with Gap */
+.mgr-sla-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+
+/* Warning Badge for InProgress */
+.mgr-sla-badge-warning {
+  background-color: #FEF3C7 !important;
+  color: #D97706 !important;
+  padding: 4px 12px !important;
+  border-radius: 12px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+
+.mgr-escalation-card {
+  background: white;
+  border: 2px solid #2d2d5f;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.mgr-escalation-card:hover {
+  box-shadow: 0 4px 12px rgba(45, 45, 95, 0.12);
+  transform: translateY(-2px);
+}
+
+
+/* Card Header - HORIZONTAL COMPACT LAYOUT */
+.mgr-escalation-card-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.mgr-escalation-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  background: #FEF3C7;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+
+.mgr-escalation-icon {
+  color: #D97706;
+  width: 20px;
+  height: 20px;
+}
+
+
+.mgr-escalation-title-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+
+.mgr-escalation-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.mgr-escalation-status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+
+.mgr-sla-status-open {
+  background-color: #FEF3C7;
+  color: #D97706;
+}
+
+
+.mgr-sla-status-closed {
+  background-color: #DCFCE7;
+  color: #16A34A;
+}
+
+
+.mgr-sla-status-inprogress {
+  background-color: #FEF3C7;
+  color: #D97706;
+}
+
+
+/* Card Body - COMPACT */
+.mgr-escalation-card-body {
+  padding: 14px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+
+.mgr-escalation-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+
+.mgr-escalation-info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+
+.mgr-escalation-info-row:first-child {
+  padding-top: 0;
+}
+
+
+.mgr-escalation-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+
+.mgr-escalation-value {
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 600;
+  text-align: right;
+}
+
+
+.mgr-text-truncate {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.mgr-sla-assigned-name {
+  color: #1e293b;
+}
+
+
+.mgr-sla-not-assigned {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+
+.text-success {
+  color: #16A34A !important;
+}
+
+
+.text-warning {
+  color: #D97706 !important;
+}
+
+
+.text-danger {
+  color: #DC2626 !important;
+}
+
+
+/* Compliance Badge */
+.mgr-compliance-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+.mgr-compliance-ontime {
+  background-color: #DCFCE7;
+  color: #16A34A;
+}
+
+
+.mgr-compliance-breached {
+  background-color: #FEE2E2;
+  color: #DC2626;
+}
+
+
+/* Card Footer - COMPACT */
+.mgr-escalation-card-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+
+.mgr-escalation-view-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  background-color: white;
+  color: #2d2d5f;
+  border: 2px solid #2d2d5f;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+
+/* Hover effect */
+.mgr-escalation-view-btn:hover {
+  background-color: #2d2d5f;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(45, 45, 95, 0.25);
+}
+
+
+.mgr-escalation-view-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(45, 45, 95, 0.2);
+}
+
+
+.mgr-escalation-view-btn:focus {
+  outline: 2px solid #2d2d5f;
+  outline-offset: 2px;
+}
+
+
 /* Wrapper */
 .mgr-sla-wrapper {
   padding: 1.5rem 2rem !important;
 }
 
+
 /* ========================================
    BREADCRUMBS
    ======================================== */
+
 
 .mgr-sla-breadcrumb {
   font-size: 0.875rem !important;
   color: #97247E !important;
 }
+
 
 .mgr-sla-breadcrumb-link {
   color: #97247E !important;
@@ -26,19 +366,23 @@
   transition: color 0.2s !important;
 }
 
+
 .mgr-sla-breadcrumb-link:hover {
   color: #7A1D66 !important;
   text-decoration: underline !important;
 }
+
 
 .mgr-sla-breadcrumb-active {
   color: #7A1D66 !important;
   font-weight: 600 !important;
 }
 
+
 /* ========================================
    STATS CARDS
    ======================================== */
+
 
 .mgr-sla-stat-card {
   background: #FFFFFF !important;
@@ -55,10 +399,12 @@
   justify-content: center !important;
 }
 
+
 .mgr-sla-stat-card:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
 }
+
 
 .mgr-sla-stat-icon {
   width: 56px !important;
@@ -70,6 +416,7 @@
   margin-bottom: 1rem !important;
 }
 
+
 .mgr-sla-stat-value {
   font-size: 2.25rem !important;
   font-weight: 700 !important;
@@ -77,6 +424,7 @@
   margin: 0 0 0.5rem !important;
   line-height: 1 !important;
 }
+
 
 .mgr-sla-stat-label {
   font-size: 0.875rem !important;
@@ -86,9 +434,11 @@
   line-height: 1.3 !important;
 }
 
+
 /* ========================================
    FILTERS CARD
    ======================================== */
+
 
 .mgr-sla-filters-card {
   background: #FFFFFF !important;
@@ -99,12 +449,14 @@
   margin-bottom: 1rem !important;
 }
 
+
 /* Search */
 .mgr-sla-search-wrapper {
   position: relative !important;
   display: flex !important;
   align-items: center !important;
 }
+
 
 .mgr-sla-search-icon {
   position: absolute !important;
@@ -113,6 +465,7 @@
   pointer-events: none !important;
   z-index: 1 !important;
 }
+
 
 .mgr-sla-search-input {
   padding-left: 2.75rem !important;
@@ -123,11 +476,13 @@
   transition: all 0.2s ease !important;
 }
 
+
 .mgr-sla-search-input:focus {
   outline: none !important;
   border-color: #3B82F6 !important;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
+
 
 .mgr-sla-select {
   appearance: none;
@@ -141,11 +496,13 @@
 }
 
 
+
 .mgr-sla-select:focus {
   outline: none !important;
   border-color: #3B82F6 !important;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
+
 
 /* Filter Action Buttons */
 .mgr-sla-filter-actions {
@@ -153,6 +510,7 @@
   gap: 0.5rem !important;
   justify-content: flex-end !important;
 }
+
 
 .mgr-sla-btn-clear {
   display: inline-flex !important;
@@ -169,6 +527,7 @@
   background: #FFFFFF !important;
 }
 
+
 .mgr-sla-btn-clear:hover {
   background: #F3F4F6 !important;
   color: #374151 !important;
@@ -176,15 +535,18 @@
   transform: translateY(-1px) !important;
 }
 
+
 /* ========================================
    TABS - BELOW FILTERS
    ======================================== */
+
 
 .mgr-sla-tabs-wrapper {
   display: flex !important;
   justify-content: center !important;
   margin-bottom: 1.25rem !important;
 }
+
 
 .mgr-sla-tabs-container {
   display: flex !important;
@@ -196,6 +558,7 @@
   max-width: 600px !important;
   width: 100% !important;
 }
+
 
 .mgr-sla-tab-pill {
   flex: 1 !important;
@@ -212,9 +575,11 @@
   text-align: center !important;
 }
 
+
 .mgr-sla-tab-pill:hover:not(.active) {
   background: rgba(255, 255, 255, 0.1) !important;
 }
+
 
 .mgr-sla-tab-pill.active {
   background: #FFFFFF !important;
@@ -222,9 +587,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
+
 /* ========================================
    TABLE
    ======================================== */
+
 
 .mgr-sla-table-wrapper {
   background: #FFFFFF !important;
@@ -234,10 +601,12 @@
   overflow: hidden !important;
 }
 
+
 .table-responsive {
   overflow-x: auto !important;
   -webkit-overflow-scrolling: touch !important;
 }
+
 
 .mgr-sla-table {
   width: 100% !important;
@@ -247,6 +616,7 @@
   border-color: transparent !important;
 }
 
+
 .mgr-sla-table > :not(caption) > * > * {
   padding: 0 !important;
   background-color: transparent !important;
@@ -254,14 +624,17 @@
   box-shadow: none !important;
 }
 
+
 .mgr-sla-table-header {
   background: #27235C !important;
   border-bottom: none !important;
 }
 
+
 .mgr-sla-table-header tr {
   border: none !important;
 }
+
 
 .mgr-sla-table-header th {
   padding: 1rem 1.25rem !important;
@@ -279,6 +652,7 @@
   letter-spacing: 0.025em !important;
 }
 
+
 /* Center specific columns */
 .mgr-sla-table-header th:nth-child(3),
 .mgr-sla-table-header th:nth-child(4),
@@ -287,9 +661,11 @@
   text-align: center !important;
 }
 
+
 .mgr-sla-table tbody {
   border-top: none !important;
 }
+
 
 .mgr-sla-table tbody tr {
   border: none !important;
@@ -297,9 +673,11 @@
   transition: all 0.15s ease !important;
 }
 
+
 .mgr-sla-table tbody tr:last-child {
   border-bottom: none !important;
 }
+
 
 .mgr-sla-table tbody td {
   padding: 1rem 1.25rem !important;
@@ -311,6 +689,7 @@
   border: none !important;
 }
 
+
 /* Center specific columns in body */
 .mgr-sla-table tbody td:nth-child(3),
 .mgr-sla-table tbody td:nth-child(4),
@@ -319,18 +698,22 @@
   text-align: center !important;
 }
 
+
 /* Clickable Row Styles */
 .mgr-sla-clickable-row {
   cursor: pointer !important;
 }
 
+
 .mgr-sla-clickable-row:hover {
   background-color: #F9FAFB !important;
 }
 
+
 .mgr-sla-clickable-row:hover td {
   background-color: #F9FAFB !important;
 }
+
 
 /* Remove all Bootstrap table defaults */
 .mgr-sla-table.table {
@@ -345,11 +728,13 @@
   border-collapse: collapse !important;
 }
 
+
 .mgr-sla-table.table-hover > tbody > tr:hover > * {
   --bs-table-accent-bg: #F9FAFB !important;
   color: inherit !important;
   background-color: #F9FAFB !important;
 }
+
 
 /* Employee Cell */
 .mgr-sla-employee-cell {
@@ -358,10 +743,12 @@
   gap: 0.625rem !important;
 }
 
+
 .mgr-sla-employee-info {
   display: flex !important;
   flex-direction: column !important;
 }
+
 
 .mgr-sla-employee-name {
   font-weight: 600 !important;
@@ -372,12 +759,14 @@
   text-align: left !important;
 }
 
+
 .mgr-sla-employee-email {
   font-size: 0.75rem !important;
   color: #6B7280 !important;
   line-height: 1.3 !important;
   text-align: left !important;
 }
+
 
 /* Badges */
 .mgr-sla-badge {
@@ -392,54 +781,65 @@
   white-space: nowrap !important;
 }
 
+
 .mgr-sla-badge-open {
   background: #DBEAFE !important;
   color: #1E40AF !important;
 }
+
 
 .mgr-sla-badge-closed {
   background: #DCFCE7 !important;
   color: #15803D !important;
 }
 
+
 .mgr-sla-badge-escalated {
   background: #FEE2E2 !important;
   color: #B91C1C !important;
 }
+
 
 .mgr-sla-badge-primary {
   background: #DBEAFE !important;
   color: #1E40AF !important;
 }
 
+
 .mgr-sla-badge-success {
   background: #DCFCE7 !important;
   color: #15803D !important;
 }
+
 
 .mgr-sla-badge-info {
   background: #E0E7FF !important;
   color: #4338CA !important;
 }
 
+
 .mgr-sla-badge-compliance-ontime {
   background: #D1FAE5 !important;
   color: #047857 !important;
 }
+
 
 .mgr-sla-badge-compliance-breached {
   background: #FEE2E2 !important;
   color: #B91C1C !important;
 }
 
+
 .mgr-sla-badge-compliance-extended {
   background: #FEF3C7 !important;
   color: #B45309 !important;
 }
 
+
 /* ========================================
    ACTION BUTTONS
    ======================================== */
+
 
 .mgr-sla-actions {
   display: flex !important;
@@ -447,6 +847,7 @@
   justify-content: center !important;
   align-items: center !important;
 }
+
 
 .mgr-sla-action-btn {
   padding: 0.375rem 0.75rem !important;
@@ -464,6 +865,7 @@
   white-space: nowrap !important;
 }
 
+
 .mgr-sla-action-view {
   border-color: #3B82F6 !important;
   color: #3B82F6 !important;
@@ -472,12 +874,14 @@
   padding: 0 !important;
 }
 
+
 .mgr-sla-action-view:hover {
   background: #3B82F6 !important;
   color: #FFFFFF !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
 }
+
 
 .mgr-sla-action-view-text {
   border-color: #3B82F6 !important;
@@ -486,12 +890,14 @@
   height: 32px !important;
 }
 
+
 .mgr-sla-action-view-text:hover {
   background: #3B82F6 !important;
   color: #FFFFFF !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
 }
+
 
 .mgr-sla-action-escalate {
   border-color: #F59E0B !important;
@@ -501,12 +907,14 @@
   padding: 0 !important;
 }
 
+
 .mgr-sla-action-escalate:hover {
   background: #F59E0B !important;
   color: #FFFFFF !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3) !important;
 }
+
 
 .mgr-sla-action-resolve {
   border-color: #16A34A !important;
@@ -516,6 +924,7 @@
   padding: 0 !important;
 }
 
+
 .mgr-sla-action-resolve:hover {
   background: #16A34A !important;
   color: #FFFFFF !important;
@@ -523,9 +932,11 @@
   box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3) !important;
 }
 
+
 /* ========================================
    EMPTY STATE - STANDALONE
    ======================================== */
+
 
 .mgr-sla-empty-state-standalone {
   padding: 4rem 2rem !important;
@@ -539,11 +950,13 @@
   border-radius: 12px !important;
 }
 
+
 .mgr-sla-empty-icon {
   color: #D1D5DB !important;
   margin-bottom: 1.5rem !important;
   opacity: 0.5 !important;
 }
+
 
 .mgr-sla-empty-text {
   color: #6B7280 !important;
@@ -552,6 +965,7 @@
   margin: 0 !important;
 }
 
+
 /* Pagination */
 .mgr-sla-pagination-wrapper {
   padding: 1rem 1.25rem !important;
@@ -559,9 +973,11 @@
   background: #FFFFFF !important;
 }
 
+
 /* ========================================
    SCROLLBAR
    ======================================== */
+
 
 .mgr-sla-table-wrapper::-webkit-scrollbar,
 .table-responsive::-webkit-scrollbar {
@@ -569,11 +985,13 @@
   height: 10px !important;
 }
 
+
 .mgr-sla-table-wrapper::-webkit-scrollbar-track,
 .table-responsive::-webkit-scrollbar-track {
   background: #f1f1f1 !important;
   border-radius: 5px !important;
 }
+
 
 .mgr-sla-table-wrapper::-webkit-scrollbar-thumb,
 .table-responsive::-webkit-scrollbar-thumb {
@@ -582,10 +1000,12 @@
   border: 2px solid #f1f1f1 !important;
 }
 
+
 .mgr-sla-table-wrapper::-webkit-scrollbar-thumb:hover,
 .table-responsive::-webkit-scrollbar-thumb:hover {
   background: #1b193f !important;
 }
+
 
 /* Firefox */
 .mgr-sla-table-wrapper,
@@ -594,46 +1014,56 @@
   scrollbar-color: #27235C #f1f1f1 !important;
 }
 
+
 /* ========================================
    RESPONSIVE
    ======================================== */
+
 
 @media (max-width: 992px) {
   .mgr-sla-wrapper {
     padding: 1rem !important;
   }
 
+
   .mgr-sla-filter-actions {
     flex-direction: column !important;
   }
 
+
   .mgr-sla-btn-clear {
     width: 100% !important;
   }
+
 
   .mgr-sla-stat-card {
     min-height: 140px !important;
     padding: 1rem !important;
   }
 
+
   .mgr-sla-table {
     min-width: 900px !important;
   }
+
 
   .mgr-sla-tabs-container {
     max-width: 100% !important;
   }
 }
 
+
 @media (max-width: 768px) {
   .mgr-sla-stat-value {
     font-size: 2rem !important;
   }
 
+
   .mgr-sla-stat-icon {
     width: 48px !important;
     height: 48px !important;
   }
+
 
   .mgr-sla-table-header th,
   .mgr-sla-table tbody td {
@@ -641,14 +1071,17 @@
     font-size: 0.8125rem !important;
   }
 
+
   .mgr-sla-badge {
     font-size: 0.75rem !important;
     padding: 0.25rem 0.5rem !important;
   }
 
+
   .mgr-sla-action-btn {
     font-size: 0.75rem !important;
   }
+
 
   .mgr-sla-action-view,
   .mgr-sla-action-escalate,
@@ -657,25 +1090,45 @@
     height: 28px !important;
   }
 
+
   .mgr-sla-action-view-text {
     min-width: 50px !important;
     height: 28px !important;
   }
+
+
+  .mgr-escalation-card-header {
+    padding: 10px 14px;
+  }
+
+
+  .mgr-escalation-card-body {
+    padding: 12px 14px;
+  }
+
+
+  .mgr-escalation-card-footer {
+    padding: 10px 14px;
+  }
 }
+
 
 @media (max-width: 576px) {
   .mgr-sla-wrapper {
     padding: 0.75rem !important;
   }
 
+
   .mgr-sla-stat-card {
     min-height: 120px !important;
     padding: 0.875rem !important;
   }
 
+
   .mgr-sla-stat-value {
     font-size: 1.75rem !important;
   }
+
 
   .mgr-sla-table-header th,
   .mgr-sla-table tbody td {
@@ -683,8 +1136,20 @@
     font-size: 0.75rem !important;
   }
 
+
   .mgr-sla-empty-state-standalone {
     min-height: 300px !important;
     padding: 2rem 1rem !important;
+  }
+
+
+  .mgr-escalation-icon-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+
+
+  .mgr-escalation-title {
+    font-size: 13px;
   }
 }
