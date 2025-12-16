@@ -39,6 +39,8 @@ public partial class Goal
 
     public virtual Employeedetailsmaster? CreatedByNavigation { get; set; }
 
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+
     public virtual ICollection<GoalApproval> GoalApprovals { get; set; } = new List<GoalApproval>();
 
     public virtual ICollection<GoalAssignment> GoalAssignments { get; set; } = new List<GoalAssignment>();
@@ -51,7 +53,11 @@ public partial class Goal
 
     public virtual ICollection<Goalprogresslog> Goalprogresslogs { get; set; } = new List<Goalprogresslog>();
 
+    public virtual ICollection<Managerreviewcomment> Managerreviewcomments { get; set; } = new List<Managerreviewcomment>();
+
     public virtual Project? Project { get; set; }
+
+    public virtual ICollection<Projectgoalfeedback> Projectgoalfeedbacks { get; set; } = new List<Projectgoalfeedback>();
 
     public virtual Employeedetailsmaster? ReopenedByNavigation { get; set; }
 

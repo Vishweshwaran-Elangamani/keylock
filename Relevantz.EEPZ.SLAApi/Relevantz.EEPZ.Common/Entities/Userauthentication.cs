@@ -61,6 +61,12 @@ public partial class Userauthentication
 
     public virtual ICollection<Mentorfeedbacktracking> Mentorfeedbacktrackings { get; set; } = new List<Mentorfeedbacktracking>();
 
+    public virtual ICollection<Nomination> NominationDeptHeadUsers { get; set; } = new List<Nomination>();
+
+    public virtual ICollection<Nomination> NominationL1managerUsers { get; set; } = new List<Nomination>();
+
+    public virtual ICollection<Nomination> NominationL2managerUsers { get; set; } = new List<Nomination>();
+
     public virtual ICollection<Nomination> NominationNominatedByUsers { get; set; } = new List<Nomination>();
 
     public virtual ICollection<Nomination> NominationNomineeUsers { get; set; } = new List<Nomination>();
@@ -108,6 +114,8 @@ public partial class Userauthentication
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
 
     public virtual ICollection<Rewardtype> Rewardtypes { get; set; } = new List<Rewardtype>();
+
+    public virtual ICollection<Selfassessmentattachment> Selfassessmentattachments { get; set; } = new List<Selfassessmentattachment>();
 
     public virtual ICollection<Selfassessment> Selfassessments { get; set; } = new List<Selfassessment>();
 

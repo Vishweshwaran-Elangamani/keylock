@@ -33,5 +33,7 @@ public partial class Recognitiondetail
 
     public virtual Userauthentication PostedByUser { get; set; } = null!;
 
+    public virtual ICollection<Recognitionstatus> Recognitionstatuses { get; set; } = new List<Recognitionstatus>();
+
     public virtual Rewardtype RewardType { get; set; } = null!;
 }

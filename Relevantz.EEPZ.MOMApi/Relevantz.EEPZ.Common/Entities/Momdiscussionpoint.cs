@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Relevantz.EEPZ.Common.Entities;
 
-/// <summary>
-/// Stores key discussion points from meetings
-/// </summary>
 public partial class Momdiscussionpoint
 {
     public int PointId { get; set; }

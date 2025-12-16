@@ -43,6 +43,8 @@ public partial class Project
 
     public DateTime? UpdatedAt { get; set; }
 
+    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
+
     public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
     public virtual ICollection<Goal> Goals { get; set; } = new List<Goal>();

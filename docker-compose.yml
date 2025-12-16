@@ -10,13 +10,27 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d  
+      - ./mysql-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping --silent --protocol=TCP -h mysql -uroot -p$root"]
+      test: [ "CMD-SHELL", "mysqladmin ping --silent --protocol=TCP -h mysql -uroot -p$root" ]
       interval: 10s
       timeout: 20s
       retries: 10
       start_period: 30s
+    networks:
+      - eepz-network
+
+  analysis-api:
+    build: ./Relevantz.EEPZ.AnalysisApi
+    container_name: analysis-api
+    restart: always
+    ports:
+      - "5111:5111"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
     networks:
       - eepz-network
 
@@ -30,7 +44,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5101
-      
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -49,7 +63,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5102
-      
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -68,7 +82,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5103
-      
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -78,7 +92,7 @@ services:
       - eepz-network
 
   hr-operations-api:
-    build: ./Relevantz.EEPZ.HrOperationsApi
+    build: ./Relevantz.EEPZ.HrOpsApi
     container_name: eepz-hr-operations-api
     restart: always
     ports:
@@ -87,7 +101,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5104
-      
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -106,7 +120,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5105
-      
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -125,7 +139,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5106
-      
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -135,16 +149,35 @@ services:
       - eepz-network
 
   meeting-api:
-    build: ./Relevantz.EEPZ.MOM&MeetingApi
-    container_name: eepz-mom-meeting-api
+    build: ./Relevantz.EEPZ.MeetingsApi
+    container_name: eepz-meeting-api
     restart: always
     ports:
       - "5107:5107"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
-      - ASPNETCORE_URLS=http://+:5107        
-      
+      - ASPNETCORE_URLS=http://+:5107
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  mom-api:
+    build: ./Relevantz.EEPZ.MoMApi
+    container_name: eepz-mom-api
+    restart: always
+    ports:
+      - "5112:5112"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5112
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -154,7 +187,7 @@ services:
       - eepz-network
 
   performance-api:
-    build: ./Relevantz.EEPZ.PerformanceManagementApi
+    build: ./Relevantz.EEPZ.PerformanceMgmtApi
     container_name: eepz-performance-api
     restart: always
     ports:
@@ -163,7 +196,26 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5108
-      
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  roles-api:
+    build: ./Relevantz.EEPZ.PerformanceMgmtRolesApi
+    container_name: eepz-roles-api
+    restart: always
+    ports:
+      - "5113:5113"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5113
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -173,7 +225,7 @@ services:
       - eepz-network
 
   proj-management-api:
-    build: ./Relevantz.EEPZ.ProjManagementApi
+    build: ./Relevantz.EEPZ.ProjMgmtApi
     container_name: eepz-proj-management-api
     restart: always
     ports:
@@ -182,7 +234,26 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5109
-      
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network
+
+  rewards-api:
+    build: ./Relevantz.EEPZ.RewardsApi
+    container_name: eepz-rewards-api
+    restart: always
+    ports:
+      - "5114:5114"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5114
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -201,76 +272,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
       - ASPNETCORE_URLS=http://+:5110
-      
-    depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - ./logs:/app/Logs
-    networks:
-      - eepz-network
 
-  mom-api:
-    build: ./Relevantz.EEPZ.MOMApi
-    container_name: eepz-mom-api
-    restart: always
-    ports:
-      - "5112:5112"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
-      - ASPNETCORE_URLS=http://+:5112
-      
-    depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - ./logs:/app/Logs
-    networks:
-      - eepz-network  
-  roles-api:
-    build: ./Relevantz.EEPZ.PerformanceManagementRolesApi
-    container_name: eepz-roles-api
-    restart: always
-    ports:
-      - "5113:5113"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
-      - ASPNETCORE_URLS=http://+:5113
-      
-    depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - ./logs:/app/Logs
-    networks:
-      - eepz-network
-  rewards-api:
-    build: ./Relevantz.EEPZ.RewardsAndRecognitionApi
-    container_name: eepz-rewards-api
-    restart: always
-    ports:
-      - "5114:5114"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
-      - ASPNETCORE_URLS=http://+:5114
-      
-    depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - ./logs:/app/Logs
-    networks:
-      - eepz-network
-
-  analysis-api:
-    build: ./Relevantz.EEPZ.AnalysisApi
-    container_name: analysis-api
-    restart: always
-    ports:
-      - "5111:5111"
     depends_on:
       mysql:
         condition: service_healthy

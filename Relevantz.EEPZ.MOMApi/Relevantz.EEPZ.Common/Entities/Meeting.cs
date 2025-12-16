@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Relevantz.EEPZ.Common.Entities;
 
-/// <summary>
-/// Stores all scheduled meetings across the organization
-/// </summary>
 public partial class Meeting
 {
     public int MeetingId { get; set; }

@@ -33,6 +33,8 @@ public partial class Department
 
     public virtual ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
 
+    public virtual ICollection<Recognitiondetail> Recognitiondetails { get; set; } = new List<Recognitiondetail>();
+
     public virtual ICollection<Risk> Risks { get; set; } = new List<Risk>();
 
     public virtual ICollection<Slacompliance> Slacompliances { get; set; } = new List<Slacompliance>();

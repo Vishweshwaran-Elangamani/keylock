@@ -17,11 +17,11 @@ public partial class Lndattachment
 
     public int CreatedByEmployeeId { get; set; }
 
-    public DateTime? CreatedOn { get; set; }
+    public DateOnly? CreatedOn { get; set; }
 
     public virtual Employee CreatedByEmployee { get; set; } = null!;
 
     public virtual ICollection<Lndapproval> Lndapprovals { get; set; } = new List<Lndapproval>();
 
-    public virtual ICollection<Sme> Smes { get; set; } = new List<Sme>();
+    public virtual ICollection<Lndsme> Lndsmes { get; set; } = new List<Lndsme>();
 }

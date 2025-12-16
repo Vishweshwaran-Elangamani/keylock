@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Relevantz.EEPZ.Common.Entities;
 
-/// <summary>
-/// Stores Minutes of Meeting (MOM) records
-/// </summary>
 public partial class Mom
 {
     public int Momid { get; set; }

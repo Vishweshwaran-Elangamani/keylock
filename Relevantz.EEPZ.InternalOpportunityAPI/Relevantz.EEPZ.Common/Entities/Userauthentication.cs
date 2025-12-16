@@ -37,9 +37,19 @@ public partial class Userauthentication
 
     public virtual ICollection<Budgetallocation> BudgetallocationEmployeeUsers { get; set; } = new List<Budgetallocation>();
 
+    public virtual ICollection<Budgetperiodallocation> Budgetperiodallocations { get; set; } = new List<Budgetperiodallocation>();
+
     public virtual ICollection<Bulkoperationlog> Bulkoperationlogs { get; set; } = new List<Bulkoperationlog>();
 
+    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
+
     public virtual Employee Employee { get; set; } = null!;
+
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+
+    public virtual ICollection<Hrfeedbackformresponse> Hrfeedbackformresponses { get; set; } = new List<Hrfeedbackformresponse>();
+
+    public virtual ICollection<Hrfeedbackform> Hrfeedbackforms { get; set; } = new List<Hrfeedbackform>();
 
     public virtual ICollection<Internalopportunity> Internalopportunities { get; set; } = new List<Internalopportunity>();
 
@@ -49,6 +59,14 @@ public partial class Userauthentication
 
     public virtual ICollection<Managernominationtracking> Managernominationtrackings { get; set; } = new List<Managernominationtracking>();
 
+    public virtual ICollection<Mentorfeedbacktracking> Mentorfeedbacktrackings { get; set; } = new List<Mentorfeedbacktracking>();
+
+    public virtual ICollection<Nomination> NominationDeptHeadUsers { get; set; } = new List<Nomination>();
+
+    public virtual ICollection<Nomination> NominationL1managerUsers { get; set; } = new List<Nomination>();
+
+    public virtual ICollection<Nomination> NominationL2managerUsers { get; set; } = new List<Nomination>();
+
     public virtual ICollection<Nomination> NominationNominatedByUsers { get; set; } = new List<Nomination>();
 
     public virtual ICollection<Nomination> NominationNomineeUsers { get; set; } = new List<Nomination>();
@@ -57,11 +75,17 @@ public partial class Userauthentication
 
     public virtual ICollection<Nominationreviewmetric> Nominationreviewmetrics { get; set; } = new List<Nominationreviewmetric>();
 
+    public virtual ICollection<Organizationalpolicy> OrganizationalpolicyCreatedByUsers { get; set; } = new List<Organizationalpolicy>();
+
+    public virtual ICollection<Organizationalpolicy> OrganizationalpolicyPublishedByNavigations { get; set; } = new List<Organizationalpolicy>();
+
     public virtual ICollection<Organizationwideobjective> Organizationwideobjectives { get; set; } = new List<Organizationwideobjective>();
 
     public virtual ICollection<Payroll> PayrollApprovedByUsers { get; set; } = new List<Payroll>();
 
     public virtual ICollection<Payroll> PayrollEmployeeUsers { get; set; } = new List<Payroll>();
+
+    public virtual ICollection<Peerfeedbackqueue> Peerfeedbackqueues { get; set; } = new List<Peerfeedbackqueue>();
 
     public virtual ICollection<Policyviolation> PolicyviolationEmployeeUsers { get; set; } = new List<Policyviolation>();
 
@@ -79,6 +103,8 @@ public partial class Userauthentication
 
     public virtual ICollection<Promotionhistory> Promotionhistories { get; set; } = new List<Promotionhistory>();
 
+    public virtual ICollection<Recognitiondetail> Recognitiondetails { get; set; } = new List<Recognitiondetail>();
+
     public virtual ICollection<Recognitionreward> RecognitionrewardEmployees { get; set; } = new List<Recognitionreward>();
 
     public virtual ICollection<Recognitionreward> RecognitionrewardSubmittedByNavigations { get; set; } = new List<Recognitionreward>();
@@ -86,6 +112,10 @@ public partial class Userauthentication
     public virtual ICollection<Refreshtoken> Refreshtokens { get; set; } = new List<Refreshtoken>();
 
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
+
+    public virtual ICollection<Rewardtype> Rewardtypes { get; set; } = new List<Rewardtype>();
+
+    public virtual ICollection<Selfassessmentattachment> Selfassessmentattachments { get; set; } = new List<Selfassessmentattachment>();
 
     public virtual ICollection<Selfassessment> Selfassessments { get; set; } = new List<Selfassessment>();
 

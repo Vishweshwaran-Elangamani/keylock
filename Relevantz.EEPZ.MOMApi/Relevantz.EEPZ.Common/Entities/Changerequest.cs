@@ -33,5 +33,7 @@ public partial class Changerequest
 
     public DateTime? ProcessedAt { get; set; }
 
+    public string? CurrentPassword { get; set; }
+
     public virtual Employee Employee { get; set; } = null!;
 }

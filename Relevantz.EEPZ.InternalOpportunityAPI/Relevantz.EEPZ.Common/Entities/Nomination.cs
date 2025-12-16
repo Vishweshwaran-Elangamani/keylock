@@ -17,25 +17,25 @@ public partial class Nomination
 
     public string? Justification { get; set; }
 
-    public string Status { get; set; } = null!;
-
     public int CurrentApprovalLevel { get; set; }
 
-    public int? L1ManagerUserId { get; set; }
+    public string Status { get; set; } = null!;
 
-    public string? L1ReviewRemarks { get; set; }
+    public int? L1managerUserId { get; set; }
 
-    public DateTime? L1ReviewedAt { get; set; }
+    public string? L1reviewRemarks { get; set; }
 
-    public string? L1Status { get; set; }
+    public DateTime? L1reviewedAt { get; set; }
 
-    public int? L2ManagerUserId { get; set; }
+    public string? L1status { get; set; }
 
-    public string? L2ReviewRemarks { get; set; }
+    public int? L2managerUserId { get; set; }
 
-    public DateTime? L2ReviewedAt { get; set; }
+    public string? L2reviewRemarks { get; set; }
 
-    public string? L2Status { get; set; }
+    public DateTime? L2reviewedAt { get; set; }
+
+    public string? L2status { get; set; }
 
     public int? DeptHeadUserId { get; set; }
 
@@ -49,9 +49,15 @@ public partial class Nomination
 
     public string? ReviewRemarks { get; set; }
 
+    public DateTime? ReviewedAt { get; set; }
+
     public DateTime SubmittedAt { get; set; }
 
-    public DateTime? ReviewedAt { get; set; }
+    public virtual Userauthentication? DeptHeadUser { get; set; }
+
+    public virtual Userauthentication? L1managerUser { get; set; }
+
+    public virtual Userauthentication? L2managerUser { get; set; }
 
     public virtual ICollection<Managernominationtracking> Managernominationtrackings { get; set; } = new List<Managernominationtracking>();
 
@@ -63,11 +69,7 @@ public partial class Nomination
 
     public virtual Internalopportunity Opportunity { get; set; } = null!;
 
+    public virtual ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
+
     public virtual Userauthentication? ReviewedByUser { get; set; }
-
-    public virtual Userauthentication? L1ManagerUser { get; set; }
-
-    public virtual Userauthentication? L2ManagerUser { get; set; }
-
-    public virtual Userauthentication? DeptHeadUser { get; set; }
 }

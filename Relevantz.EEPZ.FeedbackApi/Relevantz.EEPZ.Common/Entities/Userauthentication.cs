@@ -37,7 +37,11 @@ public partial class Userauthentication
 
     public virtual ICollection<Budgetallocation> BudgetallocationEmployeeUsers { get; set; } = new List<Budgetallocation>();
 
+    public virtual ICollection<Budgetperiodallocation> Budgetperiodallocations { get; set; } = new List<Budgetperiodallocation>();
+
     public virtual ICollection<Bulkoperationlog> Bulkoperationlogs { get; set; } = new List<Bulkoperationlog>();
+
+    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
 
     public virtual Employee Employee { get; set; } = null!;
 
@@ -57,6 +61,12 @@ public partial class Userauthentication
 
     public virtual ICollection<Mentorfeedbacktracking> Mentorfeedbacktrackings { get; set; } = new List<Mentorfeedbacktracking>();
 
+    public virtual ICollection<Nomination> NominationDeptHeadUsers { get; set; } = new List<Nomination>();
+
+    public virtual ICollection<Nomination> NominationL1managerUsers { get; set; } = new List<Nomination>();
+
+    public virtual ICollection<Nomination> NominationL2managerUsers { get; set; } = new List<Nomination>();
+
     public virtual ICollection<Nomination> NominationNominatedByUsers { get; set; } = new List<Nomination>();
 
     public virtual ICollection<Nomination> NominationNomineeUsers { get; set; } = new List<Nomination>();
@@ -64,6 +74,10 @@ public partial class Userauthentication
     public virtual ICollection<Nomination> NominationReviewedByUsers { get; set; } = new List<Nomination>();
 
     public virtual ICollection<Nominationreviewmetric> Nominationreviewmetrics { get; set; } = new List<Nominationreviewmetric>();
+
+    public virtual ICollection<Organizationalpolicy> OrganizationalpolicyCreatedByUsers { get; set; } = new List<Organizationalpolicy>();
+
+    public virtual ICollection<Organizationalpolicy> OrganizationalpolicyPublishedByNavigations { get; set; } = new List<Organizationalpolicy>();
 
     public virtual ICollection<Organizationwideobjective> Organizationwideobjectives { get; set; } = new List<Organizationwideobjective>();
 
@@ -100,6 +114,8 @@ public partial class Userauthentication
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
 
     public virtual ICollection<Rewardtype> Rewardtypes { get; set; } = new List<Rewardtype>();
+
+    public virtual ICollection<Selfassessmentattachment> Selfassessmentattachments { get; set; } = new List<Selfassessmentattachment>();
 
     public virtual ICollection<Selfassessment> Selfassessments { get; set; } = new List<Selfassessment>();
 

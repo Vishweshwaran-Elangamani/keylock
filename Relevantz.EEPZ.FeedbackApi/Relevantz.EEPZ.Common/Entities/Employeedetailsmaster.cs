@@ -15,6 +15,8 @@ public partial class Employeedetailsmaster
 
     public virtual Department Department { get; set; } = null!;
 
+    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
+
     public virtual Employee Employee { get; set; } = null!;
 
     public virtual ICollection<GoalApproval> GoalApprovalApprovedByNavigations { get; set; } = new List<GoalApproval>();
@@ -45,6 +47,12 @@ public partial class Employeedetailsmaster
 
     public virtual ICollection<Goalprogresslog> Goalprogresslogs { get; set; } = new List<Goalprogresslog>();
 
+    public virtual ICollection<Oneononediscussion> OneononediscussionCreatedByNavigations { get; set; } = new List<Oneononediscussion>();
+
+    public virtual ICollection<Oneononediscussion> OneononediscussionHostEmployees { get; set; } = new List<Oneononediscussion>();
+
+    public virtual ICollection<Oneononediscussion> OneononediscussionParticipantEmployees { get; set; } = new List<Oneononediscussion>();
+
     public virtual ICollection<Peerfeedback> PeerfeedbackPeerEmployees { get; set; } = new List<Peerfeedback>();
 
     public virtual ICollection<Peerfeedback> PeerfeedbackSubmittedByEmployees { get; set; } = new List<Peerfeedback>();
@@ -60,6 +68,4 @@ public partial class Employeedetailsmaster
     public virtual ICollection<Projectgoalfeedback> Projectgoalfeedbacks { get; set; } = new List<Projectgoalfeedback>();
 
     public virtual Role Role { get; set; } = null!;
-
-    public virtual ICollection<Sla> Slas { get; set; } = new List<Sla>();
 }

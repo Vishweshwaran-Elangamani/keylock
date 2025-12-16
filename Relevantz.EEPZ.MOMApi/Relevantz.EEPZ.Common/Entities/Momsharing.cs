@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Relevantz.EEPZ.Common.Entities;
 
-/// <summary>
-/// Tracks MOM sharing between employees
-/// </summary>
 public partial class Momsharing
 {
     public int SharingId { get; set; }

@@ -45,13 +45,11 @@ public partial class Sla
 
     public int ReopenCount { get; set; }
 
-    public sbyte IsAutoClosed { get; set; }
+    public bool IsAutoClosed { get; set; }
 
     public DateTime? LastNotificationSent { get; set; }
 
     public virtual Employee? AssignedToEmployee { get; set; }
-
-    public virtual Employeedetailsmaster CreatedByEmployee { get; set; } = null!;
 
     public virtual Department Department { get; set; } = null!;
 

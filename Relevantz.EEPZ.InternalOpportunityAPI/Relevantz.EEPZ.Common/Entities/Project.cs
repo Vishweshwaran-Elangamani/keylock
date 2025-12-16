@@ -11,6 +11,8 @@ public partial class Project
 
     public string? Description { get; set; }
 
+    public string? ClientName { get; set; }
+
     public string? BusinessUnit { get; set; }
 
     public string? Department { get; set; }
@@ -41,7 +43,9 @@ public partial class Project
 
     public DateTime? UpdatedAt { get; set; }
 
-    public string? ClientName { get; set; }
+    public virtual ICollection<Departmentheadapproval> Departmentheadapprovals { get; set; } = new List<Departmentheadapproval>();
+
+    public virtual ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 
     public virtual ICollection<Goal> Goals { get; set; } = new List<Goal>();
 
@@ -50,6 +54,8 @@ public partial class Project
     public virtual Employeedetailsmaster? L2approverEmployee { get; set; }
 
     public virtual ICollection<Projectemployee> Projectemployees { get; set; } = new List<Projectemployee>();
+
+    public virtual ICollection<Projectgoalfeedback> Projectgoalfeedbacks { get; set; } = new List<Projectgoalfeedback>();
 
     public virtual Employeedetailsmaster? ResourceOwnerEmployee { get; set; }
 }

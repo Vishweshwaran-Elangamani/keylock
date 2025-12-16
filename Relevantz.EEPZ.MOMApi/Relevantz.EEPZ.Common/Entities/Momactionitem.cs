@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Relevantz.EEPZ.Common.Entities;
 
-/// <summary>
-/// Stores action items/tasks assigned during meetings
-/// </summary>
 public partial class Momactionitem
 {
     public int ActionItemId { get; set; }

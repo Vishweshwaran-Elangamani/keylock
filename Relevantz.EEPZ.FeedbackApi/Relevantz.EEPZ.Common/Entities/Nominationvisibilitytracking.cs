@@ -15,7 +15,7 @@ public partial class Nominationvisibilitytracking
 
     public string? ActionTaken { get; set; }
 
-    public virtual Nomination Nomination { get; set; } = null!;
+    public virtual Recognitionstatus Nomination { get; set; } = null!;
 
     public virtual Employee ViewedByEmployee { get; set; } = null!;
 }

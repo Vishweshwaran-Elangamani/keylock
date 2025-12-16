@@ -22,4 +22,6 @@ public partial class Selfassessment
     public virtual Userauthentication Employee { get; set; } = null!;
 
     public virtual Assessmentform Form { get; set; } = null!;
+
+    public virtual ICollection<Selfassessmentattachment> Selfassessmentattachments { get; set; } = new List<Selfassessmentattachment>();
 }

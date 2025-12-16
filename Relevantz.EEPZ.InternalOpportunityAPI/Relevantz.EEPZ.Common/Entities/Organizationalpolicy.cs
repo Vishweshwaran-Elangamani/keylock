@@ -39,5 +39,9 @@ public partial class Organizationalpolicy
 
     public DateTime? UpdatedAt { get; set; }
 
+    public virtual Userauthentication CreatedByUser { get; set; } = null!;
+
     public virtual ICollection<Policyviolation> Policyviolations { get; set; } = new List<Policyviolation>();
+
+    public virtual Userauthentication? PublishedByNavigation { get; set; }
 }

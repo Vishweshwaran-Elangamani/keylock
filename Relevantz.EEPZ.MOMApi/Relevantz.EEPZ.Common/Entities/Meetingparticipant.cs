@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Relevantz.EEPZ.Common.Entities;
 
-/// <summary>
-/// Stores meeting participants with RSVP tracking
-/// </summary>
 public partial class Meetingparticipant
 {
     public int ParticipantId { get; set; }

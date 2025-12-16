@@ -6,7 +6,7 @@ namespace Relevantz.EEPZ.Common.Entities;
 public partial class Teamworkload
 {
     public int WorkloadId { get; set; }
-    
+
     public int TeamId { get; set; }
 
     public int ManagerUserId { get; set; }

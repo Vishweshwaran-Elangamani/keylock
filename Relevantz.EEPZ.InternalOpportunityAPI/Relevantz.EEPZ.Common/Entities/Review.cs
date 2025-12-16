@@ -8,7 +8,7 @@ public partial class Review
     public int ReviewId { get; set; }
 
     public int? GoalId { get; set; }
-    
+
     public string? GoalName { get; set; }
 
     public string Comments { get; set; } = null!;

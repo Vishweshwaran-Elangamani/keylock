@@ -47,6 +47,12 @@ public partial class Employeedetailsmaster
 
     public virtual ICollection<Goalprogresslog> Goalprogresslogs { get; set; } = new List<Goalprogresslog>();
 
+    public virtual ICollection<Oneononediscussion> OneononediscussionCreatedByNavigations { get; set; } = new List<Oneononediscussion>();
+
+    public virtual ICollection<Oneononediscussion> OneononediscussionHostEmployees { get; set; } = new List<Oneononediscussion>();
+
+    public virtual ICollection<Oneononediscussion> OneononediscussionParticipantEmployees { get; set; } = new List<Oneononediscussion>();
+
     public virtual ICollection<Peerfeedback> PeerfeedbackPeerEmployees { get; set; } = new List<Peerfeedback>();
 
     public virtual ICollection<Peerfeedback> PeerfeedbackSubmittedByEmployees { get; set; } = new List<Peerfeedback>();

@@ -17,6 +17,8 @@ public partial class Userprofile
 
     public string? CallingName { get; set; }
 
+    public byte[]? ProfilePhoto { get; set; }
+
     public string? ReferredBy { get; set; }
 
     public string? Gender { get; set; }

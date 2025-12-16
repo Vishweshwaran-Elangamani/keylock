@@ -32,6 +32,4 @@ public partial class Internalopportunity
     public virtual ICollection<Nomination> Nominations { get; set; } = new List<Nomination>();
 
     public virtual Userauthentication PostedByUser { get; set; } = null!;
-
-    public virtual ICollection<Recognitionstatus> Recognitionstatuses { get; set; } = new List<Recognitionstatus>();
 }

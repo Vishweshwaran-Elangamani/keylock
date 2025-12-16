@@ -81,6 +81,8 @@ public partial class Employee
 
     public virtual ICollection<Managerreviewcomment> ManagerreviewcommentTargetEmployees { get; set; } = new List<Managerreviewcomment>();
 
+    public virtual ICollection<Meetingmom> Meetingmoms { get; set; } = new List<Meetingmom>();
+
     public virtual ICollection<Meetingparticipant> Meetingparticipants { get; set; } = new List<Meetingparticipant>();
 
     public virtual ICollection<Meeting> Meetings { get; set; } = new List<Meeting>();
