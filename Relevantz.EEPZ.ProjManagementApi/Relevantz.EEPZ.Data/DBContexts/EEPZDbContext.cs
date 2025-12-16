@@ -45,8 +45,6 @@ public partial class EEPZDbContext : DbContext
 
     public virtual DbSet<Departmentheadapproval> Departmentheadapprovals { get; set; }
 
-    public virtual DbSet<Efmigrationshistory> Efmigrationshistories { get; set; }
-
     public virtual DbSet<Employee> Employees { get; set; }
 
     public virtual DbSet<Employeedetailsmaster> Employeedetailsmasters { get; set; }
@@ -183,6 +181,8 @@ public partial class EEPZDbContext : DbContext
 
     public virtual DbSet<Selfassessment> Selfassessments { get; set; }
 
+    public virtual DbSet<Selfassessmentattachment> Selfassessmentattachments { get; set; }
+
     public virtual DbSet<Sla> Slas { get; set; }
 
     public virtual DbSet<Slacompliance> Slacompliances { get; set; }
@@ -203,7 +203,7 @@ public partial class EEPZDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=localhost;database=eepzdb;uid=root;pwd=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.41-mysql"));
+        => optionsBuilder.UseMySql("server=mysql;database=EEPZDB;uid=root;pwd=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.41-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -417,6 +417,8 @@ public partial class EEPZDbContext : DbContext
 
             entity.HasIndex(e => e.AllocationType, "idx_allocation_type");
 
+            entity.HasIndex(e => e.BudgetId, "idx_budget");
+
             entity.HasIndex(e => e.DepartmentId, "idx_department");
 
             entity.Property(e => e.AllocatedAt)
@@ -426,6 +428,9 @@ public partial class EEPZDbContext : DbContext
             entity.Property(e => e.Amount).HasPrecision(15, 2);
             entity.Property(e => e.GoalStatus).HasMaxLength(100);
             entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.Period)
+                .HasMaxLength(10)
+                .HasComment("Q1, Q2, Q3, Q4");
             entity.Property(e => e.UpdatedAt)
                 .ValueGeneratedOnAddOrUpdate()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -441,6 +446,10 @@ public partial class EEPZDbContext : DbContext
                 .HasForeignKey(d => d.AllocatedByUserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("budgetallocations_ibfk_3");
+
+            entity.HasOne(d => d.Budget).WithMany(p => p.Budgetallocations)
+                .HasForeignKey(d => d.BudgetId)
+                .HasConstraintName("budgetallocations_ibfk_4");
 
             entity.HasOne(d => d.Department).WithMany(p => p.Budgetallocations)
                 .HasForeignKey(d => d.DepartmentId)
@@ -522,6 +531,7 @@ public partial class EEPZDbContext : DbContext
 
             entity.Property(e => e.AdminRemarks).HasMaxLength(500);
             entity.Property(e => e.ChangeType).HasMaxLength(50);
+            entity.Property(e => e.CurrentPassword).HasMaxLength(255);
             entity.Property(e => e.CurrentValue).HasMaxLength(500);
             entity.Property(e => e.NewEmail).HasMaxLength(255);
             entity.Property(e => e.NewEmployeeCompanyId).HasMaxLength(50);
@@ -654,18 +664,6 @@ public partial class EEPZDbContext : DbContext
             entity.HasOne(d => d.Project).WithMany(p => p.Departmentheadapprovals)
                 .HasForeignKey(d => d.ProjectId)
                 .HasConstraintName("departmentheadapprovals_ibfk_2");
-        });
-
-        modelBuilder.Entity<Efmigrationshistory>(entity =>
-        {
-            entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
-
-            entity
-                .ToTable("__efmigrationshistory")
-                .UseCollation("utf8mb4_0900_ai_ci");
-
-            entity.Property(e => e.MigrationId).HasMaxLength(150);
-            entity.Property(e => e.ProductVersion).HasMaxLength(32);
         });
 
         modelBuilder.Entity<Employee>(entity =>
@@ -2157,15 +2155,46 @@ public partial class EEPZDbContext : DbContext
 
             entity.HasIndex(e => e.NominatedByUserId, "NominatedByUserId");
 
-            entity.HasIndex(e => e.NomineeUserId, "NomineeUserId");
-
             entity.HasIndex(e => e.ReviewedByUserId, "ReviewedByUserId");
+
+            entity.HasIndex(e => new { e.CurrentApprovalLevel, e.Status }, "idx_approval_level");
+
+            entity.HasIndex(e => new { e.DeptHeadUserId, e.CurrentApprovalLevel, e.Status }, "idx_depthead");
+
+            entity.HasIndex(e => new { e.L1managerUserId, e.CurrentApprovalLevel, e.Status }, "idx_l1_manager");
+
+            entity.HasIndex(e => new { e.L2managerUserId, e.CurrentApprovalLevel, e.Status }, "idx_l2_manager");
+
+            entity.HasIndex(e => e.NomineeUserId, "idx_nominee");
 
             entity.HasIndex(e => e.OpportunityId, "idx_opportunity");
 
             entity.HasIndex(e => e.Status, "idx_status");
 
+            entity.Property(e => e.DeptHeadReviewRemarks).HasMaxLength(500);
+            entity.Property(e => e.DeptHeadReviewedAt).HasColumnType("datetime");
+            entity.Property(e => e.DeptHeadStatus).HasMaxLength(20);
             entity.Property(e => e.Justification).HasColumnType("text");
+            entity.Property(e => e.L1managerUserId).HasColumnName("L1ManagerUserId");
+            entity.Property(e => e.L1reviewRemarks)
+                .HasMaxLength(500)
+                .HasColumnName("L1ReviewRemarks");
+            entity.Property(e => e.L1reviewedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("L1ReviewedAt");
+            entity.Property(e => e.L1status)
+                .HasMaxLength(20)
+                .HasColumnName("L1Status");
+            entity.Property(e => e.L2managerUserId).HasColumnName("L2ManagerUserId");
+            entity.Property(e => e.L2reviewRemarks)
+                .HasMaxLength(500)
+                .HasColumnName("L2ReviewRemarks");
+            entity.Property(e => e.L2reviewedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("L2ReviewedAt");
+            entity.Property(e => e.L2status)
+                .HasMaxLength(20)
+                .HasColumnName("L2Status");
             entity.Property(e => e.NominationType).HasMaxLength(20);
             entity.Property(e => e.ReviewRemarks).HasMaxLength(500);
             entity.Property(e => e.ReviewedAt).HasColumnType("datetime");
@@ -2173,6 +2202,21 @@ public partial class EEPZDbContext : DbContext
             entity.Property(e => e.SubmittedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
+
+            entity.HasOne(d => d.DeptHeadUser).WithMany(p => p.NominationDeptHeadUsers)
+                .HasForeignKey(d => d.DeptHeadUserId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("nominations_ibfk_6");
+
+            entity.HasOne(d => d.L1managerUser).WithMany(p => p.NominationL1managerUsers)
+                .HasForeignKey(d => d.L1managerUserId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("nominations_ibfk_4");
+
+            entity.HasOne(d => d.L2managerUser).WithMany(p => p.NominationL2managerUsers)
+                .HasForeignKey(d => d.L2managerUserId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("nominations_ibfk_5");
 
             entity.HasOne(d => d.NominatedByUser).WithMany(p => p.NominationNominatedByUsers)
                 .HasForeignKey(d => d.NominatedByUserId)
@@ -2189,7 +2233,7 @@ public partial class EEPZDbContext : DbContext
             entity.HasOne(d => d.ReviewedByUser).WithMany(p => p.NominationReviewedByUsers)
                 .HasForeignKey(d => d.ReviewedByUserId)
                 .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("nominations_ibfk_4");
+                .HasConstraintName("nominations_ibfk_7");
         });
 
         modelBuilder.Entity<Nominationparameter>(entity =>
@@ -3125,6 +3169,8 @@ public partial class EEPZDbContext : DbContext
 
             entity.HasIndex(e => e.RewardCategory, "idx_category");
 
+            entity.HasIndex(e => e.IsVisibleForManagerNomination, "idx_manager_visible");
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
@@ -3226,6 +3272,58 @@ public partial class EEPZDbContext : DbContext
             entity.HasOne(d => d.Form).WithMany(p => p.Selfassessments)
                 .HasForeignKey(d => d.FormId)
                 .HasConstraintName("selfassessment_ibfk_1");
+        });
+
+        modelBuilder.Entity<Selfassessmentattachment>(entity =>
+        {
+            entity.HasKey(e => e.AttachmentId).HasName("PRIMARY");
+
+            entity.ToTable("selfassessmentattachment");
+
+            entity.HasIndex(e => e.AssessmentId, "idx_assessment");
+
+            entity.HasIndex(e => e.UploadedAt, "idx_uploaded_at");
+
+            entity.HasIndex(e => e.UploadedBy, "idx_uploaded_by");
+
+            entity.Property(e => e.AttachmentId).HasColumnName("attachment_id");
+            entity.Property(e => e.AssessmentId).HasColumnName("assessment_id");
+            entity.Property(e => e.AttachmentNote)
+                .HasMaxLength(1000)
+                .HasColumnName("attachment_note");
+            entity.Property(e => e.DisplayOrder)
+                .HasDefaultValueSql("'0'")
+                .HasColumnName("display_order");
+            entity.Property(e => e.FileName)
+                .HasMaxLength(255)
+                .HasColumnName("file_name");
+            entity.Property(e => e.FilePath)
+                .HasMaxLength(1000)
+                .HasColumnName("file_path");
+            entity.Property(e => e.FileSize).HasColumnName("file_size");
+            entity.Property(e => e.FileType)
+                .HasMaxLength(100)
+                .HasColumnName("file_type");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UploadedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("uploaded_at");
+            entity.Property(e => e.UploadedBy).HasColumnName("uploaded_by");
+
+            entity.HasOne(d => d.Assessment).WithMany(p => p.Selfassessmentattachments)
+                .HasForeignKey(d => d.AssessmentId)
+                .HasConstraintName("selfassessmentattachment_ibfk_1");
+
+            entity.HasOne(d => d.UploadedByNavigation).WithMany(p => p.Selfassessmentattachments)
+                .HasPrincipalKey(p => p.EmployeeId)
+                .HasForeignKey(d => d.UploadedBy)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("selfassessmentattachment_ibfk_2");
         });
 
         modelBuilder.Entity<Sla>(entity =>
