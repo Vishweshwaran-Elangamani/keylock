@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import momService from '../../../services/meeting/momService';
 import toastr from 'toastr';
@@ -48,17 +47,32 @@ const SharedMomsModal = ({ onClose }) => {
   return (
     <>
       <div 
-        className="modal fade show d-block" 
-        tabIndex="-1" 
-        style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} 
+        style={{ 
+          backgroundColor: 'rgba(0,0,0,0.5)', 
+          backdropFilter: 'blur(4px)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }} 
         onClick={onClose}
       >
         <div 
-          className="modal-dialog modal-dialog-scrollable modal-xl modal-dialog-centered" 
+          style={{
+            width: '90%',
+            maxWidth: '600px',
+            maxHeight: '85vh',
+            position: 'relative'
+          }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-            {/*  UPDATED: Dark purple header with white text */}
+          <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '12px', maxWidth:'1500px',overflow: 'hidden' }}>
+            {/* Header */}
             <div 
               className="modal-header border-0" 
               style={{ 
@@ -71,7 +85,7 @@ const SharedMomsModal = ({ onClose }) => {
                 <h5 className="modal-title fw-bold mb-3" style={{ color: 'white', fontSize: '1.25rem', textAlign: 'left' }}>
                   Shared MOMs
                 </h5>
-                {/* UPDATED: Tab navigation with updated styling */}
+                {/* Tab navigation */}
                 <ul className="nav nav-pills">
                   <li className="nav-item">
                     <button 
@@ -114,8 +128,15 @@ const SharedMomsModal = ({ onClose }) => {
               ></button>
             </div>
 
-            {/* UPDATED: Body with left-aligned content */}
-            <div className="modal-body p-0" style={{ textAlign: 'left' }}>
+            {/* Body */}
+            <div 
+              className="modal-body p-0" 
+              style={{ 
+                textAlign: 'left', 
+                maxHeight: 'calc(85vh - 200px)', 
+                overflowY: 'auto' 
+              }}
+            >
               {loading ? (
                 <div className="text-center py-5">
                   <div className="spinner-border text-primary" role="status">
@@ -138,7 +159,7 @@ const SharedMomsModal = ({ onClose }) => {
               ) : (
                 <div className="table-responsive">
                   <table className="table table-hover mb-0">
-                    {/* UPDATED: Left-aligned table headers */}
+                    {/* Table headers */}
                     <thead style={{ backgroundColor: '#f8f9fa', position: 'sticky', top: 0, zIndex: 1 }}>
                       <tr style={{ textAlign: 'left' }}>
                         <th className="px-4 py-3 fw-semibold" style={{ textAlign: 'left' }}>Meeting Title</th>
@@ -150,7 +171,7 @@ const SharedMomsModal = ({ onClose }) => {
                         <th className="px-4 py-3 fw-semibold text-center">Actions</th>
                       </tr>
                     </thead>
-                    {/*  UPDATED: Left-aligned table body */}
+                    {/* Table body */}
                     <tbody>
                       {currentMoms.map((mom, index) => (
                         <tr 
@@ -208,7 +229,7 @@ const SharedMomsModal = ({ onClose }) => {
               )}
             </div>
 
-            {/*UPDATED: Footer with consistent styling */}
+            {/* Footer */}
             <div 
               className="modal-footer border-0" 
               style={{ 
@@ -232,16 +253,31 @@ const SharedMomsModal = ({ onClose }) => {
         </div>
       </div>
 
-      {/* UNCHANGED: Nested MOM Details Modal */}
+      {/* Nested MOM Details Modal */}
       {selectedMom && (
         <div 
-          className="modal fade show d-block" 
-          tabIndex="-1" 
-          style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1060, backdropFilter: 'blur(6px)' }} 
+          style={{ 
+            backgroundColor: 'rgba(0,0,0,0.7)', 
+            zIndex: 10000, 
+            backdropFilter: 'blur(6px)',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }} 
           onClick={() => setSelectedMom(null)}
         >
           <div 
-            className="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered" 
+            style={{
+              width: '90%',
+              maxWidth: '900px',
+              maxHeight: '90vh',
+              position: 'relative'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <MomDetailsView mom={selectedMom} onClose={() => setSelectedMom(null)} />

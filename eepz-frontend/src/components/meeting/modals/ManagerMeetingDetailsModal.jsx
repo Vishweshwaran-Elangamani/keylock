@@ -1,251 +1,257 @@
-
-import React, { useState } from 'react';
-
-import MomDetailsView from './MomDetailsView';
+import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom';
 
 const ManagerMeetingDetailsModal = ({ meeting, onClose }) => {
-
-  const [showMomDetails, setShowMomDetails] = useState(false);
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   if (!meeting) return null;
 
   const formatDateTime = (isoString) => {
-
     if (!isoString) return "-";
-
     const date = new Date(isoString);
-
     const dd = String(date.getDate()).padStart(2, "0");
-
     const mm = String(date.getMonth() + 1).padStart(2, "0");
-
     const yyyy = date.getFullYear();
-
     const hh = String(date.getHours()).padStart(2, "0");
-
     const min = String(date.getMinutes()).padStart(2, "0");
-
     return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
-
   };
 
   const countAccepted = meeting.rsvpParticipants?.filter((p) => p.rsvpStatus === "Accepted").length || 0;
-
   const totalParticipants = meeting.rsvpParticipants?.length || 0;
 
-  return (
-    <>
+  const modalContent = (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(4px)',
+        zIndex: 10000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        overflowY: 'auto'
+      }}
+      onClick={onClose}
+    >
       <div
-
-        className="modal fade show d-block"
-
-        tabIndex="-1"
-
-        style={{ backgroundColor: "rgba(0,0,0,0.5)", backdropFilter: 'blur(4px)' }}
-
-        onClick={onClose}
+        style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          maxWidth: '600px',
+          width: '100%',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+          maxHeight: '90vh',
+          overflowY: 'auto'
+        }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div
+        {/* Header */}
+        <div style={{ padding: '1.5rem', borderBottom: '1px solid #e5e7eb', position: 'relative' }}>
+          <h5 style={{ margin: 0, fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+            {meeting.meetingTitle}
+          </h5>
+          <p style={{ margin: 0, color: '#6b7280', fontSize: '0.875rem' }}>
+            <i className="bi bi-calendar3" style={{ marginRight: '0.5rem' }}></i>
+            {formatDateTime(meeting.meetingDate)}
+          </p>
+          <button
+            onClick={onClose}
+            style={{
+              position: 'absolute',
+              top: '1.5rem',
+              right: '1.5rem',
+              background: 'none',
+              border: 'none',
+              fontSize: '1.5rem',
+              cursor: 'pointer',
+              color: '#6b7280',
+              padding: 0,
+              lineHeight: 1
+            }}
+          >
+            ×
+          </button>
+        </div>
 
-          className="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
-
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px' }}>
-            <div className="modal-header border-0 pb-0" style={{ padding: '1.5rem 1.5rem 1rem' }}>
-              <div>
-                <h5 className="modal-title fw-bold mb-2">{meeting.meetingTitle}</h5>
-                <p className="text-muted small mb-0">
-                  <i className="bi bi-calendar3 me-1"></i>
-
-                  {formatDateTime(meeting.meetingDate)}
-                </p>
+        {/* Body */}
+        <div style={{ padding: '1.5rem' }}>
+          {/* Attendance Stats */}
+          <div style={{ backgroundColor: '#f9fafb', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Accepted</div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#10b981' }}>{countAccepted}</div>
               </div>
-              <button
-
-                type="button"
-
-                className="btn-close"
-
-                onClick={onClose}
-              ></button>
-            </div>
-            <div className="modal-body" style={{ padding: '1rem 1.5rem' }}>
-
-              {/* Attendance Stats */}
-              <div className="card bg-light border-0 mb-4">
-                <div className="card-body p-3">
-                  <div className="row g-3">
-                    <div className="col-6">
-                      <div className="text-muted small mb-1">Accepted</div>
-                      <div className="fs-4 fw-bold text-success">{countAccepted}</div>
-                    </div>
-                    <div className="col-6">
-                      <div className="text-muted small mb-1">Total Invited</div>
-                      <div className="fs-4 fw-bold text-primary">{totalParticipants}</div>
-                    </div>
-                  </div>
-                  <div className="progress mt-3" style={{ height: "8px" }}>
-                    <div
-
-                      className="progress-bar bg-success"
-
-                      role="progressbar"
-
-                      style={{
-
-                        width: `${totalParticipants > 0
-
-                            ? (countAccepted / totalParticipants) * 100
-
-                            : 0
-
-                          }%`,
-
-                      }}
-                    ></div>
-                  </div>
-                </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Total Invited</div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#3b82f6' }}>{totalParticipants}</div>
               </div>
-
-              {/* Meeting Details */}
-
-              {meeting.meetingLink && (
-                <div className="mb-4">
-                  <div className="p-3 rounded" style={{ backgroundColor: '#e3f2fd', border: '1px solid #bbdefb' }}>
-                    <div className="d-flex align-items-center gap-2 mb-2">
-                      <i className="bi bi-link-45deg text-primary"></i>
-                      <small className="text-muted fw-semibold">Meeting Link</small>
-                    </div>
-                    <a
-
-                      href={meeting.meetingLink}
-
-                      target="_blank"
-
-                      rel="noreferrer"
-
-                      className="text-primary text-decoration-none d-flex align-items-center gap-2 fw-medium"
-                    >
-                      Join Meeting <i className="bi bi-box-arrow-up-right small"></i>
-                    </a>
-                  </div>
-                </div>
-
-              )}
-
-              {/* Participants List */}
-              <h6 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-                <i className="bi bi-people text-primary"></i>
-
-                Participants
-
-                {totalParticipants > 0 && (
-                  <span className="badge bg-light text-dark">{totalParticipants}</span>
-
-                )}
-              </h6>
-
-              {meeting.rsvpParticipants?.length === 0 ? (
-                <div className="alert alert-info d-flex align-items-center gap-2">
-                  <i className="bi bi-info-circle"></i>
-
-                  No participants found
-                </div>
-
-              ) : (
-                <div className="d-flex flex-column gap-2">
-
-                  {meeting.rsvpParticipants?.map((p) => (
-                    <div
-
-                      key={p.participantId}
-
-                      className="p-3 rounded"
-
-                      style={{ backgroundColor: '#f8f9fa', border: '1px solid #e9ecef' }}
-                    >
-                      <div className="d-flex justify-content-between align-items-start">
-                        <div className="flex-grow-1">
-                          <div className="fw-semibold mb-1">{p.employeeName}</div>
-
-                          {p.rsvpComments && (
-                            <small className="text-muted d-flex align-items-center gap-1">
-                              <i className="bi bi-chat-dots"></i>
-
-                              {p.rsvpComments}
-                            </small>
-
-                          )}
-                        </div>
-                        <span
-
-                          className={`badge ${p.rsvpStatus === "Accepted"
-
-                              ? "bg-success"
-
-                              : p.rsvpStatus === "Declined"
-
-                                ? "bg-danger"
-
-                                : "bg-warning text-dark"
-
-                            }`}
-                        >
-
-                          {p.rsvpStatus}
-                        </span>
-                      </div>
-                    </div>
-
-                  ))}
-                </div>
-
-              )}
             </div>
-            <div className="modal-footer border-0 bg-light" style={{ padding: '1rem 1.5rem' }}>
-              <button
-
-                className="btn btn-secondary px-4"
-
-                onClick={onClose}
-              >
-
-                Close
-              </button>
-             
+            <div style={{ height: '8px', backgroundColor: '#e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
+              <div
+                style={{
+                  height: '100%',
+                  backgroundColor: '#10b981',
+                  width: `${totalParticipants > 0 ? (countAccepted / totalParticipants) * 100 : 0}%`,
+                  transition: 'width 0.3s ease'
+                }}
+              ></div>
             </div>
           </div>
+
+          {/* Meeting Link */}
+          {meeting.meetingLink && (
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ backgroundColor: '#e3f2fd', border: '1px solid #bbdefb', padding: '1rem', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <i className="bi bi-link-45deg" style={{ color: '#3b82f6' }}></i>
+                  <small style={{ color: '#6b7280', fontWeight: 600 }}>Meeting Link</small>
+                </div>
+                <a
+                  href={meeting.meetingLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    color: '#3b82f6',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontWeight: 500
+                  }}
+                >
+                  Join Meeting <i className="bi bi-box-arrow-up-right" style={{ fontSize: '0.875rem' }}></i>
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Participants */}
+          <h6 style={{ fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <i className="bi bi-people" style={{ color: '#3b82f6' }}></i>
+            Participants
+            {totalParticipants > 0 && (
+              <span style={{
+                backgroundColor: '#f3f4f6',
+                color: '#1f2937',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '9999px',
+                fontSize: '0.75rem',
+                fontWeight: 600
+              }}>
+                {totalParticipants}
+              </span>
+            )}
+          </h6>
+
+          {meeting.rsvpParticipants?.length === 0 ? (
+            <div style={{
+              backgroundColor: '#dbeafe',
+              color: '#1e40af',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <i className="bi bi-info-circle"></i>
+              No participants found
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {meeting.rsvpParticipants?.map((p) => (
+                <div
+                  key={p.participantId}
+                  style={{
+                    backgroundColor: '#f9fafb',
+                    border: '1px solid #e5e7eb',
+                    padding: '0.75rem',
+                    borderRadius: '8px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{p.employeeName}</div>
+                      {p.rsvpComments && (
+                        <small style={{
+                          color: '#6b7280',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.25rem'
+                        }}>
+                          <i className="bi bi-chat-dots"></i>
+                          {p.rsvpComments}
+                        </small>
+                      )}
+                    </div>
+                    <span
+                      style={{
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '9999px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        backgroundColor:
+                          p.rsvpStatus === "Accepted"
+                            ? "#10b981"
+                            : p.rsvpStatus === "Declined"
+                            ? "#ef4444"
+                            : "#f59e0b",
+                        color: p.rsvpStatus === "Pending" ? "#000" : "#fff"
+                      }}
+                    >
+                      {p.rsvpStatus}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          backgroundColor: '#f9fafb',
+          padding: '1rem 1.5rem',
+          borderTop: '1px solid #e5e7eb',
+          borderRadius: '0 0 12px 12px',
+          display: 'flex',
+          justifyContent: 'flex-end'
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              backgroundColor: '#6b7280',
+              color: 'white',
+              border: 'none',
+              padding: '0.5rem 1.5rem',
+              borderRadius: '8px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'background-color 0.2s'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#4b5563'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#6b7280'}
+          >
+            Close
+          </button>
         </div>
       </div>
-
-      {showMomDetails && (
-        <div
-
-          className="modal fade show d-block"
-
-          tabIndex="-1"
-
-          style={{ backgroundColor: "rgba(0,0,0,0.5)", backdropFilter: 'blur(4px)' }}
-
-          onClick={() => setShowMomDetails(false)}
-        >
-          <div
-
-            className="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
-
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MomDetailsView mom={meeting} onClose={() => setShowMomDetails(false)} />
-          </div>
-        </div>
-
-      )}
-    </>
-
+    </div>
   );
 
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 export default ManagerMeetingDetailsModal;
-

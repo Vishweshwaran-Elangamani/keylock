@@ -189,7 +189,6 @@ const MyMomsList = () => {
     });
   };
 
-  // Filter employees based on search
   const filteredEmployees = employees.filter((emp) =>
     `${emp.firstName} ${emp.lastName} ${emp.email} ${emp.departmentName}`
       .toLowerCase()
@@ -218,113 +217,111 @@ const MyMomsList = () => {
       <div className="row justify-content-center">
         <div className="col-12 col-xl-11">
           {/* Breadcrumb Navigation */}
-          {/* Breadcrumb Navigation */}
-      <nav aria-label="breadcrumb" className="mb-3">
-        <ol
-          className="breadcrumb mb-0 d-flex align-items-center"
-          style={{
-            backgroundColor: "transparent",
-            padding: 0,
-            margin: 0,
-          }}
-        >
-          <li
-            className="breadcrumb-item"
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            <button
-              onClick={() => navigate("/employee/dashboard")}
+          <nav aria-label="breadcrumb" className="mb-3">
+            <ol
+              className="breadcrumb mb-0 d-flex align-items-center"
               style={{
-                background: "none",
-                border: "none",
-                color: "#97247E",
-                cursor: "pointer",
+                backgroundColor: "transparent",
                 padding: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
-            >
-              <i className="bi bi-house-door" style={{ fontSize: '1rem' }}></i>
-              Dashboard
-            </button>
-          </li>
-           <li
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "#97247E",
-              margin: "0 8px",
-              fontSize: "1rem",
-            }}
-          >
-            /
-          </li>
-          
-          <li
-            className="breadcrumb-item"
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            <button
-              onClick={() => navigate("/employee/dashboard/meetmom")}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#97247E",
-                cursor: "pointer",
-                padding: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                textDecoration: "none",
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
-            >
-             
-              Meetings and MoM
-            </button>
-          </li>
-          <li
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "#97247E",
-              margin: "0 8px",
-              fontSize: "1rem",
-            }}
-          >
-            /
-          </li>
-          <li
-            className="breadcrumb-item active"
-            aria-current="page"
-            style={{
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <span
-              style={{
-                color: "#1e293b",
-                fontSize: "0.875rem",
-                fontWeight: 600,
+                margin: 0,
               }}
             >
-              My MoMs
-            </span>
-          </li>
-        </ol>
-      </nav>
+              <li
+                className="breadcrumb-item"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <button
+                  onClick={() => navigate("/employee/dashboard")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                >
+                  <i className="bi bi-house-door" style={{ fontSize: '1rem' }}></i>
+                  Dashboard
+                </button>
+              </li>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#97247E",
+                  margin: "0 8px",
+                  fontSize: "1rem",
+                }}
+              >
+                /
+              </li>
+              
+              <li
+                className="breadcrumb-item"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <button
+                  onClick={() => navigate("/employee/dashboard/meetmom")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#97247E",
+                    cursor: "pointer",
+                    padding: 0,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
+                >
+                  Meetings and MoM
+                </button>
+              </li>
+              <li
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "#97247E",
+                  margin: "0 8px",
+                  fontSize: "1rem",
+                }}
+              >
+                /
+              </li>
+              <li
+                className="breadcrumb-item active"
+                aria-current="page"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span
+                  style={{
+                    color: "#1e293b",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                  }}
+                >
+                  My MoMs
+                </span>
+              </li>
+            </ol>
+          </nav>
 
           {/* MOMs Count Badge */}
           {moms.length > 0 && (
@@ -402,7 +399,7 @@ const MyMomsList = () => {
                                 <div>
                                   <div
                                     className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem" ,textAlign: "left" }}
+                                    style={{ fontSize: "0.8rem", textAlign: "left" }}
                                   >
                                     Meeting Date
                                   </div>
@@ -429,7 +426,7 @@ const MyMomsList = () => {
                                 <div>
                                   <div
                                     className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem",textAlign: "left"  }}
+                                    style={{ fontSize: "0.8rem", textAlign: "left" }}
                                   >
                                     Attendees
                                   </div>
@@ -456,7 +453,7 @@ const MyMomsList = () => {
                                 <div>
                                   <div
                                     className="text-muted fw-medium"
-                                    style={{ fontSize: "0.8rem" ,textAlign: "left" }}
+                                    style={{ fontSize: "0.8rem", textAlign: "left" }}
                                   >
                                     Submitted by
                                   </div>
@@ -524,16 +521,30 @@ const MyMomsList = () => {
           {/* Share Modal */}
           {showShareModal && shareModalMom && (
             <div
-              className="modal fade show d-block"
+              className="modal fade show d-block modal-centered-custom"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              style={{
+                backgroundColor: "rgba(0,0,0,0.5)",
+              }}
               onClick={closeShareModal}
             >
               <div
                 className="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="modal-content border-0 shadow">
+                
+<div
+  className="modal-content border-0 shadow"
+  style={{
+    borderRadius: '12px',
+    overflow: 'hidden',
+    width: '150%',
+    maxWidth: '1000px', // Increased from 560px to 800px
+    margin: '0 auto',  // Keeps it centered horizontally
+    backgroundColor: '#fff'
+  }}
+>
+
                   <div className="modal-header">
                     <div>
                       <h5 className="modal-title fw-bold mb-1">Share MOM</h5>
@@ -608,7 +619,7 @@ const MyMomsList = () => {
                                   toggleEmployeeSelection(employee.employeeId)
                                 }
                               />
-                             <div className="flex-grow-1" style={{ textAlign: "left" }}>
+                              <div className="flex-grow-1" style={{ textAlign: "left" }}>
                                 <div className="fw-semibold">
                                   {employee.firstName} {employee.lastName}
                                 </div>
@@ -638,7 +649,7 @@ const MyMomsList = () => {
                       disabled={
                         selectedEmployees.length === 0 || sharingLoading
                       }
-                      style={{ 
+                      style={{
                         background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
                         color: '#fff',
                         border: 'none',
@@ -667,12 +678,14 @@ const MyMomsList = () => {
             </div>
           )}
 
-          {/* MOM Details Modal - Left Aligned */}
+          {/* MOM Details Modal */}
           {selectedMom && (
             <div
-              className="modal fade show d-block"
+              className="modal fade show d-block modal-centered-custom"
               tabIndex="-1"
-              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+              style={{
+                backgroundColor: "rgba(0,0,0,0.5)",
+              }}
               onClick={closeMomDetails}
             >
               <div
@@ -895,7 +908,7 @@ const MyMomsList = () => {
                           closeMomDetails();
                           navigate(`/mom/edit/${selectedMom.momId}`);
                         }}
-                        style={{ 
+                        style={{
                           background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
                           color: '#fff',
                           border: 'none',
@@ -928,6 +941,17 @@ const MyMomsList = () => {
       <style>{`
         .breadcrumb-item + .breadcrumb-item::before {
           display: none;
+        }
+        
+        /* Center Modal Fix */
+        .modal-centered-custom {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        
+        .modal-centered-custom .modal-dialog {
+          margin: 0 !important;
         }
       `}</style>
     </div>
