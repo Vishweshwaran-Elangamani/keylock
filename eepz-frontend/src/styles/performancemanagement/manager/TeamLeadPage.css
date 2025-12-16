@@ -202,7 +202,7 @@ body { font-family: 'Segoe UI', 'Roboto', sans-serif; color: var(--text); backgr
   cursor: pointer;
 }
  
-.cg-bulk-btn:hover,
+
 .cg-bulk-btn:focus {
   background: var(--action-grad) !important;
   color: #fff !important;

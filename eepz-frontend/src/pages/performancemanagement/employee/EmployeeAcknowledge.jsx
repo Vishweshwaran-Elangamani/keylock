@@ -1,42 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   getPendingAcknowledgments,
   acknowledgeRating,
 } from "../../../services/performancemanagement/hr/api";
 import { Toaster, toast } from "sonner";
- 
+
 const THEME = {
   primary: "#27235C",
   secondary: "#AC5098",
-  accent: "#3B4B8C",
-  background: "#F3F4F6",
+  accent: "#27235C",
+  background: "#F8F9FA",
   card: "#FFFFFF",
   text: "#111827",
   textLight: "#6B7280",
-  border: "#E5E7EB",
+  border: "#27235C",
   success: "#10B981",
   warning: "#F59E0B",
   danger: "#EF4444",
 };
- 
+
 export default function EmployeeAcknowledgment() {
+  const navigate = useNavigate();
   const [pendingRatings, setPendingRatings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [expandedRatingId, setExpandedRatingId] = useState(null);
   const [acknowledgingId, setAcknowledgingId] = useState(null);
   const [comments, setComments] = useState({});
- 
-  // for hover effects (futuristic)
+
   const [hoveredCardId, setHoveredCardId] = useState(null);
   const [hoveredViewBtnId, setHoveredViewBtnId] = useState(null);
   const [hoveredAckBtnId, setHoveredAckBtnId] = useState(null);
- 
+
   useEffect(() => {
     fetchPendingAcknowledgments();
   }, []);
- 
+
   const fetchPendingAcknowledgments = async () => {
     setLoading(true);
     setError(null);
@@ -55,22 +55,22 @@ export default function EmployeeAcknowledgment() {
       setLoading(false);
     }
   };
- 
+
   const handleAcknowledge = async (approvalId) => {
     const comment = comments[approvalId];
- 
+
     if (!comment || comment.trim().length < 10) {
       toast.error("Please provide at least 10 characters in your comments");
       return;
     }
- 
+
     setAcknowledgingId(approvalId);
     try {
       const res = await acknowledgeRating({
         ApprovalId: approvalId,
         Comments: comment.trim(),
       });
- 
+
       if (res.data.success) {
         toast.success("Rating acknowledged successfully!");
         setPendingRatings((prev) =>
@@ -93,18 +93,18 @@ export default function EmployeeAcknowledgment() {
       setAcknowledgingId(null);
     }
   };
- 
+
   const toggleDetails = (approvalId) => {
     setExpandedRatingId((prev) => (prev === approvalId ? null : approvalId));
   };
- 
+
   const handleCommentChange = (approvalId, value) => {
     setComments((prev) => ({
       ...prev,
       [approvalId]: value,
     }));
   };
- 
+
   const getAvgRating = (competencies, key) => {
     if (!competencies || competencies.length === 0) return "-";
     const vals = competencies
@@ -114,36 +114,77 @@ export default function EmployeeAcknowledgment() {
     const total = vals.reduce((a, b) => a + b, 0);
     return (total / vals.length).toFixed(2);
   };
- 
-  const Breadcrumbs = () => (
-    <nav style={breadcrumbStyles.wrapper} aria-label="breadcrumb">
-      <div style={breadcrumbStyles.inner}>
-        <Link to="/employee/dashboard" style={breadcrumbStyles.link}>
-          <i className="bi bi-house-door" style={{ fontSize: 12 }}></i>
-        </Link>
-        <span style={breadcrumbStyles.sep}>›</span>
-        <span
-          style={{
-            ...breadcrumbStyles.current,
-            fontSize: 12,
-            fontWeight: 600,
-            color: "#7C3AED",
-          }}
-        >
-          Performance Rating Acknowledgment
-        </span>
-      </div>
-    </nav>
-  );
- 
+
+  const breadcrumbItems = [
+    { label: "Performance Rating Acknowledgment", path: null }
+  ];
+
   return (
-    <div style={{ ...styles.container, ...styles.pageWrapper }}>
+    <div style={styles.container}>
       <Toaster position="top-right" duration={3000} />
- 
-      <div style={styles.breadcrumbWrapper}>
-        <Breadcrumbs />
-      </div>
- 
+
+      {/* Breadcrumb Navigation */}
+      <nav
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.25rem',
+          marginBottom: '1.5rem',
+          fontSize: '0.875rem',
+          color: '#6c757d',
+          flexWrap: 'wrap'
+        }}
+      >
+        <i 
+          className="bi bi-house-door"
+          style={{ 
+            cursor: 'pointer', 
+            color: '#97247E', 
+            fontSize: '1rem',
+            flexShrink: 0 
+          }}
+          onClick={() => navigate("/employee/dashboard")}
+          title="Go Back"
+        />
+        
+        {breadcrumbItems.map((item, index) => (
+          <div
+            key={index}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem'
+            }}
+          >
+            <span style={{ color: '#6c757d', fontSize: '0.875rem' }}>/</span>
+            {item.path ? (
+              <span
+                onClick={() => navigate(item.path)}
+                style={{
+                  cursor: 'pointer',
+                  color: '#97247E',
+                  fontWeight: index === breadcrumbItems.length - 1 ? '600' : '400',
+                  transition: 'color 0.2s'
+                }}
+                onMouseEnter={(e) => (e.target.style.textDecoration = 'underline')}
+                onMouseLeave={(e) => (e.target.style.textDecoration = 'none')}
+              >
+                {item.label}
+              </span>
+            ) : (
+              <span
+                style={{
+                  fontWeight: '600',
+                  color: '#212529'
+                }}
+              >
+                {item.label}
+              </span>
+            )}
+          </div>
+        ))}
+      </nav>
+
       {loading && (
         <div style={styles.loadingCard}>
           <p style={{ margin: 0, color: THEME.textLight }}>
@@ -151,13 +192,13 @@ export default function EmployeeAcknowledgment() {
           </p>
         </div>
       )}
- 
+
       {error && (
         <div style={styles.errorCard}>
           <p style={{ margin: 0 }}>{error}</p>
         </div>
       )}
- 
+
       {!loading && !error && (
         <>
           {pendingRatings.length === 0 ? (
@@ -173,13 +214,12 @@ export default function EmployeeAcknowledgment() {
                 const isCardHovered = hoveredCardId === rating.approvalId;
                 const isViewHovered = hoveredViewBtnId === rating.approvalId;
                 const isAckHovered = hoveredAckBtnId === rating.approvalId;
- 
+
                 return (
                   <div
                     key={rating.approvalId}
                     style={{
                       ...styles.ratingCard,
-                      ...styles.compactCard,
                       ...(isCardHovered ? styles.ratingCardHover : {}),
                     }}
                     onMouseEnter={() => setHoveredCardId(rating.approvalId)}
@@ -187,7 +227,7 @@ export default function EmployeeAcknowledgment() {
                   >
                     {/* Accent bar */}
                     <div style={styles.cardAccentBar} />
- 
+
                     {/* Header */}
                     <div style={styles.cardHeader}>
                       <div>
@@ -205,10 +245,10 @@ export default function EmployeeAcknowledgment() {
                           })}
                         </p>
                       </div>
- 
+
                       <span style={styles.statusBadge}>Pending</span>
                     </div>
- 
+
                     {/* Summary chips */}
                     <div style={styles.summarySection}>
                       <div style={styles.summaryItem}>
@@ -233,8 +273,8 @@ export default function EmployeeAcknowledgment() {
                         </span>
                       </div>
                     </div>
- 
-                    {/* View details button (right aligned) */}
+
+                    {/* View details button */}
                     <div style={styles.actionsRowTop}>
                       <button
                         onClick={() => toggleDetails(rating.approvalId)}
@@ -252,7 +292,7 @@ export default function EmployeeAcknowledgment() {
                           : "View Details"}
                       </button>
                     </div>
- 
+
                     {/* Details table */}
                     {expandedRatingId === rating.approvalId && (
                       <div style={styles.detailsSection}>
@@ -260,16 +300,16 @@ export default function EmployeeAcknowledgment() {
                         <div style={styles.tableWrapper}>
                           <table style={styles.table}>
                             <thead>
-                              <tr>
-                                <th style={styles.th}>Competency</th>
-                                <th style={styles.th}>Your Rating</th>
-                                <th style={styles.th}>Your Comments</th>
-                                <th style={styles.th}>L1 Reviewer</th>
-                                <th style={styles.th}>L1 Rating</th>
-                                <th style={styles.th}>L1 Comments</th>
-                                <th style={styles.th}>L2 Reviewer</th>
-                                <th style={styles.th}>L2 Rating</th>
-                                <th style={styles.th}>L2 Comments</th>
+                              <tr style={{ backgroundColor: THEME.primary }}>
+                                <th style={styles.th}>COMPETENCY</th>
+                                <th style={styles.th}>YOUR RATING</th>
+                                <th style={styles.th}>YOUR COMMENTS</th>
+                                <th style={styles.th}>L1 REVIEWER</th>
+                                <th style={styles.th}>L1 RATING</th>
+                                <th style={styles.th}>L1 COMMENTS</th>
+                                <th style={styles.th}>L2 REVIEWER</th>
+                                <th style={styles.th}>L2 RATING</th>
+                                <th style={styles.th}>L2 COMMENTS</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -280,7 +320,7 @@ export default function EmployeeAcknowledgment() {
                                   </td>
                                   <td style={styles.td}>
                                     <strong
-                                      style={{ color: THEME.secondary }}
+                                      style={{ color: THEME.primary }}
                                     >
                                       {comp.employeeRating || "-"}
                                     </strong>
@@ -292,7 +332,7 @@ export default function EmployeeAcknowledgment() {
                                     {comp.l1ReviewerName || "-"}
                                   </td>
                                   <td style={styles.td}>
-                                    <strong style={{ color: THEME.accent }}>
+                                    <strong style={{ color: THEME.primary }}>
                                       {comp.l1Rating || "-"}
                                     </strong>
                                   </td>
@@ -303,7 +343,7 @@ export default function EmployeeAcknowledgment() {
                                     {comp.l2ReviewerName || "-"}
                                   </td>
                                   <td style={styles.td}>
-                                    <strong style={{ color: THEME.accent }}>
+                                    <strong style={{ color: THEME.primary }}>
                                       {comp.l2Rating || "-"}
                                     </strong>
                                   </td>
@@ -317,7 +357,7 @@ export default function EmployeeAcknowledgment() {
                         </div>
                       </div>
                     )}
- 
+
                     {/* Acknowledgment section */}
                     <div style={styles.acknowledgmentSection}>
                       <div style={styles.ackHeaderRow}>
@@ -331,7 +371,7 @@ export default function EmployeeAcknowledgment() {
                           </p>
                         </div>
                       </div>
- 
+
                       <textarea
                         value={comments[rating.approvalId] || ""}
                         onChange={(e) =>
@@ -351,7 +391,7 @@ export default function EmployeeAcknowledgment() {
                           {(comments[rating.approvalId] || "").length} / 2000
                         </span>
                       </div>
- 
+
                       <div style={styles.actionsRowBottom}>
                         <button
                           onClick={() => handleAcknowledge(rating.approvalId)}
@@ -387,61 +427,23 @@ export default function EmployeeAcknowledgment() {
     </div>
   );
 }
- 
-const breadcrumbStyles = {
-  wrapper: {
-    marginBottom: 8,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  inner: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    background: "transparent",
-    padding: "4px 0",
-  },
-  link: {
-    display: "flex",
-    alignItems: "center",
-    textDecoration: "none",
-    color: THEME.primary,
-    fontWeight: 400,
-  },
-  sep: {
-    color: THEME.primary,
-    fontWeight: 600,
-  },
-  current: {
-    fontSize: 14,
-    color: THEME.primary,
-    fontWeight: 600,
-  },
-};
- 
+
 const styles = {
   container: {
-    padding: "12px 32px 32px",
+    padding: "2rem",
     maxWidth: "1400px",
     margin: "0 auto",
     backgroundColor: THEME.background,
     minHeight: "100vh",
     fontFamily: "'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont",
   },
-  pageWrapper: {
-    paddingTop: 4,
-  },
-  breadcrumbWrapper: {
-    marginBottom: 16,
-  },
- 
+
   loadingCard: {
     backgroundColor: THEME.card,
     padding: 40,
-    borderRadius: 16,
+    borderRadius: 12,
     textAlign: "center",
-    // boxShadow: "0 18px 45px rgba(15,23,42,0.12)",
+    border: `1px solid ${THEME.border}`,
   },
   errorCard: {
     backgroundColor: "#FEE2E2",
@@ -453,9 +455,9 @@ const styles = {
   emptyState: {
     backgroundColor: THEME.card,
     padding: "40px 24px",
-    borderRadius: 16,
+    borderRadius: 12,
     textAlign: "center",
-    // boxShadow: "0 18px 45px rgba(15,23,42,0.08)",
+    border: `1px solid ${THEME.border}`,
   },
   emptyText: {
     fontSize: 18,
@@ -467,32 +469,25 @@ const styles = {
     fontSize: 14,
     color: THEME.textLight,
   },
- 
+
   ratingsContainer: {
     display: "flex",
     flexDirection: "column",
     gap: 20,
   },
- 
+
   ratingCard: {
     position: "relative",
-    backgroundColor: "rgba(255,255,255,0.96)",
-    borderRadius: 18,
-    // boxShadow: "0 18px 40px rgba(15,23,42,0.18)",
-    padding: 22,
-    border: "1px solid rgba(148,163,184,0.3)",
-    backdropFilter: "blur(6px)",
-    transition: "transform 0.18s ease, box-shadow 0.18s ease",
+    backgroundColor: THEME.card,
+    borderRadius: 12,
+    padding: 20,
+    border: `1px solid ${THEME.border}`,
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
     overflow: "hidden",
   },
   ratingCardHover: {
-    transform: "translateY(-4px)",
-    // boxShadow: "0 26px 70px rgba(15,23,42,0.32)",
-    border: "1px solid rgba(129,140,248,0.8)",
-  },
-  compactCard: {
-    paddingTop: 20,
-    paddingBottom: 22,
+    transform: "translateY(-2px)",
+    boxShadow: "0 4px 12px rgba(39, 35, 92, 0.15)",
   },
   cardAccentBar: {
     position: "absolute",
@@ -500,52 +495,48 @@ const styles = {
     left: 0,
     height: 4,
     width: "100%",
-    borderRadius: "18px 18px 0 0",
-    backgroundImage:
-      "linear-gradient(90deg, #27235C 0%, #3B4B8C 40%, #AC5098 100%)",
+    backgroundColor: THEME.primary,
   },
- 
+
   cardHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 18,
+    marginBottom: 16,
     paddingTop: 4,
   },
   projectName: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 700,
     color: THEME.primary,
     margin: 0,
-    letterSpacing: "0.03em",
   },
   approvedDate: {
     fontSize: 13,
     color: THEME.textLight,
     marginTop: 6,
+    margin: 0,
   },
   statusBadge: {
-    padding: "10px 18px",
-    borderRadius: 22,
-    backgroundImage:
-      "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(250,204,21,0.7))",
+    padding: "8px 16px",
+    borderRadius: 20,
+    backgroundColor: "#FEF3C7",
     color: "#92400E",
     fontSize: 13,
     fontWeight: 600,
-    // boxShadow: "0 8px 18px rgba(250,204,21,0.45)",
   },
- 
+
   summarySection: {
     display: "grid",
     gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-    gap: 16,
-    marginBottom: 18,
+    gap: 14,
+    marginBottom: 16,
   },
   summaryItem: {
     backgroundColor: "#F9FAFB",
-    padding: "14px 16px",
-    borderRadius: 14,
-    border: "1px solid rgba(209,213,219,0.9)",
+    padding: "12px 14px",
+    borderRadius: 10,
+    border: `1px solid ${THEME.border}`,
     textAlign: "center",
   },
   summaryLabel: {
@@ -554,153 +545,149 @@ const styles = {
     color: THEME.textLight,
     marginBottom: 4,
     textTransform: "uppercase",
-    letterSpacing: "0.08em",
+    letterSpacing: "0.05em",
   },
   summaryValue: {
     display: "block",
     fontSize: 18,
     fontWeight: 700,
-    color: THEME.accent,
+    color: THEME.primary,
   },
- 
+
   actionsRowTop: {
     display: "flex",
     justifyContent: "flex-end",
-    marginTop: 4,
-    marginBottom: 10,
+    marginBottom: 12,
   },
- 
+
   viewDetailsButton: {
     padding: "8px 20px",
-    borderRadius: 999,
+    borderRadius: 6,
     border: "none",
-    backgroundImage:
-      "linear-gradient(135deg, #27235C 0%, #3B4B8C 40%, #111827 100%)",
-    color: "#F9FAFB",
-    fontSize: 13,
+    backgroundColor: THEME.primary,
+    color: "#FFFFFF",
+    fontSize: 14,
     fontWeight: 600,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    // boxShadow: "0 10px 24px rgba(15,23,42,0.45)",
-    transition: "transform 0.15s ease, box-shadow 0.15s ease",
+    cursor: "pointer",
+    transition: "transform 0.15s ease, opacity 0.15s ease",
   },
   viewDetailsButtonHover: {
-    transform: "translateY(-1px) scale(1.03)",
-    // boxShadow: "0 16px 38px rgba(15,23,42,0.7)",
+    transform: "translateY(-1px)",
+    opacity: 0.9,
   },
- 
+
   detailsSection: {
-    marginTop: 10,
+    marginTop: 12,
     marginBottom: 16,
   },
   detailsTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 600,
     color: THEME.text,
-    marginBottom: 10,
+    marginBottom: 12,
+    margin: 0,
   },
   tableWrapper: {
     overflowX: "auto",
-    borderRadius: 12,
+    borderRadius: 8,
     border: `1px solid ${THEME.border}`,
-    backgroundColor: "#F9FAFB",
+    marginTop: 12,
   },
   table: {
     width: "100%",
     borderCollapse: "collapse",
     minWidth: 1000,
+    fontSize: "1rem",
   },
   th: {
-    padding: "10px 12px",
+    padding: "1rem",
     textAlign: "left",
-    backgroundColor: "#EEF2FF",
+    color: "#FFFFFF",
     fontWeight: 600,
-    fontSize: 12,
-    color: THEME.text,
-    borderBottom: `1px solid ${THEME.border}`,
+    fontSize: "0.95rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+    borderBottom: `2px solid ${THEME.border}`,
     whiteSpace: "nowrap",
   },
   tr: {
-    borderBottom: `1px solid ${THEME.border}`,
+    borderBottom: `1px solid #E5E7EB`,
+    backgroundColor: "#FFFFFF",
   },
   td: {
-    padding: "9px 12px",
-    fontSize: 13,
+    padding: "1rem",
+    fontSize: "1rem",
     color: THEME.text,
     verticalAlign: "top",
+    textAlign: "left",
+    borderBottom: "1px solid #E5E7EB",
   },
- 
+
   acknowledgmentSection: {
-    marginTop: 4,
+    marginTop: 16,
     backgroundColor: "#F9FAFB",
     padding: 18,
-    borderRadius: 14,
-    border: "1px solid rgba(209,213,219,0.9)",
+    borderRadius: 10,
+    border: `1px solid ${THEME.border}`,
   },
   ackHeaderRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 10,
+    marginBottom: 12,
   },
   acknowledgmentTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: 700,
     color: THEME.primary,
     margin: 0,
+    marginBottom: 6,
+    textAlign: "left",
   },
   acknowledgmentSubtext: {
     fontSize: 13,
     color: THEME.textLight,
-    marginTop: 4,
-    marginBottom: 0,
+    margin: 0,
+    textAlign: "left",
   },
   textarea: {
     width: "100%",
     padding: 12,
-    borderRadius: 10,
-    border: "1px solid rgba(209,213,219,0.9)",
+    borderRadius: 8,
+    border: `1px solid ${THEME.border}`,
     fontSize: 14,
     fontFamily: "inherit",
     resize: "vertical",
     outline: "none",
     backgroundColor: "#FFFFFF",
+    marginTop: 12,
+    boxSizing: "border-box",
   },
   characterRow: {
     display: "flex",
     justifyContent: "flex-end",
-    marginTop: 4,
+    marginTop: 6,
   },
   characterCount: {
-    fontSize: 11,
+    fontSize: 12,
     color: THEME.textLight,
   },
- 
+
   actionsRowBottom: {
     display: "flex",
     justifyContent: "flex-end",
-    marginTop: 10,
+    marginTop: 12,
   },
   acknowledgeButton: {
-    padding: "9px 24px",
-    borderRadius: 999,
+    padding: "10px 24px",
+    borderRadius: 6,
     border: "none",
-    backgroundImage:
-      "linear-gradient(135deg, #059669 0%, #10B981 40%, #22C55E 100%)",
-    color: "#ECFEFF",
+    backgroundColor: THEME.primary,
+    color: "#FFFFFF",
     fontSize: 14,
     fontWeight: 700,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    // boxShadow: "0 14px 30px rgba(16,185,129,0.5)",
-    transition: "transform 0.15s ease, box-shadow 0.15s ease",
+    cursor: "pointer",
+    transition: "transform 0.15s ease, opacity 0.15s ease",
   },
   acknowledgeButtonHover: {
-    transform: "translateY(-1px) scale(1.04)",
-    // boxShadow: "0 20px 44px rgba(16,185,129,0.75)",
+    transform: "translateY(-1px)",
+    opacity: 0.9,
   },
 };
- 
- 

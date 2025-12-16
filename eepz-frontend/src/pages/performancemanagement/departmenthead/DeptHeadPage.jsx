@@ -58,13 +58,11 @@ export default function DeptHeadPage() {
   const [expandedEmployeeIds, setExpandedEmployeeIds] = useState(new Set());
   const [approvingEmployeeId, setApprovingEmployeeId] = useState(null);
 
-
   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
 
-
   useEffect(() => {
-    fetchData();  // 
+    fetchData();
 
     const refreshInterval = setInterval(() => {
       fetchData(true);
@@ -76,7 +74,6 @@ export default function DeptHeadPage() {
   useEffect(() => {
     applyFilters();
   }, [pendingRequests, approvedRequests, activeTab, searchTerm, filterProject]);
-
 
   const fetchData = async (silent = false) => {
     try {
@@ -116,93 +113,89 @@ export default function DeptHeadPage() {
   };
 
   const fetchAttachments = async (assessmentId) => {
-  setLoadingAttachments(true);
-  try {
-    const departmentHeadId = getEmployeeIdForFilter();
-    // Changed: api.get to apiPort5222.get
-    const response = await apiPort5222.get(`/DeptHeadApprovals/${departmentHeadId}/assessment/${assessmentId}/attachments`);
+    setLoadingAttachments(true);
+    try {
+      const departmentHeadId = getEmployeeIdForFilter();
+      const response = await apiPort5222.get(`/DeptHeadApprovals/${departmentHeadId}/assessment/${assessmentId}/attachments`);
 
-    if (response.data.success) {
-      setAttachments(response.data.data || []);
-    } else {
-      setAttachments([]);
-    }
-  } catch (error) {
-    console.error("Error fetching attachments:", error);
-    setAttachments([]);
-  } finally {
-    setLoadingAttachments(false);
-  }
-};
-
-const handleDownloadAttachment = async (attachmentId) => {
-  try {
-    console.log(`Downloading attachment ${attachmentId}`);
-
-    const departmentHeadId = getEmployeeIdForFilter();
-    // Changed: api.get to apiPort5222.get
-    const response = await apiPort5222.get(
-      `/DeptHeadApprovals/${departmentHeadId}/attachments/${attachmentId}/download`,
-      { responseType: 'blob' }
-    );
-
-    console.log('Full Response:', response);
-    console.log('Response headers object:', response.headers);
-
-    let filename = 'attachment';
-
-    const contentDisposition = response.headers['content-disposition'];
-    console.log('Content-Disposition header:', contentDisposition);
-
-    if (contentDisposition) {
-      const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
-      if (matches && matches[1]) {
-        filename = matches[1].trim();
-        console.log('✅ Extracted filename from header:', filename);
+      if (response.data.success) {
+        setAttachments(response.data.data || []);
       } else {
-        const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
-        if (matches2 && matches2[1]) {
-          filename = matches2[1].trim();
-          console.log('✅ Extracted filename from header (no quotes):', filename);
+        setAttachments([]);
+      }
+    } catch (error) {
+      console.error("Error fetching attachments:", error);
+      setAttachments([]);
+    } finally {
+      setLoadingAttachments(false);
+    }
+  };
+
+  const handleDownloadAttachment = async (attachmentId) => {
+    try {
+      console.log(`Downloading attachment ${attachmentId}`);
+
+      const departmentHeadId = getEmployeeIdForFilter();
+      const response = await apiPort5222.get(
+        `/DeptHeadApprovals/${departmentHeadId}/attachments/${attachmentId}/download`,
+        { responseType: 'blob' }
+      );
+
+      console.log('Full Response:', response);
+      console.log('Response headers object:', response.headers);
+
+      let filename = 'attachment';
+
+      const contentDisposition = response.headers['content-disposition'];
+      console.log('Content-Disposition header:', contentDisposition);
+
+      if (contentDisposition) {
+        const matches = contentDisposition.match(/filename\s*=\s*"([^"]+)"/);
+        if (matches && matches[1]) {
+          filename = matches[1].trim();
+          console.log('✅ Extracted filename from header:', filename);
+        } else {
+          const matches2 = contentDisposition.match(/filename\s*=\s*([^;,\n]+)/);
+          if (matches2 && matches2[1]) {
+            filename = matches2[1].trim();
+            console.log('✅ Extracted filename from header (no quotes):', filename);
+          }
         }
       }
-    }
 
-    const contentType = response.headers['content-type'];
-    console.log('Content-Type:', contentType);
+      const contentType = response.headers['content-type'];
+      console.log('Content-Type:', contentType);
 
-    if (!filename.includes('.') && contentType) {
-      const extension = getExtensionFromContentType(contentType);
-      if (extension) {
-        filename = `${filename}${extension}`;
-        console.log('Added extension based on content-type:', filename);
+      if (!filename.includes('.') && contentType) {
+        const extension = getExtensionFromContentType(contentType);
+        if (extension) {
+          filename = `${filename}${extension}`;
+          console.log('Added extension based on content-type:', filename);
+        }
       }
+
+      console.log('Final filename for download:', filename);
+
+      const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+
+      document.body.appendChild(link);
+      link.click();
+
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+
+      toast.success(`Downloaded: ${filename}`);
+    } catch (error) {
+      console.error("Error downloading attachment:", error);
+      toast.error("Failed to download attachment.");
     }
-
-    console.log('Final filename for download:', filename);
-
-    const blob = new Blob([response.data], { type: contentType || 'application/octet-stream' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', filename);
-
-    document.body.appendChild(link);
-    link.click();
-
-    setTimeout(() => {
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    }, 100);
-
-    toast.success(`Downloaded: ${filename}`);
-  } catch (error) {
-    console.error("Error downloading attachment:", error);
-    toast.error("Failed to download attachment.");
-  }
-};
-
-
+  };
 
   const applyFilters = () => {
     let filtered = activeTab === "pending" ? [...pendingRequests] : [...approvedRequests];
@@ -225,6 +218,11 @@ const handleDownloadAttachment = async (attachmentId) => {
     setCurrentPage(1);
   };
 
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setAppliedSearch("");
+    setFilterProject("");
+  };
 
   const handleViewDetails = async (employee) => {
     setSelectedEmployee(employee);
@@ -279,7 +277,6 @@ const handleDownloadAttachment = async (attachmentId) => {
     setAttachments([]);
   };
 
-
   const toggleDetails = (employeeId) => {
     setExpandedEmployeeIds((prev) => {
       const newSet = new Set(prev);
@@ -291,7 +288,6 @@ const handleDownloadAttachment = async (attachmentId) => {
       return newSet;
     });
   };
-
 
   const getAvgRating = (competencies, key) => {
     if (!competencies || competencies.length === 0) return "-";
@@ -354,7 +350,6 @@ const handleDownloadAttachment = async (attachmentId) => {
     return [...new Set(projects)].filter(Boolean);
   };
 
-
   const formatFileSize = (bytes) => {
     if (!bytes) return "0 Bytes";
     const k = 1024;
@@ -362,7 +357,6 @@ const handleDownloadAttachment = async (attachmentId) => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
   };
-
 
   const getFileIcon = (fileType) => {
     if (!fileType) return "bi-file-earmark";
@@ -374,13 +368,11 @@ const handleDownloadAttachment = async (attachmentId) => {
     return "bi-file-earmark";
   };
 
-
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
   const getPaginatedData = (tab) => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-
 
     const data = tab === "pending" ? pendingRequests : approvedRequests;
 
@@ -394,7 +386,6 @@ const handleDownloadAttachment = async (attachmentId) => {
 
     return filtered.slice(startIndex, endIndex);
   };
-
 
   const getPageNumbers = () => {
     const pages = [];
@@ -416,8 +407,6 @@ const handleDownloadAttachment = async (attachmentId) => {
 
     return pages;
   };
-
-
 
   const renderApproveModal = () => {
     if (!showApproveModal || !selectedEmployee) return null;
@@ -623,7 +612,6 @@ const handleDownloadAttachment = async (attachmentId) => {
             zIndex: 1040,
           }}
         ></div>
-
         <div className="dp-modal-wrapper"
           style={{
             position: 'fixed',
@@ -900,7 +888,6 @@ const handleDownloadAttachment = async (attachmentId) => {
                         background: '#f8f7fc'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-
                           <div style={{ flex: 1 }}>
                             <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>
                               {attachment.fileName}
@@ -939,7 +926,6 @@ const handleDownloadAttachment = async (attachmentId) => {
                 )}
               </div>
 
-
               <div style={{
                 background: "#fff",
                 margin: "0 32px 28px 32px",
@@ -964,72 +950,65 @@ const handleDownloadAttachment = async (attachmentId) => {
                   <p className="dp-no-data">No goals assigned.</p>
                 ) : (
                   selectedEmployee.goals?.map((goal) => {
-                    // Get latest progress from goalProgressLogs
                     const latestProgressLog = goal.goalProgressLogs?.length
-                        ? goal.goalProgressLogs.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn))[0]
-                        : null;
-                 
+                      ? goal.goalProgressLogs.sort((a, b) => new Date(b.updatedOn) - new Date(a.updatedOn))[0]
+                      : null;
+
                     const latestProgress = latestProgressLog ? latestProgressLog.progressPercent : 0;
-                 
-                    // Fallback: if no logs, use checklist progress
                     const checklistProgress = getAvgChecklistProgress(goal.goalChecklists);
-                 
-                    // Decide final progress (prefer latestProgress)
                     const overallProgress = latestProgress || checklistProgress;
-                 
+
                     return (
-                        <div key={goal.goalId} className="dp-goal-card" style={{
-                            border: '1.2px solid #ece6fa',
-                            borderRadius: '9px',
-                            marginBottom: '13px',
-                            padding: '10px 13px'
+                      <div key={goal.goalId} className="dp-goal-card" style={{
+                        border: '1.2px solid #ece6fa',
+                        borderRadius: '9px',
+                        marginBottom: '13px',
+                        padding: '10px 13px'
+                      }}>
+                        <div className="dp-goal-header" style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
                         }}>
-                            <div className="dp-goal-header" style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center'
-                            }}>
-                                <div>
-                                    <h5 className="dp-goal-title" style={{ fontWeight: 600, fontSize: '1.01rem', margin: 0 }}>
-                                        {goal.goalTitle}
-                                    </h5>
-                                    <p className="dp-goal-description" style={{
-                                        fontSize: '0.96rem',
-                                        margin: 0,
-                                        opacity: 0.82
-                                    }}>{goal.goalDescription}</p>
-                                </div>
-                                <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
-                                    {goal.goalstatus}
-                                </span>
-                            </div>
-                            <div className="dp-progress-container" style={{ marginTop: 8 }}>
-                                <div className="dp-progress-label" style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    fontSize: '0.97rem'
-                                }}>
-                                    <span>Progress</span>
-                                    <span className="dp-progress-value">{overallProgress}%</span>
-                                </div>
-                                <div className="dp-progress-bar-bg" style={{
-                                    background: '#efe2f1',
-                                    borderRadius: '5px',
-                                    height: 6,
-                                    width: '96%',
-                                    marginTop: 4
-                                }}>
-                                    <div className="dp-progress-bar-fill" style={{
-                                        background: 'linear-gradient(90deg, #af295c 0%, #d1297b 100%)',
-                                        height: 6,
-                                        borderRadius: '4px',
-                                        width: `${overallProgress}%`
-                                    }} />
-                                </div>
-                            </div>
+                          <div>
+                            <h5 className="dp-goal-title" style={{ fontWeight: 600, fontSize: '1.01rem', margin: 0 }}>
+                              {goal.goalTitle}
+                            </h5>
+                            <p className="dp-goal-description" style={{
+                              fontSize: '0.96rem',
+                              margin: 0,
+                              opacity: 0.82
+                            }}>{goal.goalDescription}</p>
+                          </div>
+                          <span className={`dp-goal-status-badge status-${goal.goalstatus?.toLowerCase()}`}>
+                            {goal.goalstatus}
+                          </span>
                         </div>
-                 
-                 
+                        <div className="dp-progress-container" style={{ marginTop: 8 }}>
+                          <div className="dp-progress-label" style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            fontSize: '0.97rem'
+                          }}>
+                            <span>Progress</span>
+                            <span className="dp-progress-value">{overallProgress}%</span>
+                          </div>
+                          <div className="dp-progress-bar-bg" style={{
+                            background: '#efe2f1',
+                            borderRadius: '5px',
+                            height: 6,
+                            width: '96%',
+                            marginTop: 4
+                          }}>
+                            <div className="dp-progress-bar-fill" style={{
+                              background: 'linear-gradient(90deg, #af295c 0%, #d1297b 100%)',
+                              height: 6,
+                              borderRadius: '4px',
+                              width: `${overallProgress}%`
+                            }} />
+                          </div>
+                        </div>
+                      </div>
                     );
                   })
                 )}
@@ -1068,7 +1047,6 @@ const handleDownloadAttachment = async (attachmentId) => {
     );
   };
 
-
   if (loading) {
     return (
       <div className="dp-loading-container">
@@ -1079,33 +1057,19 @@ const handleDownloadAttachment = async (attachmentId) => {
     );
   }
 
-
   return (
     <div className="dp-page">
-      <div className="hrfcper-top-bar">
+      {/* REDUCED TOP PADDING */}
+      <div style={{ padding: '0.5rem 0 0.25rem 0' }}>
         <nav className="hrfcper-breadcrumb-nav" aria-label="breadcrumb">
           <Breadcrumb
             items={[{ label: 'Department Head Dashboard' }]}
           />
         </nav>
-        <div />
       </div>
 
-      <div className="dp-page-header">
-        <div className="dp-header-content">
-          <div className="dp-header-text"></div>
-        </div>
-      </div>
-
-
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-        gap: "1rem",
-        marginBottom: "1.5rem"
-      }}>
-
-
+      {/* TABS */}
+      <div style={{ marginBottom: '1rem' }}>
         <div
           style={{
             display: "flex",
@@ -1116,7 +1080,6 @@ const handleDownloadAttachment = async (attachmentId) => {
             gap: 6,
             border: "3px solid #27235C",
             width: "fit-content",
-            margin: "16px 0 20px 0",
             boxShadow: "0 1.5px 8px 0 rgba(39,35,92,0.03)",
           }}
         >
@@ -1144,7 +1107,6 @@ const handleDownloadAttachment = async (attachmentId) => {
             }}
             onClick={() => setActiveTab("pending")}
           >
-            <i className="bi bi-hourglass-split"></i>
             Pending ({pendingRequests.length})
           </button>
 
@@ -1172,62 +1134,125 @@ const handleDownloadAttachment = async (attachmentId) => {
             }}
             onClick={() => setActiveTab("approved")}
           >
-            <i className="bi bi-check-circle"></i>
             Approved ({approvedRequests.length})
           </button>
         </div>
       </div>
 
-
-      <div className="dp-filters-card">
-        <div className="dp-filters-content">
-          <div className="dp-filters-left">
-            <div className="dp-search-box">
-              <i className="bi bi-search dp-search-icon"></i>
+      {/* FILTERS - IMPROVED UI */}
+      <div className="dp-filters-card" style={{ marginBottom: '1rem' }}>
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          alignItems: 'center',
+          flexWrap: 'wrap'
+        }}>
+          {/* COMBINED SEARCH BAR + BUTTON */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'stretch',
+            border: '2px solid #27235C',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            flex: '1 1 300px',
+            minWidth: '250px'
+          }}>
+            <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+              <i className="bi bi-search" style={{
+                position: 'absolute',
+                left: '12px',
+                color: '#6c757d',
+                fontSize: '14px',
+                pointerEvents: 'none'
+              }}></i>
               <input
                 type="text"
-                className="dp-search-input"
                 placeholder="Search employee or project..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setAppliedSearch(searchTerm);
+                  }
+                }}
+                style={{
+                  flex: 1,
+                  padding: '10px 12px 10px 36px',
+                  border: 'none',
+                  fontSize: '14px',
+                  outline: 'none',
+                  background: 'transparent'
+                }}
               />
             </div>
-
-            <select
-              className="dp-filter-select"
-              value={filterProject}
-              onChange={(e) => setFilterProject(e.target.value)}
-            >
-              <option value="">All Projects</option>
-              {getUniqueProjects().map((project, idx) => (
-                <option key={idx} value={project}>
-                  {project}
-                </option>
-              ))}
-            </select>
             <button
-              onClick={() => {
-                setAppliedSearch(searchTerm);
-                applyFilters();
-              }}
+              onClick={() => setAppliedSearch(searchTerm)}
               style={{
-                marginLeft: "10px",
-                padding: "8px 18px",
-                backgroundColor: "#27235C",
-                color: "#fff",
-                border: "none",
-                borderRadius: "6px",
-                fontWeight: 600,
-                cursor: "pointer",
+                padding: '10px 20px',
+                backgroundColor: '#27235C',
+                color: 'white',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'opacity 0.2s',
+                whiteSpace: 'nowrap'
               }}
+              onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+              onMouseLeave={(e) => e.target.style.opacity = '1'}
             >
               Search
             </button>
           </div>
+            {/* CLEAR FILTERS BUTTON */}
+            <button
+            onClick={handleClearFilters}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#6c757d",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              fontWeight: 600,
+              fontSize: '14px',
+              cursor: "pointer",
+              transition: 'opacity 0.2s',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+            onMouseLeave={(e) => e.target.style.opacity = '1'}
+          >
+            Clear Filters
+          </button>
+
+          {/* PROJECT FILTER */}
+          <select
+            value={filterProject}
+            onChange={(e) => setFilterProject(e.target.value)}
+            style={{
+              padding: '10px 12px',
+              border: '2px solid #27235C',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              outline: 'none',
+              minWidth: '150px'
+            }}
+          >
+            <option value="">All Projects</option>
+            {getUniqueProjects().map((project, idx) => (
+              <option key={idx} value={project}>
+                {project}
+              </option>
+            ))}
+          </select>
+
+        
         </div>
       </div>
 
-
+      {/* TABLE */}
       <div
         className="dp-table-card"
         style={{ border: "2px solid #27235C", borderRadius: "8px", overflow: "hidden" }}
@@ -1333,9 +1358,11 @@ const handleDownloadAttachment = async (attachmentId) => {
               <tbody>
                 {getPaginatedData("approved").length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="dp-empty-state" style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}>
-                      <i className="bi bi-inbox"></i>
-                      <p>No approved employees found</p>
+                    <td colSpan={3} className="dp-empty-state" style={{ textAlign: "center", padding: "20px", color: "#6c757d" }}>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+                        <i className="bi bi-inbox" style={{ fontSize: "1.5rem" }}></i>
+                        <p style={{ margin: 0 }}>No approved employees found</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -1364,7 +1391,7 @@ const handleDownloadAttachment = async (attachmentId) => {
           )}
         </div>
 
-
+        {/* PAGINATION */}
         {filteredData.length > 0 && (
           <div
             className="dp-pagination-container"
@@ -1431,7 +1458,6 @@ const handleDownloadAttachment = async (attachmentId) => {
           </div>
         )}
       </div>
-
 
       {renderApproveModal()}
       {renderDetailsModal()}

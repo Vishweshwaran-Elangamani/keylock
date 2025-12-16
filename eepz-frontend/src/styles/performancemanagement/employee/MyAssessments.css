@@ -540,12 +540,12 @@
    }
 
    .empassper-btn-view {
-     background: var(--success);
+     background: darkblue;
      color: #fff;
    }
 
    .empassper-btn-view:hover {
-     background: #059669;
+   
      transform: translateY(-2px);
    }
 

@@ -64,19 +64,16 @@ function MyAssessments() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [dateFilter, setDateFilter] = useState("");
-  const [formTypeFilter, setFormTypeFilter] = useState("All");
   const [timers, setTimers] = useState({});
   const [visibleTimers, setVisibleTimers] = useState([]);
 
   const [downloadingAttachmentId, setDownloadingAttachmentId] = useState(null);
-
 
   const [attachments, setAttachments] = useState([]);
   const [viewAttachments, setViewAttachments] = useState([]);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user ? user.empId : null;
-
 
   useEffect(() => {
     if (!userId) {
@@ -117,7 +114,6 @@ function MyAssessments() {
     return () => clearInterval(interval);
   }, [assignments]);
 
-
   function getExtensionFromMime(mimeType) {
     if (!mimeType) return '';
     const type = mimeType.toLowerCase().trim();
@@ -146,79 +142,20 @@ function MyAssessments() {
   function extractFilenameFromHeader(contentDisposition) {
     if (!contentDisposition) return null;
     const matchUtf8 = contentDisposition.match(/filename\*=(?:UTF-8'')?([^;]+)(?:;|$)/i);
-    if (matchUtf8 && matchUtf8) {
+    if (matchUtf8 && matchUtf8[1]) {
       try {
-        return decodeURIComponent(matchUtf8.replace(/"/g, '').trim());
+        return decodeURIComponent(matchUtf8[1].replace(/"/g, '').trim());
       } catch (e) {
-        return matchUtf8.replace(/"/g, '').trim();
+        return matchUtf8[1].replace(/"/g, '').trim();
       }
     }
     const matchNormal = contentDisposition.match(/filename=([^;]+)(?:;|$)/i);
-    if (matchNormal && matchNormal) {
-      return matchNormal.replace(/"/g, '').trim();
+    if (matchNormal && matchNormal[1]) {
+      return matchNormal[1].replace(/"/g, '').trim();
     }
     return null;
   }
 
-
-  function hasExtension(filename) {
-    return /\.[a-zA-Z0-9]{2,5}$/.test(filename);
-  }
-
-
-
-  const handleDownloadAttachment = async (attachment) => {
-    try {
-      setDownloadingId(attachment.attachmentId);
-      setError(null);
-
-      const downloadUrl = `/api/AppraisalProcess/hr/attachments/${attachment.attachmentId}/download`;
-      const response = await fetch(downloadUrl);
-
-      if (!response.ok) {
-        throw new Error(`Download failed with status ${response.status}`);
-      }
-
-      const blob = await response.blob();
-
-      let filename = attachment.fileName || "attachment";
-      const contentDisposition = response.headers.get("content-disposition");
-      if (contentDisposition) {
-        const parsedName = extractFilenameFromHeader(contentDisposition);
-        if (parsedName) {
-          filename = parsedName;
-        }
-      }
-
-      if (!hasExtension(filename)) {
-        let extension = '';
-        const mimeType = response.headers.get("content-type") || attachment.fileType || '';
-        extension = getExtensionFromMime(mimeType);
-        if (!extension && blob.type) {
-          extension = getExtensionFromMime(blob.type);
-        }
-        if (!extension) extension = '.bin';
-
-        filename += extension;
-      }
-
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(link);
-
-      console.log(` Downloaded: ${filename}`);
-    } catch (err) {
-      console.error("Download error:", err);
-      setError(`Failed to download ${attachment.fileName}: ${err.message}`);
-    } finally {
-      setDownloadingId(null);
-    }
-  };
   const handleDownloadViewAttachment = async (attachment) => {
     try {
       setDownloadingAttachmentId(attachment.attachmentId);
@@ -264,7 +201,7 @@ function MyAssessments() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
 
-      console.log(` Downloaded: ${filename}`);
+      console.log(`✓ Downloaded: ${filename}`);
     } catch (err) {
       console.error("Download error:", err);
       toast.error(`Failed to download attachment: ${err.message}`);
@@ -272,8 +209,6 @@ function MyAssessments() {
       setDownloadingAttachmentId(null);
     }
   };
-
-
 
   const fetchAssignments = async () => {
     setLoading(true);
@@ -445,11 +380,8 @@ function MyAssessments() {
     }
   };
 
-
   const pendingAssignments = assignments.filter((a) => !a.isCompleted);
   const completedAssignments = assignments.filter((a) => a.isCompleted);
-
-  const formTypes = ["All", ...new Set(assignments.map((a) => a.formType).filter(Boolean))];
 
   const filterAssignments = (assignmentList) => {
     return assignmentList.filter((assignment) => {
@@ -461,9 +393,7 @@ function MyAssessments() {
         new Date(assignment.deadline).toLocaleDateString("en-GB") ===
         new Date(dateFilter).toLocaleDateString("en-GB");
 
-      const matchType = formTypeFilter === "All" || assignment.formType === formTypeFilter;
-
-      return matchSearch && matchDate && matchType;
+      return matchSearch && matchDate;
     });
   };
 
@@ -474,6 +404,11 @@ function MyAssessments() {
     setSearchQuery(searchInput.trim());
   };
 
+  const handleClearFilters = () => {
+    setSearchInput("");
+    setSearchQuery("");
+    setDateFilter("");
+  };
 
   const renderTable = (data) => (
     <div className="empassper-table-container">
@@ -597,38 +532,82 @@ function MyAssessments() {
         </div>
       )}
 
-      <div className="empassper-search-filter-container">
-        <div className="empassper-search-box">
-          <input
-            type="text"
-            placeholder="Search by form name or type..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
-            aria-label="Search assessments"
-          />
-          <button className="empassper-search-btn" onClick={handleSearch} aria-label="Search">Search</button>
-        </div>
-        <select
-          className="empassper-filter-select"
-          value={formTypeFilter}
-          onChange={(e) => setFormTypeFilter(e.target.value)}
-        >
-          <option value="All">All Form Types</option>
-          {formTypes.filter(t => t !== "All").map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-        <input
-          type="date"
-          className="empassper-filter-select"
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          placeholder="Filter by deadline"
-        />
-      </div>
+<div className="empassper-search-filter-container">
+  <div style={{ 
+    display: 'flex', 
+    alignItems: 'stretch', 
+    gap: '0px', 
+    flex: 1,
+    border: '1px solid #27235C',
+    borderRadius: '6px',
+    overflow: 'hidden'
+  }}>
+    <input
+      type="text"
+      placeholder="Search by form name or type..."
+      value={searchInput}
+      onChange={(e) => setSearchInput(e.target.value)}
+      onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+      aria-label="Search assessments"
+      style={{
+        flex: 1,
+        padding: '10px 14px',
+        border: 'none',
+        fontSize: '14px',
+        outline: 'none'
+      }}
+    />
+    <button 
+      onClick={handleSearch} 
+      aria-label="Search"
+      style={{
+        padding: '10px 20px',
+        backgroundColor: '#27235C',
+        color: 'white',
+        border: 'none',
+        fontSize: '14px',
+        fontWeight: '600',
+        cursor: 'pointer',
+        transition: 'opacity 0.2s',
+        whiteSpace: 'nowrap'
+      }}
+      onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+      onMouseLeave={(e) => e.target.style.opacity = '1'}
+    >
+      Search
+    </button>
+  </div>
+  <button 
+    onClick={handleClearFilters} 
+    aria-label="Clear Filters"
+    style={{
+      padding: '10px 20px',
+      backgroundColor: '#6c757d',
+      color: 'white',
+      border: 'none',
+      borderRadius: '6px',
+      fontSize: '14px',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'opacity 0.2s',
+      whiteSpace: 'nowrap'
+    }}
+    onMouseEnter={(e) => e.target.style.opacity = '0.9'}
+    onMouseLeave={(e) => e.target.style.opacity = '1'}
+  >
+    Clear Filters
+  </button>
+  <input
+    type="date"
+    className="empassper-filter-select"
+    value={dateFilter}
+    onChange={(e) => setDateFilter(e.target.value)}
+    placeholder="Filter by deadline"
+  />
+</div>
+
+
+      
 
       <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
         <div className="empassper-pill-tabs">
@@ -702,7 +681,6 @@ function MyAssessments() {
             onClick={(e) => e.stopPropagation()}
             style={{ paddingTop: "0px", marginTop: "0px" }}
           >
-
             <div className="empass-form-header" style={{ marginBottom: "0px", paddingBottom: "0px", position: "relative" }}>
               <div className="empass-logo-section">
                 <img src={logoImage} alt="Logo" className="empass-logo-small" />
@@ -731,7 +709,6 @@ function MyAssessments() {
                       transform: "translateY(-50%)"
                     }}
                   >
-
                     <span
                       style={{
                         color: "white",
@@ -748,7 +725,6 @@ function MyAssessments() {
                   </div>
                 )}
             </div>
-
 
             <div
               className="empass-form-divider"
@@ -1116,7 +1092,6 @@ function MyAssessments() {
                                       gap: "8px",
                                       marginBottom: "8px"
                                     }}>
-
                                       <div style={{
                                         fontWeight: "600",
                                         fontSize: "14px",
@@ -1242,7 +1217,6 @@ function MyAssessments() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

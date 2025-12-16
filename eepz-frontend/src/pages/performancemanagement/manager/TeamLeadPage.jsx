@@ -632,7 +632,7 @@ function TeamLeadPage() {
                               boxShadow: "0 4px 12px rgba(59,130,246,0.18)",
                             }}
                           >
-                            <i className="bi bi-eye"></i> View
+                            <i className="bi bi-eye"></i> 
                           </button>
                         )}
                       </td>
