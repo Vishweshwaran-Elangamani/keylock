@@ -134,7 +134,7 @@ services:
     networks:
       - eepz-network
 
-  mom-meeting-api:
+  meeting-api:
     build: ./Relevantz.EEPZ.MOM&MeetingApi
     container_name: eepz-mom-meeting-api
     restart: always
@@ -209,7 +209,26 @@ services:
       - ./logs:/app/Logs
     networks:
       - eepz-network
-  
+
+  mom-api:
+    build: ./Relevantz.EEPZ.MOMApi
+    container_name: eepz-mom-api
+    restart: always
+    ports:
+      - "5112:5112"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
+      - ASPNETCORE_URLS=http://+:5112
+      
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/Logs
+    networks:
+      - eepz-network  
+
   analysis-api:
     build: ./Relevantz.EEPZ.AnalysisApi
     container_name: analysis-api
