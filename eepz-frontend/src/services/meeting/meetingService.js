@@ -1,14 +1,15 @@
-import apii from "../../services/meeting/index";
+import api_meet from "../../services/meeting/index_meet";
+
 import axios from "axios";
 
 const meetingService = {
 
-   getAll: () => apii.get("/employeemanagement/all"),
+   getAll: () => api_meet.get("/employeemanagement/all"),
  
 
   scheduleMeeting: async (meetingData) => {
     try {
-      const response = await apii.post("/Meeting/schedule", meetingData);
+      const response = await api_meet.post("/Meeting/schedule", meetingData);
       return response.data;
     } catch (error) {
       console.error("Schedule meeting error:", error);
@@ -18,7 +19,7 @@ const meetingService = {
 
   getMyMeetings: async () => {
     try {
-      const response = await apii.get("/Meeting/my-meetings");
+      const response = await api_meet.get("/Meeting/my-meetings");
       return response.data;
     } catch (error) {
       console.error("Get my meetings error:", error);
@@ -28,7 +29,7 @@ const meetingService = {
 
   getMeetingById: async (meetingId) => {
     try {
-      const response = await apii.get(`/Meeting/${meetingId}`);
+      const response = await api_meet.get(`/Meeting/${meetingId}`);
       return response.data;
     } catch (error) {
       console.error("Get meeting by ID error:", error);
@@ -45,7 +46,7 @@ const meetingService = {
       if (filters.startDate) params.append("startDate", filters.startDate);
       if (filters.endDate) params.append("endDate", filters.endDate);
 
-      const response = await apii.get(`/Meeting/one-on-one-reports?${params.toString()}`);
+      const response = await api_meet.get(`/Meeting/one-on-one-reports?${params.toString()}`);
       return response.data;
     } catch (error) {
       console.error("Get one-on-one reports error:", error);
@@ -55,7 +56,7 @@ const meetingService = {
 
   getOneOnOneSummary: async () => {
     try {
-      const response = await apii.get("/Meeting/one-on-one-summary");
+      const response = await api_meet.get("/Meeting/one-on-one-summary");
       return response.data;
     } catch (error) {
       console.error("Get one-on-one summary error:", error);

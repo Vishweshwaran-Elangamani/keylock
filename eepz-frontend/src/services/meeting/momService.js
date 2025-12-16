@@ -1,10 +1,10 @@
 // services/meeting/momService.js
-import apii from "../../services/meeting/index";
+import api_mom from "../../services/meeting/index_mom";
 
 // Generic API handler to reduce code duplication
 const apiRequest = async (method, url, data = null, config = {}) => {
   try {
-    const response = await apii[method](url, data, config);
+    const response = await api_mom[method](url, data, config);
     return response.data;
   } catch (error) {
     console.error(`API Error [${method.toUpperCase()} ${url}]:`, error);
@@ -14,7 +14,7 @@ const apiRequest = async (method, url, data = null, config = {}) => {
 
 const momService = {
   // Expose apii for direct usage if needed
-  apii,
+  api_mom,
 
   // ========= MOM OPERATIONS ==========
   createMom: (momData) => apiRequest("post", "/Mom/create", momData),

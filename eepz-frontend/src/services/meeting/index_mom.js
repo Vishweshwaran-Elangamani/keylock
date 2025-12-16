@@ -1,11 +1,12 @@
 import axios from "axios";
 
-const apii = axios.create({
-  baseURL: import.meta.env.VITE_MEETING_API_URL+"/api",
+const api_mom = axios.create({
+  baseURL: import.meta.env.VITE_MOM_API_URL+"/api",
 });
 
+
 // Add a request interceptor to include authorization header with token from localStorage
-apii.interceptors.request.use(
+api_mom.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token && config.headers) {
@@ -16,4 +17,4 @@ apii.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export default apii;
+export default api_mom;

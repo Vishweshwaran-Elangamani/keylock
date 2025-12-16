@@ -1,4 +1,4 @@
-import apii from "../meeting/index"; // ← Use the same API instance as momService
+import api_meet from "./index_meet"; // ← Use the same API instance as momService
 
 const employeeService = {
   // ========= EMPLOYEE OPERATIONS =========
@@ -9,7 +9,7 @@ const employeeService = {
    */
   getAllEmployees: async () => {
     try {
-      const response = await apii.get("/EmployeeManagement/all");
+      const response = await api_meet.get("/EmployeeManagement/all");
       return response.data; // Returns { success: true, data: [...] }
     } catch (error) {
       console.error("Get all employees error:", error);
@@ -23,7 +23,7 @@ const employeeService = {
    */
   getEmployeeById: async (employeeMasterId) => {
     try {
-      const response = await apii.get(
+      const response = await api_meet.get(
         `/EmployeeManagement/${employeeMasterId}`
       );
       return response.data; // Returns { success: true, data: {...} }
@@ -40,7 +40,7 @@ const employeeService = {
    */
   getEmployeesByIds: async (employeeMasterIds) => {
     try {
-      const response = await apii.post("/EmployeeManagement/batch", {
+      const response = await api_meet.post("/EmployeeManagement/batch", {
         ids: employeeMasterIds,
       });
       return response.data; // Returns { success: true, data: [...], count: n }
@@ -56,7 +56,7 @@ const employeeService = {
    */
   getManagers: async () => {
     try {
-      const response = await apii.get("/EmployeeManagement/managers");
+      const response = await api_meet.get("/EmployeeManagement/managers");
       return response.data; // Returns { success: true, data: [...] }
     } catch (error) {
       console.error("Get managers error:", error);
@@ -70,7 +70,7 @@ const employeeService = {
    */
   searchEmployees: async (query) => {
     try {
-      const response = await apii.get("/EmployeeManagement/search", {
+      const response = await api_meet.get("/EmployeeManagement/search", {
         params: { query },
       });
       return response.data; // Returns { success: true, data: [...], count: n }
@@ -86,7 +86,7 @@ const employeeService = {
    */
   getEmployeesByDepartment: async (departmentId) => {
     try {
-      const response = await apii.get(
+      const response = await api_meet.get(
         `/EmployeeManagement/department/${departmentId}`
       );
       return response.data; // Returns { success: true, data: [...], count: n }
@@ -105,7 +105,7 @@ const employeeService = {
    */
   getEmployeesByRole: async (roleId) => {
     try {
-      const response = await apii.get(`/EmployeeManagement/role/${roleId}`);
+      const response = await api_meet.get(`/EmployeeManagement/role/${roleId}`);
       return response.data; // Returns { success: true, data: [...], count: n }
     } catch (error) {
       console.error(`Get employees by role ${roleId} error:`, error);
@@ -121,7 +121,7 @@ const employeeService = {
    */
   getAllDepartments: async () => {
     try {
-      const response = await apii.get("/EmployeeManagement/departments");
+      const response = await api_meet.get("/EmployeeManagement/departments");
       return response.data; // Returns { success: true, data: [...] }
     } catch (error) {
       console.error("Get all departments error:", error);
@@ -135,7 +135,7 @@ const employeeService = {
    */
   getDepartmentById: async (departmentId) => {
     try {
-      const response = await apii.get(
+      const response = await api_meet.get(
         `/EmployeeManagement/departments/${departmentId}`
       );
       return response.data; // Returns { success: true, data: {...} }
@@ -151,7 +151,7 @@ const employeeService = {
    */
   getAllBusinessUnits: async () => {
     try {
-      const response = await apii.get("/EmployeeManagement/business-units");
+      const response = await api_meet.get("/EmployeeManagement/business-units");
       return response.data; // Returns { success: true, data: [...] }
     } catch (error) {
       console.error("Get all business units error:", error);

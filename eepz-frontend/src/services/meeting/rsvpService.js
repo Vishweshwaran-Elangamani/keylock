@@ -1,4 +1,4 @@
-import apii from "../../services/meeting/index";
+import apii from "./index_meet";
 
 const rsvpService = {
   // Get all invitations for current user
