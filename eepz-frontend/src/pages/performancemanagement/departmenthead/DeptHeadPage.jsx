@@ -4,12 +4,13 @@ import {
   getDeptHeadSubmittedRatings,
   approveDeptHeadEmployee,
   getApprovedEmployees,
-} from "../../../services/performancemanagement/hr/api";
+} from "../../../services/performancemanagement/api/rolesapi";
 import { getEmployeeIdForFilter } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { toast } from "sonner";
 import "../../../styles/performancemanagement/hr/DeptHeadPage.css";
 import Breadcrumb from "../../../components/common/Breadcrumb";
-import api, { apiPort5222 } from "../../../services/performancemanagement/hr/api";
+import { apiPort5113 } from "../../../services/performancemanagement/api/rolesapi";
+
 
 const getExtensionFromContentType = (contentType) => {
   if (!contentType) return null;
@@ -116,7 +117,7 @@ export default function DeptHeadPage() {
     setLoadingAttachments(true);
     try {
       const departmentHeadId = getEmployeeIdForFilter();
-      const response = await apiPort5222.get(`/DeptHeadApprovals/${departmentHeadId}/assessment/${assessmentId}/attachments`);
+      const response = await apiPort5113.get(`/DeptHeadApprovals/${departmentHeadId}/assessment/${assessmentId}/attachments`);
 
       if (response.data.success) {
         setAttachments(response.data.data || []);
@@ -136,7 +137,7 @@ export default function DeptHeadPage() {
       console.log(`Downloading attachment ${attachmentId}`);
 
       const departmentHeadId = getEmployeeIdForFilter();
-      const response = await apiPort5222.get(
+      const response = await apiPort5113.get(
         `/DeptHeadApprovals/${departmentHeadId}/attachments/${attachmentId}/download`,
         { responseType: 'blob' }
       );

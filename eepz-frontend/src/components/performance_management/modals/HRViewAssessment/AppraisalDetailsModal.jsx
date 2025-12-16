@@ -1,5 +1,5 @@
 import React from "react";
-import api from "../../../../services/performancemanagement/hr/api";
+import api from "../../../../services/performancemanagement/api/api";
 
 function statusRender(status) {
   if (typeof status !== "string") return "-";

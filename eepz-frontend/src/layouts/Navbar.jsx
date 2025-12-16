@@ -9,7 +9,7 @@ import {
 } from "../utils/auth/helpers";
 import ProfilePhotoUploadModal from "../components/auth/Modal/common/ProfilePhotoUploadModal";
 import EmployeeProfileService from "../services/auth/EmployeeProfileService";
-import { getEmployeeNominations } from "../services/performancemanagement/hr/api";
+import { getEmployeeNominations } from "../services/performancemanagement/api/nominationapi";
 
 const Navbar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);

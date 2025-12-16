@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getManagerEmployeeAcknowledgments } from "../../../services/performancemanagement/hr/api";
+import { getManagerEmployeeAcknowledgments } from "../../../services/performancemanagement/api/rolesapi";
 import { getUserIdFromToken } from "../../../utils/PerformanceManagement/jwtDecoder";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

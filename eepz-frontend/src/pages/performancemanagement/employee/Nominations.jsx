@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Confetti from "react-confetti";
-import { getEmployeeNominations } from "../../../services/performancemanagement/hr/api";
+import { getEmployeeNominations } from "../../../services/performancemanagement/api/nominationapi";
 import "react-toastify/dist/ReactToastify.css";
 import "../../../styles/performancemanagement/employee/EmployeeHome.css";
 

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../../services/performancemanagement/hr/api";
+import api from "../../../services/performancemanagement/api/api";
+import { apiPort5113 } from "../../../services/performancemanagement/api/rolesapi";
+import { apiPort5114 } from "../../../services/performancemanagement/api/nominationapi";
 import { toast, Toaster } from "sonner";
 import logoImage from "../../../assets/logodark.png";
 import Breadcrumb from "../../../components/common/Breadcrumb";
@@ -72,7 +74,7 @@ export default function ManagerDashboard() {
     setLoading(true);
     setAssignments([]);
     try {
-      const roleResponse = await api.get(`/Employees/user/${userId}/role`);
+      const roleResponse = await apiPort5113.get(`/Employees/user/${userId}/role`);
       if (!roleResponse.data.success) {
         safeToast("error", "User not found.", "user-not-found");
         return;

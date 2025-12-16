@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { apiPort5222 as api } from "../../../services/performancemanagement/hr/api";
+import { apiPort5113 } from "../../../services/performancemanagement/api/rolesapi";
+import { apiPort5114 } from "../../../services/performancemanagement/api/nominationapi";
 import { Toaster, toast } from "sonner";
 import "../../../styles/performancemanagement/manager/TeamLeadPage.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -106,15 +107,15 @@ function TeamLeadPage() {
     try {
       if (active === "l1") {
         const [pendingResp, reworkResp, submittedResp] = await Promise.all([
-          api.get(`/approver/${userId}/assessments`, {
+          apiPort5113.get(`/approver/${userId}/assessments`, {
             params: { page: 1, pageSize: 25 },
           }),
-          api
+          apiPort5113
             .get(`/approver/${userId}/rework-forms`, {
               params: { page: 1, pageSize: 25 },
             })
             .catch(() => ({ data: [] })),
-          api.get(`/approver/${userId}/submitted-l1-ratings`, {
+          apiPort5113.get(`/approver/${userId}/submitted-l1-ratings`, {
             params: { page: 1, pageSize: 25 },
           }).catch(() => ({ data: [] })),
         ]);
@@ -144,7 +145,7 @@ function TeamLeadPage() {
         const allWithDetails = await Promise.all(
           allAssessmentIds.map(async (assessmentId) => {
             try {
-              const detailResp = await api.get(
+              const detailResp = await apiPort5113.get(
                 `/approver/${userId}/assessment/${assessmentId}`
               );
               return detailResp.data;
@@ -164,7 +165,7 @@ function TeamLeadPage() {
         const withNotes = await Promise.all(
           allWithDetails.map(async (a) => {
             try {
-              const decisionResp = await api.get(
+              const decisionResp = await apiPort5113.get(
                 `/approver/${userId}/assessment/${a.assessmentId}/decision`
               );
               return {
@@ -182,7 +183,7 @@ function TeamLeadPage() {
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
-              const detailResp = await api.get(
+              const detailResp = await apiPort5113.get(
                 `/approver/${userId}/assessment/${basic.assessmentId}`
               );
               return detailResp.data;
@@ -196,10 +197,10 @@ function TeamLeadPage() {
         setSubmittedL1(submittedWithDetails);
       } else {
         const [pendingResp, submittedResp] = await Promise.all([
-          api.get(`/reviewer/${userId}/assessments/full`, {
+          apiPort5113.get(`/reviewer/${userId}/assessments/full`, {
             params: { page: 1, pageSize: 25 },
           }),
-          api.get(`/reviewer/${userId}/submitted-ratings`, {
+          apiPort5113.get(`/reviewer/${userId}/submitted-ratings`, {
             params: { page: 1, pageSize: 25 },
           }).catch(() => ({ data: [] })),
         ]);
@@ -226,7 +227,7 @@ function TeamLeadPage() {
         const submittedWithDetails = await Promise.all(
           submittedAssessmentsBasic.map(async (basic) => {
             try {
-              const detailResp = await api.get(
+              const detailResp = await apiPort5113.get(
                 `/reviewer/${userId}/assessment/${basic.assessmentId}`
               );
               return detailResp.data;
@@ -273,7 +274,7 @@ function TeamLeadPage() {
           ? `/approver/${userId}/assessment/${assess.assessmentId}/attachments`
           : `/reviewer/${userId}/assessment/${assess.assessmentId}/attachments`;
  
-      const attachmentsResp = await api.get(endpoint);
+      const attachmentsResp = await apiPort5113.get(endpoint);
       const attachments =
         attachmentsResp.data?.data || attachmentsResp.data || [];
  
@@ -326,7 +327,7 @@ function TeamLeadPage() {
         return;
       }
  
-      await api.post(`/approver/${userId}/reviews`, {
+      await apiPort5113.post(`/approver/${userId}/reviews`, {
         assessmentId: modalData.assessmentId,
         items,
       });
@@ -379,11 +380,11 @@ function TeamLeadPage() {
         return;
       }
  
-      await api.post(`/reviewer/${userId}/reviews`, {
+      await apiPort5113.post(`/reviewer/${userId}/reviews`, {
         assessmentId: modalData.assessmentId,
         items,
       });
-      await api.post(
+      await apiPort5113.post(
         `/reviewer/${userId}/decision?assessmentId=${modalData.assessmentId}&decision=approved`,
         "",
         { headers: { "Content-Type": "application/json" } }
@@ -405,7 +406,7 @@ function TeamLeadPage() {
     }
     setL2ActionLoading(true);
     try {
-      await api.post(
+      await apiPort5113.post(
         `/reviewer/${userId}/decision?assessmentId=${modalData.assessmentId}&decision=rejected`,
         rejectionReason,
         { headers: { "Content-Type": "application/json" } }
@@ -427,7 +428,7 @@ function TeamLeadPage() {
           ? `/approver/${userId}/attachments/${attachmentId}/download`
           : `/reviewer/${userId}/attachments/${attachmentId}/download`;
  
-      const response = await api.get(endpoint, {
+      const response = await apiPort5113.get(endpoint, {
         responseType: "blob",
       });
  

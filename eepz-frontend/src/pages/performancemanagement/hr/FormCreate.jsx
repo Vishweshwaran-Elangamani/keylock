@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../../../services/performancemanagement/hr/api";
+import api from "../../../services/performancemanagement/api/api";
 import { toast } from "sonner";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import "../../../styles/performancemanagement/hr/FormCreate.css";

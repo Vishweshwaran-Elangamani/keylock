@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import * as api from "../../../services/performancemanagement/hr/api";
+import * as api from "../../../services/performancemanagement/api/nominationapi";
 import RewardTypeModal from "../../../components/performance_management/modals/Recognition/RewardTypeModal";
 import ParameterModal from "../../../components/performance_management/modals/Recognition/ParameterModal";
 import DeleteConfirmModal from "../../../components/performance_management/modals/Recognition/DeleteConfirmModal";

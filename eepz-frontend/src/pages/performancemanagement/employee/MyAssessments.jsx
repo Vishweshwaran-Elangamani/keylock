@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Toaster, toast } from "sonner";
-import api from "../../../services/performancemanagement/hr/api";
+import api from "../../../services/performancemanagement/api/api";
 import logoImage from "../../../assets/logodark.png";
 import "../../../styles/performancemanagement/employee/MyAssessments.css";
 
@@ -410,7 +410,7 @@ function MyAssessments() {
     setDateFilter("");
   };
 
-  const renderTable = (data) => (
+  const renderTable = (data, activeTab) => (
     <div className="empassper-table-container">
       <table className="empassper-table" style={{ borderCollapse: "separate", borderSpacing: 0, width: "100%", border: "1px solid black", borderRadius: "12px" }}>
         <thead>
@@ -419,7 +419,9 @@ function MyAssessments() {
             <th>TYPE</th>
             <th>DEADLINE</th>
             <th>STATUS</th>
-            <th style={{ borderTopRightRadius: "8px" }}>SUBMISSION</th>
+            <th style={{ borderTopRightRadius: "8px" }}>
+              {activeTab === "pending" ? "SUBMISSION" : "VIEW"}
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -469,6 +471,7 @@ function MyAssessments() {
       </table>
     </div>
   );
+
 
   if (loading) {
     return (
@@ -610,66 +613,67 @@ function MyAssessments() {
       
 
       <div className="empassper-pill-tabs-wrapper" role="tablist" aria-label="Assessment tabs">
-        <div className="empassper-pill-tabs">
-          <button
-            role="tab"
-            aria-pressed={activeTab === "pending"}
-            className={`empassper-pill ${activeTab === "pending" ? "empassper-pill--active" : ""}`}
-            onClick={() => setActiveTab("pending")}
-          >
-            <span className="empassper-pill-text">Pending Assessments</span>
-            <span className="empassper-pill-count">({filteredPending.length})</span>
-          </button>
+  <div className="empassper-pill-tabs">
+    <button
+      role="tab"
+      aria-pressed={activeTab === "pending"}
+      className={`empassper-pill ${activeTab === "pending" ? "empassper-pill--active" : ""}`}
+      onClick={() => setActiveTab("pending")}
+    >
+      <span className="empassper-pill-text">Pending Assessments</span>
+      <span className="empassper-pill-count">({filteredPending.length})</span>
+    </button>
 
-          <button
-            role="tab"
-            aria-pressed={activeTab === "completed"}
-            className={`empassper-pill ${activeTab === "completed" ? "empassper-pill--active" : ""}`}
-            onClick={() => setActiveTab("completed")}
-          >
-            <span className="empassper-pill-text">Completed Assessments</span>
-            <span className="empassper-pill-count">({filteredCompleted.length})</span>
-          </button>
+    <button
+      role="tab"
+      aria-pressed={activeTab === "completed"}
+      className={`empassper-pill ${activeTab === "completed" ? "empassper-pill--active" : ""}`}
+      onClick={() => setActiveTab("completed")}
+    >
+      <span className="empassper-pill-text">Completed Assessments</span>
+      <span className="empassper-pill-count">({filteredCompleted.length})</span>
+    </button>
+  </div>
+</div>
+
+{activeTab === "pending" && (
+  <>
+    {filteredPending.length > 0 ? (
+      renderTable(filteredPending, activeTab)
+    ) : (
+      <div className="empassper-empty-state">
+        <div className="empassper-empty-icon">
+          <i className="bi bi-inbox"></i>
         </div>
+        <h3 className="empassper-empty-title">No Pending Assessments</h3>
+        <p className="empassper-empty-text">
+          {assignments.length === 0
+            ? "You don't have any assessments assigned yet."
+            : "All assessments have been completed or filtered out!"}
+        </p>
       </div>
+    )}
+  </>
+)}
 
-      {activeTab === "pending" && (
-        <>
-          {filteredPending.length > 0 ? (
-            renderTable(filteredPending)
-          ) : (
-            <div className="empassper-empty-state">
-              <div className="empassper-empty-icon">
-                <i className="bi bi-inbox"></i>
-              </div>
-              <h3 className="empassper-empty-title">No Pending Assessments</h3>
-              <p className="empassper-empty-text">
-                {assignments.length === 0
-                  ? "You don't have any assessments assigned yet."
-                  : "All assessments have been completed or filtered out!"}
-              </p>
-            </div>
-          )}
-        </>
-      )}
+{activeTab === "completed" && (
+  <>
+    {filteredCompleted.length > 0 ? (
+      renderTable(filteredCompleted, activeTab)
+    ) : (
+      <div className="empassper-empty-state">
+        <div className="empassper-empty-icon">
+          <i className="bi bi-clipboard-check"></i>
+        </div>
+        <h3 className="empassper-empty-title">No Completed Assessments</h3>
+        <p className="empassper-empty-text">
+          Complete your pending assessments to see them here.
+        </p>
+      </div>
+    )}
+  </>
+)}
 
-      {activeTab === "completed" && (
-        <>
-          {filteredCompleted.length > 0 ? (
-            renderTable(filteredCompleted)
-          ) : (
-            <div className="empassper-empty-state">
-              <div className="empassper-empty-icon">
-                <i className="bi bi-clipboard-check"></i>
-              </div>
-              <h3 className="empassper-empty-title">No Completed Assessments</h3>
-              <p className="empassper-empty-text">
-                Complete your pending assessments to see them here.
-              </p>
-            </div>
-          )}
-        </>
-      )}
 
       {showModal && currentAssignment && (
         <div
@@ -877,7 +881,7 @@ function MyAssessments() {
                               alignItems: "center",
                               gap: "6px",
                               padding: "10px 20px",
-                              backgroundColor: "#007bff",
+                              backgroundColor: "#27235c",
                               color: "white",
                               borderRadius: "6px",
                               cursor: "pointer",
@@ -885,8 +889,8 @@ function MyAssessments() {
                               fontWeight: "500",
                               transition: "background-color 0.2s",
                             }}
-                            onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
-                            onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
+                            onMouseOver={(e) => e.target.style.backgroundColor = "#27235c"}
+                            onMouseOut={(e) => e.target.style.backgroundColor = "#27235c"}
                           >
                             <i className="bi bi-cloud-upload"></i> Add Attachment
                           </label>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../../services/performancemanagement/hr/api";
+import api from "../../../services/performancemanagement/api/api";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import AppraisalDetailsModal from "../../../components/performance_management/modals/HRViewAssessment/AppraisalDetailsModal";
 import "../../../styles/performancemanagement/hr/HRViewAssessment.css";

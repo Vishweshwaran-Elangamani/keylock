@@ -2,7 +2,10 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import api, { apiPort5222 } from "../../../services/performancemanagement/hr/api";
+import api from "../../../services/performancemanagement/api/api";
+import { apiPort5113 } from "../../../services/performancemanagement/api/rolesapi";
+import { apiPort5114 } from "../../../services/performancemanagement/api/nominationapi";
+
 import ViewFormDetailsModal from "../../../components/performance_management/modals/FormsList/ViewFormDetailsModal";
 import DeadlineModal from "../../../components/performance_management/modals/FormsList/DeadlineModal";
 import "../../../styles/performancemanagement/hr/FormList.css";
@@ -160,7 +163,7 @@ function FormsList() {
 
         let filteredUsersData = [];
         if (selectedForm.type === "Manager") {
-          const managersRes = await apiPort5222.get("/Employees/all-managers");
+          const managersRes = await apiPort5113.get("/Employees/all-managers");
           filteredUsersData = Array.isArray(managersRes.data?.data)
             ? managersRes.data.data
             : [];

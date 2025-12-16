@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import api from "../../../services/performancemanagement/hr/api";
+import api from "../../../services/performancemanagement/api/api";
 
 function HRSubmittedAssessments() {
 

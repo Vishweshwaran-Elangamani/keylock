@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   getPendingAcknowledgments,
   acknowledgeRating,
-} from "../../../services/performancemanagement/hr/api";
+} from "../../../services/performancemanagement/api/rolesapi";
 import { Toaster, toast } from "sonner";
 
 const THEME = {
