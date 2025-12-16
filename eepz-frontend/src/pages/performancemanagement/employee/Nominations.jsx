@@ -86,7 +86,7 @@ export default function Nominations() {
             ></i>
           </span>
 
-          <div style={{ paddingLeft: "79px" }}>
+          <div style={{ paddingLeft: "155px" }}>
             <h3 className="ehp-nomination-title">Congratulations!</h3>
             <p className="ehp-nomination-text">
               You have been nominated for:{" "}

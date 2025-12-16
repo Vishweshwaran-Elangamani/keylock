@@ -227,7 +227,9 @@ export const getDeptHeadApprovedNominations = (deptHeadId) => {
 };
 
 export const getEmployeeNominations = (employeeId) => {
-  return api.get(`/EmployeeNomination/search?employeeId=${employeeId}`);
+  return apiPort5113.get('/EmployeeNomination/search', {
+    params: { employeeId } 
+  });
 };
 
 // Export all instances
