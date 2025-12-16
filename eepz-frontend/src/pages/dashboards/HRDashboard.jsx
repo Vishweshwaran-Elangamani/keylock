@@ -577,17 +577,18 @@ const HRDashboard = () => {
           </div>
         </div>
 
+        {/* FIXED: Changed from perfOverview.pendingNominations to kpiStats.pendingNominations */}
         <div className="admin-kpi-card">
           <div className="admin-kpi-icon admin-yellow">
             <Award size={28} />
           </div>
           <div className="admin-kpi-content">
             <h2>
-              <CountUp end={perfOverview.pendingNominations} duration={2} />
+              <CountUp end={kpiStats.pendingNominations} duration={2} />
             </h2>
             <p>Pending Nominations</p>
             <span className="admin-kpi-subtitle">
-              {perfOverview.totalNominations} total
+              {dashboardData.nominations.length} total
             </span>
           </div>
         </div>

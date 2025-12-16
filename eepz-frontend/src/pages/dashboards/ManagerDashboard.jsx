@@ -4,16 +4,14 @@ import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
+  ResponsiveContainer,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  LineChart,
-  Line,
 } from "recharts";
 import CountUp from "react-countup";
 import {
@@ -27,11 +25,10 @@ import {
 import goalService from "../../services/goals/goalService";
 import nominationService from "../../services/internal/nominationService";
 import lndService from "../../services/lnd/lndService";
-import {
-  getTeamMembers,
-} from "../../services/performancemanagement/manager/managernominationapi";
+import { getTeamMembers } from "../../services/performancemanagement/manager/managernominationapi";
 import meetingService from "../../services/meeting/meetingService";
 import slaService from "../../services/sla/slaService";
+import internalApi from "../../services/internal/internalApi";
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
 import "../../styles/auth/AdminDashboard.css";
@@ -63,6 +60,24 @@ const ManagerDashboard = () => {
 
   useEffect(() => {
     fetchAllData();
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchAllData();
+      }
+    };
+
+    const handleFocus = () => {
+      fetchAllData();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
 
   const getUserData = () => {
@@ -73,7 +88,7 @@ const ManagerDashboard = () => {
     } catch {
       return null;
     }
-  };          
+  };
 
   const extractData = (response) => {
     if (!response) return [];
@@ -83,6 +98,10 @@ const ManagerDashboard = () => {
       if (response.data) {
         if (Array.isArray(response.data)) return response.data;
         if (response.data.$values) return response.data.$values;
+        if (response.data.nominations) {
+          if (Array.isArray(response.data.nominations)) return response.data.nominations;
+          if (response.data.nominations.$values) return response.data.nominations.$values;
+        }
         if (response.data.items) {
           if (Array.isArray(response.data.items)) return response.data.items;
           if (response.data.items.$values) return response.data.items.$values;
@@ -93,22 +112,32 @@ const ManagerDashboard = () => {
     if (response.data) {
       if (Array.isArray(response.data)) return response.data;
       if (response.data.$values) return response.data.$values;
+      if (response.data.nominations) {
+        if (Array.isArray(response.data.nominations)) return response.data.nominations;
+        if (response.data.nominations.$values) return response.data.nominations.$values;
+      }
       if (response.data.data) {
         if (Array.isArray(response.data.data)) return response.data.data;
         if (response.data.data.$values) return response.data.data.$values;
-        if (response.data.data.items?.$values)
-          return response.data.data.items.$values;
+        if (response.data.data.nominations) return response.data.data.nominations;
+        if (response.data.data.items?.$values) return response.data.data.items.$values;
         if (response.data.data.items) return response.data.data.items;
       }
     }
 
     if (response.$values) return response.$values;
+    if (response.nominations) {
+      if (Array.isArray(response.nominations)) return response.nominations;
+      if (response.nominations.$values) return response.nominations.$values;
+    }
+
     return [];
   };
 
   const fetchAllData = async () => {
     try {
       setLoading(true);
+
       const user = getUserData();
 
       if (!user) {
@@ -124,7 +153,8 @@ const ManagerDashboard = () => {
         allGoalsRes,
         myProjectsRes,
         pendingApprovalsRes,
-        myNominationsPerfMgmtRes,
+        managerTeamNominationsRes,
+        managerApprovedNominationsRes,
         pendingManagerReviewsRes,
         teamMembersRes,
         teamAssignmentsRes,
@@ -139,9 +169,8 @@ const ManagerDashboard = () => {
           .catch(() => ({ data: [] })),
         goalService.getUserProjects().catch(() => ({ data: [] })),
         goalService.getPendingApprovals().catch(() => ({ data: [] })),
-        nominationService
-          .getMyNominations()
-          .catch(() => ({ success: false, data: [] })),
+        internalApi.get(`/ManagerNomination/team/${managerId}`).catch(() => ({ data: [] })),
+        internalApi.get(`/ManagerNomination/approved/${managerId}`).catch(() => ({ data: [] })),
         nominationService
           .getPendingManagerReview()
           .catch(() => ({ success: false, data: [] })),
@@ -163,7 +192,7 @@ const ManagerDashboard = () => {
         const title = (g.title || "").toLowerCase();
         const type = (g.goalType || g.type || "").toLowerCase();
         return title.includes("self") || title.includes("personal") || type === "self";
-      }); 
+      });
 
       const extractedTeamGoals = allGoalsExtracted.filter((g) => {
         const title = (g.title || "").toLowerCase();
@@ -183,8 +212,35 @@ const ManagerDashboard = () => {
 
       const extractedProjects = extractData(myProjectsRes);
       const extractedPendingApprovals = extractData(pendingApprovalsRes);
-      const extractedMyNominationsPerfMgmt = extractData(myNominationsPerfMgmtRes);
-      const extractedPendingManagerReviews = extractData(pendingManagerReviewsRes);
+
+      // Extract all nominations from different sources
+      let extractedManagerNominations = extractData(managerTeamNominationsRes);
+      let extractedApprovedNominations = extractData(managerApprovedNominationsRes);
+      let extractedPendingManagerReviews = extractData(pendingManagerReviewsRes);
+
+      console.log("===== MANAGER TEAM NOMINATIONS (Pending) =====", extractedManagerNominations);
+      console.log("===== MANAGER APPROVED NOMINATIONS =====", extractedApprovedNominations);
+      console.log("===== PENDING MANAGER REVIEWS =====", extractedPendingManagerReviews);
+
+      // Combine all sources
+      const allNominationsCombined = [
+        ...extractedManagerNominations,
+        ...extractedApprovedNominations,
+        ...extractedPendingManagerReviews
+      ];
+
+      // Remove duplicates based on nominationId or id
+      const uniqueNominations = Array.from(
+        new Map(allNominationsCombined.map(item => [item.nominationId || item.id, item])).values()
+      );
+
+      console.log("===== UNIQUE NOMINATIONS =====", uniqueNominations.length);
+      uniqueNominations.forEach(nom => {
+        const status = nom.status || nom.nominationStatus;
+        const id = nom.nominationId || nom.id;
+        console.log(`- ID: ${id}, Status: ${status}`);
+      });
+
       const extractedTeamMembers = extractData(teamMembersRes);
 
       const extractedTeamAssignments =
@@ -221,7 +277,7 @@ const ManagerDashboard = () => {
         allGoals: allGoalsCombined,
         pendingApprovals: extractedPendingApprovals,
         myProjects: extractedProjects,
-        myNominationsPerfMgmt: extractedMyNominationsPerfMgmt,
+        myNominationsPerfMgmt: uniqueNominations,
         pendingManagerReviews: extractedPendingManagerReviews,
         teamMembers: extractedTeamMembers,
         teamAssignments: extractedTeamAssignments,
@@ -364,14 +420,14 @@ const ManagerDashboard = () => {
       "#8b5cf6",
       "#2c2c54",
     ];
-    
+
     const statusCount = {};
     dashboardData.teamAssignments.forEach((assignment) => {
       const rawStatus = assignment.assignmentStatus || assignment.status || "Unknown";
       const key = formatStatusLabel(rawStatus);
       statusCount[key] = (statusCount[key] || 0) + 1;
     });
-    
+
     return Object.entries(statusCount)
       .map(([name, value], index) => ({
         name,
@@ -383,7 +439,7 @@ const ManagerDashboard = () => {
 
   const getEscalationHistory = () => {
     const escalations = dashboardData.managerEscalations;
-    
+
     const ESCALATION_COLORS = {
       "Pending": "#f59e0b",
       "Resolved": "#10b981",
@@ -426,6 +482,47 @@ const ManagerDashboard = () => {
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
 
+    const statusCount = {};
+    nominations.forEach((nom) => {
+      const rawStatus = nom.status || nom.nominationStatus || "Unknown";
+      const key = formatStatusLabel(rawStatus);
+      statusCount[key] = (statusCount[key] || 0) + 1;
+    });
+
+    console.log("===== NOMINATION STATUS COUNT =====", statusCount);
+
+    // Count approved nominations (all variations)
+    const approvedCount = nominations.filter(n => {
+      const status = (n.status || n.nominationStatus || "").toLowerCase();
+      return status.includes("approved") || 
+             status === "manager_approved" || 
+             status === "managerapproved" ||
+             status === "hr_approved" ||
+             status === "hrapproved";
+    }).length;
+
+    const pendingCount = nominations.filter(n => {
+      const status = (n.status || n.nominationStatus || "").toLowerCase();
+      return status.includes("pending");
+    }).length;
+
+    const rejectedCount = nominations.filter(n => {
+      const status = (n.status || n.nominationStatus || "").toLowerCase();
+      return status.includes("rejected");
+    }).length;
+
+    console.log("Approved:", approvedCount, "Pending:", pendingCount, "Rejected:", rejectedCount);
+
+    const statusChartData = Object.entries(statusCount).map(([name, value]) => ({
+      name,
+      value,
+      fill:
+        name.toLowerCase().includes("pending") ? "#f59e0b" :
+        name.toLowerCase().includes("approved") ? "#10b981" :
+        name.toLowerCase().includes("rejected") ? "#ef4444" :
+        "#0F62FE"
+    }));
+
     const thisMonthNominations = nominations.filter((nom) => {
       const dateFields = [
         nom.createdDate,
@@ -450,14 +547,13 @@ const ManagerDashboard = () => {
       return false;
     });
 
-    const chartData = [
-      { category: "Total Nominations", count: nominations.length },
-    ];
-
     return {
       total: nominations.length,
       thisMonth: thisMonthNominations.length,
-      chartData,
+      approved: approvedCount,
+      pending: pendingCount,
+      rejected: rejectedCount,
+      chartData: statusChartData.filter(item => item.value > 0),
     };
   };
 
@@ -527,24 +623,12 @@ const ManagerDashboard = () => {
   const meetingScheduleData = getMeetingScheduleData();
   const meetingOverview = getMeetingOverview();
 
-  const CHART_COLORS = [
-    "#2c2c54",
-    "#0F62FE",
-    "#10b981",
-    "#f59e0b",
-    "#E01950",
-    "#8b5cf6",
-  ];
-
   return (
     <div className="hr-dashboard-container">
       <Breadcrumb items={[{ label: "Manager Dashboard" }]} />
 
       <div className="admin-kpi-grid">
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("")}
-        >
+        <div className="admin-kpi-card" onClick={() => navigate("")}>
           <div className="admin-kpi-icon admin-pink">
             <Users size={28} />
           </div>
@@ -559,10 +643,7 @@ const ManagerDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("")}
-        >
+        <div className="admin-kpi-card" onClick={() => navigate("")}>
           <div className="admin-kpi-icon admin-blue">
             <Target size={28} />
           </div>
@@ -577,10 +658,7 @@ const ManagerDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("")}
-        >
+        <div className="admin-kpi-card" onClick={() => navigate("")}>
           <div className="admin-kpi-icon admin-purple">
             <Shield size={28} />
           </div>
@@ -595,10 +673,7 @@ const ManagerDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("")}
-        >
+        <div className="admin-kpi-card" onClick={() => navigate("")}>
           <div className="admin-kpi-icon admin-green">
             <Calendar size={28} />
           </div>
@@ -613,10 +688,7 @@ const ManagerDashboard = () => {
           </div>
         </div>
 
-        <div
-          className="admin-kpi-card"
-          onClick={() => navigate("")}
-        >
+        <div className="admin-kpi-card" onClick={() => navigate("")}>
           <div className="admin-kpi-icon admin-cyan">
             <AlertTriangle size={28} />
           </div>
@@ -827,7 +899,7 @@ const ManagerDashboard = () => {
             <div className="card-header-dark">
               <div className="card-header-content">
                 <i className="bi bi-award"></i>
-                <h3>Nomination History</h3>
+                <h3>Nomination Status</h3>
               </div>
             </div>
             <div className="card-body">
@@ -835,7 +907,7 @@ const ManagerDashboard = () => {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
+                    gridTemplateColumns: "1fr 1fr 1fr",
                     gap: "0.75rem",
                     marginBottom: "1rem",
                   }}
@@ -859,7 +931,7 @@ const ManagerDashboard = () => {
                       {nominationHistory.total}
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "#1e40af" }}>
-                      Total All Time
+                      Total
                     </div>
                   </div>
                   <div
@@ -878,56 +950,64 @@ const ManagerDashboard = () => {
                         color: "#10b981",
                       }}
                     >
-                      {nominationHistory.thisMonth}
+                      {nominationHistory.approved}
                     </div>
                     <div style={{ fontSize: "0.75rem", color: "#047857" }}>
-                      This Month
+                      Approved
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      background: "#fef3c7",
+                      padding: "0.75rem",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                      border: "1px solid #fcd34d",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        color: "#d97706",
+                      }}
+                    >
+                      {nominationHistory.pending}
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "#b45309" }}>
+                      Pending
                     </div>
                   </div>
                 </div>
               </div>
               {nominationHistory.total > 0 ? (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    background: "#f5f5f5",
-                    borderRadius: "8px",
-                    padding: "1rem 0",
-                  }}
-                >
-                  <div style={{ width: "65%" }}>
-                    <ResponsiveContainer width="100%" height={180}>
-                      <BarChart data={nominationHistory.chartData} barSize={50}>
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          stroke="#e5e7eb"
-                          vertical={false}
-                        />
-                        <XAxis
-                          dataKey="category"
-                          stroke="#6b7280"
-                          fontSize={10}
-                        />
-                        <YAxis stroke="#6b7280" fontSize={11} />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            border: "1px solid #e5e7eb",
-                            borderRadius: "6px",
-                            fontSize: "12px",
-                          }}
-                        />
-                        <Bar
-                          dataKey="count"
-                          fill="#97247E"
-                          radius={[6, 6, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={nominationHistory.chartData}
+                      cx="50%"
+                      cy="45%"
+                      outerRadius={70}
+                      dataKey="value"
+                      label={false}
+                    >
+                      {nominationHistory.chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend
+                      layout="horizontal"
+                      align="center"
+                      verticalAlign="bottom"
+                      wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                      formatter={(value, entry) => {
+                        const item = nominationHistory.chartData.find(d => d.name === entry.value);
+                        return `${item?.name || value}: ${item?.value || 0}`;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="no-data-message">No nominations yet</div>
               )}
@@ -1176,10 +1256,7 @@ const ManagerDashboard = () => {
                       label={false}
                     >
                       {escalationHistory.chartData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.fill}
-                        />
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))}
                     </Pie>
                     <Tooltip />
