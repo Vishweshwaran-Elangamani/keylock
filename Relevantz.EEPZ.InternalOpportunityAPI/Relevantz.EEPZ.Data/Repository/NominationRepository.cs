@@ -223,7 +223,7 @@ namespace Relevantz.EEPZ.Data.Repository
                     .Include(n => n.NominatedByUser)
                     .Where(n => 
                         n.CurrentApprovalLevel == 1 && 
-                        n.L2ManagerUserId == managerId && 
+                        n.L2managerUserId == managerId && 
                         n.Status == "Pending_Manager_Review")
                     .OrderByDescending(n => n.SubmittedAt)
                     .ToListAsync();
@@ -477,10 +477,10 @@ public async Task<List<Nomination>> GetNominationHistoryByUserIdAsync(int userId
             .Include(n => n.NominatedByUser)
                 .ThenInclude(u => u.Employee)
                 .ThenInclude(e => e.Userprofile)
-            .Include(n => n.L1ManagerUser)
+            .Include(n => n.L1managerUser)
                 .ThenInclude(u => u.Employee)
                 .ThenInclude(e => e.Userprofile)
-            .Include(n => n.L2ManagerUser)
+            .Include(n => n.L2managerUser)
                 .ThenInclude(u => u.Employee)
                 .ThenInclude(e => e.Userprofile)
             .Include(n => n.DeptHeadUser)
