@@ -22,7 +22,7 @@ services:
 
   analysis-api:
     build: ./Relevantz.EEPZ.AnalysisApi
-    container_name: analysis-api
+    container_name: eepz-analysis-api
     restart: always
     ports:
       - "5111:5111"
