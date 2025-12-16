@@ -13,18 +13,18 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize]
     public class LnDSmeController : BaseLnDController
     {
-        private readonly ILnDService _lndService;
+       private readonly ILnDSmeService _smeService;
 
-        public LnDSmeController(ILnDService lndService)
+        public LnDSmeController(ILnDSmeService smeService)
         {
-            _lndService = lndService;  
+            _smeService = smeService;
         }
 
         [HttpGet("check")]    
         public async Task<IActionResult> CheckIfEmployeeIsSme()
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.CheckIfEmployeeIsSme(employeeId);
+            var result = await _smeService.CheckIfEmployeeIsSme(employeeId);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -33,7 +33,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> ApplyToBecomeSme([FromForm] BecomeSmeRequest request)
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.ApplyToBecomeSme(employeeId, request);
+            var result = await _smeService.ApplyToBecomeSme(employeeId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }    
@@ -46,7 +46,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] int pageSize = 10
         )
         {
-            var result = await _lndService.GetAvailableSmes(
+            var result = await _smeService.GetAvailableSmes(
                 skillId,
                 searchTerm,
                 pageNumber,

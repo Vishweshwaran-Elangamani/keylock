@@ -14,11 +14,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize]
     public class LnDAssignmentsController : BaseLnDController
     {
-        private readonly ILnDService _lndService;
+       private readonly ILnDAssignmentService _assignmentService;
 
-        public LnDAssignmentsController(ILnDService lndService)
+        // CHANGED: Constructor injection
+        public LnDAssignmentsController(ILnDAssignmentService assignmentService)
         {
-            _lndService = lndService;
+            _assignmentService = assignmentService;
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
         public async Task<IActionResult> CheckOverdueAssignments()
         {
-            var result = await _lndService.CheckAndMarkOverdueAssignments();
+            var result = await _assignmentService.CheckAndMarkOverdueAssignments();
 
             if (!result.Success)
                 return BadRequest(result);
@@ -36,11 +37,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             return Ok(result);
         }
 
+
         [HttpPost("request-sme")]
         public async Task<IActionResult> RequestSmeAssignment([FromBody] SmeRequestDto request)
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.RequestSmeAssignment(managerId, request);
+            var result = await _assignmentService.RequestSmeAssignment(managerId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -56,7 +58,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetMyAssignments(
+            var result = await _assignmentService.GetMyAssignments(
                 employeeId,
                 statusFilter,
                 searchTerm,
@@ -79,7 +81,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.ExportTeamAssignmentsToExcel(
+            var result = await _assignmentService.ExportTeamAssignmentsToExcel(
                 managerId,
                 statusFilter,
                 searchTerm,
@@ -107,7 +109,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.GetTeamAssignments(
+            var result = await _assignmentService.GetTeamAssignments(
                 managerId,
                 statusFilter,
                 searchTerm,
@@ -131,7 +133,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var smeEmployeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetSmeAssignments(
+            var result = await _assignmentService.GetSmeAssignments(
                 smeEmployeeId,
                 statusFilter,
                 searchTerm,
@@ -150,20 +152,20 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.UploadCompletionProof(employeeId, request);
+            var result = await _assignmentService.UploadCompletionProof(employeeId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPost("complete")]
+        [HttpPost("complete")]     
         public async Task<IActionResult> CompleteAssignment(
             [FromBody] CompleteAssignmentRequest request
         )
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.CompleteAssignment(managerId, request);
+            var result = await _assignmentService.CompleteAssignment(managerId, request);
 
-            return result.Success ? Ok(result) : BadRequest(result);
+            return result.Success ? Ok(result) : BadRequest(result); 
         }
     }
 }

@@ -13,11 +13,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize]
     public class LnDApprovalsController : BaseLnDController
     {
-        private readonly ILnDService _lndService;
+        private readonly ILnDApprovalService _approvalService;
 
-        public LnDApprovalsController(ILnDService lndService)
+       
+        public LnDApprovalsController(ILnDApprovalService approvalService)
         {
-            _lndService = lndService;
+            _approvalService = approvalService;
         }
 
         [HttpGet("my-approvals")]
@@ -33,7 +34,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 )
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetMyApprovals(
+            var result = await _approvalService.GetMyApprovals(
                 employeeId,
                 approvalType,
                 status,
@@ -52,7 +53,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> ProcessApproval([FromBody] ApprovalDecisionRequest request)
         {
             var approverId = GetCurrentEmployeeId();
-            var result = await _lndService.ProcessApproval(approverId, request);
+            var result = await _approvalService.ProcessApproval(approverId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -73,7 +74,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetApprovalHistory(
+            var result = await _approvalService.GetApprovalHistory(
                 employeeId,
                 approvalType,
                 status,
@@ -95,7 +96,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> GetApprovalDetails(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetApprovalDetails(employeeId, approvalId);
+            var result = await _approvalService.GetApprovalDetails(employeeId, approvalId);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -107,7 +108,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> DownloadApprovalAttachment(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetApprovalAttachment(employeeId, approvalId);
+            var result = await _approvalService.GetApprovalAttachment(employeeId, approvalId);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -115,6 +116,9 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var fileBytes = result.Data.FileBytes;
             var fileName = result.Data.FileName;
             var contentType = result.Data.ContentType;
+
+            
+            Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
 
             return File(fileBytes, contentType, fileName);
         }
@@ -126,7 +130,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> DownloadAssignmentProof(int assignmentId)
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetAssignmentProof(employeeId, assignmentId);
+            var result = await _approvalService.GetAssignmentProof(employeeId, assignmentId);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -134,7 +138,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             var fileBytes = result.Data.FileBytes;
             var fileName = result.Data.FileName;
             var contentType = result.Data.ContentType;
-
+            Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
             return File(fileBytes, contentType, fileName);
         }
 
@@ -142,7 +146,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> PreviewApprovalAttachment(int approvalId)
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.PreviewApprovalAttachment(employeeId, approvalId);
+            var result = await _approvalService.PreviewApprovalAttachment(employeeId, approvalId);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -154,7 +158,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> PreviewAssignmentProof(int assignmentId)
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.PreviewAssignmentProof(employeeId, assignmentId);
+            var result = await _approvalService.PreviewAssignmentProof(employeeId, assignmentId);
 
             if (!result.Success)
                 return BadRequest(result);

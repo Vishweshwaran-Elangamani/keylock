@@ -143,7 +143,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=mysql;Database=eepzdb;User=root;Password=root;
-      - ASPNETCORE_URLS=http://+:5107
+      - ASPNETCORE_URLS=http://+:5107        
       
     depends_on:
       mysql:

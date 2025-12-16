@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Relevantz.EEPZ.Core.Services.Implementations
 {
-    public class FileStorageService : IFileStorageService
+    public class FileStorageService : IFileStorageService  
     {
         private readonly IWebHostEnvironment _environment;
         private readonly string _baseFolder = "uploads";
@@ -45,6 +45,7 @@ namespace Relevantz.EEPZ.Core.Services.Implementations
                 _ => "application/octet-stream"
             };
         }
+
 
         public async Task<string> SaveFileAsync(IFormFile file, string subFolder)
         {

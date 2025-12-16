@@ -138,7 +138,7 @@ builder.Services.AddDbContext<EEPZDbContext>(options =>
         options.EnableSensitiveDataLogging();
         options.EnableDetailedErrors();
     }
-});  
+});
 
 // ===================================
 // Configure JWT Authentication
@@ -198,14 +198,28 @@ builder.Services.AddAuthorization();
 // Register Application Services (DI)
 // ===================================
 
+// ============================================
+// LnD Module - Complete Registration
+// ============================================
+
 // File Storage Service
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 
+// LnD Repositories
+builder.Services.AddScoped<ILnDEmployeeSkillRepository, LnDEmployeeSkillRepository>();
+builder.Services.AddScoped<ILnDSmeRepository, LnDSmeRepository>();
+builder.Services.AddScoped<ILnDAssignmentRepository, LnDAssignmentRepository>();
+builder.Services.AddScoped<ILnDApprovalRepository, LnDApprovalRepository>();
+builder.Services.AddScoped<ILnDHRRepository, LnDHRRepository>();
 
-builder.Services.AddScoped<ILnDRepository, LnDRepository>();
+// LnD Services
+builder.Services.AddScoped<ILnDEmployeeSkillService, LnDEmployeeSkillService>();
+builder.Services.AddScoped<ILnDSmeService, LnDSmeService>();
+builder.Services.AddScoped<ILnDAssignmentService, LnDAssignmentService>();
+builder.Services.AddScoped<ILnDApprovalService, LnDApprovalService>();
+builder.Services.AddScoped<ILnDHRService, LnDHRService>();
 
-// Existing service registration
-builder.Services.AddScoped<ILnDService, LnDService>();
+
 
 
 builder.Services.AddCors(options =>

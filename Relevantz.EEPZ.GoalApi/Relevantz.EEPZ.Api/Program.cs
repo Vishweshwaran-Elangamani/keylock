@@ -13,14 +13,13 @@ using Relevantz.EEPZ.Data.DBContexts;
 using Relevantz.EEPZ.Data.Repository.Implementations;
 using Relevantz.EEPZ.Data.Repository.Interface;
 
-// CRITICAL: Clear JWT claim type mappings BEFORE building
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Building........");
 
-// Configure Serilog
+
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -28,14 +27,11 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Log application starting
 Log.Information("Starting EEPZ Backend Application");
 
-// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configure Swagger with JWT support
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc(
@@ -131,7 +127,7 @@ builder
         {
             OnAuthenticationFailed = context =>
             {
-                Log.Error("❌ JWT Authentication Failed: {Message}", context.Exception.Message);
+                Log.Error(" JWT Authentication Failed: {Message}", context.Exception.Message);
                 if (context.Exception.InnerException != null)
                 {
                     Log.Error(
@@ -179,7 +175,7 @@ builder
             OnChallenge = context =>
             {
                 Log.Warning(
-                    "❌ JWT Challenge: {Error}, {ErrorDescription}",
+                    "JWT Challenge: {Error}, {ErrorDescription}",
                     context.Error,
                     context.ErrorDescription
                 );
@@ -195,7 +191,7 @@ builder
                 if (!string.IsNullOrEmpty(token))
                 {
                     Log.Information(
-                        "📨 JWT Token Received (first 20 chars): {Token}...",
+                        " JWT Token Received (first 20 chars): {Token}...",
                         token.Substring(0, Math.Min(20, token.Length))
                     );
                 }
@@ -265,7 +261,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Log configuration details
-Log.Information("🚀 Application Configuration:");
+Log.Information("   Application Configuration:");
 Log.Information("   Environment: {Environment}", app.Environment.EnvironmentName);
 Log.Information("   JWT Issuer: {Issuer}", jwtSettings["Issuer"]);
 Log.Information("   JWT Audience: {Audience}", jwtSettings["Audience"]);
@@ -281,7 +277,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "❌ Application terminated unexpectedly");
+    Log.Fatal(ex, " Application terminated unexpectedly");
 }
 finally
 {

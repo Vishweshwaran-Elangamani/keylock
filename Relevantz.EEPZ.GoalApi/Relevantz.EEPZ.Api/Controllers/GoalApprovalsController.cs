@@ -155,7 +155,7 @@ namespace Relevantz.EEPZ.Api.Controllers.Goals
         {
             try
             {
-                var userId = GetEmpMasterId();
+                var userId = GetEmpMasterId();                  
                 var role = GetUserRole();
 
                 var approvals = await _service.GetUserApprovalsAsync(query, userId, role);

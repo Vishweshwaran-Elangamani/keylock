@@ -13,11 +13,15 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize(Roles = LnDConstants.USER_ROLES.HR)]
     public class LnDHRController : BaseLnDController
     {
-        private readonly ILnDService _lndService;
+       
+        private readonly ILnDHRService _hrService;
+        private readonly ILnDSmeService _smeService;
 
-        public LnDHRController(ILnDService lndService)
+     
+        public LnDHRController(ILnDHRService hrService, ILnDSmeService smeService)
         {
-            _lndService = lndService;
+            _hrService = hrService;
+            _smeService = smeService;
         }
 
         [HttpGet("assignments/organization/export")]
@@ -28,7 +32,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] string? sortOrder
         )
         {
-            var result = await _lndService.ExportOrganizationAssignmentsToExcel(
+            
+            var result = await _hrService.ExportOrganizationAssignmentsToExcel(
                 statusFilter,
                 searchTerm,
                 sortField,
@@ -51,7 +56,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] int pageSize = 9
         )
         {
-            var result = await _lndService.GetAllOrganizationEmployees(
+            //  CHANGED: Call from specific service
+            var result = await _hrService.GetAllOrganizationEmployees(
                 searchTerm,
                 pageNumber,
                 pageSize
@@ -65,7 +71,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] string? searchTerm
         )
         {
-            var result = await _lndService.ExportAllActiveSmesToExcel(searchTerm);
+            //  CHANGED: Call from SME service
+            var result = await _smeService.ExportAllActiveSmesToExcel(searchTerm);
 
             if (!result.Success)
                 return BadRequest(result);
@@ -86,7 +93,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] int pageSize = 10
         )
         {
-            var result = await _lndService.GetAllOrganizationAssignments(
+            //  CHANGED: Call from specific service
+            var result = await _hrService.GetAllOrganizationAssignments(
                 statusFilter,
                 searchTerm,
                 sortField,
@@ -105,7 +113,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] int pageSize = 10
         )
         {
-            var result = await _lndService.GetAllActiveSmes(searchTerm, pageNumber, pageSize);
+            //  CHANGED: Call from SME service
+            var result = await _smeService.GetAllActiveSmes(searchTerm, pageNumber, pageSize);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -118,7 +127,8 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
             [FromQuery] string? sortBy = LnDConstants.DEFAULTS.SORT_BY_SKILL_NAME
         )
         {
-            var result = await _lndService.GetEmployeeSkillsById(
+            
+            var result = await _hrService.GetEmployeeSkillsById(
                 employeeId,
                 pageNumber,
                 searchTerm,
@@ -127,6 +137,5 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
-    }    
+    }
 }
-      

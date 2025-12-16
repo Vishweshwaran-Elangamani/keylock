@@ -14,11 +14,12 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
     [Authorize]
     public class LnDSkillsController : BaseLnDController
     {
-        private readonly ILnDService _lndService;
+        private readonly ILnDEmployeeSkillService _employeeSkillService;
 
-        public LnDSkillsController(ILnDService lndService)
+        // CHANGED: Constructor injection
+        public LnDSkillsController(ILnDEmployeeSkillService employeeSkillService)
         {
-            _lndService = lndService;
+            _employeeSkillService = employeeSkillService;
         }
 
         /// <summary>
@@ -32,7 +33,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.GetSubordinateEmployees(
+            var result = await _employeeSkillService.GetSubordinateEmployees(
                 managerId,
                 searchTerm,
                 pageNumber,
@@ -48,7 +49,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         [HttpGet("all")]
         public async Task<IActionResult> GetAllSkills()
         {
-            var result = await _lndService.GetAllSkills();
+            var result = await _employeeSkillService.GetAllSkills();
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -62,7 +63,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.GetSubordinateSkills(
+            var result = await _employeeSkillService.GetSubordinateSkills(
                 managerId,
                 employeeId,
                 searchTerm,
@@ -78,7 +79,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> RecordEmployeeSkill([FromBody] RecordSkillRequest request)
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.RecordEmployeeSkill(managerId, request);
+            var result = await _employeeSkillService.RecordEmployeeSkill(managerId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -89,7 +90,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.BulkRecordEmployeeSkills(managerId, request);
+            var result = await _employeeSkillService.BulkRecordEmployeeSkills(managerId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -100,7 +101,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.UpdateEmployeeSkillRating(managerId, request);
+            var result = await _employeeSkillService.UpdateEmployeeSkillRating(managerId, request);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -109,7 +110,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         public async Task<IActionResult> DeleteEmployeeSkill(int mapperId)
         {
             var managerId = GetCurrentEmployeeId();
-            var result = await _lndService.DeleteEmployeeSkill(managerId, mapperId);
+            var result = await _employeeSkillService.DeleteEmployeeSkill(managerId, mapperId);
 
             return result.Success ? Ok(result) : BadRequest(result);
         }
@@ -122,7 +123,7 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         )
         {
             var employeeId = GetCurrentEmployeeId();
-            var result = await _lndService.GetMySkills(
+            var result = await _employeeSkillService.GetMySkills(
                 employeeId,
                 searchTerm,
                 pageNumber,
@@ -133,3 +134,4 @@ namespace Relevantz.EEPZ.Api.Controllers.LnD
         }
     }
 }
+      

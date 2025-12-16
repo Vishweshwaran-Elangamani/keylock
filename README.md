@@ -9,4 +9,7 @@
     docker-compose up --build -d
 
 # Check status
-    docker-compose ps 
+    docker-compose ps       
+    
+             
+             
