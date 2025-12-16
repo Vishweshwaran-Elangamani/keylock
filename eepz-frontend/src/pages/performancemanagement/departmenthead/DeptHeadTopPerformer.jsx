@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getDeptHeadApprovedNominations } from "../../../services/performancemanagement/hr/api";
+import { getDeptHeadApprovedNominations } from "../../../services/performancemanagement/api/nominationapi";
 import "../../../styles/performancemanagement/hr/TopPerformers.css";
 
 export default function TopPerformers() {
@@ -85,22 +85,23 @@ export default function TopPerformers() {
                 <p className="dtp-detail-value">{selectedNomination.nominee.fullName}</p>
               </div>
               <div className="dtp-detail-col">
+                <label className="dtp-detail-label">REWARD TYPE</label>
+                <p className="dtp-detail-value">{selectedNomination.rewardType.rewardName}</p>
+              </div>
+              {/* <div className="dtp-detail-col">
                 <label className="dtp-detail-label">EMPLOYEE ID</label>
                 <p className="dtp-detail-value">{selectedNomination.nominee.employeeId}</p>
-              </div>
+              </div> */}
             </div>
 
             <div className="dtp-detail-row">
-              <div className="dtp-detail-col">
+              {/* <div className="dtp-detail-col">
                 <label className="dtp-detail-label">DEPARTMENT</label>
                 <p className="dtp-detail-value">
                   {selectedNomination.nominee.department || "N/A"}
                 </p>
-              </div>
-              <div className="dtp-detail-col">
-                <label className="dtp-detail-label">REWARD TYPE</label>
-                <p className="dtp-detail-value">{selectedNomination.rewardType.rewardName}</p>
-              </div>
+              </div> */}
+              
             </div>
 
             <div className="dtp-detail-section">
