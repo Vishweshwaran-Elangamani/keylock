@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import * as api from "../../../services/performancemanagement/api/nominationapi";
+import apiPort5114 from "../../../services/performancemanagement/Api/nominationapi";
 import RewardTypeModal from "../../../components/performance_management/modals/Recognition/RewardTypeModal";
 import ParameterModal from "../../../components/performance_management/modals/Recognition/ParameterModal";
 import DeleteConfirmModal from "../../../components/performance_management/modals/Recognition/DeleteConfirmModal";
@@ -59,7 +59,7 @@ function RewardConfiguration() {
   const fetchRewardTypes = async () => {
     setLoading(true);
     try {
-      const { data } = await api.getRewardTypes(false);
+      const { data } = await apiPort5114.getRewardTypes(false);
       if (data.success) setRewardTypes(data.data);
     } catch (error) {
       toast.error("Failed to fetch reward types");
@@ -74,7 +74,7 @@ function RewardConfiguration() {
     try {
       await Promise.all(
         rewardTypes.map(async (rt) => {
-          const { data } = await api.getParametersByRewardType(rt.rewardTypeId);
+          const { data } = await apiPort5114.getParametersByRewardType(rt.rewardTypeId);
           if (data.success) {
             counts[rt.rewardTypeId] = data.data.length;
           }
@@ -88,7 +88,7 @@ function RewardConfiguration() {
 
   const fetchParameters = async (rewardTypeId) => {
     try {
-      const { data } = await api.getParametersByRewardType(rewardTypeId);
+      const { data } = await apiPort5114.getParametersByRewardType(rewardTypeId);
       if (data.success) {
         setParameters(data.data);
         // ✅ Update the count for this specific reward type
@@ -151,14 +151,14 @@ function RewardConfiguration() {
     e.preventDefault();
     try {
       if (isEditMode) {
-        const { data } = await api.updateRewardType(editingRewardTypeId, rewardTypeForm);
+        const { data } = await apiPort5114.updateRewardType(editingRewardTypeId, rewardTypeForm);
         if (data.success) {
           toast.success("Reward type updated successfully!");
           closeRewardTypeModal();
           fetchRewardTypes();
         }
       } else {
-        const { data } = await api.createRewardType({
+        const { data } = await apiPort5114.createRewardType({
           ...rewardTypeForm,
           createdBy: 1,
         });
@@ -175,7 +175,7 @@ function RewardConfiguration() {
 
   const handleToggleActive = async (rewardType) => {
     try {
-      const { data } = await api.updateRewardType(rewardType.rewardTypeId, {
+      const { data } = await apiPort5114.updateRewardType(rewardType.rewardTypeId, {
         ...rewardType,
         isActive: !rewardType.isActive,
       });
@@ -205,7 +205,7 @@ function RewardConfiguration() {
 
     try {
       const updatePromises = activeRewards.map((rt) =>
-        api.updateRewardType(rt.rewardTypeId, {
+        apiPort5114.updateRewardType(rt.rewardTypeId, {
           ...rt,
           isVisibleForManagerNomination: newVisibility,
         })
@@ -229,7 +229,7 @@ function RewardConfiguration() {
       return;
     }
     try {
-      const { data } = await api.createParameter({
+      const { data } = await apiPort5114.createParameter({
         ...parameterForm,
         rewardTypeId: selectedRewardType.rewardTypeId,
         minimumValue: parameterForm.minimumValue ? parseInt(parameterForm.minimumValue) : null,
@@ -255,7 +255,7 @@ function RewardConfiguration() {
   const handleConfirmDelete = async () => {
     try {
       if (deleteType === "parameter") {
-        const { data } = await api.deleteParameter(toDeleteId);
+        const { data } = await apiPort5114.deleteParameter(toDeleteId);
         if (data.success) {
           toast.success("Parameter deleted successfully");
           // ✅ Refresh parameters for selected reward type
