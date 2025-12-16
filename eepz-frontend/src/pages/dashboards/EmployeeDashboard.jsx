@@ -1,6 +1,4 @@
 
-
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -24,14 +22,11 @@ import {
   AlertTriangle,
   TrendingUp,
 } from "lucide-react";
+import axios from "axios";
 import goalService from "../../services/goals/goalService";
 import lndService from "../../services/lnd/lndService";
 import rsvpService from "../../services/meeting/rsvpService";
 import slaService from "../../services/sla/slaService";
-import {
-  getApprovedProfiles,
-  getStatistics,
-} from "../../services/performancemanagement/hr/hrnominationapi";
 
 import Breadcrumb from "../../components/common/Breadcrumb";
 import { toast } from "sonner";
@@ -67,12 +62,16 @@ const EmployeeDashboard = () => {
     }
   };
 
+  const getToken = () => {
+    return localStorage.getItem("token") || localStorage.getItem("accessToken");
+  };
+
   const extractData = (response) => {
     if (!response) return [];
     if (Array.isArray(response)) return response;
 
     const data = response.data || response;
-    
+
     const paths = [
       data?.data?.items,
       data?.data?.$values,
@@ -92,6 +91,44 @@ const EmployeeDashboard = () => {
     }
 
     return [];
+  };
+
+  // Create axios instance for port 5113
+  const createApiPort5113 = () => {
+    const BASE_URL = import.meta.env.VITE_PERFORMANCE_API_URL + "/api";
+    const BASE_URL_5113 = BASE_URL.replace("5108", "5113");
+
+    const instance = axios.create({
+      baseURL: BASE_URL_5113,
+      headers: { "Content-Type": "application/json" },
+      timeout: 30000,
+    });
+
+    instance.interceptors.request.use(
+      (config) => {
+        const token = getToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    return instance;
+  };
+
+  // API functions using port 5113
+  const getApprovedProfiles = () => {
+    const api = createApiPort5113();
+    return api.get("/HRNomination/approved-profiles");
+  };
+
+  const getStatistics = () => {
+    const api = createApiPort5113();
+    return api.get("/HRNomination/statistics");
   };
 
   const fetchAllData = async () => {
@@ -119,24 +156,58 @@ const EmployeeDashboard = () => {
       ] = await Promise.all([
         goalService
           .queryGoals({ type: "self", pageSize: 1000 })
-          .catch(() => ({ data: [] })),
+          .catch((err) => {
+            console.error("Self Goals Error:", err);
+            return { data: [] };
+          }),
         goalService
           .queryGoals({ type: "org", pageSize: 1000 })
-          .catch(() => ({ data: [] })),
+          .catch((err) => {
+            console.error("Org Goals Error:", err);
+            return { data: [] };
+          }),
         goalService
           .queryGoals({ type: "team", pageSize: 1000 })
-          .catch(() => ({ data: [] })),
+          .catch((err) => {
+            console.error("Team Goals Error:", err);
+            return { data: [] };
+          }),
         lndService
           .getMyAssignments(1, "", "", "", "", 1000)
-          .catch(() => ({ data: [] })),
+          .catch((err) => {
+            console.error("LND Assignments Error:", err);
+            return { data: [] };
+          }),
         lndService
           .getMySkills(1, "", "", "asc", 1000)
-          .catch(() => ({ data: { items: [] } })),
-        rsvpService.getMyInvitations().catch(() => []),
-        slaService.getEmployeeSLAs(empId).catch(() => ({ data: [] })),
-        getApprovedProfiles().catch(() => ({ data: [] })),
-        getStatistics().catch(() => ({ data: null })),
+          .catch((err) => {
+            console.error("LND Skills Error:", err);
+            return { data: { items: [] } };
+          }),
+        rsvpService.getMyInvitations().catch((err) => {
+          console.error("Meetings Error:", err);
+          return [];
+        }),
+        slaService.getEmployeeSLAs(empId).catch((err) => {
+          console.error("SLAs Error:", err);
+          return { data: [] };
+        }),
+        getApprovedProfiles().catch((err) => {
+          console.error("Approved Profiles Error:", err);
+          console.error("  Error Details:", err.response?.data || err.message);
+          console.error("  Status Code:", err.response?.status);
+          return { data: [] };
+        }),
+        getStatistics().catch((err) => {
+          console.error("Statistics Error:", err);
+          console.error("  Error Details:", err.response?.data || err.message);
+          console.error("  Status Code:", err.response?.status);
+          return { data: null };
+        }),
       ]);
+
+      console.log("Approved Profiles raw response:", approvedProfilesRes);
+      console.log("Statistics raw response:", statsRes);
 
       const selfGoals = extractData(selfGoalsRes);
       const orgGoals = extractData(orgGoalsRes);
@@ -155,6 +226,10 @@ const EmployeeDashboard = () => {
       ];
 
       const allApprovedProfiles = extractData(approvedProfilesRes);
+      console.log("Total approved profiles:", allApprovedProfiles.length);
+      if (allApprovedProfiles.length > 0) {
+        console.log("Sample approved profile:", allApprovedProfiles[0]);
+      }
 
       const myRecognitions = allApprovedProfiles.filter((p) => {
         const nomineeId =
@@ -162,10 +237,22 @@ const EmployeeDashboard = () => {
           p.employeeId ||
           p.employeeMasterId ||
           p.nomineeEmployeeId;
-        return nomineeId == empId;
+        const match = nomineeId == empId;
+        console.log(
+          `Checking profile - nomineeId: ${nomineeId}, empId: ${empId}, match: ${match}`
+        );
+        return match;
       });
 
-      const stats = statsRes?.data || statsRes?.data?.data || null;
+      console.log("My recognitions count:", myRecognitions.length);
+
+      const stats =
+        statsRes?.data?.data ||
+        statsRes?.data ||
+        statsRes?.totalNominations ||
+        statsRes ||
+        null;
+      console.log("Statistics parsed object:", stats);
 
       setDashboardData({
         goals: allGoals,
@@ -188,8 +275,7 @@ const EmployeeDashboard = () => {
 
   const isOverdue = (deadline) => {
     if (!deadline) return false;
-    if (!slaService || typeof slaService.isOverdue !== "function")
-      return false;
+    if (!slaService || typeof slaService.isOverdue !== "function") return false;
     return slaService.isOverdue(deadline);
   };
 
@@ -294,9 +380,7 @@ const EmployeeDashboard = () => {
 
     const pending = goals.filter((g) => {
       const status = (g.status || g.goalStatus || "").toLowerCase();
-      return (
-        status === "pending" || status === "open" || status === "approved"
-      );
+      return status === "pending" || status === "open" || status === "approved";
     }).length;
 
     const chartData = [];
@@ -341,7 +425,7 @@ const EmployeeDashboard = () => {
       const rating =
         s.rating || s.proficiency || s.proficiencyLevel || s.score || 0;
       const r = Number(rating);
-      
+
       if (isNaN(r)) return;
 
       if (r <= 4) low += 1;
@@ -385,10 +469,9 @@ const EmployeeDashboard = () => {
       const date = new Date(m.meetingDate || m.date || m.createdDate);
       if (isNaN(date.getTime())) return;
 
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-        2,
-        "0"
-      )}`;
+      const key = `${date.getFullYear()}-${String(
+        date.getMonth() + 1
+      ).padStart(2, "0")}`;
       monthlyData[key] = (monthlyData[key] || 0) + 1;
     });
 
@@ -647,7 +730,9 @@ const EmployeeDashboard = () => {
                             const item = perfOverview.chartData.find(
                               (d) => d.name === entry.value
                             );
-                            return `${item?.name || value}: ${item?.value || 0}`;
+                            return `${item?.name || value}: ${
+                              item?.value || 0
+                            }`;
                           }}
                         />
                       </PieChart>
@@ -777,7 +862,9 @@ const EmployeeDashboard = () => {
                             const item = goalsData.chartData.find(
                               (d) => d.name === entry.value
                             );
-                            return `${item?.name || value}: ${item?.value || 0}`;
+                            return `${item?.name || value}: ${
+                              item?.value || 0
+                            }`;
                           }}
                         />
                       </PieChart>
@@ -925,7 +1012,9 @@ const EmployeeDashboard = () => {
                             const item = lndData.chartData.find(
                               (d) => d.name === entry.value
                             );
-                            return `${item?.name || value}: ${item?.value || 0}`;
+                            return `${item?.name || value}: ${
+                              item?.value || 0
+                            }`;
                           }}
                         />
                       </PieChart>
@@ -1034,9 +1123,23 @@ const EmployeeDashboard = () => {
                     <ResponsiveContainer width="100%" height={240}>
                       <AreaChart data={meetingsData.chartData}>
                         <defs>
-                          <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#2c2c54" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#2c2c54" stopOpacity={0.1}/>
+                          <linearGradient
+                            id="colorCount"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor="#2c2c54"
+                              stopOpacity={0.8}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor="#2c2c54"
+                              stopOpacity={0.1}
+                            />
                           </linearGradient>
                         </defs>
                         <CartesianGrid
@@ -1187,7 +1290,9 @@ const EmployeeDashboard = () => {
                             const item = slaData.chartData.find(
                               (d) => d.name === entry.value
                             );
-                            return `${item?.name || value}: ${item?.value || 0}`;
+                            return `${item?.name || value}: ${
+                              item?.value || 0
+                            }`;
                           }}
                         />
                       </PieChart>
