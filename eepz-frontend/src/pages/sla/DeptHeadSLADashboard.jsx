@@ -15,8 +15,10 @@ import slaService from "../../services/sla/slaService";
 import Breadcrumb from "../../components/sla/common/Breadcrumbs";
 import "../../styles/sla/DeptHeadSLADashboard.css";
 
+
 const DeptHeadSLADashboard = () => {
   const navigate = useNavigate();
+
 
   const [allL2Escalations, setAllL2Escalations] = useState([]);
   const [filteredL2Escalations, setFilteredL2Escalations] = useState([]);
@@ -27,18 +29,22 @@ const DeptHeadSLADashboard = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
 
+
   const [showResolutionModal, setShowResolutionModal] = useState(false);
   const [selectedEscalation, setSelectedEscalation] = useState(null);
   const [resolutionComments, setResolutionComments] = useState("");
   const [approvingEscalation, setApprovingEscalation] = useState(false);
 
+
   useEffect(() => {
     fetchAllData();
   }, []);
 
+
   useEffect(() => {
     applyFilters();
   }, [selectedPeriod, searchQuery, selectedStatus, activeTab, allL2Escalations]);
+
 
   const fetchAllData = async () => {
     setLoading(true);
@@ -54,29 +60,41 @@ const DeptHeadSLADashboard = () => {
     }
   };
 
+
   const fetchL2Escalations = async (deptHeadId) => {
     try {
       const response = await slaService.getManagerEscalations(deptHeadId);
 
+      console.log("Department Head Escalations Response:", response);
+
       if (response && response.success) {
         const escalations = Array.isArray(response.data) ? response.data : [];
 
-        const processed = escalations.map((e) => ({
-          escalationId: e.escalationId,
-          slaid: e.slaid,
-          slaType: e.slatype || "Performance Review",
-          employeeId: e.employeeId,
-          employeeName: e.employeeName || "Unknown Employee",
-          employeeEmail: e.employeeEmail || "",
-          managerId: e.submittedByEmployeeId,
-          managerName: e.submittedByName || "Unknown Manager",
-          reason: e.reason || "No reason provided",
-          description: e.description || "",
-          escalationLevel: e.escalationLevel || "L2",
-          escalationStatus: e.escalationStatus || "Pending",
-          submittedAt: e.submittedAt,
-          period: e.reviewCycle || "Q1-2025",
-        }));
+        console.log("Raw Escalations Data:", escalations);
+
+        const processed = escalations.map((e) => {
+          // Normalize status - check for Pending, InProgress, or any non-Resolved status
+          const normalizedStatus = e.escalationStatus || "Pending";
+          
+          return {
+            escalationId: e.escalationId,
+            slaid: e.slaid,
+            slaType: e.slatype || "Performance Review",
+            employeeId: e.employeeId,
+            employeeName: e.employeeName || "Unknown Employee",
+            employeeEmail: e.employeeEmail || "",
+            managerId: e.submittedByEmployeeId,
+            managerName: e.submittedByName || "Unknown Manager",
+            reason: e.reason || "No reason provided",
+            description: e.description || "",
+            escalationLevel: e.escalationLevel || "L2",
+            escalationStatus: normalizedStatus,
+            submittedAt: e.submittedAt,
+            period: e.reviewCycle || "Q1-2025",
+          };
+        });
+
+        console.log("Processed Escalations:", processed);
 
         setAllL2Escalations(processed);
       } else {
@@ -88,8 +106,10 @@ const DeptHeadSLADashboard = () => {
     }
   };
 
+
   const applyFilters = () => {
     let filtered = [...allL2Escalations];
+
 
     if (activeTab !== "all") {
       filtered = filtered.filter(
@@ -97,15 +117,18 @@ const DeptHeadSLADashboard = () => {
       );
     }
 
+
     if (selectedPeriod !== "all") {
       filtered = filtered.filter((e) => e.period === selectedPeriod);
     }
+
 
     if (selectedStatus !== "all") {
       filtered = filtered.filter(
         (e) => e.escalationStatus.toLowerCase() === selectedStatus
       );
     }
+
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -117,12 +140,15 @@ const DeptHeadSLADashboard = () => {
       );
     }
 
+
     setFilteredL2Escalations(filtered);
   };
+
 
   const handleViewDetails = (slaid) => {
     navigate(`/sla/depthead/details/${slaid}`);
   };
+
 
   const handleRowClick = (slaid, event) => {
     // Check if the click is from a button or its children
@@ -136,12 +162,15 @@ const DeptHeadSLADashboard = () => {
     handleViewDetails(slaid);
   };
 
+
   const handleOpenResolutionModal = (escalation, event) => {
     event.stopPropagation(); // Prevent row click
+    console.log("Opening modal for escalation:", escalation);
     setSelectedEscalation(escalation);
     setResolutionComments("");
     setShowResolutionModal(true);
   };
+
 
   const handleCloseResolutionModal = () => {
     setShowResolutionModal(false);
@@ -149,15 +178,18 @@ const DeptHeadSLADashboard = () => {
     setResolutionComments("");
   };
 
+
   const handleApproveEscalation = async () => {
     if (!resolutionComments.trim()) {
       toast.warning("Approval comments required");
       return;
     }
 
+
     setApprovingEscalation(true);
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+
 
       const payload = {
         escalationId: selectedEscalation.escalationId,
@@ -166,21 +198,27 @@ const DeptHeadSLADashboard = () => {
         resolutionComments: resolutionComments.trim(),
       };
 
+      console.log("Resolving escalation with payload:", payload);
+
       const response = await slaService.resolveEscalation(payload);
+
+      console.log("Resolution response:", response);
 
       if (response.success) {
         toast.success("Escalation approved successfully");
         handleCloseResolutionModal();
         fetchAllData();
       } else {
-        toast.error("Failed to approve escalation");
+        toast.error(response.message || "Failed to approve escalation");
       }
     } catch (err) {
+      console.error("Error approving escalation:", err);
       toast.error("Error approving escalation");
     } finally {
       setApprovingEscalation(false);
     }
   };
+
 
   const calculateStats = () => {
     const filteredByPeriod =
@@ -188,10 +226,13 @@ const DeptHeadSLADashboard = () => {
         ? allL2Escalations
         : allL2Escalations.filter((e) => e.period === selectedPeriod);
 
+
     return {
       total: filteredByPeriod.length,
-      pending: filteredByPeriod.filter((e) => e.escalationStatus === "Pending")
-        .length,
+      pending: filteredByPeriod.filter((e) => 
+        e.escalationStatus === "Pending" || 
+        e.escalationStatus === "InProgress"
+      ).length,
       resolved: filteredByPeriod.filter(
         (e) => e.escalationStatus === "Resolved"
       ).length,
@@ -201,12 +242,14 @@ const DeptHeadSLADashboard = () => {
     };
   };
 
+
   const getInitials = (name) => {
     if (!name) return "??";
     const parts = name.trim().split(" ");
     if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
+
 
   const getAvatarClass = (index) => {
     const classes = [
@@ -220,6 +263,7 @@ const DeptHeadSLADashboard = () => {
     return classes[index % classes.length];
   };
 
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -229,7 +273,15 @@ const DeptHeadSLADashboard = () => {
     });
   };
 
+  // Check if escalation can be approved (Pending or InProgress, not Resolved/Rejected)
+  const canApprove = (escalation) => {
+    const status = escalation.escalationStatus;
+    return status === "Pending" || status === "InProgress";
+  };
+
+
   const stats = calculateStats();
+
 
   if (loading) {
     return (
@@ -243,9 +295,11 @@ const DeptHeadSLADashboard = () => {
     );
   }
 
+
   return (
     <div className="dh-sla-container">
       <Breadcrumb items={[{label : "SLA Compliance"},{ label: "Department Head" }]} />
+
 
       {error && (
         <div className="dh-sla-error-alert">
@@ -256,6 +310,7 @@ const DeptHeadSLADashboard = () => {
           </button>
         </div>
       )}
+
 
       <div className="dh-sla-stats-grid">
         {[
@@ -294,6 +349,7 @@ const DeptHeadSLADashboard = () => {
         ))}
       </div>
 
+
       <div className="dh-sla-table-wrapper">
         <div className="table-responsive">
           <table className="dh-sla-table">
@@ -324,7 +380,6 @@ const DeptHeadSLADashboard = () => {
                   >
                     <td>
                       <div className="dh-sla-employee-cell">
-                       
                         <div className="dh-sla-employee-info">
                           <div className="dh-sla-employee-name">
                             {esc.employeeName}
@@ -352,7 +407,7 @@ const DeptHeadSLADashboard = () => {
                     <td>
                       <span
                         className={`dh-sla-badge ${
-                          esc.escalationStatus === "Pending"
+                          esc.escalationStatus === "Pending" || esc.escalationStatus === "InProgress"
                             ? "dh-sla-badge-pending"
                             : esc.escalationStatus === "Resolved"
                             ? "dh-sla-badge-resolved"
@@ -377,7 +432,7 @@ const DeptHeadSLADashboard = () => {
                         >
                           <Eye size={14} />
                         </button>
-                        {esc.escalationStatus === "Pending" && (
+                        {canApprove(esc) && (
                           <button
                             className="dh-sla-action-btn dh-sla-action-approve"
                             onClick={(e) => handleOpenResolutionModal(esc, e)}
@@ -395,6 +450,7 @@ const DeptHeadSLADashboard = () => {
           </table>
         </div>
       </div>
+
 
       {showResolutionModal && selectedEscalation && (
         <>
@@ -414,6 +470,7 @@ const DeptHeadSLADashboard = () => {
                   <X size={20} />
                 </button>
               </div>
+
 
               <div className="dh-sla-modal-body">
                 <div className="dh-sla-info-box">
@@ -435,7 +492,14 @@ const DeptHeadSLADashboard = () => {
                       {selectedEscalation.reason}
                     </span>
                   </div>
+                  <div className="dh-sla-info-row">
+                    <span className="dh-sla-info-label">Status:</span>
+                    <span className="dh-sla-info-value">
+                      {selectedEscalation.escalationStatus}
+                    </span>
+                  </div>
                 </div>
+
 
                 <div className="dh-sla-form-group">
                   <label className="dh-sla-form-label">
@@ -455,6 +519,7 @@ const DeptHeadSLADashboard = () => {
                   </small>
                 </div>
               </div>
+
 
               <div className="dh-sla-modal-footer">
                 <button
@@ -489,5 +554,6 @@ const DeptHeadSLADashboard = () => {
     </div>
   );
 };
+
 
 export default DeptHeadSLADashboard;
