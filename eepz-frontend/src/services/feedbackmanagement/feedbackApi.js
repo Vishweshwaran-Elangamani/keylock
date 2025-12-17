@@ -1,6 +1,8 @@
 // src/services/feedbackmanagement/feedbackApi.js
-import api from "./http";
+import api from "./index_feedback";
 import axios from "axios";
+import org_api from "./index_org";
+
 
 // Manager Reviews
 export const managerReviewApi = {
@@ -22,29 +24,29 @@ export const managerReviewApi = {
 
 // Mentor Feedback (Employee -> SME)
 export const mentorFeedbackApi = {
-  create: (body) => api.post("/mentorfeedback/create", body),
-  getById: (id) => api.get(`/mentorfeedback/${id}`),
-  aboutMe: (mentorId) => api.get(`/mentorfeedback/about-me/${mentorId}`),
-  myFeedback: (menteeId) => api.get(`/mentorfeedback/my-feedback/${menteeId}`),
-  update: (id, body) => api.put(`/mentorfeedback/${id}`, body),
-  acknowledge: (id) => api.post(`/mentorfeedback/${id}/acknowledge`),
-  remove: (id) => api.delete(`/mentorfeedback/${id}`),
+  create: (body) => org_api.post("/mentorfeedback/create", body),
+  getById: (id) => org_api.get(`/mentorfeedback/${id}`),
+  aboutMe: (mentorId) => org_api.get(`/mentorfeedback/about-me/${mentorId}`),
+  myFeedback: (menteeId) => org_api.get(`/mentorfeedback/my-feedback/${menteeId}`),
+  update: (id, body) => org_api.put(`/mentorfeedback/${id}`, body),
+  acknowledge: (id) => org_api.post(`/mentorfeedback/${id}/acknowledge`),
+  remove: (id) => org_api.delete(`/mentorfeedback/${id}`),
   list: (page = 1, size = 20) =>
-    api.get("/mentorfeedback/all", {
+    org_api.get("/mentorfeedback/all", {
       params: { pageNumber: page, pageSize: size },
     }),
 };
 
 // Org Goal Feedback
 export const orgGoalFeedbackApi = {
-  create: (body) => api.post("/orggoalfeedback/create", body),
-  getById: (id) => api.get(`/orggoalfeedback/${id}`),
+  create: (body) => org_api.post("/orggoalfeedback/create", body),
+  getById: (id) => org_api.get(`/orggoalfeedback/${id}`),
   getByObjective: (objectiveId) =>
-    api.get(`/orggoalfeedback/goal/${objectiveId}`),
-  update: (id, body) => api.put(`/orggoalfeedback/${id}`, body),
+    org_api.get(`/orggoalfeedback/goal/${objectiveId}`),
+  update: (id, body) => org_api.put(`/orggoalfeedback/${id}`, body),
   remove: (id) => api.delete(`/orggoalfeedback/${id}`),
   list: (page = 1, size = 20) =>
-    api.get("/orggoalfeedback/all", {
+    org_api.get("/orggoalfeedback/all", {
       params: { pageNumber: page, pageSize: size },
     }),
 };
@@ -96,12 +98,12 @@ export const hrFormApi = {
 
 // SME API (Subject Matter Experts / Mentors)
 export const smeApi = {
-  getActive: () => api.get("/sme/active"),
-  getById: (smeId) => api.get(`/sme/${smeId}`),
-  getBySkill: (skillId) => api.get(`/sme/skill/${skillId}`),
-  getMyMentors: (employeeId) => api.get(`/sme/mentors/${employeeId}`),
+  getActive: () => org_api.get("/sme/active"),
+  getById: (smeId) => org_api.get(`/sme/${smeId}`),
+  getBySkill: (skillId) => org_api.get(`/sme/skill/${skillId}`),
+  getMyMentors: (employeeId) => org_api.get(`/sme/mentors/${employeeId}`),
   list: (page = 1, size = 20) =>
-    api.get("/sme/all", { params: { pageNumber: page, pageSize: size } }),
+    org_api.get("/sme/all", { params: { pageNumber: page, pageSize: size } }),
 };
 
 // FEEDBACK ANALYSIS API
@@ -148,40 +150,55 @@ export const dateHelpers = {
   },
 };
 
+// Base URLs
+const PROJECT_API_URL = import.meta.env.VITE_PROJECT_API_URL;
+const LND_API_URL = import.meta.env.VITE_LND_API_URL;
+
 // Employee API
 export const employeeApi = {
-  getAll: () => api.get("/employeemanagement/all"),
-  getById: (employeeId) => api.get(`/employeemanagement/${employeeId}`),
-  getByDepartment: (departmentId) =>
-    api.get(`/employeemanagement/department/${departmentId}`),
-  getByRole: (roleId) => api.get(`/employeemanagement/role/${roleId}`),
-  search: (query) =>
-    api.get("/employeemanagement/search", { params: { q: query } }),
+  getAll: () =>
+    axios.get(`${PROJECT_API_URL}/api/employeemanagement/all`),
 
-   getSubordinates: async () => {
+  getById: (employeeId) =>
+    axios.get(`${PROJECT_API_URL}/api/employeemanagement/${employeeId}`),
+
+  getByDepartment: (departmentId) =>
+    axios.get(`${PROJECT_API_URL}/api/employeemanagement/department/${departmentId}`),
+
+  getByRole: (roleId) =>
+    axios.get(`${PROJECT_API_URL}/api/employeemanagement/role/${roleId}`),
+
+  search: (query) =>
+    axios.get(`${PROJECT_API_URL}/api/employeemanagement/search`, {
+      params: { q: query },
+    }),
+
+  getSubordinates: async () => {
     try {
       // Get access token from storage (adjust as needed)
       const accessToken = localStorage.getItem("accessToken");
       const response = await axios.get(
-  `${import.meta.env.VITE_LND_API_URL}/api/lnd-skills/employees/subordinates`,
-  {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-      });
+        `${LND_API_URL}/api/lnd-skills/employees/subordinates`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Get subordinates error:", error);
       throw error.response?.data || error;
     }
-  }
+  },
 };
+
 
 // Goals API
 export const goalsApi = {
-  getAll: () => api.get("/Goals"),
-  getById: (goalId) => api.get(`/Goals/${goalId}`),
-  getTeamAll: () => api.get("/Goals/team/all"),
-  getOrganizationLevel: () => api.get("/Goals/organization-level"),
-  getByProject: (projectId) => api.get(`/Goals/project/${projectId}`),
+  getAll: () =>org_api.get("/Goals"),
+  getById: (goalId) => org_api.get(`/Goals/${goalId}`),
+  getTeamAll: () => org_api.get("/Goals/team/all"),
+  getOrganizationLevel: () => org_api.get("/Goals/organization-level"),
+  getByProject: (projectId) => org_api.get(`/Goals/project/${projectId}`),
 };

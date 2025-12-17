@@ -1,16 +1,16 @@
-// src/services_api/http.js
+
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_FEEDBACK_API_URL+"/api",
+const org_api = axios.create({
+  baseURL: import.meta.env.VITE_ORGFEEDBACK_API_URL+"/api",
   timeout: 30000,
   headers: { "Content-Type": "application/json" },
 });
 
-api.interceptors.request.use((config) => {
+org_api.interceptors.request.use((config) => {
   const token = localStorage.getItem("authToken");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-export default api;
+export default org_api;
