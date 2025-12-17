@@ -73,8 +73,8 @@ export default function Nominations() {
           boxShadow: "0 4px 12px rgba(0,0,0,0.3)"
         }}
       >
-        <div className="ehp-nomination-content d-flex align-items-center">
-          <span className="badge text-dark me-3 position-relative" style={{ fontSize: "6.5rem" }}>
+        <div className="ehp-nomination-content d-flex align-items-center" >
+          <span className="badge text-dark me-3 position-relative" style={{ fontSize: "6.5rem"}} >
             <i className="bi bi-award-fill" style={{ color: "#FFD700" }}></i>
             <i
               className="bi bi-star-fill position-absolute top-50 start-50"
@@ -86,7 +86,7 @@ export default function Nominations() {
             ></i>
           </span>
 
-          <div style={{ paddingLeft: "155px" }}>
+          <div style={{ paddingLeft: "40px" }}>
             <h3 className="ehp-nomination-title">Congratulations!</h3>
             <p className="ehp-nomination-text">
               You have been nominated for:{" "}
@@ -94,7 +94,7 @@ export default function Nominations() {
                 {nominations.map((n) => n.roleType).join(", ")}
               </strong>
             </p>
-            <p className="ehp-nomination-subtext" style={{ fontSize: "12px" }}>
+            <p className="ehp-nomination-subtext" style={{ fontSize: "15px" }}>
               Your hard work and dedication have been recognized!
             </p>
           </div>
