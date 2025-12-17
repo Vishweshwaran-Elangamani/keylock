@@ -13,7 +13,6 @@ const ActionModal = ({
 
   return (
     <>
-
       <div
         style={{
           position: "fixed",
@@ -25,7 +24,6 @@ const ActionModal = ({
         }}
         onClick={onClose}
       ></div>
-
 
       <div
         style={{
@@ -44,39 +42,66 @@ const ActionModal = ({
             borderRadius: 18,
             boxShadow: "0 8px 24px rgba(32, 30, 60, 0.13)",
             overflow: "hidden",
+            border: "2px solid #27235c",
           }}
         >
-
+          {/* HEADER WITH X BUTTON */}
           <div
             style={{
               background: THEME.primary,
               color: "#fff",
-              padding: "22px 26px 12px 26px",
-              borderTopLeftRadius: 18,
-              borderTopRightRadius: 18,
-              minHeight: 40,
-              margin: 0,
-              width: "100%",
+              padding: "18px 24px",
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
             <h6
-              className="mb-0"
               style={{
                 fontWeight: 700,
                 fontSize: 17,
                 color: "white",
                 margin: 0,
                 letterSpacing: "0.04em",
+                textAlign: "left",
               }}
             >
               {actionType === "approve" ? "Approval Remarks" : "Rejection Reason"}
             </h6>
-
+            
+            {/* X CLOSE BUTTON */}
+            <button
+              onClick={onClose}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#fff",
+                fontSize: 20,
+                fontWeight: 600,
+                cursor: "pointer",
+                padding: "0",
+                width: 32,
+                height: 32,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 6,
+                transition: "background 0.2s",
+              }}
+              onMouseEnter={(e) => e.target.style.background = "rgba(255, 255, 255, 0.15)"}
+              onMouseLeave={(e) => e.target.style.background = "transparent"}
+              aria-label="Close"
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
           </div>
 
+          {/* BODY */}
           <div
             className="card-body"
-            style={{ padding: "32px 26px 18px 26px", background: THEME.card }}
+            style={{ padding: "24px 24px 20px 24px", background: THEME.card }}
           >
             <label
               style={{
@@ -86,6 +111,7 @@ const ActionModal = ({
                 marginBottom: "10px",
                 letterSpacing: "0.2px",
                 display: "block",
+                textAlign: "left",
               }}
             >
               {actionType === "approve"
@@ -112,20 +138,23 @@ const ActionModal = ({
                 boxShadow: "none",
                 outline: "none",
                 resize: "vertical",
+                textAlign: "left",
               }}
             />
           </div>
+
+          {/* FOOTER - EXTRA COMPACT */}
           <div
             className="card-footer"
             style={{
               background: THEME.background,
               borderTop: `1px solid ${THEME.border}`,
-              padding: "20px 26px",
-              borderBottomLeftRadius: 18,
-              borderBottomRightRadius: 18,
+              padding: "10px 24px",
+              borderBottomLeftRadius: 16,
+              borderBottomRightRadius: 16,
             }}
           >
-            <div style={{ display: "flex", gap: 14, justifyContent: "flex-end" }}>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
               <button
                 className="btn"
                 onClick={onClose}
@@ -134,12 +163,13 @@ const ActionModal = ({
                   color: "white",
                   border: `1.8px solid #d1d5db`,
                   fontWeight: 600,
-                  fontSize: 15,
-                  padding: "8px 26px",
-                  borderRadius: 8,
-                  minWidth: 86,
+                  fontSize: 13.5,
+                  padding: "6px 18px",
+                  borderRadius: 6,
+                  minWidth: 75,
                   transition: "border 0.18s, box-shadow 0.14s",
                   boxShadow: "0 1.5px 12px rgba(60,70,80,0.03)",
+                  cursor: "pointer",
                 }}
               >
                 Cancel
@@ -154,12 +184,13 @@ const ActionModal = ({
                   color: "#fff",
                   border: "none",
                   fontWeight: 700,
-                  fontSize: 15,
-                  padding: "8px 28px",
-                  borderRadius: 8,
-                  minWidth: 104,
+                  fontSize: 13.5,
+                  padding: "6px 20px",
+                  borderRadius: 6,
+                  minWidth: 85,
                   letterSpacing: "0.05em",
                   boxShadow: "0 2px 8px rgba(29,100,216,0.09)",
+                  cursor: "pointer",
                 }}
               >
                 {actionType === "approve" ? "Approve" : "Reject"}

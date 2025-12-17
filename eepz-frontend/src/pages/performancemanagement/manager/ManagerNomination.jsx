@@ -121,6 +121,7 @@ export default function ManagerNomination() {
   useEffect(() => {
     fetchRewardTypes();
   }, []);
+  
   useEffect(() => {
     if (managerId) {
       fetchTeamMembers();
@@ -175,13 +176,9 @@ export default function ManagerNomination() {
   const pendingPager = usePagination(pendingNominations, 5);
   const approvedPager = usePagination(approvedNominations, 5);
   const rejectedPager = usePagination(rejectedNominations, 5);
-  const availableMembers = teamMembers.filter(
-    (m) =>
-      !myNominations.some(
-        (nom) => nom?.nominee?.employeeId === m?.employeeId
-      )
-  );
-  const availablePager = usePagination(availableMembers, 5);
+  
+  // ✅ FIXED: Show ALL team members (don't filter based on nominations)
+  const teamMembersPager = usePagination(teamMembers, 5);
 
   const handleOpenNominate = (member) => {
     setSelectedEmployee(member);
@@ -263,8 +260,8 @@ export default function ManagerNomination() {
             alignItems: "center",
             background: "linear-gradient(135deg, #26225A 0%, #1a1740 100%)",
             padding: "16px 24px",
-            borderRadius: "16px 16px 8px 8px", // slight rounding at bottom
-            marginBottom: 8, // visual gap to table
+            borderRadius: "16px 16px 8px 8px",
+            marginBottom: 8,
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -366,7 +363,7 @@ export default function ManagerNomination() {
               </tr>
             </thead>
             <tbody>
-              {availablePager.paged.map((member, i) => {
+              {teamMembersPager.paged.map((member, i) => {
                 const name = safeText(
                   `${member?.firstName || ""} ${
                     member?.lastName || ""
@@ -381,7 +378,7 @@ export default function ManagerNomination() {
                 return (
                   <tr key={member?.employeeId || i}>
                     <td className="col-index">
-                      {(availablePager.page - 1) * availablePager.pageSize +
+                      {(teamMembersPager.page - 1) * teamMembersPager.pageSize +
                         i +
                         1}
                     </td>
@@ -399,13 +396,13 @@ export default function ManagerNomination() {
                   </tr>
                 );
               })}
-              {availableMembers.length === 0 && (
+              {teamMembers.length === 0 && (
                 <tr>
                   <td
                     colSpan={4}
                     className="managernomination-empty-row"
                   >
-                    No available team members
+                    {loading ? "Loading team members..." : "No team members found"}
                   </td>
                 </tr>
               )}
@@ -413,7 +410,7 @@ export default function ManagerNomination() {
           </table>
         </div>
         <div style={{ marginTop: 12 }}>
-          <Pagination pager={availablePager} />
+          <Pagination pager={teamMembersPager} />
         </div>
       </div>
 
@@ -471,32 +468,31 @@ export default function ManagerNomination() {
               </h3>
             </div>
             <button
-              onClick={() => setShowNominationsView(false)}
-              style={{
-                background: "rgba(255, 255, 255, 0.2)",
-                color: "#fff",
-                border: "none",
-                padding: "8px 16px",
-                borderRadius: 6,
-                fontWeight: 600,
-                cursor: "pointer",
-                fontSize: 13,
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                transition: "background 0.2s",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background =
-                  "rgba(255, 255, 255, 0.3)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background =
-                  "rgba(255, 255, 255, 0.2)")
-              }
-            >
-              <i className="bi bi-x-lg"></i> Close
-            </button>
+  onClick={() => setShowNominationsView(false)}
+  style={{
+    background: "#e0e0e0",        // light grey
+    color: "#333",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: 6,
+    fontWeight: 600,
+    cursor: "pointer",
+    fontSize: 13,
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    transition: "background 0.2s",
+  }}
+  onMouseEnter={(e) =>
+    (e.currentTarget.style.background = "#d5d5d5") // slightly darker grey
+  }
+  onMouseLeave={(e) =>
+    (e.currentTarget.style.background = "#e0e0e0")
+  }
+>
+  Close
+</button>
+
           </div>
 
           <div
