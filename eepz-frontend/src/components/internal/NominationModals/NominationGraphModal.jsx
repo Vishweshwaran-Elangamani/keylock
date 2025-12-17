@@ -38,16 +38,41 @@ const NominationGraphModal = ({ show, onHide }) => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [chartType, setChartType] = useState("bar");
+  const [chartKey, setChartKey] = useState(0);
 
   useEffect(() => {
-    if (show) fetchAnalytics();
+    if (show) {
+      fetchAnalytics();
+      
+      // Auto-refresh every 5 seconds
+      const intervalId = setInterval(() => {
+        fetchAnalytics();
+      }, 5000);
+
+      // Cleanup on unmount
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
   }, [show]);
 
   const fetchAnalytics = async () => {
     setLoading(true);
     const response = await nominationService.getMyNominationAnalytics();
-    if (response.success) setAnalytics(response.data);
-    else toast.error("Failed to load analytics");
+    
+    console.log("Analytics Response:", response);
+    console.log("Analytics Data:", response?.data);
+    
+    if (response.success) {
+      const newData = response.data;
+      // Only update if data changed
+      if (JSON.stringify(analytics) !== JSON.stringify(newData)) {
+        setAnalytics(newData);
+        setChartKey(prev => prev + 1); // Force chart re-render
+      }
+    } else {
+      toast.error("Failed to load analytics");
+    }
     setLoading(false);
   };
 
@@ -69,10 +94,10 @@ const NominationGraphModal = ({ show, onHide }) => {
           {
             label: "Nomination Statistics",
             data: values,
-            borderColor: "#27235C", // Solid blue line
+            borderColor: "#27235C",
             backgroundColor: "rgba(39,35,92,0.09)",
             borderWidth: 3,
-            pointBackgroundColor: SOLID_COLORS, // Each point colored
+            pointBackgroundColor: SOLID_COLORS,
             pointBorderColor: SOLID_COLORS,
             pointRadius: 7,
             pointHoverRadius: 10,
@@ -278,7 +303,7 @@ const NominationGraphModal = ({ show, onHide }) => {
               maxHeight: 'calc(90vh - 140px)'
             }}
           >
-            {loading ? (
+            {loading && !analytics ? (
               <div
                 style={{
                   display: 'flex',
@@ -428,13 +453,13 @@ const NominationGraphModal = ({ show, onHide }) => {
                   }}
                 >
                   {chartType === "bar" && (
-                    <Bar data={getChartData()} options={barOptions} />
+                    <Bar key={chartKey} data={getChartData()} options={barOptions} />
                   )}
                   {chartType === "pie" && (
-                    <Pie data={getChartData()} options={pieOptions} />
+                    <Pie key={chartKey} data={getChartData()} options={pieOptions} />
                   )}
                   {chartType === "line" && (
-                    <Line data={getChartData()} options={lineOptions} />
+                    <Line key={chartKey} data={getChartData()} options={lineOptions} />
                   )}
                 </div>
               </>
