@@ -36,6 +36,7 @@ const ResourcePoolMapping = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // ✅ Active search term
 
   // Modals
   const [showClearModal, setShowClearModal] = useState(false);
@@ -53,13 +54,12 @@ const ResourcePoolMapping = () => {
     setError(null);
     setRecentlyMappedIds([]);
     try {
-      //  Fetch all employees (filter for role "Employee" only)
       const employeesResponse = await projectService.getInitialStageEmployees();
       console.log("Initial stage employees response:", employeesResponse);
       
       if (employeesResponse.success && employeesResponse.data) {
         const filteredEmployees = employeesResponse.data.filter(
-          (emp) => emp.roleName?.toLowerCase() === "employee" //  Show only Employee role
+          (emp) => emp.roleName?.toLowerCase() === "employee"
         );
         setAllEmployees(filteredEmployees);
         console.log("Filtered employees (Employee role only):", filteredEmployees);
@@ -67,7 +67,6 @@ const ResourcePoolMapping = () => {
         throw new Error(employeesResponse?.message || "Failed to load employees");
       }
 
-      //  Fetch all projects to find Resource Pool
       const projectsResponse = await projectService.getAllProjects();
       console.log("All projects response:", projectsResponse);
       
@@ -76,7 +75,6 @@ const ResourcePoolMapping = () => {
         let resourcePoolProj = null;
 
         projectsResponse.data.forEach((project) => {
-          // Find Resource Pool project
           if (
             project.projectName &&
             project.projectName.toUpperCase() === RESOURCE_POOL_PROJECT_NAME.toUpperCase()
@@ -85,10 +83,8 @@ const ResourcePoolMapping = () => {
             console.log("Found Resource Pool project:", resourcePoolProj);
           }
 
-          // Collect all mapped employees
           if (Array.isArray(project.mappedEmployees)) {
             project.mappedEmployees.forEach((emp) => {
-              //  Filter for Employee role only
               if (emp.roleName?.toLowerCase() === "employee") {
                 if (!allMapped.some((m) => m.employeeMasterId === emp.employeeMasterId)) {
                   allMapped.push(emp);
@@ -101,7 +97,6 @@ const ResourcePoolMapping = () => {
         setMappedEmployees(allMapped);
         console.log("All mapped employees:", allMapped);
 
-        // Fetch Resource Pool project details using getProjectById
         if (resourcePoolProj && resourcePoolProj.projectId) {
           try {
             const resourcePoolDetails = await projectService.getProjectById(
@@ -112,7 +107,6 @@ const ResourcePoolMapping = () => {
             if (resourcePoolDetails.success && resourcePoolDetails.data) {
               setResourcePoolProject(resourcePoolDetails.data);
               
-              //  Update resource pool mapped employees from detailed data
               if (Array.isArray(resourcePoolDetails.data.mappedEmployees)) {
                 const rpMapped = resourcePoolDetails.data.mappedEmployees.filter(
                   (emp) => emp.roleName?.toLowerCase() === "employee"
@@ -146,6 +140,22 @@ const ResourcePoolMapping = () => {
     }
   };
 
+  // ✅ Search handlers
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearchTerm('');
+  };
+
   // Status helpers
   const isEmployeeSelected = (empId) =>
     selectedEmployees.some((emp) => emp.employeeMasterId === empId);
@@ -171,17 +181,16 @@ const ResourcePoolMapping = () => {
     return { text: "Available", badge: "rp-badge-success", icon: Check };
   };
 
-  // Filter employees to exclude those already in resource pool
+  // ✅ Filter employees using activeSearchTerm (not searchTerm)
   const filteredEmployees = (
-    searchTerm
+    activeSearchTerm
       ? allEmployees.filter((emp) =>
           `${emp.firstName} ${emp.lastName} ${emp.roleName} ${emp.departmentName} ${emp.employeeCompanyId}`
             .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+            .includes(activeSearchTerm.toLowerCase())
         )
       : allEmployees
   ).filter((emp) => {
-    //  Exclude employees already in resource pool
     const inResourcePool = isEmployeeInResourcePool(emp.employeeMasterId);
     const recentlyMapped = isRecentlyMapped(emp.employeeMasterId);
     return !inResourcePool && !recentlyMapped;
@@ -195,7 +204,6 @@ const ResourcePoolMapping = () => {
 
   // Actions
   const handleAddEmployee = (employee) => {
-    //  Check if employee is already in resource pool
     if (isEmployeeInResourcePool(employee.employeeMasterId)) {
       toast.warning(
         `${employee.firstName} ${employee.lastName} is already mapped to Resource Pool`,
@@ -258,7 +266,6 @@ const ResourcePoolMapping = () => {
       return;
     }
 
-    //  Check if any selected employees are already in resource pool
     const alreadyInPool = selectedEmployees.filter((emp) =>
       isEmployeeInResourcePool(emp.employeeMasterId)
     );
@@ -315,7 +322,6 @@ const ResourcePoolMapping = () => {
         { duration: 3000 }
       );
 
-      //  Refresh data after mapping
       await fetchInitialData();
     } catch (error) {
       console.error("Error mapping to resource pool:", error);
@@ -379,7 +385,7 @@ const ResourcePoolMapping = () => {
         </ol>
       </nav>
 
-      {/*  Resource Pool Info Section */}
+      {/* Resource Pool Info Section */}
       {resourcePoolProject && (
         <div className="alert alert-info mb-3 d-flex align-items-center" role="alert">
           <Database size={20} className="me-2" />
@@ -427,19 +433,36 @@ const ResourcePoolMapping = () => {
             </div>
 
             <div className="rp-card-body">
-              {/* Search */}
+              {/* ✅ Search with Button and Clear Icon */}
               <div className="rp-search-bar">
-                <div className="input-group">
-                  <span className="input-group-text">
-                    <Search size={18} />
-                  </span>
+                <div className="rp-search-wrapper">
+                  <Search size={18} className="rp-search-icon" />
                   <input
                     type="text"
-                    className="form-control"
+                    className="rp-search-input"
                     placeholder="Search by name, department, or ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={handleSearchKeyPress}
                   />
+                  {activeSearchTerm && (
+                    <button
+                      className="rp-clear-btn"
+                      type="button"
+                      onClick={handleClearSearch}
+                      title="Clear search"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                  <button
+                    className="rp-search-btn"
+                    type="button"
+                    onClick={handleSearch}
+                  >
+                    <Search size={16} />
+                    Search
+                  </button>
                 </div>
               </div>
 
@@ -462,7 +485,7 @@ const ResourcePoolMapping = () => {
                           <UserX size={64} className="rp-empty-icon" />
                           <p className="rp-empty-title">No employees found</p>
                           <p className="rp-empty-text">
-                            {searchTerm 
+                            {activeSearchTerm 
                               ? "No matches for your search." 
                               : "All eligible employees are mapped."}
                           </p>
@@ -578,7 +601,6 @@ const ResourcePoolMapping = () => {
               </div>
 
               <div className="rp-selected-footer">
-                {/*  GRADIENT BUTTON */}
                 <button
                   className="btn w-100 rp-btn-map"
                   onClick={handleMapToResourcePool}
@@ -704,7 +726,6 @@ const ResourcePoolMapping = () => {
               >
                 Cancel
               </button>
-              {/* GRADIENT BUTTON FOR MODAL */}
               <button 
                 className="btn"
                 onClick={confirmMapToResourcePool}

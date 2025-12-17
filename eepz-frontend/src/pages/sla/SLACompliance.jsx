@@ -13,7 +13,7 @@ import {
   CheckCircle,
   Clock,
 } from "lucide-react";
-import ComplianceCard from "../../components/sla/cards/ComplianceCard";
+import ComplianceCard from "../../components/sla/cards/ComplianceCard"; // ← Make sure THIS file has border: '1.5px solid #27235C'
 import slaService from "../../services/sla/slaService";
 import {
   getComplianceSummary,
@@ -24,7 +24,7 @@ const SLACompliance = () => {
   const [allSLAs, setAllSLAs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState("cards"); // 'cards' or 'table'
+  const [viewMode, setViewMode] = useState("cards");
   const [sortBy, setSortBy] = useState("compliancePercentage");
   const [sortOrder, setSortOrder] = useState("desc");
 
@@ -32,7 +32,6 @@ const SLACompliance = () => {
     fetchAllData();
   }, []);
 
-  //  Fetch ALL SLAs
   const fetchAllData = async () => {
     setLoading(true);
     setError(null);
@@ -55,22 +54,17 @@ const SLACompliance = () => {
     }
   };
 
-  //  Calculate compliance data for each department (ALL SLAs)
   const complianceData = useMemo(() => {
     if (allSLAs.length === 0) return [];
 
-    // Get unique departments
     const departments = [...new Set(allSLAs.map((sla) => sla.departmentId))];
 
-    // Calculate compliance for each department
     return departments.map((deptId) => {
       const deptSLAs = allSLAs.filter((sla) => sla.departmentId === deptId);
       const deptName = deptSLAs[0]?.departmentName || "Department";
 
-      //  Use getComplianceSummary (CLOSED SLAs ONLY for compliance %)
       const summary = getComplianceSummary(deptSLAs);
 
-      // Get date range
       const dates = deptSLAs
         .filter((s) => s.deadline)
         .map((s) => new Date(s.deadline))
@@ -101,7 +95,6 @@ const SLACompliance = () => {
     });
   }, [allSLAs]);
 
-  // Calculate overall stats
   const calculateOverallStats = () => {
     if (complianceData.length === 0) {
       return {
@@ -221,39 +214,54 @@ const SLACompliance = () => {
         </div>
       </div>
 
-      {/* Overall Stats Cards */}
+      {/* Overall Stats Cards - Horizontal Layout with Black Border */}
       <div className="row g-3 mb-4">
         {/* Total Escalations Card */}
-        <div className="col-md-3">
+        <div className="col-lg-3 col-md-6">
           <div
             className="card h-100"
             style={{
-              borderRadius: "12px",
-              border: "2px solid #2C3E50",
+              borderRadius: "16px",
+              border: "1.5px solid #27235C",
               backgroundColor: "#FFFFFF",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              padding: "1.5rem",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "1rem",
+              transition: "all 0.2s ease",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.borderColor = "#0F62FE";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(39, 35, 92, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.borderColor = "#27235C";
+              e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
             }}
           >
             <div
-              className="card-body d-flex flex-column align-items-center justify-content-center text-center"
-              style={{ padding: "20px 16px" }}
+              className="d-flex align-items-center justify-content-center"
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "12px",
+                backgroundColor: "#E8F1FF",
+                flexShrink: 0,
+              }}
             >
-              <div
-                className="d-flex align-items-center justify-content-center mb-2"
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "12px",
-                  backgroundColor: "#E8F1FF",
-                }}
-              >
-                <Users size={24} style={{ color: "#5B93FF" }} />
-              </div>
+              <Users size={24} style={{ color: "#5B93FF" }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <h2
                 className="fw-bold mb-1"
                 style={{
-                  fontSize: "32px",
-                  color: "#1a1a1a",
+                  fontSize: "2rem",
+                  color: "#0f172a",
                   lineHeight: "1",
                   margin: "0",
                 }}
@@ -263,9 +271,11 @@ const SLACompliance = () => {
               <p
                 className="mb-0"
                 style={{
-                  fontSize: "13px",
-                  color: "#6B7280",
-                  fontWeight: "500",
+                  fontSize: "0.75rem",
+                  color: "#64748b",
+                  fontWeight: "600",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
                 }}
               >
                 Total Escalations
@@ -275,36 +285,51 @@ const SLACompliance = () => {
         </div>
 
         {/* Approved Card */}
-        <div className="col-md-3">
+        <div className="col-lg-3 col-md-6">
           <div
             className="card h-100"
             style={{
-              borderRadius: "12px",
-              border: "2px solid #2C3E50",
+              borderRadius: "16px",
+              border: "1.5px solid #27235C",
               backgroundColor: "#FFFFFF",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              padding: "1.5rem",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "1rem",
+              transition: "all 0.2s ease",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.borderColor = "#0F62FE";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(39, 35, 92, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.borderColor = "#27235C";
+              e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
             }}
           >
             <div
-              className="card-body d-flex flex-column align-items-center justify-content-center text-center"
-              style={{ padding: "20px 16px" }}
+              className="d-flex align-items-center justify-content-center"
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "12px",
+                backgroundColor: "#D1FAE5",
+                flexShrink: 0,
+              }}
             >
-              <div
-                className="d-flex align-items-center justify-content-center mb-2"
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "12px",
-                  backgroundColor: "#D1FAE5",
-                }}
-              >
-                <CheckCircle size={24} style={{ color: "#10B981" }} />
-              </div>
+              <CheckCircle size={24} style={{ color: "#10B981" }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <h2
                 className="fw-bold mb-1"
                 style={{
-                  fontSize: "32px",
-                  color: "#1a1a1a",
+                  fontSize: "2rem",
+                  color: "#0f172a",
                   lineHeight: "1",
                   margin: "0",
                 }}
@@ -314,9 +339,11 @@ const SLACompliance = () => {
               <p
                 className="mb-0"
                 style={{
-                  fontSize: "13px",
-                  color: "#6B7280",
-                  fontWeight: "500",
+                  fontSize: "0.75rem",
+                  color: "#64748b",
+                  fontWeight: "600",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
                 }}
               >
                 Approved
@@ -326,36 +353,51 @@ const SLACompliance = () => {
         </div>
 
         {/* Pending Card */}
-        <div className="col-md-3">
+        <div className="col-lg-3 col-md-6">
           <div
             className="card h-100"
             style={{
-              borderRadius: "12px",
-              border: "2px solid #2C3E50",
+              borderRadius: "16px",
+              border: "1.5px solid #27235C",
               backgroundColor: "#FFFFFF",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              padding: "1.5rem",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "1rem",
+              transition: "all 0.2s ease",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.borderColor = "#0F62FE";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(39, 35, 92, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.borderColor = "#27235C";
+              e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
             }}
           >
             <div
-              className="card-body d-flex flex-column align-items-center justify-content-center text-center"
-              style={{ padding: "20px 16px" }}
+              className="d-flex align-items-center justify-content-center"
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "12px",
+                backgroundColor: "#FEF3C7",
+                flexShrink: 0,
+              }}
             >
-              <div
-                className="d-flex align-items-center justify-content-center mb-2"
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "12px",
-                  backgroundColor: "#FEF3C7",
-                }}
-              >
-                <Clock size={24} style={{ color: "#F59E0B" }} />
-              </div>
+              <Clock size={24} style={{ color: "#F59E0B" }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <h2
                 className="fw-bold mb-1"
                 style={{
-                  fontSize: "32px",
-                  color: "#1a1a1a",
+                  fontSize: "2rem",
+                  color: "#0f172a",
                   lineHeight: "1",
                   margin: "0",
                 }}
@@ -365,9 +407,11 @@ const SLACompliance = () => {
               <p
                 className="mb-0"
                 style={{
-                  fontSize: "13px",
-                  color: "#6B7280",
-                  fontWeight: "500",
+                  fontSize: "0.75rem",
+                  color: "#64748b",
+                  fontWeight: "600",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
                 }}
               >
                 Pending
@@ -377,36 +421,51 @@ const SLACompliance = () => {
         </div>
 
         {/* Rejected Card */}
-        <div className="col-md-3">
+        <div className="col-lg-3 col-md-6">
           <div
             className="card h-100"
             style={{
-              borderRadius: "12px",
-              border: "2px solid #2C3E50",
+              borderRadius: "16px",
+              border: "1.5px solid #27235C",
               backgroundColor: "#FFFFFF",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              padding: "1.5rem",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "1rem",
+              transition: "all 0.2s ease",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.borderColor = "#0F62FE";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(39, 35, 92, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.borderColor = "#27235C";
+              e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
             }}
           >
             <div
-              className="card-body d-flex flex-column align-items-center justify-content-center text-center"
-              style={{ padding: "20px 16px" }}
+              className="d-flex align-items-center justify-content-center"
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "12px",
+                backgroundColor: "#FEE2E2",
+                flexShrink: 0,
+              }}
             >
-              <div
-                className="d-flex align-items-center justify-content-center mb-2"
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "12px",
-                  backgroundColor: "#FEE2E2",
-                }}
-              >
-                <AlertCircle size={24} style={{ color: "#EF4444" }} />
-              </div>
+              <AlertCircle size={24} style={{ color: "#EF4444" }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <h2
                 className="fw-bold mb-1"
                 style={{
-                  fontSize: "32px",
-                  color: "#1a1a1a",
+                  fontSize: "2rem",
+                  color: "#0f172a",
                   lineHeight: "1",
                   margin: "0",
                 }}
@@ -416,9 +475,11 @@ const SLACompliance = () => {
               <p
                 className="mb-0"
                 style={{
-                  fontSize: "13px",
-                  color: "#6B7280",
-                  fontWeight: "500",
+                  fontSize: "0.75rem",
+                  color: "#64748b",
+                  fontWeight: "600",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
                 }}
               >
                 Rejected
@@ -428,67 +489,31 @@ const SLACompliance = () => {
         </div>
       </div>
 
-      {/* View Mode Toggle & Sort */}
-      <div
-        className="card border-0 shadow-sm mb-4"
-        style={{ borderRadius: "12px" }}
-      >
-        <div className="card-body p-3">
-          <div className="d-flex justify-content-between align-items-center">
-            <div className="btn-group" role="group">
-              <button
-                type="button"
-                className={`btn ${
-                  viewMode === "cards" ? "btn-primary" : "btn-outline-primary"
-                }`}
-                onClick={() => setViewMode("cards")}
-                style={{ borderRadius: "8px 0 0 8px" }}
-              >
-                <PieChart size={16} className="me-2" />
-                Cards View
-              </button>
-              <button
-                type="button"
-                className={`btn ${
-                  viewMode === "table" ? "btn-primary" : "btn-outline-primary"
-                }`}
-                onClick={() => setViewMode("table")}
-                style={{ borderRadius: "0 8px 8px 0" }}
-              >
-                <BarChart3 size={16} className="me-2" />
-                Table View
-              </button>
-            </div>
-
-            <div className="d-flex align-items-center gap-3">
-              <div className="d-flex align-items-center gap-2">
-                <Filter size={16} className="text-muted" />
-                <span className="text-muted small">Sort by:</span>
-                <select
-                  className="form-select form-select-sm"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  style={{ width: "auto", borderRadius: "6px" }}
-                >
-                  <option value="compliancePercentage">Compliance %</option>
-                  <option value="departmentName">Department</option>
-                  <option value="totalSlas">Total SLAs</option>
-                  <option value="closedSlas">Closed SLAs</option>
-                  <option value="breachedSlas">Breached</option>
-                </select>
-              </div>
-
-              <button
-                className="btn btn-sm btn-outline-secondary"
-                onClick={() =>
-                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                }
-                style={{ borderRadius: "6px" }}
-              >
-                {sortOrder === "asc" ? "↑ ASC" : "↓ DESC"}
-              </button>
-            </div>
-          </div>
+      {/* View Mode Toggle */}
+      <div className="mb-4" style={{ padding: "1rem 0" }}>
+        <div className="btn-group" role="group">
+          <button
+            type="button"
+            className={`btn ${
+              viewMode === "cards" ? "btn-primary" : "btn-outline-primary"
+            }`}
+            onClick={() => setViewMode("cards")}
+            style={{ borderRadius: "8px 0 0 8px", padding: "0.75rem 1.5rem" }}
+          >
+            <PieChart size={16} className="me-2" />
+            Cards View
+          </button>
+          <button
+            type="button"
+            className={`btn ${
+              viewMode === "table" ? "btn-primary" : "btn-outline-primary"
+            }`}
+            onClick={() => setViewMode("table")}
+            style={{ borderRadius: "0 8px 8px 0", padding: "0.75rem 1.5rem" }}
+          >
+            <BarChart3 size={16} className="me-2" />
+            Table View
+          </button>
         </div>
       </div>
 
@@ -526,6 +551,7 @@ const SLACompliance = () => {
                   key={compliance.complianceId}
                   className="col-md-6 col-lg-4"
                 >
+                  {/* ComplianceCard component renders here with its own styling */}
                   <ComplianceCard
                     compliance={compliance}
                     slaData={allSLAs.filter(
@@ -541,8 +567,11 @@ const SLACompliance = () => {
           {/* Table View */}
           {viewMode === "table" && (
             <div
-              className="card border-0 shadow-sm"
-              style={{ borderRadius: "12px" }}
+              className="card shadow-sm"
+              style={{
+                borderRadius: "12px",
+                border: "1.5px solid #27235C",
+              }}
             >
               <div className="table-responsive">
                 <table className="table table-hover mb-0 align-middle">
@@ -662,37 +691,37 @@ const SLACompliance = () => {
         </>
       )}
 
-      {/* Empty State - CENTERED WITH IMPROVED STYLING */}
+      {/* Empty State */}
       {!loading && sortedData.length === 0 && (
         <div
           className="d-flex flex-column align-items-center justify-content-center text-center"
-          style={{ 
+          style={{
             minHeight: "400px",
-            padding: "60px 20px"
+            padding: "60px 20px",
           }}
         >
-          <FileText 
-            size={48} 
-            className="mb-3" 
-            style={{ 
+          <FileText
+            size={48}
+            className="mb-3"
+            style={{
               strokeWidth: 1.5,
-              color: "#9CA3AF"
+              color: "#9CA3AF",
             }}
           />
-          <h5 
-            className="fw-semibold mb-2" 
-            style={{ 
+          <h5
+            className="fw-semibold mb-2"
+            style={{
               fontSize: "18px",
-              color: "#374151" 
+              color: "#374151",
             }}
           >
             No Compliance Data
           </h5>
-          <p 
-            className="mb-0" 
-            style={{ 
+          <p
+            className="mb-0"
+            style={{
               fontSize: "14px",
-              color: "#6B7280" 
+              color: "#6B7280",
             }}
           >
             No SLA data available to display

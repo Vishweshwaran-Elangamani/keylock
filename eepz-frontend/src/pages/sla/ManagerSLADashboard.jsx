@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Home,
   Zap,
+  X,
 } from 'lucide-react';
 import slaService from '../../services/sla/slaService';
 import ManagerEscalationModal from '../../components/sla/modals/ManagerEscalationModal';
@@ -22,12 +23,8 @@ import { dateHelpers } from '../../services/sla/slaService';
 import Pagination from '../../components/project_management_components/common/Pagination';
 import '../../styles/sla/ManagerSLADashboard.css';
 
-
-
 const ManagerSLADashboard = () => {
   const navigate = useNavigate();
-
-
 
   const [mySLAs, setMySLAs] = useState([]);
   const [managerEscalations, setManagerEscalations] = useState([]);
@@ -36,14 +33,11 @@ const ManagerSLADashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(9);
 
-
-
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [complianceFilter, setComplianceFilter] = useState('All');
   const [activeTab, setActiveTab] = useState('my-escalation');
-
-
 
   const [showEscalationModal, setShowEscalationModal] = useState(false);
   const [showResolveModal, setShowResolveModal] = useState(false);
@@ -51,39 +45,28 @@ const ManagerSLADashboard = () => {
   const [selectedEscalationForResolve, setSelectedEscalationForResolve] = useState(null);
   const [deptHeads, setDeptHeads] = useState([]);
 
-
-
   useEffect(() => {
     loadData();
   }, []);
 
-
-
   useEffect(() => {
     applyFilters();
-  }, [mySLAs, managerEscalations, searchTerm, statusFilter, complianceFilter, activeTab]);
-
-
+  }, [mySLAs, managerEscalations, activeSearchTerm, statusFilter, complianceFilter, activeTab]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, complianceFilter, activeTab]);
-
-
+  }, [activeSearchTerm, statusFilter, complianceFilter, activeTab]);
 
   const loadData = async () => {
     setLoading(true);
     try {
       const userData = JSON.parse(localStorage.getItem('user'));
 
-
-
       if (!userData?.empId) {
         toast.error('User not found');
         setLoading(false);
         return;
       }
-
 
       if (userData.departmentId) {
         const deptHeadRes = await slaService.getDepartmentHeads(userData.departmentId);
@@ -92,15 +75,11 @@ const ManagerSLADashboard = () => {
         }
       }
 
-
-
       // Get escalations received from employees
       const escalationsRes = await slaService.getManagerEscalations(userData.empId);
       if (escalationsRes?.success && Array.isArray(escalationsRes.data)) {
         setManagerEscalations(escalationsRes.data);
       }
-
-
 
       // Get manager's own SLAs
       const mySLAsRes = await slaService.getEmployeeSLAs(userData.empId);
@@ -116,8 +95,6 @@ const ManagerSLADashboard = () => {
     }
   };
 
-
-
   const getTabData = () => {
     switch (activeTab) {
       case 'my-escalation':
@@ -129,16 +106,12 @@ const ManagerSLADashboard = () => {
     }
   };
 
-
-
   const applyFilters = () => {
     let result = getTabData();
 
-
-
     if (activeTab === 'my-escalation') {
-      if (searchTerm) {
-        const term = searchTerm.toLowerCase();
+      if (activeSearchTerm) {
+        const term = activeSearchTerm.toLowerCase();
         result = result.filter(
           (sla) =>
             sla.employeeName?.toLowerCase().includes(term) ||
@@ -149,18 +122,16 @@ const ManagerSLADashboard = () => {
         );
       }
 
-
       if (statusFilter !== 'All') {
         result = result.filter((sla) => sla.status === statusFilter);
       }
-
 
       if (complianceFilter !== 'All') {
         result = result.filter((sla) => sla.complianceStatus === complianceFilter);
       }
     } else if (activeTab === 'team-escalation') {
-      if (searchTerm) {
-        const term = searchTerm.toLowerCase();
+      if (activeSearchTerm) {
+        const term = activeSearchTerm.toLowerCase();
         result = result.filter(
           (esc) =>
             esc.reason?.toLowerCase().includes(term) ||
@@ -168,18 +139,28 @@ const ManagerSLADashboard = () => {
         );
       }
 
-
       if (statusFilter !== 'All') {
         result = result.filter((esc) => esc.escalationStatus === statusFilter);
       }
     }
 
-
-
     setFilteredSlas(result);
   };
 
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
 
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearchTerm('');
+  };
 
   const calculateStats = () => {
     return {
@@ -190,22 +171,16 @@ const ManagerSLADashboard = () => {
     };
   };
 
-
-
   const handleViewClick = (e, id) => {
     e.stopPropagation();
     navigate(`/sla/manager/details/${id}`);
   };
-
-
 
   const handleEscalateClick = (e, escalation) => {
     e.stopPropagation();
     setSelectedSLAForEscalation(escalation);
     setShowEscalationModal(true);
   };
-
-
 
   const handleEscalateToDeptHead = async (payload) => {
     try {
@@ -222,15 +197,11 @@ const ManagerSLADashboard = () => {
     }
   };
 
-
-
   const handleResolveClick = (e, escalation) => {
     e.stopPropagation();
     setSelectedEscalationForResolve(escalation);
     setShowResolveModal(true);
   };
-
-
 
   const handleResolveEscalation = async (payload) => {
     try {
@@ -246,21 +217,17 @@ const ManagerSLADashboard = () => {
     }
   };
 
-
-
   const handleRowClick = (id) => {
     navigate(`/sla/manager/details/${id}`);
   };
 
-
-
   const clearFilters = () => {
     setSearchTerm('');
+    setActiveSearchTerm('');
     setStatusFilter('All');
     setComplianceFilter('All');
     toast.info('Filters cleared');
   };
-
 
   const getStatusBadgeClass = (status) => {
     if (status === 'Closed') return 'mgr-sla-status-closed';
@@ -269,15 +236,11 @@ const ManagerSLADashboard = () => {
     return 'mgr-sla-status-open';
   };
 
-
-
   const stats = calculateStats();
   const totalPages = Math.ceil(filteredSlas.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = filteredSlas.slice(startIndex, endIndex);
-
-
 
   if (loading) {
     return (
@@ -289,8 +252,6 @@ const ManagerSLADashboard = () => {
       </div>
     );
   }
-
-
 
   return (
     <div className="mgr-sla-wrapper">
@@ -317,8 +278,6 @@ const ManagerSLADashboard = () => {
           </li>
         </ol>
       </nav>
-
-
 
       {/* Stats Cards */}
       <div className="row g-3 mb-3">
@@ -364,14 +323,21 @@ const ManagerSLADashboard = () => {
         ))}
       </div>
 
-
-
       {/* Filters Card */}
       <div className="mgr-sla-filters-card">
         <div className="row g-3 align-items-center">
           <div className="col-lg-4 col-md-6">
-            <div className="mgr-sla-search-wrapper">
-              <Search size={16} className="mgr-sla-search-icon" />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Search 
+                size={16} 
+                style={{ 
+                  position: 'absolute',
+                  left: '0.875rem',
+                  color: '#6b7280',
+                  pointerEvents: 'none',
+                  zIndex: 2
+                }} 
+              />
               <input
                 type="text"
                 className="form-control mgr-sla-search-input"
@@ -382,7 +348,78 @@ const ManagerSLADashboard = () => {
                 }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                style={{ 
+                  paddingLeft: '2.5rem',
+                  paddingRight: activeSearchTerm ? '130px' : '90px'
+                }}
               />
+              {activeSearchTerm && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  style={{
+                    position: 'absolute',
+                    right: '85px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#dc3545',
+                    cursor: 'pointer',
+                    padding: 0,
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 2,
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#c82333';
+                    e.currentTarget.style.transform = 'scale(1.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#dc3545';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                  title="Clear search"
+                >
+                  <X size={18} style={{ strokeWidth: 2.5 }} />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleSearch}
+                style={{
+                  position: 'absolute',
+                  right: '4px',
+                  background: '#5A5486',
+                  border: 'none',
+                  color: 'white',
+                  borderRadius: '6px',
+                  padding: '0.4rem 0.75rem',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  zIndex: 1,
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#4A4076';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(90, 84, 134, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#5A5486';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <Search size={14} />
+                Search
+              </button>
             </div>
           </div>
           <div className="col-lg-2 col-md-6">
@@ -432,8 +469,6 @@ const ManagerSLADashboard = () => {
         </div>
       </div>
 
-
-
       {/* Tabs */}
       <div className="mgr-sla-tabs-wrapper">
         <div className="mgr-sla-tabs-container">
@@ -451,8 +486,6 @@ const ManagerSLADashboard = () => {
           ))}
         </div>
       </div>
-
-
 
       {/* Content Area */}
       <div className="mgr-sla-table-wrapper">
@@ -491,7 +524,6 @@ const ManagerSLADashboard = () => {
                         </span>
                       </div>
 
-
                       {/* Card Body */}
                       <div className="mgr-escalation-card-body">
                         <div className="mgr-escalation-info-row">
@@ -501,14 +533,12 @@ const ManagerSLADashboard = () => {
                           </span>
                         </div>
 
-
                         <div className="mgr-escalation-info-row">
                           <span className="mgr-escalation-label">Days Remaining</span>
                           <span className={`mgr-escalation-value ${daysRemaining < 0 ? 'text-danger' : daysRemaining <= 3 ? 'text-warning' : 'text-success'}`}>
                             {Math.abs(daysRemaining)} days
                           </span>
                         </div>
-
 
                         <div className="mgr-escalation-info-row">
                           <span className="mgr-escalation-label">Assigned To</span>
@@ -521,7 +551,6 @@ const ManagerSLADashboard = () => {
                           </span>
                         </div>
 
-
                         {sla.complianceStatus && (
                           <div className="mgr-escalation-info-row">
                             <span className="mgr-escalation-label">Compliance</span>
@@ -531,7 +560,6 @@ const ManagerSLADashboard = () => {
                           </div>
                         )}
                       </div>
-
 
                       {/* Card Footer */}
                       <div className="mgr-escalation-card-footer">
@@ -549,7 +577,6 @@ const ManagerSLADashboard = () => {
               })}
             </div>
 
-
             {filteredSlas.length > itemsPerPage && (
               <div className="mgr-sla-pagination-wrapper mt-4">
                 <Pagination
@@ -566,85 +593,86 @@ const ManagerSLADashboard = () => {
         ) : (
           // Table View for Team Escalation
           <>
-            <div className="table-responsive">
-              <table className="table table-hover mb-0 mgr-sla-table">
-                <thead className="mgr-sla-table-header">
-                  <tr>
-                    <th>Employee</th>
-                    <th>Reason</th>
-                    <th>Level</th>
-                    <th>Status</th>
-                    <th>Submitted</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.map((esc) => (
-                    <tr
-                      key={esc.escalationId}
-                      className="mgr-sla-clickable-row"
-                    >
-                      <td onClick={() => handleRowClick(esc.slaid)}>
-                        <div className="mgr-sla-employee-cell">
-                          <div className="mgr-sla-employee-info">
-                            <div className="mgr-sla-employee-name">{esc.employeeName || '—'}</div>
-                            <div className="mgr-sla-employee-email">{esc.employeeEmail || 'No email'}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td onClick={() => handleRowClick(esc.slaid)}>{esc.reason || '—'}</td>
-                      <td onClick={() => handleRowClick(esc.slaid)}>
-                        <span className="mgr-sla-badge mgr-sla-badge-info">{esc.escalationLevel}</span>
-                      </td>
-                      <td onClick={() => handleRowClick(esc.slaid)}>
-                        <span
-                          className={`mgr-sla-badge ${
-                            esc.escalationStatus === 'Resolved'
-                              ? 'mgr-sla-badge-success'
-                              : esc.escalationStatus === 'InProgress'
-                              ? 'mgr-sla-badge-warning'
-                              : 'mgr-sla-badge-primary'
-                          }`}
-                        >
-                          {esc.escalationStatus}
-                        </span>
-                      </td>
-                      <td onClick={() => handleRowClick(esc.slaid)}>{formatDate(esc.submittedAt)}</td>
-                      <td>
-                        <div className="mgr-sla-actions">
-                          <button
-                            className="btn btn-sm mgr-sla-action-btn mgr-sla-action-view"
-                            onClick={(e) => handleViewClick(e, esc.slaid)}
-                            title="View details"
-                          >
-                            <Eye size={16} />
-                          </button>
-                          {esc.escalationStatus !== 'Resolved' && (
-                            <>
-                              <button
-                                className="btn btn-sm mgr-sla-action-btn mgr-sla-action-escalate"
-                                onClick={(e) => handleEscalateClick(e, esc)}
-                                title="Escalate to Department Head"
-                              >
-                                <Send size={16} />
-                              </button>
-                              <button
-                                className="btn btn-sm mgr-sla-action-btn mgr-sla-action-resolve"
-                                onClick={(e) => handleResolveClick(e, esc)}
-                                title="Resolve escalation"
-                              >
-                                <CheckCircle size={16} />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
+            <div className="mgr-sla-table-container">
+              <div className="table-responsive">
+                <table className="table table-hover mb-0 mgr-sla-table">
+                  <thead className="mgr-sla-table-header">
+                    <tr>
+                      <th>Employee</th>
+                      <th>Reason</th>
+                      <th>Level</th>
+                      <th>Status</th>
+                      <th>Submitted</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {paginatedData.map((esc) => (
+                      <tr
+                        key={esc.escalationId}
+                        className="mgr-sla-clickable-row"
+                      >
+                        <td onClick={() => handleRowClick(esc.slaid)}>
+                          <div className="mgr-sla-employee-cell">
+                            <div className="mgr-sla-employee-info">
+                              <div className="mgr-sla-employee-name">{esc.employeeName || '—'}</div>
+                              <div className="mgr-sla-employee-email">{esc.employeeEmail || 'No email'}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td onClick={() => handleRowClick(esc.slaid)}>{esc.reason || '—'}</td>
+                        <td onClick={() => handleRowClick(esc.slaid)}>
+                          <span className="mgr-sla-badge mgr-sla-badge-info">{esc.escalationLevel}</span>
+                        </td>
+                        <td onClick={() => handleRowClick(esc.slaid)}>
+                          <span
+                            className={`mgr-sla-badge ${
+                              esc.escalationStatus === 'Resolved'
+                                ? 'mgr-sla-badge-success'
+                                : esc.escalationStatus === 'InProgress'
+                                ? 'mgr-sla-badge-warning'
+                                : 'mgr-sla-badge-primary'
+                            }`}
+                          >
+                            {esc.escalationStatus}
+                          </span>
+                        </td>
+                        <td onClick={() => handleRowClick(esc.slaid)}>{formatDate(esc.submittedAt)}</td>
+                        <td>
+                          <div className="mgr-sla-actions">
+                            <button
+                              className="btn btn-sm mgr-sla-action-btn mgr-sla-action-view"
+                              onClick={(e) => handleViewClick(e, esc.slaid)}
+                              title="View details"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            {esc.escalationStatus !== 'Resolved' && (
+                              <>
+                                <button
+                                  className="btn btn-sm mgr-sla-action-btn mgr-sla-action-escalate"
+                                  onClick={(e) => handleEscalateClick(e, esc)}
+                                  title="Escalate to Department Head"
+                                >
+                                  <Send size={16} />
+                                </button>
+                                <button
+                                  className="btn btn-sm mgr-sla-action-btn mgr-sla-action-resolve"
+                                  onClick={(e) => handleResolveClick(e, esc)}
+                                  title="Resolve escalation"
+                                >
+                                  <CheckCircle size={16} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-
 
             {filteredSlas.length > itemsPerPage && (
               <div className="mgr-sla-pagination-wrapper">
@@ -662,8 +690,6 @@ const ManagerSLADashboard = () => {
         )}
       </div>
 
-
-
       {/* Modals */}
       {showEscalationModal && selectedSLAForEscalation && (
         <ManagerEscalationModal
@@ -673,8 +699,6 @@ const ManagerSLADashboard = () => {
           deptHeads={deptHeads}
         />
       )}
-
-
 
       {showResolveModal && selectedEscalationForResolve && (
         <ResolveEscalationModal
@@ -686,7 +710,5 @@ const ManagerSLADashboard = () => {
     </div>
   );
 };
-
-
 
 export default ManagerSLADashboard;

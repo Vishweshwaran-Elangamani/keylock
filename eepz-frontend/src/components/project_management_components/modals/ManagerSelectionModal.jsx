@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { X, Search, ChevronLeft, ChevronRight, AlertCircle, CheckCircle, UserCog, Info } from 'lucide-react';
 
-
 const ManagerSelectionModal = ({
   show,
   onClose,
@@ -15,6 +14,8 @@ const ManagerSelectionModal = ({
   setActiveTab,
   searchTerm,
   setSearchTerm,
+  activeSearchTerm, // NEW: Receive from parent
+  setActiveSearchTerm, // NEW: Receive from parent
   filterRole,
   setFilterRole,
   filterDepartment,
@@ -42,9 +43,23 @@ const ManagerSelectionModal = ({
     };
   }, [show]);
 
+  // Search handlers
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearchTerm('');
+  };
 
   if (!show) return null;
-
 
   const getSelectedManager = () => {
     if (activeTab === 'resource') return selectedResourceOwner;
@@ -53,12 +68,10 @@ const ManagerSelectionModal = ({
     return null;
   };
 
-
   const isManagerSelected = (emp) => {
     const selected = getSelectedManager();
     return selected?.employeeMasterId === emp.employeeMasterId;
   };
-
 
   const modalContent = (
     <>
@@ -76,7 +89,7 @@ const ManagerSelectionModal = ({
         onClick={onClose}
       />
 
-      {/* Modal Container - MEDIUM SIZE */}
+      {/* Modal Container */}
       <div
         style={{ 
           position: 'fixed',
@@ -341,35 +354,104 @@ const ManagerSelectionModal = ({
               </div>
             </div>
 
-            {/* Filters */}
+            {/* Filters with Search Button and Clear Icon */}
             <div className="row g-2 mb-3">
               <div className="col-md-6">
-                <div className="input-group">
-                  <span 
-                    className="input-group-text"
-                    style={{
-                      backgroundColor: 'white',
-                      border: '1px solid #d1d5db',
-                      borderRight: 'none',
-                      borderRadius: '8px 0 0 8px'
-                    }}
-                  >
-                    <Search size={16} style={{ color: '#6b7280' }} />
-                  </span>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <Search 
+                    size={16} 
+                    style={{ 
+                      position: 'absolute',
+                      left: '0.875rem',
+                      color: '#6b7280',
+                      pointerEvents: 'none',
+                      zIndex: 2
+                    }} 
+                  />
                   <input
                     type="text"
                     className="form-control text-start"
                     placeholder="Search by name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={handleSearchKeyPress}
                     style={{ 
                       fontSize: '0.875rem',
                       border: '1px solid #d1d5db',
-                      borderLeft: 'none',
-                      padding: '0.5rem 0.75rem',
-                      borderRadius: '0 8px 8px 0'
+                      padding: '0.5rem 0.75rem 0.5rem 2.5rem',
+                      borderRadius: '8px',
+                      width: '100%',
+                      paddingRight: activeSearchTerm ? '130px' : '90px'
                     }}
                   />
+                  {/* Clear Icon */}
+                  {activeSearchTerm && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      style={{
+                        position: 'absolute',
+                        right: '85px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#dc3545',
+                        cursor: 'pointer',
+                        padding: 0,
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 2,
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#c82333';
+                        e.currentTarget.style.transform = 'scale(1.2)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#dc3545';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                      title="Clear search"
+                    >
+                      <X size={18} style={{ strokeWidth: 2.5 }} />
+                    </button>
+                  )}
+                  {/* Search Button */}
+                  <button
+                    type="button"
+                    onClick={handleSearch}
+                    style={{
+                      position: 'absolute',
+                      right: '4px',
+                      background: '#5A5486',
+                      border: 'none',
+                      color: 'white',
+                      borderRadius: '6px',
+                      padding: '0.4rem 0.75rem',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      zIndex: 1,
+                      transition: 'all 0.2s ease',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#4A4076';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(90, 84, 134, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#5A5486';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <Search size={14} />
+                    Search
+                  </button>
                 </div>
               </div>
               <div className="col-md-3">
@@ -456,7 +538,7 @@ const ManagerSelectionModal = ({
                         className="text-center py-4 text-muted"
                         style={{ fontSize: '0.875rem' }}
                       >
-                        No employees found
+                        {activeSearchTerm ? 'No employees found matching your search' : 'No employees found'}
                       </td>
                     </tr>
                   ) : (
@@ -662,6 +744,5 @@ const ManagerSelectionModal = ({
   // Render using React Portal
   return ReactDOM.createPortal(modalContent, document.body);
 };
-
 
 export default ManagerSelectionModal;

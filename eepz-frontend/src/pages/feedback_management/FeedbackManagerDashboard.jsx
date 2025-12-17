@@ -184,7 +184,7 @@ export default function FeedbackManagerDashboard() {
     try {
       // Fetch reviews and peer feedback in parallel
       await Promise.all([fetchMyReviews(), fetchPeerFeedback()]);
-      
+
       // Fetch forms first
       await fetchAllForms();
     } catch (err) {
@@ -221,7 +221,8 @@ export default function FeedbackManagerDashboard() {
 
   // Calculate stats
   const stats = useMemo(() => {
-    const pending = allForms.filter((f) => !submittedFormIds.has(f.formId)).length;
+    const pending = allForms.filter((f) => !submittedFormIds.has(f.formId))
+      .length;
 
     return {
       myReviews: myReviews.length,
@@ -267,18 +268,20 @@ export default function FeedbackManagerDashboard() {
         </div>
       )}
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Updated with Horizontal Layout */}
       <div className="fm-mgrdash-stats">
         <div className="fm-mgrdash-stat-card">
           <div className="fm-mgrdash-stat-card__body">
             <div
               className="fm-mgrdash-stat-card__icon"
-              style={{ backgroundColor: "#EEF2FF" }}
+              style={{ backgroundColor: "#E8F1FF" }}
             >
-              <Star size={28} color="#3B82F6" strokeWidth={2.5} />
+              <Star size={24} color="#3B82F6" strokeWidth={2.5} />
             </div>
-            <h2 className="fm-mgrdash-stat-card__value">{stats.myReviews}</h2>
-            <p className="fm-mgrdash-stat-card__label">My Reviews</p>
+            <div className="fm-mgrdash-stat-card__content">
+              <h2 className="fm-mgrdash-stat-card__value">{stats.myReviews}</h2>
+              <p className="fm-mgrdash-stat-card__label">MY REVIEWS</p>
+            </div>
           </div>
         </div>
 
@@ -288,10 +291,14 @@ export default function FeedbackManagerDashboard() {
               className="fm-mgrdash-stat-card__icon"
               style={{ backgroundColor: "#FEE2E2" }}
             >
-              <FileText size={28} color="#E01950" strokeWidth={2.5} />
+              <FileText size={24} color="#E01950" strokeWidth={2.5} />
             </div>
-            <h2 className="fm-mgrdash-stat-card__value">{stats.pendingForms}</h2>
-            <p className="fm-mgrdash-stat-card__label">Pending Forms</p>
+            <div className="fm-mgrdash-stat-card__content">
+              <h2 className="fm-mgrdash-stat-card__value">
+                {stats.pendingForms}
+              </h2>
+              <p className="fm-mgrdash-stat-card__label">PENDING FORMS</p>
+            </div>
           </div>
         </div>
 
@@ -301,10 +308,14 @@ export default function FeedbackManagerDashboard() {
               className="fm-mgrdash-stat-card__icon"
               style={{ backgroundColor: "#DCFCE7" }}
             >
-              <Users size={28} color="#16A34A" strokeWidth={2.5} />
+              <Users size={24} color="#16A34A" strokeWidth={2.5} />
             </div>
-            <h2 className="fm-mgrdash-stat-card__value">{stats.peerFeedback}</h2>
-            <p className="fm-mgrdash-stat-card__label">Peer Feedback</p>
+            <div className="fm-mgrdash-stat-card__content">
+              <h2 className="fm-mgrdash-stat-card__value">
+                {stats.peerFeedback}
+              </h2>
+              <p className="fm-mgrdash-stat-card__label">PEER FEEDBACK</p>
+            </div>
           </div>
         </div>
       </div>
@@ -315,7 +326,9 @@ export default function FeedbackManagerDashboard() {
           <li className="fm-mgrdash-tabs__item">
             <button
               className={`fm-mgrdash-tabs__button ${
-                activeTab === "overview" ? "fm-mgrdash-tabs__button--active" : ""
+                activeTab === "overview"
+                  ? "fm-mgrdash-tabs__button--active"
+                  : ""
               }`}
             >
               <Briefcase size={16} />
@@ -323,7 +336,6 @@ export default function FeedbackManagerDashboard() {
             </button>
           </li>
         </ul>
-       
       </div>
 
       {/* Content Area */}
@@ -343,7 +355,9 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
                 <Plus size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">Create Review</span>
+              <span className="fm-mgrdash-action-card__label">
+                Create Review
+              </span>
             </Link>
 
             <Link
@@ -353,7 +367,9 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--primary">
                 <Eye size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">All Reviews</span>
+              <span className="fm-mgrdash-action-card__label">
+                All Reviews
+              </span>
             </Link>
 
             <Link
@@ -376,7 +392,9 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Send size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">Mentor Feedback</span>
+              <span className="fm-mgrdash-action-card__label">
+                Mentor Feedback
+              </span>
             </Link>
 
             <Link
@@ -386,7 +404,9 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <MessageSquare size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">Context Feedback</span>
+              <span className="fm-mgrdash-action-card__label">
+                Context Feedback
+              </span>
             </Link>
 
             <Link
@@ -396,7 +416,9 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Target size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">Assigned Forms</span>
+              <span className="fm-mgrdash-action-card__label">
+                Assigned Forms
+              </span>
             </Link>
 
             <Link
@@ -406,7 +428,9 @@ export default function FeedbackManagerDashboard() {
               <div className="fm-mgrdash-action-card__icon-wrapper fm-mgrdash-action-card__icon-wrapper--secondary">
                 <Search size={20} />
               </div>
-              <span className="fm-mgrdash-action-card__label">My Submissions</span>
+              <span className="fm-mgrdash-action-card__label">
+                My Submissions
+              </span>
             </Link>
           </div>
         )}

@@ -45,8 +45,11 @@ const ComplianceCard = ({
   if (!calculatedCompliance) {
     return (
       <div
-        className="card h-100 border-0 shadow-sm"
-        style={{ borderRadius: "12px" }}
+        className="card h-100"
+        style={{
+          borderRadius: "12px",
+          border: "1.5px solid #27235C",
+        }}
       >
         <div className="card-body text-center py-5">
           <p className="text-muted">No compliance data available</p>
@@ -78,24 +81,28 @@ const ComplianceCard = ({
 
   return (
     <div
-      className="card h-100 border-0 shadow-sm"
+      className="card h-100"
       style={{
         borderRadius: "12px",
-        transition: "all 0.3s ease",
+        border: "1.5px solid #27235C",
+        backgroundColor: "#FFFFFF",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+        transition: "all 0.2s ease",
         cursor: onClick ? "pointer" : "default",
-        border: `2px solid ${rating.color}15`,
         overflow: "hidden",
       }}
       onMouseEnter={(e) => {
         if (onClick) {
-          e.currentTarget.style.transform = "translateY(-4px)";
-          e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.12)";
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.borderColor = "#0F62FE";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(39, 35, 92, 0.1)";
         }
       }}
       onMouseLeave={(e) => {
         if (onClick) {
           e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+          e.currentTarget.style.borderColor = "#27235C";
+          e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)";
         }
       }}
     >
@@ -120,7 +127,6 @@ const ComplianceCard = ({
             >
               {calculatedCompliance.departmentName || "Department"}
             </h5>
-            <div className="d-flex align-items-center gap-2"></div>
             <div className="d-flex align-items-center gap-2 mt-1">
               <small className="text-muted" style={{ fontSize: "0.75rem" }}>
                 <Calendar size={12} className="me-1" />
@@ -188,132 +194,116 @@ const ComplianceCard = ({
           </div>
         </div>
 
-        {/* Stats Grid - Closed SLAs Breakdown */}
+        {/* Stats Grid - 2x2 Layout with Horizontal Alignment */}
         <div className="row g-3 mb-3">
+          {/* On Time */}
           <div className="col-6">
             <div
-              className="d-flex align-items-center gap-2 p-3 rounded"
-              style={{ backgroundColor: "#24A14808" }}
+              className="d-flex align-items-center gap-3 p-3 rounded-3"
+              style={{ backgroundColor: "#D1FAE5" }}
             >
               <div
-                className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                className="rounded-circle d-flex align-items-center justify-content-center"
                 style={{
-                  width: "36px",
-                  height: "36px",
-                  backgroundColor: "#24A14815",
+                  width: "40px",
+                  height: "40px",
+                  backgroundColor: "#10B981",
+                  flexShrink: 0,
                 }}
               >
-                <CheckCircle size={18} color="#24A148" strokeWidth={2.5} />
+                <CheckCircle size={20} color="#FFFFFF" />
               </div>
-              <div className="flex-grow-1">
-                <small
-                  className="text-muted d-block"
-                  style={{ fontSize: "0.7rem" }}
-                >
+              <div>
+                <p className="mb-0" style={{ fontSize: "0.75rem", color: "#047857", fontWeight: 500 }}>
                   On Time
-                </small>
-                <strong
-                  className="d-block"
-                  style={{ fontSize: "1rem", color: "#24A148" }}
-                >
+                </p>
+                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.5rem", color: "#10B981" }}>
                   {onTimeSlas}
-                </strong>
+                </h4>
               </div>
             </div>
           </div>
 
+          {/* Breached */}
           <div className="col-6">
             <div
-              className="d-flex align-items-center gap-2 p-3 rounded"
-              style={{ backgroundColor: "#E0195008" }}
+              className="d-flex align-items-center gap-3 p-3 rounded-3"
+              style={{ backgroundColor: "#FEE2E2" }}
             >
               <div
-                className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                className="rounded-circle d-flex align-items-center justify-content-center"
                 style={{
-                  width: "36px",
-                  height: "36px",
-                  backgroundColor: "#E0195015",
+                  width: "40px",
+                  height: "40px",
+                  backgroundColor: "#EF4444",
+                  flexShrink: 0,
                 }}
               >
-                <AlertCircle size={18} color="#E01950" strokeWidth={2.5} />
+                <AlertCircle size={20} color="#FFFFFF" />
               </div>
-              <div className="flex-grow-1">
-                <small
-                  className="text-muted d-block"
-                  style={{ fontSize: "0.7rem" }}
-                >
+              <div>
+                <p className="mb-0" style={{ fontSize: "0.75rem", color: "#991B1B", fontWeight: 500 }}>
                   Breached
-                </small>
-                <strong
-                  className="d-block"
-                  style={{ fontSize: "1rem", color: "#E01950" }}
-                >
+                </p>
+                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.5rem", color: "#EF4444" }}>
                   {breachedSlas}
-                </strong>
+                </h4>
               </div>
             </div>
           </div>
 
+          {/* Extended */}
           <div className="col-6">
             <div
-              className="d-flex align-items-center gap-2 p-3 rounded"
-              style={{ backgroundColor: "#E2B93B08" }}
+              className="d-flex align-items-center gap-3 p-3 rounded-3"
+              style={{ backgroundColor: "#FEF3C7" }}
             >
               <div
-                className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                className="rounded-circle d-flex align-items-center justify-content-center"
                 style={{
-                  width: "36px",
-                  height: "36px",
-                  backgroundColor: "#E2B93B15",
+                  width: "40px",
+                  height: "40px",
+                  backgroundColor: "#F59E0B",
+                  flexShrink: 0,
                 }}
               >
-                <Clock size={18} color="#E2B93B" strokeWidth={2.5} />
+                <Clock size={20} color="#FFFFFF" />
               </div>
-              <div className="flex-grow-1">
-                <small
-                  className="text-muted d-block"
-                  style={{ fontSize: "0.7rem" }}
-                >
+              <div>
+                <p className="mb-0" style={{ fontSize: "0.75rem", color: "#92400E", fontWeight: 500 }}>
                   Extended
-                </small>
-                <strong
-                  className="d-block"
-                  style={{ fontSize: "1rem", color: "#E2B93B" }}
-                >
+                </p>
+                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.5rem", color: "#F59E0B" }}>
                   {extendedSlas}
-                </strong>
+                </h4>
               </div>
             </div>
           </div>
 
+          {/* Total */}
           <div className="col-6">
             <div
-              className="d-flex align-items-center gap-2 p-3 rounded"
-              style={{ backgroundColor: "#0F62FE08" }}
+              className="d-flex align-items-center gap-3 p-3 rounded-3"
+              style={{ backgroundColor: "#E8F1FF" }}
             >
               <div
-                className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                className="rounded-circle d-flex align-items-center justify-content-center"
                 style={{
-                  width: "36px",
-                  height: "36px",
-                  backgroundColor: "#0F62FE15",
+                  width: "40px",
+                  height: "40px",
+                  backgroundColor: "#5B93FF",
+                  flexShrink: 0,
                 }}
               >
-                <TrendingUp size={18} color="#0F62FE" strokeWidth={2.5} />
+                <TrendingUp size={20} color="#FFFFFF" />
               </div>
-              <div className="flex-grow-1">
-                <small
-                  className="text-muted d-block"
-                  style={{ fontSize: "0.7rem" }}
-                >
+              <div>
+                <p className="mb-0" style={{ fontSize: "0.75rem", color: "#1E40AF", fontWeight: 500 }}>
                   Total
-                </small>
-                <strong
-                  className="d-block"
-                  style={{ fontSize: "1rem", color: "#0F62FE" }}
-                >
+                </p>
+                <h4 className="mb-0 fw-bold" style={{ fontSize: "1.5rem", color: "#5B93FF" }}>
                   {closedSlas}
-                </strong>
+                </h4>
               </div>
             </div>
           </div>
@@ -322,15 +312,17 @@ const ComplianceCard = ({
         {/* Open SLAs Info */}
         {openSlas > 0 && (
           <div
-            className="alert alert-info py-2 px-3 mb-3 d-flex align-items-center gap-2"
+            className="alert mb-3 d-flex align-items-center gap-2"
             style={{
               fontSize: "0.813rem",
               borderRadius: "8px",
-              backgroundColor: "#0F62FE08",
-              border: "1px solid #0F62FE30",
+              backgroundColor: "#EFF6FF",
+              border: "1px solid #DBEAFE",
+              padding: "0.75rem 1rem",
+              color: "#1E40AF",
             }}
           >
-            <Clock size={16} color="#0F62FE" />
+            <Clock size={16} />
             <span>
               <strong>{openSlas}</strong> SLA(s) currently open (not included in
               compliance %)
@@ -339,7 +331,7 @@ const ComplianceCard = ({
         )}
 
         {/* Last Updated */}
-        <div className="text-muted small mb-0" style={{ fontSize: "0.75rem" }}>
+        <div className="text-muted small mb-0 text-center" style={{ fontSize: "0.75rem" }}>
           <Clock size={12} className="me-1" />
           Last Updated:{" "}
           {formatDate(

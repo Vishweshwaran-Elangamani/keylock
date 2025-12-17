@@ -26,6 +26,7 @@ import { hrFormApi } from "../../services/feedbackmanagement/hrFormApi";
 import FeedbackBreadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
 import "../../styles/feedback/FeedbackHRDashboard.css";
 
+
 const StatCard = ({ label, value, Icon, color, bgColor }) => (
   <div className="fb-hr-stat-card">
     <div className="fb-hr-stat-card__row">
@@ -40,25 +41,21 @@ const StatCard = ({ label, value, Icon, color, bgColor }) => (
   </div>
 );
 
-const HeroActionCard = ({ title, description, icon: Icon, to, iconBg, iconColor }) => (
-  <Link to={to} style={{ textDecoration: "none", display: "block", height: "100%" }}>
-    <div className="fb-hr-action-card">
-      <div className="fb-hr-action-card__main">
-        <div className="fb-hr-action-card__icon" style={{ background: iconBg }}>
-          <Icon size={24} style={{ color: iconColor }} />
-        </div>
 
+const HeroActionCard = ({ title, description, icon: Icon, to, iconBg, iconColor }) => (
+  <Link to={to} className="fb-hr-action-card-link">
+    <div className="fb-hr-action-card">
+      <div className="fb-hr-action-card__icon-wrapper" style={{ background: iconBg }}>
+        <Icon size={24} style={{ color: iconColor }} />
+      </div>
+      <div className="fb-hr-action-card__content">
         <h5 className="fb-hr-action-card__title">{title}</h5>
         <p className="fb-hr-action-card__desc">{description}</p>
-
-        <div className="fb-hr-action-card__arrow">
-          <span>Get Started</span>
-          <ArrowRight size={14} />
-        </div>
       </div>
     </div>
   </Link>
 );
+
 
 export default function FeedbackHRDashboard() {
   const user = useMemo(
@@ -282,7 +279,7 @@ export default function FeedbackHRDashboard() {
             </div>
             <div className="fb-hr-alert__main">
               <strong>Error</strong>
-              <p style={{ margin: "0.3rem 0 0 0", fontSize: "0.95rem" }}>{error}</p>
+              <p className="fb-hr-alert__error-text">{error}</p>
             </div>
             <button
               type="button"
@@ -304,51 +301,34 @@ export default function FeedbackHRDashboard() {
           ))}
         </div>
 
-        {/* Hero Section Title */}
-        <div className="fb-hr-hero-title">
-          <div className="fb-hr-hero-title__row">
-            <Zap size={28} className="fb-hr-hero-title__icon" />
-            <h3 className="fb-hr-hero-title__main">Quick Actions</h3>
-          </div>
-          <p className="fb-hr-hero-title__desc">
-            Manage feedback, create forms, and streamline your HR operations
-          </p>
-        </div>
-
         {/* Hero Action Cards */}
         <div className="fb-hr-action-cards-row">
-          <div>
-            <HeroActionCard
-              title="View All Feedback"
-              description="Browse, search, and manage all feedback submissions from employees."
-              icon={Search}
-              to="/hr/dashboard/feedback/hrformlist"
-              iconBg="#EDE9FE"
-              iconColor="#8B5CF6"
-            />
-          </div>
+          <HeroActionCard
+            title="View All Feedback"
+            description="Browse, search, and manage all feedback submissions from employees."
+            icon={Search}
+            to="/hr/dashboard/feedback/hrformlist"
+            iconBg="#EDE9FE"
+            iconColor="#8B5CF6"
+          />
 
-          <div>
-            <HeroActionCard
-              title="Create New Form"
-              description="Design and publish custom feedback forms for performance reviews."
-              icon={Plus}
-              to="/hr/dashboard/feedback/create-form"
-              iconBg="#FECDD3"
-              iconColor="#E11D48"
-            />
-          </div>
+          <HeroActionCard
+            title="Create New Form"
+            description="Design and publish custom feedback forms for performance reviews."
+            icon={Plus}
+            to="/hr/dashboard/feedback/create-form"
+            iconBg="#FECDD3"
+            iconColor="#E11D48"
+          />
 
-          <div>
-            <HeroActionCard
-              title="Submit Mentor Feedback"
-              description="Provide valuable feedback and guidance to mentees and team members."
-              icon={Send}
-              to="/hr/dashboard/feedback/submit-mentor"
-              iconBg="#DBEAFE"
-              iconColor="#3B82F6"
-            />
-          </div>
+          <HeroActionCard
+            title="Submit Mentor Feedback"
+            description="Provide valuable feedback and guidance to mentees and team members."
+            icon={Send}
+            to="/hr/dashboard/feedback/submit-mentor"
+            iconBg="#DBEAFE"
+            iconColor="#3B82F6"
+          />
         </div>
 
         {/* Peer Feedback Section */}

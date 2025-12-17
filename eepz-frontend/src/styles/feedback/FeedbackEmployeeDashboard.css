@@ -12,25 +12,6 @@
   min-height: 60vh;
 }
 
-/* Toolbar */
-.fm-empdb-toolbar__right .fm-empdb-refresh-btn {
-  font-size: 0.75rem;
-  padding-inline: 0.75rem;
-}
-
-.fm-empdb-icon-spin {
-  animation: fm-empdb-spin 1s linear infinite;
-}
-
-@keyframes fm-empdb-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* Error alert */
 .fm-empdb-error {
   border-radius: 8px;
@@ -53,51 +34,66 @@
   font-size: 0.75rem;
 }
 
-/* Stat cards */
+/* ========================================
+   STAT CARDS - HORIZONTAL LAYOUT WITH BLACK BORDERS
+   ======================================== */
+
 .fm-empdb-stat-card {
-  background: white;
-  border: 2px solid #27235c !important;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #FFFFFF;
+  border: 1.5px solid #27235C;
+  border-radius: 16px;
   padding: 1.5rem;
-  display: flex !important;
-  align-items: center !important;
-  gap: 1rem !important;
   transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .fm-empdb-stat-card:hover {
+  border-color: #0F62FE;
+  box-shadow: 0 4px 12px rgba(39, 35, 92, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-}
-
-.fm-empdb-stat-card__body {
-  padding: 1.25rem 1rem;
 }
 
 .fm-empdb-stat-card__icon-wrapper {
-  border-radius: 8px;
-  padding: 0.75rem;
-  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.fm-empdb-stat-card__content {
+  flex: 1;
+  min-width: 0;
 }
 
 .fm-empdb-stat-card__value {
   font-size: 2rem;
+  font-weight: 700;
   color: #0f172a;
+  margin: 0 0 0.25rem 0;
   line-height: 1;
 }
 
 .fm-empdb-stat-card__label {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: #64748b;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  line-height: 1.2;
 }
 
-/* Toggle navigation */
+/* ========================================
+   TOGGLE NAVIGATION
+   ======================================== */
+
 .fm-empdb-toggle-nav-wrapper {
   width: 100%;
 }
@@ -154,7 +150,17 @@
   background-color: #dc2626;
 }
 
-/* Content card */
+.fm-empdb-toggle-tab:focus,
+.fm-empdb-toggle-tab:active {
+  outline: none;
+  box-shadow: none;
+  border-radius: 50px;
+}
+
+/* ========================================
+   CONTENT
+   ======================================== */
+
 .fm-empdb-content {
   background-color: #ffffff;
   border-radius: 10px;
@@ -162,7 +168,10 @@
   padding: 1.5rem;
 }
 
-/* Action cards */
+/* ========================================
+   ACTION CARDS
+   ======================================== */
+
 .fm-empdb-action-card {
   display: flex;
   flex-direction: column;
@@ -185,14 +194,6 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-}
-
-/* Keep pill look on click/focus */
-.fm-empdb-toggle-tab:focus,
-.fm-empdb-toggle-tab:active {
-  outline: none;
-  box-shadow: none;
-  border-radius: 50px; /* ensure it stays pill */
 }
 
 .fm-empdb-action-card__icon-wrapper--primary {
@@ -238,7 +239,6 @@
   transform: translateY(-2px);
 }
 
-/* Different hover themes */
 .fm-empdb-action-card:not(.fm-empdb-action-card--peer):not(.fm-empdb-action-card--submissions):not(
     .fm-empdb-action-card--sme
   ):hover {
@@ -265,7 +265,6 @@
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
 }
 
-/* SME badge */
 .fm-empdb-action-card__badge {
   position: absolute;
   top: 8px;
@@ -280,13 +279,15 @@
   text-align: center;
 }
 
-/* Peer feedback tab */
+/* ========================================
+   PEER FEEDBACK
+   ======================================== */
+
 .fm-empdb-peer-title {
   color: #0f172a;
   font-size: 1.125rem;
 }
 
-/* Empty state */
 .fm-empdb-peer-empty__icon {
   color: #cbd5e1;
   opacity: 0.5;
@@ -302,7 +303,6 @@
   color: #6b7280;
 }
 
-/* Peer feedback cards */
 .fm-empdb-peer-card {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -337,7 +337,21 @@
   font-size: 0.875rem;
 }
 
-/* Responsive tweaks */
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .fm-empdb-stat-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .fm-empdb-stat-card__icon-wrapper {
+    margin-bottom: 0.5rem;
+  }
+}
+
 @media (max-width: 576px) {
   .fm-empdb-page-wrapper {
     padding: 1rem;

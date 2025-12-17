@@ -13,6 +13,7 @@ import {
   CheckCircle,
   TrendingUp,
   Home,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import slaService from "../../services/sla/slaService";
@@ -33,6 +34,7 @@ const HRSLADashboard = () => {
   const [itemsPerPage] = useState(5);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState(""); // ✅ ADDED
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [complianceFilter, setComplianceFilter] = useState("All");
@@ -51,11 +53,11 @@ const HRSLADashboard = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [slas, searchTerm, statusFilter, typeFilter, complianceFilter]);
+  }, [slas, activeSearchTerm, statusFilter, typeFilter, complianceFilter]); // ✅ CHANGED
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, typeFilter, complianceFilter]);
+  }, [activeSearchTerm, statusFilter, typeFilter, complianceFilter]); // ✅ CHANGED
 
   const fetchSLAs = async () => {
     setLoading(true);
@@ -79,14 +81,15 @@ const HRSLADashboard = () => {
     }
   };
 
+  // ✅ UPDATED: Use activeSearchTerm
   const applyFilters = () => {
     let filtered = [...slas];
-    if (searchTerm) {
+    if (activeSearchTerm) {
       filtered = filtered.filter(
         (sla) =>
-          sla.employeeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          sla.slatype?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          sla.slaid.toString().includes(searchTerm)
+          sla.employeeName?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+          sla.slatype?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+          sla.slaid.toString().includes(activeSearchTerm)
       );
     }
     if (statusFilter !== "All")
@@ -98,6 +101,22 @@ const HRSLADashboard = () => {
         (sla) => sla.complianceStatus === complianceFilter
       );
     setFilteredSlas(filtered);
+  };
+
+  // ✅ ADDED: Search handlers
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearchTerm('');
   };
 
   const handleEdit = (e, sla) => {
@@ -221,8 +240,10 @@ const HRSLADashboard = () => {
     }
   };
 
+  // ✅ UPDATED: Clear both search terms
   const clearFilters = () => {
     setSearchTerm("");
+    setActiveSearchTerm("");
     setStatusFilter("All");
     setTypeFilter("All");
     setComplianceFilter("All");
@@ -329,19 +350,101 @@ const HRSLADashboard = () => {
         ))}
       </div>
 
-      {/* Filters with Buttons */}
+      {/* ✅ UPDATED: Filters with Search Button */}
       <div className="hr-sla-filters-card">
         <div className="row g-3 align-items-center">
           <div className="col-lg-3 col-md-6">
-            <div className="hr-sla-search-wrapper">
-              <Search size={16} className="hr-sla-search-icon" />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <Search 
+                size={16} 
+                style={{ 
+                  position: 'absolute',
+                  left: '0.875rem',
+                  color: '#6b7280',
+                  pointerEvents: 'none',
+                  zIndex: 2
+                }} 
+              />
               <input
                 type="text"
                 className="form-control hr-sla-search-input"
                 placeholder="Search by employee, type, or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                style={{ 
+                  paddingLeft: '2.5rem',
+                  paddingRight: activeSearchTerm ? '130px' : '90px'
+                }}
               />
+              {/* Clear Icon */}
+              {activeSearchTerm && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  style={{
+                    position: 'absolute',
+                    right: '85px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#dc3545',
+                    cursor: 'pointer',
+                    padding: 0,
+                    width: '20px',
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 2,
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#c82333';
+                    e.currentTarget.style.transform = 'scale(1.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#dc3545';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                  title="Clear search"
+                >
+                  <X size={18} style={{ strokeWidth: 2.5 }} />
+                </button>
+              )}
+              {/* Search Button */}
+              <button
+                type="button"
+                onClick={handleSearch}
+                style={{
+                  position: 'absolute',
+                  right: '4px',
+                  background: '#5A5486',
+                  border: 'none',
+                  color: 'white',
+                  borderRadius: '6px',
+                  padding: '0.4rem 0.75rem',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  zIndex: 1,
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#4A4076';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(90, 84, 134, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#5A5486';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <Search size={14} />
+                Search
+              </button>
             </div>
           </div>
           <div className="col-lg-2 col-md-6">
@@ -411,7 +514,6 @@ const HRSLADashboard = () => {
                 ? "Try adjusting your search criteria or filters"
                 : "Get started by creating your first SLA"}
             </p>
-           
           </div>
         </div>
       ) : (

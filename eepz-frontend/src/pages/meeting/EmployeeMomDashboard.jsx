@@ -236,7 +236,6 @@ const EmployeeMomDashboard = () => {
               onMouseEnter={(e) => (e.currentTarget.style.color = "#7a1d65")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#97247E")}
             >
-             
               Meetings and MoM
             </button>
           </li>
@@ -272,14 +271,14 @@ const EmployeeMomDashboard = () => {
         </ol>
       </nav>
 
-      {/* Quick Stats */}
+      {/* Quick Stats - Horizontal Layout */}
       <div className="row g-3 mb-4">
         <StatCard 
           icon="bi-file-text" 
           bgColor="#E3F2FD" 
           iconColor="#3B82F6"
           count={stats.myMoms} 
-          label="My MOMs"
+          label="MY MOMS"
           onClick={() => navigate('/employee/dashboard/meetmom/my-moms')}
         />
         <StatCard 
@@ -287,7 +286,7 @@ const EmployeeMomDashboard = () => {
           bgColor="#E0E7FF" 
           iconColor="#7C3AED"
           count={stats.pendingActionItems} 
-          label="Pending Actions"
+          label="PENDING ACTIONS"
           onClick={() => navigate('/employee/dashboard/meetmom/action-items')}
         />
         <StatCard 
@@ -295,7 +294,7 @@ const EmployeeMomDashboard = () => {
           bgColor="#DCFCE7" 
           iconColor="#16A34A"
           count={stats.meetingInvitations} 
-          label="Invitations"
+          label="INVITATIONS"
           onClick={() => navigate('/employee/dashboard/meetmom/invitations')}
         />
         <StatCard 
@@ -303,11 +302,10 @@ const EmployeeMomDashboard = () => {
           bgColor="#FEF3C7" 
           iconColor="#F59E0B"
           count={stats.sharedMoms} 
-          label="Shared MOMs"
+          label="SHARED MOMS"
           onClick={openSharedModal}
         />
       </div>
-
 
       {/* Quick Action Buttons */}
       <div className="row g-3 mb-4">
@@ -458,7 +456,7 @@ const EmployeeMomDashboard = () => {
         </div>
       </div>
 
-      {/*  Modal Components */}
+      {/* Modal Components */}
       {selectedMeeting && (
         <MeetingDetailsModal 
           meeting={selectedMeeting}
@@ -496,63 +494,63 @@ const EmployeeMomDashboard = () => {
   );
 };
 
-// Stat Card Component - Updated to match reference design
+// Stat Card Component - Horizontal Layout with Black Border
 const StatCard = ({ icon, bgColor, iconColor, count, label, onClick }) => (
   <div className="col-lg-3 col-md-6">
     <div 
-      className="card shadow-sm h-100 mom-stat-card-custom"
+      className="card shadow-sm h-100 mom-stat-card-horizontal"
       onClick={onClick}
       style={{ 
-        transition: 'all 0.3s',
+        transition: 'all 0.2s ease',
         cursor: 'pointer',
-        border: '2px solid #000000', 
-        borderRadius: '12px',
+        border: '1.5px solid #27235C',
+        borderRadius: '16px',
         padding: '1.5rem',
-        textAlign: 'center',
-        minHeight: '180px',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center'
+        gap: '1rem',
+        backgroundColor: '#FFFFFF'
       }}
       onMouseOver={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)';
-        e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.1)';
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.borderColor = '#0F62FE';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(39, 35, 92, 0.1)';
       }}
       onMouseOut={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+        e.currentTarget.style.borderColor = '#27235C';
+        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
       }}
     >
       {/* Icon with rounded background */}
       <div 
         style={{ 
-          width: '64px', 
-          height: '64px', 
+          width: '56px', 
+          height: '56px', 
           backgroundColor: bgColor,
           borderRadius: '12px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '1rem'
+          flexShrink: 0
         }}
       >
-        <i className={`${icon} fs-2`} style={{ color: iconColor }}></i>
+        <i className={`${icon} fs-3`} style={{ color: iconColor }}></i>
       </div>
       
-    
-      <h3 className="fw-bold mb-2" style={{ fontSize: '2.5rem', color: '#000000', lineHeight: 1 }}>
-        {count}
-      </h3>
-      
-    
-      <p className="mb-0 fw-medium" style={{ fontSize: '0.9375rem', color: '#6B7280' }}>
-        {label}
-      </p>
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h3 className="fw-bold mb-1" style={{ fontSize: '2rem', color: '#0f172a', lineHeight: 1 }}>
+          {count}
+        </h3>
+        <p className="mb-0 fw-semibold" style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          {label}
+        </p>
+      </div>
     </div>
   </div>
 );
-
 
 const ActionButton = ({ icon, label, color, count, onClick }) => (
   <div className="col-lg-3 col-md-6">
@@ -582,7 +580,6 @@ const ActionButton = ({ icon, label, color, count, onClick }) => (
     </button>
   </div>
 );
-
 
 const ActivityItem = ({ item, onClick }) => {
   const iconBgColor = {

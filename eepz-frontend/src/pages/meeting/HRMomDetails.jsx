@@ -234,17 +234,6 @@ const HRMomDetails = () => {
         <div className="hrmom-stats-grid">
           <div className="hrmom-stat-card">
             <div className="hrmom-stat-content">
-              <Users size={24} className="hrmom-stat-icon hrmom-stat-icon-primary" />
-              <div className="hrmom-stat-info">
-                <div className="hrmom-stat-value">
-                  {Array.isArray(mom.attendees) ? mom.attendees.length : 0}
-                </div>
-                <div className="hrmom-stat-label">Attendees</div>
-              </div>
-            </div>
-          </div>
-          <div className="hrmom-stat-card">
-            <div className="hrmom-stat-content">
               <MessageSquare size={24} className="hrmom-stat-icon hrmom-stat-icon-info" />
               <div className="hrmom-stat-info">
                 <div className="hrmom-stat-value">
@@ -354,46 +343,6 @@ const HRMomDetails = () => {
           </div>
         </div>
 
-        {/* Attendees Card */}
-        <div className="hrmom-card">
-          <div className="hrmom-card-header">
-            <h5 className="hrmom-card-title">
-              <Users size={22} />
-              Attendees ({Array.isArray(mom.attendees) ? mom.attendees.length : 0})
-            </h5>
-          </div>
-          <div className="hrmom-card-body">
-            {mom.attendees && Array.isArray(mom.attendees) && mom.attendees.length > 0 ? (
-              <div className="hrmom-attendees-grid">
-                {mom.attendees.map((attendee, index) => {
-                  const attendeeName =
-                    typeof attendee === "string"
-                      ? attendee
-                      : attendee.name || attendee.employeeName || "Unknown";
-                  return (
-                    <div key={index} className="hrmom-attendee-card">
-                      <div className="hrmom-attendee-avatar">
-                        <User size={20} />
-                      </div>
-                      <div className="hrmom-attendee-info">
-                        <div className="hrmom-attendee-name">{attendeeName}</div>
-                        {typeof attendee === "object" && attendee.role && (
-                          <small className="hrmom-attendee-role">
-                            <Briefcase size={12} />
-                            {attendee.role}
-                          </small>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="hrmom-empty-state">No attendees recorded</div>
-            )}
-          </div>
-        </div>
-
         {/* Comments/Observations Card */}
         {mom.commentsObservations && (
           <div className="hrmom-card">
@@ -409,181 +358,89 @@ const HRMomDetails = () => {
           </div>
         )}
 
-        {/* Discussion Points Card */}
-        <div className="hrmom-card">
-          <div className="hrmom-card-header">
-            <h5 className="hrmom-card-title">
-              <MessageSquare size={22} />
-              Discussion Points (
-              {Array.isArray(mom.discussionPoints) ? mom.discussionPoints.length : 0})
-            </h5>
-          </div>
-          <div className="hrmom-card-body">
-            {mom.discussionPoints &&
-            Array.isArray(mom.discussionPoints) &&
-            mom.discussionPoints.length > 0 ? (
-              <div className="hrmom-discussion-list">
-                {mom.discussionPoints.map((dp, index) => (
-                  <div key={dp.pointId || index} className="hrmom-discussion-item">
-                    <span className="hrmom-discussion-number">{index + 1}</span>
-                    <div className="hrmom-discussion-content">
-                      <p className="hrmom-discussion-text">
-                        {dp.pointText || dp.point || "No details"}
-                      </p>
-                      {dp.timestamp && (
-                        <small className="hrmom-discussion-time">
-                          <Clock size={12} />
-                          Discussed at: {formatDateTime(dp.timestamp)}
-                        </small>
-                      )}
+        {/* Discussion Points & Action Items - SIDE BY SIDE */}
+        <div className="hrmom-two-column-grid">
+          {/* Discussion Points Card */}
+          <div className="hrmom-card">
+            <div className="hrmom-card-header">
+              <h5 className="hrmom-card-title">
+                <MessageSquare size={22} />
+                Discussion Points (
+                {Array.isArray(mom.discussionPoints) ? mom.discussionPoints.length : 0})
+              </h5>
+            </div>
+            <div className="hrmom-card-body">
+              {mom.discussionPoints &&
+              Array.isArray(mom.discussionPoints) &&
+              mom.discussionPoints.length > 0 ? (
+                <div className="hrmom-discussion-list">
+                  {mom.discussionPoints.map((dp, index) => (
+                    <div key={dp.pointId || index} className="hrmom-discussion-item">
+                      <span className="hrmom-discussion-number">{index + 1}</span>
+                      <div className="hrmom-discussion-content">
+                        <p className="hrmom-discussion-text">
+                          {dp.pointText || dp.point || "No details"}
+                        </p>
+                        {dp.timestamp && (
+                          <small className="hrmom-discussion-time">
+                            <Clock size={12} />
+                            Discussed at: {formatDateTime(dp.timestamp)}
+                          </small>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="hrmom-empty-state">No discussion points recorded</div>
-            )}
-          </div>
-        </div>
-
-        {/* Action Items Card */}
-        <div className="hrmom-card">
-          <div className="hrmom-card-header hrmom-card-header-between">
-            <h5 className="hrmom-card-title">
-              <CheckCircle size={22} />
-              Action Items ({actionStats.total})
-            </h5>
-            <div className="hrmom-action-stats">
-              <span className="hrmom-badge hrmom-badge-success">
-                {actionStats.completed} Completed
-              </span>
-              <span className="hrmom-badge hrmom-badge-warning">
-                {actionStats.pending} Pending
-              </span>
-              {actionStats.overdue > 0 && (
-                <span className="hrmom-badge hrmom-badge-danger">
-                  {actionStats.overdue} Overdue
-                </span>
+                  ))}
+                </div>
+              ) : (
+                <div className="hrmom-empty-state">No discussion points recorded</div>
               )}
             </div>
           </div>
-          <div className="hrmom-card-body hrmom-card-body-table">
-            {mom.actionItems && Array.isArray(mom.actionItems) && mom.actionItems.length > 0 ? (
-              <div className="hrmom-table-wrapper">
-                <table className="hrmom-table">
-                  <thead className="hrmom-table-header">
-                    <tr>
-                      <th style={{ width: "5%" }}>#</th>
-                      <th style={{ width: "35%" }}>Task Description</th>
-                      <th style={{ width: "20%" }}>Assigned To</th>
-                      <th style={{ width: "15%" }}>Due Date</th>
-                      <th style={{ width: "15%" }}>Status</th>
-                      <th style={{ width: "10%" }}>Priority</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {mom.actionItems.map((ai, index) => (
-                      <tr key={ai.actionItemId || index}>
-                        <td>
-                          <div className="hrmom-table-number">{index + 1}</div>
-                        </td>
-                        <td>
-                          <div className="hrmom-task-cell">
-                            <CheckCircle size={16} className="hrmom-task-icon" />
-                            <div>
-                              <div className="hrmom-task-title">
-                                {ai.taskDescription || ai.task || "No description"}
-                              </div>
-                              {ai.notes && <small className="hrmom-task-notes">{ai.notes}</small>}
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="hrmom-assignee-cell">
-                            <User size={16} />
-                            <span>{ai.assignedToEmployeeName || ai.assignTo || "Unassigned"}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="hrmom-date-cell">
-                            <Calendar size={14} />
-                            <span className={ai.isOverdue ? "hrmom-date-overdue" : ""}>
-                              {formatDate(ai.dueDate)}
-                            </span>
-                          </div>
-                        </td>
-                        <td>
-                          {getStatusBadge(ai.status, ai.isOverdue)}
-                        </td>
-                        <td>
-                          {ai.priority && getPriorityBadge(ai.priority)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="hrmom-empty-state">No action items recorded</div>
-            )}
-          </div>
-        </div>
 
-        {/* Metadata Card */}
-        <div className="hrmom-card">
-          <div className="hrmom-card-header">
-            <h6 className="hrmom-card-title-small">System Information & Metadata</h6>
-          </div>
-          <div className="hrmom-card-body">
-            <div className="hrmom-metadata-grid">
-              <div className="hrmom-metadata-item">
-                <small className="hrmom-metadata-label">MOM ID</small>
-                <span className="hrmom-metadata-value hrmom-metadata-code">{mom.momId}</span>
-              </div>
-              <div className="hrmom-metadata-item">
-                <small className="hrmom-metadata-label">Created At</small>
-                <span className="hrmom-metadata-value">{formatDateTime(mom.createdAt)}</span>
-              </div>
-              {mom.updatedAt && (
-                <div className="hrmom-metadata-item">
-                  <small className="hrmom-metadata-label">Last Updated</small>
-                  <span className="hrmom-metadata-value">{formatDateTime(mom.updatedAt)}</span>
+          {/* Action Items Card */}
+          <div className="hrmom-card">
+            <div className="hrmom-card-header">
+              <h5 className="hrmom-card-title">
+                <CheckCircle size={22} />
+                Action Items ({actionStats.total})
+              </h5>
+            </div>
+            <div className="hrmom-card-body">
+              {mom.actionItems && Array.isArray(mom.actionItems) && mom.actionItems.length > 0 ? (
+                <div className="hrmom-action-items-list">
+                  {mom.actionItems.map((ai, index) => (
+                    <div key={ai.actionItemId || index} className="hrmom-action-item">
+                      <div className="hrmom-action-item-header">
+                        <div className="hrmom-action-item-number">{index + 1}</div>
+                        <div className="hrmom-action-item-content">
+                          <div className="hrmom-action-item-title">
+                            {ai.taskDescription || ai.task || "No description"}
+                          </div>
+                          {ai.notes && <small className="hrmom-action-item-notes">{ai.notes}</small>}
+                        </div>
+                      </div>
+                      <div className="hrmom-action-item-details">
+                        <div className="hrmom-action-item-detail">
+                          <User size={14} />
+                          <span>{ai.assignedToEmployeeName || ai.assignTo || "Unassigned"}</span>
+                        </div>
+                        <div className="hrmom-action-item-detail">
+                          <Calendar size={14} />
+                          <span className={ai.isOverdue ? "hrmom-date-overdue" : ""}>
+                            {formatDate(ai.dueDate)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="hrmom-action-item-badges">
+                        {getStatusBadge(ai.status, ai.isOverdue)}
+                        {ai.priority && getPriorityBadge(ai.priority)}
+                      </div>
+                    </div>
+                  ))}
                 </div>
+              ) : (
+                <div className="hrmom-empty-state">No action items recorded</div>
               )}
-              {mom.submittedById && (
-                <div className="hrmom-metadata-item">
-                  <small className="hrmom-metadata-label">Submitted By ID</small>
-                  <span className="hrmom-metadata-value hrmom-metadata-code">
-                    {mom.submittedById}
-                  </span>
-                </div>
-              )}
-              {mom.departmentId && (
-                <div className="hrmom-metadata-item">
-                  <small className="hrmom-metadata-label">Department ID</small>
-                  <span className="hrmom-metadata-value hrmom-metadata-code">
-                    {mom.departmentId}
-                  </span>
-                </div>
-              )}
-              {mom.projectId && (
-                <div className="hrmom-metadata-item">
-                  <small className="hrmom-metadata-label">Project ID</small>
-                  <span className="hrmom-metadata-value hrmom-metadata-code">
-                    {mom.projectId}
-                  </span>
-                </div>
-              )}
-              <div className="hrmom-metadata-item">
-                <small className="hrmom-metadata-label">Status</small>
-                <span className="hrmom-badge hrmom-badge-success">Active</span>
-              </div>
-              <div className="hrmom-metadata-item">
-                <small className="hrmom-metadata-label">Visibility</small>
-                <span className="hrmom-badge hrmom-badge-info">
-                  {mom.isPrivate ? "Private" : "Public"}
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -652,62 +509,6 @@ const HRMomDetails = () => {
           font-weight: 600;
         }
 
-        /* Header */
-        .hrmom-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 1.5rem;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-
-        .hrmom-header-left {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-
-        .hrmom-btn-back {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          border: none;
-          background: #ffffff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          flex-shrink: 0;
-        }
-
-        .hrmom-btn-back:hover {
-          background: #f8f9fa;
-          transform: translateX(-2px);
-        }
-
-        .hrmom-title {
-          font-size: 1.75rem;
-          font-weight: 700;
-          color: #1e293b;
-          margin: 0;
-          line-height: 1.2;
-        }
-
-        .hrmom-subtitle {
-          font-size: 0.95rem;
-          color: #64748b;
-          margin: 0.25rem 0 0;
-        }
-
-        .hrmom-header-actions {
-          display: flex;
-          gap: 0.75rem;
-          flex-wrap: wrap;
-        }
-
         /* Buttons */
         .hrmom-btn {
           display: inline-flex;
@@ -734,32 +535,10 @@ const HRMomDetails = () => {
           box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
         }
 
-        .hrmom-btn-success {
-          background: #10b981;
-          color: #ffffff;
-        }
-
-        .hrmom-btn-success:hover {
-          background: #059669;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-        }
-
-        .hrmom-btn-outline {
-          background: #ffffff;
-          color: #3b82f6;
-          border: 1.5px solid #3b82f6;
-        }
-
-        .hrmom-btn-outline:hover {
-          background: #eff6ff;
-          transform: translateY(-1px);
-        }
-
-        /* Stats Grid - LEFT ALIGNED */
+        /* Stats Grid */
         .hrmom-stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          grid-template-columns: repeat(3, 1fr);
           gap: 1rem;
           margin-bottom: 1.5rem;
         }
@@ -822,6 +601,14 @@ const HRMomDetails = () => {
           color: #64748b;
         }
 
+        /* Two Column Grid for Discussion & Action Items */
+        .hrmom-two-column-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.5rem;
+          margin-bottom: 1.5rem;
+        }
+
         /* Cards */
         .hrmom-card {
           background: #ffffff;
@@ -832,17 +619,13 @@ const HRMomDetails = () => {
           overflow: hidden;
         }
 
+        .hrmom-two-column-grid .hrmom-card {
+          margin-bottom: 0;
+        }
+
         .hrmom-card-header {
           padding: 1.25rem 1.5rem;
           border-bottom: 1px solid #e2e8f0;
-        }
-
-        .hrmom-card-header-between {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 1rem;
         }
 
         .hrmom-card-title {
@@ -855,19 +638,8 @@ const HRMomDetails = () => {
           gap: 0.5rem;
         }
 
-        .hrmom-card-title-small {
-          font-size: 1rem;
-          font-weight: 600;
-          color: #1e293b;
-          margin: 0;
-        }
-
         .hrmom-card-body {
           padding: 1.5rem;
-        }
-
-        .hrmom-card-body-table {
-          padding: 0;
         }
 
         /* Meeting Header */
@@ -1024,53 +796,6 @@ const HRMomDetails = () => {
           text-decoration: underline;
         }
 
-        /* Attendees */
-        .hrmom-attendees-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1rem;
-        }
-
-        .hrmom-attendee-card {
-          background: #f8f9fa;
-          border-radius: 8px;
-          padding: 1rem;
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .hrmom-attendee-avatar {
-          width: 45px;
-          height: 45px;
-          border-radius: 50%;
-          background: #e3f2fd;
-          color: #1976d2;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-
-        .hrmom-attendee-info {
-          text-align: left;
-        }
-
-        .hrmom-attendee-name {
-          font-size: 0.95rem;
-          font-weight: 600;
-          color: #1e293b;
-        }
-
-        .hrmom-attendee-role {
-          display: flex;
-          align-items: center;
-          gap: 0.25rem;
-          font-size: 0.75rem;
-          color: #64748b;
-          margin-top: 0.25rem;
-        }
-
         /* Comments */
         .hrmom-comments-box {
           background: #f8f9fa;
@@ -1099,25 +824,26 @@ const HRMomDetails = () => {
         }
 
         .hrmom-discussion-number {
-          width: 40px;
-          height: 40px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           background: #3b82f6;
           color: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1rem;
+          font-size: 0.95rem;
           font-weight: 700;
           flex-shrink: 0;
         }
 
         .hrmom-discussion-content {
           text-align: left;
+          flex: 1;
         }
 
         .hrmom-discussion-text {
-          font-size: 1rem;
+          font-size: 0.95rem;
           color: #1e293b;
           line-height: 1.6;
           margin: 0;
@@ -1132,114 +858,77 @@ const HRMomDetails = () => {
           margin-top: 0.5rem;
         }
 
-        /* Action Stats */
-        .hrmom-action-stats {
+        /* Action Items List */
+        .hrmom-action-items-list {
           display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
+          flex-direction: column;
+          gap: 1rem;
         }
 
-        /* Table */
-        .hrmom-table-wrapper {
-          overflow-x: auto;
-        }
-
-        .hrmom-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        .hrmom-table-header {
-          background: #27235C;
-        }
-
-        .hrmom-table-header th {
-          padding: 1rem 1.25rem;
-          text-align: left;
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #ffffff;
-          text-transform: uppercase;
-          letter-spacing: 0.025em;
-          white-space: nowrap;
-        }
-
-        .hrmom-table tbody tr {
-          border-bottom: 1px solid #e2e8f0;
-          transition: background 0.15s;
-        }
-
-        .hrmom-table tbody tr:last-child {
-          border-bottom: none;
-        }
-
-        .hrmom-table tbody tr:hover {
+        .hrmom-action-item {
           background: #f8f9fa;
+          border-radius: 8px;
+          padding: 1rem;
         }
 
-        .hrmom-table tbody td {
-          padding: 1rem 1.25rem;
-          font-size: 0.875rem;
-          color: #1e293b;
-          vertical-align: middle;
-          text-align: left;
+        .hrmom-action-item-header {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 0.75rem;
         }
 
-        .hrmom-table-number {
-          width: 30px;
-          height: 30px;
+        .hrmom-action-item-number {
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
-          background: #3b82f6;
+          background: #10b981;
           color: #ffffff;
-          display: inline-flex;
+          display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.85rem;
-          font-weight: 600;
-        }
-
-        .hrmom-task-cell {
-          display: flex;
-          align-items: flex-start;
-          gap: 0.5rem;
-        }
-
-        .hrmom-task-icon {
-          color: #3b82f6;
+          font-size: 0.95rem;
+          font-weight: 700;
           flex-shrink: 0;
-          margin-top: 0.125rem;
         }
 
-        .hrmom-task-title {
+        .hrmom-action-item-content {
+          flex: 1;
+        }
+
+        .hrmom-action-item-title {
+          font-size: 0.95rem;
           font-weight: 600;
           color: #1e293b;
-          text-align: left;
+          line-height: 1.4;
         }
 
-        .hrmom-task-notes {
+        .hrmom-action-item-notes {
           display: block;
           color: #64748b;
           margin-top: 0.25rem;
           font-size: 0.75rem;
-          text-align: left;
         }
 
-        .hrmom-assignee-cell {
+        .hrmom-action-item-details {
           display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-weight: 500;
+          gap: 1.5rem;
+          margin-bottom: 0.75rem;
+          padding-left: 3rem;
         }
 
-        .hrmom-assignee-cell svg {
-          color: #64748b;
-        }
-
-        .hrmom-date-cell {
+        .hrmom-action-item-detail {
           display: flex;
           align-items: center;
           gap: 0.375rem;
+          font-size: 0.85rem;
           color: #64748b;
+        }
+
+        .hrmom-action-item-badges {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          padding-left: 3rem;
         }
 
         .hrmom-date-overdue {
@@ -1247,40 +936,10 @@ const HRMomDetails = () => {
           font-weight: 600;
         }
 
-        /* Metadata */
-        .hrmom-metadata-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 1.5rem;
-        }
-
-        .hrmom-metadata-item {
-          text-align: left;
-        }
-
-        .hrmom-metadata-label {
-          display: block;
-          font-size: 0.75rem;
-          color: #64748b;
-          margin-bottom: 0.375rem;
-          text-transform: uppercase;
-          letter-spacing: 0.025em;
-        }
-
-        .hrmom-metadata-value {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #1e293b;
-        }
-
-        .hrmom-metadata-code {
-          font-family: 'Courier New', monospace;
-        }
-
         /* Empty State */
         .hrmom-empty-state {
           padding: 2rem;
-          text-align: left;
+          text-align: center;
           background: #f8f9fa;
           border-radius: 8px;
           color: #64748b;
@@ -1316,20 +975,25 @@ const HRMomDetails = () => {
             padding: 1rem;
           }
 
-          .hrmom-title {
-            font-size: 1.5rem;
-          }
-
           .hrmom-meeting-details {
             grid-template-columns: 1fr;
           }
 
-          .hrmom-attendees-grid {
-            grid-template-columns: 1fr;
+          .hrmom-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
           }
 
-          .hrmom-metadata-grid {
-            grid-template-columns: repeat(2, 1fr);
+          .hrmom-two-column-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+          }
+
+          .hrmom-two-column-grid .hrmom-card {
+            margin-bottom: 1rem;
+          }
+
+          .hrmom-two-column-grid .hrmom-card:last-child {
+            margin-bottom: 0;
           }
         }
 
@@ -1338,38 +1002,6 @@ const HRMomDetails = () => {
             padding: 0.75rem;
           }
 
-          .hrmom-header {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-
-          .hrmom-header-actions {
-            width: 100%;
-          }
-
-          .hrmom-btn {
-            flex: 1;
-            justify-content: center;
-          }
-
-          .hrmom-stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .hrmom-table-wrapper {
-            overflow-x: scroll;
-          }
-
-          .hrmom-table {
-            min-width: 800px;
-          }
-
-          .hrmom-metadata-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 576px) {
           .hrmom-stats-grid {
             grid-template-columns: 1fr;
           }
@@ -1378,12 +1010,28 @@ const HRMomDetails = () => {
             padding: 1.25rem;
           }
 
+          .hrmom-discussion-item {
+            flex-direction: column;
+          }
+
+          .hrmom-action-item-details {
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-left: 3rem;
+          }
+        }
+
+        @media (max-width: 576px) {
           .hrmom-meeting-header {
             flex-direction: column;
           }
 
-          .hrmom-discussion-item {
-            flex-direction: column;
+          .hrmom-action-item-details {
+            padding-left: 0;
+          }
+
+          .hrmom-action-item-badges {
+            padding-left: 0;
           }
         }
       `}</style>

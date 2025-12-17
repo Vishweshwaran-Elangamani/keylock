@@ -1,7 +1,7 @@
 // src/pages/ProjectManagement/ProjectList.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home } from 'lucide-react';
+import { FolderKanban, Plus, Edit, Trash2, UserCog, Users, Search, Filter, Calendar, Building, Briefcase, AlertCircle, ChevronLeft, ChevronRight, Home, X } from 'lucide-react';
 import { toast } from 'sonner';
 import projectService from '../../services/project_management/projectService';
 import '../../styles/projectmanagement/ProjectList.css'
@@ -21,6 +21,7 @@ const ProjectList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
 
   // Pagination
@@ -52,6 +53,7 @@ const ProjectList = () => {
   const [selectedL1Approver, setSelectedL1Approver] = useState(null);
   const [selectedL2Approver, setSelectedL2Approver] = useState(null);
   const [managerSearchTerm, setManagerSearchTerm] = useState('');
+  const [activeManagerSearchTerm, setActiveManagerSearchTerm] = useState('');
   const [managerFilterRole, setManagerFilterRole] = useState('All');
   const [managerFilterDepartment, setManagerFilterDepartment] = useState('All');
   const [activeManagerTab, setActiveManagerTab] = useState('resource');
@@ -61,6 +63,7 @@ const ProjectList = () => {
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState([]);
   const [primaryEmployeeIds, setPrimaryEmployeeIds] = useState([]);
   const [employeeSearchTerm, setEmployeeSearchTerm] = useState('');
+  const [activeEmployeeSearchTerm, setActiveEmployeeSearchTerm] = useState(''); // ✅ ADDED
   const [employeeFilterRole, setEmployeeFilterRole] = useState('All');
   const [employeeFilterDepartment, setEmployeeFilterDepartment] = useState('All');
   const [employeeFilterStatus, setEmployeeFilterStatus] = useState('All');
@@ -77,15 +80,15 @@ const ProjectList = () => {
 
   useEffect(() => {
     filterProjectsList();
-  }, [searchTerm, filterStatus, projects]);
+  }, [activeSearchTerm, filterStatus, projects]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterStatus]);
+  }, [activeSearchTerm, filterStatus]);
 
   useEffect(() => {
     setManagerCurrentPage(1);
-  }, [managerSearchTerm, managerFilterRole, managerFilterDepartment]);
+  }, [activeManagerSearchTerm, managerFilterRole, managerFilterDepartment]);
 
   const fetchStaticDropdownData = async () => {
     try {
@@ -130,8 +133,8 @@ const ProjectList = () => {
   const filterProjectsList = () => {
     let filtered = [...projects];
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    if (activeSearchTerm) {
+      const term = activeSearchTerm.toLowerCase();
       filtered = filtered.filter(project =>
         project.projectName?.toLowerCase().includes(term) ||
         project.department?.toLowerCase().includes(term) ||
@@ -146,13 +149,28 @@ const ProjectList = () => {
     setFilteredProjects(filtered);
   };
 
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearchTerm('');
+  };
+
   // Get filtered managers (ALL employees, no role restriction)
   const getFilteredManagers = () => {
     return allEmployees.filter(emp => {
-      const searchMatch = managerSearchTerm === '' || 
+      const searchMatch = activeManagerSearchTerm === '' || 
         `${emp.firstName} ${emp.lastName} ${emp.roleName} ${emp.departmentName}`
           .toLowerCase()
-          .includes(managerSearchTerm.toLowerCase());
+          .includes(activeManagerSearchTerm.toLowerCase());
       
       const roleMatch = managerFilterRole === 'All' || emp.roleName === managerFilterRole;
       const deptMatch = managerFilterDepartment === 'All' || emp.departmentName === managerFilterDepartment;
@@ -227,6 +245,7 @@ const ProjectList = () => {
     return managerIds;
   };
 
+  // ✅ UPDATED: Use activeEmployeeSearchTerm
   const getFilteredEmployees = () => {
     const managerIds = getProjectManagerIds();
     
@@ -235,9 +254,9 @@ const ProjectList = () => {
 
       const isMapped = mappedEmployees.some(m => m.employeeMasterId === emp.employeeMasterId);
       
-      const searchMatch = employeeSearchTerm === '' || 
+      const searchMatch = activeEmployeeSearchTerm === '' || 
         `${emp.firstName} ${emp.lastName} ${emp.roleName} ${emp.departmentName}`
-          .toLowerCase().includes(employeeSearchTerm.toLowerCase());
+          .toLowerCase().includes(activeEmployeeSearchTerm.toLowerCase());
       
       const roleMatch = employeeFilterRole === 'All' || emp.roleName === employeeFilterRole;
       const deptMatch = employeeFilterDepartment === 'All' || emp.departmentName === employeeFilterDepartment;
@@ -361,6 +380,7 @@ const ProjectList = () => {
     setSelectedL2Approver(project.l2Approver || null);
     setActiveManagerTab('resource');
     setManagerSearchTerm('');
+    setActiveManagerSearchTerm('');
     setManagerFilterRole('All');
     setManagerFilterDepartment('All');
     setManagerCurrentPage(1);
@@ -415,11 +435,13 @@ const ProjectList = () => {
     }
   };
 
+  // ✅ UPDATED: Reset activeEmployeeSearchTerm
   const handleEmployeeClick = async (project) => {
     setSelectedProject(project);
     setSelectedEmployeeIds([]);
     setPrimaryEmployeeIds([]);
     setEmployeeSearchTerm('');
+    setActiveEmployeeSearchTerm(''); // ✅ ADDED
     setEmployeeFilterRole('All');
     setEmployeeFilterDepartment('All');
     setEmployeeFilterStatus('All');
@@ -662,7 +684,7 @@ const ProjectList = () => {
 
   return (
     <div className="prj-list-wrapper h-100 d-flex flex-column">
-      {/* Breadcrumb - KEPT */}
+      {/* Breadcrumb */}
       <nav aria-label="breadcrumb" className="mb-3">
         <ol className="breadcrumb mb-0 p-3 rounded prj-list-breadcrumb">
           <li className="breadcrumb-item">
@@ -681,7 +703,7 @@ const ProjectList = () => {
         </ol>
       </nav>
 
-      {/* Compact Filter Bar with Buttons */}
+      {/* Compact Filter Bar with Search and Clear Buttons */}
       <div className="prj-list-filter-bar">
         <div className="prj-list-filter-bar-content">
           <div className="prj-list-search-wrapper">
@@ -691,8 +713,27 @@ const ProjectList = () => {
               className="prj-list-search-input" 
               placeholder="Search projects..." 
               value={searchTerm} 
-              onChange={(e) => setSearchTerm(e.target.value)} 
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
             />
+            {activeSearchTerm && (
+              <button 
+                className="prj-list-clear-btn" 
+                type="button"
+                onClick={handleClearSearch}
+                title="Clear search"
+              >
+                <X size={16} />
+              </button>
+            )}
+            <button 
+              className="prj-list-search-btn" 
+              type="button"
+              onClick={handleSearch}
+            >
+              <Search size={16} />
+              Search
+            </button>
           </div>
           <div className="prj-list-status-filter-wrapper">
             <Filter size={18} className="prj-list-filter-icon" />
@@ -791,7 +832,6 @@ const ProjectList = () => {
                               >
                                 {project.projectName}
                               </div>
-                             
                             </div>
                           </td>
                           <td className="py-3">
@@ -836,34 +876,34 @@ const ProjectList = () => {
                             )}
                           </td>
                           <td className="py-3">
-                            <div className="d-flex gap-2 justify-content-center flex-wrap">
+                            <div className="d-flex gap-2 justify-content-center">
                               <button 
                                 className="prj-list-action-btn prj-list-btn-edit" 
                                 onClick={() => handleEditClick(project)} 
                                 title="Edit Project"
                               >
-                                <Edit size={16} />
+                                <Edit size={14} />
                               </button>
                               <button 
                                 className="prj-list-action-btn prj-list-btn-manager" 
                                 onClick={() => handleManagerClick(project)} 
                                 title="Edit Managers"
                               >
-                                <UserCog size={16} />
+                                <UserCog size={14} />
                               </button>
                               <button 
                                 className="prj-list-action-btn prj-list-btn-employee" 
                                 onClick={() => handleEmployeeClick(project)} 
                                 title="Map/Unmap Employees"
                               >
-                                <Users size={16} />
+                                <Users size={14} />
                               </button>
                               <button 
                                 className="prj-list-action-btn prj-list-btn-delete" 
                                 onClick={() => handleDeleteClick(project)} 
                                 title="Delete Project"
                               >
-                                <Trash2 size={16} />
+                                <Trash2 size={14} />
                               </button>
                             </div>
                           </td>
@@ -955,6 +995,8 @@ const ProjectList = () => {
         setActiveTab={setActiveManagerTab}
         searchTerm={managerSearchTerm}
         setSearchTerm={setManagerSearchTerm}
+        activeSearchTerm={activeManagerSearchTerm}
+        setActiveSearchTerm={setActiveManagerSearchTerm}
         filterRole={managerFilterRole}
         setFilterRole={setManagerFilterRole}
         filterDepartment={managerFilterDepartment}
@@ -972,6 +1014,7 @@ const ProjectList = () => {
         uniqueDepartments={getUniqueManagerDepartments()}
       />
 
+      {/* ✅ UPDATED: Added activeSearchTerm and setActiveSearchTerm props */}
       <EmployeeMappingModal 
         show={showEmployeeModal}
         onClose={() => setShowEmployeeModal(false)}
@@ -990,6 +1033,8 @@ const ProjectList = () => {
         isLoadingData={isLoadingModalData}
         searchTerm={employeeSearchTerm}
         setSearchTerm={setEmployeeSearchTerm}
+        activeSearchTerm={activeEmployeeSearchTerm}
+        setActiveSearchTerm={setActiveEmployeeSearchTerm}
         filterRole={employeeFilterRole}
         setFilterRole={setEmployeeFilterRole}
         filterDepartment={employeeFilterDepartment}

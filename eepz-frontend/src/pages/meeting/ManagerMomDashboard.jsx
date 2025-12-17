@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import momService from "../../services/meeting/momService";
@@ -9,7 +8,6 @@ import toastr from "toastr";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import ManagerMeetingDetailsModal from "../../components/meeting/modals/ManagerMeetingDetailsModal";
-
 
 const ManagerMomDashboard = () => {
   const navigate = useNavigate();
@@ -29,19 +27,17 @@ const ManagerMomDashboard = () => {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [actionItemFilter, setActionItemFilter] = useState("all");
 
-
   useEffect(() => {
     loadDashboardData();
   }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      loadDashboardData(true); 
-    }, 30000); 
+      loadDashboardData(true);
+    }, 30000);
 
-    return () => clearInterval(interval); // Cleanup on unmount
+    return () => clearInterval(interval);
   }, []);
-
 
   const loadDashboardData = async (silentRefresh = false) => {
     try {
@@ -50,14 +46,14 @@ const ManagerMomDashboard = () => {
       } else {
         setRefreshing(true);
       }
-      
-    
-      const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] = await Promise.all([
-        momService.getMyMoms(),
-        meetingService.getMyMeetings(),
-        employeeService.getAllEmployees(),
-        momService.getActionItemsAssignedByMe(), // This gets action items assigned BY manager
-      ]);
+
+      const [myMomsRes, meetingsRes, employeesRes, actionItemsAssignedByMeRes] =
+        await Promise.all([
+          momService.getMyMoms(),
+          meetingService.getMyMeetings(),
+          employeeService.getAllEmployees(),
+          momService.getActionItemsAssignedByMe(),
+        ]);
 
       if (employeesRes.success && employeesRes.data) {
         const nameMap = {};
@@ -68,7 +64,7 @@ const ManagerMomDashboard = () => {
       }
 
       const allActionItems = actionItemsAssignedByMeRes.data || [];
-      
+
       console.log(" Action Items Assigned By Manager:", allActionItems);
 
       const overdueCount = allActionItems.filter((ai) => {
@@ -85,15 +81,13 @@ const ManagerMomDashboard = () => {
         totalMeetingsCount: meetingsRes.data?.length || 0,
       });
 
-      // Set action items
       setActionItems(allActionItems);
 
       const meetingsWithRsvp = await Promise.all(
         (meetingsRes.data || []).map(async (meeting) => {
           try {
-            const rsvpSummaryResponse = await rsvpService.getMeetingRsvpSummary(
-              meeting.meetingId
-            );
+            const rsvpSummaryResponse =
+              await rsvpService.getMeetingRsvpSummary(meeting.meetingId);
             const rsvpSummary = rsvpSummaryResponse.data;
             return {
               ...meeting,
@@ -127,16 +121,13 @@ const ManagerMomDashboard = () => {
     }
   };
 
-
   const openMeetingDetails = (meeting) => {
     setSelectedMeeting(meeting);
   };
 
-
   const closeMeetingDetails = () => {
     setSelectedMeeting(null);
   };
-
 
   const formatDateTime = (isoString) => {
     if (!isoString) return "-";
@@ -168,11 +159,11 @@ const ManagerMomDashboard = () => {
       if (actionItemFilter === "all") return true;
       if (actionItemFilter === "pending") return item.status === "Pending";
       if (actionItemFilter === "completed") return item.status === "Completed";
-      if (actionItemFilter === "overdue") return isOverdue(item.dueDate, item.status);
+      if (actionItemFilter === "overdue")
+        return isOverdue(item.dueDate, item.status);
       return true;
     });
   };
-
 
   if (loading) {
     return (
@@ -188,7 +179,6 @@ const ManagerMomDashboard = () => {
     );
   }
 
-
   return (
     <div
       className="container-fluid px-4 py-4"
@@ -197,43 +187,36 @@ const ManagerMomDashboard = () => {
       {/* Statistics Cards */}
       <div className="row g-3 mb-4">
         <StatCard
-          icon="bi-file-text"
-          bgColor="#e3f2fd"
-          iconColor="#1976d2"
+          icon="bi-clock"
+          bgColor="#FEF3C7"
+          iconColor="#D97706"
           count={stats.teamMomsCount}
-          label="Team MOMs"
-          sublabel="This Month"
+          label="Pending Forms"
         />
         <StatCard
-          icon="bi-person-circle"
-          bgColor="#e8f5e9"
-          iconColor="#388e3c"
+          icon="bi-check-circle"
+          bgColor="#D1FAE5"
+          iconColor="#059669"
           count={stats.oneOnOnesCount}
-          label="1-on-1s"
-          sublabel="This Month"
+          label="Submitted Forms"
         />
         <StatCard
-          icon="bi-exclamation-triangle"
-          bgColor="#fff3e0"
-          iconColor="#f57c00"
+          icon="bi-star"
+          bgColor="#DBEAFE"
+          iconColor="#2563EB"
           count={stats.overdueActionsCount}
-          label="Overdue Actions"
-          sublabel="Needs Attention"
+          label="Reviews Received"
         />
         <StatCard
-          icon="bi-calendar-check"
-          bgColor="#f3e5f5"
-          iconColor="#7b1fa2"
+          icon="bi-people"
+          bgColor="#F3E8FF"
+          iconColor="#9333EA"
           count={stats.totalMeetingsCount}
-          label="Total Meetings"
-          sublabel="All Time"
+          label="Peer Feedback"
         />
       </div>
 
-
-    
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
-       
         <div className="btn-group" role="group">
           <button
             type="button"
@@ -259,30 +242,27 @@ const ManagerMomDashboard = () => {
           </button>
         </div>
 
-
-        {/* Right: Refresh and Schedule Meeting Buttons */}
         <div className="d-flex gap-2">
-         
-          
           <button
             className="btn d-flex align-items-center gap-2 px-3 py-2"
             onClick={() => navigate("/manager/dashboard/meetmom/schedule")}
-            style={{ 
-              background: 'linear-gradient(90deg, #97247E 0%, #E01950 100%)',
-              color: '#fff',
-              border: 'none',
-              fontWeight: '500',
-              transition: 'all 0.2s ease'
+            style={{
+              background: "linear-gradient(90deg, #97247E 0%, #E01950 100%)",
+              color: "#fff",
+              border: "none",
+              fontWeight: "500",
+              transition: "all 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = '0.9';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(151, 36, 126, 0.3)';
+              e.currentTarget.style.opacity = "0.9";
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(151, 36, 126, 0.3)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '1';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.opacity = "1";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
             }}
           >
             <i className="bi bi-calendar-plus"></i>
@@ -291,9 +271,11 @@ const ManagerMomDashboard = () => {
         </div>
       </div>
 
-
       {/* Upcoming Meetings */}
-      <div className="card shadow-sm mb-4" style={{ border: '1px solid #27235c', borderRadius: '12px' }}>
+      <div
+        className="card shadow-sm mb-4"
+        style={{ border: "1px solid #27235c", borderRadius: "12px" }}
+      >
         <div className="card-body">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h5
@@ -307,210 +289,221 @@ const ManagerMomDashboard = () => {
             </span>
           </div>
 
-
           {showTableView ? (
-            <div className="table-responsive" style={{ borderRadius: '8px', overflow: 'hidden' }}>
-              <table className="table align-middle" style={{ marginBottom: 0 }}>
-                <thead>
-                  <tr style={{ backgroundColor: "#27235c" }}>
-                    <th
-                      className="fw-semibold text-uppercase"
-                      style={{
-                        color: "#ffffff",
-                        padding: "16px 12px",
-                        backgroundColor: "#27235c",
-                        borderBottom: "none",
-                        fontSize: "0.75rem",
-                        letterSpacing: "0.5px"
-                      }}
-                    >
-                      MEETING TITLE
-                    </th>
-                    <th
-                      className="fw-semibold text-uppercase"
-                      style={{
-                        color: "#ffffff",
-                        padding: "16px 12px",
-                        backgroundColor: "#27235c",
-                        borderBottom: "none",
-                        fontSize: "0.75rem",
-                        letterSpacing: "0.5px"
-                      }}
-                    >
-                      DATE & TIME
-                    </th>
-                    <th
-                      className="fw-semibold text-uppercase"
-                      style={{
-                        color: "#ffffff",
-                        padding: "16px 12px",
-                        backgroundColor: "#27235c",
-                        borderBottom: "none",
-                        fontSize: "0.75rem",
-                        letterSpacing: "0.5px"
-                      }}
-                    >
-                      TYPE
-                    </th>
-                    <th
-                      className="fw-semibold text-uppercase"
-                      style={{
-                        color: "#ffffff",
-                        padding: "16px 12px",
-                        backgroundColor: "#27235c",
-                        borderBottom: "none",
-                        fontSize: "0.75rem",
-                        letterSpacing: "0.5px"
-                      }}
-                    >
-                      ATTENDANCE
-                    </th>
-                    <th
-                      className="fw-semibold text-uppercase"
-                      style={{
-                        color: "#ffffff",
-                        padding: "16px 12px",
-                        backgroundColor: "#27235c",
-                        borderBottom: "none",
-                        fontSize: "0.75rem",
-                        letterSpacing: "0.5px"
-                      }}
-                    >
-                      STATUS
-                    </th>
-                    <th
-                      className="fw-semibold text-uppercase"
-                      style={{
-                        color: "#ffffff",
-                        padding: "16px 12px",
-                        backgroundColor: "#27235c",
-                        borderBottom: "none",
-                        fontSize: "0.75rem",
-                        letterSpacing: "0.5px"
-                      }}
-                    >
-                      ACTIONS
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {upcomingMeetings.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" className="text-center py-5 text-muted">
-                        <i
-                          className="bi bi-calendar-x"
-                          style={{ fontSize: "2rem" }}
-                        ></i>
-                        <p className="mt-2 mb-0">No upcoming meetings</p>
-                      </td>
-                    </tr>
-                  ) : (
-                    upcomingMeetings.map((meeting) => (
-                      <tr
-                        key={meeting.meetingId}
+            <div
+              style={{
+                border: "2px solid #27235c",
+                borderRadius: "12px",
+                overflow: "hidden",
+              }}
+            >
+              <div className="table-responsive">
+                <table
+                  className="table align-middle"
+                  style={{ marginBottom: 0 }}
+                >
+                  <thead>
+                    <tr style={{ backgroundColor: "#27235c" }}>
+                      <th
+                        className="fw-semibold text-uppercase"
                         style={{
-                          cursor: "pointer",
-                          transition: "background-color 0.2s"
-                        }}
-                        onClick={() => openMeetingDetails(meeting)}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#f8f9fa";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "transparent";
+                          color: "#ffffff",
+                          padding: "16px 12px",
+                          backgroundColor: "#27235c",
+                          borderBottom: "none",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.5px",
                         }}
                       >
-                        <td style={{ padding: "12px" }}>
-                          <div className="d-flex align-items-center gap-2">
-                            <div
-                              className="rounded-circle d-flex align-items-center justify-content-center"
-                              style={{
-                                width: "36px",
-                                height: "36px",
-                                backgroundColor: "#e3f2fd",
-                              }}
-                            >
-                              <i
-                                className="bi bi-calendar-event"
-                                style={{ color: "#1976d2" }}
-                              ></i>
-                            </div>
-                            <span className="fw-semibold">
-                              {meeting.meetingTitle}
-                            </span>
-                          </div>
-                        </td>
-                        <td style={{ padding: "12px" }}>
-                          <span className="text-muted">
-                            <i className="bi bi-clock me-1"></i>
-                            {formatDateTime(meeting.meetingDate)}
-                          </span>
-                        </td>
-                        <td style={{ padding: "12px" }}>
-                          <span className="badge bg-light text-dark border">
-                            {meeting.meetingType || "General"}
-                          </span>
-                        </td>
-                        <td style={{ padding: "12px" }}>
-                          <div className="d-flex align-items-center gap-2">
-                            <div
-                              className="progress"
-                              style={{ width: "60px", height: "6px" }}
-                            >
-                              <div
-                                className="progress-bar bg-success"
-                                role="progressbar"
-                                style={{
-                                  width: `${
-                                    meeting.rsvpTotalInvitations > 0
-                                      ? (meeting.rsvpAcceptedCount /
-                                          meeting.rsvpTotalInvitations) *
-                                        100
-                                      : 0
-                                  }%`,
-                                }}
-                              ></div>
-                            </div>
-                            <small className="text-muted">
-                              {meeting.rsvpAcceptedCount}/
-                              {meeting.rsvpTotalInvitations}
-                            </small>
-                          </div>
-                        </td>
-                        <td style={{ padding: "12px" }}>
-                          {meeting.rsvpAcceptedCount ===
-                            meeting.rsvpTotalInvitations &&
-                          meeting.rsvpTotalInvitations > 0 ? (
-                            <span className="badge bg-success">
-                              All Accepted
-                            </span>
-                          ) : meeting.rsvpAcceptedCount > 0 ? (
-                            <span className="badge bg-warning text-dark">
-                              Pending
-                            </span>
-                          ) : (
-                            <span className="badge bg-secondary">
-                              No Response
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ padding: "12px" }}>
-                          <button
-                            className="btn btn-sm btn-outline-primary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openMeetingDetails(meeting);
-                            }}
-                          >
-                            <i className="bi bi-eye me-1"></i>
-                            View
-                          </button>
+                        MEETING TITLE
+                      </th>
+                      <th
+                        className="fw-semibold text-uppercase"
+                        style={{
+                          color: "#ffffff",
+                          padding: "16px 12px",
+                          backgroundColor: "#27235c",
+                          borderBottom: "none",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        DATE & TIME
+                      </th>
+                      <th
+                        className="fw-semibold text-uppercase"
+                        style={{
+                          color: "#ffffff",
+                          padding: "16px 12px",
+                          backgroundColor: "#27235c",
+                          borderBottom: "none",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        TYPE
+                      </th>
+                      <th
+                        className="fw-semibold text-uppercase"
+                        style={{
+                          color: "#ffffff",
+                          padding: "16px 12px",
+                          backgroundColor: "#27235c",
+                          borderBottom: "none",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        ATTENDANCE
+                      </th>
+                      <th
+                        className="fw-semibold text-uppercase"
+                        style={{
+                          color: "#ffffff",
+                          padding: "16px 12px",
+                          backgroundColor: "#27235c",
+                          borderBottom: "none",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        STATUS
+                      </th>
+                      <th
+                        className="fw-semibold text-uppercase"
+                        style={{
+                          color: "#ffffff",
+                          padding: "16px 12px",
+                          backgroundColor: "#27235c",
+                          borderBottom: "none",
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        ACTIONS
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {upcomingMeetings.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="text-center py-5 text-muted">
+                          <i
+                            className="bi bi-calendar-x"
+                            style={{ fontSize: "2rem" }}
+                          ></i>
+                          <p className="mt-2 mb-0">No upcoming meetings</p>
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      upcomingMeetings.map((meeting) => (
+                        <tr
+                          key={meeting.meetingId}
+                          style={{
+                            cursor: "pointer",
+                            transition: "background-color 0.2s",
+                          }}
+                          onClick={() => openMeetingDetails(meeting)}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#f8f9fa";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor =
+                              "transparent";
+                          }}
+                        >
+                          <td style={{ padding: "12px" }}>
+                            <div className="d-flex align-items-center gap-2">
+                              <div
+                                className="rounded-circle d-flex align-items-center justify-content-center"
+                                style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  backgroundColor: "#e3f2fd",
+                                }}
+                              >
+                                <i
+                                  className="bi bi-calendar-event"
+                                  style={{ color: "#1976d2" }}
+                                ></i>
+                              </div>
+                              <span className="fw-semibold">
+                                {meeting.meetingTitle}
+                              </span>
+                            </div>
+                          </td>
+                          <td style={{ padding: "12px" }}>
+                            <span className="text-muted">
+                              <i className="bi bi-clock me-1"></i>
+                              {formatDateTime(meeting.meetingDate)}
+                            </span>
+                          </td>
+                          <td style={{ padding: "12px" }}>
+                            <span className="badge bg-light text-dark border">
+                              {meeting.meetingType || "General"}
+                            </span>
+                          </td>
+                          <td style={{ padding: "12px" }}>
+                            <div className="d-flex align-items-center gap-2">
+                              <div
+                                className="progress"
+                                style={{ width: "60px", height: "6px" }}
+                              >
+                                <div
+                                  className="progress-bar bg-success"
+                                  role="progressbar"
+                                  style={{
+                                    width: `${
+                                      meeting.rsvpTotalInvitations > 0
+                                        ? (meeting.rsvpAcceptedCount /
+                                            meeting.rsvpTotalInvitations) *
+                                          100
+                                        : 0
+                                    }%`,
+                                  }}
+                                ></div>
+                              </div>
+                              <small className="text-muted">
+                                {meeting.rsvpAcceptedCount}/
+                                {meeting.rsvpTotalInvitations}
+                              </small>
+                            </div>
+                          </td>
+                          <td style={{ padding: "12px" }}>
+                            {meeting.rsvpAcceptedCount ===
+                              meeting.rsvpTotalInvitations &&
+                            meeting.rsvpTotalInvitations > 0 ? (
+                              <span className="badge bg-success">
+                                All Accepted
+                              </span>
+                            ) : meeting.rsvpAcceptedCount > 0 ? (
+                              <span className="badge bg-warning text-dark">
+                                Pending
+                              </span>
+                            ) : (
+                              <span className="badge bg-secondary">
+                                No Response
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ padding: "12px" }}>
+                            <button
+                              className="btn btn-sm btn-outline-primary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openMeetingDetails(meeting);
+                              }}
+                            >
+                              <i className="bi bi-eye me-1"></i>
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           ) : (
             <div className="row g-3">
@@ -530,7 +523,7 @@ const ManagerMomDashboard = () => {
                       style={{
                         cursor: "pointer",
                         transition: "transform 0.2s",
-                        border: '1px solid #27235c',
+                        border: "1px solid #27235c",
                       }}
                       onClick={() => openMeetingDetails(meeting)}
                       onMouseEnter={(e) =>
@@ -604,11 +597,9 @@ const ManagerMomDashboard = () => {
         </div>
       </div>
 
-
-
-      {/*  Modal Component */}
+      {/* Modal Component */}
       {selectedMeeting && (
-        <ManagerMeetingDetailsModal 
+        <ManagerMeetingDetailsModal
           meeting={selectedMeeting}
           onClose={closeMeetingDetails}
         />
@@ -620,44 +611,72 @@ const ManagerMomDashboard = () => {
 const StatCard = ({ icon, bgColor, iconColor, count, label, sublabel }) => (
   <div className="col-lg-3 col-md-6">
     <div
-      className="card shadow-sm h-100"   
+      className="card shadow-sm h-100"
       style={{
-        border: "1px solid #27235c",    
-        borderRadius: "0.5rem"         
+        border: "1.5px solid #27235c",
+        borderRadius: "16px",
+        transition: "all 0.2s ease",
+        cursor: "pointer",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.borderColor = "#0f62fe";
+        e.currentTarget.style.boxShadow = "0 4px 12px rgba(39, 35, 92, 0.1)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.borderColor = "#27235c";
+        e.currentTarget.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.05)";
       }}
     >
-      <div className="card-body d-flex align-items-center p-4">
+      <div 
+        className="card-body d-flex align-items-center px-4 py-3" 
+        style={{ minHeight: "80px", gap: "1.5rem" }}
+      >
+        {/* Icon - Left */}
         <div
-          className="rounded-circle d-flex align-items-center justify-content-center me-3"
+          className="rounded d-flex align-items-center justify-content-center"
           style={{
-            width: "56px",
-            height: "56px",
+            width: "48px",
+            height: "48px",
             backgroundColor: bgColor,
+            flexShrink: 0,
+            borderRadius: "12px",
           }}
         >
-          <i className={`${icon} fs-4`} style={{ color: iconColor }}></i>
+          <i className={`${icon}`} style={{ color: iconColor, fontSize: "22px" }}></i>
         </div>
-        <div>
-          <h3
-            className="fw-bold mb-0"
-            style={{ fontSize: "1.75rem", color: "#1e293b" }}
-          >
-            {count}
-          </h3>
-          <p
-            className="mb-0 fw-semibold"
-            style={{ fontSize: "0.875rem", color: "#64748b" }}
-          >
-            {label}
-          </p>
-          <p className="mb-0 text-muted" style={{ fontSize: "0.75rem" }}>
-            {sublabel}
-          </p>
-        </div>
+        
+        {/* Number - Center Left */}
+        <h3
+          className="fw-bold mb-0"
+          style={{ 
+            fontSize: "2.25rem", 
+            color: "#0f172a", 
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+        >
+          {count}
+        </h3>
+        
+        {/* Label - Right */}
+        <p
+          className="mb-0 fw-semibold text-uppercase"
+          style={{
+            fontSize: "0.95rem",
+            color: "#6B7280",
+            letterSpacing: "0.5px",
+            lineHeight: 1.3,
+            whiteSpace: "nowrap",
+            marginLeft: "auto",
+          }}
+        >
+          {label}
+        </p>
       </div>
     </div>
   </div>
 );
-
 
 export default ManagerMomDashboard;

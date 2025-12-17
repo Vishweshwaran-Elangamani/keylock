@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState, useMemo } from "react";
 import {
   RefreshCw,
@@ -25,7 +23,7 @@ import {
   mentorFeedbackApi,
 } from "../../services/feedbackmanagement/feedbackApi";
 import "../../styles/feedback/FeedbackEmployeeDashboard.css";
-import  Breadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb"
+import Breadcrumb from "../../components/feedback_management/common/FeedbackBreadcrumb";
 
 // Helper function to get role-based feedback dashboard path
 const getFeedbackDashboardPath = (roleName) => {
@@ -45,11 +43,11 @@ const StatCard = ({ label, value, Icon, bgColor, iconColor }) => (
       className="fm-empdb-stat-card__icon-wrapper"
       style={{ backgroundColor: bgColor }}
     >
-      <Icon size={28} color={iconColor} strokeWidth={2.5} />
+      <Icon size={24} color={iconColor} strokeWidth={2.5} />
     </div>
-    <div>
-      <h2 className="fm-empdb-stat-card__value fw-bold mb-2">{value}</h2>
-      <p className="fm-empdb-stat-card__label mb-0">{label}</p>
+    <div className="fm-empdb-stat-card__content">
+      <h2 className="fm-empdb-stat-card__value">{value}</h2>
+      <p className="fm-empdb-stat-card__label">{label}</p>
     </div>
   </div>
 );
@@ -96,7 +94,6 @@ export default function FeedbackEmployeeDashboard() {
 
         if (isSme) {
           try {
-            // FIXED: Changed from getAboutMe to aboutMe
             const feedbackResponse = await mentorFeedbackApi.aboutMe(empId);
             const feedbackData = Array.isArray(feedbackResponse?.data)
               ? feedbackResponse.data
@@ -144,7 +141,6 @@ export default function FeedbackEmployeeDashboard() {
         console.warn("Error fetching employee map:", err.message);
       }
 
-      // FIXED: Changed from getActiveForms to listActive
       try {
         const activeRes = await hrFormApi.listActive();
         const formsData = activeRes?.data || [];
@@ -154,7 +150,6 @@ export default function FeedbackEmployeeDashboard() {
         setActiveHrForms([]);
       }
 
-      // FIXED: Get submitted forms by getting all forms and filtering responses
       try {
         const allFormsRes = await hrFormApi.listForms();
         const allForms = Array.isArray(allFormsRes?.data)
@@ -162,8 +157,7 @@ export default function FeedbackEmployeeDashboard() {
           : allFormsRes?.data?.data || [];
 
         let allMyResponses = [];
-        
-        // Get responses for each form and filter by employee
+
         for (const form of allForms) {
           try {
             const responsesRes = await hrFormApi.byForm(form.formId);
@@ -171,7 +165,6 @@ export default function FeedbackEmployeeDashboard() {
               ? responsesRes.data
               : responsesRes?.data?.data || [];
 
-            // Filter responses for this employee
             const myResponses = responses.filter(
               (r) => Number(r.employeeId) === Number(empId)
             );
@@ -190,7 +183,6 @@ export default function FeedbackEmployeeDashboard() {
         setSubmittedForms([]);
       }
 
-      // FIXED: Changed from getByTargetEmployee to getForTarget
       try {
         const reviewRes = await managerReviewApi.getForTarget(empId);
         const reviewsData = Array.isArray(reviewRes?.data)
@@ -202,7 +194,6 @@ export default function FeedbackEmployeeDashboard() {
         setMyReviews([]);
       }
 
-      // Fetch peer feedback
       try {
         const peerRes = await peerQueueApi.list(1, 1000);
         const peerData = Array.isArray(peerRes?.data)
@@ -232,19 +223,16 @@ export default function FeedbackEmployeeDashboard() {
     }
   };
 
-  // Load data on mount
   useEffect(() => {
     fetchDashboardData();
   }, [user?.empId]);
 
-  // Refresh handler
   const refresh = async () => {
     setRefreshing(true);
     await fetchDashboardData();
     setRefreshing(false);
   };
 
-  // Calculate stats
   const stats = useMemo(() => {
     const submittedFormIds = new Set(submittedForms.map((f) => f.formId));
     const pending = activeHrForms.filter(
@@ -254,28 +242,28 @@ export default function FeedbackEmployeeDashboard() {
 
     return [
       {
-        label: "Pending Forms",
+        label: "PENDING FORMS",
         value: pending,
         Icon: Clock,
         bgColor: "#fef3c7",
         iconColor: "#E2B93B",
       },
       {
-        label: "Submitted Forms",
+        label: "SUBMITTED FORMS",
         value: submitted,
         Icon: CheckCircle,
         bgColor: "#dcfce7",
         iconColor: "#24A148",
       },
       {
-        label: "Reviews Received",
+        label: "REVIEWS RECEIVED",
         value: myReviews.length,
         Icon: Star,
         bgColor: "#dbeafe",
         iconColor: "#0F62FE",
       },
       {
-        label: "Peer Feedback",
+        label: "PEER FEEDBACK",
         value: myPeerFeedback.length,
         Icon: Users,
         bgColor: "#f8f0ff",
@@ -284,7 +272,6 @@ export default function FeedbackEmployeeDashboard() {
     ];
   }, [activeHrForms, submittedForms, myReviews, myPeerFeedback]);
 
-  // Loading state
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center fm-empdb-loading">
@@ -299,22 +286,19 @@ export default function FeedbackEmployeeDashboard() {
     );
   }
 
-    // Get role-based dashboard path
-  const feedbackDashboardPath = user?.roleName 
-    ? getFeedbackDashboardPath(user.roleName) 
+  const feedbackDashboardPath = user?.roleName
+    ? getFeedbackDashboardPath(user.roleName)
     : "/hr/dashboard/feedback";
-
 
   return (
     <div className="fm-empdb-page-wrapper">
-      {/* ========== BREADCRUMB ========== */}
-        <Breadcrumb
-          items={[
-            { label: "Feedback Management", path: feedbackDashboardPath },
-            { label: "Employee" },
-          ]}
-        />
-      {/* Error Alert */}
+      <Breadcrumb
+        items={[
+          { label: "Feedback Management", path: feedbackDashboardPath },
+          { label: "Employee" },
+        ]}
+      />
+
       {error && (
         <div className="alert fm-empdb-error d-flex align-items-start gap-2 mb-3">
           <AlertTriangle
@@ -330,10 +314,9 @@ export default function FeedbackEmployeeDashboard() {
             onClick={() => setError("")}
           />
         </div>
-        
       )}
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Horizontal Layout */}
       <div className="row g-3 mb-3">
         {stats.map((s, idx) => (
           <div key={idx} className="col-lg-3 col-md-6">
@@ -373,10 +356,8 @@ export default function FeedbackEmployeeDashboard() {
 
       {/* Content Area */}
       <div className="fm-empdb-content">
-        {/* Overview Tab - Quick Actions */}
         {activeTab === "overview" && (
           <div className="row g-3">
-            {/* Mentor Feedback */}
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/submit-mentor"
@@ -394,7 +375,6 @@ export default function FeedbackEmployeeDashboard() {
               </Link>
             </div>
 
-            {/* Context Feedback */}
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/contextfeedback"
@@ -412,7 +392,6 @@ export default function FeedbackEmployeeDashboard() {
               </Link>
             </div>
 
-            {/* Assigned Forms */}
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/assignedform"
@@ -430,7 +409,6 @@ export default function FeedbackEmployeeDashboard() {
               </Link>
             </div>
 
-            {/* Peer Feedback */}
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/submit-peer"
@@ -448,7 +426,6 @@ export default function FeedbackEmployeeDashboard() {
               </Link>
             </div>
 
-            {/* My Submissions */}
             <div className="col-md-4 col-6">
               <Link
                 to="/employee/dashboard/feedback/submissions"
@@ -466,7 +443,6 @@ export default function FeedbackEmployeeDashboard() {
               </Link>
             </div>
 
-            {/* SME Dashboard - Only if user is a mentor */}
             {isMentor && (
               <div className="col-md-4 col-6">
                 <Link
@@ -493,7 +469,6 @@ export default function FeedbackEmployeeDashboard() {
           </div>
         )}
 
-        {/* Peer Feedback Tab */}
         {activeTab === "peer-feedback" && (
           <div>
             <h5 className="fw-bold mb-4 fm-empdb-peer-title">

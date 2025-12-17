@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Users, CheckCircle, AlertCircle, Info, Search, Check, X } from 'lucide-react';
 
-
 const EmployeeMappingModal = ({
   show,
   onClose,
@@ -13,6 +12,8 @@ const EmployeeMappingModal = ({
   primaryEmployeeIds,
   searchTerm,
   setSearchTerm,
+  activeSearchTerm, // ✅ NEW: Receive from parent
+  setActiveSearchTerm, // ✅ NEW: Receive from parent
   filterRole,
   setFilterRole,
   filterDepartment,
@@ -46,9 +47,23 @@ const EmployeeMappingModal = ({
     };
   }, [show]);
 
+  // ✅ Search handlers
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setActiveSearchTerm('');
+  };
 
   if (!show) return null;
-
 
   const getProjectManagerIds = () => {
     if (!project) return [];
@@ -65,18 +80,15 @@ const EmployeeMappingModal = ({
     return managerIds;
   };
 
-
   //  Filter out employees with "Admin" role
   const displayEmployees = filteredEmployees.filter(
     emp => emp.roleName && emp.roleName.toLowerCase() !== 'admin'
   );
 
-
   // Filter out "Admin" role from unique roles
   const displayUniqueRoles = uniqueRoles.filter(
     role => role && role.toLowerCase() !== 'admin'
   );
-
 
   const modalContent = (
     <>
@@ -94,7 +106,7 @@ const EmployeeMappingModal = ({
         onClick={onClose}
       />
 
-      {/* Modal Container - SMALLER SIZE */}
+      {/* Modal Container - CENTERED & SMALLER */}
       <div
         style={{ 
           position: 'fixed',
@@ -102,8 +114,8 @@ const EmployeeMappingModal = ({
           left: '50%',
           transform: 'translate(-50%, -50%)',
           zIndex: 10001,
-          width: '1200px',
-          maxWidth: '95vw',
+          width: '950px', // ✅ REDUCED from 1200px
+          maxWidth: '90vw',
           maxHeight: '85vh'
         }}
       >
@@ -124,7 +136,7 @@ const EmployeeMappingModal = ({
             style={{ 
               backgroundColor: '#25235c',
               borderBottom: 'none',
-              padding: '1rem 1.5rem',
+              padding: '1.25rem 1.5rem', // ✅ REDUCED vertical padding
               color: 'white',
               flexShrink: 0,
               display: 'flex',
@@ -137,7 +149,7 @@ const EmployeeMappingModal = ({
               alignItems: 'center',
               gap: '0.5rem',
               margin: 0,
-              fontSize: '1.05rem',
+              fontSize: '1.1rem',
               fontWeight: 600,
               color: 'white'
             }}>
@@ -159,7 +171,7 @@ const EmployeeMappingModal = ({
                 opacity: 0.9
               }}
             >
-              <X size={20} />
+              <X size={22} />
             </button>
           </div>
 
@@ -179,7 +191,7 @@ const EmployeeMappingModal = ({
                 style={{
                   borderRadius: '8px',
                   border: 'none',
-                  padding: '0.875rem',
+                  padding: '0.75rem 1rem', // ✅ REDUCED padding
                   fontSize: '0.875rem',
                   backgroundColor: message.type === 'success' 
                     ? 'rgba(36, 161, 72, 0.1)' 
@@ -197,14 +209,13 @@ const EmployeeMappingModal = ({
               </div>
             )}
 
-
             {getProjectManagerIds().length > 0 && (
               <div
                 className="alert alert-info d-flex align-items-start gap-2 mb-3"
                 style={{
                   borderRadius: '8px',
                   border: 'none',
-                  padding: '0.875rem',
+                  padding: '0.75rem 1rem', // ✅ REDUCED padding
                   backgroundColor: 'rgba(13, 110, 253, 0.1)',
                   color: '#084298',
                   textAlign: 'left'
@@ -214,7 +225,7 @@ const EmployeeMappingModal = ({
                 <div style={{ textAlign: 'left' }}>
                   <strong style={{ fontSize: '0.875rem' }}>Note:</strong> The following employees are
                   automatically associated with this project as managers:
-                  <ul className="mb-0 mt-2" style={{ fontSize: '0.85rem', textAlign: 'left' }}>
+                  <ul className="mb-0 mt-2" style={{ fontSize: '0.85rem', textAlign: 'left', paddingLeft: '1.25rem' }}>
                     {project.resourceOwner && (
                       <li>
                         <strong>Resource Owner:</strong>{" "}
@@ -241,7 +252,6 @@ const EmployeeMappingModal = ({
               </div>
             )}
 
-
             {isLoadingData ? (
               <div className="text-center py-5">
                 <div 
@@ -259,35 +269,104 @@ const EmployeeMappingModal = ({
               </div>
             ) : (
               <>
-                {/* Filters */}
+                {/* ✅ UPDATED: Filters with Search Button */}
                 <div className="row g-2 mb-3">
                   <div className="col-md-6">
-                    <div className="input-group">
-                      <span 
-                        className="input-group-text"
-                        style={{
-                          backgroundColor: 'white',
-                          border: '1px solid #d1d5db',
-                          borderRight: 'none',
-                          borderRadius: '8px 0 0 8px'
-                        }}
-                      >
-                        <Search size={18} style={{ color: '#6b7280' }} />
-                      </span>
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                      <Search 
+                        size={16} 
+                        style={{ 
+                          position: 'absolute',
+                          left: '0.875rem',
+                          color: '#6b7280',
+                          pointerEvents: 'none',
+                          zIndex: 2
+                        }} 
+                      />
                       <input
                         type="text"
                         className="form-control text-start"
-                        placeholder="Search employees..."
+                        placeholder="Search by name..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={handleSearchKeyPress}
                         style={{ 
                           fontSize: '0.875rem',
                           border: '1px solid #d1d5db',
-                          borderLeft: 'none',
-                          padding: '0.5rem 0.75rem',
-                          borderRadius: '0 8px 8px 0'
+                          padding: '0.5rem 0.75rem 0.5rem 2.5rem',
+                          borderRadius: '8px',
+                          width: '100%',
+                          paddingRight: activeSearchTerm ? '130px' : '90px'
                         }}
                       />
+                      {/* Clear Icon */}
+                      {activeSearchTerm && (
+                        <button
+                          type="button"
+                          onClick={handleClearSearch}
+                          style={{
+                            position: 'absolute',
+                            right: '85px',
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#dc3545',
+                            cursor: 'pointer',
+                            padding: 0,
+                            width: '20px',
+                            height: '20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 2,
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#c82333';
+                            e.currentTarget.style.transform = 'scale(1.2)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#dc3545';
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
+                          title="Clear search"
+                        >
+                          <X size={18} style={{ strokeWidth: 2.5 }} />
+                        </button>
+                      )}
+                      {/* Search Button */}
+                      <button
+                        type="button"
+                        onClick={handleSearch}
+                        style={{
+                          position: 'absolute',
+                          right: '4px',
+                          background: '#5A5486',
+                          border: 'none',
+                          color: 'white',
+                          borderRadius: '6px',
+                          padding: '0.4rem 0.75rem',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          zIndex: 1,
+                          transition: 'all 0.2s ease',
+                          whiteSpace: 'nowrap'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#4A4076';
+                          e.currentTarget.style.boxShadow = '0 2px 8px rgba(90, 84, 134, 0.3)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = '#5A5486';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <Search size={14} />
+                        Search
+                      </button>
                     </div>
                   </div>
                   <div className="col-md-2">
@@ -349,15 +428,14 @@ const EmployeeMappingModal = ({
                   </div>
                 </div>
 
-
-                {/* Selection Summary */}
-                <div className="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                {/* Selection Summary - REDUCED SPACING */}
+                <div className="mb-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
                   <div className="d-flex gap-2 flex-wrap">
                     <span 
                       className="badge" 
                       style={{ 
-                        fontSize: '0.8rem', 
-                        padding: '0.4rem 0.65rem',
+                        fontSize: '0.75rem', // ✅ REDUCED font size
+                        padding: '0.35rem 0.6rem', // ✅ REDUCED padding
                         backgroundColor: '#0ea5e9',
                         color: 'white'
                       }}
@@ -367,8 +445,8 @@ const EmployeeMappingModal = ({
                     <span 
                       className="badge" 
                       style={{ 
-                        fontSize: '0.8rem', 
-                        padding: '0.4rem 0.65rem',
+                        fontSize: '0.75rem',
+                        padding: '0.35rem 0.6rem',
                         backgroundColor: '#10b981',
                         color: 'white'
                       }}
@@ -378,8 +456,8 @@ const EmployeeMappingModal = ({
                     <span 
                       className="badge" 
                       style={{ 
-                        fontSize: '0.8rem', 
-                        padding: '0.4rem 0.65rem',
+                        fontSize: '0.75rem',
+                        padding: '0.35rem 0.6rem',
                         backgroundColor: '#f59e0b',
                         color: 'white'
                       }}
@@ -390,8 +468,8 @@ const EmployeeMappingModal = ({
                       <span 
                         className="badge" 
                         style={{ 
-                          fontSize: '0.8rem', 
-                          padding: '0.4rem 0.65rem',
+                          fontSize: '0.75rem',
+                          padding: '0.35rem 0.6rem',
                           backgroundColor: '#8b5cf6',
                           color: 'white'
                         }}
@@ -407,33 +485,31 @@ const EmployeeMappingModal = ({
                     style={{ 
                       fontSize: '0.8rem',
                       borderRadius: '8px',
-                      padding: '0.4rem 0.85rem'
+                      padding: '0.35rem 0.75rem' // ✅ REDUCED padding
                     }}
                   >
                     Select/Deselect All
                   </button>
                 </div>
 
-
                 <div
                   className="alert alert-warning d-flex align-items-start gap-2 mb-3"
                   style={{
                     borderRadius: '8px',
                     border: 'none',
-                    padding: '0.75rem',
+                    padding: '0.65rem 0.85rem', // ✅ REDUCED padding
                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                     color: '#92400e',
                     textAlign: 'left'
                   }}
                 >
-                  <Info size={18} className="flex-shrink-0 mt-1" />
-                  <div style={{ fontSize: '0.85rem', textAlign: 'left' }}>
+                  <Info size={16} className="flex-shrink-0 mt-1" />
+                  <div style={{ fontSize: '0.8rem', textAlign: 'left' }}>
                     <strong>Primary Project:</strong> You can select multiple
                     employees and mark multiple as primary for this project.
                     Employees must be selected first before marking as primary.
                   </div>
                 </div>
-
 
                 {/* Employee Table */}
                 <div
@@ -470,7 +546,7 @@ const EmployeeMappingModal = ({
                         <th style={{ width: '90px', fontSize: '0.8rem', padding: '0.75rem', fontWeight: 600, textAlign: 'left' }}>
                           Status
                         </th>
-                        <th style={{ width: '110px', fontSize: '0.8rem', padding: '0.75rem', fontWeight: 600, textAlign: 'left' }}>
+                        <th style={{ width: '110px', fontSize: '0.8rem', padding: '0.75rem', fontWeight: 600, textAlign: 'center' }}>
                           Primary Project
                         </th>
                       </tr>
@@ -483,7 +559,7 @@ const EmployeeMappingModal = ({
                             className="text-center py-4 text-muted"
                             style={{ fontSize: '0.875rem' }}
                           >
-                            No employees match the filters
+                            {activeSearchTerm ? 'No employees found matching your search' : 'No employees match the filters'}
                           </td>
                         </tr>
                       ) : (
@@ -500,7 +576,6 @@ const EmployeeMappingModal = ({
                           const currentlyMappedAsPrimary = mappedEmployees.find(
                             (m) => m.employeeMasterId === emp.employeeMasterId
                           )?.isPrimary;
-
 
                           return (
                             <tr
@@ -551,7 +626,7 @@ const EmployeeMappingModal = ({
                                     }}
                                   >
                                     <Check size={12} />
-                                    Mapped {currentlyMappedAsPrimary && <span style={{ marginLeft: '2px' }}>Primary</span>}
+                                    Mapped
                                   </span>
                                 ) : (
                                   <span 
@@ -568,7 +643,7 @@ const EmployeeMappingModal = ({
                               </td>
                               <td 
                                 onClick={(e) => e.stopPropagation()} 
-                                style={{ padding: '0.75rem', textAlign: 'left' }}
+                                style={{ padding: '0.75rem', textAlign: 'center' }}
                               >
                                 <input
                                   type="checkbox"
@@ -601,11 +676,10 @@ const EmployeeMappingModal = ({
             )}
           </div>
 
-
           {/* Footer */}
           <div 
             style={{ 
-              padding: '0.875rem 1.5rem',
+              padding: '1rem 1.5rem',
               borderTop: '1px solid #e5e7eb',
               backgroundColor: 'white',
               display: 'flex',
@@ -620,7 +694,7 @@ const EmployeeMappingModal = ({
               style={{ 
                 fontSize: '0.875rem',
                 fontWeight: 600,
-                padding: '0.5rem 1.1rem',
+                padding: '0.5rem 1.25rem',
                 borderRadius: '8px',
                 backgroundColor: '#6b7280',
                 border: 'none',
@@ -732,6 +806,5 @@ const EmployeeMappingModal = ({
   // Render using React Portal
   return ReactDOM.createPortal(modalContent, document.body);
 };
-
 
 export default EmployeeMappingModal;

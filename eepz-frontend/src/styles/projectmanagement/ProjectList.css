@@ -12,7 +12,6 @@
    ======================================== */
 
 .prj-list-breadcrumb {
-
   font-size: 0.875rem !important;
 }
 
@@ -31,12 +30,12 @@
 }
 
 .prj-list-breadcrumb-active {
-  color:  #97247E !important;
+  color: #97247E !important;
   font-weight: 600 !important;
 }
 
 /* ========================================
-   COMPACT FILTER BAR WITH BUTTONS
+   COMPACT FILTER BAR - NO GAPS
    ======================================== */
 
 .prj-list-filter-bar {
@@ -51,15 +50,22 @@
 .prj-list-filter-bar-content {
   display: flex !important;
   align-items: center !important;
-  gap: 1rem !important;
-  flex-wrap: wrap !important;
+  gap: 0.75rem !important;
+  flex-wrap: nowrap !important;
 }
 
-/* Search Input */
+/* ========================================
+   SEARCH INPUT WITH INTEGRATED BUTTONS
+   ======================================== */
+
+/* Search Input Wrapper - FLEXIBLE WIDTH */
 .prj-list-search-wrapper {
   position: relative !important;
+  display: flex !important;
+  align-items: center !important;
   flex: 1 !important;
-  min-width: 250px !important;
+  max-width: 500px !important;
+  min-width: 300px !important;
 }
 
 .prj-list-search-icon {
@@ -69,6 +75,7 @@
   transform: translateY(-50%) !important;
   color: #6c757d !important;
   pointer-events: none !important;
+  z-index: 2 !important;
 }
 
 .prj-list-search-input {
@@ -86,11 +93,91 @@
   box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
 }
 
-/* Status Filter */
+/* Adjust input padding when clear button is visible */
+.prj-list-search-wrapper:has(.prj-list-clear-btn) .prj-list-search-input {
+  padding-right: 135px !important;
+}
+
+/* Clear Button - ICON ONLY WITH BETTER SPACING */
+.prj-list-clear-btn {
+  position: absolute !important;
+  right: 95px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: #dc3545 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  z-index: 2 !important;
+}
+
+.prj-list-clear-btn:hover {
+  color: #c82333 !important;
+  transform: translateY(-50%) scale(1.2) !important;
+}
+
+.prj-list-clear-btn:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.prj-list-clear-btn svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke-width: 2.5 !important;
+}
+
+/* Search Button - Integrated into Input */
+.prj-list-search-btn {
+  position: absolute !important;
+  right: 4px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  padding: 0.5rem 0.875rem !important;
+  background: #5A5486 !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+  z-index: 1 !important;
+}
+
+.prj-list-search-btn:hover {
+  background: #4A4076 !important;
+  transform: translateY(-50%) scale(1.02) !important;
+  box-shadow: 0 2px 8px rgba(90, 84, 134, 0.3) !important;
+}
+
+.prj-list-search-btn:active {
+  transform: translateY(-50%) scale(0.98) !important;
+}
+
+.prj-list-search-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Status Filter - FLEXIBLE */
 .prj-list-status-filter-wrapper {
   position: relative !important;
   display: flex !important;
   align-items: center !important;
+  flex-shrink: 0 !important;
 }
 
 .prj-list-filter-icon {
@@ -106,7 +193,7 @@
   border: 1px solid #dee2e6 !important;
   border-radius: 8px !important;
   font-size: 0.875rem !important;
-  min-width: 160px !important;
+  min-width: 150px !important;
   background: #FFFFFF !important;
   cursor: pointer !important;
   transition: all 0.2s !important;
@@ -118,10 +205,11 @@
   box-shadow: 0 0 0 0.2rem rgba(15, 98, 254, 0.1) !important;
 }
 
-/* Action Buttons Group */
+/* Action Buttons Group - NO LEFT MARGIN AUTO */
 .prj-list-actions-group {
   display: flex !important;
   gap: 0.75rem !important;
+  flex-shrink: 0 !important;
   margin-left: auto !important;
 }
 
@@ -142,7 +230,6 @@
 .prj-list-btn-resource {
   background: #25235c !important;
   color: white !important;
-  
 }
 
 .prj-list-btn-resource:hover {
@@ -312,7 +399,6 @@
   flex-shrink: 0 !important;
 }
 
-
 .prj-list-icon-business .prj-list-icon-filled {
   color: #0F62FE !important;
 }
@@ -348,18 +434,39 @@
   font-size: 0.9rem !important;
 }
 
-/* Action Buttons - Filled Style with Icons */
+/* ========================================
+   ACTION BUTTONS - UPDATED FOR SINGLE LINE
+   ======================================== */
+
+/* Action Buttons Container - Prevent Wrapping */
+.prj-list-table tbody td:last-child > div {
+  display: flex !important;
+  gap: 0.375rem !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  min-width: 145px !important;
+}
+
+/* Action Buttons - Reduced Size */
 .prj-list-action-btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 32px !important;
-  height: 32px !important;
+  width: 30px !important;
+  height: 30px !important;
   padding: 0 !important;
   border-radius: 6px !important;
   border: none !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+}
+
+/* Icon size within buttons */
+.prj-list-action-btn svg {
+  width: 14px !important;
+  height: 14px !important;
 }
 
 .prj-list-btn-edit {
@@ -429,6 +536,12 @@
    RESPONSIVE
    ======================================== */
 
+@media (max-width: 1200px) {
+  .prj-list-search-wrapper {
+    max-width: 400px !important;
+  }
+}
+
 @media (max-width: 992px) {
   .prj-list-filter-bar-content {
     flex-direction: column !important;
@@ -436,7 +549,16 @@
   }
 
   .prj-list-search-wrapper {
+    max-width: 100% !important;
     min-width: 100% !important;
+  }
+
+  .prj-list-status-filter-wrapper {
+    width: 100% !important;
+  }
+
+  .prj-list-status-select {
+    width: 100% !important;
   }
 
   .prj-list-actions-group {
@@ -468,13 +590,41 @@
     padding: 10px 12px !important;
   }
 
+  /* Further reduce button size on mobile */
   .prj-list-action-btn {
-    width: 28px !important;
-    height: 28px !important;
+    width: 26px !important;
+    height: 26px !important;
   }
 
   .prj-list-action-btn svg {
-    width: 14px !important;
-    height: 14px !important;
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  /* Reduce gap on mobile */
+  .prj-list-table tbody td:last-child > div {
+    gap: 0.25rem !important;
+    min-width: 115px !important;
+  }
+
+  /* Adjust search controls on mobile */
+  .prj-list-search-wrapper:has(.prj-list-clear-btn) .prj-list-search-input {
+    padding-right: 125px !important;
+  }
+
+  .prj-list-clear-btn {
+    right: 80px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .prj-list-clear-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .prj-list-search-btn {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.8rem !important;
   }
 }

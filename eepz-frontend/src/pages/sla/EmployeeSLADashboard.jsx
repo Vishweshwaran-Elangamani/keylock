@@ -191,9 +191,10 @@ const EmployeeSLADashboard = () => {
 
   return (
     <div className="emp-sla-dashboard">
-      <Breadcrumb items={[{label : "SLA Compliance"},{ label: "My SLAs" }]} />
+      <Breadcrumb
+        items={[{ label: "SLA Compliance" }, { label: "My SLAs" }]}
+      />
 
-      
       {/* Error Alert */}
       {error && (
         <div className="emp-sla-alert-error">
@@ -211,46 +212,51 @@ const EmployeeSLADashboard = () => {
         </div>
       )}
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Centered Layout with Black Border */}
       <div className="emp-sla-stats-grid">
-        {[
-          {
-            label: "Total SLAs",
-            value: stats.total,
-            icon: FileText,
-            bg: "#EEF2FF",
-            color: "#3B82F6",
-          },
-          {
-            label: "Open",
-            value: stats.open,
-            icon: Clock,
-            bg: "#E0E7FF",
-            color: "#4F46E5",
-          },
-          {
-            label: "In Progress",
-            value: stats.inProgress,
-            icon: Zap,
-            bg: "#FEF3C7",
-            color: "#D97706",
-          },
-          {
-            label: "Completed",
-            value: stats.completed,
-            icon: CheckCircle,
-            bg: "#DCFCE7",
-            color: "#16A34A",
-          },
-        ].map(({ label, value, icon: Icon, bg, color }) => (
-          <div key={label} className="emp-sla-stat-card">
-            <div className="emp-sla-stat-icon" style={{ backgroundColor: bg }}>
-              <Icon size={22} color={color} strokeWidth={2.5} />
-            </div>
-            <h3 className="emp-sla-stat-value">{value}</h3>
-            <p className="emp-sla-stat-label">{label}</p>
+        <div className="emp-sla-stat-card">
+          <div
+            className="emp-sla-stat-icon-wrapper"
+            style={{ backgroundColor: "#E8F1FF" }}
+          >
+            <FileText size={24} style={{ color: "#5B93FF" }} />
           </div>
-        ))}
+          <h3 className="emp-sla-stat-value">{stats.total}</h3>
+          <p className="emp-sla-stat-label">Total SLAs</p>
+        </div>
+
+        <div className="emp-sla-stat-card">
+          <div
+            className="emp-sla-stat-icon-wrapper"
+            style={{ backgroundColor: "#E0E7FF" }}
+          >
+            <Clock size={24} style={{ color: "#6366F1" }} />
+          </div>
+          <h3 className="emp-sla-stat-value">{stats.open}</h3>
+          <p className="emp-sla-stat-label">Open</p>
+        </div>
+
+        <div className="emp-sla-stat-card">
+          <div
+            className="emp-sla-stat-icon-wrapper"
+            style={{ backgroundColor: "#FEF3C7" }}
+          >
+            <Zap size={24} style={{ color: "#F59E0B" }} />
+          </div>
+          <h3 className="emp-sla-stat-value">{stats.inProgress}</h3>
+          <p className="emp-sla-stat-label">In Progress</p>
+        </div>
+
+        <div className="emp-sla-stat-card">
+          <div
+            className="emp-sla-stat-icon-wrapper"
+            style={{ backgroundColor: "#D1FAE5" }}
+          >
+            <CheckCircle size={24} style={{ color: "#10B981" }} />
+          </div>
+          <h3 className="emp-sla-stat-value">{stats.completed}</h3>
+          <p className="emp-sla-stat-label">Completed</p>
+        </div>
       </div>
 
       {/* Overdue Alert */}
@@ -282,7 +288,9 @@ const EmployeeSLADashboard = () => {
           ].map(({ key, label }) => (
             <button
               key={key}
-              className={`emp-sla-tab-pill ${activeTab === key ? "active" : ""}`}
+              className={`emp-sla-tab-pill ${
+                activeTab === key ? "active" : ""
+              }`}
               onClick={() => setActiveTab(key)}
             >
               {label}
@@ -349,7 +357,9 @@ const EmployeeSLADashboard = () => {
                       <tr key={sla._key}>
                         <td>
                           <div className="emp-sla-table-type">
-                            <div className={`emp-sla-table-icon ${style.className}`}>
+                            <div
+                              className={`emp-sla-table-icon ${style.className}`}
+                            >
                               <Icon size={18} />
                             </div>
                             <span className="emp-sla-table-type-text">
@@ -415,7 +425,7 @@ const EmployeeSLADashboard = () => {
             </div>
           </div>
         ) : (
-          // Card View - Minimalistic Design (Title Left, Badge Right)
+          // Card View
           <div className="emp-sla-cards-grid">
             {filteredSLAs.map((sla) => {
               const isOverdueStatus = isOverdue(sla);
@@ -426,7 +436,7 @@ const EmployeeSLADashboard = () => {
 
               return (
                 <div key={sla._key} className="emp-sla-card">
-                  {/* Card Header - Icon, Title (Left), Badge (Right) */}
+                  {/* Card Header */}
                   <div className="emp-sla-card-header">
                     <div className={`emp-sla-card-icon ${style.className}`}>
                       <IconComponent size={20} strokeWidth={2} />
@@ -435,7 +445,9 @@ const EmployeeSLADashboard = () => {
                       <h6 className="emp-sla-card-title">
                         {sla.slatype || "SLA"}
                       </h6>
-                      <span className={`emp-sla-card-badge ${style.className}`}>
+                      <span
+                        className={`emp-sla-card-badge ${style.className}`}
+                      >
                         {isOverdueStatus ? "OVERDUE" : sla.status}
                       </span>
                     </div>
@@ -451,7 +463,9 @@ const EmployeeSLADashboard = () => {
                     </div>
 
                     <div className="emp-sla-card-row">
-                      <span className="emp-sla-card-label">Days Remaining</span>
+                      <span className="emp-sla-card-label">
+                        Days Remaining
+                      </span>
                       <span
                         className={`emp-sla-card-value ${
                           isOverdueStatus
@@ -467,7 +481,9 @@ const EmployeeSLADashboard = () => {
 
                     {sla.assignedToName && (
                       <div className="emp-sla-card-row">
-                        <span className="emp-sla-card-label">Assigned To</span>
+                        <span className="emp-sla-card-label">
+                          Assigned To
+                        </span>
                         <span className="emp-sla-card-value emp-sla-truncate">
                           {sla.assignedToName}
                         </span>
